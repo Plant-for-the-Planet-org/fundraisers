@@ -10,6 +10,7 @@
 ## Project Overview
 
 A SaaS web application for managing fundraisers with the following tech stack:
+
 - **Framework:** Next.js 15+ (App Router, Turbopack)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
@@ -35,6 +36,7 @@ A SaaS web application for managing fundraisers with the following tech stack:
 - [x] Import alias `@/*` configured
 
 **Initial Configuration:**
+
 ```
 Project: fundraisers
 TypeScript: ✅
@@ -58,29 +60,33 @@ Import alias: @/* ✅
 ### ⏳ Phase 3: Code Quality Tools
 
 #### 3.1 Prettier Setup
-- [ ] Install Prettier and related packages
-- [ ] Create `.prettierrc.json`
-- [ ] Create `.prettierignore`
-- [ ] Update `.eslintrc.json`
-- [ ] Add format scripts to `package.json`
-- [ ] Run initial format
-- [ ] Commit changes
+
+- [x] Install Prettier and related packages
+- [x] Create `.prettierrc.json`
+- [x] Create `.prettierignore`
+- [x] Update `.eslint.config.mjs`
+- [x] Add format scripts to `package.json`
+- [x] Run initial format
+- [x] Commit changes
 
 **Installation:**
+
 ```bash
 npm install -D prettier eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
 ```
 
 **Files to Create:**
+
 - `.prettierrc.json`
 - `.prettierignore`
-- Update `.eslintrc.json`
+- Update `.eslintrc.config.js`
 
 ---
 
 ### ⏳ Phase 4: Internationalization (i18n)
 
 #### 4.1 next-intl Setup
+
 - [ ] Install next-intl
 - [ ] Create folder structure for locales
 - [ ] Create translation files (en, es, fr)
@@ -93,11 +99,13 @@ npm install -D prettier eslint-config-prettier eslint-plugin-prettier @typescrip
 - [ ] Commit changes
 
 **Installation:**
+
 ```bash
 npm install next-intl
 ```
 
 **Folder Structure to Create:**
+
 ```
 src/
   i18n/
@@ -118,6 +126,7 @@ src/
 ```
 
 **App Structure Changes:**
+
 ```
 src/app/
   [locale]/
@@ -133,6 +142,7 @@ src/app/
 ### ⏳ Phase 5: Authentication
 
 #### 5.1 Auth0 Setup
+
 - [ ] Install Auth0 SDK
 - [ ] Set up Auth0 application (in Auth0 dashboard)
 - [ ] Create `.env.local` with Auth0 credentials
@@ -145,16 +155,19 @@ src/app/
 - [ ] Commit changes
 
 **Installation:**
+
 ```bash
 npm install @auth0/nextjs-auth0
 ```
 
 **Files to Create:**
+
 - `.env.local` (not committed)
 - `.env.example` (committed)
 - `src/app/api/auth/[auth0]/route.ts`
 
 **Environment Variables Needed:**
+
 ```env
 AUTH0_SECRET=
 AUTH0_BASE_URL=http://localhost:3000
@@ -168,6 +181,7 @@ AUTH0_CLIENT_SECRET=
 ### ⏳ Phase 6: Error Monitoring
 
 #### 6.1 Sentry Setup
+
 - [ ] Run Sentry wizard
 - [ ] Configure Sentry organization and project
 - [ ] Add Sentry DSN to `.env.local`
@@ -177,17 +191,20 @@ AUTH0_CLIENT_SECRET=
 - [ ] Commit changes
 
 **Installation:**
+
 ```bash
 npx @sentry/wizard@latest -i nextjs
 ```
 
 **Files Created Automatically:**
+
 - `sentry.client.config.ts`
 - `sentry.server.config.ts`
 - `sentry.edge.config.ts`
 - Updated `next.config.js`
 
 **Environment Variables Needed:**
+
 ```env
 NEXT_PUBLIC_SENTRY_DSN=
 SENTRY_ORG=
@@ -200,6 +217,7 @@ SENTRY_AUTH_TOKEN=
 ### ⏳ Phase 7: Testing Infrastructure
 
 #### 7.1 Unit & Integration Testing (Vitest)
+
 - [ ] Install Vitest and testing libraries
 - [ ] Create `vitest.config.ts`
 - [ ] Create `vitest.setup.ts`
@@ -211,12 +229,14 @@ SENTRY_AUTH_TOKEN=
 - [ ] Commit changes
 
 **Installation:**
+
 ```bash
 npm install -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event
 npm install -D msw@latest
 ```
 
 **Folder Structure to Create:**
+
 ```
 src/
   __tests__/
@@ -237,12 +257,14 @@ tests/
 ```
 
 **Files to Create:**
+
 - `vitest.config.ts`
 - `vitest.setup.ts`
 - `tests/mocks/handlers.ts`
 - `tests/mocks/server.ts`
 
 #### 7.2 End-to-End Testing (Playwright)
+
 - [ ] Install Playwright
 - [ ] Run Playwright install for browsers
 - [ ] Create `playwright.config.ts`
@@ -252,12 +274,14 @@ tests/
 - [ ] Commit changes
 
 **Installation:**
+
 ```bash
 npm install -D @playwright/test
 npx playwright install
 ```
 
 **Folder Structure to Create:**
+
 ```
 tests/
   e2e/
@@ -266,6 +290,7 @@ tests/
 ```
 
 **Files to Create:**
+
 - `playwright.config.ts`
 
 ---
@@ -273,6 +298,7 @@ tests/
 ### ⏳ Phase 8: API Client Setup
 
 #### 8.1 Fetch Wrapper
+
 - [ ] Create `src/lib/api.ts`
 - [ ] Implement API client with error handling
 - [ ] Create example usage documentation
@@ -280,6 +306,7 @@ tests/
 - [ ] Commit changes
 
 **Files to Create:**
+
 - `src/lib/api.ts`
 - `src/lib/api.test.ts`
 
@@ -288,6 +315,7 @@ tests/
 ### ⏳ Phase 9: Component Library Foundation
 
 #### 9.1 Base Components
+
 - [ ] Create components folder structure
 - [ ] Create Button component with tests
 - [ ] Create Input component with tests
@@ -296,6 +324,7 @@ tests/
 - [ ] Commit changes
 
 **Folder Structure:**
+
 ```
 src/components/
   ui/
@@ -350,6 +379,7 @@ After all setups, your `package.json` should include:
 ## Environment Variables Checklist
 
 ### `.env.local` (Not committed - add to `.gitignore`)
+
 ```env
 # Auth0
 AUTH0_SECRET='generate-with: openssl rand -hex 32'
@@ -369,6 +399,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 ### `.env.example` (Committed - template for team)
+
 ```env
 # Auth0
 AUTH0_SECRET=
@@ -392,6 +423,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ## Git Workflow
 
 ### Branching Strategy
+
 - `main` - Production-ready code
 - `develop` - Development branch
 - `feature/*` - Feature branches
@@ -399,6 +431,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 - `hotfix/*` - Hotfix branches
 
 ### Commit Message Convention
+
 ```
 feat: Add new feature
 fix: Fix bug
@@ -410,6 +443,7 @@ chore: Update dependencies
 ```
 
 ### Pre-commit Checklist
+
 - [ ] Code formatted (`npm run format`)
 - [ ] Linting passes (`npm run lint`)
 - [ ] Tests pass (`npm test`)
@@ -420,12 +454,14 @@ chore: Update dependencies
 ## Development Workflow
 
 ### Starting Development
+
 ```bash
 npm run dev
 # Visit http://localhost:3000
 ```
 
 ### Before Committing
+
 ```bash
 npm run format
 npm run lint
@@ -436,6 +472,7 @@ git commit -m "feat: your message"
 ```
 
 ### Running All Checks
+
 ```bash
 npm run format && npm run lint && npm test && npm run type-check
 ```
@@ -445,6 +482,7 @@ npm run format && npm run lint && npm test && npm run type-check
 ## Deployment Checklist
 
 ### Pre-deployment
+
 - [ ] All tests passing
 - [ ] Environment variables configured in hosting platform
 - [ ] Build succeeds locally (`npm run build`)
@@ -453,6 +491,7 @@ npm run format && npm run lint && npm test && npm run type-check
 - [ ] Documentation updated
 
 ### Hosting Platforms (Choose One)
+
 - Vercel (Recommended for Next.js)
 - Netlify
 - AWS Amplify
@@ -491,6 +530,7 @@ npm run format && npm run lint && npm test && npm run type-check
 ## Resources
 
 ### Documentation
+
 - [Next.js Docs](https://nextjs.org/docs)
 - [TypeScript Docs](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
@@ -501,6 +541,7 @@ npm run format && npm run lint && npm test && npm run type-check
 - [Playwright Docs](https://playwright.dev/)
 
 ### Community
+
 - [Next.js GitHub](https://github.com/vercel/next.js)
 - [Next.js Discord](https://discord.gg/nextjs)
 

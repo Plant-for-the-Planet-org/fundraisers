@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.yarn/install-state.gz
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Test coverage
+coverage/
+
+# Environment files
+.env*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.sql
+
+# Generated files
+next-env.d.ts
+*.tsbuildinfo
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Vercel
+.vercel
+
+# Security
+*.pem
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sentry
+.env.sentry-build-plugin
