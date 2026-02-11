@@ -33,7 +33,10 @@ const eslintConfig = defineConfig([
 
       // React rules
       'react/self-closing-comp': 'error',
-      'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'never' }],
+      'react/jsx-curly-brace-presence': [
+        'error',
+        { props: 'never', children: 'never' },
+      ],
     },
   },
   globalIgnores([

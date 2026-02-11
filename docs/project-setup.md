@@ -13,9 +13,9 @@ A SaaS web application for managing fundraisers with the following tech stack:
 
 - **Framework:** Next.js 15+ (App Router, Turbopack)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS
+- **Styling:** Tailwind CSS v4
 - **Authentication:** Auth0
-- **Internationalization:** next-intl (multi-file approach)
+- **Internationalization:** next-intl with nested namespaces (en, de)
 - **Error Monitoring:** Sentry
 - **Testing:** Vitest + React Testing Library + Playwright
 - **Code Quality:** ESLint + Prettier
@@ -50,14 +50,14 @@ Import alias: @/* ✅
 
 ---
 
-### 🔄 Phase 2: Git Repository Setup (COMPLETED)
+### ✅ Phase 2: Git Repository Setup (COMPLETED)
 
 - [x] Initialize git repository
 - [x] Create initial commit
 - [x] Connect to remote repository
 - [x] Push to remote
 
-### ⏳ Phase 3: Code Quality Tools
+### ✅ Phase 3: Code Quality Tools (COMPLETED)
 
 #### 3.1 Prettier Setup
 
@@ -79,24 +79,29 @@ npm install -D prettier eslint-config-prettier eslint-plugin-prettier @typescrip
 
 - `.prettierrc.json`
 - `.prettierignore`
-- Update `.eslintrc.config.js`
+- Update `.eslintrc.config.mjs`
 
 ---
 
-### ⏳ Phase 4: Internationalization (i18n)
+### ✅ Phase 4: Internationalization (i18n)
 
 #### 4.1 next-intl Setup
 
-- [ ] Install next-intl
-- [ ] Create folder structure for locales
-- [ ] Create translation files (en, es, fr)
-- [ ] Create `src/i18n/request.ts`
-- [ ] Update `next.config.js`
-- [ ] Create `src/middleware.ts`
-- [ ] Restructure app directory for `[locale]`
-- [ ] Create locale layouts
-- [ ] Test locale switching
-- [ ] Commit changes
+#### 4.1 next-intl Setup
+
+- [x] Install next-intl
+- [x] Create root level folder structure for locales (for easier Lingohub integration)
+- [x] Create translation files with nested namespaces (en, de)
+- [x] Create `src/i18n/routing.ts` (centralized routing config)
+- [x] Create `src/i18n/request.ts` (message loading - server)
+- [x] Create `src/i18n/navigation.ts` (locale-aware navigation helpers)
+- [x] Update `next.config.mjs` with next-intl plugin
+- [x] Create `src/proxy.ts` (Next.js 16 middleware replacement)
+- [x] Restructure app directory for `[locale]` routing
+- [x] Create locale-specific layout
+- [x] Update root layout to pass-through only
+- [x] Test locale switching
+- [x] Commit changes
 
 **Installation:**
 
@@ -107,35 +112,101 @@ npm install next-intl
 **Folder Structure to Create:**
 
 ```
+locales/                      ← Root level (for Lingohub)
+  en/
+    common.json               ← {"Common": {"greeting": "Hello"}}
+    auth.json                 ← {"Auth": {"signIn": "Sign in"}}
+    dashboard.json            ← {"Dashboard": {"title": "Dashboard"}}
+  de/
+    common.json               ← {"Common": {"greeting": "Hallo"}}
+    auth.json
+    dashboard.json
+
 src/
   i18n/
-    locales/
-      en/
-        common.json
-        auth.json
-        dashboard.json
-      es/
-        common.json
-        auth.json
-        dashboard.json
-      fr/
-        common.json
-        auth.json
-        dashboard.json
-    request.ts
+    routing.ts                ← Central routing configuration
+    request.ts                ← Server-side message loading
+    navigation.ts             ← Locale-aware Link, useRouter, etc.
+  proxy.ts                    ← Middleware (Next.js 16)
 ```
 
 **App Structure Changes:**
 
 ```
 src/app/
-  [locale]/
-    layout.tsx
-    page.tsx
+  [locale]/                   ← Locale-specific routes
+    layout.tsx                ← Fonts, metadata, NextIntlClientProvider
+    page.tsx                  ← Home page
     dashboard/
-      page.tsx
-  layout.tsx (root layout)
+      page.tsx                ← Other pages go here
+  layout.tsx                  ← Root layout (simplified - returns children)
 ```
+
+**Usage in Components:**
+
+**Server Components:**
+
+```typescript
+import { useTranslations } from 'next-intl';
+
+export default function HomePage() {
+  const t = useTranslations('Common');
+  return {t('greeting')};
+}
+```
+
+**Client Components with Navigation:**
+
+```typescript
+'use client';
+
+import { Link, useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+
+export default function Navigation() {
+  const t = useTranslations('Common');
+  const router = useRouter();
+
+  return (
+
+      {t('home')}
+      {t('dashboard')}
+
+  );
+}
+```
+
+**Key Architectural Decisions:**
+
+1. **Locales at Root Level** (not `src/i18n/locales/`)
+   - Better for Lingohub integration
+   - Clear separation of content from code
+   - Easier for non-developers to find translations
+
+2. **Three Config Files**
+   - `routing.ts`: Single source of truth for locales
+   - `request.ts`: Server-side message loading
+   - `navigation.ts`: Reusable navigation helpers
+
+3. **Nested Namespaces in JSON**
+
+   ```json
+   {
+     "Common": { "greeting": "Hello" },
+     "Auth": { "signIn": "Sign in" }
+   }
+   ```
+
+   Better organization when files get large, clearer component usage
+
+4. **Uses `proxy.ts` Instead of `middleware.ts`**
+   - Next.js 16 renamed middleware files
+   - Same functionality, different filename
+
+5. **Modern next-intl API**
+   - Uses `requestLocale` instead of deprecated `locale` parameter
+   - Uses `hasLocale()` helper for validation
+   - Graceful fallback to default locale instead of 404
 
 ---
 
