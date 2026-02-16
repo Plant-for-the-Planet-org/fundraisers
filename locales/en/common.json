@@ -1,6 +1,16 @@
 {
   "Common": {
     "greeting": "Hello, World!",
-    "welcome": "Welcome to our application."
+    "welcome": "Welcome to our application.",
+    "languageSelectionLabel": "Language:",
+    "legalLinks": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
+      "imprint": "Imprint"
+    },
+    "headerLinks": {
+      "explore": "Explore",
+      "startFundraiser": "Start Fundraiser"
+    }
   }
 }

@@ -37,6 +37,9 @@ const eslintConfig = defineConfig([
         'error',
         { props: 'never', children: 'never' },
       ],
+
+      // Next.js rules
+      '@next/next/no-img-element': 'off',
     },
   },
   globalIgnores([

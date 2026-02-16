@@ -1,0 +1,32 @@
+import { useTranslations } from 'next-intl';
+import { FOOTER_LINKS } from './config';
+
+export function LinksBar() {
+  const tLinks = useTranslations('Common.legalLinks');
+
+  return (
+    <nav aria-label='Legal links'>
+      <ul className='flex flex-wrap items-center justify-center md:justify-start gap-1 text-xs text-zinc-500 list-none p-0 m-0'>
+        {FOOTER_LINKS.map((link, index) => (
+          <li key={link.labelKey} className='flex items-center gap-1'>
+            {index > 0 && (
+              <span className='text-zinc-300' aria-hidden='true'>
+                •
+              </span>
+            )}
+            <a
+              href={link.href}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hover:text-zinc-700'
+            >
+              {tLinks(link.labelKey)}
+            </a>
+          </li>
+        ))}
+        {/* <span className='text-zinc-300'>•</span> */}
+        {/* CookieSettings */}
+      </ul>
+    </nav>
+  );
+}
