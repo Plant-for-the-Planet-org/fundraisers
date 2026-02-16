@@ -1,13 +1,13 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { useLocaleStore } from '@/stores/localeStore';
 import { routing } from '@/i18n/routing';
 
 export function LanguageSelector() {
   const t = useTranslations('Common');
-  const currentLocale = useLocale();
-  const pathname = usePathname();
+  const localeFromStore = useLocaleStore(state => state.locale);
+  const setLocale = useLocaleStore(state => state.setLocale);
 
   return (
     <nav aria-labelledby='language-selector-label'>
@@ -20,19 +20,18 @@ export function LanguageSelector() {
                 |
               </span>
             )}
-            <Link
-              href={pathname}
-              locale={locale}
+            <button
+              onClick={() => setLocale(locale)}
               lang={locale}
-              aria-current={currentLocale === locale ? 'page' : undefined}
+              aria-current={localeFromStore === locale ? 'page' : undefined}
               className={
-                currentLocale === locale
+                localeFromStore === locale
                   ? 'underline text-zinc-900'
                   : 'hover:text-zinc-700'
               }
             >
               {locale.toUpperCase()}
-            </Link>
+            </button>
           </li>
         ))}
       </ul>

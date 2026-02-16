@@ -1,7 +1,7 @@
 # Fundraisers Project Setup Plan
 
 **Project Name:** Fundraisers  
-**Framework:** Next.js 15+ with App Router  
+**Framework:** Next.js 16 with App Router  
 **Project Path:** `/fundraisers`  
 **Date Created:** February 10, 2026
 
@@ -11,14 +11,15 @@
 
 A SaaS web application for managing fundraisers with the following tech stack:
 
-- **Framework:** Next.js 15+ (App Router, Turbopack)
+- **Framework:** Next.js 16 (App Router, Turbopack)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
 - **Authentication:** Auth0
-- **Internationalization:** next-intl with nested namespaces (en, de)
+- **Internationalization:** next-intl with cookie-based locale management (en, de)
+- **State Management:** Zustand
 - **Error Monitoring:** Sentry
 - **Testing:** Vitest + React Testing Library + Playwright
-- **Code Quality:** ESLint + Prettier
+- **Code Quality:** ESLint (flat config) + Prettier
 
 ---
 
@@ -57,6 +58,8 @@ Import alias: @/* ✅
 - [x] Connect to remote repository
 - [x] Push to remote
 
+---
+
 ### ✅ Phase 3: Code Quality Tools (COMPLETED)
 
 #### 3.1 Prettier Setup
@@ -64,7 +67,7 @@ Import alias: @/* ✅
 - [x] Install Prettier and related packages
 - [x] Create `.prettierrc.json`
 - [x] Create `.prettierignore`
-- [x] Update `.eslint.config.mjs`
+- [x] Update `eslint.config.mjs`
 - [x] Add format scripts to `package.json`
 - [x] Run initial format
 - [x] Commit changes
@@ -79,67 +82,60 @@ npm install -D prettier eslint-config-prettier eslint-plugin-prettier @typescrip
 
 - `.prettierrc.json`
 - `.prettierignore`
-- Update `.eslintrc.config.mjs`
+- Update `eslint.config.mjs`
 
 ---
 
-### ✅ Phase 4: Internationalization (i18n)
+### ✅ Phase 4: Internationalization (i18n) (COMPLETED)
 
-#### 4.1 next-intl Setup
+#### 4.1 Cookie-Based Locale Management with Zustand
 
-#### 4.1 next-intl Setup
-
-- [x] Install next-intl
-- [x] Create root level folder structure for locales (for easier Lingohub integration)
+- [x] Install next-intl and zustand
+- [x] Create root-level `/locales` folder structure
 - [x] Create translation files with nested namespaces (en, de)
-- [x] Create `src/i18n/routing.ts` (centralized routing config)
-- [x] Create `src/i18n/request.ts` (message loading - server)
-- [x] Create `src/i18n/navigation.ts` (locale-aware navigation helpers)
+- [x] Create `src/i18n/routing.ts` (locale configuration)
+- [x] Create `src/i18n/request.ts` (reads locale from cookie)
+- [x] Create `src/stores/localeStore.ts` (Zustand store)
+- [x] Create `src/components/LocaleInitializer.tsx` (syncs server/client)
+- [x] Update `src/components/footer/language-selector.tsx` (use Zustand)
 - [x] Update `next.config.mjs` with next-intl plugin
-- [x] Create `src/proxy.ts` (Next.js 16 middleware replacement)
-- [x] Restructure app directory for `[locale]` routing
-- [x] Create locale-specific layout
-- [x] Update root layout to pass-through only
-- [x] Test locale switching
+- [x] Flatten app directory (remove `[locale]` folder)
+- [x] Update root layout with LocaleInitializer
+- [x] Test locale switching and persistence
 - [x] Commit changes
 
 **Installation:**
 
 ```bash
-npm install next-intl
+npm install next-intl zustand
 ```
 
-**Folder Structure to Create:**
+**Folder Structure Created:**
 
 ```
 locales/                      ← Root level (for Lingohub)
   en/
-    common.json               ← {"Common": {"greeting": "Hello"}}
-    auth.json                 ← {"Auth": {"signIn": "Sign in"}}
-    dashboard.json            ← {"Dashboard": {"title": "Dashboard"}}
+    common.json
   de/
-    common.json               ← {"Common": {"greeting": "Hallo"}}
-    auth.json
-    dashboard.json
+    common.json
 
 src/
-  i18n/
-    routing.ts                ← Central routing configuration
-    request.ts                ← Server-side message loading
-    navigation.ts             ← Locale-aware Link, useRouter, etc.
-  proxy.ts                    ← Middleware (Next.js 16)
-```
-
-**App Structure Changes:**
-
-```
-src/app/
-  [locale]/                   ← Locale-specific routes
-    layout.tsx                ← Fonts, metadata, NextIntlClientProvider
+  app/
+    layout.tsx                ← Root layout with LocaleInitializer
     page.tsx                  ← Home page
-    dashboard/
-      page.tsx                ← Other pages go here
-  layout.tsx                  ← Root layout (simplified - returns children)
+    (standard)/               ← Route group (optional)
+      layout.tsx
+      explore/
+        page.tsx
+  components/
+    LocaleInitializer.tsx     ← Syncs server/client locale
+    footer/
+      language-selector.tsx   ← Language switcher (Zustand-based)
+  i18n/
+    routing.ts                ← Locale configuration
+    request.ts                ← Reads locale from cookie
+  stores/
+    localeStore.ts            ← Zustand store for locale state
 ```
 
 **Usage in Components:**
@@ -151,62 +147,84 @@ import { useTranslations } from 'next-intl';
 
 export default function HomePage() {
   const t = useTranslations('Common');
-  return {t('greeting')};
+  return <h1>{t('greeting')}</h1>;
 }
 ```
 
-**Client Components with Navigation:**
+**Client Component:**
 
 ```typescript
 'use client';
 
-import { Link, useRouter } from '@/i18n/navigation';
+import { useLocale } from 'next-intl';
 import { useTranslations } from 'next-intl';
 
-export default function Navigation() {
+export function WelcomeMessage() {
+  const locale = useLocale();
   const t = useTranslations('Common');
-  const router = useRouter();
 
   return (
-
-      {t('home')}
-      {t('dashboard')}
-
+    <div>
+      <p>{t('welcome')}</p>
+      <p className="text-sm text-gray-500">
+        Current language: {locale === 'en' ? 'English' : 'Deutsch'}
+      </p>
+    </div>
   );
 }
 ```
 
+**Note:** You only need `useLocaleStore` when you want to _change_ the locale (via `setLocale()`). For just _reading_ the current locale, use next-intl's `useLocale()` hook.
+
 **Key Architectural Decisions:**
 
-1. **Locales at Root Level** (not `src/i18n/locales/`)
+1. **Cookie + localStorage for Locale**
+   - localStorage: Persists preference across sessions
+   - Cookie: Allows server to read locale on initial render
+   - No URL-based routing (`/en`, `/de` removed)
+   - Clean URLs: `/explore` instead of `/en/explore`
+
+2. **Zustand for State Management**
+   - More performant than Context API (selective re-renders)
+   - Built-in persistence middleware
+   - Simpler API than Context
+   - Easy to scale (can add more global state later)
+
+3. **No Middleware Required**
+   - Locale handled entirely by cookie + localStorage
+   - No `proxy.ts` or `middleware.ts` needed
+   - Simpler architecture, fewer moving parts
+
+4. **Flat App Structure**
+   - No `[locale]` folder in app directory
+   - Pages at root level (e.g., `src/app/page.tsx`)
+   - Route groups optional (e.g., `(standard)` for layout grouping)
+
+5. **Locales at Root Level**
+   - `/locales` not `/src/i18n/locales`
    - Better for Lingohub integration
    - Clear separation of content from code
-   - Easier for non-developers to find translations
+   - Easier for non-developers to find and manage
 
-2. **Three Config Files**
-   - `routing.ts`: Single source of truth for locales
-   - `request.ts`: Server-side message loading
-   - `navigation.ts`: Reusable navigation helpers
+6. **Single Domain (Current Implementation)**
+   - Currently: One domain with locale in cookie/localStorage
+   - Future: Can add multiple domains with different defaults
+   - Easy migration path when needed
 
-3. **Nested Namespaces in JSON**
+**URL Structure:**
 
-   ```json
-   {
-     "Common": { "greeting": "Hello" },
-     "Auth": { "signIn": "Sign in" }
-   }
-   ```
+```
+✅ http://localhost:3000/           (locale from cookie)
+✅ http://localhost:3000/explore    (clean URLs, no locale prefix)
+❌ http://localhost:3000/en         (not used)
+❌ http://localhost:3000/de/explore (not used)
+```
 
-   Better organization when files get large, clearer component usage
+**Locale Persistence Flow:**
 
-4. **Uses `proxy.ts` Instead of `middleware.ts`**
-   - Next.js 16 renamed middleware files
-   - Same functionality, different filename
-
-5. **Modern next-intl API**
-   - Uses `requestLocale` instead of deprecated `locale` parameter
-   - Uses `hasLocale()` helper for validation
-   - Graceful fallback to default locale instead of 404
+1. User visits site → Server reads `ui-locale` cookie → Loads messages
+2. User clicks language → Updates localStorage + cookie → Reloads page
+3. User returns → localStorage synced to cookie → Previous choice remembered
 
 ---
 
@@ -431,8 +449,8 @@ After all setups, your `package.json` should include:
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
     "test": "vitest",
@@ -444,6 +462,8 @@ After all setups, your `package.json` should include:
   }
 }
 ```
+
+**Note:** Next.js 16 removed `next lint` command - use `eslint .` directly.
 
 ---
 
@@ -606,6 +626,7 @@ npm run format && npm run lint && npm test && npm run type-check
 - [TypeScript Docs](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
 - [next-intl Docs](https://next-intl-docs.vercel.app/)
+- [Zustand Docs](https://zustand-demo.pmnd.rs/)
 - [Auth0 Docs](https://auth0.com/docs)
 - [Sentry Docs](https://docs.sentry.io/)
 - [Vitest Docs](https://vitest.dev/)
@@ -615,6 +636,38 @@ npm run format && npm run lint && npm test && npm run type-check
 
 - [Next.js GitHub](https://github.com/vercel/next.js)
 - [Next.js Discord](https://discord.gg/nextjs)
+
+---
+
+## Future: Multiple Domains
+
+When ready to scale, plan to add multiple domains with domain-specific defaults:
+
+**Example Future Configuration:**
+
+```typescript
+// src/i18n/routing.ts
+domains: [
+  {
+    domain: 'fundraisers.de',
+    defaultLocale: 'de',
+    locales: ['en', 'de'],
+  },
+  {
+    domain: 'fundraisers.com',
+    defaultLocale: 'en',
+    locales: ['en', 'de'],
+  },
+];
+```
+
+**Migration Steps:**
+
+- DNS setup for subdomains
+- Update routing.ts with domains config
+- Test with .localhost in development
+- No changes needed to locale switching logic
+- Add 301 redirects from old structure
 
 ---
 
@@ -628,5 +681,5 @@ npm run format && npm run lint && npm test && npm run type-check
 
 ---
 
-**Last Updated:** February 10, 2026  
-**Status:** Phase 1 Complete, Phase 2 In Progress
+**Last Updated:** February 16, 2026  
+**Status:** Phases 1-4 Complete, Phase 5 Ready (Auth0)

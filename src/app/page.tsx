@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
@@ -23,7 +25,6 @@ export default function Home() {
             {t('welcome')}
           </p>
         </div>
-        {/* Keep your existing buttons */}
       </main>
     </div>
   );
