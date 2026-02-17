@@ -10,7 +10,10 @@ export function LanguageSelector() {
   const setLocale = useLocaleStore(state => state.setLocale);
 
   return (
-    <nav aria-labelledby='language-selector-label'>
+    <nav
+      className='language-selector'
+      aria-labelledby='language-selector-label'
+    >
       <ul className='flex items-center justify-center md:justify-start gap-2 text-xs text-zinc-500 list-none p-0 m-0'>
         <li id='language-selector-label'>{t('languageSelectionLabel')}</li>
         {routing.locales.map((locale, index) => (

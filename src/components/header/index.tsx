@@ -3,7 +3,7 @@ import { Navigation } from './navigation';
 
 export function Header() {
   return (
-    <header className='w-full'>
+    <header className='header w-full'>
       <div className='max-w-[960px] mx-auto px-4 py-4'>
         <div className='flex items-center justify-between'>
           <Logo />

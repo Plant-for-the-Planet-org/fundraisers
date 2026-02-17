@@ -13,11 +13,11 @@ export function Footer({ className }: FooterProps) {
     >
       <div className='max-w-[960px] mx-auto px-4'>
         <div className='flex flex-col md:flex-row justify-between gap-6'>
-          <div className='flex flex-col gap-4 items-center md:items-start'>
+          <div className='links-wrapper flex flex-col gap-4 items-center md:items-start'>
             <LinksBar />
             <LanguageSelector />
           </div>
-          <div className='flex items-center justify-center md:justify-start gap-4 h-[34px]'>
+          <div className='logos-wrapper'>
             <Logos />
           </div>
         </div>

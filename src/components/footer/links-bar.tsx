@@ -5,7 +5,7 @@ export function LinksBar() {
   const tLinks = useTranslations('Common.legalLinks');
 
   return (
-    <nav aria-label='Legal links'>
+    <nav className='links-bar' aria-label='Legal links'>
       <ul className='flex flex-wrap items-center justify-center md:justify-start gap-1 text-xs text-zinc-500 list-none p-0 m-0'>
         {FOOTER_LINKS.map((link, index) => (
           <li key={link.labelKey} className='flex items-center gap-1'>

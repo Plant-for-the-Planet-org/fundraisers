@@ -7,7 +7,7 @@ export function Navigation() {
 
   return (
     <nav
-      className='hidden md:flex items-center gap-6'
+      className='navigation hidden md:flex items-center gap-6'
       aria-label='Primary navigation'
     >
       <ul className='flex items-center gap-6 list-none p-0 m-0'>

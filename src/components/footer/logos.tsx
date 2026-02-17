@@ -1,6 +1,6 @@
 export function Logos() {
   return (
-    <>
+    <div className='logos flex items-center justify-center md:justify-start gap-4 h-[34px]'>
       <a
         href='https://www.plant-for-the-planet.org'
         target='_blank'
@@ -25,6 +25,6 @@ export function Logos() {
           className='h-full w-auto'
         />
       </a>
-    </>
+    </div>
   );
 }

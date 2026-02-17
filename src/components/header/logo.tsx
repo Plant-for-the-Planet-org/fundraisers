@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function Logo() {
   return (
-    <Link href='/' className='flex items-center gap-2'>
+    <Link href='/' className='logo flex items-center gap-2'>
       <svg
         xmlns='http://www.w3.org/2000/svg'
         viewBox='0 0 83.405 85'
