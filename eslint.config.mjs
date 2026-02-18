@@ -25,6 +25,7 @@ const eslintConfig = defineConfig([
         },
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/consistent-type-imports': 'warn',
 
       // General rules
       'no-console': ['warn', { allow: ['warn', 'error'] }],
