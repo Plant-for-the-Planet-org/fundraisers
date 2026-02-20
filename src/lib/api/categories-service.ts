@@ -11,13 +11,36 @@ export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
   workspace: Fundraiser['workspace'] | [];
 }
 
-export interface CategoryFundraisersResponse {
+interface RawCategoryFundraisersResponse {
   category: Category;
   fundraisers: ApiFundraiser[];
 }
 
+export interface CategoryFundraisersResponse {
+  category: Category;
+  fundraisers: Fundraiser[];
+}
+
 export interface CategoryOptions {
   sort_by?: 'popular' | 'recent' | 'gross';
+}
+
+function normalizeFundraiser(fundraiser: ApiFundraiser): Fundraiser {
+  return {
+    ...fundraiser,
+    workspace: Array.isArray(fundraiser.workspace)
+      ? null
+      : fundraiser.workspace,
+  };
+}
+
+function normalizeFundraisersResponse(
+  response: RawCategoryFundraisersResponse
+): CategoryFundraisersResponse {
+  return {
+    ...response,
+    fundraisers: response.fundraisers.map(normalizeFundraiser),
+  };
 }
 
 export class CategoriesService {
@@ -101,7 +124,8 @@ export class CategoriesService {
       );
     }
 
-    return response.json();
+    const data: RawCategoryFundraisersResponse = await response.json();
+    return normalizeFundraisersResponse(data);
   }
 
   /**
@@ -136,6 +160,3 @@ export class CategoriesService {
 
 // Create a singleton instance
 export const categoriesService = new CategoriesService();
-
-// Export types for use in components
-// export type { Category as CategoryResponse };

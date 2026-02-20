@@ -14,7 +14,6 @@ async function fetchFundraisers(
       }
     );
     return response.fundraisers;
-    // return response.fundraisers.map(adaptFundraiser);
   } catch (error) {
     console.error(`Failed to fetch ${sort} fundraisers:`, error);
     return [];
