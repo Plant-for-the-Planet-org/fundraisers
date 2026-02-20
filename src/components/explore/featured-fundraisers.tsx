@@ -49,16 +49,17 @@ export function FeaturedFundraisers({
           </TabsList>
         </Tabs>
       </div>
-
-      {/* {showLoading ? (
-        <FundraiserCardSkeletonGrid count={Math.min(limit, 6)} />
-      ) : ( */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-        {displayedFundraisers.map(fundraiser => (
-          <FundraiserCard key={fundraiser.id} fundraiser={fundraiser} />
-        ))}
-      </div>
-      {/* )} */}
+      {displayedFundraisers.length === 0 ? (
+        <div className='text-center py-8 text-muted-foreground'>
+          <p>{tFeaturedFundraisers('noFundraisersFound')}</p>
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {displayedFundraisers.map(fundraiser => (
+            <FundraiserCard key={fundraiser.id} fundraiser={fundraiser} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

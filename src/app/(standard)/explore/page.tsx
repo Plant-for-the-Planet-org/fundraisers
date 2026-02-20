@@ -5,6 +5,7 @@ import {
   CategoriesSkeleton,
 } from '@/components/explore/fundraiser-categories';
 import { FeaturedFundraisersLoader } from '@/components/explore/featured-fundraisers-loader';
+import { FeaturedFundraisersSkeleton } from '@/components/explore/featured-fundraisers-skeleton';
 
 export default function ExplorePage() {
   return (
@@ -14,8 +15,9 @@ export default function ExplorePage() {
         <Suspense fallback={<CategoriesSkeleton />}>
           <FundraiserCategories />
         </Suspense>
-
-        <FeaturedFundraisersLoader /*limit={6}*/ />
+        <Suspense fallback={<FeaturedFundraisersSkeleton />}>
+          <FeaturedFundraisersLoader />
+        </Suspense>
 
         {/*<TopProjects limit={6} />
 

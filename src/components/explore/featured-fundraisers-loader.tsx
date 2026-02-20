@@ -22,11 +22,14 @@ async function fetchFundraisers(
 }
 
 export async function FeaturedFundraisersLoader() {
-  // Logic to initially load the featured fundraisers can be implemented here, such as showing skeleton loaders or placeholders while the data is being fetched.
   const [popularFundraisers, grossFundraisers] = await Promise.all([
     fetchFundraisers('popular'),
     fetchFundraisers('gross'),
   ]);
+
+  if (!popularFundraisers.length && !grossFundraisers.length) {
+    return null;
+  }
 
   const featuredFundraisers = {
     popularFundraisers,
