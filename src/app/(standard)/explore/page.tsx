@@ -4,7 +4,7 @@ import {
   FundraiserCategories,
   CategoriesSkeleton,
 } from '@/components/explore/fundraiser-categories';
-import { FeaturedFundraisers } from '@/components/explore/featured-fundraisers';
+import { FeaturedFundraisersLoader } from '@/components/explore/featured-fundraisers-loader';
 
 export default function ExplorePage() {
   return (
@@ -15,7 +15,7 @@ export default function ExplorePage() {
           <FundraiserCategories />
         </Suspense>
 
-        <FeaturedFundraisers /*limit={6}*/ />
+        <FeaturedFundraisersLoader /*limit={6}*/ />
 
         {/*<TopProjects limit={6} />
 

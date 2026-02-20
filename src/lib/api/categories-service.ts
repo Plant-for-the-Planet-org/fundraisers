@@ -4,16 +4,21 @@
  */
 
 import type { Category } from '@/lib/types/category';
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import { API_BASE_URL } from '@/lib/constants/app-config';
+
+export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
+  workspace: Fundraiser['workspace'] | [];
+}
+
 export interface CategoryFundraisersResponse {
   category: Category;
-  fundraisers: any[];
+  fundraisers: ApiFundraiser[];
 }
 
 export interface CategoryOptions {
   sort_by?: 'popular' | 'recent' | 'gross';
 }
-
-import { API_BASE_URL } from '@/lib/constants/app-config';
 
 export class CategoriesService {
   /**

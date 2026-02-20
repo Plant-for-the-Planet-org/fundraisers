@@ -1,0 +1,14 @@
+{
+  "Fundraisers": {
+    "donationCount": "{count, plural, =0 {0 Donations} one {1 Donation} other {{formattedCount} Donations}}",
+    "amountRaised": "{formattedAmountWithCurrency} raised",
+    "hostedBy": "by {hostName}",
+    "hostedByWithOthers": "by {hostName} and {otherCount, plural, one {1 other} other {{othersCount} others}}",
+    "unknownHost": "Unknown",
+    "anonymousHost": "Anonymous host",
+    "coverImageAlt": "Cover image for {title}",
+    "donationCountLabel": "Donation count",
+    "amountRaisedLabel": "Amount raised",
+    "hostedByLabel": "Hosted by"
+  }
+}

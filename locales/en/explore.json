@@ -6,6 +6,14 @@
       "title": "Browse by Category",
       "noCategoriesFound": "No categories available at the moment.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
+    },
+    "featuredFundraisers": {
+      "title": "Popular Fundraisers",
+      "tabs": {
+        "popular": "Popular",
+        "gross": "Top Raised"
+      },
+      "noFundraisersFound": "No fundraisers available at the moment."
     }
   }
 }
