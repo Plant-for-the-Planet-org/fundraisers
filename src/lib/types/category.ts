@@ -2,6 +2,7 @@ import type { Nullable } from './utility';
 
 interface CategoryMetadata {
   icon?: string;
+  image?: string;
   featured?: boolean;
 }
 

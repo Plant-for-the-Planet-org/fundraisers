@@ -15,6 +15,12 @@
         "gross": "Top Erlöse"
       },
       "noFundraisersFound": "Derzeit sind keine Fundraiser verfügbar."
+    },
+    "fundraiserCities": {
+      "title": "Lokale Fundraiser",
+      "loading": "Lokale Fundraiser werden geladen",
+      "noCategoriesFound": "Derzeit sind keine lokalen Fundraiser verfügbar.",
+      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
     }
   }
 }

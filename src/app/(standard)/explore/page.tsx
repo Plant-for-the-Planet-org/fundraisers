@@ -6,6 +6,10 @@ import {
 } from '@/components/explore/fundraiser-categories';
 import { FeaturedFundraisersLoader } from '@/components/explore/featured-fundraisers-loader';
 import { FeaturedFundraisersSkeleton } from '@/components/explore/featured-fundraisers-skeleton';
+import {
+  FundraiserCities,
+  FundraiserCitiesSkeleton,
+} from '@/components/explore/fundraiser-cities';
 
 export default function ExplorePage() {
   return (
@@ -19,9 +23,11 @@ export default function ExplorePage() {
           <FeaturedFundraisersLoader />
         </Suspense>
 
-        {/*<TopProjects limit={6} />
+        {/*<TopProjects limit={6} />*/}
 
-        <LocalFundraisers /> */}
+        <Suspense fallback={<FundraiserCitiesSkeleton />}>
+          <FundraiserCities />
+        </Suspense>
       </div>
     </>
   );
