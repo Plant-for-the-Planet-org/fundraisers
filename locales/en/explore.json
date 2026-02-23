@@ -4,6 +4,7 @@
     "description": "Explore popular fundraisers near you or browse by category.",
     "categories": {
       "title": "Browse by Category",
+      "loading": "Loading fundraiser categories",
       "noCategoriesFound": "No categories available at the moment.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
     },

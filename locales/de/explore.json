@@ -4,6 +4,7 @@
     "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorie.",
     "categories": {
       "title": "Nach Kategorie durchsuchen",
+      "loading": "Spendenkampagnen-Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
     },

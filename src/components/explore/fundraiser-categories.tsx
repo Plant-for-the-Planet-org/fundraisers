@@ -11,15 +11,20 @@ interface AdaptedCategory extends Category {
   displayCount: string;
 }
 
-export function CategoriesSkeleton() {
+export async function CategoriesSkeleton() {
+  const tCategories = await getTranslations('Explore.categories');
   return (
-    <section className='space-y-6'>
+    <section
+      className='space-y-6'
+      aria-label={tCategories('loading')}
+      aria-busy='true'
+    >
       <div>
         <Skeleton className='h-7 w-48 mb-2' />
       </div>
-      <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className='p-4 rounded-lg border border-border bg-card'>
+          <li key={i} className='p-4 rounded-lg border border-border bg-card'>
             <div className='flex flex-col items-start space-y-3'>
               <Skeleton className='w-14 h-14' />
               <div className='w-full'>
@@ -27,9 +32,9 @@ export function CategoriesSkeleton() {
                 <Skeleton className='h-4 w-20' />
               </div>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
@@ -70,9 +75,15 @@ export async function FundraiserCategories() {
 
   if (categories.length === 0) {
     return (
-      <section className='fundraiser-categories space-y-6'>
+      <section
+        className='fundraiser-categories space-y-6'
+        aria-labelledby='fundraiser-categories-heading'
+      >
         <div>
-          <h2 className='text-xl font-semibold text-foreground mb-2'>
+          <h2
+            id='fundraiser-categories-heading'
+            className='text-xl font-semibold text-foreground mb-2'
+          >
             {tCategories('title')}
           </h2>
         </div>
@@ -84,36 +95,43 @@ export async function FundraiserCategories() {
   }
 
   return (
-    <section className='fundraiser-categories space-y-6'>
+    <section
+      className='fundraiser-categories space-y-6'
+      aria-labelledby='fundraiser-categories-heading'
+    >
       <div>
-        <h2 className='text-xl font-semibold text-foreground mb-2'>
+        <h2
+          id='fundraiser-categories-heading'
+          className='text-xl font-semibold text-foreground mb-2'
+        >
           {tCategories('title')}
         </h2>
       </div>
 
-      <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
         {categories.map(category => (
-          <Link
-            key={category.id}
-            href={`/explore/${category.slug}`}
-            className='group block p-4 rounded-lg border border-border bg-card hover:bg-accent hover:border-accent-foreground/20 transition-colors'
-          >
-            <div className='flex flex-col items-start space-y-3'>
-              <div className='w-14 h-14 flex items-center justify-start'>
-                <CategoryIcon category={category} size='regular' />
+          <li key={category.id}>
+            <Link
+              href={`/explore/${category.slug}`}
+              className='group block p-4 rounded-lg border border-border bg-card hover:bg-accent hover:border-accent-foreground/20 transition-colors'
+            >
+              <div className='flex flex-col items-start space-y-3'>
+                <div className='w-14 h-14 flex items-center justify-start'>
+                  <CategoryIcon category={category} size='regular' />
+                </div>
+                <div>
+                  <h3 className='font-medium text-foreground group-hover:text-accent-foreground mb-1'>
+                    {category.name}
+                  </h3>
+                  <p className='text-sm text-muted-foreground'>
+                    {category.displayCount}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className='font-medium text-foreground group-hover:text-accent-foreground mb-1'>
-                  {category.name}
-                </h3>
-                <p className='text-sm text-muted-foreground'>
-                  {category.displayCount}
-                </p>
-              </div>
-            </div>
-          </Link>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
