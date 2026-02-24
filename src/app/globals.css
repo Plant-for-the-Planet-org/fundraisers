@@ -1,35 +1,75 @@
 @import 'tailwindcss';
 
+/* Class-based dark mode: activates when any ancestor has class="dark" */
+@variant dark (&:is(.dark *));
+
+@theme {
+  /* Fonts — referencing Next.js font CSS variables set in layout.tsx */
+  --font-open-sans: var(--font-open-sans-var), 'Open Sans', sans-serif;
+  --font-inter: var(--font-inter-var), 'Inter', sans-serif;
+  --font-poppins: var(--font-poppins-var), 'Poppins', sans-serif;
+  --font-playfair: var(--font-playfair-var), 'Playfair Display', serif;
+  --font-roboto: var(--font-roboto-var), 'Roboto', sans-serif;
+
+  /* Semantic color tokens */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-accent-color: var(--accent-color);
+
+  /* Border radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  /* Breakpoints */
+  --breakpoint-xs: 475px;
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 224 71.4% 4.1%;
   --muted: 220 14.3% 95.9%;
   --muted-foreground: 220 8.9% 46.1%;
-  --color-primary: #16a34a;
+  --card: 0 0% 100%;
+  --card-foreground: 224 71.4% 4.1%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+  --radius: 0.5rem;
+  --accent-color: #16a34a;
 }
 
-@theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-primary: #16a34a;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --color-primary: #22c55e;
-  }
+.dark {
+  --background: 224 71.4% 4.1%;
+  --foreground: 210 20% 98%;
+  --muted: 215 27.9% 16.9%;
+  --muted-foreground: 217.9 10.6% 64.9%;
+  --card: 224 71.4% 4.1%;
+  --card-foreground: 210 20% 98%;
+  --border: 215 27.9% 16.9%;
+  --input: 215 27.9% 16.9%;
 }
 
 body {
-  background: hsl(var(--background));
+  font-family: var(--theme-body-font, var(--font-open-sans-var), 'Open Sans', sans-serif);
+  background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--theme-title-font, var(--font-poppins-var), 'Poppins', sans-serif);
 }
