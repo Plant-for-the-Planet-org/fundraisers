@@ -2,7 +2,8 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { HandCoins, HeartHandshake, UsersRound } from 'lucide-react';
+import { HandCoins, UsersRound } from 'lucide-react';
+import { FundraiserCardImage } from './fundraiser-card-image';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -48,20 +49,10 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
       >
         <div className='flex items-start space-x-4'>
           <div className='fundraiser-image w-20 h-20 rounded-lg overflow-hidden bg-muted shrink-0 transition-transform duration-300 group-hover:scale-110'>
-            {imageUrl !== null ? (
-              <img
-                src={imageUrl}
-                alt={tFundraisers('coverImageAlt', { title: fundraiser.title })}
-                className='w-full h-full object-cover'
-              />
-            ) : (
-              <div
-                className='w-full h-full bg-linear-to-br from-primary/20 to-primary/5 flex items-center justify-center'
-                aria-hidden='true'
-              >
-                <HeartHandshake className='w-6 h-6 text-muted-foreground' />
-              </div>
-            )}
+            <FundraiserCardImage
+              imageUrl={imageUrl}
+              alt={tFundraisers('coverImageAlt', { title: fundraiser.title })}
+            />
           </div>
 
           <div className='fundraiser-content flex-1 min-w-0'>
