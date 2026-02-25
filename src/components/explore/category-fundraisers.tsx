@@ -5,10 +5,11 @@ import type { FundraiserSortOptions } from '@/lib/api/categories-service';
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { isFundraiserSortOption } from '@/lib/api/categories-service';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { FundraiserCard } from './fundraiser-card';
 import { FundraiserCardSkeletonGrid } from './fundraiser-card-skeleton';
-import { useTranslations } from 'next-intl';
 
 interface CategoryFundraisersProps {
   fundraisers: Fundraiser[];
@@ -26,7 +27,7 @@ export function CategoryFundraisers({
   const [isPending, startTransition] = useTransition();
 
   const handleSortChange = (newSort: string) => {
-    if (newSort === currentSort) return;
+    if (!isFundraiserSortOption(newSort) || newSort === currentSort) return;
     startTransition(() => {
       router.push(`/explore/${slug}?sort=${newSort}`);
     });

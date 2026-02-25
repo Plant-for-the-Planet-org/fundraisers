@@ -23,6 +23,21 @@ export interface CategoryFundraisersResponse {
 
 export type FundraiserSortOptions = 'popular' | 'recent' | 'gross';
 
+const VALID_SORT_OPTIONS: FundraiserSortOptions[] = [
+  'popular',
+  'recent',
+  'gross',
+];
+
+export function isFundraiserSortOption(
+  value: unknown
+): value is FundraiserSortOptions {
+  return (
+    typeof value === 'string' &&
+    (VALID_SORT_OPTIONS as readonly string[]).includes(value)
+  );
+}
+
 export interface CategoryOptions {
   sort_by?: FundraiserSortOptions;
 }
