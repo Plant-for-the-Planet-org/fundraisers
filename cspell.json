@@ -1,0 +1,28 @@
+// cSpell Settings
+{
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  // language - current active spelling language
+  "language": "en",
+  // words - list of words to be always considered correct
+  "words": [],
+  // flagWords - list of words to be always considered incorrect
+  // This is useful for offensive words and common spelling errors.
+  // For example "hte" should be "the"
+  "flagWords": [],
+  "ignorePaths": [
+    "locales/de/",
+    "cspell.json",
+    "node_modules/",
+    "public/",
+    ".vscode/",
+    ".next/",
+    "tsconfig.tsbuildinfo",
+    "package-lock.json",
+    "package.json"
+  ],
+  "ignoreRegExpList": [
+    "Email",
+    "/\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b/g"
+  ]
+}
