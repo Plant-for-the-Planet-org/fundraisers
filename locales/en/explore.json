@@ -21,6 +21,24 @@
       "loading": "Loading local fundraisers",
       "noCategoriesFound": "No local fundraisers available at the moment.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
+    },
+    "categoryPage": {
+      "fundraiserCount": "{count, plural, =0 {0 fundraisers} one {1 fundraiser} other {{formattedCount} fundraisers}}",
+      "fundraisers": {
+        "title": "Fundraisers",
+        "tabs": {
+          "popular": "Popular",
+          "recent": "Recent",
+          "gross": "Top Raised"
+        },
+        "noFundraisersFound": "No fundraisers found",
+        "noFundraisersFoundDescription": "There are currently no active fundraisers in this category."
+      },
+      "notFound": {
+        "title": "Page not found",
+        "description": "This page doesn't exist or may have been removed.",
+        "exploreLinkText": "Discover Fundraisers"
+      }
     }
   }
 }

@@ -10,6 +10,7 @@ import {
   TreePine,
   Users,
 } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 interface CategoryIconProps {
   category: Category;
@@ -35,12 +36,16 @@ export function CategoryIcon({
   };
 
   const IconComponent = iconMap[iconName.toLowerCase()] || Circle;
-  const iconClass = size === 'compact' ? 'w-8 h-8' : 'w-10 h-10';
+  const iconClass = cn(
+    'category-icon',
+    size === 'compact' ? 'w-8 h-8' : 'w-10 h-10'
+  );
 
   return (
     <IconComponent
       className={iconClass}
       style={{ color: category.color || '#6b7280' }}
+      aria-hidden='true'
     />
   );
 }

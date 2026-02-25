@@ -21,6 +21,19 @@
       "loading": "Lokale Fundraiser werden geladen",
       "noCategoriesFound": "Derzeit sind keine lokalen Fundraiser verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
+    },
+    "categoryPage": {
+      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}",
+      "fundraisers": {
+        "title": "Fundraiser",
+        "tabs": {
+          "popular": "Beliebt",
+          "recent": "Neueste",
+          "gross": "Top Erlöse"
+        },
+        "noFundraisersFound": "Keine Fundraiser gefunden",
+        "noFundraisersFoundDescription": "Derzeit sind keine aktiven Fundraiser in dieser Kategorie."
+      }
     }
   }
 }

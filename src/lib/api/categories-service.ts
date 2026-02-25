@@ -21,8 +21,10 @@ export interface CategoryFundraisersResponse {
   fundraisers: Fundraiser[];
 }
 
+export type FundraiserSortOptions = 'popular' | 'recent' | 'gross';
+
 export interface CategoryOptions {
-  sort_by?: 'popular' | 'recent' | 'gross';
+  sort_by?: FundraiserSortOptions;
 }
 
 function normalizeFundraiser(fundraiser: ApiFundraiser): Fundraiser {
