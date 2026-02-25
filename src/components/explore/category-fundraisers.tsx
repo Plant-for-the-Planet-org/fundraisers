@@ -3,7 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { FundraiserSortOptions } from '@/lib/api/categories-service';
 
-import { useTransition } from 'react';
+import { useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { isFundraiserSortOption } from '@/lib/api/categories-service';
@@ -25,10 +25,12 @@ export function CategoryFundraisers({
   const tCategoryPage = useTranslations('Explore.categoryPage');
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [optimisticSort, setOptimisticSort] = useOptimistic(currentSort);
 
   const handleSortChange = (newSort: string) => {
     if (!isFundraiserSortOption(newSort) || newSort === currentSort) return;
     startTransition(() => {
+      setOptimisticSort(newSort);
       router.push(`/explore/${slug}?sort=${newSort}`);
     });
   };
@@ -37,7 +39,7 @@ export function CategoryFundraisers({
     <section className='category-fundraisers'>
       <Tabs
         className='category-fundraisers space-y-6'
-        value={currentSort}
+        value={optimisticSort}
         onValueChange={handleSortChange}
       >
         <div className='flex items-center justify-between'>
@@ -58,7 +60,7 @@ export function CategoryFundraisers({
         </div>
 
         <TabsContent
-          value={currentSort}
+          value={optimisticSort}
           aria-live='polite'
           aria-busy={isPending}
         >
