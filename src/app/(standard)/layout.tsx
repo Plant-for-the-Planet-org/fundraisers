@@ -6,6 +6,7 @@ import { getAccentColor } from '@/lib/theme/accent-utils';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { MainContent } from '@/components/ui/main-content';
 
 export default async function StandardLayout({
   children,
@@ -21,7 +22,8 @@ export default async function StandardLayout({
   return (
     <ThemeProvider theme={theme}>
       <div
-        className={`${theme.mode} relative min-h-screen flex flex-col`}
+        className={`theme-${theme.id} ${theme.mode} relative min-h-screen flex flex-col`}
+        data-theme={theme.id}
         style={
           {
             fontFamily: getFontStack(theme.bodyFont),
@@ -35,11 +37,7 @@ export default async function StandardLayout({
         />
         <div className='relative z-10 flex flex-col min-h-screen'>
           <Header />
-          <main className='flex-1'>
-            <div className='max-w-[960px] rounded-2xl backdrop-blur-[10px] w-full mx-auto my-8 px-4 py-4'>
-              {children}
-            </div>
-          </main>
+          <MainContent>{children}</MainContent>
           <Footer />
         </div>
       </div>
