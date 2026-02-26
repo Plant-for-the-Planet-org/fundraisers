@@ -13,13 +13,16 @@ A SaaS web application for managing fundraisers with the following tech stack:
 
 - **Framework:** Next.js 16 (App Router, Turbopack)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS v4
-- **Authentication:** Auth0
+- **Styling:** Tailwind CSS v4 + clsx + tailwind-merge
+- **Authentication:** Auth0 (planned)
 - **Internationalization:** next-intl with cookie-based locale management (en, de)
 - **State Management:** Zustand
-- **Error Monitoring:** Sentry
-- **Testing:** Vitest + React Testing Library + Playwright
-- **Code Quality:** ESLint (flat config) + Prettier
+- **Schema Validation:** Zod
+- **UI Primitives:** Radix UI
+- **Icons:** Lucide React
+- **Error Monitoring:** Sentry (planned)
+- **Testing:** Vitest + React Testing Library + Playwright (planned)
+- **Code Quality:** ESLint (flat config) + Prettier + cspell
 
 ---
 
@@ -98,7 +101,7 @@ npm install -D prettier eslint-config-prettier eslint-plugin-prettier @typescrip
 - [x] Create `src/stores/localeStore.ts` (Zustand store)
 - [x] Create `src/components/LocaleInitializer.tsx` (syncs server/client)
 - [x] Update `src/components/footer/language-selector.tsx` (use Zustand)
-- [x] Update `next.config.mjs` with next-intl plugin
+- [x] Update `next.config.ts` with next-intl plugin
 - [x] Flatten app directory (remove `[locale]` folder)
 - [x] Update root layout with LocaleInitializer
 - [x] Test locale switching and persistence
@@ -128,7 +131,7 @@ src/
       explore/
         page.tsx
   components/
-    LocaleInitializer.tsx     ← Syncs server/client locale
+    locale-initializer.tsx    ← Syncs server/client locale
     footer/
       language-selector.tsx   ← Language switcher (Zustand-based)
   i18n/
@@ -190,10 +193,10 @@ export function WelcomeMessage() {
    - Simpler API than Context
    - Easy to scale (can add more global state later)
 
-3. **No Middleware Required**
+3. **Proxy Instead of Middleware**
    - Locale handled entirely by cookie + localStorage
-   - No `proxy.ts` or `middleware.ts` needed
-   - Simpler architecture, fewer moving parts
+   - `src/proxy.ts` used (not `middleware.ts`) — sets `x-pathname` header for theme routing
+   - No locale-based middleware needed
 
 4. **Flat App Structure**
    - No `[locale]` folder in app directory
@@ -228,9 +231,65 @@ export function WelcomeMessage() {
 
 ---
 
-### ⏳ Phase 5: Authentication
+### ✅ Phase 5: Theme System (COMPLETED)
 
-#### 5.1 Auth0 Setup
+See [docs/theme-system.md](./theme-system.md) for full documentation.
+
+- [x] Define theme types (accent colors, font stacks, animations) — `src/lib/theme/types.ts`
+- [x] Create 15 predefined themes (spring, clean, dashboard, birthday, etc.) — `src/lib/theme/themes.ts`
+- [x] Build route-to-theme mapping — `src/lib/theme/route-themes.ts`
+- [x] Implement theme builder with validation — `src/lib/theme/build-theme.ts`
+- [x] Create accent color utilities (CSS classes + hex values) — `src/lib/theme/accent-utils.ts`
+- [x] Create font stack utilities — `src/lib/theme/font-utils.ts`
+- [x] Create `ThemeProvider` client component — `src/components/theme/theme-provider.tsx`
+- [x] Use `proxy.ts` to pass `x-pathname` header for server-side theme resolution
+
+**Folder Structure:**
+
+```
+src/
+  lib/
+    theme/
+      types.ts            ← Theme type definitions
+      themes.ts           ← 15 predefined themes
+      route-themes.ts     ← Route → theme mapping
+      build-theme.ts      ← Theme builder + validation
+      accent-utils.ts     ← Accent color CSS/hex helpers
+      font-utils.ts       ← Font stack management
+  components/
+    theme/
+      theme-provider.tsx  ← Client component, applies CSS vars
+  proxy.ts                ← Sets x-pathname header on all routes
+```
+
+---
+
+### ⏳ Phase 6: Core Library & Utilities (IN PROGRESS)
+
+Only utilities needed so far have been created. This phase continues as the app grows.
+
+- [x] Create shared utility functions — `src/lib/utils/`
+  - `cn.ts` — clsx + tailwind-merge helper
+  - `currency.ts` — 25-currency formatting + exchange rate conversion
+  - `formatting.ts` — Localized abbreviated number counts
+  - `fundraiser.ts` — Fundraiser URL generation
+  - `images.ts` — CDN image URL generation
+- [x] Define shared TypeScript types — `src/lib/types/`
+  - `category.ts`, `fundraiser.ts`, `utility.ts`
+- [x] Create app config with Zod validation — `src/lib/constants/app-config.ts`
+- [x] Create API service layer — `src/lib/api/categories-service.ts`
+- [ ] Create `src/lib/api.ts` fetch wrapper with shared error handling
+- [ ] Write tests for utilities and API client
+
+---
+
+> **Features built:** The Explore feature (explore page, category pages, fundraiser cards) was implemented alongside Phase 6. See [docs/explore-feature.md](./explore-feature.md) for details.
+
+---
+
+### ⏳ Phase 7: Authentication
+
+#### 7.1 Auth0 Setup
 
 - [ ] Install Auth0 SDK
 - [ ] Set up Auth0 application (in Auth0 dashboard)
@@ -267,9 +326,9 @@ AUTH0_CLIENT_SECRET=
 
 ---
 
-### ⏳ Phase 6: Error Monitoring
+### ⏳ Phase 8: Error Monitoring
 
-#### 6.1 Sentry Setup
+#### 8.1 Sentry Setup
 
 - [ ] Run Sentry wizard
 - [ ] Configure Sentry organization and project
@@ -303,9 +362,9 @@ SENTRY_AUTH_TOKEN=
 
 ---
 
-### ⏳ Phase 7: Testing Infrastructure
+### ⏳ Phase 9: Testing Infrastructure
 
-#### 7.1 Unit & Integration Testing (Vitest)
+#### 9.1 Unit & Integration Testing (Vitest)
 
 - [ ] Install Vitest and testing libraries
 - [ ] Create `vitest.config.ts`
@@ -352,7 +411,7 @@ tests/
 - `tests/mocks/handlers.ts`
 - `tests/mocks/server.ts`
 
-#### 7.2 End-to-End Testing (Playwright)
+#### 9.2 End-to-End Testing (Playwright)
 
 - [ ] Install Playwright
 - [ ] Run Playwright install for browsers
@@ -384,12 +443,14 @@ tests/
 
 ---
 
-### ⏳ Phase 8: API Client Setup
+### ⏳ Phase 10: API Client Setup
 
-#### 8.1 Fetch Wrapper
+#### 10.1 Fetch Wrapper
 
-- [ ] Create `src/lib/api.ts`
-- [ ] Implement API client with error handling
+> Note: `src/lib/api/categories-service.ts` was created as part of Phase 6 with retry logic. A shared base fetch wrapper is still needed.
+
+- [ ] Create `src/lib/api.ts` shared fetch wrapper with error handling
+- [ ] Refactor `categories-service.ts` to use the shared wrapper
 - [ ] Create example usage documentation
 - [ ] Write tests for API client
 - [ ] Commit changes
@@ -401,11 +462,15 @@ tests/
 
 ---
 
-### ⏳ Phase 9: Component Library Foundation
+### ⏳ Phase 11: Component Library Foundation
 
-#### 9.1 Base Components
+#### 11.1 Base Components
 
-- [ ] Create components folder structure
+> Note: Some UI primitives already exist in `src/components/ui/` — `skeleton.tsx`, `tabs.tsx`, `main-content.tsx`, `page-container.tsx`.
+
+- [x] Create skeleton loading component
+- [x] Create tabs component (Radix UI wrapper)
+- [x] Create main-content and page-container layout components
 - [ ] Create Button component with tests
 - [ ] Create Input component with tests
 - [ ] Create Card component with tests
@@ -417,17 +482,19 @@ tests/
 ```
 src/components/
   ui/
-    Button/
-      Button.tsx
-      Button.test.tsx
-    Input/
-    Card/
-    Modal/
+    skeleton.tsx        ← ✅ exists
+    tabs.tsx            ← ✅ exists
+    main-content.tsx    ← ✅ exists
+    page-container.tsx  ← ✅ exists
+    button.tsx          ← planned
+    input.tsx           ← planned
+    card.tsx            ← planned
+    modal.tsx           ← planned
 ```
 
 ---
 
-### ⏳ Phase 10: Documentation
+### ⏳ Phase 12: Documentation
 
 - [ ] Create `README.md` with project overview
 - [ ] Document environment setup
@@ -439,9 +506,9 @@ src/components/
 
 ---
 
-## Package.json Scripts (Final)
+## Package.json Scripts
 
-After all setups, your `package.json` should include:
+### Current Scripts
 
 ```json
 {
@@ -453,17 +520,27 @@ After all setups, your `package.json` should include:
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "find-typos": "cspell --words-only --unique . | sort --ignore-case > project-words.txt"
   }
 }
 ```
 
-**Note:** Next.js 16 removed `next lint` command - use `eslint .` directly.
+**Note:** Next.js 16 removed `next lint` command — use `eslint .` directly.
+
+### Planned Scripts (after Phase 9)
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  }
+}
+```
 
 ---
 
@@ -681,5 +758,5 @@ domains: [
 
 ---
 
-**Last Updated:** February 16, 2026  
-**Status:** Phases 1-4 Complete, Phase 5 Ready (Auth0)
+**Last Updated:** February 26, 2026
+**Status:** Phases 1–5 Complete, Phase 6 In Progress, Phases 7–12 Pending
