@@ -1,25 +1,25 @@
 {
   "Explore": {
     "title": "Entdecke Fundraiser",
-    "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorie.",
+    "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorien.",
     "categories": {
-      "title": "Nach Kategorie durchsuchen",
-      "loading": "Spendenkampagnen-Kategorien werden geladen",
+      "title": "In Kategorien stöbern",
+      "loading": "Fundraiser-Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
-      "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
+      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
     },
     "featuredFundraisers": {
       "title": "Beliebte Fundraiser",
       "tabs": {
         "popular": "Beliebt",
-        "gross": "Top Erlöse"
+        "gross": "Top Spendenerlöse"
       },
       "noFundraisersFound": "Derzeit sind keine Fundraiser verfügbar."
     },
     "fundraiserCities": {
-      "title": "Lokale Fundraiser",
-      "loading": "Lokale Fundraiser werden geladen",
-      "noCategoriesFound": "Derzeit sind keine lokalen Fundraiser verfügbar.",
+      "title": "Fundraiser in der Nähe",
+      "loading": "Fundraiser in der Nähe werden geladen",
+      "noCategoriesFound": "Derzeit sind keine Fundraiser in der Nähe verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
     },
     "categoryPage": {
@@ -29,10 +29,15 @@
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",
-          "gross": "Top Erlöse"
+          "gross": "Top Spendenerlöse"
         },
         "noFundraisersFound": "Keine Fundraiser gefunden",
-        "noFundraisersFoundDescription": "Derzeit sind keine aktiven Fundraiser in dieser Kategorie."
+        "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Fundraiser in dieser Kategorie."
+      },
+      "notFound": {
+        "title": "Seite nicht gefunden",
+        "description": "Diese Seite existiert nicht oder wurde möglicherweise entfernt.",
+        "exploreLinkText": "Fundraiser entdecken"
       }
     }
   }
