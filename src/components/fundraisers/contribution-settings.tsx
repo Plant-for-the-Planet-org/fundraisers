@@ -4,6 +4,7 @@ export function FundraiserContributionSettings() {
   return (
     <div>
       <PreviewSectionHeader2 content='Contribution Settings' />
+      <div className='h-64 text-sm'>Contribution Donate Form will go here</div>
     </div>
   );
 }

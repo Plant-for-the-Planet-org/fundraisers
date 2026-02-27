@@ -6,6 +6,7 @@ type BaseTypographyProps = {
 };
 
 type SectionHeaderBaseProps = BaseTypographyProps & {
+  containerClassName?: string;
   actionSlot?: React.ReactNode;
   showDivider?: boolean;
 };
@@ -26,17 +27,19 @@ export function Title({ content, className }: BaseTypographyProps) {
 export function ContentSectionTitle({
   content,
   className,
-}: SectionHeaderBaseProps) {
+}: BaseTypographyProps) {
   return (
-    <h1
-      className={cn(
-        'text-4xl font-bold cursor-text hover:opacity-80 transition-opacity',
-        className
-      )}
-      style={{ fontFamily: 'var(--theme-title-font)' }}
-    >
-      {content}
-    </h1>
+    <>
+      <h1
+        className={cn(
+          'text-4xl font-bold cursor-text hover:opacity-80 transition-opacity',
+          className
+        )}
+        style={{ fontFamily: 'var(--theme-title-font)' }}
+      >
+        {content}
+      </h1>
+    </>
   );
 }
 
@@ -66,32 +69,34 @@ export function Header2({ content, className }: BaseTypographyProps) {
 }
 
 export function PreviewSectionHeader1({
+  containerClassName,
   content,
   className,
 }: SectionHeaderBaseProps) {
   return (
-    <>
+    <div className={cn(containerClassName)}>
       <div className={cn('flex flex-col', className)}>
         <Header1 content={content} />
       </div>
       {/* <div className='h-px bg-gray-200 dark:bg-gray-700' /> */}
-    </>
+    </div>
   );
 }
 
 export function PreviewSectionHeader2({
+  containerClassName,
   content,
   className,
   actionSlot,
   showDivider = true,
 }: SectionHeaderBaseProps) {
   return (
-    <>
+    <div className={cn(containerClassName)}>
       <div className={cn('flex flex-col', className)}>
         <Header2 content={content} />
         {actionSlot}
       </div>
       {showDivider && <div className='h-px bg-gray-200 dark:bg-gray-700' />}
-    </>
+    </div>
   );
 }

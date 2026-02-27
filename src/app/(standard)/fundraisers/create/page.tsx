@@ -1,5 +1,7 @@
 import { FundraiserCauses } from '@/components/fundraisers/causes';
 import { FundraiserContributionSettings } from '@/components/fundraisers/contribution-settings';
+import { CreateFundraiserButton } from '@/components/fundraisers/create/create-fundraiser-button';
+import { CountryGoalInfo } from '@/components/fundraisers/create/info';
 import { FundraiserTheme } from '@/components/fundraisers/create/theme';
 import { FundraiserDescription } from '@/components/fundraisers/description';
 import { FundraiserDonorsPreview } from '@/components/fundraisers/donors';
@@ -38,8 +40,10 @@ export default function CreateFundraiserPage() {
             <FundraiserWorkspaceInput />
             <FundraiserGoalInput />
           </div>
+          <CountryGoalInfo />
           <FundraiserCauses />
           <FundraiserOptions />
+          <CreateFundraiserButton />
         </FundraiserContentMainContentColumn>
       </FundraiserContent>
     </>
