@@ -1,9 +1,9 @@
-import { PreviewSectionHeader2 } from './typography';
+import { SectionHeader } from './typography';
 
 export function ContributionSettings() {
   return (
     <div>
-      <PreviewSectionHeader2 content='Contribution Settings' />
+      <SectionHeader>Contribution Settings</SectionHeader>
       <div className='h-64 text-sm'>Contribution Donate Form will go here</div>
     </div>
   );

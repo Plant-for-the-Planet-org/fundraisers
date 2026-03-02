@@ -1,9 +1,9 @@
-import { PreviewSectionHeader2 } from './typography';
+import { SectionHeader } from './typography';
 
 export function Description() {
   return (
     <div>
-      <PreviewSectionHeader2 content='Description' />
+      <SectionHeader>Description</SectionHeader>
       <div className='h-64 text-sm'>Description Editor will go here</div>
     </div>
   );

@@ -1,9 +1,9 @@
-import { PreviewSectionHeader2 } from './typography';
+import { SectionHeader } from './typography';
 
 export function Options() {
   return (
     <div className='flex flex-col gap-3'>
-      <PreviewSectionHeader2 content='Fundraiser Options' />
+      <SectionHeader>Fundraiser Options</SectionHeader>
     </div>
   );
 }

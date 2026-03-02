@@ -1,31 +1,20 @@
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 type BaseTypographyProps = {
-  content: string;
+  children: ReactNode;
   className?: string;
 };
 
 type SectionHeaderBaseProps = BaseTypographyProps & {
   containerClassName?: string;
-  actionSlot?: React.ReactNode;
+  actionSlot?: ReactNode;
   showDivider?: boolean;
 };
 
-export function Title({ content, className }: BaseTypographyProps) {
-  return (
-    <h2
-      className={cn(
-        'text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight',
-        className
-      )}
-    >
-      {content}
-    </h2>
-  );
-}
-
+// TODO: remove this while working on title as it does not really fall under typography
 export function ContentSectionTitle({
-  content,
+  children,
   className,
 }: BaseTypographyProps) {
   return (
@@ -37,13 +26,26 @@ export function ContentSectionTitle({
         )}
         style={{ fontFamily: 'var(--theme-title-font)' }}
       >
-        {content}
+        {children}
       </h1>
     </>
   );
 }
 
-export function Header1({ content, className }: BaseTypographyProps) {
+export function Heading1({ children, className }: BaseTypographyProps) {
+  return (
+    <h1
+      className={cn(
+        'text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight',
+        className
+      )}
+    >
+      {children}
+    </h1>
+  );
+}
+
+export function Heading2({ children, className }: BaseTypographyProps) {
   return (
     <h2
       className={cn(
@@ -51,41 +53,14 @@ export function Header1({ content, className }: BaseTypographyProps) {
         className
       )}
     >
-      {content}
-    </h2>
-  );
-}
-export function Header2({ content, className }: BaseTypographyProps) {
-  return (
-    <h2
-      className={cn(
-        'mb-1 text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight',
-        className
-      )}
-    >
-      {content}
+      {children}
     </h2>
   );
 }
 
-export function PreviewSectionHeader1({
+export function SectionHeader({
   containerClassName,
-  content,
-  className,
-}: SectionHeaderBaseProps) {
-  return (
-    <div className={cn(containerClassName)}>
-      <div className={cn('flex flex-col', className)}>
-        <Header1 content={content} />
-      </div>
-      {/* <div className='h-px bg-gray-200 dark:bg-gray-700' /> */}
-    </div>
-  );
-}
-
-export function PreviewSectionHeader2({
-  containerClassName,
-  content,
+  children,
   className,
   actionSlot,
   showDivider = true,
@@ -93,7 +68,7 @@ export function PreviewSectionHeader2({
   return (
     <div className={cn(containerClassName)}>
       <div className={cn('flex flex-col', className)}>
-        <Header2 content={content} />
+        <Heading2 className='mb-1'>{children}</Heading2>
         {actionSlot}
       </div>
       {showDivider && <div className='h-px bg-gray-200 dark:bg-gray-700' />}

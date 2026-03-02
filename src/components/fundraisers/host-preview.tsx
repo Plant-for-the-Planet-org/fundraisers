@@ -1,9 +1,9 @@
-import { PreviewSectionHeader2 } from './typography';
+import { SectionHeader } from './typography';
 
 export function HostPreview() {
   return (
     <div className='flex flex-col gap-3'>
-      <PreviewSectionHeader2 content='Hosted by' />
+      <SectionHeader>Hosted by</SectionHeader>
       <div className='flex flex-row gap-2'>
         <div className='h-6 w-6 rounded-full bg-red-500' />
         <div>Host Name</div>
