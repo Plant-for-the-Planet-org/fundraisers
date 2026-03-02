@@ -1,4 +1,4 @@
-export function FundraiserImage() {
+export function ImageSelector() {
   return (
     <div className='self-stretch h-80 relative bg-white/50 dark:bg-gray-800 rounded-2xl overflow-hidden'>
       {/* {currentImage ? (

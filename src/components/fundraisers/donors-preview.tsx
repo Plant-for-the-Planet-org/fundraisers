@@ -1,6 +1,6 @@
 import { PreviewSectionHeader2 } from './typography';
 
-export function FundraiserDonorsPreview() {
+export function DonorsPreview() {
   return (
     <div className='flex flex-col gap-2'>
       <PreviewSectionHeader2 content='200 Donors' />

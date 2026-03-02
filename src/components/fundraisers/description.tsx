@@ -1,6 +1,6 @@
 import { PreviewSectionHeader2 } from './typography';
 
-export function FundraiserDescription() {
+export function Description() {
   return (
     <div>
       <PreviewSectionHeader2 content='Description' />

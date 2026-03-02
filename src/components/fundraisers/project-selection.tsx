@@ -1,6 +1,6 @@
 import { Header2, PreviewSectionHeader2 } from './typography';
 
-export function FundraiserCauses() {
+export function ProjectSelection() {
   return (
     <div className='flex flex-col gap-3'>
       <PreviewSectionHeader2

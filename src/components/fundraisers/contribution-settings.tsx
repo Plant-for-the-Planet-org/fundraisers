@@ -1,6 +1,6 @@
 import { PreviewSectionHeader2 } from './typography';
 
-export function FundraiserContributionSettings() {
+export function ContributionSettings() {
   return (
     <div>
       <PreviewSectionHeader2 content='Contribution Settings' />

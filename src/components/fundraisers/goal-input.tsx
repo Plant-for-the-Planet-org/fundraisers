@@ -1,14 +1,6 @@
-import { PreviewSectionHeader1, PreviewSectionHeader2 } from './typography';
+import { PreviewSectionHeader2 } from './typography';
 
-export function FundraiserGoalPreview() {
-  return (
-    <div>
-      <PreviewSectionHeader1 content='$2,000 Raised' />
-    </div>
-  );
-}
-
-export function FundraiserGoalInput() {
+export function GoalInput() {
   return (
     <div className='flex flex-col gap-3'>
       <PreviewSectionHeader2 content='Fundraiser Goal' />
