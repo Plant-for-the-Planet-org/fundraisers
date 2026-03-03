@@ -17,6 +17,13 @@
         "errors": {
           "required": "Please enter a fundraiser name."
         }
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell people about your fundraiser...",
+        "errors": {
+          "required": "Please enter a fundraiser description."
+        }
       }
     }
   }
