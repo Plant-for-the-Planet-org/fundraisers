@@ -12,13 +12,14 @@ import { ImageSelector } from '@/components/fundraisers/image-selector';
 import { Options } from '@/components/fundraisers/options';
 import { Title } from '@/components/fundraisers/title';
 import { WorkspaceSelector } from '@/components/fundraisers/workspace-selector';
+import { CreateFundraiserFormProvider } from '@/components/fundraisers/create-fundraiser-form-context';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 
 export default function CreateFundraiserPage() {
   return (
-    <>
+    <CreateFundraiserFormProvider>
       <FundraiserLayout>
         <SidebarPanel>
           <ImageSelector />
@@ -41,6 +42,6 @@ export default function CreateFundraiserPage() {
           <CreateFundraiserButton />
         </MainPanel>
       </FundraiserLayout>
-    </>
+    </CreateFundraiserFormProvider>
   );
 }

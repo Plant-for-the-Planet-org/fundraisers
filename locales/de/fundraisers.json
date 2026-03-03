@@ -9,6 +9,15 @@
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
-    "hostedByLabel": "Veranstaltet von"
+    "hostedByLabel": "Veranstaltet von",
+    "create": {
+      "title": {
+        "label": "Name der Spendenaktion",
+        "placeholder": "Name der Spendenaktion",
+        "errors": {
+          "required": "Bitte gib einen Namen für die Spendenaktion ein."
+        }
+      }
+    }
   }
 }
