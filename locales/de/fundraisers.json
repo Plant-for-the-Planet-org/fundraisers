@@ -12,10 +12,11 @@
     "hostedByLabel": "Veranstaltet von",
     "create": {
       "title": {
-        "label": "Name der Spendenaktion",
-        "placeholder": "Name der Spendenaktion",
+        "label": "Name der Fundraiser",
+        "placeholder": "Name der Fundraiser",
         "errors": {
-          "required": "Bitte gib einen Namen für die Spendenaktion ein."
+          "required": "Bitte gib einen Namen für die Fundraiser ein.",
+          "maxLength": "Bitte halte den Namen der Fundraiser bei maximal {max} Zeichen."
         }
       },
       "description": {

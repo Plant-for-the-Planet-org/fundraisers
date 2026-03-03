@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 export const createFundraiserFormSchema = z.object({
-  title: z.string().trim().min(1),
+  title: z.string().trim().min(1).max(50),
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0),
