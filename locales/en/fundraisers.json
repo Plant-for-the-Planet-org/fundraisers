@@ -9,6 +9,16 @@
     "coverImageAlt": "Cover image for {title}",
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
-    "hostedByLabel": "Hosted by"
+    "hostedByLabel": "Hosted by",
+    "create": {
+      "title": {
+        "label": "Fundraiser name",
+        "placeholder": "Fundraiser Name",
+        "errors": {
+          "required": "Please enter a fundraiser name.",
+          "maxLength": "Please keep the fundraiser name within {max} characters."
+        }
+      }
+    }
   }
 }

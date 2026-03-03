@@ -9,6 +9,16 @@
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Anzahl der Spenden",
     "amountRaisedLabel": "Gesammelter Betrag",
-    "hostedByLabel": "Veranstaltet von"
+    "hostedByLabel": "Veranstaltet von",
+    "create": {
+      "title": {
+        "label": "Name der Fundraiser",
+        "placeholder": "Name der Fundraiser",
+        "errors": {
+          "required": "Bitte gib einen Namen für die Fundraiser ein.",
+          "maxLength": "Bitte halte den Namen der Fundraiser bei maximal {max} Zeichen."
+        }
+      }
+    }
   }
 }
