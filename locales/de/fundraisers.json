@@ -3,7 +3,7 @@
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
-    "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 anderem} other {# anderen}}",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
