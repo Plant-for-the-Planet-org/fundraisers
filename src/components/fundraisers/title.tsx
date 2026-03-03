@@ -1,8 +1,8 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 import { useFormContext } from 'react-hook-form';
 
@@ -24,12 +24,8 @@ interface TitleInputProps {
   requiredMessage: string;
 }
 
-export function TitleInput({
-  label,
-  placeholder,
-  requiredMessage,
-}: TitleInputProps) {
-  const inputId = useId();
+function TitleInput({ label, placeholder, requiredMessage }: TitleInputProps) {
+  const inputId = 'form-title';
   const errorId = `${inputId}-error`;
 
   const {
@@ -48,7 +44,10 @@ export function TitleInput({
         id={inputId}
         type='text'
         placeholder={placeholder}
-        className='typo-form-title-input bg-transparent border-none outline-none w-full'
+        className={cn(
+          'typo-form-title-input bg-transparent outline-none w-full',
+          hasTitleError && 'border-b border-red-500'
+        )}
         aria-invalid={hasTitleError}
         aria-describedby={hasTitleError ? errorId : undefined}
         {...register('title')}
