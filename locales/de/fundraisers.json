@@ -11,6 +11,11 @@
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
     "create": {
+      "theme": {
+        "sectionHeading": "Thema",
+        "labelAccentColor": "Akzentfarbe",
+        "selectAccent": "Akzentfarbe {accent} auswählen"
+      },
       "title": {
         "label": "Name der Fundraiser",
         "placeholder": "Name der Fundraiser",
@@ -19,10 +24,12 @@
           "maxLength": "Bitte halte den Namen der Fundraiser bei maximal {max, number} Zeichen."
         }
       },
-      "theme": {
-        "sectionHeading": "Thema",
-        "labelAccentColor": "Akzentfarbe",
-        "selectAccent": "Akzentfarbe {accent} auswählen"
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Erzähle mehr über deine Spendenaktion...",
+        "errors": {
+          "required": "Bitte gib eine Beschreibung für die Spendenaktion ein."
+        }
       }
     }
   }
