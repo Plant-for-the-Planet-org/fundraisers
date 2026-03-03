@@ -18,6 +18,13 @@
           "required": "Bitte gib einen Namen für die Fundraiser ein.",
           "maxLength": "Bitte halte den Namen der Fundraiser bei maximal {max} Zeichen."
         }
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Erzähle mehr über deine Spendenaktion...",
+        "errors": {
+          "required": "Bitte gib eine Beschreibung für die Spendenaktion ein."
+        }
       }
     }
   }

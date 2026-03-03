@@ -18,6 +18,13 @@
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max} characters."
         }
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell people about your fundraiser...",
+        "errors": {
+          "required": "Please enter a fundraiser description."
+        }
       }
     }
   }
