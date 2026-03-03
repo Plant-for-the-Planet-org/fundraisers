@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { useEffect } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
@@ -37,6 +37,16 @@ interface ToolbarButtonProps {
   title: string;
 }
 
+const INACTIVE_EDITOR_STATE = {
+  isBold: false,
+  isItalic: false,
+  isUnderline: false,
+  isStrike: false,
+  isBulletList: false,
+  isOrderedList: false,
+  isBlockquote: false,
+} as const;
+
 function ToolbarButton({
   onClick,
   isActive = false,
@@ -46,7 +56,11 @@ function ToolbarButton({
   return (
     <button
       type='button'
-      onClick={onClick}
+      onMouseDown={event => {
+        // Keep editor focus on toolbar interactions so selection/active-state is preserved.
+        event.preventDefault();
+        onClick();
+      }}
       className={cn(
         'h-8 w-8 rounded-md p-0 inline-flex items-center justify-center transition-colors',
         'hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -98,13 +112,33 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'min-h-[120px] p-3 text-sm text-foreground focus:outline-none prose-editor-content',
+          'min-h-[120px] p-3 text-sm text-foreground leading-[1.625] focus:outline-none',
         'aria-invalid': String(ariaInvalid),
         ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
       },
     },
     immediatelyRender: false,
   });
+
+  const activeState = useEditorState({
+    editor,
+    selector: ({ editor: currentEditor }) => {
+      if (!currentEditor) {
+        return INACTIVE_EDITOR_STATE;
+      }
+
+      return {
+        isBold: currentEditor.isActive('bold'),
+        isItalic: currentEditor.isActive('italic'),
+        isUnderline: currentEditor.isActive('underline'),
+        isStrike: currentEditor.isActive('strike'),
+        isBulletList: currentEditor.isActive('bulletList'),
+        isOrderedList: currentEditor.isActive('orderedList'),
+        isBlockquote: currentEditor.isActive('blockquote'),
+      };
+    },
+  });
+  const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
@@ -126,28 +160,28 @@ export function RichTextEditor({
       <div className='border-b border-input p-2 flex items-center gap-1 flex-wrap bg-muted/10'>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
-          isActive={editor.isActive('bold')}
+          isActive={toolbarState.isBold}
           title='Bold (Ctrl+B)'
         >
           <Bold className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          isActive={editor.isActive('italic')}
+          isActive={toolbarState.isItalic}
           title='Italic (Ctrl+I)'
         >
           <Italic className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          isActive={editor.isActive('underline')}
+          isActive={toolbarState.isUnderline}
           title='Underline (Ctrl+U)'
         >
           <UnderlineIcon className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          isActive={editor.isActive('strike')}
+          isActive={toolbarState.isStrike}
           title='Strikethrough'
         >
           <Strikethrough className='h-4 w-4' />
@@ -157,14 +191,14 @@ export function RichTextEditor({
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          isActive={editor.isActive('bulletList')}
+          isActive={toolbarState.isBulletList}
           title='Bullet List'
         >
           <List className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          isActive={editor.isActive('orderedList')}
+          isActive={toolbarState.isOrderedList}
           title='Numbered List'
         >
           <ListOrdered className='h-4 w-4' />
@@ -174,7 +208,7 @@ export function RichTextEditor({
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          isActive={editor.isActive('blockquote')}
+          isActive={toolbarState.isBlockquote}
           title='Quote'
         >
           <Quote className='h-4 w-4' />
@@ -189,7 +223,43 @@ export function RichTextEditor({
 
       <EditorContent
         editor={editor}
-        className='[&_.ProseMirror]:bg-transparent [&_.ProseMirror]:text-foreground [&_.ProseMirror]:border-0 [&_.ProseMirror]:outline-none [&_.ProseMirror]:min-h-[120px] [&_.ProseMirror_p]:text-foreground [&_.ProseMirror_strong]:text-foreground [&_.ProseMirror_em]:text-foreground [&_.ProseMirror_u]:text-foreground [&_.ProseMirror_s]:text-foreground [&_.ProseMirror_blockquote]:border-l-border [&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_hr]:border-border [&_.ProseMirror_ul]:text-foreground [&_.ProseMirror_ol]:text-foreground [&_.ProseMirror_li]:text-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none'
+        className='
+          [&_.ProseMirror]:bg-transparent
+          [&_.ProseMirror]:text-foreground
+          [&_.ProseMirror]:border-0
+          [&_.ProseMirror]:outline-none
+          [&_.ProseMirror]:min-h-[120px]
+          [&_.ProseMirror_p]:text-foreground
+          [&_.ProseMirror_p]:my-3
+          [&_.ProseMirror_p:first-child]:mt-0
+          [&_.ProseMirror_p:last-child]:mb-0
+          [&_.ProseMirror_strong]:font-semibold
+          [&_.ProseMirror_em]:italic
+          [&_.ProseMirror_u]:underline
+          [&_.ProseMirror_s]:line-through
+          [&_.ProseMirror_ul]:my-3
+          [&_.ProseMirror_ul]:pl-6
+          [&_.ProseMirror_ul]:list-disc
+          [&_.ProseMirror_ol]:my-3
+          [&_.ProseMirror_ol]:pl-6
+          [&_.ProseMirror_ol]:list-decimal
+          [&_.ProseMirror_li]:my-1
+          [&_.ProseMirror_blockquote]:my-4
+          [&_.ProseMirror_blockquote]:pl-4
+          [&_.ProseMirror_blockquote]:border-l-4
+          [&_.ProseMirror_blockquote]:border-l-border
+          [&_.ProseMirror_blockquote]:italic
+          [&_.ProseMirror_blockquote]:text-muted-foreground
+          [&_.ProseMirror_hr]:my-6
+          [&_.ProseMirror_hr]:border-0
+          [&_.ProseMirror_hr]:border-t-2
+          [&_.ProseMirror_hr]:border-t-border
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0
+          [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none
+        '
       />
     </div>
   );
