@@ -16,7 +16,7 @@
         "placeholder": "Fundraiser Name",
         "errors": {
           "required": "Please enter a fundraiser name.",
-          "maxLength": "Please keep the fundraiser name within {max} characters."
+          "maxLength": "Please keep the fundraiser name within {max, number} characters."
         }
       },
       "theme": {
