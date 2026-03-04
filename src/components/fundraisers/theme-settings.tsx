@@ -7,6 +7,7 @@ import type { AccentColor } from '@/lib/theme/types';
 import { THEMES } from '@/lib/theme/themes';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
+import { Button } from '@/components/ui/button';
 import { SectionHeader } from './typography';
 import { useTranslations } from 'next-intl';
 
@@ -69,8 +70,9 @@ export function ThemeSettings() {
       <div>
         <SectionHeader>{tTheme('sectionHeading')}</SectionHeader>
         <div ref={dropdownRef} className='relative mt-2' onBlur={handleBlur}>
-          <button
-            className='w-full flex items-center justify-between px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm'
+          <Button
+            variant='outline'
+            className='w-full justify-between bg-transparent border-border hover:bg-muted/5'
             onClick={handleToggle}
             aria-expanded={isOpen}
             aria-haspopup='listbox'
@@ -79,27 +81,25 @@ export function ThemeSettings() {
             <ChevronDown
               className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             />
-          </button>
+          </Button>
 
           {isOpen && (
             <div
               role='listbox'
-              className='absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto'
+              className='absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto'
             >
               {THEME_OPTIONS.map(theme => (
                 <button
                   key={theme.id}
                   role='option'
                   aria-selected={activeTheme.id === theme.id}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                    activeTheme.id === theme.id
-                      ? 'bg-gray-50 dark:bg-gray-800 font-semibold'
-                      : ''
+                  className={`w-full px-3 py-2 text-left hover:bg-muted text-sm ${
+                    activeTheme.id === theme.id ? 'bg-muted' : ''
                   }`}
                   onClick={() => handleThemeSelect(theme.id)}
                 >
-                  <div>{theme.name}</div>
-                  <div className='text-xs text-gray-500 dark:text-gray-400 capitalize'>
+                  <div className='font-medium'>{theme.name}</div>
+                  <div className='text-xs text-muted-foreground capitalize'>
                     {theme.category}
                   </div>
                 </button>
