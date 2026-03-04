@@ -18,6 +18,11 @@
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max} characters."
         }
+      },
+      "theme": {
+        "sectionHeading": "Theme",
+        "labelAccentColor": "Accent color",
+        "selectAccent": "Select {accent} accent color"
       }
     }
   }
