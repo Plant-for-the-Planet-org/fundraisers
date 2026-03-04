@@ -1,7 +1,7 @@
 {
   "Common": {
     "greeting": "Hallo, Welt!",
-    "welcome": "Willkommen zu unserer Anwendung.",
+    "welcome": "Willkommen bei unserer Anwendung.",
     "languageSelectionLabel": "Sprache:",
     "legalLinks": {
       "privacy": "Datenschutz",
@@ -9,8 +9,8 @@
       "imprint": "Impressum"
     },
     "headerLinks": {
-      "explore": "Entdecken",
-      "startFundraiser": "Fundraiser starten"
+      "explore": "Fundraiser Entdecken",
+      "startFundraiser": "Fundraiser erstellen"
     }
   }
 }
