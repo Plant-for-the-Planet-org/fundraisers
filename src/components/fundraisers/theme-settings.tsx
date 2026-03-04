@@ -113,15 +113,21 @@ export function ThemeSettings() {
         <SectionHeader showDivider={false}>
           {tTheme('labelAccentColor')}
         </SectionHeader>
-        <div className='flex flex-wrap gap-2 mt-2'>
+        <div
+          role='radiogroup'
+          aria-label={tTheme('labelAccentColor')}
+          className='flex flex-wrap gap-2 mt-2'
+        >
           {activeTheme.colorOptions.map(accent => (
             <button
               key={accent}
+              role='radio'
+              aria-checked={activeTheme.accent === accent}
               onClick={() => handleAccentChange(accent)}
               className={`w-6 h-6 rounded-full border-2 transition-all duration-200 hover:scale-110 ${
                 activeTheme.accent === accent
                   ? 'border-gray-900 dark:border-gray-100 shadow-md'
-                  : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
               }`}
               title={tTheme('selectAccent', { accent })}
               aria-label={tTheme('selectAccent', { accent })}
