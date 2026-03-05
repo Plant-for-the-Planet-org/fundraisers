@@ -11,6 +11,11 @@
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
     "create": {
+      "theme": {
+        "sectionHeading": "Thema",
+        "labelAccentColor": "Akzentfarbe",
+        "selectAccent": "Akzentfarbe {accent} auswählen"
+      },
       "title": {
         "label": "Name der Fundraiser",
         "placeholder": "Name der Fundraiser",

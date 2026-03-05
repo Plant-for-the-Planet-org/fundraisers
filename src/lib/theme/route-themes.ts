@@ -7,6 +7,7 @@ import { THEMES, DEFAULT_THEME } from './themes';
 const ROUTE_THEME_MAP: Record<string, string> = {
   '/': 'spring',
   '/explore': 'stratospheric',
+  '/fundraisers/create': 'spring',
 };
 
 export function getThemeForPath(pathname: string): Theme {

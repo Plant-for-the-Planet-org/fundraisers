@@ -11,6 +11,11 @@
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
     "create": {
+      "theme": {
+        "sectionHeading": "Theme",
+        "labelAccentColor": "Accent color",
+        "selectAccent": "Select {accent} accent color"
+      },
       "title": {
         "label": "Fundraiser name",
         "placeholder": "Fundraiser Name",
