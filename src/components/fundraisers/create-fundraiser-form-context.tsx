@@ -18,6 +18,32 @@ const DevTool =
       })
     : null;
 
+import type { SelectedImage } from '@/lib/types/image-selection';
+
+const selectedImageSchema = z.object({
+  url: z.string().min(1),
+  thumbnailUrl: z.string().min(1),
+  originalUrl: z.string().optional(),
+  attribution: z
+    .object({
+      photographer: z.string().min(1),
+      photographerUrl: z.string().min(1),
+      unsplashUrl: z.string().min(1),
+    })
+    .optional(),
+  source: z.enum(['unsplash', 'upload']),
+  uploadStatus: z.enum(['pending', 'uploading', 'completed', 'failed']),
+  downloadLocation: z.string().optional(),
+  file: z
+    .custom<File | undefined>(value => {
+      if (value === undefined) {
+        return true;
+      }
+      return typeof File !== 'undefined' && value instanceof File;
+    })
+    .optional(),
+});
+
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
@@ -34,11 +60,12 @@ export const createFundraiserFormSchema = z.object({
       animation: z.string(),
     }),
   }),
+  image: selectedImageSchema.nullable(),
 });
 
 export type CreateFundraiserFormValues = z.infer<
   typeof createFundraiserFormSchema
->;
+> & { image: SelectedImage | null };
 
 interface CreateFundraiserFormProviderProps {
   children: ReactNode;
@@ -66,6 +93,7 @@ export function CreateFundraiserFormProvider({
       },
       title: '',
       description: '',
+      image: null,
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
