@@ -1,12 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
-
-import { cn } from '@/lib/utils';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
-
 import { useTranslations } from 'next-intl';
+import { useCallback, useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import { cn } from '@/lib/utils';
 
 const TITLE_MAX_LENGTH = 50;
 
@@ -81,7 +80,7 @@ function TitleInput({
         maxLength={TITLE_MAX_LENGTH} // Keeping this will restrict the content & Error would never appear.
         placeholder={placeholder}
         className={cn(
-          'font-poppins typo-form-title-input bg-transparent outline-none w-full resize-none overflow-hidden',
+          'font-poppins typo-form-title-input border-b border-transparent bg-transparent outline-none w-full resize-none overflow-hidden',
           hasTitleError && 'border-b border-red-500'
         )}
         aria-invalid={hasTitleError}
@@ -96,11 +95,9 @@ function TitleInput({
         }}
       />
 
-      {hasTitleError && (
-        <p id={errorId} className='text-sm text-red-600 dark:text-red-400'>
-          {titleErrorMessage}
-        </p>
-      )}
+      <p id={errorId} className='text-sm h-5 text-red-600 dark:text-red-400'>
+        {hasTitleError ? titleErrorMessage : ''}
+      </p>
     </div>
   );
 }

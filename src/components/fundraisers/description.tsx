@@ -1,16 +1,16 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
-
-import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 import { Controller, useFormContext } from 'react-hook-form';
+
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { SectionHeader } from './typography';
+import { cn } from '@/lib/utils';
 
 export function Description() {
   const t = useTranslations('Fundraisers.create.description');
-  const descriptionId = useId();
+  const descriptionId = 'form-description';
   const errorId = `${descriptionId}-error`;
 
   const {
@@ -31,6 +31,7 @@ export function Description() {
         control={control}
         render={({ field }) => (
           <RichTextEditor
+            className={cn(hasDescriptionError && 'border-b border-red-500')}
             value={field.value}
             onChange={field.onChange}
             onBlur={field.onBlur}
@@ -41,11 +42,9 @@ export function Description() {
         )}
       />
 
-      {hasDescriptionError && (
-        <p id={errorId} className='text-sm text-red-600 dark:text-red-400'>
-          {t('errors.required')}
-        </p>
-      )}
+      <p id={errorId} className='text-sm h-5 text-red-600 dark:text-red-400'>
+        {hasDescriptionError ? t('errors.required') : ''}
+      </p>
     </div>
   );
 }
