@@ -1,7 +1,11 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 import type { AccentColor } from '@/lib/theme/types';
+
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useController } from 'react-hook-form';
 import { THEMES } from '@/lib/theme/themes';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
@@ -13,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SectionHeader } from './typography';
-import { useTranslations } from 'next-intl';
 
 const ACCENT_BG: Record<AccentColor, string> = {
   blue: 'bg-blue-500',
@@ -45,16 +48,33 @@ export function ThemeSettings() {
   const pathname = usePathname();
   const tTheme = useTranslations('Fundraisers.create.theme');
   const { selectedTheme, setSelectedTheme } = useThemeStore();
+  const { field } = useController<CreateFundraiserFormValues, 'settings.theme'>(
+    {
+      name: 'settings.theme',
+    }
+  );
 
   const activeTheme = selectedTheme ?? getThemeForPath(pathname);
 
   const handleThemeSelect = (themeId: string) => {
     const theme = THEMES[themeId];
     if (!theme) return;
+
+    field.onChange({
+      base_id: theme.id,
+      mode: theme.mode,
+      accent: theme.accent,
+      background: theme.background,
+      body_font: theme.bodyFont,
+      title_font: theme.titleFont,
+      animation: theme.animation ?? 'none',
+    });
+
     setSelectedTheme(theme);
   };
 
   const handleAccentChange = (accent: AccentColor) => {
+    field.onChange({ ...field.value, accent });
     setSelectedTheme({ ...activeTheme, accent });
   };
 
