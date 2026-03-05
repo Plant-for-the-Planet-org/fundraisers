@@ -1,23 +1,23 @@
 'use client';
 
-import type { ReactNode } from 'react';
-
-import { useEffect } from 'react';
-import { useEditor, EditorContent, useEditorState } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
 import { TextStyle } from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
   Bold,
   Italic,
-  Underline as UnderlineIcon,
-  Strikethrough,
   List,
   ListOrdered,
-  Quote,
   Minus,
+  Quote,
+  Strikethrough,
+  Underline as UnderlineIcon,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+
 import { cn } from '@/lib/utils/cn';
 
 interface RichTextEditorProps {
@@ -147,7 +147,7 @@ export function RichTextEditor({
   }, [editor, value]);
 
   if (!editor) {
-    return null;
+    return <div className='h-[171px] w-full bg-transparent' />;
   }
 
   return (
