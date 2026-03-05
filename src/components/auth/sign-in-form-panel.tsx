@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { buildSocialAuthorizeUrl } from '@/lib/auth/auth0-config';
 
 export function SignInFormPanel() {
-  const tAuth = useTranslations('auth');
+  const tAuth = useTranslations('Auth');
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') || '/dash';
   const [email, setEmail] = useState('');

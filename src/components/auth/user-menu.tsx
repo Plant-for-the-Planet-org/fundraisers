@@ -23,7 +23,7 @@ import { useTranslations } from 'next-intl';
 export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const tDashboard = useTranslations('dashboard');
+  const tDashboard = useTranslations('Dashboard');
   const tFundraiser = useTranslations('Fundraisers');
 
   const pathname = usePathname();

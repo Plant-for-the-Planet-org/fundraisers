@@ -22,7 +22,7 @@ export function EmailSignInForm({
 }: EmailSignInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const tAuth = useTranslations('auth');
+  const tAuth = useTranslations('Auth');
   const continueLabel = tAuth('continueButton');
 
   const handleEmailSignIn = async (e: React.SubmitEvent) => {

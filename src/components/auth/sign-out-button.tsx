@@ -18,7 +18,7 @@ export function SignOutButton({
   size = 'default',
   children,
 }: SignOutButtonProps) {
-  const tAuth = useTranslations('auth');
+  const tAuth = useTranslations('Auth');
   const signOut = useAuthStore(state => state.logout);
   const handleSignOut = () => {
     signOut();
