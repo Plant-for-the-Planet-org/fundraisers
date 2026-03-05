@@ -7,7 +7,7 @@
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
-    "donationCountLabel": "Anzahl der Spenden",
+    "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
     "create": {
