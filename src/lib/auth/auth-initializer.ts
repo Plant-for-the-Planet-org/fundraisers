@@ -14,8 +14,8 @@ function cleanUrl(params: string[]) {
 }
 
 async function handleCodeExchange(code: string) {
-  const tokens = await exchangeCodeForTokens(code);
   cleanUrl(['code']);
+  const tokens = await exchangeCodeForTokens(code);
   return tokens.access_token;
 }
 
