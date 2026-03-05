@@ -113,7 +113,7 @@ export function RichTextEditor({
       attributes: {
         class:
           'min-h-[120px] p-3 text-sm text-foreground leading-[1.625] focus:outline-none',
-        'aria-invalid': String(ariaInvalid),
+        ...(ariaInvalid ? { 'aria-invalid': 'true' } : {}),
         ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
       },
     },
@@ -141,7 +141,7 @@ export function RichTextEditor({
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
+    if (editor && !editor.isFocused && value !== editor.getHTML()) {
       editor.commands.setContent(value);
     }
   }, [editor, value]);
