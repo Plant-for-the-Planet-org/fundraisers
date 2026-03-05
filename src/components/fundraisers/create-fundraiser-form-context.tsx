@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -19,6 +20,9 @@ const DevTool =
 
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
+  description: z
+    .string()
+    .refine(value => getRichTextTextContent(value).length > 0),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -49,7 +53,6 @@ export function CreateFundraiserFormProvider({
   const methods = useForm<CreateFundraiserFormValues>({
     resolver: zodResolver(createFundraiserFormSchema),
     defaultValues: {
-      title: '',
       settings: {
         theme: {
           base_id: initialTheme.id,
@@ -61,6 +64,8 @@ export function CreateFundraiserFormProvider({
           animation: initialTheme.animation ?? 'none',
         },
       },
+      title: '',
+      description: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
