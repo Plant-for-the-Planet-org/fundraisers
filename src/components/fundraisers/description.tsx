@@ -36,6 +36,7 @@ export function Description() {
             onChange={field.onChange}
             onBlur={field.onBlur}
             placeholder={t('placeholder')}
+            aria-label={t('label')}
             ariaInvalid={hasDescriptionError}
             ariaDescribedBy={hasDescriptionError ? errorId : undefined}
           />
