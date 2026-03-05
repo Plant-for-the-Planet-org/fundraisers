@@ -15,7 +15,7 @@ export function SignInButton({
   variant = 'default',
   size = 'default',
 }: SignInButtonProps) {
-  const tAuth = useTranslations('auth');
+  const tAuth = useTranslations('Auth');
   const handleLogin = () => {
     const url = getSignInPageUrl(redirectTo);
     window.location.assign(url);
