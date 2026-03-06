@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -32,20 +32,12 @@ export default function LoginPage() {
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className='flex items-center justify-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary' />
-        </div>
-      }
-    >
-      <div className='flex flex-col lg:flex-row'>
-        {/* Left side - Hero Image with Tagline (hidden on mobile, shown on desktop) */}
-        <SignInHeroImage />
+    <div className='flex flex-col lg:flex-row'>
+      {/* Left side - Hero Image with Tagline (hidden on mobile, shown on desktop) */}
+      <SignInHeroImage />
 
-        {/* Right side - Login (order-1 on mobile, order-2 on desktop) */}
-        <SignInFormPanel redirectTo={safeRedirect} />
-      </div>
-    </Suspense>
+      {/* Right side - Login (order-1 on mobile, order-2 on desktop) */}
+      <SignInFormPanel redirectTo={safeRedirect} />
+    </div>
   );
 }
