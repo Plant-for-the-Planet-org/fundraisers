@@ -20,6 +20,9 @@ async function handleCodeExchange(code: string) {
 }
 
 export function AuthInitializer() {
+  const setIsAuthInitializing = useAuthStore(
+    state => state.setIsAuthInitializing
+  );
   const setAccessToken = useAuthStore(state => state.setAccessToken);
   const clearAuth = useAuthStore(state => state.clearAuth);
 
@@ -55,7 +58,7 @@ export function AuthInitializer() {
         console.error('Auth init failed:', err);
         clearAuth();
       } finally {
-        useAuthStore.setState({ isLoading: false });
+        setIsAuthInitializing(false);
       }
     };
 

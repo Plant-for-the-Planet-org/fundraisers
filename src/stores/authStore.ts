@@ -15,10 +15,11 @@ interface AuthStore {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isAuthInitializing: boolean;
   error: string | null;
 
   setAccessToken: (token: string | null) => void;
+  setIsAuthInitializing: (value: boolean) => void;
   loadUserProfile: () => Promise<void>;
   logout: (customReturnTo?: string | undefined) => void;
   clearAuth: () => void;
@@ -30,9 +31,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
-  isLoading: false,
+  isAuthInitializing: true,
   error: null,
 
+  setIsAuthInitializing: value => set({ isAuthInitializing: value }),
   /**
    * Only responsible for:
    * - Setting token
@@ -45,13 +47,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
     if (get().accessToken === token) return;
 
-    set({ accessToken: token, isAuthenticated: true });
+    set({ accessToken: token });
 
     if (isBrowser) {
       localStorage.setItem('access_token', token);
     }
     document.cookie = `is-authenticated=true; path=/; secure; samesite=lax`;
     await get().loadUserProfile();
+    if (get().user) {
+      set({ isAuthenticated: true });
+    }
   },
 
   /**
@@ -62,7 +67,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!accessToken) return;
 
     try {
-      set({ isLoading: true });
+      set({ isAuthInitializing: true });
 
       const profile = await userService.getProfileSafe(accessToken);
 
@@ -84,7 +89,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({ error: 'Authentication failed' });
       get().clearAuth();
     } finally {
-      set({ isLoading: false });
+      set({ isAuthInitializing: false });
     }
   },
 
@@ -121,7 +126,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       accessToken: null,
       isAuthenticated: false,
       error: null,
-      isLoading: false,
+      isAuthInitializing: false,
     });
   },
 }));
