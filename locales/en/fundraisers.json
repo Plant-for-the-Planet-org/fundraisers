@@ -24,10 +24,15 @@
         "labelAccentColor": "Accent color",
         "selectAccent": "Select {accent} accent color"
       },
-      "workspace": {
+      "countryEntity": {
         "label": "Country",
         "restOfWorld": "Rest of the World",
-        "currencyLabel": "{currency} currency"
+        "currencyLabel": "{currency} currency",
+        "info": {
+          "general": "Your selected country determines the tax deductibility of donations and which causes are available for your fundraiser.",
+          "taxReceiptEligible": "You will receive a tax-deduction eligible donation receipt for {country}.",
+          "notTaxReceiptEligible": "{country, select, ROW {Tax-deduction eligible donation receipts are not available.} other {Tax-deduction eligible donation receipts are not available for {country}.}}"
+        }
       }
     }
   }

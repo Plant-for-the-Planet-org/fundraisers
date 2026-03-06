@@ -15,7 +15,7 @@ import { getAllowedCountries } from '@/lib/utils/country-currency';
 
 export function WorkspaceSelector() {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.workspace');
+  const t = useTranslations('Fundraisers.create.countryEntity');
 
   const { field } = useController<CreateFundraiserFormValues, 'country'>({
     name: 'country',
