@@ -18,7 +18,7 @@ interface AuthStore {
   isAuthInitializing: boolean;
   error: string | null;
 
-  setAccessToken: (token: string | null) => void;
+  setAccessToken: (token: string | null) => Promise<void>;
   setIsAuthInitializing: (value: boolean) => void;
   loadUserProfile: () => Promise<void>;
   logout: (customReturnTo?: string | undefined) => void;
@@ -35,8 +35,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   error: null,
 
   setIsAuthInitializing: value => set({ isAuthInitializing: value }),
+
   /**
-   * Only responsible for:
+   * Responsible for:
    * - Setting token
    * - Triggering profile load
    */
@@ -45,17 +46,29 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       get().clearAuth();
       return;
     }
+
     if (get().accessToken === token) return;
 
     set({ accessToken: token });
 
-    if (isBrowser) {
-      localStorage.setItem('access_token', token);
-    }
-    document.cookie = `is-authenticated=true; path=/; secure; samesite=lax`;
-    await get().loadUserProfile();
-    if (get().user) {
+    try {
+      await get().loadUserProfile();
+
+      const user = get().user;
+
+      if (!user) {
+        throw new Error('User profile not loaded');
+      }
+
+      if (isBrowser) {
+        localStorage.setItem('access_token', token);
+        document.cookie = `is-authenticated=true; path=/; secure; samesite=lax`;
+      }
+
       set({ isAuthenticated: true });
+    } catch (err) {
+      console.error('Auth failed:', err);
+      get().clearAuth();
     }
   },
 
@@ -64,11 +77,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    */
   loadUserProfile: async () => {
     const { accessToken } = get();
-    if (!accessToken) return;
+
+    if (!accessToken) {
+      throw new Error('Missing access token');
+    }
 
     try {
-      set({ isAuthInitializing: true });
-
       const profile = await userService.getProfileSafe(accessToken);
 
       if (!profile) {
@@ -87,9 +101,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (err) {
       console.error('Profile load failed:', err);
       set({ error: 'Authentication failed' });
-      get().clearAuth();
-    } finally {
-      set({ isAuthInitializing: false });
+      throw err; // let caller decide
     }
   },
 
@@ -126,7 +138,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       accessToken: null,
       isAuthenticated: false,
       error: null,
-      isAuthInitializing: false,
     });
   },
 }));

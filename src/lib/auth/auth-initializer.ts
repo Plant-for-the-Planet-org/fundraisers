@@ -10,7 +10,7 @@ import {
 function cleanUrl(params: string[]) {
   const url = new URL(window.location.href);
   params.forEach(p => url.searchParams.delete(p));
-  window.history.replaceState({}, '', url.toString());
+  window.history.replaceState({}, '', url.pathname + url.search);
 }
 
 async function handleCodeExchange(code: string) {
@@ -53,6 +53,7 @@ export function AuthInitializer() {
           return;
         } else {
           await trySignInSilently();
+          return;
         }
       } catch (err) {
         console.error('Auth init failed:', err);
