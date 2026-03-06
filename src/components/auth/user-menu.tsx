@@ -31,9 +31,9 @@ export function UserMenu() {
   const user = useAuthStore(state => state.user);
   const profile = useAuthStore(state => state.user?.profile);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const isLoading = useAuthStore(state => state.isLoading);
+  const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
-  if (isLoading) {
+  if (isAuthInitializing) {
     return <div className='w-14 h-8 bg-gray-200 rounded-full animate-pulse' />;
   }
 
@@ -67,7 +67,7 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className='w-66  rounded-xl shadow-lg'
+        className='w-66  rounded-xl shadow-lg bg-white'
         align='end'
         forceMount
       >
@@ -104,7 +104,7 @@ export function UserMenu() {
           <SignOutButton
             variant='ghost'
             size='sm'
-            className='text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer'
+            className='w-full justify-start hover:bg-gray-100 cursor-pointer'
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
