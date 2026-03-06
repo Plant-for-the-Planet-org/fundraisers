@@ -96,7 +96,7 @@ export function ThemeSettings() {
               <SelectItem
                 key={theme.id}
                 value={theme.id}
-                stacked
+                layout='stacked'
                 className='pr-2 py-2 focus:bg-muted data-[state=checked]:bg-muted **:data-[slot=select-item-indicator]:hidden'
               >
                 <div className='font-medium'>{theme.name}</div>

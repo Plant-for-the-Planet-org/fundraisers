@@ -105,16 +105,23 @@ function SelectLabel({
 function SelectItem({
   className,
   children,
-  /** stacked: renders children in a flex column, useful for two-line items (e.g. name + description) */
-  stacked = false,
+  /**
+   * layout:
+   *  'inline'  (default) — ItemText renders as an inline span
+   *  'block'             — ItemText renders as a full-width div; use when children manage their own layout (e.g. flag + name + currency row)
+   *  'stacked'           — ItemText renders as a full-width flex-col div; use for multi-line items (e.g. name + description)
+   */
+  layout = 'inline',
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item> & { stacked?: boolean }) {
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+  layout?: 'inline' | 'block' | 'stacked';
+}) {
   return (
     <SelectPrimitive.Item
       data-slot='select-item'
       className={cn(
         "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
-        stacked && 'flex-col items-start',
+        layout === 'stacked' && 'flex-col items-start',
         className
       )}
       {...props}
@@ -127,12 +134,16 @@ function SelectItem({
           <CheckIcon className='size-4' />
         </SelectPrimitive.ItemIndicator>
       </span>
-      {stacked ? (
-        <SelectPrimitive.ItemText asChild>
-          <div className='flex w-full flex-col'>{children}</div>
-        </SelectPrimitive.ItemText>
-      ) : (
+      {layout === 'inline' ? (
         <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      ) : (
+        <SelectPrimitive.ItemText asChild>
+          <div
+            className={cn('w-full', layout === 'stacked' && 'flex flex-col')}
+          >
+            {children}
+          </div>
+        </SelectPrimitive.ItemText>
       )}
     </SelectPrimitive.Item>
   );
