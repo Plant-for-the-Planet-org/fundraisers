@@ -18,30 +18,21 @@ const DevTool =
       })
     : null;
 
-import type { SelectedImage } from '@/lib/types/image-selection';
+const unsplashAttributionSchema = z.object({
+  photographer: z.string(),
+  photographerUrl: z.string(),
+  unsplashUrl: z.string(),
+});
 
 const selectedImageSchema = z.object({
   url: z.string().min(1),
   thumbnailUrl: z.string().min(1),
   originalUrl: z.string().optional(),
-  attribution: z
-    .object({
-      photographer: z.string().min(1),
-      photographerUrl: z.string().min(1),
-      unsplashUrl: z.string().min(1),
-    })
-    .optional(),
+  attribution: unsplashAttributionSchema.optional(),
   source: z.enum(['unsplash', 'upload']),
   uploadStatus: z.enum(['pending', 'uploading', 'completed', 'failed']),
   downloadLocation: z.string().optional(),
-  file: z
-    .custom<File | undefined>(value => {
-      if (value === undefined) {
-        return true;
-      }
-      return typeof File !== 'undefined' && value instanceof File;
-    })
-    .optional(),
+  file: z.unknown().optional(),
 });
 
 export const createFundraiserFormSchema = z.object({
@@ -49,6 +40,7 @@ export const createFundraiserFormSchema = z.object({
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0),
+  image: selectedImageSchema.nullable(),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -60,12 +52,11 @@ export const createFundraiserFormSchema = z.object({
       animation: z.string(),
     }),
   }),
-  image: selectedImageSchema.nullable(),
 });
 
 export type CreateFundraiserFormValues = z.infer<
   typeof createFundraiserFormSchema
-> & { image: SelectedImage | null };
+>;
 
 interface CreateFundraiserFormProviderProps {
   children: ReactNode;

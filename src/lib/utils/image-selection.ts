@@ -1,12 +1,13 @@
 import type {
   ImageValidationResult,
   SelectedImage,
+  UnsplashPhoto,
 } from '@/lib/types/image-selection';
 
-import type { UnsplashPhoto } from '@/lib/api/unsplash-service';
+export const MAX_IMAGE_FILE_SIZE_MB = 10;
+export const MAX_IMAGE_FILE_SIZE = MAX_IMAGE_FILE_SIZE_MB * 1024 * 1024;
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
-const ALLOWED_MIME_TYPES = [
+export const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
   'image/jpg',
   'image/png',
@@ -15,36 +16,36 @@ const ALLOWED_MIME_TYPES = [
 ] as const;
 
 export function validateImageFile(file: File): ImageValidationResult {
-  if (!file) {
-    return {
-      isValid: false,
-      error: { code: 'INVALID_FILE_TYPE', message: 'No file provided' },
-    };
-  }
-
   if (file.size === 0) {
     return {
       isValid: false,
-      error: { code: 'INVALID_FILE_TYPE', message: 'File is empty' },
-    };
-  }
-
-  if (file.size > MAX_FILE_SIZE_BYTES) {
-    return {
-      isValid: false,
       error: {
-        code: 'FILE_TOO_LARGE',
-        message: `File size must be less than ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB`,
+        code: 'EMPTY_FILE',
+        message: 'Selected file is empty.',
       },
     };
   }
 
-  if (!(ALLOWED_MIME_TYPES as readonly string[]).includes(file.type)) {
+  if (file.size > MAX_IMAGE_FILE_SIZE) {
+    return {
+      isValid: false,
+      error: {
+        code: 'FILE_TOO_LARGE',
+        message: `Image must be ${MAX_IMAGE_FILE_SIZE_MB}MB or smaller.`,
+      },
+    };
+  }
+
+  if (
+    !ALLOWED_IMAGE_TYPES.includes(
+      file.type as (typeof ALLOWED_IMAGE_TYPES)[number]
+    )
+  ) {
     return {
       isValid: false,
       error: {
         code: 'INVALID_FILE_TYPE',
-        message: 'File must be a valid image (JPEG, PNG, WebP, or GIF)',
+        message: 'Please upload a JPG, PNG, WEBP, or GIF image.',
       },
     };
   }
@@ -71,7 +72,7 @@ export function createUnsplashSelectedImage(
   return {
     url: photo.urls.regular,
     thumbnailUrl: photo.urls.small,
-    originalUrl: photo.urls.full,
+    originalUrl: photo.urls.full || photo.urls.regular,
     attribution: {
       photographer: photo.user.name,
       photographerUrl: photo.user.links.html,
@@ -79,33 +80,27 @@ export function createUnsplashSelectedImage(
     },
     source: 'unsplash',
     uploadStatus: 'completed',
-    downloadLocation: photo.links.download_location,
+    downloadLocation: photo.links.downloadLocation,
   };
 }
 
 export function pickRandomPhoto(photos: UnsplashPhoto[]): UnsplashPhoto | null {
-  if (!photos.length) {
+  if (photos.length === 0) {
     return null;
   }
-  return photos[Math.floor(Math.random() * photos.length)] ?? null;
+
+  const randomIndex = Math.floor(Math.random() * photos.length);
+  return photos[randomIndex] ?? null;
 }
 
-export function revokeSelectedImageObjectUrl(image: SelectedImage | null) {
-  if (!image) {
+export function revokeSelectedImageObjectUrl(
+  image: SelectedImage | null | undefined
+): void {
+  if (!image || image.source !== 'upload') {
     return;
   }
 
-  if (image.source !== 'upload') {
-    return;
-  }
-
-  if (!image.url.startsWith('blob:')) {
-    return;
-  }
-
-  try {
+  if (image.url.startsWith('blob:')) {
     URL.revokeObjectURL(image.url);
-  } catch {
-    // ignore
   }
 }

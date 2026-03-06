@@ -32,55 +32,39 @@
         }
       },
       "image": {
-        "preview": {
-          "alt": "Vorschaubild der Fundraiser",
-          "change": "Bild ändern"
+        "previewAlt": "Vorschaubild der Fundraiser",
+        "states": {
+          "loadingDefault": "Standardbild wird geladen...",
+          "loading": "Bilder werden geladen...",
+          "defaultError": "Standardbild konnte nicht geladen werden.",
+          "loadError": "Bilder konnten nicht geladen werden. Bitte versuche es erneut.",
+          "errorTitle": "Bilder konnten nicht geladen werden",
+          "noResultsTitle": "Keine Bilder gefunden",
+          "noResultsDescription": "Versuche einen anderen Suchbegriff oder eine andere Kategorie.",
+          "noResultsWithQuery": "Keine Bilder entsprechen \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Bild ändern",
+          "retry": "Erneut versuchen",
+          "tryAgain": "Nochmal versuchen",
+          "closeAria": "Bildauswahl schließen",
+          "selectImageAria": "Bild auswählen"
         },
         "overlay": {
-          "title": "Bild auswählen",
-          "close": "Bildauswahl schließen",
-          "ariaLabel": "Bildauswahl"
+          "title": "Ein Bild auswählen",
+          "uploadTitle": "Per Drag-and-drop oder Klick hochladen",
+          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash",
+          "searchPlaceholder": "Bilder suchen...",
+          "uploadInputAria": "Bilddatei hochladen"
         },
-        "upload": {
-          "title": "Drag & Drop oder klicken zum Hochladen",
-          "subtitle": "Oder wähle ein Bild von",
-          "unsplash": "Unsplash",
-          "ariaLabel": "Bilddatei hochladen",
-          "errors": {
-            "fileTooLarge": "Die Datei darf höchstens 10 MB groß sein.",
-            "invalidType": "Bitte lade eine gültige Bilddatei hoch (JPEG, PNG, WebP oder GIF)."
-          }
+        "attribution": {
+          "photoBy": "Foto von",
+          "unsplashLink": "Unsplash"
         },
-        "search": {
-          "placeholder": "Bilder suchen…",
-          "ariaLabel": "Bilder suchen"
-        },
-        "states": {
-          "loading": "Bilder werden geladen…",
-          "loadError": {
-            "title": "Bilder konnten nicht geladen werden",
-            "message": "Beim Laden der Bilder ist etwas schiefgelaufen.",
-            "retry": "Erneut versuchen"
-          },
-          "searchError": {
-            "message": "Bei der Bildsuche ist etwas schiefgelaufen."
-          },
-          "empty": {
-            "title": "Keine Bilder gefunden",
-            "search": "Keine Bilder passen zu „{query}“.",
-            "category": "Für diese Kategorie sind keine Bilder verfügbar."
-          },
-          "defaultLoading": "Standardbild wird geladen…",
-          "defaultLoadError": {
-            "title": "Standardbild konnte nicht geladen werden",
-            "message": "Beim Laden des Standardbilds ist etwas schiefgelaufen.",
-            "retry": "Erneut versuchen"
-          }
-        },
-        "grid": {
-          "selectImage": "Bild auswählen",
-          "photoAlt": "Foto von {photographer}",
-          "attributionPrefix": "Foto von"
+        "errors": {
+          "fileTooLarge": "Das Bild muss {maxMb}MB oder kleiner sein.",
+          "invalidFileType": "Bitte lade ein JPG-, PNG-, WEBP- oder GIF-Bild hoch.",
+          "emptyFile": "Die ausgewählte Datei ist leer."
         },
         "categories": {
           "outdoors": "Draußen",
@@ -94,7 +78,7 @@
           "valentines": "Valentinstag",
           "easter": "Ostern",
           "summer": "Sommer",
-          "back-to-school": "Schulanfang",
+          "back-to-school": "Zurück zur Schule",
           "diwali": "Diwali",
           "mothers-day": "Muttertag",
           "fathers-day": "Vatertag",

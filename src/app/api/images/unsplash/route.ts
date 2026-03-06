@@ -1,141 +1,197 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { unsplashService, UnsplashAPIError } from '@/lib/api/unsplash-service';
+import {
+  UnsplashServiceError,
+  unsplashService,
+} from '@/lib/api/unsplash-service';
 
 const MAX_COUNT = 50;
-const DEFAULT_COUNT = 20;
 const MAX_PAGE = 10;
-const CACHE_MAX_AGE_SECONDS = 60 * 60 * 2; // 2 hours
-const STALE_WHILE_REVALIDATE_SECONDS = 60 * 60 * 24; // 24 hours
+const CACHE_MAX_AGE_SECONDS = 2 * 60 * 60;
+const STALE_WHILE_REVALIDATE_SECONDS = 24 * 60 * 60;
 
-function toInt(value: string | null, fallback: number): number {
-  if (!value) {
+function clampNumber(
+  value: string | null,
+  fallback: number,
+  min: number,
+  max: number
+): number {
+  const parsedValue = Number.parseInt(value ?? '', 10);
+
+  if (Number.isNaN(parsedValue)) {
     return fallback;
   }
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : fallback;
+
+  return Math.min(Math.max(parsedValue, min), max);
 }
 
-function jsonError(status: number, code: string, message: string) {
-  return NextResponse.json({ error: { code, message } }, { status });
+function isValidOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+  const host = request.headers.get('host');
+
+  if (!host) {
+    return true;
+  }
+
+  if (!origin && !referer) {
+    return true;
+  }
+
+  try {
+    if (origin && new URL(origin).host === host) {
+      return true;
+    }
+
+    if (referer && new URL(referer).host === host) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+
+  return false;
 }
 
-function setCacheHeaders(response: NextResponse) {
+function applyCacheHeaders(response: NextResponse): NextResponse {
   const cacheDisabled = process.env.DISABLE_UNSPLASH_CACHE === 'true';
 
   if (cacheDisabled) {
-    response.headers.set('Cache-Control', 'no-store');
-    return;
+    response.headers.set(
+      'Cache-Control',
+      'no-cache, no-store, must-revalidate'
+    );
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   }
 
   response.headers.set(
     'Cache-Control',
     `public, max-age=${CACHE_MAX_AGE_SECONDS}, s-maxage=${CACHE_MAX_AGE_SECONDS}, stale-while-revalidate=${STALE_WHILE_REVALIDATE_SECONDS}`
   );
+  response.headers.set(
+    'CDN-Cache-Control',
+    `public, max-age=${CACHE_MAX_AGE_SECONDS}`
+  );
   response.headers.set('Vary', 'Accept-Encoding');
+
+  return response;
+}
+
+function getErrorStatus(error: unknown): number {
+  if (error instanceof UnsplashServiceError && error.status) {
+    return error.status;
+  }
+
+  return 500;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'Failed to fetch images from Unsplash.';
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const action = searchParams.get('action');
-
-  const count = Math.max(
-    1,
-    Math.min(toInt(searchParams.get('count'), DEFAULT_COUNT), MAX_COUNT)
-  );
-  const page = Math.max(
-    1,
-    Math.min(toInt(searchParams.get('page'), 1), MAX_PAGE)
-  );
+  if (!isValidOrigin(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
 
   if (!unsplashService.isAvailable()) {
-    return jsonError(
-      503,
-      'SERVICE_UNAVAILABLE',
-      'Unsplash service is not configured'
+    return NextResponse.json(
+      { error: 'Unsplash service is not configured.' },
+      { status: 503 }
     );
   }
 
   try {
-    if (action === 'category') {
-      const category = searchParams.get('category');
-      if (!category) {
-        return jsonError(400, 'BAD_REQUEST', 'Category parameter is required');
-      }
-
-      const results = await unsplashService.getCategoryImages(category, count);
-      const response = NextResponse.json({ results });
-      setCacheHeaders(response);
-      return response;
-    }
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get('action');
 
     if (action === 'search') {
       const query = searchParams.get('query')?.trim();
+
       if (!query) {
-        return jsonError(
-          400,
-          'BAD_REQUEST',
-          'Query parameter is required for search'
+        return NextResponse.json(
+          { error: 'Query parameter is required for search.' },
+          { status: 400 }
         );
       }
 
+      const page = clampNumber(searchParams.get('page'), 1, 1, MAX_PAGE);
+      const count = clampNumber(searchParams.get('count'), 20, 1, MAX_COUNT);
       const result = await unsplashService.searchPhotos(query, page, count);
-      const response = NextResponse.json(result);
-      setCacheHeaders(response);
-      return response;
+
+      return applyCacheHeaders(NextResponse.json(result));
     }
 
-    return jsonError(
-      400,
-      'BAD_REQUEST',
-      'Invalid action. Use: search or category'
+    if (action === 'category') {
+      const category = searchParams.get('category')?.trim();
+
+      if (!category) {
+        return NextResponse.json(
+          { error: 'Category parameter is required.' },
+          { status: 400 }
+        );
+      }
+
+      const count = clampNumber(searchParams.get('count'), 20, 1, MAX_COUNT);
+      const results = await unsplashService.getCategoryImages(category, count);
+
+      return applyCacheHeaders(NextResponse.json({ results }));
+    }
+
+    return NextResponse.json(
+      { error: 'Invalid action. Use: search or category.' },
+      { status: 400 }
     );
   } catch (error) {
-    if (error instanceof UnsplashAPIError) {
-      const status = error.status ?? 500;
-      return jsonError(status, error.code, error.message);
-    }
+    console.error('Unsplash API GET error:', error);
 
-    return jsonError(
-      500,
-      'INTERNAL_ERROR',
-      'Failed to fetch images from Unsplash'
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      { status: getErrorStatus(error) }
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  if (!isValidOrigin(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+
   if (!unsplashService.isAvailable()) {
-    return jsonError(
-      503,
-      'SERVICE_UNAVAILABLE',
-      'Unsplash service is not configured'
+    return NextResponse.json(
+      { error: 'Unsplash service is not configured.' },
+      { status: 503 }
     );
   }
 
   try {
-    const body = (await request.json().catch(() => null)) as {
-      downloadLocation?: unknown;
-    } | null;
-
-    const downloadLocation =
-      typeof body?.downloadLocation === 'string'
-        ? body.downloadLocation.trim()
-        : '';
+    const payload = (await request.json()) as { downloadLocation?: string };
+    const downloadLocation = payload.downloadLocation?.trim();
 
     if (!downloadLocation) {
-      return jsonError(400, 'BAD_REQUEST', 'Download location is required');
+      return NextResponse.json(
+        { error: 'Download location is required.' },
+        { status: 400 }
+      );
     }
 
     await unsplashService.trackDownload(downloadLocation);
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    if (error instanceof UnsplashAPIError) {
-      const status = error.status ?? 500;
-      return jsonError(status, error.code, error.message);
-    }
+    console.error('Unsplash API POST error:', error);
 
-    return jsonError(500, 'INTERNAL_ERROR', 'Failed to track download');
+    return NextResponse.json(
+      { error: getErrorMessage(error) },
+      { status: getErrorStatus(error) }
+    );
   }
 }

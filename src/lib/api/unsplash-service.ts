@@ -1,128 +1,160 @@
-/**
- * Unsplash API Service
- * Server-side integration using the official Unsplash SDK.
- */
-
 import { createApi } from 'unsplash-js';
-import type { Basic } from 'unsplash-js/dist/methods/photos/types';
-import type { ApiResponse } from 'unsplash-js/dist/helpers/response';
 
-import { getStaticImageCategories } from '@/lib/constants/image-categories';
+import { getImageCategoriesFallback } from '@/lib/constants/image-categories';
+import type {
+  UnsplashPhoto,
+  UnsplashSearchResponse,
+} from '@/lib/types/image-selection';
 
-export class UnsplashAPIError extends Error {
-  constructor(
-    message: string,
-    public code:
-      | 'API_KEY_MISSING'
-      | 'AUTH_ERROR'
-      | 'RATE_LIMIT_EXCEEDED'
-      | 'HTTP_ERROR'
-      | 'NO_PHOTOS_FOUND',
-    public status?: number,
-    public response?: unknown
-  ) {
+const DEFAULT_FALLBACK_QUERY = 'fundraising community charity helping';
+
+export class UnsplashServiceError extends Error {
+  status?: number;
+
+  code: string;
+
+  constructor(message: string, code: string, status?: number) {
     super(message);
-    this.name = 'UnsplashAPIError';
+    this.name = 'UnsplashServiceError';
+    this.code = code;
+    this.status = status;
   }
 }
 
-export interface UnsplashPhoto {
-  id: string;
-  altDescription: string | null;
-  urls: {
-    thumb: string;
-    small: string;
-    regular: string;
-    full: string;
-  };
-  user: {
-    name: string;
-    links: {
-      html: string;
-    };
-  };
-  links: {
-    html: string;
-    download_location: string;
-  };
-}
+function normalizePhoto(rawPhoto: unknown): UnsplashPhoto {
+  const photo = (rawPhoto ?? {}) as Record<string, unknown>;
+  const rawUrls = (photo.urls ?? {}) as Record<string, unknown>;
+  const rawUser = (photo.user ?? {}) as Record<string, unknown>;
+  const rawUserLinks = (rawUser.links ?? {}) as Record<string, unknown>;
+  const rawLinks = (photo.links ?? {}) as Record<string, unknown>;
 
-export interface UnsplashSearchResponse {
-  results: UnsplashPhoto[];
-  total: number;
-  totalPages: number;
-}
+  const thumb = String(
+    rawUrls.thumb ?? rawUrls.small ?? rawUrls.regular ?? rawUrls.full ?? ''
+  );
+  const small = String(
+    rawUrls.small ?? rawUrls.thumb ?? rawUrls.regular ?? rawUrls.full ?? ''
+  );
+  const regular = String(
+    rawUrls.regular ?? rawUrls.small ?? rawUrls.thumb ?? rawUrls.full ?? ''
+  );
+  const full = String(
+    rawUrls.full ?? rawUrls.regular ?? rawUrls.small ?? rawUrls.thumb ?? ''
+  );
 
-function normalizePhoto(photo: Basic): UnsplashPhoto {
   return {
-    id: photo.id,
-    altDescription: photo.alt_description ?? null,
+    id: String(photo.id ?? ''),
+    altDescription:
+      typeof photo.alt_description === 'string' ? photo.alt_description : null,
     urls: {
-      thumb: photo.urls.thumb,
-      small: photo.urls.small,
-      regular: photo.urls.regular,
-      full: photo.urls.full,
+      thumb,
+      small,
+      regular,
+      full,
     },
     user: {
-      name: photo.user.name,
+      name: String(rawUser.name ?? 'Unknown'),
       links: {
-        html: photo.user.links.html,
+        html: String(rawUserLinks.html ?? ''),
       },
     },
     links: {
-      html: photo.links.html,
-      download_location: photo.links.download_location,
+      html: String(rawLinks.html ?? ''),
+      downloadLocation: String(rawLinks.download_location ?? ''),
     },
   };
 }
 
-export class UnsplashService {
-  private unsplash: ReturnType<typeof createApi> | null = null;
-  private accessKey: string;
-
-  constructor() {
-    this.accessKey = process.env.UNSPLASH_ACCESS_KEY || '';
-    if (this.accessKey) {
-      this.unsplash = createApi({ accessKey: this.accessKey });
-    }
+function ensurePhotoList(result: unknown): unknown[] {
+  if (Array.isArray(result)) {
+    return result;
   }
 
-  private handleApiResponse<T>(response: ApiResponse<T>): T {
+  if (!result) {
+    return [];
+  }
+
+  return [result];
+}
+
+interface UnsplashApiSuccess<T> {
+  type: 'success';
+  response: T;
+}
+
+interface UnsplashApiError {
+  type: 'error';
+  status?: number;
+  errors?: string[];
+}
+
+type UnsplashApiResponse<T> = UnsplashApiSuccess<T> | UnsplashApiError;
+
+export class UnsplashService {
+  private readonly accessKey: string;
+
+  private readonly unsplash: ReturnType<typeof createApi> | null;
+
+  constructor() {
+    this.accessKey = process.env.UNSPLASH_ACCESS_KEY ?? '';
+    this.unsplash = this.accessKey
+      ? createApi({
+          accessKey: this.accessKey,
+        })
+      : null;
+  }
+
+  isAvailable(): boolean {
+    return Boolean(this.unsplash);
+  }
+
+  private getClient(): ReturnType<typeof createApi> {
+    if (!this.unsplash) {
+      throw new UnsplashServiceError(
+        'Unsplash service is not configured.',
+        'API_KEY_MISSING',
+        503
+      );
+    }
+
+    return this.unsplash;
+  }
+
+  private unwrapResponse<T>(response: UnsplashApiResponse<T>): T {
     if (response.type === 'error') {
       const status = response.status;
-      const errorMessage = response.errors?.[0] || 'Unknown error';
-
-      if (status === 403) {
-        throw new UnsplashAPIError(
-          'Unsplash API rate limit exceeded',
-          'RATE_LIMIT_EXCEEDED',
-          403,
-          response.errors
-        );
-      }
+      const firstError = response.errors?.[0];
 
       if (status === 401) {
-        throw new UnsplashAPIError(
-          'Unsplash API authentication failed',
+        throw new UnsplashServiceError(
+          firstError ?? 'Unsplash authentication failed.',
           'AUTH_ERROR',
-          401,
-          response.errors
+          401
         );
       }
 
-      throw new UnsplashAPIError(
-        errorMessage,
-        'HTTP_ERROR',
-        status,
-        response.errors
+      if (status === 403) {
+        throw new UnsplashServiceError(
+          firstError ?? 'Unsplash rate limit exceeded.',
+          'RATE_LIMIT_EXCEEDED',
+          403
+        );
+      }
+
+      throw new UnsplashServiceError(
+        firstError ?? 'Unsplash request failed.',
+        'REQUEST_FAILED',
+        status
       );
     }
 
     return response.response;
   }
 
-  isAvailable(): boolean {
-    return Boolean(this.accessKey);
+  private resolveCategoryQuery(categoryId: string): string {
+    const category = getImageCategoriesFallback().find(
+      item => item.id === categoryId
+    );
+    return category?.query ?? DEFAULT_FALLBACK_QUERY;
   }
 
   async searchPhotos(
@@ -130,81 +162,57 @@ export class UnsplashService {
     page: number = 1,
     perPage: number = 20
   ): Promise<UnsplashSearchResponse> {
-    if (!this.unsplash) {
-      throw new UnsplashAPIError(
-        'Unsplash API key not configured',
-        'API_KEY_MISSING',
-        500
-      );
-    }
-
-    const response = await this.unsplash.search.getPhotos({
+    const client = this.getClient();
+    const response = (await client.search.getPhotos({
       query,
       page,
       perPage,
       orientation: 'landscape',
-    });
+    })) as UnsplashApiResponse<{
+      results: unknown[];
+      total: number;
+      total_pages: number;
+    }>;
 
-    const result = this.handleApiResponse(response);
+    const result = this.unwrapResponse(response);
+    const results = (result.results ?? []).map(normalizePhoto);
 
     return {
-      results: result.results.map(normalizePhoto),
-      total: result.total,
-      totalPages: result.total_pages,
+      results,
+      total: Number(result.total ?? results.length),
+      totalPages: Number(result.total_pages ?? 1),
     };
-  }
-
-  private async getRandomPhotos(
-    count: number,
-    query: string
-  ): Promise<UnsplashPhoto[]> {
-    if (!this.unsplash) {
-      throw new UnsplashAPIError(
-        'Unsplash API key not configured',
-        'API_KEY_MISSING',
-        500
-      );
-    }
-
-    const response = await this.unsplash.photos.getRandom({
-      query,
-      count,
-      orientation: 'landscape',
-    });
-
-    const result = this.handleApiResponse(response);
-
-    if (Array.isArray(result)) {
-      return result.map(photo => normalizePhoto(photo as Basic));
-    }
-
-    if (!result) {
-      return [];
-    }
-
-    return [normalizePhoto(result as Basic)];
   }
 
   async getCategoryImages(
     categoryId: string,
     count: number = 20
   ): Promise<UnsplashPhoto[]> {
-    const categories = getStaticImageCategories();
-    const category = categories.find(cat => cat.id === categoryId);
-    const query = category?.query || 'fundraising community charity helping';
-    return this.getRandomPhotos(count, query);
+    const client = this.getClient();
+    const query = this.resolveCategoryQuery(categoryId);
+
+    const response = (await client.photos.getRandom({
+      query,
+      count,
+      orientation: 'landscape',
+    })) as UnsplashApiResponse<unknown[] | unknown>;
+
+    const result = this.unwrapResponse(response);
+    const photos = ensurePhotoList(result).map(normalizePhoto);
+
+    return photos.filter(
+      photo => photo.id && photo.urls.small && photo.urls.regular
+    );
   }
 
   async trackDownload(downloadLocation: string): Promise<void> {
-    if (!this.unsplash) {
-      return;
-    }
+    const client = this.getClient();
 
-    try {
-      await this.unsplash.photos.trackDownload({ downloadLocation });
-    } catch {
-      // Optional compliance tracking — don't block UI flows.
-    }
+    const response = (await client.photos.trackDownload({
+      downloadLocation,
+    })) as UnsplashApiResponse<unknown>;
+
+    this.unwrapResponse(response);
   }
 }
 
