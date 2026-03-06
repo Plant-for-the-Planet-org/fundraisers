@@ -7,13 +7,10 @@ import { SignInWithButton } from '@/components/auth/sign-in-with-button';
 import { SignUpButton } from './sign-up-button';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
 import { buildSocialAuthorizeUrl } from '@/lib/auth/auth0-config';
 
-export function SignInFormPanel() {
+export function SignInFormPanel({ redirectTo }: { redirectTo: string }) {
   const tAuth = useTranslations('Auth');
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/dash';
   const [email, setEmail] = useState('');
 
   const socialProviders = [

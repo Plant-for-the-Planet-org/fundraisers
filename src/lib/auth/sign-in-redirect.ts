@@ -1,4 +1,17 @@
 /**
+ * Redirects to login page with current URL as redirect target
+ * Prevents redirect loops by detecting if already on login page
+ */
+export function redirectToLogin(customRedirectTo?: string) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const url = getSignInPageUrl(customRedirectTo);
+  window.location.assign(url);
+}
+
+/**
  * Gets the login page URL with redirect parameter
  * Prevents redirect loops by detecting if already on login page
  */
