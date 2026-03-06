@@ -14,6 +14,7 @@ import {
   SUPPORTED_CURRENCIES,
   getCurrencyForCountry,
 } from '@/lib/utils/country-currency';
+import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -24,6 +25,9 @@ const DevTool =
 
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
+  description: z
+    .string()
+    .refine(value => getRichTextTextContent(value).length > 0),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
   goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
@@ -58,6 +62,7 @@ export function CreateFundraiserFormProvider({
     resolver: zodResolver(createFundraiserFormSchema),
     defaultValues: {
       title: '',
+      description: '',
       country: 'DE',
       currency: getCurrencyForCountry('DE'),
       goalAmount: 5000,

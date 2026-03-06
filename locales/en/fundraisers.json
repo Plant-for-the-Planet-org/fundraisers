@@ -11,6 +11,11 @@
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
     "create": {
+      "theme": {
+        "sectionHeading": "Theme",
+        "labelAccentColor": "Accent color",
+        "selectAccent": "Select {accent} accent color"
+      },
       "title": {
         "label": "Fundraiser name",
         "placeholder": "Fundraiser Name",
@@ -19,10 +24,12 @@
           "maxLength": "Please keep the fundraiser name within {max, number} characters."
         }
       },
-      "theme": {
-        "sectionHeading": "Theme",
-        "labelAccentColor": "Accent color",
-        "selectAccent": "Select {accent} accent color"
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell people about your fundraiser...",
+        "errors": {
+          "required": "Please enter a fundraiser description."
+        }
       },
       "countryEntity": {
         "label": "Country",
