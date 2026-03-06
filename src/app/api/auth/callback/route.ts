@@ -3,14 +3,14 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 // Whitelist of allowed redirect destinations
-const ALLOWED_REDIRECTS = ['/dash', '/explore'];
+const ALLOWED_REDIRECTS = ['/explore'];
 
 function getSafeRedirectUrl(state: string | null): string {
-  if (!state) return '/dash';
+  if (!state) return '/explore';
 
   // Only allow relative paths from whitelist
   const isAllowed = ALLOWED_REDIRECTS.some(path => state.startsWith(path));
-  return isAllowed ? state : '/dash';
+  return isAllowed ? state : '/explore';
 }
 
 export async function GET(request: NextRequest) {
