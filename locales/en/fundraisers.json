@@ -23,6 +23,11 @@
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
         "selectAccent": "Select {accent} accent color"
+      },
+      "workspace": {
+        "label": "Country",
+        "restOfWorld": "Rest of the World",
+        "currencyLabel": "{currency} currency"
       }
     }
   }

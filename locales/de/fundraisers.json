@@ -23,6 +23,11 @@
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
         "selectAccent": "Akzentfarbe {accent} auswählen"
+      },
+      "workspace": {
+        "label": "Land",
+        "restOfWorld": "Rest der Welt",
+        "currencyLabel": "{currency} Währung"
       }
     }
   }
