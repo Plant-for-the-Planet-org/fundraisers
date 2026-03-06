@@ -9,7 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getThemeForPath } from '@/lib/theme/route-themes';
-import { ALLOWED_COUNTRIES } from '@/lib/utils/country-currency';
+import {
+  ALLOWED_COUNTRIES,
+  SUPPORTED_CURRENCIES,
+  getCurrencyForCountry,
+} from '@/lib/utils/country-currency';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -21,6 +25,7 @@ const DevTool =
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   country: z.enum(ALLOWED_COUNTRIES),
+  currency: z.enum(SUPPORTED_CURRENCIES),
   goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
   settings: z.object({
     theme: z.object({
@@ -54,6 +59,7 @@ export function CreateFundraiserFormProvider({
     defaultValues: {
       title: '',
       country: 'DE',
+      currency: getCurrencyForCountry('DE'),
       goalAmount: 5000,
       settings: {
         theme: {

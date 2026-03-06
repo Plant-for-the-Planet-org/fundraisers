@@ -3,7 +3,7 @@
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useController } from 'react-hook-form';
+import { useController, useFormContext } from 'react-hook-form';
 import {
   Select,
   SelectContent,
@@ -11,15 +11,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getAllowedCountries } from '@/lib/utils/country-currency';
+import {
+  getAllowedCountries,
+  getCurrencyForCountry,
+  type AllowedCountry,
+} from '@/lib/utils/country-currency';
 
 export function WorkspaceSelector() {
   const locale = useLocale();
   const t = useTranslations('Fundraisers.create.countryEntity');
 
+  const { setValue } = useFormContext<CreateFundraiserFormValues>();
   const { field } = useController<CreateFundraiserFormValues, 'country'>({
     name: 'country',
   });
+
+  const handleCountryChange = (country: string) => {
+    field.onChange(country);
+    setValue('currency', getCurrencyForCountry(country as AllowedCountry));
+  };
 
   const countries = getAllowedCountries(locale).map(c =>
     c.code === 'ROW' ? { ...c, name: t('restOfWorld') } : c
@@ -32,7 +42,7 @@ export function WorkspaceSelector() {
       <label className='text-sm font-medium' htmlFor='form-country'>
         {t('label')}
       </label>
-      <Select value={field.value} onValueChange={field.onChange}>
+      <Select value={field.value} onValueChange={handleCountryChange}>
         <SelectTrigger
           className='w-full bg-transparent border-border hover:bg-muted/5'
           id='form-country'

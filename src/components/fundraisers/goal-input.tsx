@@ -6,10 +6,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
-import {
-  getCurrencyForCountry,
-  type AllowedCountry,
-} from '@/lib/utils/country-currency';
 import { getCurrencySymbol } from '@/lib/utils/currency';
 
 export function GoalInput() {
@@ -22,11 +18,9 @@ export function GoalInput() {
     name: 'goalAmount',
   });
 
-  const country = useWatch<CreateFundraiserFormValues, 'country'>({
-    name: 'country',
+  const currency = useWatch<CreateFundraiserFormValues, 'currency'>({
+    name: 'currency',
   });
-
-  const currency = getCurrencyForCountry(country as AllowedCountry);
   const currencySymbol = getCurrencySymbol(currency);
 
   const [isFocused, setIsFocused] = useState(false);
