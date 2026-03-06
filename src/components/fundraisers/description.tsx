@@ -31,7 +31,7 @@ export function Description() {
         control={control}
         render={({ field }) => (
           <RichTextEditor
-            className={cn(hasDescriptionError && 'border-b border-red-500')}
+            className={cn(hasDescriptionError && 'border-b border-destructive')}
             value={field.value}
             onChange={field.onChange}
             onBlur={field.onBlur}
@@ -43,7 +43,7 @@ export function Description() {
         )}
       />
 
-      <p id={errorId} className='text-sm h-5 text-red-600 dark:text-red-400'>
+      <p id={errorId} className='text-sm h-5 text-destructive'>
         {hasDescriptionError ? t('errors.required') : ''}
       </p>
     </div>
