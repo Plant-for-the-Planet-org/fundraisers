@@ -5,6 +5,7 @@ import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { Loader } from '@/components/ui/loader';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,17 +27,10 @@ export default function LoginPage() {
     return () => clearTimeout(timer);
   }, [logoutSuccess, safeRedirect, router]);
 
-  // Show logout success loading state
   if (logoutSuccess === 'true') {
-    return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='text-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4' />
-          <p className='text-gray-600'>{tAuth('redirecting')}</p>
-        </div>
-      </div>
-    );
+    return <Loader text={tAuth('redirecting')} />;
   }
+
   return (
     <Suspense
       fallback={
