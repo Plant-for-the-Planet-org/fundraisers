@@ -37,7 +37,11 @@ export function UserMenu() {
     return <div className='w-14 h-8 bg-gray-200 rounded-full animate-pulse' />;
   }
 
-  if (!isAuthenticated && !pathname.startsWith('/login')) {
+  if (
+    !isAuthInitializing &&
+    !isAuthenticated &&
+    !pathname.startsWith('/login')
+  ) {
     return <SignInButton variant='outline' size='sm' />;
   }
 

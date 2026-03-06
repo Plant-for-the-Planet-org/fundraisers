@@ -36,20 +36,20 @@ export function AuthInitializer() {
         // Case 1 — PKCE code exchange
         if (code) {
           const token = await handleCodeExchange(code);
-          setAccessToken(token);
+          await setAccessToken(token);
           return;
         }
 
         // Case 2 — Token directly in URL
         if (tokenFromUrl) {
-          setAccessToken(tokenFromUrl);
+          await setAccessToken(tokenFromUrl);
           return;
         }
 
         // Case 3 — Previously stored token
         const storedToken = localStorage.getItem('access_token');
         if (storedToken) {
-          setAccessToken(storedToken);
+          await setAccessToken(storedToken);
           return;
         } else {
           await trySignInSilently();
