@@ -33,6 +33,12 @@
           "taxReceiptEligible": "You will receive a tax-deduction eligible donation receipt for {country}.",
           "notTaxReceiptEligible": "{country, select, ROW {Tax-deduction eligible donation receipts are not available.} other {Tax-deduction eligible donation receipts are not available for {country}.}}"
         }
+      },
+      "goal": {
+        "label": "Fundraiser Goal",
+        "errors": {
+          "required": "Please enter a fundraiser goal."
+        }
       }
     }
   }

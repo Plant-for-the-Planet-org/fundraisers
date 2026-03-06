@@ -82,7 +82,7 @@ function TitleInput({
         placeholder={placeholder}
         className={cn(
           'font-poppins typo-form-title-input bg-transparent outline-none w-full resize-none overflow-hidden',
-          hasTitleError && 'border-b border-red-500'
+          hasTitleError && 'border-b border-destructive'
         )}
         aria-invalid={hasTitleError}
         aria-describedby={hasTitleError ? errorId : undefined}
@@ -97,7 +97,7 @@ function TitleInput({
       />
 
       {hasTitleError && (
-        <p id={errorId} className='text-sm text-red-600 dark:text-red-400'>
+        <p id={errorId} className='text-sm text-destructive'>
           {titleErrorMessage}
         </p>
       )}

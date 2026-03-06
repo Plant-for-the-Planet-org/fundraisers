@@ -21,6 +21,7 @@ const DevTool =
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   country: z.enum(ALLOWED_COUNTRIES),
+  goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -53,6 +54,7 @@ export function CreateFundraiserFormProvider({
     defaultValues: {
       title: '',
       country: 'DE',
+      goalAmount: 5000,
       settings: {
         theme: {
           base_id: initialTheme.id,
