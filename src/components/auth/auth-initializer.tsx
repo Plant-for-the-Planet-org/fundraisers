@@ -6,7 +6,7 @@ import {
   exchangeCodeForTokens,
   trySignInSilently,
 } from '@/lib/auth/auth0-config';
-import { isTokenExpired } from './jwt-utils';
+import { isTokenExpired } from '../../lib/auth/jwt-utils';
 
 function cleanUrl(params: string[]) {
   const url = new URL(window.location.href);

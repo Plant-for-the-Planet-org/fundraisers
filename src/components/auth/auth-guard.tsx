@@ -21,7 +21,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
   }
 
   if (!isAuthenticated && !isAuthInitializing) {
-    // Redirect to sing in page
+    // Redirect to sign in page
     router.push(getSignInPath());
     return null;
   }
