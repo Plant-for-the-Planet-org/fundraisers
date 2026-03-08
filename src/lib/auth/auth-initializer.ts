@@ -6,6 +6,7 @@ import {
   exchangeCodeForTokens,
   trySignInSilently,
 } from '@/lib/auth/auth0-config';
+import { isTokenExpired } from './jwt-utils';
 
 function cleanUrl(params: string[]) {
   const url = new URL(window.location.href);
@@ -48,12 +49,35 @@ export function AuthInitializer() {
 
         // Case 3 — Previously stored token
         const storedToken = localStorage.getItem('access_token');
+
         if (storedToken) {
-          await setAccessToken(storedToken);
-          return;
-        } else {
-          await trySignInSilently();
-          return;
+          /**
+           * IMPORTANT:
+           * Check if the stored JWT is expired before reusing it.
+           * Using an expired token would cause API calls to fail with 401.
+           */
+          if (!isTokenExpired(storedToken)) {
+            await setAccessToken(storedToken);
+            return;
+          }
+
+          localStorage.removeItem('access_token');
+        }
+
+        /**
+         * Attempt silent authentication if:
+         * - no token exists
+         * - token is expired
+         */
+        const silentSuccess = await trySignInSilently();
+
+        /**
+         * If silent auth fails, we simply continue.
+         * AuthGuard will redirect the user to login when it sees
+         * that the user is not authenticated.
+         */
+        if (!silentSuccess) {
+          // Silent auth unavailable — AuthGuard will redirect to login
         }
       } catch (err) {
         console.error('Auth init failed:', err);
