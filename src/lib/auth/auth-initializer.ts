@@ -43,6 +43,7 @@ export function AuthInitializer() {
 
         // Case 2 — Token directly in URL
         if (tokenFromUrl) {
+          cleanUrl(['access_token']);
           await setAccessToken(tokenFromUrl);
           return;
         }

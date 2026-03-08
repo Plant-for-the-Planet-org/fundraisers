@@ -1,8 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { getSignInPageUrl } from '@/lib/auth/sign-in-redirect';
+import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 interface SignInButtonProps {
   redirectTo?: string;
@@ -16,13 +17,14 @@ export function SignInButton({
   size = 'default',
 }: SignInButtonProps) {
   const tAuth = useTranslations('Auth');
-  const handleLogin = () => {
-    const url = getSignInPageUrl(redirectTo);
-    window.location.assign(url);
-  };
+  const router = useRouter();
 
   return (
-    <Button onClick={handleLogin} variant={variant} size={size}>
+    <Button
+      onClick={() => router.push(getSignInPath(redirectTo))}
+      variant={variant}
+      size={size}
+    >
       {tAuth('signIn')}
     </Button>
   );
