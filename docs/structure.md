@@ -2,8 +2,8 @@
 
 > This is a living document. Update it when the directory structure or conventions change.
 
-```
-fundraisers/
+```text
+fundraiser/
 ├── src/
 │   ├── app/                        # Next.js App Router routes
 │   │   ├── layout.tsx              # Root layout — font loading, theme mode
@@ -83,3 +83,18 @@ components/explore/
 ```
 
 Keep server components (data fetching, async) and client components (`'use client'`) in the same folder — the file name and directive make the distinction clear without needing a naming suffix.
+
+## Recent Additions (Create Fundraiser Project Selection)
+
+```text
+src/
+├── components/fundraisers/
+│   ├── create-fundraiser-form-context.tsx
+│   ├── project-selection.tsx
+│   └── project-selection-overlay.tsx
+└── lib/
+    ├── api/projects-service.ts
+    ├── constants/project-selection.ts
+    ├── types/project-selection.ts
+    └── utils/project-selection.ts
+```
