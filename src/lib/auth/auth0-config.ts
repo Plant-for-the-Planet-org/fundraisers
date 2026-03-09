@@ -91,73 +91,76 @@ async function buildSilentAuthorizeUrl(
 }
 
 /**
- * Attempts silent sign-in by loading the Auth0 silent auth URL inside a hidden iframe.
- * Resolves to true if the iframe is redirected to the callback URL (session reuse succeeded),
- * or false if Auth0 requires interaction, the request times out (5s), or a cross-origin error occurs.
+ * Attempts silent authentication using Auth0 in a hidden iframe.
+ *
+ * Flow:
+ * 1. Loads the Auth0 `/authorize` endpoint with `prompt=none`.
+ * 2. If a session exists, Auth0 redirects the iframe to `/api/auth/callback`
+ *    with an authorization `code`.
+ * 3. The code is extracted and exchanged for tokens.
+ *
+ * Note:
+ * Previously this flow redirected the main window using `window.location`,
+ * which cancelled ongoing app initialization (e.g., profile fetching).
+ * This implementation keeps the flow inside the iframe to avoid interrupting
+ * the application lifecycle.
+ *
+ * Returns the `access_token` on success, otherwise `null`.
  */
 export async function trySignInSilently(
   redirectTo: string = DEFAULT_REDIRECT_PATH
-): Promise<boolean> {
+): Promise<string | null> {
   try {
     const silentUrl = await buildSilentAuthorizeUrl(redirectTo);
 
-    // Create a hidden iframe to attempt silent auth
-    return new Promise(resolve => {
+    const code = await new Promise<string | null>(resolve => {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
       iframe.src = silentUrl;
 
-      const cleanup = () => {
-        if (document.body.contains(iframe)) {
-          document.body.removeChild(iframe);
-        }
-      };
-
       const timeout = setTimeout(() => {
         cleanup();
-        resolve(false);
-      }, 5000);
+        resolve(null);
+      }, 8000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        iframe.remove();
+      }
 
       iframe.onload = () => {
         try {
-          // Check if we got redirected to callback (success)
-          if (
-            iframe.contentWindow?.location.href.includes('/api/auth/callback')
-          ) {
-            clearTimeout(timeout);
-            const callbackUrl = iframe.contentWindow.location.href;
+          const url = iframe.contentWindow?.location.href;
 
-            cleanup();
+          if (!url) return;
 
-            window.location.href = callbackUrl;
-            resolve(true);
-          } else {
-            clearTimeout(timeout);
+          if (url.includes('/api/auth/callback')) {
+            const code = new URL(url).searchParams.get('code');
             cleanup();
-            resolve(false);
+            resolve(code);
           }
         } catch {
-          // Cross-origin error → still on Auth0 domain
-          clearTimeout(timeout);
-          cleanup();
-          resolve(false);
+          // Expected cross-origin error before redirect
         }
       };
 
       iframe.onerror = () => {
-        clearTimeout(timeout);
         cleanup();
-        resolve(false);
+        resolve(null);
       };
 
       document.body.appendChild(iframe);
     });
-  } catch (error) {
-    console.error('Silent auth failed:', error);
-    return false;
+
+    if (!code) return null;
+
+    const tokens = await exchangeCodeForTokens(code);
+    return tokens.access_token;
+  } catch (err) {
+    console.error('Silent auth failed:', err);
+    return null;
   }
 }
-
 /**
  * Builds the Auth0 authorize URL for the default Universal Login screen (email/password).
  * Optionally accepts a login_hint to pre-fill the email field.

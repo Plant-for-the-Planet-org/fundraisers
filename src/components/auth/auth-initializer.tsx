@@ -65,20 +65,10 @@ export function AuthInitializer() {
           localStorage.removeItem('access_token');
         }
 
-        /**
-         * Attempt silent authentication if:
-         * - no token exists
-         * - token is expired
-         */
-        const silentSuccess = await trySignInSilently();
+        const silentToken = await trySignInSilently();
 
-        /**
-         * If silent auth fails, we simply continue.
-         * AuthGuard will redirect the user to login when it sees
-         * that the user is not authenticated.
-         */
-        if (!silentSuccess) {
-          // Silent auth unavailable — AuthGuard will redirect to login
+        if (silentToken) {
+          await setAccessToken(silentToken);
         }
       } catch (err) {
         console.error('Auth init failed:', err);
