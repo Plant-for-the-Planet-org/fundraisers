@@ -38,7 +38,7 @@ export const useAuthStore = create<AuthStore>()(
       error: null,
 
       setIsAuthInitializing: (value: boolean) =>
-        set({ isAuthInitializing: value }, false, {
+        set({ isAuthInitializing: value }, undefined, {
           type: 'auth/set_is_authInitializing',
         }),
 
@@ -50,11 +50,12 @@ export const useAuthStore = create<AuthStore>()(
 
         if (get().accessToken === token) return;
 
-        set({ accessToken: token }, false, { type: 'auth/set_access_token' });
+        set({ accessToken: token }, undefined, {
+          type: 'auth/set_access_token',
+        });
 
         try {
           await get().loadUserProfile();
-
           const user = get().user;
 
           if (!user) throw new Error('User profile not loaded');

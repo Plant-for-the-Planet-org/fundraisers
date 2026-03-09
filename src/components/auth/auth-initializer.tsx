@@ -28,50 +28,60 @@ export function AuthInitializer() {
   const clearAuth = useAuthStore(state => state.clearAuth);
 
   useEffect(() => {
+    const getValidStoredToken = () => {
+      const token = localStorage.getItem('access_token');
+
+      if (!token) return null;
+
+      if (isTokenExpired(token)) {
+        localStorage.removeItem('access_token');
+        return null;
+      }
+
+      return token;
+    };
+
     const init = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const tokenFromUrl = urlParams.get('access_token');
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        const tokenFromUrl = params.get('access_token');
 
-        // Case 1 — PKCE code exchange
+        // 1. Handle PKCE code exchange
         if (code) {
           const token = await handleCodeExchange(code);
           await setAccessToken(token);
           return;
         }
 
-        // Case 2 — Token directly in URL
+        // 2. Handle token directly from URL
         if (tokenFromUrl) {
           cleanUrl(['access_token']);
           await setAccessToken(tokenFromUrl);
           return;
         }
 
-        // Case 3 — Previously stored token
-        const storedToken = localStorage.getItem('access_token');
-
+        // 3. Check token from localStorage
+        const storedToken = getValidStoredToken();
         if (storedToken) {
-          /**
-           * IMPORTANT:
-           * Check if the stored JWT is expired before reusing it.
-           * Using an expired token would cause API calls to fail with 401.
-           */
-          if (!isTokenExpired(storedToken)) {
-            await setAccessToken(storedToken);
-            return;
-          }
-
-          localStorage.removeItem('access_token');
+          await setAccessToken(storedToken);
+          return;
         }
 
+        // 4. Try silent authentication
         const silentToken = await trySignInSilently();
-
         if (silentToken) {
           await setAccessToken(silentToken);
+          return;
         }
-      } catch (err) {
-        console.error('Auth init failed:', err);
+
+        // 5. Final fallback check
+        const fallbackToken = getValidStoredToken();
+        if (fallbackToken) {
+          await setAccessToken(fallbackToken);
+        }
+      } catch (error) {
+        console.error('Auth init failed:', error);
         clearAuth();
       } finally {
         setIsAuthInitializing(false);
