@@ -46,6 +46,17 @@
         "errors": {
           "required": "Please enter a fundraiser goal."
         }
+      },
+      "options": {
+        "sectionHeading": "Fundraiser Options",
+        "status": {
+          "label": "Collect Donations for the Fundraiser",
+          "description": "Enable donation collection and make the fundraiser active"
+        },
+        "visibility": {
+          "label": "Make the fundraiser discoverable",
+          "description": "Allow people to find this fundraiser in search and browse"
+        }
       }
     }
   }
