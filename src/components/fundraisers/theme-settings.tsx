@@ -79,7 +79,7 @@ export function ThemeSettings() {
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='theme-settings flex flex-col gap-4'>
       <div>
         <SectionHeader>{tTheme('sectionHeading')}</SectionHeader>
         <Select value={activeTheme.id} onValueChange={handleThemeSelect}>
