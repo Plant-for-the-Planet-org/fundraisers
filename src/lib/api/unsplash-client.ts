@@ -1,32 +1,31 @@
-/**
- * Client-side Unsplash API wrapper.
- * Calls our proxy route instead of hitting Unsplash directly.
- */
+import type {
+  UnsplashPhoto,
+  UnsplashSearchResponse,
+} from '@/lib/types/image-selection';
 
-import type { UnsplashPhoto, UnsplashSearchResponse } from './unsplash-service';
+const UNSPLASH_API_BASE_URL = '/api/images/unsplash';
+
+interface UnsplashCategoryResponse {
+  results: UnsplashPhoto[];
+}
 
 interface ApiErrorResponse {
-  error?: {
-    code?: string;
-    message?: string;
-  };
+  error?: string;
 }
 
-function getErrorMessage(payload: unknown, fallback: string): string {
-  if (
-    payload &&
-    typeof payload === 'object' &&
-    'error' in payload &&
-    typeof (payload as ApiErrorResponse).error?.message === 'string'
-  ) {
-    return (payload as ApiErrorResponse).error!.message!;
+async function parseApiError(
+  response: Response,
+  fallback: string
+): Promise<Error> {
+  try {
+    const payload = (await response.json()) as ApiErrorResponse;
+    return new Error(payload.error ?? fallback);
+  } catch {
+    return new Error(fallback);
   }
-  return fallback;
 }
 
-export class UnsplashClient {
-  private baseUrl = '/api/images/unsplash';
-
+export class UnsplashClientService {
   async searchPhotos(
     query: string,
     page: number = 1,
@@ -35,17 +34,20 @@ export class UnsplashClient {
     const params = new URLSearchParams({
       action: 'search',
       query,
-      page: String(page),
-      count: String(perPage),
+      page: page.toString(),
+      count: perPage.toString(),
     });
 
-    const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+    const response = await fetch(
+      `${UNSPLASH_API_BASE_URL}?${params.toString()}`
+    );
+
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as unknown;
-      throw new Error(getErrorMessage(payload, 'Failed to search images'));
+      throw await parseApiError(response, 'Failed to search images.');
     }
 
-    return response.json();
+    const payload = (await response.json()) as UnsplashSearchResponse;
+    return payload;
   }
 
   async getCategoryImages(
@@ -55,37 +57,34 @@ export class UnsplashClient {
     const params = new URLSearchParams({
       action: 'category',
       category: categoryId,
-      count: String(count),
+      count: count.toString(),
     });
 
-    const response = await fetch(`${this.baseUrl}?${params.toString()}`);
+    const response = await fetch(
+      `${UNSPLASH_API_BASE_URL}?${params.toString()}`
+    );
+
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as unknown;
-      throw new Error(
-        getErrorMessage(payload, 'Failed to load category images')
-      );
+      throw await parseApiError(response, 'Failed to load images.');
     }
 
-    const data = (await response.json()) as { results: UnsplashPhoto[] };
-    return data.results;
+    const payload = (await response.json()) as UnsplashCategoryResponse;
+    return payload.results;
   }
 
   async trackDownload(downloadLocation: string): Promise<void> {
-    const response = await fetch(this.baseUrl, {
+    const response = await fetch(UNSPLASH_API_BASE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ downloadLocation }),
     });
 
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as unknown;
-      throw new Error(getErrorMessage(payload, 'Failed to track download'));
+      throw await parseApiError(response, 'Failed to track image download.');
     }
-  }
-
-  isAvailable(): boolean {
-    return true;
   }
 }
 
-export const unsplashClient = new UnsplashClient();
+export const unsplashClient = new UnsplashClientService();

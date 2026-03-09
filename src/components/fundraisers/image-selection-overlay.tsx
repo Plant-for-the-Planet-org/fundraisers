@@ -1,17 +1,19 @@
 'use client';
 
-import type { ChangeEvent, DragEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { cn } from '@/lib/utils';
 import { unsplashClient } from '@/lib/api/unsplash-client';
-import type { UnsplashPhoto } from '@/lib/api/unsplash-service';
-import { getVisibleImageCategories } from '@/lib/constants/image-categories';
-import type { SelectedImage } from '@/lib/types/image-selection';
 import {
+  DEFAULT_IMAGE_CATEGORY_ID,
+  getVisibleImageCategories,
+} from '@/lib/constants/image-categories';
+import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
+import { cn } from '@/lib/utils/cn';
+import {
+  MAX_IMAGE_FILE_SIZE_MB,
   createUnsplashSelectedImage,
   createUploadedSelectedImage,
   validateImageFile,
@@ -30,20 +32,17 @@ export function ImageSelectionOverlay({
 }: ImageSelectionOverlayProps) {
   const t = useTranslations('Fundraisers.create.image');
 
-  const [mounted, setMounted] = useState(false);
+  const categories = useMemo(() => getVisibleImageCategories(), []);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('outdoors');
+  const [selectedCategory, setSelectedCategory] = useState(
+    categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID
+  );
   const [isDragOver, setIsDragOver] = useState(false);
   const [images, setImages] = useState<UnsplashPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
-  const categories = useMemo(() => getVisibleImageCategories(), []);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted, setMounted] = useState(false);
 
   const loadCategoryImages = useCallback(
     async (categoryId: string) => {
@@ -54,7 +53,7 @@ export function ImageSelectionOverlay({
         const photos = await unsplashClient.getCategoryImages(categoryId, 20);
         setImages(photos);
       } catch {
-        setError(t('states.loadError.message'));
+        setError(t('states.loadError'));
         setImages([]);
       } finally {
         setIsLoading(false);
@@ -66,7 +65,7 @@ export function ImageSelectionOverlay({
   const loadSearchImages = useCallback(
     async (query: string) => {
       if (!query.trim()) {
-        loadCategoryImages(selectedCategory);
+        await loadCategoryImages(selectedCategory);
         return;
       }
 
@@ -77,7 +76,7 @@ export function ImageSelectionOverlay({
         const result = await unsplashClient.searchPhotos(query, 1, 20);
         setImages(result.results);
       } catch {
-        setError(t('states.searchError.message'));
+        setError(t('states.loadError'));
         setImages([]);
       } finally {
         setIsLoading(false);
@@ -86,27 +85,29 @@ export function ImageSelectionOverlay({
     [loadCategoryImages, selectedCategory, t]
   );
 
-  const handleCategorySelect = useCallback(
-    (categoryId: string) => {
-      setSelectedCategory(categoryId);
-      setSearchQuery('');
-      loadCategoryImages(categoryId);
+  const getUploadErrorMessage = useCallback(
+    (code: 'FILE_TOO_LARGE' | 'INVALID_FILE_TYPE' | 'EMPTY_FILE'): string => {
+      if (code === 'FILE_TOO_LARGE') {
+        return t('errors.fileTooLarge', {
+          maxMb: `${MAX_IMAGE_FILE_SIZE_MB}`,
+        });
+      }
+
+      if (code === 'EMPTY_FILE') {
+        return t('errors.emptyFile');
+      }
+
+      return t('errors.invalidFileType');
     },
-    [loadCategoryImages]
+    [t]
   );
 
   const handleFileUpload = useCallback(
     (file: File) => {
-      setUploadError(null);
+      const validationResult = validateImageFile(file);
 
-      const validation = validateImageFile(file);
-      if (!validation.isValid) {
-        const code = validation.error?.code;
-        if (code === 'FILE_TOO_LARGE') {
-          setUploadError(t('upload.errors.fileTooLarge'));
-        } else {
-          setUploadError(t('upload.errors.invalidType'));
-        }
+      if (!validationResult.isValid && validationResult.error) {
+        setError(getUploadErrorMessage(validationResult.error.code));
         return;
       }
 
@@ -114,37 +115,33 @@ export function ImageSelectionOverlay({
       onImageSelect(selectedImage);
       onClose();
     },
-    [onClose, onImageSelect, t]
+    [getUploadErrorMessage, onClose, onImageSelect]
   );
 
   const handleDrop = useCallback(
-    (e: DragEvent) => {
-      e.preventDefault();
+    (event: React.DragEvent) => {
+      event.preventDefault();
       setIsDragOver(false);
-      const file = Array.from(e.dataTransfer.files)[0];
-      if (file) {
-        handleFileUpload(file);
+
+      const files = Array.from(event.dataTransfer.files);
+      const imageFile = files.find(file => file.type.startsWith('image/'));
+
+      if (imageFile) {
+        handleFileUpload(imageFile);
       }
     },
     [handleFileUpload]
   );
 
-  const handleDragOver = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
   const handleFileSelect = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+
       if (file) {
         handleFileUpload(file);
       }
+
+      event.currentTarget.value = '';
     },
     [handleFileUpload]
   );
@@ -159,26 +156,22 @@ export function ImageSelectionOverlay({
   );
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (categories.length === 0) {
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
+    const categoryExists = categories.some(
+      category => category.id === selectedCategory
+    );
+
+    if (!categoryExists) {
+      setSelectedCategory(categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID);
+    }
+  }, [categories, selectedCategory]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -188,15 +181,18 @@ export function ImageSelectionOverlay({
     const timeoutId = setTimeout(
       () => {
         if (searchQuery.trim()) {
-          loadSearchImages(searchQuery);
-        } else {
-          loadCategoryImages(selectedCategory);
+          void loadSearchImages(searchQuery);
+          return;
         }
+
+        void loadCategoryImages(selectedCategory);
       },
       searchQuery.trim() ? 300 : 0
     );
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [
     isOpen,
     loadCategoryImages,
@@ -205,232 +201,243 @@ export function ImageSelectionOverlay({
     selectedCategory,
   ]);
 
-  const overlayContent = useMemo(() => {
+  useEffect(() => {
     if (!isOpen) {
-      return null;
+      return;
     }
 
-    return (
-      <div
-        className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-start justify-center pt-[10vh]'
-        role='dialog'
-        aria-modal='true'
-        aria-label={t('overlay.ariaLabel')}
-      >
-        <div className='w-full max-w-4xl mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-800 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200'>
-          <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-gray-800'>
-            <div className='flex items-center justify-between gap-4'>
-              <h2 className='text-xl font-semibold text-gray-900 dark:text-gray-50'>
-                {t('overlay.title')}
-              </h2>
-              <button
-                type='button'
-                onClick={onClose}
-                className='p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors'
-                aria-label={t('overlay.close')}
-              >
-                <X className='w-5 h-5 text-gray-500 dark:text-gray-400' />
-              </button>
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  if (!mounted || !isOpen) {
+    return null;
+  }
+
+  return createPortal(
+    <div
+      className='fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-start justify-center pt-[10vh] px-4'
+      onClick={event => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className='w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-gray-200/60 bg-white dark:bg-zinc-900 dark:border-zinc-700 animate-in fade-in-0 zoom-in-95 duration-200'>
+        <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-zinc-700'>
+          <div className='flex items-center justify-between gap-4'>
+            <h2 className='text-xl font-semibold text-zinc-900 dark:text-zinc-100'>
+              {t('overlay.title')}
+            </h2>
+            <button
+              onClick={onClose}
+              className='p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800'
+              aria-label={t('actions.closeAria')}
+            >
+              <X className='w-5 h-5 text-gray-500 dark:text-zinc-400' />
+            </button>
+          </div>
+        </div>
+
+        <div className='max-h-[70vh] overflow-y-auto p-4 space-y-4'>
+          <div
+            className={cn(
+              'relative border-2 border-dashed rounded-lg p-6 text-center transition-colors',
+              isDragOver
+                ? 'border-green-500 bg-green-50 dark:bg-green-950/20'
+                : 'border-gray-200 hover:border-gray-300 dark:border-zinc-700 dark:hover:border-zinc-500'
+            )}
+            onDragOver={event => {
+              event.preventDefault();
+              setIsDragOver(true);
+            }}
+            onDragLeave={event => {
+              event.preventDefault();
+              setIsDragOver(false);
+            }}
+            onDrop={handleDrop}
+          >
+            <input
+              type='file'
+              accept='image/*'
+              onChange={handleFileSelect}
+              className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+              aria-label={t('overlay.uploadInputAria')}
+            />
+            <div className='space-y-2'>
+              <div className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>
+                {t('overlay.uploadTitle')}
+              </div>
+              <div className='text-xs text-gray-500 dark:text-zinc-400'>
+                {t('overlay.uploadSubtitle')}{' '}
+                <a
+                  href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
+                >
+                  {t('attribution.unsplashLink')}
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className='max-h-[70vh] overflow-y-auto'>
-            <div className='p-4 space-y-4'>
-              <div
-                className={cn(
-                  'relative border-2 border-dashed rounded-xl p-6 text-center transition-colors',
-                  isDragOver
-                    ? 'border-primary bg-primary/10'
-                    : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
-                )}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <input
-                  type='file'
-                  accept='image/*'
-                  onChange={handleFileSelect}
-                  className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
-                  aria-label={t('upload.ariaLabel')}
-                />
-                <div className='space-y-2'>
-                  <div className='text-sm font-medium text-gray-900 dark:text-gray-50'>
-                    {t('upload.title')}
-                  </div>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>
-                    {t('upload.subtitle')}{' '}
-                    <a
-                      href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='underline underline-offset-2 hover:no-underline'
-                    >
-                      {t('upload.unsplash')}
-                    </a>
-                  </div>
+          <div className='relative'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500' />
+            <input
+              type='text'
+              placeholder={t('overlay.searchPlaceholder')}
+              value={searchQuery}
+              onChange={event => {
+                setSearchQuery(event.target.value);
+              }}
+              className='w-full rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 pl-10 pr-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
+              autoFocus
+            />
+          </div>
 
-                  {uploadError && (
-                    <p className='text-xs text-red-600 dark:text-red-400'>
-                      {uploadError}
-                    </p>
-                  )}
-                </div>
+          <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4'>
+            <div className='sm:col-span-1 min-w-[150px]'>
+              <div className='flex sm:flex-col gap-1 overflow-x-auto sm:overflow-x-visible'>
+                {categories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedCategory(category.id);
+                      setSearchQuery('');
+                    }}
+                    className={cn(
+                      'flex-shrink-0 sm:w-full text-left px-3 py-2 rounded-md text-sm transition-colors whitespace-nowrap',
+                      selectedCategory === category.id
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-medium'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
+                    )}
+                  >
+                    {t(`categories.${category.id}` as never)}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className='relative'>
-                <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                <input
-                  type='text'
-                  placeholder={t('search.placeholder')}
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className='w-full h-10 pl-10 pr-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 placeholder:text-gray-400 outline-none focus-visible:ring-2 focus-visible:ring-primary/40'
-                  autoFocus
-                  aria-label={t('search.ariaLabel')}
-                />
-              </div>
-
-              <div className='flex flex-col sm:grid sm:grid-cols-4 gap-4'>
-                <div className='sm:col-span-1 min-w-[150px]'>
-                  <div className='flex sm:flex-col gap-1 overflow-x-auto sm:overflow-x-visible'>
-                    {categories.map(category => (
-                      <button
-                        key={category.id}
-                        type='button'
-                        onClick={() => handleCategorySelect(category.id)}
-                        className={cn(
-                          'flex-shrink-0 sm:w-full text-left px-3 py-2 rounded-xl text-sm transition-colors whitespace-nowrap',
-                          selectedCategory === category.id
-                            ? 'bg-primary/10 text-primary font-medium'
-                            : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-                        )}
-                      >
-                        {t(`categories.${category.id}` as never)}
-                      </button>
-                    ))}
+            <div className='sm:col-span-3'>
+              {error && (
+                <div className='text-center py-8'>
+                  <div className='w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3'>
+                    <X className='w-6 h-6 text-red-600 dark:text-red-300' />
                   </div>
+                  <h3 className='font-medium text-zinc-900 dark:text-zinc-100 mb-1'>
+                    {t('states.errorTitle')}
+                  </h3>
+                  <p className='text-sm text-zinc-600 dark:text-zinc-400 mb-3'>
+                    {error}
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (searchQuery.trim()) {
+                        void loadSearchImages(searchQuery);
+                      } else {
+                        void loadCategoryImages(selectedCategory);
+                      }
+                    }}
+                    className='px-3 py-2 text-sm rounded-md border border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-300 dark:hover:bg-green-900/20'
+                  >
+                    {t('actions.tryAgain')}
+                  </button>
                 </div>
+              )}
 
-                <div className='sm:col-span-3'>
-                  {error && (
-                    <div className='text-center py-8'>
-                      <h3 className='font-medium text-gray-900 dark:text-gray-50 mb-1'>
-                        {t('states.loadError.title')}
-                      </h3>
-                      <p className='text-sm text-gray-600 dark:text-gray-300 mb-4'>
-                        {error}
-                      </p>
+              {isLoading && (
+                <div className='text-center py-8'>
+                  <div className='w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-3' />
+                  <p className='text-sm text-zinc-600 dark:text-zinc-400'>
+                    {t('states.loading')}
+                  </p>
+                </div>
+              )}
+
+              {!isLoading && !error && images.length === 0 && (
+                <div className='text-center py-8'>
+                  <div className='w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3'>
+                    <Search className='w-6 h-6 text-gray-400 dark:text-zinc-500' />
+                  </div>
+                  <h3 className='font-medium text-zinc-900 dark:text-zinc-100 mb-1'>
+                    {t('states.noResultsTitle')}
+                  </h3>
+                  <p className='text-sm text-zinc-600 dark:text-zinc-400'>
+                    {searchQuery.trim()
+                      ? t('states.noResultsWithQuery', { query: searchQuery })
+                      : t('states.noResultsDescription')}
+                  </p>
+                </div>
+              )}
+
+              {!isLoading && !error && images.length > 0 && (
+                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
+                  {images.map(photo => (
+                    <div key={photo.id} className='relative group'>
                       <button
-                        type='button'
-                        onClick={() =>
-                          searchQuery.trim()
-                            ? loadSearchImages(searchQuery)
-                            : loadCategoryImages(selectedCategory)
-                        }
-                        className='h-9 px-3 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm'
+                        onClick={() => {
+                          handleImageSelect(photo);
+                        }}
+                        className='relative block w-full aspect-square bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-lg'
+                        aria-label={t('actions.selectImageAria')}
                       >
-                        {t('states.loadError.retry')}
+                        <img
+                          src={photo.urls.small}
+                          alt={photo.altDescription ?? t('previewAlt')}
+                          className='w-full h-full object-cover'
+                          loading='lazy'
+                        />
+                        <div className='absolute inset-0 border-2 border-transparent group-hover:border-green-500 rounded-lg transition-colors' />
                       </button>
-                    </div>
-                  )}
 
-                  {isLoading && (
-                    <div className='text-center py-8'>
-                      <div className='w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3' />
-                      <p className='text-sm text-gray-600 dark:text-gray-300'>
-                        {t('states.loading')}
-                      </p>
-                    </div>
-                  )}
-
-                  {!isLoading && !error && images.length === 0 && (
-                    <div className='text-center py-8'>
-                      <h3 className='font-medium text-gray-900 dark:text-gray-50 mb-1'>
-                        {t('states.empty.title')}
-                      </h3>
-                      <p className='text-sm text-gray-600 dark:text-gray-300'>
-                        {searchQuery.trim()
-                          ? t('states.empty.search', { query: searchQuery })
-                          : t('states.empty.category')}
-                      </p>
-                    </div>
-                  )}
-
-                  {!isLoading && !error && images.length > 0 && (
-                    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3'>
-                      {images.map(photo => (
-                        <div key={photo.id} className='relative group'>
-                          <button
-                            type='button'
-                            onClick={() => handleImageSelect(photo)}
-                            className='relative aspect-square w-full bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40'
-                            aria-label={t('grid.selectImage')}
+                      <div className='absolute inset-0 bg-black/50 flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-lg'>
+                        <div className='text-white text-xs pointer-events-auto'>
+                          {t('attribution.photoBy')}{' '}
+                          <a
+                            href={`${photo.user.links.html}?utm_source=plant-for-the-planet&utm_medium=referral`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='underline hover:no-underline'
+                            onClick={event => {
+                              event.stopPropagation();
+                            }}
                           >
-                            <img
-                              src={photo.urls.small}
-                              alt={
-                                photo.altDescription ||
-                                t('grid.photoAlt', {
-                                  photographer: photo.user.name,
-                                })
-                              }
-                              className='w-full h-full object-cover'
-                              loading='lazy'
-                            />
-                            <span className='absolute inset-0 border-2 border-transparent group-hover:border-primary rounded-xl transition-colors' />
-                          </button>
-
-                          <div className='absolute inset-0 bg-black/50 flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-xl'>
-                            <div className='text-white text-[11px] pointer-events-auto'>
-                              {t('grid.attributionPrefix')}{' '}
-                              <a
-                                href={`${photo.user.links.html}?utm_source=plant-for-the-planet&utm_medium=referral`}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='underline underline-offset-2 hover:no-underline'
-                                onClick={e => e.stopPropagation()}
-                              >
-                                {photo.user.name}
-                              </a>
-                            </div>
-                          </div>
+                            {photo.user.name}
+                          </a>
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    );
-  }, [
-    categories,
-    error,
-    handleCategorySelect,
-    handleDragLeave,
-    handleDragOver,
-    handleDrop,
-    handleFileSelect,
-    handleImageSelect,
-    isDragOver,
-    images,
-    isLoading,
-    isOpen,
-    loadCategoryImages,
-    loadSearchImages,
-    onClose,
-    searchQuery,
-    selectedCategory,
-    t,
-    uploadError,
-  ]);
-
-  if (!mounted) {
-    return null;
-  }
-
-  return overlayContent ? createPortal(overlayContent, document.body) : null;
+    </div>,
+    document.body
+  );
 }

@@ -9,39 +9,48 @@ fundraisers/
 │   │   ├── layout.tsx              # Root layout — font loading, theme mode
 │   │   ├── globals.css             # Global styles, Tailwind theme config (@theme)
 │   │   ├── page.tsx                # Root — redirects to /explore
-│   │   └── (standard)/            # Route group: shared header/footer layout
-│   │       └── explore/
-│   │           ├── page.tsx
-│   │           └── [category]/
-│   │               ├── page.tsx
-│   │               └── not-found.tsx
-│   │   └── api/                    # Route handlers (server-only)
-│   │       └── images/
-│   │           └── unsplash/
-│   │               └── route.ts
+│   │   ├── api/
+│   │   │   └── images/
+│   │   │       └── unsplash/
+│   │   │           └── route.ts    # Server proxy for Unsplash image APIs
+│   │   └── (standard)/             # Route group: shared header/footer layout
+│   │       ├── explore/
+│   │       │   ├── page.tsx
+│   │       │   └── [category]/
+│   │       │       ├── page.tsx
+│   │       │       └── not-found.tsx
+│   │       └── fundraisers/
+│   │           └── create/
+│   │               └── page.tsx
 │   │
 │   ├── components/
 │   │   ├── ui/                     # Reusable UI primitives (no business logic)
 │   │   ├── theme/                  # Theme context provider
 │   │   ├── header/                 # Header component and sub-components
 │   │   ├── footer/                 # Footer component and sub-components
-│   │   └── explore/                # Explore feature components
-│   │   └── fundraisers/            # Fundraiser create flow components
+│   │   ├── explore/                # Explore feature components
+│   │   └── fundraisers/            # Create fundraiser flow components
 │   │
 │   ├── lib/
-│   │   ├── api/                    # API service classes
-│   │   ├── constants/              # App-wide constants (validated with Zod)
+│   │   ├── api/                    # API service classes (categories, unsplash)
+│   │   ├── constants/              # App-wide constants
 │   │   ├── theme/                  # Theme types, registry, and utilities
-│   │   ├── types/                  # Shared TypeScript interfaces
-│   │   └── utils/                  # Pure utility functions
+│   │   ├── types/                  # Shared TypeScript interfaces and form contracts
+│   │   └── utils/                  # Pure utility functions (formatting, image helpers)
 │   │
 │   ├── stores/                     # Zustand state stores
 │   ├── i18n/                       # next-intl routing and request config
 │   └── proxy.ts                    # Sets x-pathname header for server components
 │
 ├── locales/                        # Translation files
-│   ├── en/common.json
-│   └── de/common.json
+│   ├── en/
+│   │   ├── common.json
+│   │   ├── explore.json
+│   │   └── fundraisers.json
+│   └── de/
+│       ├── common.json
+│       ├── explore.json
+│       └── fundraisers.json
 │
 ├── docs/                           # Project documentation
 ├── public/                         # Static assets
@@ -58,7 +67,7 @@ fundraisers/
 
 **`src/stores/`** — Zustand stores for client-side state that needs to persist or be shared across the tree (e.g. locale).
 
-**`locales/`** — Translation files at the root level, outside `src/`. Add new keys to both `en/common.json` and `de/common.json` together.
+**`locales/`** — Translation files at the root level, outside `src/`. Add feature keys in both `en/*` and `de/*` files together.
 
 ## Component Co-location
 

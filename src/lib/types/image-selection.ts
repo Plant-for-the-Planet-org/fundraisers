@@ -23,12 +23,13 @@ export interface SelectedImage {
   file?: File;
 }
 
+export type ImageUploadErrorCode =
+  | 'FILE_TOO_LARGE'
+  | 'INVALID_FILE_TYPE'
+  | 'EMPTY_FILE';
+
 export interface ImageUploadError {
-  code:
-    | 'FILE_TOO_LARGE'
-    | 'INVALID_FILE_TYPE'
-    | 'UPLOAD_FAILED'
-    | 'NETWORK_ERROR';
+  code: ImageUploadErrorCode;
   message: string;
 }
 
@@ -37,7 +38,42 @@ export interface ImageValidationResult {
   error?: ImageUploadError;
 }
 
+export interface SeasonalWindow {
+  startMonth: number;
+  startDay: number;
+  endMonth: number;
+  endDay: number;
+}
+
 export interface ImageCategory {
   id: string;
   query: string;
+  seasonal?: SeasonalWindow;
+}
+
+export interface UnsplashPhoto {
+  id: string;
+  altDescription: string | null;
+  urls: {
+    thumb: string;
+    small: string;
+    regular: string;
+    full: string;
+  };
+  user: {
+    name: string;
+    links: {
+      html: string;
+    };
+  };
+  links: {
+    html: string;
+    downloadLocation: string;
+  };
+}
+
+export interface UnsplashSearchResponse {
+  results: UnsplashPhoto[];
+  total: number;
+  totalPages: number;
 }

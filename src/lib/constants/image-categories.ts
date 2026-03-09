@@ -1,17 +1,9 @@
 import type { ImageCategory } from '@/lib/types/image-selection';
 
-interface SeasonalWindow {
-  startMonth: number; // 1-12
-  startDay: number;
-  endMonth: number;
-  endDay: number;
-}
+export const DEFAULT_IMAGE_CATEGORY_ID = 'outdoors';
+export const DEFAULT_IMAGE_LOAD_CATEGORY_ID = 'nature';
 
-interface SeasonalCategory extends ImageCategory {
-  seasonal?: SeasonalWindow;
-}
-
-const ALL_IMAGE_CATEGORIES: SeasonalCategory[] = [
+const ALL_IMAGE_CATEGORIES: ImageCategory[] = [
   { id: 'outdoors', query: 'nature outdoor adventure hiking' },
   { id: 'nature', query: 'forest trees wildlife animals' },
   { id: 'birthday', query: 'birthday party celebration cake' },
@@ -93,13 +85,16 @@ const ALL_IMAGE_CATEGORIES: SeasonalCategory[] = [
   },
 ];
 
-function isInSeason(window: SeasonalWindow, date: Date): boolean {
+function isCategoryVisible(category: ImageCategory, date: Date): boolean {
+  if (!category.seasonal) {
+    return true;
+  }
+
   const currentMonth = date.getMonth() + 1;
   const currentDay = date.getDate();
 
-  const { startMonth, startDay, endMonth, endDay } = window;
+  const { startMonth, startDay, endMonth, endDay } = category.seasonal;
 
-  // Handle year-crossing windows (e.g. start in Nov, end in Jan)
   if (startMonth > endMonth) {
     return (
       currentMonth > startMonth ||
@@ -117,22 +112,14 @@ function isInSeason(window: SeasonalWindow, date: Date): boolean {
   );
 }
 
-function stripSeasonal(category: SeasonalCategory): ImageCategory {
-  const { seasonal: _seasonal, ...rest } = category;
-  return rest;
-}
-
-export function getStaticImageCategories(): ImageCategory[] {
-  return ALL_IMAGE_CATEGORIES.map(stripSeasonal);
-}
-
 export function getVisibleImageCategories(
   date: Date = new Date()
 ): ImageCategory[] {
-  return ALL_IMAGE_CATEGORIES.filter(category => {
-    if (!category.seasonal) {
-      return true;
-    }
-    return isInSeason(category.seasonal, date);
-  }).map(stripSeasonal);
+  return ALL_IMAGE_CATEGORIES.filter(category =>
+    isCategoryVisible(category, date)
+  );
+}
+
+export function getImageCategoriesFallback(): ImageCategory[] {
+  return ALL_IMAGE_CATEGORIES.map(category => ({ ...category }));
 }

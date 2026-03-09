@@ -32,55 +32,39 @@
         }
       },
       "image": {
-        "preview": {
-          "alt": "Fundraiser preview image",
-          "change": "Change image"
+        "previewAlt": "Fundraiser preview image",
+        "states": {
+          "loadingDefault": "Loading default image...",
+          "loading": "Loading images...",
+          "defaultError": "Failed to load a default image.",
+          "loadError": "Failed to load images. Please try again.",
+          "errorTitle": "Failed to load images",
+          "noResultsTitle": "No images found",
+          "noResultsDescription": "Try another search term or category.",
+          "noResultsWithQuery": "No images match \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Change image",
+          "retry": "Retry",
+          "tryAgain": "Try again",
+          "closeAria": "Close image selector",
+          "selectImageAria": "Select image"
         },
         "overlay": {
           "title": "Select an image",
-          "close": "Close image selector",
-          "ariaLabel": "Image selector"
+          "uploadTitle": "Drag and drop or click to upload",
+          "uploadSubtitle": "Or choose an image from Unsplash below",
+          "searchPlaceholder": "Search images...",
+          "uploadInputAria": "Upload image file"
         },
-        "upload": {
-          "title": "Drag & drop or click to upload",
-          "subtitle": "Or choose an image from",
-          "unsplash": "Unsplash",
-          "ariaLabel": "Upload image file",
-          "errors": {
-            "fileTooLarge": "File size must be 10MB or less.",
-            "invalidType": "Please upload a valid image file (JPEG, PNG, WebP, or GIF)."
-          }
+        "attribution": {
+          "photoBy": "Photo by",
+          "unsplashLink": "Unsplash"
         },
-        "search": {
-          "placeholder": "Search images…",
-          "ariaLabel": "Search images"
-        },
-        "states": {
-          "loading": "Loading images…",
-          "loadError": {
-            "title": "Failed to load images",
-            "message": "Something went wrong while loading images.",
-            "retry": "Try again"
-          },
-          "searchError": {
-            "message": "Something went wrong while searching images."
-          },
-          "empty": {
-            "title": "No images found",
-            "search": "No images match “{query}”.",
-            "category": "No images available for this category."
-          },
-          "defaultLoading": "Loading default image…",
-          "defaultLoadError": {
-            "title": "Failed to load default image",
-            "message": "Something went wrong while loading the default image.",
-            "retry": "Retry"
-          }
-        },
-        "grid": {
-          "selectImage": "Select image",
-          "photoAlt": "Photo by {photographer}",
-          "attributionPrefix": "Photo by"
+        "errors": {
+          "fileTooLarge": "Image must be {maxMb}MB or smaller.",
+          "invalidFileType": "Please upload a JPG, PNG, WEBP, or GIF image.",
+          "emptyFile": "Selected file is empty."
         },
         "categories": {
           "outdoors": "Outdoors",
@@ -91,13 +75,13 @@
           "thanksgiving": "Thanksgiving",
           "christmas": "Christmas",
           "new-year": "New Year",
-          "valentines": "Valentine’s Day",
+          "valentines": "Valentine's Day",
           "easter": "Easter",
           "summer": "Summer",
           "back-to-school": "Back to School",
           "diwali": "Diwali",
-          "mothers-day": "Mother’s Day",
-          "fathers-day": "Father’s Day",
+          "mothers-day": "Mother's Day",
+          "fathers-day": "Father's Day",
           "oktoberfest": "Oktoberfest",
           "chinese-new-year": "Chinese New Year",
           "holi": "Holi",
