@@ -31,6 +31,79 @@
           "required": "Bitte gib eine Beschreibung für die Spendenaktion ein."
         }
       },
+      "image": {
+        "preview": {
+          "alt": "Vorschaubild der Fundraiser",
+          "change": "Bild ändern"
+        },
+        "overlay": {
+          "title": "Bild auswählen",
+          "close": "Bildauswahl schließen",
+          "ariaLabel": "Bildauswahl"
+        },
+        "upload": {
+          "title": "Drag & Drop oder klicken zum Hochladen",
+          "subtitle": "Oder wähle ein Bild von",
+          "unsplash": "Unsplash",
+          "ariaLabel": "Bilddatei hochladen",
+          "errors": {
+            "fileTooLarge": "Die Datei darf höchstens 10 MB groß sein.",
+            "invalidType": "Bitte lade eine gültige Bilddatei hoch (JPEG, PNG, WebP oder GIF)."
+          }
+        },
+        "search": {
+          "placeholder": "Bilder suchen…",
+          "ariaLabel": "Bilder suchen"
+        },
+        "states": {
+          "loading": "Bilder werden geladen…",
+          "loadError": {
+            "title": "Bilder konnten nicht geladen werden",
+            "message": "Beim Laden der Bilder ist etwas schiefgelaufen.",
+            "retry": "Erneut versuchen"
+          },
+          "searchError": {
+            "message": "Bei der Bildsuche ist etwas schiefgelaufen."
+          },
+          "empty": {
+            "title": "Keine Bilder gefunden",
+            "search": "Keine Bilder passen zu „{query}“.",
+            "category": "Für diese Kategorie sind keine Bilder verfügbar."
+          },
+          "defaultLoading": "Standardbild wird geladen…",
+          "defaultLoadError": {
+            "title": "Standardbild konnte nicht geladen werden",
+            "message": "Beim Laden des Standardbilds ist etwas schiefgelaufen.",
+            "retry": "Erneut versuchen"
+          }
+        },
+        "grid": {
+          "selectImage": "Bild auswählen",
+          "photoAlt": "Foto von {photographer}",
+          "attributionPrefix": "Foto von"
+        },
+        "categories": {
+          "outdoors": "Draußen",
+          "nature": "Natur",
+          "birthday": "Geburtstag",
+          "wedding": "Hochzeit",
+          "halloween": "Halloween",
+          "thanksgiving": "Erntedank",
+          "christmas": "Weihnachten",
+          "new-year": "Neujahr",
+          "valentines": "Valentinstag",
+          "easter": "Ostern",
+          "summer": "Sommer",
+          "back-to-school": "Schulanfang",
+          "diwali": "Diwali",
+          "mothers-day": "Muttertag",
+          "fathers-day": "Vatertag",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Chinesisches Neujahr",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
       "countryEntity": {
         "label": "Land",
         "restOfWorld": "Rest der Welt",

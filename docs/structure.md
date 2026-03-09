@@ -15,6 +15,10 @@ fundraisers/
 │   │           └── [category]/
 │   │               ├── page.tsx
 │   │               └── not-found.tsx
+│   │   └── api/                    # Route handlers (server-only)
+│   │       └── images/
+│   │           └── unsplash/
+│   │               └── route.ts
 │   │
 │   ├── components/
 │   │   ├── ui/                     # Reusable UI primitives (no business logic)
@@ -22,6 +26,7 @@ fundraisers/
 │   │   ├── header/                 # Header component and sub-components
 │   │   ├── footer/                 # Footer component and sub-components
 │   │   └── explore/                # Explore feature components
+│   │   └── fundraisers/            # Fundraiser create flow components
 │   │
 │   ├── lib/
 │   │   ├── api/                    # API service classes
