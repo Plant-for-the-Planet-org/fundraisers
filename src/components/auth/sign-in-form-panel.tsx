@@ -1,7 +1,6 @@
 'use client';
 
-import { AppleIcon } from 'lucide-react';
-import { FacebookIcon, GoogleIcon } from '../icons/social';
+import { AppleIcon, FacebookIcon, GoogleIcon } from '../icons/social';
 import { EmailSignInForm } from '@/components/auth/email-sign-in-form';
 import { SignInWithButton } from '@/components/auth/sign-in-with-button';
 import { SignUpButton } from './sign-up-button';

@@ -71,7 +71,7 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className='w-66  rounded-xl shadow-lg bg-white'
+        className='w-66  rounded-xl shadow-lg bg-white border-0'
         align='end'
         forceMount
       >
