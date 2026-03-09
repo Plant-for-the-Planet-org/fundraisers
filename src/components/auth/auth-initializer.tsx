@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import {
   exchangeCodeForTokens,
-  trySignInSilently,
+  getAccessTokenSilently,
 } from '@/lib/auth/auth0-config';
 import { isTokenExpired } from '../../lib/auth/jwt-utils';
 
@@ -45,19 +45,11 @@ export function AuthInitializer() {
       try {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
-        const tokenFromUrl = params.get('access_token');
 
         // 1. Handle PKCE code exchange
         if (code) {
           const token = await handleCodeExchange(code);
           await setAccessToken(token);
-          return;
-        }
-
-        // 2. Handle token directly from URL
-        if (tokenFromUrl) {
-          cleanUrl(['access_token']);
-          await setAccessToken(tokenFromUrl);
           return;
         }
 
@@ -69,7 +61,7 @@ export function AuthInitializer() {
         }
 
         // 4. Try silent authentication
-        const silentToken = await trySignInSilently();
+        const silentToken = await getAccessTokenSilently();
         if (silentToken) {
           await setAccessToken(silentToken);
           return;

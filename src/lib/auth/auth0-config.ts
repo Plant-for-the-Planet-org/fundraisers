@@ -23,7 +23,7 @@ export interface Auth0TokenResponse {
   refresh_token?: string;
 }
 
-const DEFAULT_REDIRECT_PATH = '/dash';
+const DEFAULT_REDIRECT_PATH = '/explore';
 
 /** Returns the OAuth callback URL based on current environment (browser vs server). */
 function getRedirectUri(): string {
@@ -40,7 +40,7 @@ function getRedirectUri(): string {
  * and merges in any extra params (e.g. prompt, connection, screen_hint).
  */
 async function createBaseAuthorizeParams(
-  redirectTo: string = '/dash',
+  redirectTo: string = '/explore',
   extraParams?: Record<string, string>
 ): Promise<URLSearchParams> {
   const codeVerifier = generateCodeVerifier();
@@ -107,7 +107,7 @@ async function buildSilentAuthorizeUrl(
  *
  * Returns the `access_token` on success, otherwise `null`.
  */
-export async function trySignInSilently(
+export async function getAccessTokenSilently(
   redirectTo: string = DEFAULT_REDIRECT_PATH
 ): Promise<string | null> {
   try {
