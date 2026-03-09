@@ -9,6 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import {
+  ALLOWED_COUNTRIES,
+  SUPPORTED_CURRENCIES,
+  getCurrencyForCountry,
+} from '@/lib/utils/country-currency';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 const DevTool =
@@ -23,6 +28,9 @@ export const createFundraiserFormSchema = z.object({
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0),
+  country: z.enum(ALLOWED_COUNTRIES),
+  currency: z.enum(SUPPORTED_CURRENCIES),
+  goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -53,6 +61,11 @@ export function CreateFundraiserFormProvider({
   const methods = useForm<CreateFundraiserFormValues>({
     resolver: zodResolver(createFundraiserFormSchema),
     defaultValues: {
+      title: '',
+      description: '',
+      country: 'DE',
+      currency: getCurrencyForCountry('DE'),
+      goalAmount: 5000,
       settings: {
         theme: {
           base_id: initialTheme.id,
@@ -64,8 +77,6 @@ export function CreateFundraiserFormProvider({
           animation: initialTheme.animation ?? 'none',
         },
       },
-      title: '',
-      description: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
