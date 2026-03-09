@@ -87,6 +87,22 @@
           "holi": "Holi",
           "ramadan": "Ramadan"
         }
+      },
+      "countryEntity": {
+        "label": "Land",
+        "restOfWorld": "Rest der Welt",
+        "currencyLabel": "{currency} Währung",
+        "info": {
+          "general": "Ihr ausgewähltes Land bestimmt die steuerliche Absetzbarkeit von Spenden und welche Projekte für Ihren Fundraiser verfügbar sind.",
+          "taxReceiptEligible": "Sie erhalten eine steuerlich absetzbare Spendenquittung für {country}.",
+          "notTaxReceiptEligible": "{country, select, ROW {Steuerlich absetzbare Spendenquittungen sind nicht verfügbar.} other {Steuerlich absetzbare Spendenquittungen sind für {country} nicht verfügbar.}}"
+        }
+      },
+      "goal": {
+        "label": "Fundraiser-Ziel",
+        "errors": {
+          "required": "Bitte gib ein Fundraiser-Ziel ein."
+        }
       }
     }
   }

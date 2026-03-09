@@ -81,7 +81,7 @@ function TitleInput({
         placeholder={placeholder}
         className={cn(
           'font-poppins typo-form-title-input border-b border-transparent bg-transparent outline-none w-full resize-none overflow-hidden',
-          hasTitleError && 'border-b border-red-500'
+          hasTitleError && 'border-b border-destructive'
         )}
         aria-invalid={hasTitleError}
         aria-describedby={hasTitleError ? errorId : undefined}
@@ -94,8 +94,7 @@ function TitleInput({
           textareaRef.current = element;
         }}
       />
-
-      <p id={errorId} className='text-sm h-5 text-red-600 dark:text-red-400'>
+      <p id={errorId} className='text-sm h-5 text-destructive'>
         {hasTitleError ? titleErrorMessage : ''}
       </p>
     </div>
