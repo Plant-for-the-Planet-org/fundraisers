@@ -25,7 +25,11 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 - `CreateFundraiserFormValues.projects` remains the source of truth.
 - Country change still resets selected projects to default non-earmarked cause (legacy create-page behavior).
 - Allocation remains derived from selected projects via utility function.
-- Default non-earmarked cause minimum allocation is `28%`; this applies when equal split would drop below `28` (starts from 4+ causes).
+- `MIN_DEFAULT_CAUSE_PERCENT` is `25`.
+- Allocation behavior:
+  - 1 cause: `100%` to that cause.
+  - 2-3 causes: equal split across all selected causes.
+  - 4+ causes (when default non-earmarked cause is present): default keeps `25%`, remaining `75%` is split across non-default causes (integer remainder is distributed across non-default causes, never added to default).
 
 4. Improve project card metadata in overlay (legacy parity + requested improvement).
 

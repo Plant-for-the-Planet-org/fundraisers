@@ -128,13 +128,11 @@ export function calculateProjectAllocations(
     return equalSplitAllocations(projects, defaultCauseId);
   }
 
-  const equalShare = Math.floor(100 / projects.length);
-  const shouldUseEqualSplit =
-    normalizedMinDefaultPercent == null ||
-    normalizedMinDefaultPercent === 0 ||
-    equalShare >= normalizedMinDefaultPercent;
+  if (projects.length <= 3) {
+    return equalSplitAllocations(projects, defaultCauseId);
+  }
 
-  if (shouldUseEqualSplit) {
+  if (normalizedMinDefaultPercent == null) {
     return equalSplitAllocations(projects, defaultCauseId);
   }
 
@@ -159,12 +157,12 @@ export function calculateProjectAllocations(
   return [
     {
       ...defaultCause,
-      percentage: normalizedMinDefaultPercent + remainder,
+      percentage: normalizedMinDefaultPercent,
       isDefault: true,
     },
-    ...otherProjects.map(project => ({
+    ...otherProjects.map((project, index) => ({
       ...project,
-      percentage: otherShare,
+      percentage: otherShare + (index < remainder ? 1 : 0),
       isDefault: false,
     })),
   ];
