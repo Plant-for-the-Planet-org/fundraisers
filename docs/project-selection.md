@@ -57,25 +57,30 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 ### Test Plan
 
 1. Open Add Cause overlay:
+
 - fetch runs once on first open
 - shows loading, success, and retry states
 
 2. Verify filter order parity:
+
 - tab (`top`/`all`) changes result set
 - selected projects are excluded
 - search filters remaining results by legacy fields
 
 3. Verify metadata row on each project card:
+
 - Top Project tag
 - Country label
 - Type tag
 - Learn More opens external project page and does not select the project
 
 4. Verify selection flow:
+
 - click project card selects and closes overlay
 - selected project no longer appears in overlay list
 
 5. Verify create-flow behavior:
+
 - default non-earmarked cause exists initially
 - country change resets selected projects to default cause
 - allocation display remains correct
