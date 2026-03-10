@@ -11,6 +11,15 @@
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
     "create": {
+      "goalPreview": {
+        "raised": "{amount} gesammelt",
+        "goalLine": "von {amount} Ziel",
+        "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
+      },
+      "donorsPreview": {
+        "donorCount": "{count, plural, one {# Spender} other {# Spender}}",
+        "others": " und {count, plural, one {# weiterer} other {# weitere}}"
+      },
       "theme": {
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",

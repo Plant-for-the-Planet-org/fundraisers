@@ -1,6 +1,8 @@
+import { useTranslations } from 'next-intl';
 import { SectionHeader } from './typography';
 
 export function DonorsPreview() {
+  const t = useTranslations('Fundraisers.create.donorsPreview');
   const donors = [
     { id: '1', name: 'Ava' },
     { id: '2', name: 'Noah' },
@@ -21,9 +23,7 @@ export function DonorsPreview() {
 
   return (
     <div className='flex flex-col gap-4'>
-      <SectionHeader>
-        {donorCount} {donorCount === 1 ? 'Donor' : 'Donors'}
-      </SectionHeader>
+      <SectionHeader>{t('donorCount', { count: donorCount })}</SectionHeader>
 
       <div className='flex flex-col gap-2.5'>
         <div className='flex items-center'>
@@ -43,7 +43,9 @@ export function DonorsPreview() {
               {index < namedDonors.length - 1 && ', '}
             </span>
           ))}
-          {remainingCount > 0 && <span> and {remainingCount} others</span>}
+          {remainingCount > 0 && (
+            <span>{t('others', { count: remainingCount })}</span>
+          )}
         </div>
       </div>
     </div>
