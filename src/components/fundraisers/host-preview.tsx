@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
 import { SectionHeader } from './typography';
 
@@ -15,6 +16,8 @@ type ProfilePlaceholder = {
 };
 
 export function HostPreview() {
+  const t = useTranslations('Fundraisers');
+
   const [profile] = useState<ProfilePlaceholder>({
     id: 'prf_P8800000000va24Xb0000NHj',
     slug: 'john-doe',
@@ -28,7 +31,7 @@ export function HostPreview() {
   const hostName =
     profile.displayName ||
     [profile.firstname, profile.lastname].filter(Boolean).join(' ') ||
-    'Host';
+    t('unknownHost');
   const imageUrl = getImageUrl('profile', 'thumb', profile.image);
   const gradient = useMemo(() => {
     const gradients = [
@@ -49,7 +52,7 @@ export function HostPreview() {
 
   return (
     <div className='flex flex-col gap-3'>
-      <SectionHeader>Hosted by</SectionHeader>
+      <SectionHeader>{t('hostedByLabel')}</SectionHeader>
       <div className='flex flex-row items-center gap-2.5'>
         <div className='h-6 w-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center'>
           {imageUrl ? (
