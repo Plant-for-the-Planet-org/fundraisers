@@ -159,12 +159,12 @@ export function calculateProjectAllocations(
   return [
     {
       ...defaultCause,
-      percentage: normalizedMinDefaultPercent,
+      percentage: normalizedMinDefaultPercent + remainder,
       isDefault: true,
     },
-    ...otherProjects.map((project, index) => ({
+    ...otherProjects.map(project => ({
       ...project,
-      percentage: otherShare + (index < remainder ? 1 : 0),
+      percentage: otherShare,
       isDefault: false,
     })),
   ];
