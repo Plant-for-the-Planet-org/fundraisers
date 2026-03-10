@@ -161,7 +161,8 @@ export function DonationForm({
         )}
 
         <Button
-          className='h-9 w-full font-medium text-base'
+          className='h-9 w-full font-medium text-base hover:brightness-90'
+          style={{ backgroundColor: 'var(--accent-color)' }}
           onClick={() =>
             onDonate(
               customAmount || selectedAmount,
