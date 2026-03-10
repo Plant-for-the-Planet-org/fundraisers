@@ -1,10 +1,10 @@
 'use client';
 
+import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+
 import { useTranslations } from 'next-intl';
 import { Controller, useFormContext } from 'react-hook-form';
-
 import { Switch } from '@/components/ui/switch';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 import { SectionHeader } from './typography';
 
 export function Options() {
