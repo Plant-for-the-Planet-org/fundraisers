@@ -52,8 +52,14 @@ function normalizeProject(project: unknown): CauseProjectData | null {
 }
 
 export class ProjectsService {
-  async getProjects(): Promise<CauseProjectData[]> {
-    const response = await fetch(`${API_BASE_URL}/projects`, {
+  async getProjects(country?: string): Promise<CauseProjectData[]> {
+    const url = new URL(`${API_BASE_URL}/projects`);
+
+    if (country) {
+      url.searchParams.append('country', country);
+    }
+
+    const response = await fetch(url.toString(), {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -75,8 +81,10 @@ export class ProjectsService {
       .filter((project): project is CauseProjectData => project !== null);
   }
 
-  async getCauseSelectableProjects(): Promise<CauseProjectData[]> {
-    const projects = await this.getProjects();
+  async getCauseSelectableProjects(
+    country?: string
+  ): Promise<CauseProjectData[]> {
+    const projects = await this.getProjects(country);
 
     return projects.filter(project => project.allowDonations === true);
   }

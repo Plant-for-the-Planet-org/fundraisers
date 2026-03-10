@@ -8,13 +8,15 @@ import type {
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, Target, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { projectsService } from '@/lib/api/projects-service';
 import { getImageUrl } from '@/lib/utils/images';
 import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
+import { useWatch } from 'react-hook-form';
+import { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
 type ProjectSelectionTab = 'top' | 'all';
 
@@ -41,6 +43,15 @@ function buildLearnMoreUrl(projectId: string): string {
   return `https://web.plant-for-the-planet.org/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
+function normalizeCountryForProjects(countryCode?: string): string | undefined {
+  if (!countryCode) {
+    return undefined;
+  }
+
+  const normalized = countryCode.trim().toUpperCase();
+  return normalized === 'ROW' ? 'DE' : normalized;
+}
+
 export function ProjectSelectionOverlay({
   isOpen,
   onClose,
@@ -49,6 +60,10 @@ export function ProjectSelectionOverlay({
 }: ProjectSelectionOverlayProps) {
   const t = useTranslations('Fundraisers.create.projectSelection');
   const locale = useLocale();
+  const country = useWatch<CreateFundraiserFormValues, 'country'>({
+    name: 'country',
+  });
+  const lastFetchedCountryRef = useRef<string | undefined>(undefined);
 
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,12 +81,13 @@ export function ProjectSelectionOverlay({
     setIsMounted(true);
   }, []);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async (countryCode?: string) => {
     setIsLoading(true);
     setLoadError(false);
 
     try {
-      const projects = await projectsService.getCauseSelectableProjects();
+      const projects =
+        await projectsService.getCauseSelectableProjects(countryCode);
       setAllProjects(projects);
     } catch {
       setLoadError(true);
@@ -81,12 +97,22 @@ export function ProjectSelectionOverlay({
   }, []);
 
   useEffect(() => {
-    if (!isOpen || allProjects.length > 0 || isLoading) {
+    if (!isOpen || isLoading) {
       return;
     }
 
-    void fetchProjects();
-  }, [allProjects.length, fetchProjects, isLoading, isOpen]);
+    const normalizedCountry = normalizeCountryForProjects(country);
+
+    if (
+      allProjects.length > 0 &&
+      lastFetchedCountryRef.current === normalizedCountry
+    ) {
+      return;
+    }
+
+    lastFetchedCountryRef.current = normalizedCountry;
+    void fetchProjects(normalizedCountry);
+  }, [allProjects.length, country, fetchProjects, isLoading, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -275,7 +301,13 @@ export function ProjectSelectionOverlay({
               <p className='text-sm text-muted-foreground mb-3'>
                 {t('modal.errorMessage')}
               </p>
-              <Button variant='outline' size='sm' onClick={fetchProjects}>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() =>
+                  fetchProjects(normalizeCountryForProjects(country))
+                }
+              >
                 {t('modal.retry')}
               </Button>
             </div>

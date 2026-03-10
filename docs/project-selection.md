@@ -7,10 +7,10 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 
 ### Implementation Changes
 
-1. Keep data fetch behavior exactly as legacy.
+1. Data fetch behavior.
 
 - Use `/projects` endpoint via `ProjectsService`.
-- Load all projects once when overlay opens.
+- Load projects when overlay opens and refetch when fundraiser country changes.
 - Keep only `allowDonations === true` projects for cause selection.
 
 2. Keep filtering pipeline exactly as legacy.
@@ -26,10 +26,9 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 - Country change still resets selected projects to default non-earmarked cause (legacy create-page behavior).
 - Allocation remains derived from selected projects via utility function.
 - `MIN_DEFAULT_CAUSE_PERCENT` is `25`.
-- Allocation behavior:
-  - 1 cause: `100%` to that cause.
-  - 2-3 causes: equal split across all selected causes.
-  - 4+ causes (when default non-earmarked cause is present): default keeps `25%`, remaining `75%` is split across non-default causes (integer remainder is distributed across non-default causes, never added to default).
+- Allocation behavior (legacy parity):
+  - Equal split across all projects when `floor(100 / projectCount) >= 25` (or when `MIN_DEFAULT_CAUSE_PERCENT` is `null`/`0`).
+  - Otherwise, default cause gets `25%` plus the remainder, other causes split the remaining `75%` evenly.
 
 4. Improve project card metadata in overlay (legacy parity + requested improvement).
 
