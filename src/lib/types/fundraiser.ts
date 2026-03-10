@@ -1,24 +1,24 @@
 import type { Nullable } from './utility';
 
-interface FundraiserUser {
+export interface FundraiserUser {
   id: string;
   name: string;
   avatar: Nullable<string>;
 }
 
-// TODO: check possible values for role (other than owner) and status (other than active)
-interface FundraiserHost {
+export type FundraiserHostType = 'user' | 'team';
+export interface FundraiserHost {
   id: string;
   user: Nullable<FundraiserUser>;
-  hostType: 'user' | 'team';
-  role: string;
+  hostType: FundraiserHostType;
+  role: string; // 'owner' or 'admin'
   isPublic: boolean;
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
-  status: string;
+  status: string; //'active'
 }
 
-interface FundraiserWorkspace {
+export interface FundraiserWorkspace {
   country: string;
   name: string;
   address: {
@@ -29,7 +29,7 @@ interface FundraiserWorkspace {
   };
 }
 
-interface FundraiserSettings {
+export interface FundraiserSettings {
   theme: {
     base_id?: string; // Base theme ID (optional)
     mode?: 'light' | 'dark'; // Override mode (optional)
@@ -62,7 +62,7 @@ interface FundraiserSettings {
     donor_score?: {
       enabled: boolean;
       show_goal: boolean;
-      showdays_left: boolean;
+      show_days_left: boolean;
     };
     projects_supported?: {
       enabled: boolean;
@@ -79,7 +79,7 @@ interface FundraiserSettings {
   };
 }
 
-interface ProjectAllocation {
+export interface ProjectAllocation {
   project: {
     id: string;
     name: string;
@@ -89,6 +89,14 @@ interface ProjectAllocation {
   percentage: number;
 }
 
+export type FundraiserStatus =
+  | 'draft'
+  | 'active'
+  | 'cancelled'
+  | 'completed'
+  | 'paused';
+export type FundraiserVisibility = 'public' | 'unlisted';
+
 // From API response - response structure for a single fundraiser in the list response (GET /fundraisers) and the details response (GET /fundraisers/{id}) is the same
 export interface Fundraiser {
   id: string;
@@ -97,13 +105,13 @@ export interface Fundraiser {
   title: string;
   description: Nullable<string>;
   image: Nullable<string>;
-  goalAmount: number; // in cents
-  totalRaised: number; // in cents
+  goalAmount: number; // Integer, not in cents
+  totalRaised: number; // in decimals
   donationCount: number;
   currency: string;
   workspace: Nullable<FundraiserWorkspace>;
   hosts: FundraiserHost[];
-  visibility: 'public' | 'private';
+  visibility: FundraiserVisibility;
   canDonate: boolean;
   projectAllocations: ProjectAllocation[];
   startDate: string;
@@ -114,16 +122,17 @@ export interface Fundraiser {
 }
 
 export interface CreateFundraiserRequest {
-  slug?: string; //ASK: when will this be provided?
+  /** Needs to be unique. Database error if duplicate */
+  slug?: string;
   title: string;
   description: string;
   country: string; //TODO: update with possible value type
   tags?: string[]; //TODO: confirm whether this is removed
-  content: Record<string, unknown>; //For rich text content in the future
-  goalAmount: string; // in cents
+  content: Record<string, unknown>; //For rich text content in the future. JSON type
+  goalAmount: number; // send as integer value. NOT IN CENTS. No decimals possible.
   currency: string; //TODO: update with possible value type
-  visibility: 'public' | 'private' | 'link-only'; //TODO: confirm whether 'link-only' is needed
-  status: 'draft' | 'active'; //TODO: confirm possible values for status
+  visibility: FundraiserVisibility;
+  status: FundraiserStatus;
   projectAllocations: Array<{
     percentage: number;
     project_id: string;

@@ -31,6 +31,8 @@ export const createFundraiserFormSchema = z.object({
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
   goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
+  visibility: z.enum(['public', 'unlisted']),
+  status: z.enum(['draft', 'active']),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -66,6 +68,8 @@ export function CreateFundraiserFormProvider({
       country: 'DE',
       currency: getCurrencyForCountry('DE'),
       goalAmount: 5000,
+      visibility: 'public',
+      status: 'draft',
       settings: {
         theme: {
           base_id: initialTheme.id,

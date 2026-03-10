@@ -46,6 +46,17 @@
         "errors": {
           "required": "Bitte gib ein Fundraiser-Ziel ein."
         }
+      },
+      "options": {
+        "sectionHeading": "Fundraiser-Optionen",
+        "status": {
+          "label": "Spenden für den Fundraiser sammeln",
+          "description": "Spendensammlung aktivieren und den Fundraiser veröffentlichen"
+        },
+        "visibility": {
+          "label": "Fundraiser auffindbar machen",
+          "description": "Ermögliche es Personen, diesen Fundraiser in der Suche und beim Stöbern zu finden"
+        }
       }
     }
   }
