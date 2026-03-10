@@ -40,6 +40,8 @@
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-primary: hsl(var(--primary));
@@ -66,6 +68,8 @@
   --muted-foreground: 220 8.9% 46.1%;
   --card: 0 0% 100%;
   --card-foreground: 224 71.4% 4.1%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 71.4% 4.1%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
   --primary: 214 100% 59%;
@@ -85,6 +89,8 @@
   --muted-foreground: 217.9 10.6% 64.9%;
   --card: 224 71.4% 4.1%;
   --card-foreground: 210 20% 98%;
+  --popover: 224 71.4% 4.1%;
+  --popover-foreground: 210 20% 98%;
   --border: 215 27.9% 16.9%;
   --input: 215 27.9% 16.9%;
   --ring: 142 71% 45%;

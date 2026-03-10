@@ -1,10 +1,26 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { useWatch } from 'react-hook-form';
 import { SectionHeader } from './typography';
+import { DonationForm } from './donation-form';
+import { formatCurrency } from '@/lib/utils/currency';
 
 export function ContributionSettings() {
+  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const currency = useWatch({ name: 'currency' }) as string;
+
   return (
-    <div>
-      <SectionHeader>Contribution Settings</SectionHeader>
-      <div className='h-64 text-sm'>Contribution Donate Form will go here</div>
+    <div className='contribution-settings flex flex-col gap-3'>
+      <SectionHeader>{t('sectionHeading')}</SectionHeader>
+      <DonationForm
+        currency={currency}
+        onDonate={(amount, isDedicated, frequency) => {
+          alert(
+            `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency === 'one-time' ? 'once' : frequency}${isDedicated ? ' (dedicated)' : ''}`
+          );
+        }}
+      />
     </div>
   );
 }

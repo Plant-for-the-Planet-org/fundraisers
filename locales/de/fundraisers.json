@@ -57,6 +57,24 @@
           "label": "Fundraiser auffindbar machen",
           "description": "Ermögliche es Personen, diesen Fundraiser in der Suche und beim Stöbern zu finden"
         }
+      },
+      "contributionSettings": {
+        "sectionHeading": "Beitragseinstellungen",
+        "cardHeader": "Beitrag",
+        "giftTitle": "Diese Spende widmen",
+        "giftSubtitle": "Feiern, verschenken oder gedenken Sie jemandem, indem Sie Ihre Bäume widmen.",
+        "donateNow": "Jetzt spenden",
+        "donateMonthly": "Monatlich spenden",
+        "donateQuarterly": "Vierteljährlich spenden",
+        "donateYearly": "Jährlich spenden",
+        "frequency": {
+          "oneTime": "Einmalig",
+          "monthly": "Monatlich",
+          "quarterly": "Vierteljährlich",
+          "yearly": "Jährlich"
+        },
+        "customAmount": "Eigener Betrag",
+        "enterAmount": "Betrag eingeben"
       }
     }
   }

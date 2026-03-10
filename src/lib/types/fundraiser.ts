@@ -1,5 +1,23 @@
 import type { Nullable } from './utility';
 
+export type RecurrencyType = 'one_time' | 'monthly' | 'quarterly' | 'annual';
+
+export interface ContributionOption {
+  amount_cent: number | 'custom';
+  label?: string | null;
+  sub_label?: string | null;
+  default?: boolean;
+  min?: number;
+}
+
+export interface ContributionModuleSettings {
+  recurrency_options?: RecurrencyType[];
+  options?: ContributionOption[];
+  allow_dedication?: boolean;
+  allow_recurrency?: boolean;
+  show_totals_on_fundraiser?: boolean;
+}
+
 export interface FundraiserUser {
   id: string;
   name: string;
