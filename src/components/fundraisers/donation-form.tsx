@@ -102,9 +102,9 @@ export function DonationForm({
   };
 
   return (
-    <Card className='donation-form border-2 border-white shadow py-0 gap-0 rounded-2xl'>
-      <CardHeader className='px-4 py-2.5 mx-1 mt-1 bg-stone-50 rounded-tl-lg rounded-tr-lg flex flex-row justify-between items-center gap-0 space-y-0'>
-        <div className='text-zinc-700 text-sm font-semibold'>
+    <Card className='donation-form border-2 border-card shadow py-0 gap-0 rounded-2xl'>
+      <CardHeader className='px-4 py-2.5 mx-1 mt-1 bg-muted rounded-tl-lg rounded-tr-lg flex flex-row justify-between items-center gap-0 space-y-0'>
+        <div className='text-muted-foreground text-sm font-semibold'>
           {t('cardHeader')}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
@@ -141,19 +141,19 @@ export function DonationForm({
                 <div
                   className={`w-5 h-5 left-px top-px absolute rounded shadow-sm border flex items-center justify-center transition-all ${
                     isDedicated
-                      ? 'bg-zinc-800 border-zinc-800'
-                      : 'bg-white border-neutral-200'
+                      ? 'bg-foreground border-foreground'
+                      : 'bg-background border-input'
                   }`}
                 >
-                  {isDedicated && <Check className='w-4 h-4 text-white' />}
+                  {isDedicated && <Check className='w-4 h-4 text-background' />}
                 </div>
               </button>
             </div>
             <div className='flex-1 flex flex-col gap-1'>
-              <div className='text-zinc-800 text-sm font-semibold'>
+              <div className='text-foreground text-sm font-semibold'>
                 {t('giftTitle')}
               </div>
-              <div className='text-neutral-600 text-sm font-normal'>
+              <div className='text-muted-foreground text-sm font-normal'>
                 {t('giftSubtitle')}
               </div>
             </div>

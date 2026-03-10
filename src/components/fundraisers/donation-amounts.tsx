@@ -44,25 +44,25 @@ export function DonationAmounts({
               setInputValue('');
             }}
             className={cn(
-              'h-14 p-5 bg-white rounded-lg border border-stone-300/50 flex items-center gap-3 transition-all justify-start',
+              'h-14 p-5 bg-card rounded-lg border border-border/50 flex items-center gap-3 transition-all justify-start',
               selectedAmount === amount && !isCustomInputSelected
-                ? 'border-zinc-800'
-                : 'hover:border-stone-400'
+                ? 'border-foreground'
+                : 'hover:border-border'
             )}
           >
             <div
               className={cn(
                 'w-4 h-4 rounded-lg border transition-all flex items-center justify-center',
                 selectedAmount === amount && !isCustomInputSelected
-                  ? 'bg-zinc-800 border-zinc-800'
-                  : 'border-gray-300'
+                  ? 'bg-foreground border-foreground'
+                  : 'border-input'
               )}
             >
               {selectedAmount === amount && !isCustomInputSelected && (
-                <Check className='w-3 h-3 text-white' />
+                <Check className='w-3 h-3 text-background' />
               )}
             </div>
-            <div className='text-zinc-800 text-base font-semibold'>
+            <div className='text-foreground text-base font-semibold'>
               {formatCurrency(amount, currency)}
             </div>
           </Button>
@@ -73,8 +73,8 @@ export function DonationAmounts({
       {customOption && (
         <div
           className={cn(
-            'h-12 px-5 py-6 bg-white rounded-lg border border-stone-300/50 flex justify-between items-center cursor-pointer transition-all',
-            isCustomInputSelected ? 'border-zinc-800' : 'hover:border-stone-400'
+            'h-12 px-5 py-6 bg-card rounded-lg border border-border/50 flex justify-between items-center cursor-pointer transition-all',
+            isCustomInputSelected ? 'border-foreground' : 'hover:border-border'
           )}
           onClick={() => setIsCustomInputSelected(true)}
         >
@@ -131,7 +131,7 @@ export function DonationAmounts({
                 onBlur={() => {
                   if (!inputValue) setIsCustomInputSelected(false);
                 }}
-                className='flex-1 bg-transparent border-none outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-800 text-base font-semibold p-0 h-auto shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                className='flex-1 bg-transparent border-none outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground text-base font-semibold p-0 h-auto shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                 autoFocus
               />
               <button
@@ -141,18 +141,18 @@ export function DonationAmounts({
                   onCustomAmountChange(0);
                   setIsCustomInputSelected(false);
                 }}
-                className='text-gray-400 hover:text-gray-600 transition-colors'
+                className='text-muted-foreground hover:text-foreground transition-colors'
                 type='button'
               >
                 <X className='w-4 h-4' />
               </button>
             </div>
           ) : (
-            <div className='opacity-60 text-zinc-800 text-base font-normal'>
+            <div className='text-muted-foreground text-base font-normal'>
               {customOption.label || t('customAmount')}
             </div>
           )}
-          <div className='flex items-center gap-1 text-zinc-700 font-bold pointer-events-none'>
+          <div className='flex items-center gap-1 text-foreground font-bold pointer-events-none'>
             {getCurrencySymbol(currency)} {currency.toUpperCase()}
           </div>
         </div>
