@@ -1,20 +1,20 @@
 'use client';
 
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { SelectedImage } from '@/lib/types/image-selection';
+
 import { Image as ImageIcon, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-
+import { ImageSelectionOverlay } from '@/components/fundraisers/image-selection-overlay';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { DEFAULT_IMAGE_LOAD_CATEGORY_ID } from '@/lib/constants/image-categories';
-import type { SelectedImage } from '@/lib/types/image-selection';
 import {
   createUnsplashSelectedImage,
   pickRandomPhoto,
   revokeSelectedImageObjectUrl,
 } from '@/lib/utils/image-selection';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
-import { ImageSelectionOverlay } from './image-selection-overlay';
 
 export function ImageSelector() {
   const t = useTranslations('Fundraisers.create.image');

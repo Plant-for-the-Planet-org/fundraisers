@@ -369,11 +369,13 @@ export function ImageSelectionOverlay({
               )}
 
               {isLoading && (
-                <div className='text-center py-8'>
-                  <div className='w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-3' />
-                  <p className='text-sm text-zinc-600 dark:text-zinc-400'>
-                    {t('states.loading')}
-                  </p>
+                <div className='text-center h-full flex items-center justify-center'>
+                  <div>
+                    <div className='w-8 h-8 border-2 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-3' />
+                    <p className='text-sm text-zinc-600 dark:text-zinc-400'>
+                      {t('states.loading')}
+                    </p>
+                  </div>
                 </div>
               )}
 
