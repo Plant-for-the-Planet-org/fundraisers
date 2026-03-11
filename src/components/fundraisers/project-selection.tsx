@@ -5,7 +5,7 @@ import type { SelectedProject } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
 import { Target } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
@@ -13,7 +13,6 @@ import { getImageUrl } from '@/lib/utils/images';
 import {
   calculateProjectAllocations,
   createDefaultCause,
-  getDefaultCauseId,
 } from '@/lib/utils/project-selection';
 import { ProjectSelectionOverlay } from './project-selection-overlay';
 import { SectionHeader } from './typography';
@@ -32,7 +31,8 @@ function getProjectImageSource(image?: string): string | null {
 
 export function ProjectSelection() {
   const t = useTranslations('Fundraisers.create.projectSelection');
-  const { control, setValue } = useFormContext<CreateFundraiserFormValues>();
+  const { control, getValues, setValue } =
+    useFormContext<CreateFundraiserFormValues>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
@@ -40,58 +40,78 @@ export function ProjectSelection() {
     name: 'country',
   });
 
-  const selectedProjects = useWatch<CreateFundraiserFormValues, 'projects'>({
-    control,
-    name: 'projects',
-  });
-  const projects = useMemo(() => selectedProjects ?? [], [selectedProjects]);
-  const previousCountryRef = useRef(country);
+  const [extraProjects, setExtraProjects] = useState<SelectedProject[]>([]);
 
-  const defaultCauseId = useMemo(() => getDefaultCauseId(country), [country]);
+  const defaultCause = useMemo(
+    () =>
+      createDefaultCause(country ?? 'DE', [], {
+        name: t('defaultCause.name'),
+        description: t('defaultCause.description'),
+      }),
+    [country, t]
+  );
+
+  const selectedProjects = useMemo(
+    () => [defaultCause, ...extraProjects],
+    [defaultCause, extraProjects]
+  );
+
+  const defaultCauseId = defaultCause.id;
   const projectAllocations = useMemo(
     () =>
       calculateProjectAllocations(
-        projects,
+        selectedProjects,
         defaultCauseId,
         MIN_DEFAULT_CAUSE_PERCENT
       ),
-    [projects, defaultCauseId]
+    [selectedProjects, defaultCauseId]
   );
 
   useEffect(() => {
-    if (previousCountryRef.current === country) {
-      return;
-    }
+    const nextAllocations = projectAllocations.map(project => ({
+      project_id: project.id,
+      percentage: project.percentage,
+    }));
+    const currentAllocations = getValues('projectAllocations') ?? [];
 
-    previousCountryRef.current = country;
-    setValue(
-      'projects',
-      [
-        createDefaultCause(country, [], {
-          name: t('defaultCause.name'),
-          description: t('defaultCause.description'),
-        }),
-      ],
-      { shouldDirty: true, shouldValidate: true }
-    );
-  }, [country, setValue, t]);
+    const isSame =
+      currentAllocations.length === nextAllocations.length &&
+      currentAllocations.every((allocation, index) => {
+        const next = nextAllocations[index];
+        return (
+          allocation?.project_id === next?.project_id &&
+          allocation?.percentage === next?.percentage
+        );
+      });
+
+    if (!isSame) {
+      setValue('projectAllocations', nextAllocations, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  }, [getValues, projectAllocations, setValue]);
 
   function handleSelectProject(project: SelectedProject) {
-    if (projects.some(selectedProject => selectedProject.id === project.id)) {
+    if (project.id === defaultCauseId) {
       return;
     }
 
-    setValue(
-      'projects',
-      [
-        ...projects,
-        {
-          ...project,
-          isDefault: project.id === defaultCauseId,
-        },
-      ],
-      { shouldDirty: true, shouldValidate: true }
-    );
+    if (
+      selectedProjects.some(
+        selectedProject => selectedProject.id === project.id
+      )
+    ) {
+      return;
+    }
+
+    setExtraProjects(prev => [
+      ...prev,
+      {
+        ...project,
+        isDefault: false,
+      },
+    ]);
   }
 
   function handleRemoveProject(projectId: string) {
@@ -99,11 +119,7 @@ export function ProjectSelection() {
       return;
     }
 
-    setValue(
-      'projects',
-      projects.filter(project => project.id !== projectId),
-      { shouldDirty: true, shouldValidate: true }
-    );
+    setExtraProjects(prev => prev.filter(project => project.id !== projectId));
   }
 
   return (
@@ -188,7 +204,7 @@ export function ProjectSelection() {
         isOpen={isOverlayOpen}
         onClose={() => setIsOverlayOpen(false)}
         onSelectProject={handleSelectProject}
-        selectedProjectIds={projects.map(project => project.id)}
+        selectedProjectIds={selectedProjects.map(project => project.id)}
       />
     </>
   );

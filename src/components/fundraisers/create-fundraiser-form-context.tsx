@@ -3,14 +3,13 @@
 import type { Control } from 'react-hook-form';
 import type { ReactNode } from 'react';
 
-import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { getThemeForPath } from '@/lib/theme/route-themes';
-import { createDefaultCause } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import {
   ALLOWED_COUNTRIES,
   SUPPORTED_CURRENCIES,
@@ -42,13 +41,9 @@ const selectedImageSchema = z.object({
   file: z.unknown().optional(),
 });
 
-const selectedCauseProjectSchema = z.object({
-  id: z.string().trim().min(1),
-  name: z.string().trim().min(1),
-  description: z.string(),
-  image: z.string().optional(),
-  country: z.string().optional(),
-  isDefault: z.boolean().optional(),
+const projectAllocationSchema = z.object({
+  project_id: z.string().trim().min(1),
+  percentage: z.number().int().min(1).max(100),
 });
 
 export const createFundraiserFormSchema = z.object({
@@ -62,7 +57,7 @@ export const createFundraiserFormSchema = z.object({
   goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
   visibility: z.enum(['public', 'unlisted']),
   status: z.enum(['draft', 'active']),
-  projects: z.array(selectedCauseProjectSchema).min(1, 'required'),
+  projectAllocations: z.array(projectAllocationSchema).min(1, 'required'),
   settings: z.object({
     theme: z.object({
       base_id: z.string(),
@@ -87,7 +82,6 @@ interface CreateFundraiserFormProviderProps {
 export function CreateFundraiserFormProvider({
   children,
 }: CreateFundraiserFormProviderProps) {
-  const t = useTranslations('Fundraisers.create.projectSelection');
   const pathname = usePathname();
   const initialTheme = getThemeForPath(pathname);
   const defaultCountry = 'DE';
@@ -103,11 +97,11 @@ export function CreateFundraiserFormProvider({
       goalAmount: 5000,
       visibility: 'public',
       status: 'draft',
-      projects: [
-        createDefaultCause(defaultCountry, [], {
-          name: t('defaultCause.name'),
-          description: t('defaultCause.description'),
-        }),
+      projectAllocations: [
+        {
+          project_id: getDefaultCauseId(defaultCountry),
+          percentage: 100,
+        },
       ],
       settings: {
         theme: {
@@ -124,6 +118,8 @@ export function CreateFundraiserFormProvider({
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
+
+  methods.register('projectAllocations');
 
   {
     /* TODO: wrap children in a <form> tag for accessibility (Enter key submission, screen reader semantics).
