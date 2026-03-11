@@ -1,7 +1,7 @@
 'use client';
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
-import type { SelectedCauseProject } from '@/lib/types/project-selection';
+import type { SelectedProject } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
 import { Target } from 'lucide-react';
@@ -76,7 +76,7 @@ export function ProjectSelection() {
     );
   }, [country, setValue, t]);
 
-  function handleSelectProject(project: SelectedCauseProject) {
+  function handleSelectProject(project: SelectedProject) {
     if (projects.some(selectedProject => selectedProject.id === project.id)) {
       return;
     }

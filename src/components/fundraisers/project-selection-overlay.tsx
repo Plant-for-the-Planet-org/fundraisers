@@ -2,9 +2,10 @@
 
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import type {
-  CauseProjectData,
-  SelectedCauseProject,
+  ProjectData,
+  SelectedProject,
 } from '@/lib/types/project-selection';
+import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ type ProjectSelectionTab = 'top' | 'all';
 interface ProjectSelectionOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectProject: (project: SelectedCauseProject) => void;
+  onSelectProject: (project: SelectedProject) => void;
   selectedProjectIds: string[];
 }
 
@@ -70,7 +71,7 @@ export function ProjectSelectionOverlay({
   const [loadError, setLoadError] = useState(false);
   const [activeTab, setActiveTab] = useState<ProjectSelectionTab>('top');
   const [searchQuery, setSearchQuery] = useState('');
-  const [allProjects, setAllProjects] = useState<CauseProjectData[]>([]);
+  const [allProjects, setAllProjects] = useState<ProjectData[]>([]);
 
   const countryDisplayNames = useMemo(
     () => new Intl.DisplayNames([locale], { type: 'region' }),
@@ -178,7 +179,7 @@ export function ProjectSelectionOverlay({
     return filteredProjects;
   }, [activeTab, allProjects, searchQuery, selectedProjectIds]);
 
-  function handleSelectProject(project: CauseProjectData) {
+  function handleSelectProject(project: ProjectData) {
     onSelectProject(mapProjectToSelectedCause(project));
     handleCloseOverlay();
   }

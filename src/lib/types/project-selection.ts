@@ -1,6 +1,6 @@
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
-export interface CauseProjectData {
+export interface ProjectData {
   id: string;
   slug?: string;
   name: string;
@@ -16,7 +16,7 @@ export interface CauseProjectData {
   };
 }
 
-export interface SelectedCauseProject {
+export interface SelectedProject {
   id: string;
   name: string;
   description: string;
@@ -25,7 +25,7 @@ export interface SelectedCauseProject {
   isDefault?: boolean;
 }
 
-export interface ProjectAllocationPreview extends SelectedCauseProject {
+export interface ProjectAllocationPreview extends SelectedProject {
   percentage: number;
   isDefault: boolean;
 }

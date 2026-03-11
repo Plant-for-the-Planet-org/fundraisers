@@ -1,4 +1,4 @@
-import type { CauseProjectData } from '@/lib/types/project-selection';
+import type { ProjectData } from '@/lib/types/project-selection';
 
 import { API_BASE_URL } from '@/lib/constants/app-config';
 
@@ -6,7 +6,7 @@ interface ProjectsApiEnvelope {
   projects?: unknown[];
 }
 
-function normalizeTpo(tpo: unknown): CauseProjectData['tpo'] | undefined {
+function normalizeTpo(tpo: unknown): ProjectData['tpo'] | undefined {
   if (!tpo || typeof tpo !== 'object') {
     return undefined;
   }
@@ -22,7 +22,7 @@ function normalizeTpo(tpo: unknown): CauseProjectData['tpo'] | undefined {
   };
 }
 
-function normalizeProject(project: unknown): CauseProjectData | null {
+function normalizeProject(project: unknown): ProjectData | null {
   if (!project || typeof project !== 'object') {
     return null;
   }
@@ -52,7 +52,7 @@ function normalizeProject(project: unknown): CauseProjectData | null {
 }
 
 export class ProjectsService {
-  async getProjects(country?: string): Promise<CauseProjectData[]> {
+  async getProjects(country?: string): Promise<ProjectData[]> {
     const url = new URL(`${API_BASE_URL}/projects`);
 
     if (country) {
@@ -76,14 +76,10 @@ export class ProjectsService {
       ? data
       : ((data as ProjectsApiEnvelope)?.projects ?? []);
 
-    return projects
-      .map(normalizeProject)
-      .filter((project): project is CauseProjectData => project !== null);
+    return projects.map(normalizeProject).filter(project => project !== null);
   }
 
-  async getCauseSelectableProjects(
-    country?: string
-  ): Promise<CauseProjectData[]> {
+  async getCauseSelectableProjects(country?: string): Promise<ProjectData[]> {
     const projects = await this.getProjects(country);
 
     return projects.filter(project => project.allowDonations === true);

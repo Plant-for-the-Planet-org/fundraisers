@@ -1,7 +1,7 @@
 import type {
-  CauseProjectData,
+  ProjectData,
   ProjectAllocationPreview,
-  SelectedCauseProject,
+  SelectedProject,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
@@ -32,8 +32,8 @@ export function getDefaultCauseId(countryCode: string): string {
 }
 
 export function mapProjectToSelectedCause(
-  project: CauseProjectData
-): SelectedCauseProject {
+  project: ProjectData
+): SelectedProject {
   return {
     id: project.id,
     name: project.name,
@@ -51,9 +51,9 @@ interface DefaultCauseFallback {
 
 export function createDefaultCause(
   countryCode: string,
-  projects: CauseProjectData[] = [],
+  projects: ProjectData[] = [],
   fallback: DefaultCauseFallback = {}
-): SelectedCauseProject {
+): SelectedProject {
   const defaultCauseId = getDefaultCauseId(countryCode);
   const defaultCauseFromProjects = projects.find(
     project => project.id === defaultCauseId
@@ -79,7 +79,7 @@ export function createDefaultCause(
 }
 
 function equalSplitAllocations(
-  projects: SelectedCauseProject[],
+  projects: SelectedProject[],
   defaultCauseId: string
 ): ProjectAllocationPreview[] {
   if (projects.length === 0) {
@@ -97,7 +97,7 @@ function equalSplitAllocations(
 }
 
 export function calculateProjectAllocations(
-  projects: SelectedCauseProject[],
+  projects: SelectedProject[],
   defaultCauseId: string,
   minDefaultPercent: number | null = MIN_DEFAULT_CAUSE_PERCENT
 ): ProjectAllocationPreview[] {
