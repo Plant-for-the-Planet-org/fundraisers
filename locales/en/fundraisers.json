@@ -57,6 +57,24 @@
           "label": "Make the fundraiser discoverable",
           "description": "Allow people to find this fundraiser in search and browse"
         }
+      },
+      "contributionSettings": {
+        "sectionHeading": "Contribution Settings",
+        "cardHeader": "Contribution",
+        "giftTitle": "Dedicate this donation",
+        "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
+        "donateNow": "Donate Now",
+        "donateMonthly": "Donate Monthly",
+        "donateQuarterly": "Donate Quarterly",
+        "donateYearly": "Donate Yearly",
+        "frequency": {
+          "oneTime": "One Time",
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "yearly": "Yearly"
+        },
+        "customAmount": "Custom Amount",
+        "enterAmount": "Enter Amount"
       }
     }
   }
