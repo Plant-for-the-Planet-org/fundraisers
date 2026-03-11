@@ -5,7 +5,6 @@ import type {
   ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
