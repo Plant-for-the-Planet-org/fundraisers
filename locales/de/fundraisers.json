@@ -40,6 +40,63 @@
           "required": "Bitte gib eine Beschreibung für die Spendenaktion ein."
         }
       },
+      "image": {
+        "previewAlt": "Vorschaubild der Fundraiser",
+        "states": {
+          "loadingDefault": "Standardbild wird geladen...",
+          "loading": "Bilder werden geladen...",
+          "defaultError": "Standardbild konnte nicht geladen werden.",
+          "loadError": "Bilder konnten nicht geladen werden. Bitte versuche es erneut.",
+          "errorTitle": "Bilder konnten nicht geladen werden",
+          "noResultsTitle": "Keine Bilder gefunden",
+          "noResultsDescription": "Versuche einen anderen Suchbegriff oder eine andere Kategorie.",
+          "noResultsWithQuery": "Keine Bilder entsprechen \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Bild ändern",
+          "retry": "Erneut versuchen",
+          "tryAgain": "Nochmal versuchen",
+          "closeAria": "Bildauswahl schließen",
+          "selectImageAria": "Bild auswählen"
+        },
+        "overlay": {
+          "title": "Ein Bild auswählen",
+          "uploadTitle": "Per Drag-and-drop oder Klick hochladen",
+          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash",
+          "searchPlaceholder": "Bilder suchen...",
+          "uploadInputAria": "Bilddatei hochladen"
+        },
+        "attribution": {
+          "photoBy": "Foto von",
+          "unsplashLink": "Unsplash"
+        },
+        "errors": {
+          "fileTooLarge": "Das Bild muss {maxMb}MB oder kleiner sein.",
+          "invalidFileType": "Bitte lade ein JPG-, PNG-, WEBP- oder GIF-Bild hoch.",
+          "emptyFile": "Die ausgewählte Datei ist leer."
+        },
+        "categories": {
+          "outdoors": "Draußen",
+          "nature": "Natur",
+          "birthday": "Geburtstag",
+          "wedding": "Hochzeit",
+          "halloween": "Halloween",
+          "thanksgiving": "Erntedank",
+          "christmas": "Weihnachten",
+          "new-year": "Neujahr",
+          "valentines": "Valentinstag",
+          "easter": "Ostern",
+          "summer": "Sommer",
+          "back-to-school": "Zurück zur Schule",
+          "diwali": "Diwali",
+          "mothers-day": "Muttertag",
+          "fathers-day": "Vatertag",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Chinesisches Neujahr",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
       "countryEntity": {
         "label": "Land",
         "restOfWorld": "Rest der Welt",

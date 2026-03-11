@@ -23,11 +23,29 @@ const DevTool =
       })
     : null;
 
+const unsplashAttributionSchema = z.object({
+  photographer: z.string(),
+  photographerUrl: z.string(),
+  unsplashUrl: z.string(),
+});
+
+const selectedImageSchema = z.object({
+  url: z.string().min(1),
+  thumbnailUrl: z.string().min(1),
+  originalUrl: z.string().optional(),
+  attribution: unsplashAttributionSchema.optional(),
+  source: z.enum(['unsplash', 'upload']),
+  uploadStatus: z.enum(['pending', 'uploading', 'completed', 'failed']),
+  downloadLocation: z.string().optional(),
+  file: z.unknown().optional(),
+});
+
 export const createFundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0),
+  image: selectedImageSchema.nullable(),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
   goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
@@ -65,6 +83,7 @@ export function CreateFundraiserFormProvider({
     defaultValues: {
       title: '',
       description: '',
+      image: null,
       country: 'DE',
       currency: getCurrencyForCountry('DE'),
       goalAmount: 5000,

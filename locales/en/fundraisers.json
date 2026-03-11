@@ -40,6 +40,63 @@
           "required": "Please enter a fundraiser description."
         }
       },
+      "image": {
+        "previewAlt": "Fundraiser preview image",
+        "states": {
+          "loadingDefault": "Loading default image...",
+          "loading": "Loading images...",
+          "defaultError": "Failed to load a default image.",
+          "loadError": "Failed to load images. Please try again.",
+          "errorTitle": "Failed to load images",
+          "noResultsTitle": "No images found",
+          "noResultsDescription": "Try another search term or category.",
+          "noResultsWithQuery": "No images match \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Change image",
+          "retry": "Retry",
+          "tryAgain": "Try again",
+          "closeAria": "Close image selector",
+          "selectImageAria": "Select image"
+        },
+        "overlay": {
+          "title": "Select an image",
+          "uploadTitle": "Drag and drop or click to upload",
+          "uploadSubtitle": "Or choose an image from Unsplash below",
+          "searchPlaceholder": "Search images...",
+          "uploadInputAria": "Upload image file"
+        },
+        "attribution": {
+          "photoBy": "Photo by",
+          "unsplashLink": "Unsplash"
+        },
+        "errors": {
+          "fileTooLarge": "Image must be {maxMb}MB or smaller.",
+          "invalidFileType": "Please upload a JPG, PNG, WEBP, or GIF image.",
+          "emptyFile": "Selected file is empty."
+        },
+        "categories": {
+          "outdoors": "Outdoors",
+          "nature": "Nature",
+          "birthday": "Birthday",
+          "wedding": "Wedding",
+          "halloween": "Halloween",
+          "thanksgiving": "Thanksgiving",
+          "christmas": "Christmas",
+          "new-year": "New Year",
+          "valentines": "Valentine's Day",
+          "easter": "Easter",
+          "summer": "Summer",
+          "back-to-school": "Back to School",
+          "diwali": "Diwali",
+          "mothers-day": "Mother's Day",
+          "fathers-day": "Father's Day",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Chinese New Year",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
       "countryEntity": {
         "label": "Country",
         "restOfWorld": "Rest of the World",

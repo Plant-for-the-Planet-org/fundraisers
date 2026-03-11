@@ -26,9 +26,7 @@ export function Title() {
       label={t('label')}
       placeholder={t('placeholder')}
       requiredMessage={t('errors.required')}
-      maxLengthMessage={t('errors.maxLength', {
-        max: TITLE_MAX_LENGTH,
-      })}
+      maxLengthMessage={t('errors.maxLength', { max: TITLE_MAX_LENGTH })}
     />
   );
 }
