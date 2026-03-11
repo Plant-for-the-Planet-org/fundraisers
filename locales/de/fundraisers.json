@@ -1,5 +1,6 @@
 {
   "Fundraisers": {
+    "startFundraiser": "Fundraiser starten",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",

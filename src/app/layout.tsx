@@ -13,6 +13,7 @@ import {
 import { LocaleInitializer } from '@/components/locale-initializer';
 import './globals.css';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { AuthInitializer } from '@/components/auth/auth-initializer';
 
 const openSans = Open_Sans({
   variable: '--font-open-sans-var',
@@ -68,6 +69,7 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <LocaleInitializer initialLocale={locale} />
+          <AuthInitializer />
           {children}
         </NextIntlClientProvider>
       </body>
