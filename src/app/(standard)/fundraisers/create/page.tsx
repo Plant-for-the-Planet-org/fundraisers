@@ -16,32 +16,35 @@ import { CreateFundraiserFormProvider } from '@/components/fundraisers/create-fu
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import { AuthGuard } from '@/components/auth/auth-guard';
 
 export default function CreateFundraiserPage() {
   return (
-    <CreateFundraiserFormProvider>
-      <FundraiserLayout>
-        <SidebarPanel>
-          <ImageSelector />
-          <GoalPreview />
-          <DonorsPreview />
-          <HostPreview />
-          <ThemeSettings />
-        </SidebarPanel>
-        <MainPanel>
-          <Title />
-          <ContributionSettings />
-          <Description />
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <WorkspaceSelector />
-            <GoalInput />
-          </div>
-          <WorkspaceInfo />
-          <ProjectSelection />
-          <Options />
-          <CreateFundraiserButton />
-        </MainPanel>
-      </FundraiserLayout>
-    </CreateFundraiserFormProvider>
+    <AuthGuard>
+      <CreateFundraiserFormProvider>
+        <FundraiserLayout>
+          <SidebarPanel>
+            <ImageSelector />
+            <GoalPreview />
+            <DonorsPreview />
+            <HostPreview />
+            <ThemeSettings />
+          </SidebarPanel>
+          <MainPanel>
+            <Title />
+            <ContributionSettings />
+            <Description />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <WorkspaceSelector />
+              <GoalInput />
+            </div>
+            <WorkspaceInfo />
+            <ProjectSelection />
+            <Options />
+            <CreateFundraiserButton />
+          </MainPanel>
+        </FundraiserLayout>
+      </CreateFundraiserFormProvider>
+    </AuthGuard>
   );
 }
