@@ -62,7 +62,6 @@ export const useAuthStore = create<AuthStore>()(
 
           if (isBrowser) {
             localStorage.setItem('access_token', token);
-            document.cookie = `is-authenticated=true; path=/; secure; samesite=lax`;
           }
 
           set({ isAuthenticated: true }, undefined, 'auth/set_authenticated');
@@ -126,8 +125,6 @@ export const useAuthStore = create<AuthStore>()(
       clearAuth: () => {
         if (isBrowser) {
           localStorage.removeItem('access_token');
-          document.cookie =
-            'is-authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=lax';
         }
         set(
           {
