@@ -11,6 +11,15 @@
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
     "create": {
+      "goalPreview": {
+        "raised": "{amount} raised",
+        "goalLine": "of {amount} goal",
+        "daysLeft": "{days, plural, one {# day left} other {# days left}}"
+      },
+      "donorsPreview": {
+        "donorCount": "{count, plural, one {# Donor} other {# Donors}}",
+        "others": " and {count, plural, one {# other} other {# others}}"
+      },
       "theme": {
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
