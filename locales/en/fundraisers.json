@@ -1,5 +1,6 @@
 {
   "Fundraisers": {
+    "startFundraiser": "Start Fundraiser",
     "donationCount": "{count, plural, =0 {0 Donations} one {1 Donation} other {{formattedCount} Donations}}",
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",

@@ -1,3 +1,4 @@
+import { UserMenu } from '../auth/user-menu';
 import { Logo } from './logo';
 import { Navigation } from './navigation';
 
@@ -10,7 +11,7 @@ export function Header() {
           {/* Navigation and Actions */}
           <div className='flex items-center gap-6'>
             <Navigation />
-            {/* <UserMenu /> */}
+            <UserMenu />
           </div>
         </div>
       </div>
