@@ -187,9 +187,11 @@
         "customAmount": "Custom Amount",
         "enterAmount": "Enter Amount"
       },
-      "buttonText": {
-        "processing": "Creating Fundraiser...",
-        "submit": "Create Fundraiser"
+      "formSubmission": {
+        "buttonProcessing": "Creating Fundraiser...",
+        "buttonSubmit": "Create Fundraiser",
+        "successMessage": "Fundraiser created!",
+        "errorMessage": "Error"
       }
     }
   }

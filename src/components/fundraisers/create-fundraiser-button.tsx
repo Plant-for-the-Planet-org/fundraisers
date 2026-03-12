@@ -13,10 +13,11 @@ import { createFundraiser } from '@/lib/api/create-fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { imageToBase64 } from '@/lib/utils/image-processor';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {
-  const t = useTranslations('Fundraisers.create');
+  const t = useTranslations('Fundraisers.create.formSubmission');
   const { handleSubmit } = useFormContext<CreateFundraiserFormValues>();
   const accessToken = useAuthStore(state => state.accessToken);
   const router = useRouter();
@@ -48,11 +49,12 @@ export function CreateFundraiserButton() {
       if (!fundraiser.slug) {
         throw new Error('Invalid response from server - missing slug');
       }
+      toast.success(t('successMessage'));
       router.push(`/fundraisers/${fundraiser.slug}`);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to create fundraiser';
-      alert(message);
+      toast.error(t('errorMessage'), { description: message });
       setIsSubmitting(false);
     }
   };
@@ -65,7 +67,7 @@ export function CreateFundraiserButton() {
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}
-      {isSubmitting ? t('buttonText.processing') : t('buttonText.submit')}
+      {isSubmitting ? t('buttonProcessing') : t('buttonSubmit')}
     </Button>
   );
 }

@@ -187,9 +187,11 @@
         "customAmount": "Eigener Betrag",
         "enterAmount": "Betrag eingeben"
       },
-      "buttonText": {
-        "processing": "Fundraiser wird erstellt...",
-        "submit": "Fundraiser erstellen"
+      "formSubmission": {
+        "buttonProcessing": "Fundraiser wird erstellt...",
+        "buttonSubmit": "Fundraiser erstellen",
+        "successMessage": "Fundraiser erstellt!",
+        "errorMessage": "Fehler"
       }
     }
   }
