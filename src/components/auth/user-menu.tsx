@@ -92,13 +92,13 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className='cursor-pointer'>
-          <Link href='/dash' className='flex items-center'>
+          <Link href='/dashboard' className='flex items-center'>
             <CreditCard className='mr-2 h-4 w-4' />
             <span>{tDashboard('dashboard')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='cursor-pointer'>
-          <Link href='/dash/raise/new' className='flex items-center'>
+          <Link href='/fundraisers/create' className='flex items-center'>
             <Plus className='mr-2 h-4 w-4' />
             <span>{tFundraiser('startFundraiser')}</span>
           </Link>
