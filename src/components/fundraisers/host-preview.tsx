@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getImageUrl } from '@/lib/utils/images';
 import { SectionHeader } from './typography';
 import { useAuthStore } from '@/stores/authStore';
@@ -14,7 +15,15 @@ export function HostPreview() {
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
   if (isAuthInitializing) {
-    return <div className='h-16 bg-gray-200 rounded-xl animate-pulse' />;
+    return (
+      <div className='flex flex-col gap-3'>
+        <SectionHeader>{t('hostedByLabel')}</SectionHeader>
+        <div className='flex flex-row items-center gap-2.5'>
+          <Skeleton className='h-6 w-6 rounded-full' />
+          <Skeleton className='h-6 w-32' />
+        </div>
+      </div>
+    );
   }
 
   if (!isAuthenticated || !user) {
