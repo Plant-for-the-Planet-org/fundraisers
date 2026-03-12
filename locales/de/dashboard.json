@@ -1,5 +1,25 @@
 {
   "Dashboard": {
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "welcome": "Willkommen zurück, {displayName}!",
+    "fallbackName": "dort",
+    "cards": {
+      "myFundraisers": {
+        "title": "Meine Fundraiser",
+        "description": "Verwalte deine aktiven Spendenaktionen",
+        "empty": "Keine aktiven Fundraiser"
+      },
+      "totalRaised": {
+        "title": "Insgesamt gesammelt",
+        "description": "Summe über alle Kampagnen",
+        "value": "€0",
+        "empty": "Starte deine erste Kampagne"
+      },
+      "donations": {
+        "title": "Spenden",
+        "description": "Deine Spendenhistorie",
+        "empty": "Noch keine Spenden"
+      }
+    }
   }
 }
