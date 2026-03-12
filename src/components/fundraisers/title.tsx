@@ -51,7 +51,7 @@ function TitleInput({
   const {
     control,
     register,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isSubmitted },
   } = useFormContext<CreateFundraiserFormValues>();
   const titleValue = useWatch({ control, name: 'title' });
 
@@ -65,7 +65,9 @@ function TitleInput({
 
   const { ref: registerRef, ...titleField } = register('title');
 
-  const hasTitleError = Boolean(touchedFields.title && errors.title);
+  const hasTitleError = Boolean(
+    (touchedFields.title || isSubmitted) && errors.title
+  );
   const titleErrorMessage =
     errors.title?.type === 'too_big' ? maxLengthMessage : requiredMessage;
 

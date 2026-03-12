@@ -15,11 +15,11 @@ export function Description() {
 
   const {
     control,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isSubmitted },
   } = useFormContext<CreateFundraiserFormValues>();
 
   const hasDescriptionError = Boolean(
-    touchedFields.description && errors.description
+    (touchedFields.description || isSubmitted) && errors.description
   );
 
   return (
