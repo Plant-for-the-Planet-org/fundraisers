@@ -1,0 +1,5 @@
+@layer components {
+  .typo-form-title-input {
+    @apply text-4xl font-bold placeholder:text-black/50 dark:placeholder:text-white/50;
+  }
+}

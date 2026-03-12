@@ -10,6 +10,189 @@
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
-    "hostedByLabel": "Veranstaltet von"
+    "hostedByLabel": "Veranstaltet von",
+    "create": {
+      "goalPreview": {
+        "raised": "{amount} gesammelt",
+        "goalLine": "von {amount} Ziel",
+        "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
+      },
+      "donorsPreview": {
+        "donorCount": "{count, plural, one {# Spender} other {# Spender}}",
+        "others": " und {count, plural, one {# weiterer} other {# weitere}}"
+      },
+      "theme": {
+        "sectionHeading": "Thema",
+        "labelAccentColor": "Akzentfarbe",
+        "selectAccent": "Akzentfarbe {accent} auswählen"
+      },
+      "title": {
+        "label": "Name der Fundraiser",
+        "placeholder": "Name der Fundraiser",
+        "errors": {
+          "required": "Bitte gib einen Namen für die Fundraiser ein.",
+          "maxLength": "Bitte halte den Namen der Fundraiser bei maximal {max, number} Zeichen."
+        }
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Erzähle mehr über deine Spendenaktion...",
+        "errors": {
+          "required": "Bitte gib eine Beschreibung für die Spendenaktion ein."
+        }
+      },
+      "image": {
+        "previewAlt": "Vorschaubild der Fundraiser",
+        "states": {
+          "loadingDefault": "Standardbild wird geladen...",
+          "loading": "Bilder werden geladen...",
+          "defaultError": "Standardbild konnte nicht geladen werden.",
+          "loadError": "Bilder konnten nicht geladen werden. Bitte versuche es erneut.",
+          "errorTitle": "Bilder konnten nicht geladen werden",
+          "noResultsTitle": "Keine Bilder gefunden",
+          "noResultsDescription": "Versuche einen anderen Suchbegriff oder eine andere Kategorie.",
+          "noResultsWithQuery": "Keine Bilder entsprechen \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Bild ändern",
+          "retry": "Erneut versuchen",
+          "tryAgain": "Nochmal versuchen",
+          "closeAria": "Bildauswahl schließen",
+          "selectImageAria": "Bild auswählen"
+        },
+        "overlay": {
+          "title": "Ein Bild auswählen",
+          "uploadTitle": "Per Drag-and-drop oder Klick hochladen",
+          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash",
+          "searchPlaceholder": "Bilder suchen...",
+          "uploadInputAria": "Bilddatei hochladen"
+        },
+        "attribution": {
+          "photoBy": "Foto von",
+          "unsplashLink": "Unsplash"
+        },
+        "errors": {
+          "fileTooLarge": "Das Bild muss {maxMb}MB oder kleiner sein.",
+          "invalidFileType": "Bitte lade ein JPG-, PNG-, WEBP- oder GIF-Bild hoch.",
+          "emptyFile": "Die ausgewählte Datei ist leer."
+        },
+        "categories": {
+          "outdoors": "Draußen",
+          "nature": "Natur",
+          "birthday": "Geburtstag",
+          "wedding": "Hochzeit",
+          "halloween": "Halloween",
+          "thanksgiving": "Erntedank",
+          "christmas": "Weihnachten",
+          "new-year": "Neujahr",
+          "valentines": "Valentinstag",
+          "easter": "Ostern",
+          "summer": "Sommer",
+          "back-to-school": "Zurück zur Schule",
+          "diwali": "Diwali",
+          "mothers-day": "Muttertag",
+          "fathers-day": "Vatertag",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Chinesisches Neujahr",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
+      "countryEntity": {
+        "label": "Land",
+        "restOfWorld": "Rest der Welt",
+        "currencyLabel": "{currency} Währung",
+        "info": {
+          "general": "Ihr ausgewähltes Land bestimmt die steuerliche Absetzbarkeit von Spenden und welche Projekte für Ihren Fundraiser verfügbar sind.",
+          "taxReceiptEligible": "Sie erhalten eine steuerlich absetzbare Spendenquittung für {country}.",
+          "notTaxReceiptEligible": "{country, select, ROW {Steuerlich absetzbare Spendenquittungen sind nicht verfügbar.} other {Steuerlich absetzbare Spendenquittungen sind für {country} nicht verfügbar.}}"
+        }
+      },
+      "goal": {
+        "label": "Fundraiser-Ziel",
+        "errors": {
+          "required": "Bitte gib ein Fundraiser-Ziel ein."
+        }
+      },
+      "projectSelection": {
+        "sectionHeading": "Von dieser Fundraiser unterstützte Projekte",
+        "addCause": "Projekt hinzufügen",
+        "removeCause": "Projekt entfernen",
+        "allocationLabel": "{percentage, number}% Zuteilung",
+        "projectImageAlt": "Bild für {name}",
+        "defaultCause": {
+          "name": "Junge Menschen stärken und Wälder zurückbringen",
+          "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen weltweit zu befähigen, Klimaschutzmaßnahmen umzusetzen. Wir stellen Wälder wieder her, bilden Gemeinschaften aus und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
+        },
+        "aria": {
+          "closeModal": "Projektauswahl schließen",
+          "selectCause": "Projekt {name} hinzufügen"
+        },
+        "modal": {
+          "title": "Projekt hinzufügen",
+          "subtitle": "Wähle weitere Projekte zur Unterstützung aus",
+          "searchPlaceholder": "Projekte suchen...",
+          "searchAriaLabel": "Projekte suchen",
+          "tabs": {
+            "top": "Top-Projekte",
+            "all": "Alle Projekte"
+          },
+          "resultsCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
+          "loading": "Projekte werden geladen...",
+          "errorTitle": "Projekte konnten nicht geladen werden",
+          "errorMessage": "Projekte konnten nicht geladen werden. Bitte versuche es erneut.",
+          "retry": "Erneut versuchen",
+          "byOrganization": "von {organization}",
+          "tags": {
+            "topProject": "Top-Projekt",
+            "restoration": "Wiederaufforstung",
+            "conservation": "Naturschutz",
+            "learnMore": "Mehr erfahren",
+            "restOfWorld": "Rest der Welt"
+          },
+          "add": "Hinzufügen",
+          "emptySearchTitle": "Keine Projekte gefunden",
+          "emptySearchDescription": "Keine Projekte entsprechen \"{query}\"",
+          "clearSearch": "Suche löschen",
+          "emptyAllTitle": "Alle Projekte hinzugefügt",
+          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deiner Fundraiser hinzugefügt"
+        }
+      },
+      "options": {
+        "sectionHeading": "Fundraiser-Optionen",
+        "status": {
+          "label": "Spenden für den Fundraiser sammeln",
+          "description": "Spendensammlung aktivieren und den Fundraiser veröffentlichen"
+        },
+        "visibility": {
+          "label": "Fundraiser auffindbar machen",
+          "description": "Ermögliche es Personen, diesen Fundraiser in der Suche und beim Stöbern zu finden"
+        }
+      },
+      "contributionSettings": {
+        "sectionHeading": "Beitragseinstellungen",
+        "cardHeader": "Beitrag",
+        "giftTitle": "Diese Spende widmen",
+        "giftSubtitle": "Feiern, verschenken oder gedenken Sie jemandem, indem Sie Ihre Bäume widmen.",
+        "donateNow": "Jetzt spenden",
+        "donateMonthly": "Monatlich spenden",
+        "donateQuarterly": "Vierteljährlich spenden",
+        "donateYearly": "Jährlich spenden",
+        "frequency": {
+          "oneTime": "Einmalig",
+          "monthly": "Monatlich",
+          "quarterly": "Vierteljährlich",
+          "yearly": "Jährlich"
+        },
+        "customAmount": "Eigener Betrag",
+        "enterAmount": "Betrag eingeben"
+      },
+      "formSubmission": {
+        "buttonProcessing": "Fundraiser wird erstellt...",
+        "buttonSubmit": "Fundraiser erstellen",
+        "successMessage": "Fundraiser erstellt!",
+        "errorMessage": "Fehler"
+      }
+    }
   }
 }

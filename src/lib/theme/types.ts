@@ -33,25 +33,31 @@ export type AnimationType =
 export type ThemeMode = 'light' | 'dark';
 
 export type ThemeCategory =
-  | 'minimal'
+  | 'atmospheric'
   | 'celebration'
   | 'nature'
+  | 'minimal'
   | 'business'
-  | 'atmospheric';
+  | 'system'
+  | 'seasonal'
+  | 'corporate'
+  | 'simple'
+  | 'dark';
 
 export interface Theme {
   id: string;
   name: string;
   category: ThemeCategory;
-  background: string;
-  accent: AccentColor;
-  mode: ThemeMode;
+  background: string; // Tailwind gradient classes or solid color
+  accent: AccentColor; // Tailwind color name (e.g., 'emerald', 'blue')
+  mode: ThemeMode; // Defines if theme is light or dark for text/UI colors
   bodyFont: FontId;
   titleFont: FontId;
-  animation: AnimationType;
+  animation?: AnimationType;
+  logo?: string; // URL for corporate themes
   colorOptions: AccentColor[];
   isPlain?: boolean;
-  featured?: boolean;
+  featured?: boolean; // To make available for selection in the ThemeSettings while creating a fundraiser. Not all themes need to be featured.
 }
 
 // The shape stored in fundraiser.settings.theme (raw DB record).

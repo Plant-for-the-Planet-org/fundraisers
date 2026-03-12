@@ -16,7 +16,7 @@ export function SignInWithButton({
   return (
     <Button
       variant='outline'
-      className='w-full h-12'
+      className='w-full h-12 border-border'
       size='lg'
       onClick={onClick}
     >

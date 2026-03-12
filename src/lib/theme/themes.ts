@@ -35,7 +35,7 @@ export const THEMES: Record<string, Theme> = {
     titleFont: 'poppins',
     animation: 'none',
     isPlain: true,
-    featured: true,
+    featured: false,
     colorOptions: [
       'blue',
       'emerald',
@@ -81,6 +81,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'confetti',
+    featured: false,
     colorOptions: [
       'blue',
       'pink',
@@ -103,6 +104,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'playfair',
     animation: 'hearts',
+    featured: true,
     colorOptions: [
       'rose',
       'pink',
@@ -125,6 +127,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'none',
+    featured: true,
     colorOptions: [
       'blue',
       'indigo',
@@ -192,6 +195,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'none',
+    featured: true,
     colorOptions: [
       'blue',
       'indigo',
@@ -213,6 +217,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'snow',
+    featured: true,
     colorOptions: [
       'emerald',
       'green',
@@ -234,6 +239,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'none',
+    featured: true,
     colorOptions: [
       'orange',
       'red',
@@ -255,6 +261,7 @@ export const THEMES: Record<string, Theme> = {
     bodyFont: 'open-sans',
     titleFont: 'poppins',
     animation: 'none',
+    featured: true,
     colorOptions: [
       'slate',
       'gray',
@@ -277,6 +284,7 @@ export const THEMES: Record<string, Theme> = {
     titleFont: 'poppins',
     animation: 'none',
     isPlain: true,
+    featured: true,
     colorOptions: [
       'blue',
       'slate',
@@ -299,6 +307,7 @@ export const THEMES: Record<string, Theme> = {
     titleFont: 'poppins',
     animation: 'none',
     isPlain: true,
+    featured: false,
     colorOptions: [
       'gray',
       'slate',

@@ -52,6 +52,7 @@ const eslintConfig = defineConfig([
     'coverage/**',
     'next-env.d.ts',
     '*.tsbuildinfo',
+    'locales/**/*.d.json.ts',
   ]),
 ]);
 
