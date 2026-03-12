@@ -187,49 +187,11 @@
         "customAmount": "Eigener Betrag",
         "enterAmount": "Betrag eingeben"
       },
-      "projectSelection": {
-        "sectionHeading": "Von dieser Fundraiser unterstützte Projekte",
-        "addCause": "Projekt hinzufügen",
-        "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}% Zuteilung",
-        "projectImageAlt": "Bild für {name}",
-        "defaultCause": {
-          "name": "Junge Menschen stärken und Wälder zurückbringen",
-          "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen weltweit zu befähigen, Klimaschutzmaßnahmen umzusetzen. Wir stellen Wälder wieder her, bilden Gemeinschaften aus und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
-        },
-        "aria": {
-          "closeModal": "Projektauswahl schließen",
-          "selectCause": "Projekt {name} hinzufügen"
-        },
-        "modal": {
-          "title": "Projekt hinzufügen",
-          "subtitle": "Wähle weitere Projekte zur Unterstützung aus",
-          "searchPlaceholder": "Projekte suchen...",
-          "searchAriaLabel": "Projekte suchen",
-          "tabs": {
-            "top": "Top-Projekte",
-            "all": "Alle Projekte"
-          },
-          "resultsCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
-          "loading": "Projekte werden geladen...",
-          "errorTitle": "Projekte konnten nicht geladen werden",
-          "errorMessage": "Projekte konnten nicht geladen werden. Bitte versuche es erneut.",
-          "retry": "Erneut versuchen",
-          "byOrganization": "von {organization}",
-          "tags": {
-            "topProject": "Top-Projekt",
-            "restoration": "Wiederaufforstung",
-            "conservation": "Naturschutz",
-            "learnMore": "Mehr erfahren",
-            "restOfWorld": "Rest der Welt"
-          },
-          "add": "Hinzufügen",
-          "emptySearchTitle": "Keine Projekte gefunden",
-          "emptySearchDescription": "Keine Projekte entsprechen \"{query}\"",
-          "clearSearch": "Suche löschen",
-          "emptyAllTitle": "Alle Projekte hinzugefügt",
-          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deiner Fundraiser hinzugefügt"
-        }
+      "formSubmission": {
+        "buttonProcessing": "Fundraiser wird erstellt...",
+        "buttonSubmit": "Fundraiser erstellen",
+        "successMessage": "Fundraiser erstellt!",
+        "errorMessage": "Fehler"
       }
     }
   }

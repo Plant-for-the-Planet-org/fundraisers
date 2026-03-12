@@ -119,6 +119,8 @@ export function CreateFundraiserFormProvider({
     reValidateMode: 'onChange',
   });
 
+  methods.register('image');
+  methods.register('currency');
   methods.register('projectAllocations');
 
   {
