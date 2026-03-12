@@ -1,19 +1,21 @@
 const PKCE_STORAGE_KEY = 'pkce_code_verifier';
+const isBrowser = typeof window !== 'undefined';
+const PKCE_BYTE_LENGTH = 32;
 
 export function storeCodeVerifier(verifier: string): void {
-  if (typeof window === 'undefined') return;
+  if (!isBrowser) return;
   sessionStorage.setItem(PKCE_STORAGE_KEY, verifier);
 }
 
 export function getStoredCodeVerifier(): string | null {
+  if (!isBrowser) return null;
   return sessionStorage.getItem(PKCE_STORAGE_KEY);
 }
 
 export function clearStoredCodeVerifier(): void {
+  if (!isBrowser) return;
   return sessionStorage.removeItem(PKCE_STORAGE_KEY);
 }
-
-const PKCE_BYTE_LENGTH = 32;
 
 function base64URLEncode(array: Uint8Array): string {
   return btoa(String.fromCharCode(...array))
@@ -23,8 +25,10 @@ function base64URLEncode(array: Uint8Array): string {
 }
 
 export function generateCodeVerifier(): string {
-  if (typeof window === 'undefined' || !window.crypto) {
-    throw new Error('Secure random generator not available');
+  if (!isBrowser || !window.crypto) {
+    throw new Error(
+      'Secure random generator not available in a non-browser environment'
+    );
   }
 
   const bytes = new Uint8Array(PKCE_BYTE_LENGTH);
@@ -36,6 +40,11 @@ export function generateCodeVerifier(): string {
 export async function generateCodeChallenge(
   codeVerifier: string
 ): Promise<string> {
+  if (!isBrowser) {
+    throw new Error(
+      'generateCodeChallenge is not available in a non-browser environment'
+    );
+  }
   const textEncoder = new TextEncoder();
   // Convert verifier string into bytes
   const verifierBytes = textEncoder.encode(codeVerifier);
