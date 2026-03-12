@@ -116,7 +116,7 @@ export async function getAccessTokenSilently(
     const code = await new Promise<string | null>(resolve => {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
-      iframe.src = silentUrl;
+      const settled = { current: false };
 
       const timeout = setTimeout(() => {
         cleanup();
@@ -124,18 +124,27 @@ export async function getAccessTokenSilently(
       }, 8000);
 
       function cleanup() {
+        if (settled.current) return;
+        settled.current = true;
         clearTimeout(timeout);
         iframe.remove();
       }
 
       iframe.onload = () => {
+        if (settled.current) return;
         try {
           const url = iframe.contentWindow?.location.href;
 
           if (!url) return;
 
           if (url.includes('/api/auth/callback')) {
-            const code = new URL(url).searchParams.get('code');
+            const params = new URL(url).searchParams;
+            if (params.get('error')) {
+              cleanup();
+              resolve(null);
+              return;
+            }
+            const code = params.get('code');
             cleanup();
             resolve(code);
           }
@@ -148,7 +157,7 @@ export async function getAccessTokenSilently(
         cleanup();
         resolve(null);
       };
-
+      iframe.src = silentUrl;
       document.body.appendChild(iframe);
     });
 

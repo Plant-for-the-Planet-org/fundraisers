@@ -45,11 +45,18 @@ export function AuthInitializer() {
       try {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
+        const error = params.get('error');
 
         // 1. Handle PKCE code exchange
         if (code) {
           const token = await handleCodeExchange(code);
           await setAccessToken(token);
+          return;
+        }
+
+        if (error === 'auth_failed') {
+          console.warn('Auth previously failed, skipping silent auth');
+          cleanUrl(['error', 'reason']);
           return;
         }
 
