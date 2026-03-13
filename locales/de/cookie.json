@@ -1,34 +1,38 @@
 {
   "consentModal": {
-    "title": "Wir verwenden Cookies",
-    "description": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern und die Nutzung der Website zu analysieren. Sie können wählen, welche Cookies Sie akzeptieren möchten.",
+    "title": "Hallo! Es ist Zeit für Cookies!",
+    "description": "Wir verwenden Cookies auf unserer Website. Mit Ihrer Zustimmung verwenden wir auch Analyse-Cookies. Sie können Ihre Zustimmung jederzeit verwalten.",
     "acceptAllBtn": "Alle akzeptieren",
-    "acceptNecessaryBtn": "Alle ablehnen",
+    "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Einstellungen verwalten",
-    "closeIconLabel": "Schließen",
-    "footer": "<a href=\"https://www.plant-for-the-planet.org/privacy-policy\" target=\"_blank\" rel=\"noopener noreferrer\">Datenschutzrichtlinie</a>"
+    "closeIconLabel": "Alle ablehnen und schließen",
+    "footer": "<a href=\"https://www.plant-for-the-planet.org/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/privacy/terms\">Datenschutzerklärung</a><a href=\"https://www.plant-for-the-planet.org/terms-and-conditions\">Allgemeine Geschäftsbedingungen</a>"
   },
   "preferencesModal": {
-    "title": "Cookie-Einstellungen",
+    "title": "Zustimmungseinstellungen",
     "acceptAllBtn": "Alle akzeptieren",
-    "acceptNecessaryBtn": "Alle ablehnen",
+    "acceptNecessaryBtn": "Optionale ablehnen",
     "savePreferencesBtn": "Einstellungen speichern",
-    "closeIconLabel": "Schließen",
+    "closeIconLabel": "Modal schließen",
     "serviceCounterLabel": "Dienst|Dienste",
     "sections": [
       {
-        "title": "Cookie-Nutzung",
-        "description": "Wir verwenden Cookies, um die grundlegenden Funktionen der Website zu gewährleisten und Ihre Online-Erfahrung zu verbessern."
+        "title": "Hat jemand ... Cookies gesagt?",
+        "description": "Unsere Website verwendet notwendige Cookies, um ihren ordnungsgemäßen Betrieb zu gewährleisten, sowie Tracking-Cookies, um zu verstehen, wie Sie mit ihr interagieren. Letztere werden nur nach Ihrer Zustimmung gesetzt."
       },
       {
-        "title": "Unbedingt erforderliche Cookies",
-        "description": "Diese Cookies sind für das ordnungsgemäße Funktionieren der Website unerlässlich.",
+        "title": "Unbedingt erforderliche Cookies <span class=\"pm__badge\">Immer aktiviert</span>",
+        "description": "Diese Cookies sind erforderlich, damit die Website ordnungsgemäß funktioniert, einschließlich der Speicherung Ihrer Spracheinstellungen.",
         "linkedCategory": "necessary"
       },
       {
         "title": "Analyse-Cookies",
-        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.",
+        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem Informationen anonym gesammelt und gemeldet werden.",
         "linkedCategory": "analytics"
+      },
+      {
+        "title": "Weitere Informationen",
+        "description": "Bei Fragen zu unserer Cookie-Richtlinie und Ihren Auswahlmöglichkeiten kontaktieren Sie uns bitte."
       }
     ]
   }
