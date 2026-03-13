@@ -98,7 +98,7 @@ export function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='cursor-pointer'>
-          <Link href='/dash/raise/new' className='flex items-center'>
+          <Link href='/fundraisers/create' className='flex items-center'>
             <Plus className='mr-2 h-4 w-4' />
             <span>{tFundraiser('startFundraiser')}</span>
           </Link>
