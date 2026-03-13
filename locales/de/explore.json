@@ -1,6 +1,6 @@
 {
   "Explore": {
-    "title": "Entdecke Fundraiser",
+    "title": "Fundraiser entdecken",
     "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorien.",
     "categories": {
       "title": "Nach Kategorien stöbern",
@@ -12,7 +12,7 @@
       "title": "Beliebte Fundraiser",
       "tabs": {
         "popular": "Beliebt",
-        "gross": "Meiste Spenden"
+        "gross": "Größtes Spendenaufkommen"
       },
       "noFundraisersFound": "Derzeit sind keine Fundraiser verfügbar."
     },
@@ -29,13 +29,13 @@
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",
-          "gross": "Meiste Spenden"
+          "gross": "Höchstes Spendenaufkommen"
         },
         "noFundraisersFound": "Keine Fundraiser gefunden",
         "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Fundraiser in dieser Kategorie."
       },
       "notFound": {
-        "title": "Seite nicht gefunden",
+        "title": "Seite wurde nicht gefunden",
         "description": "Diese Seite existiert nicht oder wurde möglicherweise entfernt.",
         "exploreLinkText": "Fundraiser entdecken"
       }
