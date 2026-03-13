@@ -32,7 +32,11 @@ Documents the current implementation, architectural decisions, and plans for the
 - **Live theme selector** — `ThemeSettings` component in the create fundraiser sidebar: featured theme dropdown + accent color picker
 - **Dark mode switching** — `ThemeShell` syncs `activeTheme.mode` to `<html>` via `useEffect`, so body-level CSS variables and `dark:` utilities work correctly when the user switches to a dark theme
 
-**Phase 2 is deferred.** Per-fundraiser themes from the DB are not yet wired up. The fundraiser page (`raise/[id]`) doesn't exist yet.
+**Phase 2 is complete.** Per-fundraiser themes are now wired up end-to-end:
+
+- **`(fundraiser)` route group** — `src/app/(fundraiser)/fundraisers/[slug]/layout.tsx` server-fetches the fundraiser and passes `buildTheme(fundraiser.settings?.theme)` to `ThemeShell` as `initialTheme`; the correct theme is in the SSR HTML before any JS runs
+- **`ThemeShell` `initialTheme` prop** — `activeTheme = selectedTheme ?? initialTheme ?? getThemeForPath(pathname)`; owners of non-public fundraisers see a brief theme transition (spring → actual theme) after the client-side auth retry resolves
+- **Cross-route-group theme isolation** — `ThemeShell` clears `selectedTheme` on unmount so a theme set during the auth retry doesn't bleed into other route groups' `ThemeShell` instances
 
 ---
 
@@ -104,7 +108,7 @@ No flash, no layout shift. After hydration, `ThemeShell` has the same `activeThe
               style="font-family: var(--font-poppins-var)...;
                      --theme-title-font: var(--font-poppins-var)...;
                      --accent-color: #0ea5e9">
-           <div class="fixed inset-0 bg-gradient-to-br ..."/>
+           <div class="fixed inset-0 bg-linear-to-br ..."/>
            <div class="relative z-10 ...">
              <Header />
              <MainContent>...</MainContent>
@@ -314,7 +318,7 @@ All theme rendering is delegated to `ThemeShell`. `Header`, `MainContent`, and `
 - `--theme-title-font` cascades to all `h1–h6` descendants.
 - `--accent-color` is a CSS variable for non-Tailwind contexts (SVG, canvas).
 - The fixed background layer covers the viewport behind all content.
-- Two `useEffect`s run after mount: one clears `selectedTheme` when the pathname changes; the other syncs `activeTheme.mode` to `document.documentElement`.
+- Three `useEffect`s: one clears `selectedTheme` when the pathname changes (same-instance navigation); one clears `selectedTheme` on unmount (prevents bleed when navigating between route groups, each of which has its own `ThemeShell` instance); one syncs `activeTheme.mode` to `document.documentElement`.
 
 ---
 
@@ -381,7 +385,7 @@ export default function StandardLayout({ children }) {
   return (
     <ThemeProvider theme={THEMES.spring}>
       <div className='light relative ...'>
-        <div className='fixed inset-0 bg-gradient-to-br from-emerald-300/25 ...' />
+        <div className='fixed inset-0 bg-linear-to-br from-emerald-300/25 ...' />
         ...
       </div>
     </ThemeProvider>
@@ -393,45 +397,15 @@ This was replaced by the route-theme map approach (`route-themes.ts`), which kee
 
 ---
 
-## Phase 2 — per-fundraiser themes (deferred)
+## Phase 2 — per-fundraiser themes (complete)
 
-Prerequisite: a `getCachedFundraiser(id)` data service must exist first.
+Fundraiser view routes live under the `(fundraiser)` route group with their own layout, so they don't inherit the `(standard)` layout's `ThemeShell`.
 
-Fundraiser view routes live under a separate route group (e.g. `(fundraiser)`) with their own layout, so they don't inherit the `(standard)` layout's `ThemeShell`.
+`src/app/(fundraiser)/fundraisers/[slug]/layout.tsx` server-fetches the fundraiser, calls `buildTheme`, and passes the result to `ThemeShell` as `initialTheme`. On 404 (non-public fundraiser), it falls back to `DEFAULT_THEME` and lets the page render `FundraiserAuthRetry`, which retries with the auth token and calls `setSelectedTheme` once the fundraiser resolves.
 
-The server layout fetches the fundraiser, calls `buildTheme`, and passes the result to `ThemeShell` as an `initialTheme` prop:
+`ThemeShell` clears `selectedTheme` on unmount (in addition to on pathname change) so a theme set by the auth retry doesn't persist into other route groups.
 
-```tsx
-// src/app/(fundraiser)/raise/[id]/layout.tsx
-const fundraiser = await getCachedFundraiser(id);
-const theme = buildTheme(fundraiser.settings?.theme);
-
-return (
-  <ThemeShell initialTheme={theme}>
-    {children}
-  </ThemeShell>
-);
-```
-
-`ThemeShell` needs one additional prop and one change to its `activeTheme` computation:
-
-```ts
-// Props
-initialTheme?: Theme
-
-// activeTheme resolution
-activeTheme = selectedTheme ?? initialTheme ?? getThemeForPath(pathname)
-```
-
-On SSR, `selectedTheme` is null and `initialTheme` is the DB theme → correct theme baked into HTML, no flash. The Zustand store override layers on top if the user edits the theme on the view page (e.g. for a live preview in an edit mode).
-
-Once that exists, the full implementation order is:
-
-1. **`src/lib/types/fundraiser.ts`** — extend `Fundraiser` with `settings?: { theme?: FundraiserThemeSettings; [key: string]: unknown }`
-2. **`src/components/theme/theme-shell.tsx`** — add `initialTheme?: Theme` prop; update `activeTheme` resolution
-3. **`src/styles/theme-safelist.ts`** — all gradient class combinations as string literals; add `@source "../src/styles/theme-safelist.ts"` to `globals.css`
-4. **`src/components/theme/animation-layer.tsx`** — `'use client'` component for snow/confetti/hearts animations, conditionally rendered by the fundraiser layout
-5. **`src/app/(fundraiser)/raise/[id]/layout.tsx`** — fetches the fundraiser server-side, calls `buildTheme(fundraiser.settings?.theme)`, passes result to `ThemeShell` as `initialTheme`
+**Still deferred:** `src/styles/theme-safelist.ts` — all gradient class combinations as string literals for custom DB gradients. Freeform gradient strings set by a fundraiser editor would never appear in source files and would be purged by Tailwind. This is needed only once a gradient editor exists.
 
 ---
 
