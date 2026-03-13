@@ -1,6 +1,6 @@
 import type { RedirectPath } from '../types/auth';
 
-import { DEFAULT_REDIRECT_PATH } from '../types/auth';
+import { DEFAULT_REDIRECT_PATH } from '../constants/auth';
 import {
   clearStoredCodeVerifier,
   generateCodeChallenge,

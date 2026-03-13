@@ -1,5 +1,3 @@
-export const ALLOWED_REDIRECTS = ['/explore'] as const;
+export const ALLOWED_REDIRECT_PATHS = ['/explore', '/dash'] as const;
 
-export type RedirectPath = (typeof ALLOWED_REDIRECTS)[number];
-
-export const DEFAULT_REDIRECT_PATH: RedirectPath = '/explore';
+export type RedirectPath = (typeof ALLOWED_REDIRECT_PATHS)[number];
