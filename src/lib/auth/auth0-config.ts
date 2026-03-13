@@ -1,3 +1,6 @@
+import type { RedirectPath } from '../types/auth';
+
+import { DEFAULT_REDIRECT_PATH } from '../types/auth';
 import {
   clearStoredCodeVerifier,
   generateCodeChallenge,
@@ -23,8 +26,6 @@ export interface Auth0TokenResponse {
   refresh_token?: string;
 }
 
-const DEFAULT_REDIRECT_PATH = '/explore';
-
 /** Returns the OAuth callback URL based on current environment (browser vs server). */
 function getRedirectUri(): string {
   if (typeof window !== 'undefined') {
@@ -40,7 +41,7 @@ function getRedirectUri(): string {
  * and merges in any extra params (e.g. prompt, connection, screen_hint).
  */
 async function createBaseAuthorizeParams(
-  redirectTo: string = '/explore',
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   extraParams?: Record<string, string>
 ): Promise<URLSearchParams> {
   const codeVerifier = generateCodeVerifier();
@@ -81,7 +82,7 @@ function buildAuthorizeUrl(params: URLSearchParams): string {
  * Auth0 will attempt to reuse an existing session without showing any UI.
  */
 async function buildSilentAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo, {
     prompt: 'none',
@@ -108,7 +109,7 @@ async function buildSilentAuthorizeUrl(
  * Returns the `access_token` on success, otherwise `null`.
  */
 export async function getAccessTokenSilently(
-  redirectTo: string = DEFAULT_REDIRECT_PATH
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
 ): Promise<string | null> {
   try {
     const silentUrl = await buildSilentAuthorizeUrl(redirectTo);
@@ -175,7 +176,7 @@ export async function getAccessTokenSilently(
  * Optionally accepts a login_hint to pre-fill the email field.
  */
 export async function buildUniversalLoginAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH,
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   loginHint?: string
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo);
@@ -192,7 +193,7 @@ export async function buildUniversalLoginAuthorizeUrl(
  * Optionally accepts a login_hint to pre-fill the email field.
  */
 export async function buildSignupAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH,
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   loginHint?: string
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo, {
@@ -212,7 +213,7 @@ export async function buildSignupAuthorizeUrl(
  */
 export async function buildSocialAuthorizeUrl(
   connection: string,
-  redirectTo: string = DEFAULT_REDIRECT_PATH
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo, {
     connection,

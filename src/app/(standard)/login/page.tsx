@@ -1,5 +1,8 @@
 'use client';
+import type { RedirectPath } from '@/lib/types/auth';
 
+import { DEFAULT_REDIRECT_PATH } from '@/lib/types/auth';
+import { ALLOWED_REDIRECTS } from '@/lib/types/auth';
 import { useEffect } from 'react';
 import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
@@ -7,15 +10,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader } from '@/components/ui/loader';
 
+export function isAllowedRedirect(path: string): path is RedirectPath {
+  return ALLOWED_REDIRECTS.includes(path as RedirectPath);
+}
+export function getSafeRedirect(path: string | null): RedirectPath {
+  if (path && isAllowedRedirect(path)) {
+    return path;
+  }
+  return DEFAULT_REDIRECT_PATH;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tAuth = useTranslations('Auth');
   const logoutSuccess = searchParams.get('logoutSuccess');
-  const redirectTo = searchParams.get('redirectTo') || '/explore';
+  const safeRedirect = getSafeRedirect(searchParams.get('redirectTo'));
 
-  const safeRedirect =
-    redirectTo && redirectTo.startsWith('/') ? redirectTo : '/explore';
   useEffect(() => {
     if (logoutSuccess !== 'true') return;
 

@@ -1,16 +1,17 @@
 import type { NextRequest } from 'next/server';
 
+import { DEFAULT_REDIRECT_PATH } from '@/lib/types/auth';
+import { ALLOWED_REDIRECTS } from '@/lib/types/auth';
 import { NextResponse } from 'next/server';
 
 // Whitelist of allowed redirect destinations
-const ALLOWED_REDIRECTS = ['/explore'];
 
-function getSafeRedirectUrl(state: string | null): string {
-  if (!state) return '/explore';
+export function getSafeRedirectUrl(state: string | null): string {
+  if (!state) return DEFAULT_REDIRECT_PATH;
 
   // Only allow relative paths from whitelist
   const isAllowed = ALLOWED_REDIRECTS.some(path => state.startsWith(path));
-  return isAllowed ? state : '/explore';
+  return isAllowed ? state : DEFAULT_REDIRECT_PATH;
 }
 
 export async function GET(request: NextRequest) {

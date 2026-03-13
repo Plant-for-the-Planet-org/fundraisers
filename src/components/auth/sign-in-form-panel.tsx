@@ -1,4 +1,5 @@
 'use client';
+import type { RedirectPath } from '@/lib/types/auth';
 
 import { AppleIcon, FacebookIcon, GoogleIcon } from '../icons/social';
 import { EmailSignInForm } from '@/components/auth/email-sign-in-form';
@@ -8,7 +9,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { buildSocialAuthorizeUrl } from '@/lib/auth/auth0-config';
 
-export function SignInFormPanel({ redirectTo }: { redirectTo: string }) {
+export function SignInFormPanel({ redirectTo }: { redirectTo: RedirectPath }) {
   const tAuth = useTranslations('Auth');
   const [email, setEmail] = useState('');
 
