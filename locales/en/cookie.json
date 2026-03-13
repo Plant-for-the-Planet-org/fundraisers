@@ -15,25 +15,6 @@
     "savePreferencesBtn": "Save preferences",
     "closeIconLabel": "Close modal",
     "serviceCounterLabel": "Service|Services",
-    "sections": [
-      {
-        "title": "Somebody said ... cookies?",
-        "description": "Our website uses essential cookies to ensure its proper operation and tracking cookies to understand how you interact with it. The latter will be set only after consent."
-      },
-      {
-        "title": "Strictly necessary cookies <span class=\"pm__badge\">Always enabled</span>",
-        "description": "These cookies are required for the website to function properly, including remembering your language preference.",
-        "linkedCategory": "necessary"
-      },
-      {
-        "title": "Analytics cookies",
-        "description": "These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously.",
-        "linkedCategory": "analytics"
-      },
-      {
-        "title": "More information",
-        "description": "For any queries about our cookie policy and your choices, please contact us."
-      }
-    ]
+    "sections": ["", "", "", ""]
   }
 }
