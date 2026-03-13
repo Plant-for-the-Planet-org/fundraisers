@@ -10,6 +10,189 @@
     "coverImageAlt": "Cover image for {title}",
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
-    "hostedByLabel": "Hosted by"
+    "hostedByLabel": "Hosted by",
+    "create": {
+      "goalPreview": {
+        "raised": "{amount} raised",
+        "goalLine": "of {amount} goal",
+        "daysLeft": "{days, plural, one {# day left} other {# days left}}"
+      },
+      "donorsPreview": {
+        "donorCount": "{count, plural, one {# Donor} other {# Donors}}",
+        "others": " and {count, plural, one {# other} other {# others}}"
+      },
+      "theme": {
+        "sectionHeading": "Theme",
+        "labelAccentColor": "Accent color",
+        "selectAccent": "Select {accent} accent color"
+      },
+      "title": {
+        "label": "Fundraiser name",
+        "placeholder": "Fundraiser Name",
+        "errors": {
+          "required": "Please enter a fundraiser name.",
+          "maxLength": "Please keep the fundraiser name within {max, number} characters."
+        }
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell people about your fundraiser...",
+        "errors": {
+          "required": "Please enter a fundraiser description."
+        }
+      },
+      "image": {
+        "previewAlt": "Fundraiser preview image",
+        "states": {
+          "loadingDefault": "Loading default image...",
+          "loading": "Loading images...",
+          "defaultError": "Failed to load a default image.",
+          "loadError": "Failed to load images. Please try again.",
+          "errorTitle": "Failed to load images",
+          "noResultsTitle": "No images found",
+          "noResultsDescription": "Try another search term or category.",
+          "noResultsWithQuery": "No images match \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Change image",
+          "retry": "Retry",
+          "tryAgain": "Try again",
+          "closeAria": "Close image selector",
+          "selectImageAria": "Select image"
+        },
+        "overlay": {
+          "title": "Select an image",
+          "uploadTitle": "Drag and drop or click to upload",
+          "uploadSubtitle": "Or choose an image from Unsplash below",
+          "searchPlaceholder": "Search images...",
+          "uploadInputAria": "Upload image file"
+        },
+        "attribution": {
+          "photoBy": "Photo by",
+          "unsplashLink": "Unsplash"
+        },
+        "errors": {
+          "fileTooLarge": "Image must be {maxMb}MB or smaller.",
+          "invalidFileType": "Please upload a JPG, PNG, WEBP, or GIF image.",
+          "emptyFile": "Selected file is empty."
+        },
+        "categories": {
+          "outdoors": "Outdoors",
+          "nature": "Nature",
+          "birthday": "Birthday",
+          "wedding": "Wedding",
+          "halloween": "Halloween",
+          "thanksgiving": "Thanksgiving",
+          "christmas": "Christmas",
+          "new-year": "New Year",
+          "valentines": "Valentine's Day",
+          "easter": "Easter",
+          "summer": "Summer",
+          "back-to-school": "Back to School",
+          "diwali": "Diwali",
+          "mothers-day": "Mother's Day",
+          "fathers-day": "Father's Day",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Chinese New Year",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
+      "countryEntity": {
+        "label": "Country",
+        "restOfWorld": "Rest of the World",
+        "currencyLabel": "{currency} currency",
+        "info": {
+          "general": "Your selected country determines the tax deductibility of donations and which causes are available for your fundraiser.",
+          "taxReceiptEligible": "You will receive a tax-deduction eligible donation receipt for {country}.",
+          "notTaxReceiptEligible": "{country, select, ROW {Tax-deduction eligible donation receipts are not available.} other {Tax-deduction eligible donation receipts are not available for {country}.}}"
+        }
+      },
+      "goal": {
+        "label": "Fundraiser Goal",
+        "errors": {
+          "required": "Please enter a fundraiser goal."
+        }
+      },
+      "projectSelection": {
+        "sectionHeading": "Causes Supported by this Fundraiser",
+        "addCause": "Add Cause",
+        "removeCause": "Remove Cause",
+        "allocationLabel": "{percentage, number}% allocation",
+        "projectImageAlt": "Image for {name}",
+        "defaultCause": {
+          "name": "Empower Young People and Bring Back Forests",
+          "description": "Support Plant-for-the-Planet's mission to empower young people worldwide to take climate action. We restore forests, educate communities, and advocate for climate justice to create a sustainable future for all."
+        },
+        "aria": {
+          "closeModal": "Close cause selection",
+          "selectCause": "Add cause {name}"
+        },
+        "modal": {
+          "title": "Add a Cause",
+          "subtitle": "Choose additional causes to support",
+          "searchPlaceholder": "Search causes...",
+          "searchAriaLabel": "Search causes",
+          "tabs": {
+            "top": "Top Projects",
+            "all": "All Projects"
+          },
+          "resultsCount": "{count, plural, one {# result} other {# results}}",
+          "loading": "Loading projects...",
+          "errorTitle": "Failed to load projects",
+          "errorMessage": "Unable to load projects. Please try again.",
+          "retry": "Try Again",
+          "byOrganization": "by {organization}",
+          "tags": {
+            "topProject": "Top Project",
+            "restoration": "Restoration",
+            "conservation": "Conservation",
+            "learnMore": "Learn More",
+            "restOfWorld": "Rest of the World"
+          },
+          "add": "Add",
+          "emptySearchTitle": "No projects found",
+          "emptySearchDescription": "No projects match \"{query}\"",
+          "clearSearch": "Clear search",
+          "emptyAllTitle": "All projects added",
+          "emptyAllDescription": "You've added all available projects to your fundraiser"
+        }
+      },
+      "options": {
+        "sectionHeading": "Fundraiser Options",
+        "status": {
+          "label": "Collect Donations for the Fundraiser",
+          "description": "Enable donation collection and make the fundraiser active"
+        },
+        "visibility": {
+          "label": "Make the fundraiser discoverable",
+          "description": "Allow people to find this fundraiser in search and browse"
+        }
+      },
+      "contributionSettings": {
+        "sectionHeading": "Contribution Settings",
+        "cardHeader": "Contribution",
+        "giftTitle": "Dedicate this donation",
+        "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
+        "donateNow": "Donate Now",
+        "donateMonthly": "Donate Monthly",
+        "donateQuarterly": "Donate Quarterly",
+        "donateYearly": "Donate Yearly",
+        "frequency": {
+          "oneTime": "One Time",
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "yearly": "Yearly"
+        },
+        "customAmount": "Custom Amount",
+        "enterAmount": "Enter Amount"
+      },
+      "formSubmission": {
+        "buttonProcessing": "Creating Fundraiser...",
+        "buttonSubmit": "Create Fundraiser",
+        "successMessage": "Fundraiser created!",
+        "errorMessage": "Error"
+      }
+    }
   }
 }

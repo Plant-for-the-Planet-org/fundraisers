@@ -1,4 +1,14 @@
 @import 'tailwindcss';
+@import '../styles/typography.css';
+
+@font-face {
+  font-family: 'Twemoji Country Flags';
+  unicode-range:
+    U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E,
+    U+E0073-E0074, U+E0077, U+E007F;
+  src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8/dist/TwemojiCountryFlags.woff2')
+    format('woff2');
+}
 
 /* Class-based dark mode: activates when any ancestor has class="dark" */
 @variant dark (&:is(.dark *));
@@ -10,6 +20,18 @@
   --font-poppins: var(--font-poppins-var), 'Poppins', sans-serif;
   --font-playfair: var(--font-playfair-var), 'Playfair Display', serif;
   --font-roboto: var(--font-roboto-var), 'Roboto', sans-serif;
+  --font-theme-title: var(
+    --theme-title-font,
+    var(--font-poppins-var),
+    'Poppins',
+    sans-serif
+  );
+  --font-theme-body: var(
+    --theme-body-font,
+    var(--font-open-sans-var),
+    'Open Sans',
+    sans-serif
+  );
 
   /* Semantic color tokens */
   --color-background: hsl(var(--background));
@@ -18,10 +40,16 @@
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-ring: hsl(var(--ring));
+  --color-destructive: hsl(var(--destructive));
   --color-accent-color: var(--accent-color);
 
   /* Border radius */
@@ -40,12 +68,18 @@
   --muted-foreground: 220 8.9% 46.1%;
   --card: 0 0% 100%;
   --card-foreground: 224 71.4% 4.1%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 71.4% 4.1%;
   --border: 220 13% 91%;
   --input: 220 13% 91%;
-  --primary: 142 76% 36%;
+  --primary: 214 100% 59%;
   --primary-foreground: 0 0% 100%;
   --radius: 0.5rem;
   --accent-color: #16a34a;
+  --ring: 142 76% 36%;
+  --destructive: 0 72% 51%;
+  --accent: 220 14.3% 95.9%;
+  --accent-foreground: 220.9 39.3% 11%;
 }
 
 .dark {
@@ -55,8 +89,14 @@
   --muted-foreground: 217.9 10.6% 64.9%;
   --card: 224 71.4% 4.1%;
   --card-foreground: 210 20% 98%;
+  --popover: 224 71.4% 4.1%;
+  --popover-foreground: 210 20% 98%;
   --border: 215 27.9% 16.9%;
   --input: 215 27.9% 16.9%;
+  --ring: 142 71% 45%;
+  --destructive: 0 63% 55%;
+  --accent: 215 27.9% 16.9%;
+  --accent-foreground: 210 20% 98%;
 }
 
 body {

@@ -42,7 +42,7 @@ export function UserMenu() {
     !isAuthenticated &&
     !pathname.startsWith('/login')
   ) {
-    return <SignInButton variant='outline' size='sm' />;
+    return <SignInButton />;
   }
 
   if (!isAuthenticated) return null;
@@ -105,11 +105,7 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <SignOutButton
-            variant='ghost'
-            size='sm'
-            className='w-full justify-start hover:bg-gray-100 cursor-pointer'
-          />
+          <SignOutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
