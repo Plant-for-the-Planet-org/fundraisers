@@ -7,6 +7,7 @@ import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useThemeStore } from '@/stores/theme-store';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
 export function FundraiserAuthRetry({ slug }: { slug: string }) {
   const accessToken = useAuthStore(s => s.accessToken);
@@ -33,9 +34,5 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
   if (failed) notFound();
   if (!fundraiser) return null;
 
-  return (
-    <section>
-      <h2>{fundraiser.title}</h2>
-    </section>
-  );
+  return <FundraiserView fundraiser={fundraiser} />;
 }

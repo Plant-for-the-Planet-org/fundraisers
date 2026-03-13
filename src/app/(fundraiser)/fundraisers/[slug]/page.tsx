@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
+import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
 export async function generateMetadata({
   params,
@@ -41,9 +42,5 @@ export default async function FundraiserPage({
     throw e;
   }
 
-  return (
-    <section>
-      <h2>{fundraiser.title}</h2>
-    </section>
-  );
+  return <FundraiserView fundraiser={fundraiser} />;
 }
