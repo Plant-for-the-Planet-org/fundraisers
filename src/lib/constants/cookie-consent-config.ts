@@ -29,7 +29,7 @@ export const COOKIE_CONSENT_CONFIG: CookieConsentConfig = {
       enabled: true,
       services: {
         locale: {
-          label: 'Language Preference',
+          label: 'Language Preference (ui-locale)',
           cookies: [{ name: 'ui-locale' }],
         },
       },
