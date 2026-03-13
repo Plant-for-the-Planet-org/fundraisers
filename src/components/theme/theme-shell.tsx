@@ -27,6 +27,13 @@ export function ThemeShell({
     }
   }, [pathname, setSelectedTheme]);
 
+  // Clear on unmount so selectedTheme doesn't bleed into a new ThemeShell instance when navigating between route groups (each group has its own ThemeShell).
+  useEffect(() => {
+    return () => {
+      setSelectedTheme(null);
+    };
+  }, [setSelectedTheme]);
+
   const activeTheme =
     selectedTheme ?? initialTheme ?? getThemeForPath(pathname);
 
