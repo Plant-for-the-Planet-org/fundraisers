@@ -13,21 +13,28 @@ export const COOKIE_CONSENT_CONFIG: CookieConsentConfig = {
     consentModal: {
       layout: 'box wide',
       position: 'bottom left',
-      equalWeightButtons: true,
-      flipButtons: false,
+      equalWeightButtons: false,
+      flipButtons: true,
     },
     preferencesModal: {
       layout: 'box',
       position: 'right',
-      equalWeightButtons: true,
-      flipButtons: false,
+      equalWeightButtons: false,
+      flipButtons: true,
     },
   },
   categories: {
     [COOKIE_CATEGORIES.NECESSARY]: {
       readOnly: true,
       enabled: true,
+      services: {
+        locale: {
+          label: 'Language Preference',
+          cookies: [{ name: 'ui-locale' }],
+        },
+      },
     },
+
     [COOKIE_CATEGORIES.ANALYTICS]: {
       enabled: false,
     },
