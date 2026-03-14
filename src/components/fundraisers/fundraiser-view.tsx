@@ -7,6 +7,7 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SectionHeader } from '@/components/fundraisers/typography';
+import { Description } from '@/components/fundraisers/description';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
@@ -158,15 +159,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         />
 
         {/* Description */}
-        {fundraiser.description && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>{t('create.description.label')}</SectionHeader>
-            <div
-              className='text-sm text-foreground leading-relaxed [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:pl-6 [&_ul]:list-disc [&_ol]:my-2 [&_ol]:pl-6 [&_ol]:list-decimal [&_li]:my-1 [&_blockquote]:pl-4 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through'
-              dangerouslySetInnerHTML={{ __html: fundraiser.description }}
-            />
-          </div>
-        )}
+        <Description mode='read' value={fundraiser.description} />
 
         {/* Project allocations */}
         {fundraiser.projectAllocations.length > 0 && (
