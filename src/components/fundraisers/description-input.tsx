@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+import { Controller, useFormContext } from 'react-hook-form';
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
