@@ -3,6 +3,8 @@ import type { UserProfile } from '@/lib/api/user-service';
 import { create } from 'zustand';
 import { userService } from '@/lib/api/user-service';
 import { devtools } from 'zustand/middleware';
+import { isProtectedRoute } from '@/lib/utils/auth';
+import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 
 interface User {
   sub: string;
@@ -57,7 +59,6 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await get().loadUserProfile();
           const user = get().user;
-
           if (!user) throw new Error('User profile not loaded');
 
           if (isBrowser) {
@@ -102,17 +103,19 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: (customReturnTo?: string) => {
-        get().clearAuth();
-
         const currentPage = window.location.pathname + window.location.search;
         const redirectAfterLogout = customReturnTo || currentPage;
+
+        const safeRedirect = isProtectedRoute(redirectAfterLogout)
+          ? DEFAULT_REDIRECT_PATH
+          : redirectAfterLogout;
 
         const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
         const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
         const baseUrl = window.location.origin;
 
-        const logoutSuccessUrl = `${baseUrl}/login?logoutSuccess=true&redirectTo=${encodeURIComponent(
-          redirectAfterLogout
+        const logoutSuccessUrl = `${baseUrl}/redirecting?logoutSuccess=true&redirectTo=${encodeURIComponent(
+          safeRedirect
         )}`;
 
         const logoutUrl = new URL(`https://${auth0Domain}/v2/logout`);
@@ -131,6 +134,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             accessToken: null,
             isAuthenticated: false,
+            isAuthInitializing: false,
             error: null,
           },
           undefined,

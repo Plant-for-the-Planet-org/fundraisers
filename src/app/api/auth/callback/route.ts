@@ -1,7 +1,6 @@
 import type { NextRequest } from 'next/server';
 
 import { NextResponse } from 'next/server';
-import { getSafeRedirectPath } from '@/lib/utils/auth';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,10 +23,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/?error=no_code', request.url));
   }
 
-  //Safe redirect — no open redirect vulnerability
-  const redirectPath = getSafeRedirectPath(state);
-  const url = new URL(redirectPath, request.url);
+  const url = new URL('/redirecting', request.url);
   url.searchParams.set('code', code);
+  if (state) url.searchParams.set('state', state);
 
   const response = NextResponse.redirect(url);
 

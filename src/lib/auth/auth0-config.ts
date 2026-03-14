@@ -8,6 +8,7 @@ import {
   getStoredCodeVerifier,
   storeCodeVerifier,
 } from './pkce';
+import { storeOAuthState } from './oauth-state';
 
 export const AUTH0_CONFIG = {
   domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN!,
@@ -42,13 +43,20 @@ function getRedirectUri(): string {
  */
 async function createBaseAuthorizeParams(
   redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
-  extraParams?: Record<string, string>
+  extraParams?: Record<string, string>,
+  storeState: boolean = true
 ): Promise<URLSearchParams> {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
+  const nonce = crypto.randomUUID();
 
   // Persist PKCE verifier for token exchange
   storeCodeVerifier(codeVerifier);
+
+  // Store redirect target mapped to nonce
+  if (storeState) {
+    storeOAuthState(nonce, redirectTo);
+  }
 
   const params = new URLSearchParams({
     response_type: 'code',
@@ -56,7 +64,7 @@ async function createBaseAuthorizeParams(
     redirect_uri: getRedirectUri(),
     scope: AUTH0_CONFIG.scope,
     audience: AUTH0_CONFIG.audience,
-    state: redirectTo, // (Can later be upgraded to secure state handling)
+    state: nonce,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
   });
@@ -84,9 +92,13 @@ function buildAuthorizeUrl(params: URLSearchParams): string {
 async function buildSilentAuthorizeUrl(
   redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
 ): Promise<string> {
-  const params = await createBaseAuthorizeParams(redirectTo, {
-    prompt: 'none',
-  });
+  const params = await createBaseAuthorizeParams(
+    redirectTo,
+    {
+      prompt: 'none',
+    },
+    false // don't store state
+  );
 
   return buildAuthorizeUrl(params);
 }

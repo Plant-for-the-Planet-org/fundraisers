@@ -62,3 +62,12 @@ export const getValidStoredToken = () => {
 
   return token;
 };
+
+// Removes specified query parameters from the current URL
+// and updates the browser history without triggering a page reload.
+
+export function cleanUrl(params: string[]) {
+  const url = new URL(window.location.href);
+  params.forEach(p => url.searchParams.delete(p));
+  window.history.replaceState({}, '', url.pathname + url.search);
+}

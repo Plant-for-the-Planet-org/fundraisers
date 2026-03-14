@@ -6,13 +6,8 @@ import {
   exchangeCodeForTokens,
   getAccessTokenSilently,
 } from '@/lib/auth/auth0-config';
-import { isTokenExpired } from '../../lib/auth/jwt-utils';
-
-function cleanUrl(params: string[]) {
-  const url = new URL(window.location.href);
-  params.forEach(p => url.searchParams.delete(p));
-  window.history.replaceState({}, '', url.pathname + url.search);
-}
+import { useSearchParams } from 'next/navigation';
+import { cleanUrl, getValidStoredToken } from '@/lib/utils/auth';
 
 async function handleCodeExchange(code: string) {
   cleanUrl(['code']);
@@ -21,6 +16,11 @@ async function handleCodeExchange(code: string) {
 }
 
 export function AuthInitializer() {
+  const searchParams = useSearchParams();
+  const code = searchParams.get('code');
+  const error = searchParams.get('error');
+  const logoutSuccess = searchParams.get('logoutSuccess');
+  // store: actions
   const setIsAuthInitializing = useAuthStore(
     state => state.setIsAuthInitializing
   );
@@ -28,25 +28,9 @@ export function AuthInitializer() {
   const clearAuth = useAuthStore(state => state.clearAuth);
 
   useEffect(() => {
-    const getValidStoredToken = () => {
-      const token = localStorage.getItem('access_token');
-
-      if (!token) return null;
-
-      if (isTokenExpired(token)) {
-        localStorage.removeItem('access_token');
-        return null;
-      }
-
-      return token;
-    };
-
+    if (logoutSuccess === 'true') return;
     const init = async () => {
       try {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        const error = params.get('error');
-
         // 1. Handle PKCE code exchange
         if (code) {
           const token = await handleCodeExchange(code);
@@ -54,6 +38,7 @@ export function AuthInitializer() {
           return;
         }
 
+        // 2. Previous auth failed
         if (error === 'auth_failed') {
           console.warn('Auth previously failed, skipping silent auth');
           cleanUrl(['error', 'reason']);
@@ -88,7 +73,18 @@ export function AuthInitializer() {
     };
 
     init();
-  }, []);
+  }, [
+    clearAuth,
+    logoutSuccess,
+    setAccessToken,
+    setIsAuthInitializing,
+    code,
+    error,
+  ]);
+
+  useEffect(() => {
+    if (logoutSuccess === 'true') clearAuth();
+  }, [clearAuth, logoutSuccess]);
 
   return null;
 }
