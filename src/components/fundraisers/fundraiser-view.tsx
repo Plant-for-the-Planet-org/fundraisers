@@ -1,6 +1,8 @@
 'use client';
 
+import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
+import { Title } from '@/components/fundraisers/title';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
@@ -11,7 +13,6 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import DescriptionDisplay from '@/components/fundraisers/description-display';
 
 function getProjectImageSource(image?: string): string | null {
   if (!image) return null;
@@ -137,12 +138,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <h1
-          className='text-4xl font-bold'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
-        >
-          {fundraiser.title}
-        </h1>
+        <Title mode='read' value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
