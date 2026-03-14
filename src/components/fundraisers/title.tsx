@@ -18,8 +18,18 @@ function resizeToContent(element: HTMLTextAreaElement | null) {
   element.style.height = `${element.scrollHeight}px`;
 }
 
-export function Title() {
+interface TitleProps {
+  mode?: 'read' | 'write';
+  value?: string;
+  className?: string;
+}
+
+export function Title({ mode = 'read', value, className }: TitleProps) {
   const t = useTranslations('Fundraisers.create.title');
+
+  if (mode === 'read') {
+    return <TitleDisplay value={value ?? ''} className={className} />;
+  }
 
   return (
     <TitleInput
@@ -28,6 +38,22 @@ export function Title() {
       requiredMessage={t('errors.required')}
       maxLengthMessage={t('errors.maxLength', { max: TITLE_MAX_LENGTH })}
     />
+  );
+}
+
+interface TitleDisplayProps {
+  value: string;
+  className?: string;
+}
+
+function TitleDisplay({ value, className }: TitleDisplayProps) {
+  return (
+    <h1
+      className={cn('text-4xl font-bold break-all', className)}
+      style={{ fontFamily: 'var(--theme-title-font)' }}
+    >
+      {value}
+    </h1>
   );
 }
 
