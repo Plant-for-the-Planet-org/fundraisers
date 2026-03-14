@@ -12,6 +12,7 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const fundraiser = await getCachedFundraiser(slug);
+    console.log(JSON.stringify(fundraiser, null, 2));
     return {
       title: fundraiser.title,
       description: fundraiser.description ?? undefined,
