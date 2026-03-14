@@ -3,6 +3,9 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  poweredByHeader: false,
+  compress: true,
+  generateEtags: true,
   redirects: async () => {
     return [
       {
