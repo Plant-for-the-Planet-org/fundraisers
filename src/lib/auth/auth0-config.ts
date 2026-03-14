@@ -104,21 +104,25 @@ async function buildSilentAuthorizeUrl(
 }
 
 /**
- * Attempts silent authentication using Auth0 in a hidden iframe.
+ * Attempts silent authentication with Auth0 using a hidden iframe.
  *
  * Flow:
- * 1. Loads the Auth0 `/authorize` endpoint with `prompt=none`.
- * 2. If a session exists, Auth0 redirects the iframe to `/api/auth/callback`
- *    with an authorization `code`.
- * 3. The code is extracted and exchanged for tokens.
+ * 1. Loads the Auth0 `/authorize` endpoint with `prompt=none` in a hidden iframe.
+ * 2. If the user already has an Auth0 session, Auth0 redirects to our callback
+ *    and eventually lands on our domain with an authorization `code`.
+ * 3. Once the iframe lands on our origin, we extract the `code` from the URL
+ *    and exchange it for tokens.
  *
- * Note:
- * Previously this flow redirected the main window using `window.location`,
- * which cancelled ongoing app initialization (e.g., profile fetching).
- * This implementation keeps the flow inside the iframe to avoid interrupting
- * the application lifecycle.
+ * Safety mechanisms:
+ * - A timeout (3s) prevents the app from waiting indefinitely if silent auth fails
+ *   (e.g., no Auth0 session or blocked third-party cookies).
+ * - `origin` check ensures we only read URLs from our own domain to avoid
+ *   cross-origin access errors.
+ * - `cleanup()` removes the iframe and clears timers once the flow completes.
  *
- * Returns the `access_token` on success, otherwise `null`.
+ * Returns:
+ * - `access_token` if silent authentication succeeds
+ * - `null` if no session exists or the operation times out
  */
 export async function getAccessTokenSilently(
   redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
@@ -134,7 +138,7 @@ export async function getAccessTokenSilently(
       const timeout = setTimeout(() => {
         cleanup();
         resolve(null);
-      }, 8000);
+      }, 3000);
 
       function cleanup() {
         if (settled.current) return;
@@ -146,20 +150,25 @@ export async function getAccessTokenSilently(
       iframe.onload = () => {
         if (settled.current) return;
         try {
-          const url = iframe.contentWindow?.location.href;
+          const urlStr = iframe.contentWindow?.location.href;
 
-          if (!url) return;
+          if (!urlStr) return;
 
-          if (url.includes('/api/auth/callback')) {
-            const params = new URL(url).searchParams;
-            if (params.get('error')) {
-              cleanup();
-              resolve(null);
-              return;
-            }
-            const code = params.get('code');
+          const url = new URL(urlStr);
+
+          if (url.origin !== window.location.origin) return;
+
+          const code = url.searchParams.get('code');
+          const error = url.searchParams.get('error');
+
+          if (code) {
             cleanup();
             resolve(code);
+          }
+
+          if (error) {
+            cleanup();
+            resolve(null);
           }
         } catch {
           // Expected cross-origin error before redirect
