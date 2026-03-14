@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { ImageSelectionOverlay } from '@/components/fundraisers/image-selection-overlay';
+import { ImageComponentBase } from '@/components/fundraisers/image-component-base';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { DEFAULT_IMAGE_LOAD_CATEGORY_ID } from '@/lib/constants/image-categories';
 import {
@@ -115,38 +116,36 @@ export function ImageSelector() {
     void loadDefaultImage(true);
   }, [loadDefaultImage]);
 
+  const fallbackContent = defaultImageError ? (
+    <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-4'>
+      <ImageIcon className='w-16 h-16 mb-4' />
+      <p className='text-sm font-medium mb-2'>{t('states.errorTitle')}</p>
+      <p className='text-xs text-center mb-4'>{defaultImageError}</p>
+      <button
+        className='inline-flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+        onClick={handleRetryDefaultImage}
+        type='button'
+      >
+        <RefreshCw className='w-4 h-4' />
+        {t('actions.retry')}
+      </button>
+    </div>
+  ) : (
+    <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400'>
+      {isLoadingDefaultImage && (
+        <RefreshCw className='w-8 h-8 mb-4 animate-spin' />
+      )}
+      <p className='text-sm font-medium'>{t('states.loadingDefault')}</p>
+    </div>
+  );
+
   return (
     <>
-      <div className='self-stretch h-80 relative bg-white/50 dark:bg-gray-800 rounded-2xl overflow-hidden'>
-        {currentImage ? (
-          <img
-            className='w-full h-full object-cover'
-            src={currentImage.url}
-            alt={t('previewAlt')}
-          />
-        ) : defaultImageError ? (
-          <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-4'>
-            <ImageIcon className='w-16 h-16 mb-4' />
-            <p className='text-sm font-medium mb-2'>{t('states.errorTitle')}</p>
-            <p className='text-xs text-center mb-4'>{defaultImageError}</p>
-            <button
-              className='inline-flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
-              onClick={handleRetryDefaultImage}
-              type='button'
-            >
-              <RefreshCw className='w-4 h-4' />
-              {t('actions.retry')}
-            </button>
-          </div>
-        ) : (
-          <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400'>
-            {isLoadingDefaultImage && (
-              <RefreshCw className='w-8 h-8 mb-4 animate-spin' />
-            )}
-            <p className='text-sm font-medium'>{t('states.loadingDefault')}</p>
-          </div>
-        )}
-
+      <ImageComponentBase
+        imageUrl={currentImage?.url}
+        alt={t('previewAlt')}
+        fallback={fallbackContent}
+      >
         <button
           onClick={() => {
             setIsImageOverlayOpen(true);
@@ -157,7 +156,7 @@ export function ImageSelector() {
         >
           <ImageIcon className='h-4 w-4 text-white' />
         </button>
-      </div>
+      </ImageComponentBase>
 
       <ImageSelectionOverlay
         isOpen={isImageOverlayOpen}
