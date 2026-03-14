@@ -8,6 +8,7 @@ import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
+import { Description } from '@/components/fundraisers/description';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -97,7 +98,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         />
 
         {/* Description */}
-        <DescriptionDisplay value={fundraiser.description} />
+        <Description mode='read' value={fundraiser.description} />
 
         {/* Project allocations */}
         <ProjectsSupportedDisplay
