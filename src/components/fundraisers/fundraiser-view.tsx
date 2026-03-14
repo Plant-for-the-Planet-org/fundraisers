@@ -1,5 +1,7 @@
 'use client';
 
+import type { Fundraiser } from '@/lib/types/fundraiser';
+
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
@@ -9,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import type { Fundraiser } from '@/lib/types/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
