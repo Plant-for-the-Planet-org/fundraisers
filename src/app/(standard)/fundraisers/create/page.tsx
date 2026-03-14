@@ -25,7 +25,7 @@ export default function CreateFundraiserPage() {
         <FundraiserLayout>
           <SidebarPanel>
             <ImageSelector />
-            <GoalPreview />
+            <GoalPreview mode='write' />
             <DonorsPreview />
             <HostPreview />
             <ThemeSettings />
