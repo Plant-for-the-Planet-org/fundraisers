@@ -18,6 +18,8 @@ export const AUTH0_CONFIG = {
   scope: 'openid profile email',
 };
 
+const SILENT_AUTH_TIMEOUT = 5000;
+
 export interface Auth0TokenResponse {
   access_token: string;
   id_token: string;
@@ -43,8 +45,7 @@ function getRedirectUri(): string {
  */
 async function createBaseAuthorizeParams(
   redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
-  extraParams?: Record<string, string>,
-  storeState: boolean = true
+  extraParams?: Record<string, string>
 ): Promise<URLSearchParams> {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -54,9 +55,7 @@ async function createBaseAuthorizeParams(
   storeCodeVerifier(codeVerifier);
 
   // Store redirect target mapped to nonce
-  if (storeState) {
-    storeOAuthState(nonce, redirectTo);
-  }
+  storeOAuthState(nonce, redirectTo);
 
   const params = new URLSearchParams({
     response_type: 'code',
@@ -90,15 +89,20 @@ function buildAuthorizeUrl(params: URLSearchParams): string {
  * Auth0 will attempt to reuse an existing session without showing any UI.
  */
 async function buildSilentAuthorizeUrl(
-  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
+  inMemoryVerifier: string
 ): Promise<string> {
-  const params = await createBaseAuthorizeParams(
-    redirectTo,
-    {
-      prompt: 'none',
-    },
-    false // don't store state
-  );
+  const codeChallenge = await generateCodeChallenge(inMemoryVerifier);
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: AUTH0_CONFIG.clientId,
+    redirect_uri: getRedirectUri(),
+    scope: AUTH0_CONFIG.scope,
+    audience: AUTH0_CONFIG.audience,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+    prompt: 'none',
+  });
 
   return buildAuthorizeUrl(params);
 }
@@ -124,11 +128,10 @@ async function buildSilentAuthorizeUrl(
  * - `access_token` if silent authentication succeeds
  * - `null` if no session exists or the operation times out
  */
-export async function getAccessTokenSilently(
-  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
-): Promise<string | null> {
+export async function getAccessTokenSilently(): Promise<string | null> {
   try {
-    const silentUrl = await buildSilentAuthorizeUrl(redirectTo);
+    const verifier = generateCodeVerifier();
+    const silentUrl = await buildSilentAuthorizeUrl(verifier);
 
     const code = await new Promise<string | null>(resolve => {
       const iframe = document.createElement('iframe');
@@ -138,7 +141,7 @@ export async function getAccessTokenSilently(
       const timeout = setTimeout(() => {
         cleanup();
         resolve(null);
-      }, 3000);
+      }, SILENT_AUTH_TIMEOUT);
 
       function cleanup() {
         if (settled.current) return;
@@ -185,7 +188,7 @@ export async function getAccessTokenSilently(
 
     if (!code) return null;
 
-    const tokens = await exchangeCodeForTokens(code);
+    const tokens = await exchangeCodeForTokens(code, verifier);
     return tokens.access_token;
   } catch (err) {
     console.error('Silent auth failed:', err);
@@ -249,9 +252,11 @@ export async function buildSocialAuthorizeUrl(
  * and clears the verifier from sessionStorage once the exchange is complete (success or failure).
  */
 export async function exchangeCodeForTokens(
-  code: string
+  code: string,
+  inMemoryVerifier?: string // optional verifier for silent auth
 ): Promise<Auth0TokenResponse> {
-  const codeVerifier = getStoredCodeVerifier();
+  // Use in-memory verifier if provided, otherwise fallback to sessionStorage
+  const codeVerifier = inMemoryVerifier ?? getStoredCodeVerifier();
 
   if (!codeVerifier) {
     throw new Error(
@@ -287,6 +292,15 @@ export async function exchangeCodeForTokens(
   } catch (error) {
     throw error;
   } finally {
-    clearStoredCodeVerifier();
+    /**
+     * Only clear sessionStorage verifier if we are using
+     * the redirect-based login flow.
+     *
+     * Silent auth keeps the verifier in memory, so it
+     * must NOT clear sessionStorage.
+     */
+    if (!inMemoryVerifier) {
+      clearStoredCodeVerifier();
+    }
   }
 }
