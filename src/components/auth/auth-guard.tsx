@@ -49,25 +49,14 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
   }, [accessToken, isAuthInitializing, setAccessToken, clearAuth, router]);
 
   /**
-   * Redirect unauthenticated users
-   */
-  useEffect(() => {
-    if (!isAuthInitializing && !isAuthenticated) {
-      router.replace(getSignInPath());
-    }
-  }, [isAuthenticated, isAuthInitializing, router]);
-
-  /**
    * Show loader while auth state is initializing
    */
   if (isAuthInitializing) {
     return fallback ?? <Loader text={tAuth('redirecting')} />;
   }
 
-  /**
-   * Prevent UI flicker before redirect happens
-   */
   if (!isAuthenticated) {
+    router.replace(getSignInPath());
     return null;
   }
 
