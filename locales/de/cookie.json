@@ -15,6 +15,25 @@
     "savePreferencesBtn": "Einstellungen speichern",
     "closeIconLabel": "Fenster schließen",
     "serviceCounterLabel": "Service|Dienstleistungen",
-    "sections": ["", "", "", ""]
+    "sections": {
+      "intro": {
+        "title": "Hat jemand ... Cookies gesagt?",
+        "description": "Unsere Website verwendet notwendige Cookies, um ihren ordnungsgemäßen Betrieb sicherzustellen, sowie Analyse-Cookies, um zu verstehen, wie Sie mit ihr interagieren. Letztere werden nur nach Ihrer Zustimmung gesetzt."
+      },
+      "necessary": {
+        "title": "Unbedingt erforderliche Cookies <span class=\"pm__badge\">Immer aktiviert</span>",
+        "description": "Diese Cookies sind erforderlich, damit die Website ordnungsgemäß funktioniert, einschließlich der Speicherung Ihrer Spracheinstellungen.",
+        "linkedCategory": "necessary"
+      },
+      "analytics": {
+        "title": "Analyse-Cookies",
+        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem Informationen anonym gesammelt und gemeldet werden.",
+        "linkedCategory": "analytics"
+      },
+      "moreInfo": {
+        "title": "Weitere Informationen",
+        "description": "Wenn Sie Fragen zu unserer Cookie-Richtlinie und Ihren Auswahlmöglichkeiten haben, kontaktieren Sie uns bitte."
+      }
+    }
   }
 }

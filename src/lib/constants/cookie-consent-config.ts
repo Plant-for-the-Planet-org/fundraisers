@@ -1,12 +1,54 @@
 import type { CookieConsentConfig } from 'vanilla-cookieconsent';
 
-import en from '../../../locales/en/cookie.json';
-import de from '../../../locales/de/cookie.json';
+import enRaw from '../../../locales/en/cookie.json';
+import deRaw from '../../../locales/de/cookie.json';
 
 export const COOKIE_CATEGORIES = {
   NECESSARY: 'necessary',
   ANALYTICS: 'analytics',
 } as const;
+
+type CookieTranslation = typeof enRaw;
+
+function buildSections(t: CookieTranslation) {
+  const sections = t.preferencesModal.sections;
+  return [
+    {
+      title: sections.intro.title,
+      description: sections.intro.description,
+    },
+    {
+      title: sections.necessary.title,
+      description: sections.necessary.description,
+      linkedCategory: 'necessary',
+    },
+    {
+      title: sections.analytics.title,
+      description: sections.analytics.description,
+      linkedCategory: 'analytics',
+    },
+    {
+      title: sections.moreInfo.title,
+      description: sections.moreInfo.description,
+    },
+  ];
+}
+
+const en = {
+  ...enRaw,
+  preferencesModal: {
+    ...enRaw.preferencesModal,
+    sections: buildSections(enRaw),
+  },
+};
+
+const de = {
+  ...deRaw,
+  preferencesModal: {
+    ...deRaw.preferencesModal,
+    sections: buildSections(deRaw),
+  },
+};
 
 export const COOKIE_CONSENT_CONFIG: CookieConsentConfig = {
   guiOptions: {
