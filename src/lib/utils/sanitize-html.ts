@@ -1,4 +1,4 @@
-import sanitizeHtml from 'sanitize-html';
+import type { IOptions } from 'sanitize-html';
 
 import type { SafeHtml } from '@/lib/types/safe-html';
 
@@ -21,7 +21,7 @@ const DESCRIPTION_ALLOWED_TAGS = [
   'h3',
 ];
 
-const DESCRIPTION_ALLOWED_ATTR: sanitizeHtml.IOptions['allowedAttributes'] = {
+const DESCRIPTION_ALLOWED_ATTR: IOptions['allowedAttributes'] = {
   a: ['href', 'title', 'rel'],
 };
 
