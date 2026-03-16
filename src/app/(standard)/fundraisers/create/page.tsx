@@ -2,7 +2,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { ContributionSettings } from '@/components/fundraisers/contribution-settings';
 import { CreateFundraiserButton } from '@/components/fundraisers/create-fundraiser-button';
 import { CreateFundraiserFormProvider } from '@/components/fundraisers/create-fundraiser-form-context';
-import DescriptionInput from '@/components/fundraisers/description-input';
+import DescriptionInput from '@/components/fundraisers/description';
 import { DonorsPreview } from '@/components/fundraisers/donors-preview';
 import { GoalInput } from '@/components/fundraisers/goal-input';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
@@ -33,7 +33,7 @@ export default function CreateFundraiserPage() {
           <MainPanel>
             <Title />
             <ContributionSettings />
-            <Description mode='write' />
+            <DescriptionInput />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <WorkspaceSelector />
               <GoalInput />
