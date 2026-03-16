@@ -10,12 +10,8 @@ import { SectionHeader } from '@/components/fundraisers/typography';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
-import TitleDisplay from '@/components/fundraisers/title-display';
-import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getImageUrl } from '@/lib/utils/images';
-import { Target } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
 export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
   const t = useTranslations('Fundraisers');
