@@ -3,7 +3,7 @@
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
-import { Title } from '@/components/fundraisers/title';
+import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
@@ -133,7 +133,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <Title mode='read' value={fundraiser.title} />
+        <TitleDisplay value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
