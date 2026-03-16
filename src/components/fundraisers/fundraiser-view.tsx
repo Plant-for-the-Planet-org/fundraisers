@@ -9,6 +9,7 @@ import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ImageComponentBase } from '@/components/fundraisers/image-component-base';
+import TitleDisplay from '@/components/fundraisers/title-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
@@ -135,12 +136,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <h1
-          className='text-4xl font-bold'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
-        >
-          {fundraiser.title}
-        </h1>
+        <TitleDisplay value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
