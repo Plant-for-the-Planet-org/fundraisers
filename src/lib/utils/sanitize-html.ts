@@ -1,6 +1,7 @@
+import type { SafeHtml } from '@/lib/types/safe-html';
 import type { IOptions } from 'sanitize-html';
 
-import type { SafeHtml } from '@/lib/types/safe-html';
+import sanitizeHtml from 'sanitize-html';
 
 const DESCRIPTION_ALLOWED_TAGS = [
   'p',
