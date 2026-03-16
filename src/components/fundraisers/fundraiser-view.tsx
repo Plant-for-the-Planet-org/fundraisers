@@ -3,7 +3,7 @@
 import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
-import { ImageComponentBase } from '@/components/fundraisers/image-component-base';
+import ImageDisplay from '@/components/fundraisers/image-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -13,12 +13,6 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
-
-function getFundraiserImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('fundraiser', 'large', image);
-}
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
@@ -37,8 +31,6 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
-  const fundraiserImageSource = getFundraiserImageSource(fundraiser.image);
-
   const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
 
   const contribution = fundraiser.settings?.modules?.contribution;
@@ -47,8 +39,8 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
     <FundraiserLayout>
       <SidebarPanel>
         {/* Image */}
-        <ImageComponentBase
-          imageUrl={fundraiserImageSource}
+        <ImageDisplay
+          image={fundraiser.image}
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
 
