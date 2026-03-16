@@ -1,6 +1,5 @@
 import sanitizeHtml from 'sanitize-html';
 
-import { toSafeHtml } from '@/lib/types/safe-html';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
 const DESCRIPTION_ALLOWED_TAGS = [
@@ -9,10 +8,12 @@ const DESCRIPTION_ALLOWED_TAGS = [
   'ol',
   'li',
   'strong',
+  'b',
   'em',
   'u',
   's',
   'blockquote',
+  'hr',
   'br',
   'span',
   'a',
@@ -21,9 +22,12 @@ const DESCRIPTION_ALLOWED_TAGS = [
 ];
 
 const DESCRIPTION_ALLOWED_ATTR: sanitizeHtml.IOptions['allowedAttributes'] = {
-  a: ['href', 'title', 'target', 'rel'],
-  '*': ['class'],
+  a: ['href', 'title', 'rel'],
 };
+
+function toSafeHtml(html: string): SafeHtml {
+  return html as SafeHtml;
+}
 
 export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
@@ -31,8 +35,17 @@ export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
     allowedAttributes: DESCRIPTION_ALLOWED_ATTR,
     allowedSchemes: ['http', 'https', 'mailto'],
     allowProtocolRelative: false,
+    transformTags: {
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          ...attribs,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+      }),
+    },
   });
 
   return toSafeHtml(clean);
 }
-

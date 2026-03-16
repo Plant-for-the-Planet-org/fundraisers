@@ -1,17 +1,17 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { Target } from 'lucide-react';
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
-import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
-import { SectionHeader } from '@/components/fundraisers/typography';
-import { Description } from '@/components/fundraisers/description';
 import { DonationForm } from '@/components/fundraisers/donation-form';
+import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
+import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
+import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
+import { Target } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import DescriptionDisplay from '@/components/fundraisers/description-display';
 
 function getProjectImageSource(image?: string): string | null {
   if (!image) return null;
@@ -159,7 +159,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         />
 
         {/* Description */}
-        <Description mode='read' value={fundraiser.description} />
+        <DescriptionDisplay value={fundraiser.description} />
 
         {/* Project allocations */}
         {fundraiser.projectAllocations.length > 0 && (
