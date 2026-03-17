@@ -26,9 +26,7 @@ The mapping lives in `mapPaymentOptionsToContributionSettings()` in `contributio
 
 **Tax deductibility**
 
-`SecurityNotice` (shown below the donation form) derives `isTaxDeductible` from `paymentOptions.taxDeductionCountries` — this is an array of country codes where donations to this fundraiser are tax-deductible. We check whether `fundraiser.workspace.country` is in that list.
-
-Note: `src/lib/utils/country-currency.ts` contains a hardcoded `TAX_DEDUCTIBLE_COUNTRIES` set (`DE`, `US`, `ES`) with a `getTaxDeductibilityInfo()` helper. This predates the `paymentOptions` API and should not be used for the donation flow — `paymentOptions.taxDeductionCountries` is the authoritative source.
+`SecurityNotice` (shown below the donation form) derives `isTaxDeductible` from `getTaxDeductibilityInfo(fundraiser.workspace.country)` in `src/lib/utils/country-currency.ts`. This checks against a hardcoded `TAX_DEDUCTIBLE_COUNTRIES` set (`DE`, `US`, `ES`). `workspaceName` and `workspaceCountry` are extracted as variables in `FundraiserView` before being passed as props.
 
 **Client boundary**
 

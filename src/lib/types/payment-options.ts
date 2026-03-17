@@ -18,7 +18,6 @@ export interface PaymentOptions {
   currency: string;
   requestedCountry: string;
   effectiveCountry: string;
-  taxDeductionCountries: string[];
   frequencies: {
     once?: PaymentFrequency;
     monthly?: PaymentFrequency;

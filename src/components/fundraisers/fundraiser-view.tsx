@@ -12,6 +12,7 @@ import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
@@ -40,6 +41,10 @@ export function FundraiserView({
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
+  const workspaceName = fundraiser.workspace?.name ?? '';
+  const workspaceCountry = fundraiser.workspace?.country ?? '';
+  const isTaxDeductible =
+    getTaxDeductibilityInfo(workspaceCountry).isDeductible;
 
   return (
     <FundraiserLayout>
@@ -138,11 +143,9 @@ export function FundraiserView({
               paymentOptions={paymentOptions}
             />
             <SecurityNotice
-              organizationName={fundraiser.workspace?.name ?? ''}
-              countryCode={fundraiser.workspace?.country ?? ''}
-              isTaxDeductible={paymentOptions.taxDeductionCountries.includes(
-                fundraiser.workspace?.country ?? ''
-              )}
+              organizationName={workspaceName}
+              countryCode={workspaceCountry}
+              isTaxDeductible={isTaxDeductible}
             />
           </>
         ) : (
