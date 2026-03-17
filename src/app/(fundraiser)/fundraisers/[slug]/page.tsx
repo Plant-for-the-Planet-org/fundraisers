@@ -48,11 +48,7 @@ export default async function FundraiserPage({
     try {
       paymentOptions = await getPaymentOptions(fundraiser.id);
     } catch (e) {
-      if (e instanceof PlatformAPIError && e.status === 404) {
-        paymentOptions = undefined;
-      } else {
-        throw e;
-      }
+      if (!(e instanceof PlatformAPIError)) throw e;
     }
   }
 
