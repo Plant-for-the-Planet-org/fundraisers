@@ -120,6 +120,8 @@
         "removeCause": "Projekt entfernen",
         "allocationLabel": "{percentage, number}% Zuteilung",
         "projectImageAlt": "Bild für {name}",
+        "expandDescription": "Mehr lesen",
+        "collapseDescription": "Weniger lesen",
         "defaultCause": {
           "name": "Junge Menschen stärken und Wälder zurückbringen",
           "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen weltweit zu befähigen, Klimaschutzmaßnahmen umzusetzen. Wir stellen Wälder wieder her, bilden Gemeinschaften aus und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."

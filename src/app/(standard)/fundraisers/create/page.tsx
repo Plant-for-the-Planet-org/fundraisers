@@ -2,7 +2,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { ContributionSettings } from '@/components/fundraisers/contribution-settings';
 import { CreateFundraiserButton } from '@/components/fundraisers/create-fundraiser-button';
 import { CreateFundraiserFormProvider } from '@/components/fundraisers/create-fundraiser-form-context';
-import DescriptionInput from '@/components/fundraisers/description';
+import DescriptionInput from '@/components/fundraisers/description-input';
 import { DonorsPreview } from '@/components/fundraisers/donors-preview';
 import { GoalInput } from '@/components/fundraisers/goal-input';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
