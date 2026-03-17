@@ -29,8 +29,9 @@ function HostPreviewRead({ fundraiser }: { fundraiser?: Fundraiser }) {
   }
 
   const publicHosts = fundraiser.hosts.filter(host => host.isPublic);
+  const hostsToShow = publicHosts.length > 0 ? publicHosts : fundraiser.hosts;
 
-  if (publicHosts.length === 0) {
+  if (hostsToShow.length === 0) {
     return null;
   }
 
@@ -38,7 +39,7 @@ function HostPreviewRead({ fundraiser }: { fundraiser?: Fundraiser }) {
     <div className='flex flex-col gap-3'>
       <SectionHeader>{t('hostedByLabel')}</SectionHeader>
       <div className='flex flex-col gap-2'>
-        {publicHosts.map(host => {
+        {hostsToShow.map(host => {
           const hostName =
             host.displayName ?? host.user?.name ?? t('unknownHost');
           const avatarUrl = host.user?.avatar
