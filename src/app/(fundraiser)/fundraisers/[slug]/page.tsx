@@ -43,9 +43,18 @@ export default async function FundraiserPage({
     throw e;
   }
 
-  const paymentOptions = fundraiser.canDonate
-    ? await getPaymentOptions(fundraiser.id)
-    : undefined;
+  let paymentOptions;
+  if (fundraiser.canDonate) {
+    try {
+      paymentOptions = await getPaymentOptions(fundraiser.id);
+    } catch (e) {
+      if (e instanceof PlatformAPIError && e.status === 404) {
+        paymentOptions = undefined;
+      } else {
+        throw e;
+      }
+    }
+  }
 
   return (
     <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
