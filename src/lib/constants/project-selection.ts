@@ -8,6 +8,7 @@ export const DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY: Readonly<DefaultCauseIdByCo
   {
     DE: DEFAULT_NON_EARMARKED_CAUSE_ID,
     ES: 'proj_zNQk6R8H1C2fCKwrHEUYRHnz',
+    CH: 'proj_YeAk6Y7E3Es2LgHzgQ0aqw8l',
   };
 
 export const DEFAULT_NON_EARMARKED_CAUSE_FALLBACK = {
