@@ -1,22 +1,20 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { Target } from 'lucide-react';
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
-import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
-import { SectionHeader } from '@/components/fundraisers/typography';
-import { HostPreview } from '@/components/fundraisers/host-preview';
+import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
+import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
+import TitleDisplay from '@/components/fundraisers/title-display';
+import { SectionHeader } from '@/components/fundraisers/typography';
+import ImageDisplay from '@/components/fundraisers/image-display';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
+import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
+import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import { HostPreview } from '@/components/fundraisers/host-preview';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
-
-function getProjectImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
-}
+import { useTranslations } from 'next-intl';
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
@@ -42,19 +40,10 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
     <FundraiserLayout>
       <SidebarPanel>
         {/* Image */}
-        <div className='self-stretch h-80 relative rounded-2xl overflow-hidden bg-white/50 dark:bg-gray-800'>
-          {fundraiser.image ? (
-            <img
-              src={fundraiser.image}
-              alt={t('coverImageAlt', { title: fundraiser.title })}
-              className='w-full h-full object-cover'
-            />
-          ) : (
-            <div className='w-full h-full flex items-center justify-center'>
-              <Target className='w-16 h-16 text-gray-400' />
-            </div>
-          )}
-        </div>
+        <ImageDisplay
+          image={fundraiser.image}
+          alt={t('coverImageAlt', { title: fundraiser.title })}
+        />
 
         {/* Stats */}
         <div className='flex flex-col'>
@@ -101,12 +90,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <h1
-          className='text-4xl font-bold'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
-        >
-          {fundraiser.title}
-        </h1>
+        <TitleDisplay value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
@@ -123,67 +107,12 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         />
 
         {/* Description */}
-        {fundraiser.description && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>{t('create.description.label')}</SectionHeader>
-            <div
-              className='text-sm text-foreground leading-relaxed [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:pl-6 [&_ul]:list-disc [&_ol]:my-2 [&_ol]:pl-6 [&_ol]:list-decimal [&_li]:my-1 [&_blockquote]:pl-4 [&_blockquote]:border-l-4 [&_blockquote]:border-border [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through'
-              dangerouslySetInnerHTML={{ __html: fundraiser.description }}
-            />
-          </div>
-        )}
+        <DescriptionDisplay value={fundraiser.description} />
 
         {/* Project allocations */}
-        {fundraiser.projectAllocations.length > 0 && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('create.projectSelection.sectionHeading')}
-            </SectionHeader>
-            <div className='space-y-4'>
-              {fundraiser.projectAllocations.map((allocation, index) => {
-                const project = allocation.project;
-                const imageSource = getProjectImageSource(project.image);
-                const isLast =
-                  index === fundraiser.projectAllocations.length - 1;
-                return (
-                  <div key={project.id}>
-                    <div className='flex gap-4'>
-                      <div className='w-24 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center'>
-                        {imageSource ? (
-                          <img
-                            src={imageSource}
-                            alt={t('create.projectSelection.projectImageAlt', {
-                              name: project.name,
-                            })}
-                            className='w-full h-full object-cover'
-                          />
-                        ) : (
-                          <Target className='w-6 h-6 text-gray-400' />
-                        )}
-                      </div>
-                      <div className='flex-1 min-w-0'>
-                        <p className='text-zinc-800 dark:text-gray-100 text-base font-semibold leading-tight'>
-                          {project.name}
-                        </p>
-                        <p className='text-zinc-800 dark:text-gray-100 text-base font-normal leading-tight mt-1 line-clamp-3'>
-                          {project.description}
-                        </p>
-                        <span className='text-sm text-green-600 font-medium'>
-                          {t('create.projectSelection.allocationLabel', {
-                            percentage: allocation.percentage,
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                    {!isLast && (
-                      <div className='mt-3 h-px bg-gray-200 dark:bg-gray-700' />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <ProjectsSupportedDisplay
+          projectAllocations={fundraiser.projectAllocations}
+        />
       </MainPanel>
     </FundraiserLayout>
   );
