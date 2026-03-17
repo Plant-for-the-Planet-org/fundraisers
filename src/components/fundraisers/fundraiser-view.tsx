@@ -1,8 +1,11 @@
-import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
+import DescriptionDisplay from '@/components/fundraisers/description-display';
+import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
+import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
+import ImageDisplay from '@/components/fundraisers/image-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -11,9 +14,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
-import { Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import DescriptionDisplay from '@/components/fundraisers/description-display';
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
@@ -38,26 +39,16 @@ export function FundraiserView({
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
-
   const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
 
   return (
     <FundraiserLayout>
       <SidebarPanel>
         {/* Image */}
-        <div className='self-stretch h-80 relative rounded-2xl overflow-hidden bg-white/50 dark:bg-gray-800'>
-          {fundraiser.image ? (
-            <img
-              src={fundraiser.image}
-              alt={t('coverImageAlt', { title: fundraiser.title })}
-              className='w-full h-full object-cover'
-            />
-          ) : (
-            <div className='w-full h-full flex items-center justify-center'>
-              <Target className='w-16 h-16 text-gray-400' />
-            </div>
-          )}
-        </div>
+        <ImageDisplay
+          image={fundraiser.image}
+          alt={t('coverImageAlt', { title: fundraiser.title })}
+        />
 
         {/* Stats */}
         <div className='flex flex-col'>
@@ -137,12 +128,7 @@ export function FundraiserView({
 
       <MainPanel>
         {/* Title */}
-        <h1
-          className='text-4xl font-bold'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
-        >
-          {fundraiser.title}
-        </h1>
+        <TitleDisplay value={fundraiser.title} />
 
         {/* Donation form + overlay */}
         {fundraiser.canDonate && paymentOptions ? (
