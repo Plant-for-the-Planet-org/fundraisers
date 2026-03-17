@@ -1,14 +1,13 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { Controller, useFormContext } from 'react-hook-form';
-
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
+import { Controller, useFormContext } from 'react-hook-form';
 
-export function Description() {
+export default function DescriptionInput() {
   const t = useTranslations('Fundraisers.create.description');
   const descriptionId = 'form-description';
   const errorId = `${descriptionId}-error`;
