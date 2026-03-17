@@ -20,9 +20,15 @@ Key differences from the old approach:
 
 The mapping lives in `mapPaymentOptionsToContributionSettings()` in `contribution-utils.ts`. The old `mapContributionSettings()` is kept as a fallback but is no longer used in the donation flow.
 
-**`canDonate` flag**
+**`canDonate` flag and closed state**
 
-`paymentOptions` is only fetched when `fundraiser.canDonate` is true. `FundraiserView` gates `DonationSection` on `paymentOptions` being defined — so if the fundraiser can't accept donations, the form simply isn't rendered. A `ClosedForContribution` component still needs to be added (see below).
+`paymentOptions` is only fetched when `fundraiser.canDonate` is true. `FundraiserView` gates `DonationSection` on both `fundraiser.canDonate && paymentOptions`. When either is falsy, `ClosedForContribution` is shown instead, with an optional custom message from `fundraiser.metadata?.closedMessage`.
+
+**Tax deductibility**
+
+`SecurityNotice` (shown below the donation form) derives `isTaxDeductible` from `paymentOptions.taxDeductionCountries` — this is an array of country codes where donations to this fundraiser are tax-deductible. We check whether `fundraiser.workspace.country` is in that list.
+
+Note: `src/lib/utils/country-currency.ts` contains a hardcoded `TAX_DEDUCTIBLE_COUNTRIES` set (`DE`, `US`, `ES`) with a `getTaxDeductibilityInfo()` helper. This predates the `paymentOptions` API and should not be used for the donation flow — `paymentOptions.taxDeductionCountries` is the authoritative source.
 
 **Client boundary**
 
