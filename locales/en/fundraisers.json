@@ -11,6 +11,14 @@
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
+    "closedForContribution": {
+      "title": "Thank you for your support!",
+      "defaultMessage": "This fundraiser has been archived and no longer accepts new donations."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
+      "withoutTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b>."
+    },
     "create": {
       "goalPreview": {
         "raised": "{amount} raised",

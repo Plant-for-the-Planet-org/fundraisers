@@ -1,5 +1,7 @@
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
+import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
+import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
@@ -143,10 +145,27 @@ export function FundraiserView({
         </h1>
 
         {/* Donation form + overlay */}
-        {paymentOptions && (
-          <DonationSection
-            fundraiser={fundraiser}
-            paymentOptions={paymentOptions}
+        {fundraiser.canDonate && paymentOptions ? (
+          <>
+            <DonationSection
+              fundraiser={fundraiser}
+              paymentOptions={paymentOptions}
+            />
+            <SecurityNotice
+              organizationName={fundraiser.workspace?.name ?? ''}
+              countryCode={fundraiser.workspace?.country ?? ''}
+              isTaxDeductible={paymentOptions.taxDeductionCountries.includes(
+                fundraiser.workspace?.country ?? ''
+              )}
+            />
+          </>
+        ) : (
+          <ClosedForContribution
+            message={
+              typeof fundraiser.metadata?.closedMessage === 'string'
+                ? fundraiser.metadata.closedMessage
+                : undefined
+            }
           />
         )}
 

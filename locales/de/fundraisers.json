@@ -11,6 +11,14 @@
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
+    "closedForContribution": {
+      "title": "Vielen Dank für deine Unterstützung!",
+      "defaultMessage": "Diese Spendenaktion wurde archiviert und akzeptiert keine neuen Spenden mehr."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country} und ist steuerlich absetzbar in {country}.",
+      "withoutTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country}."
+    },
     "create": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
