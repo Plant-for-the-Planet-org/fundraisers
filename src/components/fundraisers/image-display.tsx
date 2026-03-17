@@ -1,7 +1,5 @@
-import { Target } from 'lucide-react';
-
-import { cn } from '@/lib/utils/cn';
 import { getImageUrl } from '@/lib/utils/images';
+import { ImageComponentBase } from './image-component-base';
 
 interface ImageDisplayProps {
   image: string | null | undefined;
@@ -25,23 +23,11 @@ export default function ImageDisplay({
   const imageUrl = getFundraiserImageSource(image);
 
   return (
-    <div
-      className={cn(
-        'self-stretch h-80 relative bg-white/50 dark:bg-gray-800 rounded-2xl overflow-hidden',
-        className
-      )}
-    >
-      {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={alt}
-          className={cn('w-full h-full object-cover', imageClassName)}
-        />
-      ) : (
-        <div className='w-full h-full flex items-center justify-center'>
-          <Target className='w-16 h-16 text-gray-400' />
-        </div>
-      )}
-    </div>
+    <ImageComponentBase
+      imageUrl={imageUrl}
+      alt={alt}
+      className={className}
+      imageClassName={imageClassName}
+    />
   );
 }

@@ -16,6 +16,7 @@ import {
   pickRandomPhoto,
   revokeSelectedImageObjectUrl,
 } from '@/lib/utils/image-selection';
+import { cn } from '@/lib/utils';
 
 export function ImageSelector() {
   const t = useTranslations('Fundraisers.create.image');
@@ -116,8 +117,11 @@ export function ImageSelector() {
     void loadDefaultImage(true);
   }, [loadDefaultImage]);
 
+  const baseClassName =
+    'w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400';
+
   const fallbackContent = defaultImageError ? (
-    <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-4'>
+    <div className={cn(baseClassName, 'px-4')}>
       <ImageIcon className='w-16 h-16 mb-4' />
       <p className='text-sm font-medium mb-2'>{t('states.errorTitle')}</p>
       <p className='text-xs text-center mb-4'>{defaultImageError}</p>
@@ -125,13 +129,14 @@ export function ImageSelector() {
         className='inline-flex items-center gap-2 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
         onClick={handleRetryDefaultImage}
         type='button'
+        aria-label={t('actions.retry')}
       >
         <RefreshCw className='w-4 h-4' />
         {t('actions.retry')}
       </button>
     </div>
   ) : (
-    <div className='w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400'>
+    <div className={baseClassName}>
       {isLoadingDefaultImage && (
         <RefreshCw className='w-8 h-8 mb-4 animate-spin' />
       )}
