@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
+import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
@@ -42,5 +43,11 @@ export default async function FundraiserPage({
     throw e;
   }
 
-  return <FundraiserView fundraiser={fundraiser} />;
+  const paymentOptions = fundraiser.canDonate
+    ? await getPaymentOptions(fundraiser.id)
+    : undefined;
+
+  return (
+    <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+  );
 }

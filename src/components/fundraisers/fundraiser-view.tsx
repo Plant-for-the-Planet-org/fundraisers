@@ -1,13 +1,12 @@
-'use client';
-
-import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
+import { DonationSection } from '@/components/fundraisers/donation-section';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { Target } from 'lucide-react';
@@ -23,7 +22,13 @@ function getDaysLeft(endDate: string): number {
   );
 }
 
-export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
+export function FundraiserView({
+  fundraiser,
+  paymentOptions,
+}: {
+  fundraiser: Fundraiser;
+  paymentOptions?: PaymentOptions;
+}) {
   const t = useTranslations('Fundraisers');
 
   const progressPercent =
@@ -33,8 +38,6 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
   const daysLeft = getDaysLeft(fundraiser.endDate);
 
   const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
-
-  const contribution = fundraiser.settings?.modules?.contribution;
 
   return (
     <FundraiserLayout>
@@ -139,19 +142,13 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
           {fundraiser.title}
         </h1>
 
-        {/* Donation form */}
-        <DonationForm
-          currency={fundraiser.currency}
-          contributionSettings={
-            contribution
-              ? {
-                  allow_dedication: contribution.allow_dedication,
-                  allow_recurrency: contribution.allow_recurrency,
-                }
-              : undefined
-          }
-          onDonate={() => {}}
-        />
+        {/* Donation form + overlay */}
+        {paymentOptions && (
+          <DonationSection
+            fundraiser={fundraiser}
+            paymentOptions={paymentOptions}
+          />
+        )}
 
         {/* Description */}
         <DescriptionDisplay value={fundraiser.description} />
