@@ -11,6 +11,12 @@
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut oder stöbere in anderen Fundraisern.",
+      "retry": "Erneut versuchen",
+      "browse": "Fundraiser durchsuchen"
+    },
     "closedForContribution": {
       "title": "Vielen Dank für deine Unterstützung!",
       "defaultMessage": "Diese Spendenaktion wurde archiviert und akzeptiert keine neuen Spenden mehr."

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 export default function FundraiserError({
@@ -12,6 +13,8 @@ export default function FundraiserError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations('Fundraisers.error');
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -20,18 +23,15 @@ export default function FundraiserError({
     <div className='flex flex-col items-center justify-center gap-6 py-24 text-center'>
       <AlertCircle className='w-12 h-12 text-muted-foreground' />
       <div className='flex flex-col gap-2'>
-        <h1 className='text-xl font-semibold text-foreground'>
-          Something went wrong
-        </h1>
+        <h1 className='text-xl font-semibold text-foreground'>{t('title')}</h1>
         <p className='text-sm text-muted-foreground max-w-sm'>
-          This fundraiser could not be loaded. Please try again, or browse other
-          fundraisers.
+          {t('description')}
         </p>
       </div>
       <div className='flex gap-3'>
-        <Button onClick={reset}>Try again</Button>
+        <Button onClick={reset}>{t('retry')}</Button>
         <Button variant='outline' asChild>
-          <Link href='/explore'>Browse fundraisers</Link>
+          <Link href='/explore'>{t('browse')}</Link>
         </Button>
       </div>
     </div>
