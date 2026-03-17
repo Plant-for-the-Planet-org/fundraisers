@@ -4,6 +4,7 @@ import type { ProjectAllocation } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { getImageUrl } from '@/lib/utils/images';
 
@@ -24,13 +25,16 @@ function ProjectItem({ project }: ProjectItemProps) {
 
   return (
     <li className='project-item flex gap-4'>
-      {imageSource && (
+      {imageSource !== null && (
         <div className='w-24 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800'>
           <img
             src={imageSource}
             alt={t('projectImageAlt', { name: project.name })}
             className='w-full h-full object-cover'
             loading='lazy'
+            onError={e => {
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
           />
         </div>
       )}
@@ -43,7 +47,10 @@ function ProjectItem({ project }: ProjectItemProps) {
           <div className='flex flex-col gap-1 items-start'>
             <p
               id={descriptionId}
-              className={`text-foreground text-base font-normal leading-tight${!isExpanded && needsTruncation ? ' line-clamp-3' : ''}`}
+              className={cn(
+                'text-foreground text-base font-normal leading-tight',
+                { 'line-clamp-3': !isExpanded && needsTruncation }
+              )}
             >
               {description}
             </p>
