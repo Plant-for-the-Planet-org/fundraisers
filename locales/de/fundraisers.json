@@ -130,6 +130,7 @@
       },
       "projectSelection": {
         "sectionHeading": "Von dieser Fundraiser unterstützte Projekte",
+        "viewModeSectionHeading": "Von dieser Fundraiser unterstützte Projekte",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
         "allocationLabel": "{percentage, number}% Zuteilung",
