@@ -2,8 +2,8 @@
 
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
+import { Title } from '@/components/fundraisers/title';
 import { SectionHeader } from '@/components/fundraisers/typography';
-import TitleDisplay from '@/components/fundraisers/title-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -138,7 +138,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <TitleDisplay value={fundraiser.title} />
+        <Title mode='read' value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
