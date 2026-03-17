@@ -2,9 +2,9 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { useTranslations } from 'next-intl';
 import { useWatch } from 'react-hook-form';
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 export function GoalPreview() {
   const t = useTranslations('Fundraisers.create.goalPreview');
@@ -43,10 +43,7 @@ export function GoalPreview() {
       <div className='mt-2 flex items-center justify-between text-sm text-zinc-800 dark:text-gray-300'>
         <div>
           {t('goalLine', {
-            amount: formatCurrencyFromDecimal(
-              safeGoalAmount,
-              previewCurrency
-            ),
+            amount: formatCurrencyFromDecimal(safeGoalAmount, previewCurrency),
           })}
         </div>
         <div>{t('daysLeft', { days: 42 })}</div>
