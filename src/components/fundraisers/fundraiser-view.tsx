@@ -2,7 +2,8 @@
 
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationForm } from '@/components/fundraisers/donation-form';
-import { Title } from '@/components/fundraisers/title';
+import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
+import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
@@ -13,12 +14,6 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-
-function getProjectImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
-}
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
@@ -138,7 +133,7 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
 
       <MainPanel>
         {/* Title */}
-        <Title mode='read' value={fundraiser.title} />
+        <TitleDisplay value={fundraiser.title} />
 
         {/* Donation form */}
         <DonationForm
@@ -158,56 +153,9 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         <DescriptionDisplay value={fundraiser.description} />
 
         {/* Project allocations */}
-        {fundraiser.projectAllocations.length > 0 && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('create.projectSelection.sectionHeading')}
-            </SectionHeader>
-            <div className='space-y-4'>
-              {fundraiser.projectAllocations.map((allocation, index) => {
-                const project = allocation.project;
-                const imageSource = getProjectImageSource(project.image);
-                const isLast =
-                  index === fundraiser.projectAllocations.length - 1;
-                return (
-                  <div key={project.id}>
-                    <div className='flex gap-4'>
-                      <div className='w-24 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center'>
-                        {imageSource ? (
-                          <img
-                            src={imageSource}
-                            alt={t('create.projectSelection.projectImageAlt', {
-                              name: project.name,
-                            })}
-                            className='w-full h-full object-cover'
-                          />
-                        ) : (
-                          <Target className='w-6 h-6 text-gray-400' />
-                        )}
-                      </div>
-                      <div className='flex-1 min-w-0'>
-                        <p className='text-zinc-800 dark:text-gray-100 text-base font-semibold leading-tight'>
-                          {project.name}
-                        </p>
-                        <p className='text-zinc-800 dark:text-gray-100 text-base font-normal leading-tight mt-1 line-clamp-3'>
-                          {project.description}
-                        </p>
-                        <span className='text-sm text-green-600 font-medium'>
-                          {t('create.projectSelection.allocationLabel', {
-                            percentage: allocation.percentage,
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                    {!isLast && (
-                      <div className='mt-3 h-px bg-gray-200 dark:bg-gray-700' />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <ProjectsSupportedDisplay
+          projectAllocations={fundraiser.projectAllocations}
+        />
       </MainPanel>
     </FundraiserLayout>
   );
