@@ -5,6 +5,7 @@ import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
+import ImageDisplay from '@/components/fundraisers/image-display';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -12,7 +13,6 @@ import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
-import { Target } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 function getDaysLeft(endDate: string): number {
@@ -32,7 +32,6 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
-
   const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
 
   const contribution = fundraiser.settings?.modules?.contribution;
@@ -41,19 +40,10 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
     <FundraiserLayout>
       <SidebarPanel>
         {/* Image */}
-        <div className='self-stretch h-80 relative rounded-2xl overflow-hidden bg-white/50 dark:bg-gray-800'>
-          {fundraiser.image ? (
-            <img
-              src={fundraiser.image}
-              alt={t('coverImageAlt', { title: fundraiser.title })}
-              className='w-full h-full object-cover'
-            />
-          ) : (
-            <div className='w-full h-full flex items-center justify-center'>
-              <Target className='w-16 h-16 text-gray-400' />
-            </div>
-          )}
-        </div>
+        <ImageDisplay
+          image={fundraiser.image}
+          alt={t('coverImageAlt', { title: fundraiser.title })}
+        />
 
         {/* Stats */}
         <div className='flex flex-col'>
