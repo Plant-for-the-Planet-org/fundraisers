@@ -2,12 +2,13 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { useTranslations } from 'next-intl';
+import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { useWatch } from 'react-hook-form';
 
+const PREVIEW_PROGRESS_PERCENTAGE = 40;
+const PREVIEW_DAYS_LEFT = 42;
+
 export function GoalPreview() {
-  const t = useTranslations('Fundraisers.create.goalPreview');
   const goalAmount = useWatch<CreateFundraiserFormValues, 'goalAmount'>({
     name: 'goalAmount',
   });
@@ -19,35 +20,17 @@ export function GoalPreview() {
     typeof goalAmount === 'number' && Number.isFinite(goalAmount)
       ? goalAmount
       : 0;
-  const previewCurrency = currency ?? 'USD';
-  const progress = 40;
-  const raisedAmount = Math.round((safeGoalAmount * progress) / 100);
+  const raisedAmount = Math.round(
+    (safeGoalAmount * PREVIEW_PROGRESS_PERCENTAGE) / 100
+  );
 
   return (
-    <div className='flex flex-col'>
-      <div className='text-zinc-800 dark:text-gray-100 text-lg font-bold'>
-        {t('raised', {
-          amount: formatCurrencyFromDecimal(raisedAmount, previewCurrency),
-        })}
-      </div>
-
-      <div className='mt-2'>
-        <div className='h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden'>
-          <div
-            className='h-full bg-green-600'
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      <div className='mt-2 flex items-center justify-between text-sm text-zinc-800 dark:text-gray-300'>
-        <div>
-          {t('goalLine', {
-            amount: formatCurrencyFromDecimal(safeGoalAmount, previewCurrency),
-          })}
-        </div>
-        <div>{t('daysLeft', { days: 42 })}</div>
-      </div>
-    </div>
+    <GoalProgressDisplay
+      raisedAmount={raisedAmount}
+      goalAmount={safeGoalAmount}
+      currency={currency ?? 'EUR'}
+      progress={PREVIEW_PROGRESS_PERCENTAGE}
+      daysLeft={PREVIEW_DAYS_LEFT}
+    />
   );
 }

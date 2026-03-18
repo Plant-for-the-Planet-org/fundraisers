@@ -4,7 +4,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
-import GoalPreviewDisplay from '@/components/fundraisers/goal-preview-display';
+import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
@@ -17,6 +17,15 @@ import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
+
+function getDaysLeft(endDate: string): number {
+  const end = new Date(endDate);
+  const now = new Date();
+  return Math.max(
+    0,
+    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  );
+}
 
 export function FundraiserView({
   fundraiser,
@@ -32,6 +41,11 @@ export function FundraiserView({
   const workspaceCountry = fundraiser.workspace?.country ?? '';
   const isTaxDeductible =
     getTaxDeductibilityInfo(workspaceCountry).isDeductible;
+  const goalProgress =
+    fundraiser.goalAmount > 0
+      ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
+      : 0;
+  const daysLeft = getDaysLeft(fundraiser.endDate);
 
   return (
     <FundraiserLayout>
@@ -42,8 +56,22 @@ export function FundraiserView({
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
 
-        {/* Stats */}
-        <GoalPreviewDisplay fundraiser={fundraiser} />
+        {/* Goal progress */}
+        <GoalProgressDisplay
+          raisedAmount={fundraiser.totalRaised}
+          goalAmount={fundraiser.goalAmount}
+          currency={fundraiser.currency}
+          progress={goalProgress}
+          daysLeft={daysLeft}
+        />
+
+        {/* Donation count */}
+        <div className='text-foreground text-sm font-semibold leading-tight'>
+          {t('donationCount', {
+            count: fundraiser.donationCount,
+            formattedCount: fundraiser.donationCount.toLocaleString(),
+          })}
+        </div>
 
         {/* Hosts */}
         {publicHosts.length > 0 && (
