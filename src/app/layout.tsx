@@ -14,6 +14,8 @@ import { LocaleInitializer } from '@/components/locale-initializer';
 import './globals.css';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
+import { CookieConsentProvider } from '@/components/cookie/cookie-consent-provider';
+import 'vanilla-cookieconsent/dist/cookieconsent.css';
 
 const openSans = Open_Sans({
   variable: '--font-open-sans-var',
@@ -70,6 +72,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <LocaleInitializer initialLocale={locale} />
           <AuthInitializer />
+          <CookieConsentProvider />
           {children}
         </NextIntlClientProvider>
       </body>
