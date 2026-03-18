@@ -6,7 +6,7 @@ import DescriptionInput from '@/components/fundraisers/description-input';
 import { DonorsPreview } from '@/components/fundraisers/donors-preview';
 import { GoalInput } from '@/components/fundraisers/goal-input';
 import { GoalPreview } from '@/components/fundraisers/goal-preview';
-import { HostPreview } from '@/components/fundraisers/host-preview';
+import { Hosts } from '@/components/fundraisers/hosts';
 import { ImageSelector } from '@/components/fundraisers/image-selector';
 import { Options } from '@/components/fundraisers/options';
 import { ProjectSelection } from '@/components/fundraisers/project-selection';
@@ -27,7 +27,7 @@ export default function CreateFundraiserPage() {
             <ImageSelector />
             <GoalPreview />
             <DonorsPreview />
-            <HostPreview />
+            <Hosts mode='preview' />
             <ThemeSettings />
           </SidebarPanel>
           <MainPanel>

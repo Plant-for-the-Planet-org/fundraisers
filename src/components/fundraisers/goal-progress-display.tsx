@@ -5,7 +5,7 @@ interface GoalProgressDisplayProps {
   raisedAmount: number;
   goalAmount: number;
   currency: string;
-  progress: number;
+  progressPercentage: number;
   daysLeft: number;
 }
 
@@ -13,7 +13,7 @@ export function GoalProgressDisplay({
   raisedAmount,
   goalAmount,
   currency,
-  progress,
+  progressPercentage,
   daysLeft,
 }: GoalProgressDisplayProps) {
   const t = useTranslations('Fundraisers.create.goalPreview');
@@ -30,7 +30,7 @@ export function GoalProgressDisplay({
         <div className='h-2 w-full rounded-full bg-muted overflow-hidden'>
           <div
             className='h-full bg-accent-color'
-            style={{ width: `${progress}%` }}
+            style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </div>
