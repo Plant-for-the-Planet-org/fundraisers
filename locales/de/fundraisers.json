@@ -11,6 +11,20 @@
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut oder stöbere in anderen Fundraisern.",
+      "retry": "Erneut versuchen",
+      "browse": "Fundraiser durchsuchen"
+    },
+    "closedForContribution": {
+      "title": "Vielen Dank für deine Unterstützung!",
+      "defaultMessage": "Diese Spendenaktion wurde archiviert und akzeptiert keine neuen Spenden mehr."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country} und ist steuerlich absetzbar in {country}.",
+      "withoutTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country}."
+    },
     "create": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -116,6 +130,7 @@
       },
       "projectSelection": {
         "sectionHeading": "Von dieser Fundraiser unterstützte Projekte",
+        "viewModeSectionHeading": "Von dieser Fundraiser unterstützte Projekte",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
         "allocationLabel": "{percentage, number}% Zuteilung",

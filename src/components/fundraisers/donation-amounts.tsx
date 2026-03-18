@@ -30,6 +30,11 @@ export function DonationAmounts({
   const [isCustomInputSelected, setIsCustomInputSelected] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
+  const symbol = getCurrencySymbol(currency);
+  const currencyCode = currency.toUpperCase();
+  const currencyLabel =
+    symbol === currencyCode ? currencyCode : `${symbol} ${currencyCode}`;
+
   return (
     <div className='space-y-4'>
       {/* Preset amounts */}
@@ -153,7 +158,7 @@ export function DonationAmounts({
             </div>
           )}
           <div className='flex items-center gap-1 text-foreground font-bold pointer-events-none'>
-            {getCurrencySymbol(currency)} {currency.toUpperCase()}
+            {currencyLabel}
           </div>
         </div>
       )}

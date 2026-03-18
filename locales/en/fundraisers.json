@@ -11,6 +11,20 @@
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
+    "error": {
+      "title": "Something went wrong",
+      "description": "This fundraiser could not be loaded. Please try again, or browse other fundraisers.",
+      "retry": "Try again",
+      "browse": "Browse fundraisers"
+    },
+    "closedForContribution": {
+      "title": "Thank you for your support!",
+      "defaultMessage": "This fundraiser has been archived and no longer accepts new donations."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
+      "withoutTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b>."
+    },
     "create": {
       "goalPreview": {
         "raised": "{amount} raised",
