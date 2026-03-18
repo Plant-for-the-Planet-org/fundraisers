@@ -1,7 +1,7 @@
-'use client';
-
+import { DonationSection } from '@/components/fundraisers/donation-section';
+import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
+import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
-import { DonationForm } from '@/components/fundraisers/donation-form';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
@@ -12,6 +12,8 @@ import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { HostPreview } from '@/components/fundraisers/host-preview';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
+import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
@@ -25,7 +27,13 @@ function getDaysLeft(endDate: string): number {
   );
 }
 
-export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
+export function FundraiserView({
+  fundraiser,
+  paymentOptions,
+}: {
+  fundraiser: Fundraiser;
+  paymentOptions?: PaymentOptions;
+}) {
   const t = useTranslations('Fundraisers');
 
   const progressPercent =
@@ -33,8 +41,11 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
-
-  const contribution = fundraiser.settings?.modules?.contribution;
+  const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
+  const workspaceName = fundraiser.workspace?.name ?? '';
+  const workspaceCountry = fundraiser.workspace?.country ?? '';
+  const isTaxDeductible =
+    getTaxDeductibilityInfo(workspaceCountry).isDeductible;
 
   return (
     <FundraiserLayout>
@@ -92,19 +103,28 @@ export function FundraiserView({ fundraiser }: { fundraiser: Fundraiser }) {
         {/* Title */}
         <TitleDisplay value={fundraiser.title} />
 
-        {/* Donation form */}
-        <DonationForm
-          currency={fundraiser.currency}
-          contributionSettings={
-            contribution
-              ? {
-                  allow_dedication: contribution.allow_dedication,
-                  allow_recurrency: contribution.allow_recurrency,
-                }
-              : undefined
-          }
-          onDonate={() => {}}
-        />
+        {/* Donation form + overlay */}
+        {fundraiser.canDonate && paymentOptions ? (
+          <>
+            <DonationSection
+              fundraiser={fundraiser}
+              paymentOptions={paymentOptions}
+            />
+            <SecurityNotice
+              organizationName={workspaceName}
+              countryCode={workspaceCountry}
+              isTaxDeductible={isTaxDeductible}
+            />
+          </>
+        ) : (
+          <ClosedForContribution
+            message={
+              typeof fundraiser.metadata?.closedMessage === 'string'
+                ? fundraiser.metadata.closedMessage
+                : undefined
+            }
+          />
+        )}
 
         {/* Description */}
         <DescriptionDisplay value={fundraiser.description} />

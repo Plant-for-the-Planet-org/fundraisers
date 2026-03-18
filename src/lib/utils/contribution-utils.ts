@@ -1,8 +1,13 @@
 import type {
   ContributionModuleSettings,
   ContributionOption,
+  FundraiserSettings,
   RecurrencyType,
 } from '@/lib/types/fundraiser';
+import type {
+  PaymentFrequency,
+  PaymentOptions,
+} from '@/lib/types/payment-options';
 
 const DEFAULT_CONTRIBUTION_SETTINGS: Required<ContributionModuleSettings> = {
   recurrency_options: ['one_time', 'monthly', 'annual'],
@@ -80,4 +85,67 @@ export function getCustomOption(
 ): ContributionOption | null {
   if (!Array.isArray(options)) return null;
   return options.find(option => option.amount_cent === 'custom') ?? null;
+}
+
+export function mapContributionSettings(
+  raw: FundraiserSettings['modules']['contribution']
+): ContributionModuleSettings | undefined {
+  if (!raw) return undefined;
+  return {
+    allow_dedication: raw.allow_dedication,
+    allow_recurrency: raw.allow_recurrency,
+    options: raw.options?.map(opt => ({
+      amount_cent:
+        opt.unit !== undefined ? opt.unit * 100 : ('custom' as const),
+      label: opt.label ?? null,
+      sub_label: opt.sub_label ?? null,
+    })),
+  };
+}
+
+function mapFrequencyOptions(
+  frequency: PaymentFrequency
+): ContributionOption[] {
+  return frequency.options.map(opt => ({
+    amount_cent: opt.quantity !== null ? opt.quantity * 100 : 'custom',
+    label: opt.caption,
+    sub_label: null,
+    default: opt.isDefault,
+    ...(opt.quantity === null && { min: frequency.minQuantity * 100 }),
+  }));
+}
+
+const API_FREQUENCY_TO_RECURRENCY: Record<string, RecurrencyType> = {
+  once: 'one_time',
+  monthly: 'monthly',
+  yearly: 'annual',
+};
+
+export function mapPaymentOptionsToContributionSettings(
+  paymentOptions: PaymentOptions,
+  fundraiserContribution?: FundraiserSettings['modules']['contribution']
+): ContributionModuleSettings {
+  const recurrencyOptions = (
+    Object.keys(paymentOptions.frequencies) as Array<
+      keyof typeof paymentOptions.frequencies
+    >
+  )
+    .map(key => API_FREQUENCY_TO_RECURRENCY[key])
+    .filter((r): r is RecurrencyType => r !== undefined);
+
+  const baseFrequency =
+    paymentOptions.frequencies.once ??
+    paymentOptions.frequencies[
+      Object.keys(
+        paymentOptions.frequencies
+      )[0] as keyof typeof paymentOptions.frequencies
+    ];
+
+  return {
+    recurrency_options: recurrencyOptions,
+    options: baseFrequency ? mapFrequencyOptions(baseFrequency) : undefined,
+    allow_recurrency: paymentOptions.recurrency.supported,
+    allow_dedication: fundraiserContribution?.allow_dedication,
+    show_totals_on_fundraiser: undefined,
+  };
 }
