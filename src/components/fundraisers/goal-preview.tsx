@@ -29,7 +29,7 @@ export function GoalPreview() {
       raisedAmount={raisedAmount}
       goalAmount={safeGoalAmount}
       currency={currency ?? 'EUR'}
-      progress={PREVIEW_PROGRESS_PERCENTAGE}
+      progressPercentage={PREVIEW_PROGRESS_PERCENTAGE}
       daysLeft={PREVIEW_DAYS_LEFT}
     />
   );
