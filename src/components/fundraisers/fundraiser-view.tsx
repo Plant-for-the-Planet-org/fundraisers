@@ -1,30 +1,22 @@
-import { DonationSection } from '@/components/fundraisers/donation-section';
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
+
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
-import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
-import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
-import TitleDisplay from '@/components/fundraisers/title-display';
+import { DonationSection } from '@/components/fundraisers/donation-section';
 import GoalPreviewDisplay from '@/components/fundraisers/goal-preview-display';
+import ImageDisplay from '@/components/fundraisers/image-display';
+import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
+import { SecurityNotice } from '@/components/fundraisers/security-notice';
+import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentOptions } from '@/lib/types/payment-options';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
-
-function getDaysLeft(endDate: string): number {
-  const end = new Date(endDate);
-  const now = new Date();
-  return Math.max(
-    0,
-    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  );
-}
 
 export function FundraiserView({
   fundraiser,
