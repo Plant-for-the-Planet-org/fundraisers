@@ -1,14 +1,11 @@
 'use client';
 
-// Temporary overlay to display donation details after user clicks "Donate" in the DonationForm. This is a placeholder for the actual payment flow, which will be implemented in a future iteration.
+import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils/currency';
-import type { Fundraiser } from '@/lib/types/fundraiser';
 
 export interface DonationData {
   amount: number;
@@ -66,146 +63,47 @@ export function DonateOverlay({
 
   if (!mounted || !isOpen || !donationData) return null;
 
-  const lineItems = fundraiser.projectAllocations.map(allocation => ({
-    project: allocation.project,
-    amount: (donationData.amount / 100) * (allocation.percentage / 100),
-    percentage: allocation.percentage,
-  }));
-
-  return createPortal(
-    <div className='fixed inset-0 z-50 overflow-y-auto'>
-      {/* Backdrop */}
-      <div
-        className='fixed inset-0 bg-black/50'
+  const overlayContent = (
+    <div
+      className='fixed inset-0 z-50 bg-gray-50 overflow-auto'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='donate-overlay-title'
+    >
+      {/* Close button — fixed so it stays visible while scrolling */}
+      <button
+        type='button'
         onClick={onClose}
-        aria-hidden='true'
-      />
+        className='fixed top-6 right-6 z-10 p-3 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all hover:bg-gray-50'
+        aria-label='Close donation overlay'
+      >
+        <X className='w-5 h-5 text-gray-600' />
+      </button>
 
-      {/* Panel */}
-      <div className='relative bg-background min-h-full w-full flex flex-col'>
-        {/* Header */}
-        <div className='flex items-center justify-between px-5 py-4 border-b border-border'>
-          <h2 className='text-base font-semibold text-foreground'>
-            Complete Your Donation
-          </h2>
-          <button
-            onClick={onClose}
-            className='text-muted-foreground hover:text-foreground transition-colors'
-            aria-label='Close'
-          >
-            <X className='w-5 h-5' />
-          </button>
-        </div>
+      <div className='w-full max-w-5xl mx-auto px-6 py-12'>
+        <div className='flex flex-col lg:flex-row gap-8'>
+          {/* Left Column */}
+          <div className='flex-1 flex flex-col gap-6'>
+            {/* Error Message */}
+            {/* Success Message */}
+            {/* Custom Fields Section */}
+            {/* Payment Methods Section */}
+            <div className='h-20 bg-gray-100 rounded-md' />
+            <div className='h-40 bg-gray-100 rounded-md' />
+            <div className='h-60 bg-gray-100 rounded-md' />
+          </div>
 
-        <div className='flex flex-col gap-5 p-5'>
-          {/* Donation summary */}
-          <section className='flex flex-col gap-2'>
-            <h3 className='text-sm font-semibold text-muted-foreground uppercase tracking-wide'>
-              Donation Summary
-            </h3>
-            <div className='bg-muted rounded-xl p-4 flex flex-col gap-2'>
-              <div className='flex justify-between text-sm'>
-                <span className='text-muted-foreground'>Amount</span>
-                <span className='font-semibold text-foreground'>
-                  {formatCurrency(donationData.amount, donationData.currency)}
-                </span>
-              </div>
-              <div className='flex justify-between text-sm'>
-                <span className='text-muted-foreground'>Frequency</span>
-                <span className='font-medium text-foreground'>
-                  {FREQUENCY_LABELS[donationData.frequency] ??
-                    donationData.frequency}
-                </span>
-              </div>
-              {donationData.dedicated && (
-                <div className='flex justify-between text-sm'>
-                  <span className='text-muted-foreground'>Dedicated gift</span>
-                  <span className='font-medium text-foreground'>Yes</span>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Project line items */}
-          {lineItems.length > 0 && (
-            <section className='flex flex-col gap-2'>
-              <h3 className='text-sm font-semibold text-muted-foreground uppercase tracking-wide'>
-                Project Allocation
-              </h3>
-              <div className='flex flex-col gap-2'>
-                {lineItems.map(item => (
-                  <div
-                    key={item.project.id}
-                    className='flex justify-between items-center text-sm'
-                  >
-                    <span className='text-foreground flex-1 min-w-0 truncate pr-4'>
-                      {item.project.name}
-                    </span>
-                    <span className='text-muted-foreground shrink-0'>
-                      {item.percentage}% &mdash;{' '}
-                      {formatCurrency(
-                        Math.round(item.amount * 100),
-                        donationData.currency
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Debug: raw donation data */}
-          <section className='flex flex-col gap-2'>
-            <h3 className='text-sm font-semibold text-muted-foreground uppercase tracking-wide'>
-              Debug: Donation Data
-            </h3>
-            <pre className='bg-muted rounded-xl p-4 text-xs text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all'>
-              {JSON.stringify(donationData, null, 2)}
-            </pre>
-          </section>
-
-          {/* Donor details (placeholder) */}
-          <section className='flex flex-col gap-3'>
-            <h3 className='text-sm font-semibold text-muted-foreground uppercase tracking-wide'>
-              Donor Details
-            </h3>
-            <div className='flex flex-col gap-1'>
-              <label
-                htmlFor='donorAlias'
-                className='text-sm font-medium text-foreground'
-              >
-                Display name
-              </label>
-              <input
-                id='donorAlias'
-                {...register('donorAlias')}
-                placeholder='Your name (as shown on the fundraiser)'
-                className='h-9 rounded-lg border border-input bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring'
-              />
-            </div>
-          </section>
-
-          {/* Payment placeholder */}
-          <section className='flex flex-col gap-2'>
-            <h3 className='text-sm font-semibold text-muted-foreground uppercase tracking-wide'>
-              Payment
-            </h3>
-            <div className='bg-muted rounded-xl p-4 text-sm text-muted-foreground text-center'>
-              Payment integration coming soon
-            </div>
-          </section>
-
-          <Button
-            className='w-full font-medium'
-            style={{ backgroundColor: 'var(--accent-color)' }}
-            disabled
-          >
-            {formatCurrency(donationData.amount, donationData.currency)} &mdash;
-            Pay now
-          </Button>
+          {/* Right Column */}
+          <div className='lg:w-2/5 space-y-6'>
+            {/*Dedication */}
+            {/*Donation overview */}
+            {/*DonateCTA */}
+            <div className='h-40 bg-gray-100 rounded-md' />
+          </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
+
+  return createPortal(overlayContent, document.body);
 }
