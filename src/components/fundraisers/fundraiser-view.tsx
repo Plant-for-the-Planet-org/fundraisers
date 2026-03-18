@@ -4,9 +4,7 @@ import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import TitleDisplay from '@/components/fundraisers/title-display';
-import { SectionHeader } from '@/components/fundraisers/typography';
 import ImageDisplay from '@/components/fundraisers/image-display';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
@@ -15,7 +13,6 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getImageUrl } from '@/lib/utils/images';
 import { useTranslations } from 'next-intl';
 
 function getDaysLeft(endDate: string): number {
@@ -41,7 +38,6 @@ export function FundraiserView({
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
-  const publicHosts = fundraiser.hosts.filter(h => h.isPublic);
   const workspaceName = fundraiser.workspace?.name ?? '';
   const workspaceCountry = fundraiser.workspace?.country ?? '';
   const isTaxDeductible =
