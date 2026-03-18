@@ -8,7 +8,7 @@ import ImageDisplay from '@/components/fundraisers/image-display';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { HostPreview } from '@/components/fundraisers/host-preview';
+import { Hosts } from '@/components/fundraisers/hosts';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
@@ -92,7 +92,7 @@ export function FundraiserView({
         </div>
 
         {/* Hosts */}
-        <HostPreview mode='read' fundraiser={fundraiser} />
+        <Hosts mode='display' fundraiser={fundraiser} />
       </SidebarPanel>
 
       <MainPanel>
