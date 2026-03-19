@@ -1,5 +1,8 @@
 {
   "Dashboard": {
+    "breadcrumb": {
+      "home": "Home"
+    },
     "dashboard": "Dashboard",
     "welcome": "Welcome back, {displayName}!",
     "fallbackName": "there",

@@ -8,6 +8,7 @@ import {
   MyFundraisersCard,
   TotalRaisedCard,
 } from '@/components/dashboard';
+import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
 export default function Dashboard() {
   const t = useTranslations('Dashboard');
@@ -19,11 +20,19 @@ export default function Dashboard() {
   return (
     <AuthGuard>
       <section className='space-y-6'>
+        <BreadcrumbTrail
+          items={[
+            { label: t('breadcrumb.home'), href: '/' },
+            { label: t('dashboard') },
+          ]}
+        />
         <div>
           <h1 className='text-3xl font-bold text-foreground'>
             {t('dashboard')}
           </h1>
-          <p className='text-muted-foreground'>{t('welcome', { displayName })}</p>
+          <p className='text-muted-foreground'>
+            {t('welcome', { displayName })}
+          </p>
         </div>
 
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
