@@ -49,6 +49,7 @@ export function DonationSection({
         }}
         donationData={donationData}
         fundraiser={fundraiser}
+        paymentOptions={paymentOptions}
       />
     </>
   );

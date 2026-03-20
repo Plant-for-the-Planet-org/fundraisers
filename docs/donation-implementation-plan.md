@@ -14,33 +14,36 @@ State lives in three layers. Nothing outside these layers needs to hold donation
 
 ### 1. Immutable props (flow down, never mutate during a session)
 
-`DonationSection` already holds `fundraiser` and `paymentOptions`. Add `paymentOptions` as a new prop on `DonateOverlay` — it is not there yet.
+`DonationSection` passes `fundraiser`, `donationData`, and `paymentOptions` to `DonateOverlay`. These flow into `DonationFormProvider` and are accessible to all children via `useDonationForm()`.
 
 ```
 DonationSection
   └─ DonateOverlay(fundraiser, donationData, paymentOptions)
-      ├─ DonationOverview   ← fundraiser + donationData
-      ├─ PaymentMethods     ← paymentOptions.gateways (determines which methods to show)
-      │   ├─ StripeCardForm ← paymentOptions.gateways.stripe (publishable key + accountId)
-      │   └─ PayPalButton   ← paymentOptions.gateways.paypal (client_id)
-      └─ DonateCTA          ← paymentOptions.recurrency.supported (monthly toggle visibility)
+      └─ DonationFormProvider  ← holds useForm + exposes static data via context
+          ├─ DonationOverview   ← fundraiser + donationData (from context)
+          ├─ PaymentMethods     ← paymentOptions.gateways (from context)
+          │   ├─ StripeCardForm ← paymentOptions.gateways.stripe (publishable key + accountId)
+          │   └─ PayPalButton   ← paymentOptions.gateways.paypal (client_id)
+          └─ DonateCTA          ← paymentOptions.recurrency.supported (from context)
 ```
 
-### 2. RHF form in `DonateOverlay`
+### 2. RHF form in `DonationFormProvider`
 
-The overlay owns the single `useForm` instance. RHF covers **all user-controlled inputs** — donor fields and in-overlay preferences — so that `handleSubmit` is the single assembly point for everything the user has entered.
+`DonationFormProvider` (`src/components/donate/donation-form-context.tsx`) owns the single `useForm` instance and wraps children in RHF's `FormProvider`. RHF covers **all user-controlled inputs** — donor fields and in-overlay preferences — so that `handleSubmit` is the single assembly point for everything the user has entered.
 
-RHF fields:
+RHF fields (schema: `donationFormSchema`, type: `DonationFormValues`):
 
 - `firstname`, `lastname`, `email`
-- `address`, `zipCode`, `city`, `country` (unauthenticated / new address only)
+- `address`, `zipCode`, `city`, `country` (unauthenticated / new address only; optional at schema level)
 - `isAnonymous`
 - `makeMonthly`, `coverFees`
 - `selectedPaymentMethod`
 
 `donorAlias` is **not** an RHF field — it is derived at payload-build time from `firstname + lastname`, and omitted entirely when `isAnonymous` is true.
 
-`DonorDetails` receives `register`, `control`, and `formState.errors` as props. It does **not** call `useForm` itself.
+Child components access form state via `useFormContext<DonationFormValues>()` (RHF) or `useDonationForm()` (for static overlay data). Neither calls `useForm` itself.
+
+The provider also handles form reset: when `isOpen` becomes `false`, `methods.reset()` is called internally.
 
 ### 3. Submission state (`useDonation` hook)
 
@@ -148,7 +151,7 @@ Wire into overlay: replace `{/* Donation overview */}` stub in `donate-overlay.t
 Install packages first:
 
 ```
-yarn add @stripe/stripe-js @stripe/react-stripe-js @paypal/react-paypal-js
+npm install @stripe/stripe-js @stripe/react-stripe-js @paypal/react-paypal-js
 ```
 
 Files:
@@ -271,15 +274,19 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 
 ### Final wiring
 
-`src/components/fundraisers/donate-overlay.tsx`:
+`src/components/donate/donate-overlay.tsx` ✅ done:
 
-- Add `paymentOptions: PaymentOptions` to props
-- Wire all `src/components/donate/*` components
-- Use `useDonation` hook
+- `paymentOptions: PaymentOptions` prop added
+- Wraps portal content in `DonationFormProvider`
+- Stub `onSubmit` logs values; replace with `useDonation.submitDonation` call
 
-`src/components/fundraisers/donation-section.tsx`:
+`src/components/fundraisers/donation-section.tsx` ✅ done:
 
-- Pass `paymentOptions` to `DonateOverlay` (it already has it as a prop)
+- Passes `paymentOptions` to `DonateOverlay`
+
+Remaining for Portion 4:
+
+- Implement `useDonation` hook and wire into `onSubmit` in `donate-overlay.tsx`
 
 ---
 
@@ -293,11 +300,13 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 
 ## Existing utilities to reuse
 
-| Utility                                 | Location                           |
-| --------------------------------------- | ---------------------------------- |
-| `formatCurrency(amountCents, currency)` | `src/lib/utils/currency.ts`        |
-| `getImageUrl(type, size, filename)`     | `src/lib/utils/images.ts`          |
-| `platformAPIClient`                     | `src/lib/api/external-client.ts`   |
-| `useAuthStore`                          | `src/stores/authStore.ts`          |
-| `PaymentOptions` type                   | `src/lib/types/payment-options.ts` |
-| `Fundraiser` type                       | `src/lib/types/fundraiser.ts`      |
+| Utility                                 | Location                                          |
+| --------------------------------------- | ------------------------------------------------- |
+| `formatCurrency(amountCents, currency)` | `src/lib/utils/currency.ts`                       |
+| `getImageUrl(type, size, filename)`     | `src/lib/utils/images.ts`                         |
+| `platformAPIClient`                     | `src/lib/api/external-client.ts`                  |
+| `useAuthStore`                          | `src/stores/authStore.ts`                         |
+| `PaymentOptions` type                   | `src/lib/types/payment-options.ts`                |
+| `Fundraiser` type                       | `src/lib/types/fundraiser.ts`                     |
+| `DonationData` type                     | `src/components/donate/donate-overlay.tsx`        |
+| `DonationFormValues`, `donationFormSchema`, `useDonationForm` | `src/components/donate/donation-form-context.tsx` |
