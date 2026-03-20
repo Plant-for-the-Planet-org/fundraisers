@@ -31,6 +31,7 @@ DonationSection
 The overlay owns the single `useForm` instance. RHF covers **all user-controlled inputs** — donor fields and in-overlay preferences — so that `handleSubmit` is the single assembly point for everything the user has entered.
 
 RHF fields:
+
 - `firstname`, `lastname`, `email`
 - `address`, `zipCode`, `city`, `country` (unauthenticated / new address only)
 - `isAnonymous`
@@ -63,6 +64,7 @@ DonateCTA button
 ```
 
 Two validation layers:
+
 - RHF: donor field rules (required, email format) — runs before any API call
 - `useDonation`: API-level field errors — set on hook state after a failed call
 
@@ -81,22 +83,24 @@ Actual payment details (card numbers, IBAN, CVV) are **never stored in React sta
 ---
 
 ## Portion 1 — Donor Info
+
 > **Owner: colleague**
 
-File: `src/components/donate/donor-details.tsx`
+File: `src/components/donate/donor-info.tsx`
 
 - Guest: full form (email, firstName, lastName, address, zip, city, country)
 - Authenticated: pre-populate from `authStore.user.profile` (`src/stores/authStore.ts`)
   - Primary address: `profile.addresses.find(a => a.isPrimary)`
 - Profile type: `UserProfileResponse` from `src/lib/api/user-service.ts`
 
-Reference: `gofundnature/src/components/donate/donor-details.tsx`
+Reference: `gofundnature/src/components/donate/donor-info.tsx`
 
 ---
 
 ## Portion 2 — Donation Summary
 
 Files:
+
 - `src/lib/donation/line-item-calculator.ts`
 - `src/components/donate/donation-overview.tsx`
 
@@ -115,14 +119,16 @@ Reference: `gofundnature/src/lib/donation/line-item-calculator.ts`
 ### `donation-overview.tsx`
 
 Props:
+
 ```ts
 {
-  fundraiser: Fundraiser       // src/lib/types/fundraiser.ts
-  donationData: DonationData   // src/components/fundraisers/donate-overlay.tsx
+  fundraiser: Fundraiser; // src/lib/types/fundraiser.ts
+  donationData: DonationData; // src/components/fundraisers/donate-overlay.tsx
 }
 ```
 
 Shows:
+
 - Fundraiser thumbnail + title
   - `getImageUrl('fundraiser', 'small', fundraiser.image)` from `src/lib/utils/images.ts`
 - Per-project breakdown from `calculateLineItems`
@@ -140,11 +146,13 @@ Wire into overlay: replace `{/* Donation overview */}` stub in `donate-overlay.t
 ## Portion 3 — Payment Methods
 
 Install packages first:
+
 ```
 yarn add @stripe/stripe-js @stripe/react-stripe-js @paypal/react-paypal-js
 ```
 
 Files:
+
 - `src/components/donate/payment-methods.tsx`
 - `src/components/donate/stripe-card-form.tsx`
 - `src/components/donate/stripe-sepa-form.tsx`
@@ -155,6 +163,7 @@ Files:
 ### `payment-methods.tsx`
 
 Derives available methods from `paymentOptions.gateways` — **no hardcoding**:
+
 - `gateways.stripe.methods` includes `'card'` → show Card tab
 - `gateways.stripe.methods` includes `'sepa_debit'` → show SEPA tab
 - `gateways.paypal` present → show PayPal tab
@@ -185,8 +194,10 @@ Same Stripe init as card form. Uses `<IbanElement>`. Mandate acceptance checkbox
 ### `paypal-button.tsx`
 
 ```tsx
-<PayPalScriptProvider options={{ clientId: paymentOptions.gateways.paypal.authorization.client_id }}>
-  <PayPalButtons onApprove={(data) => onApproved(data.orderID)} />
+<PayPalScriptProvider
+  options={{ clientId: paymentOptions.gateways.paypal.authorization.client_id }}
+>
+  <PayPalButtons onApprove={data => onApproved(data.orderID)} />
 </PayPalScriptProvider>
 ```
 
@@ -209,14 +220,17 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 ### Files to create
 
 **`src/lib/donation/types.ts`**
+
 - `DonationFormData`, `DonationPayload`, `PaymentRequest`, `PaymentResponse` (union), `DonationError`
 - Reference: `gofundnature/src/lib/donation/types.ts`
 
 **`src/lib/utils/idempotency.ts`**
+
 - `generateIdempotencyKey(prefix)` → `${prefix}-${crypto.randomUUID()}`
 - Reference: `gofundnature/src/lib/utils/idempotency.ts`
 
 **`src/lib/donation/payload-builder.ts`**
+
 - Builds POST `/donations` body
 - `donorAlias` derived from `firstname + lastname`; omitted when `isAnonymous` is true — not a separate input
 - Frequency map: `'one-time' → 'once'`, others pass through. ⚠️ **Open question**: verify where `frequency` belongs in the payload (top-level field, lineItem attribute, or PUT call only) against the staging API before implementing
@@ -225,12 +239,14 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 - Reference: `gofundnature/src/lib/donation/payload-builder.ts`
 
 **`src/lib/api/donation-service.ts`**
+
 - `createDonation(payload, token?)` — adds `Idempotency-Key: donation_{uuid}` header
 - `submitPayment(donationId, paymentRequest, token?)` — adds `Idempotency-Key: payment_{uuid}` header
 - Uses `platformAPIClient` from `src/lib/api/external-client.ts`
 - Reference: `gofundnature/src/lib/api/donation-service.ts`
 
 **`src/hooks/use-donation.ts`**
+
 - State: `{ isLoading, isSuccess, error, fieldErrors, donationId, bankTransferDetails }`
 - `submitDonation(formData, paymentContext)`:
   1. Validate required fields → set fieldErrors
@@ -246,21 +262,23 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 
 ### PUT /donations payload reference
 
-| Gateway | `gateway` | `account` | `method` | `source` |
-|---------|-----------|-----------|---------|---------|
-| Stripe card | `"stripe"` | `gateways.stripe.account` | `"card"` | `{ id: "<pm-id>", object: "payment_method" }` |
-| Stripe SEPA | `"stripe"` | `gateways.stripe.account` | `"sepa_debit"` | `{ id: "<pm-id>", object: "payment_method" }` |
-| PayPal | `"paypal"` | `gateways.paypal.account` | `"paypal"` | `{ type: "server_order", orderId: "<order-id>" }` |
-| Offline | `"offline"` | `gateways.offline.account` | `"offline"` | `{}` |
+| Gateway     | `gateway`   | `account`                  | `method`       | `source`                                          |
+| ----------- | ----------- | -------------------------- | -------------- | ------------------------------------------------- |
+| Stripe card | `"stripe"`  | `gateways.stripe.account`  | `"card"`       | `{ id: "<pm-id>", object: "payment_method" }`     |
+| Stripe SEPA | `"stripe"`  | `gateways.stripe.account`  | `"sepa_debit"` | `{ id: "<pm-id>", object: "payment_method" }`     |
+| PayPal      | `"paypal"`  | `gateways.paypal.account`  | `"paypal"`     | `{ type: "server_order", orderId: "<order-id>" }` |
+| Offline     | `"offline"` | `gateways.offline.account` | `"offline"`    | `{}`                                              |
 
 ### Final wiring
 
 `src/components/fundraisers/donate-overlay.tsx`:
+
 - Add `paymentOptions: PaymentOptions` to props
 - Wire all `src/components/donate/*` components
 - Use `useDonation` hook
 
 `src/components/fundraisers/donation-section.tsx`:
+
 - Pass `paymentOptions` to `DonateOverlay` (it already has it as a prop)
 
 ---
@@ -275,11 +293,11 @@ Reference: `gofundnature/src/components/donate/donate-cta.tsx`
 
 ## Existing utilities to reuse
 
-| Utility | Location |
-|---------|----------|
-| `formatCurrency(amountCents, currency)` | `src/lib/utils/currency.ts` |
-| `getImageUrl(type, size, filename)` | `src/lib/utils/images.ts` |
-| `platformAPIClient` | `src/lib/api/external-client.ts` |
-| `useAuthStore` | `src/stores/authStore.ts` |
-| `PaymentOptions` type | `src/lib/types/payment-options.ts` |
-| `Fundraiser` type | `src/lib/types/fundraiser.ts` |
+| Utility                                 | Location                           |
+| --------------------------------------- | ---------------------------------- |
+| `formatCurrency(amountCents, currency)` | `src/lib/utils/currency.ts`        |
+| `getImageUrl(type, size, filename)`     | `src/lib/utils/images.ts`          |
+| `platformAPIClient`                     | `src/lib/api/external-client.ts`   |
+| `useAuthStore`                          | `src/stores/authStore.ts`          |
+| `PaymentOptions` type                   | `src/lib/types/payment-options.ts` |
+| `Fundraiser` type                       | `src/lib/types/fundraiser.ts`      |
