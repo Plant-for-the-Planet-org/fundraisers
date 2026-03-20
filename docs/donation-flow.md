@@ -132,6 +132,12 @@ The `frequency` field from the donation form (`'one-time'`, `'monthly'`, `'quart
 
 ---
 
+## Implementation plan
+
+See [donation-implementation-plan.md](./donation-implementation-plan.md) for the full breakdown of what to build and in what order.
+
+---
+
 ## Key files
 
 | File | Purpose |
