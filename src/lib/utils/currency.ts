@@ -80,7 +80,6 @@ export function formatCurrency(
 
 /**
  * Format currency amount from decimal value (for backward compatibility with old data)
- * @deprecated This is for backward compatibility only. New API data should use formatCurrency directly.
  *
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')

@@ -6,7 +6,7 @@ import { HandCoins, UsersRound } from 'lucide-react';
 import { FundraiserCardImage } from './fundraiser-card-image';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
-import { formatCurrency } from '@/lib/utils/currency';
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils';
 
 interface FundraiserCardProps {
@@ -69,7 +69,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   </dt>
                   <dd>
                     {tFundraisers('amountRaised', {
-                      formattedAmountWithCurrency: formatCurrency(
+                      formattedAmountWithCurrency: formatCurrencyFromDecimal(
                         fundraiser.totalRaised,
                         fundraiser.currency
                       ),
