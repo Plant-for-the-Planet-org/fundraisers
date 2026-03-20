@@ -7,8 +7,15 @@ import { getThemeForPath } from '@/lib/theme/route-themes';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { useThemeStore } from '@/stores/theme-store';
+import type { Theme } from '@/lib/theme/types';
 
-export function ThemeShell({ children }: { children: ReactNode }) {
+export function ThemeShell({
+  children,
+  initialTheme,
+}: {
+  children: ReactNode;
+  initialTheme?: Theme;
+}) {
   const pathname = usePathname();
   const { selectedTheme, setSelectedTheme } = useThemeStore();
   const prevPathname = useRef(pathname);
@@ -20,7 +27,15 @@ export function ThemeShell({ children }: { children: ReactNode }) {
     }
   }, [pathname, setSelectedTheme]);
 
-  const activeTheme = selectedTheme ?? getThemeForPath(pathname);
+  // Clear on unmount so selectedTheme doesn't bleed into a new ThemeShell instance when navigating between route groups (each group has its own ThemeShell).
+  useEffect(() => {
+    return () => {
+      setSelectedTheme(null);
+    };
+  }, [setSelectedTheme]);
+
+  const activeTheme =
+    selectedTheme ?? initialTheme ?? getThemeForPath(pathname);
 
   useEffect(() => {
     const html = document.documentElement;

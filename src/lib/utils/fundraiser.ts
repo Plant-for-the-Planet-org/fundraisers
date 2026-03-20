@@ -18,5 +18,5 @@ export interface FundraiserUrlData {
  */
 export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   const identifier = fundraiser.slug || fundraiser.id;
-  return `/raise/${identifier}`;
+  return `/fundraisers/${identifier}`;
 }

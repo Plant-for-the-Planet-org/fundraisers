@@ -11,6 +11,20 @@
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut oder stöbere in anderen Fundraisern.",
+      "retry": "Erneut versuchen",
+      "browse": "Fundraiser durchsuchen"
+    },
+    "closedForContribution": {
+      "title": "Vielen Dank für deine Unterstützung!",
+      "defaultMessage": "Diese Spendenaktion wurde archiviert und akzeptiert keine neuen Spenden mehr."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country} und ist steuerlich absetzbar in {country}.",
+      "withoutTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country}."
+    },
     "create": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -116,10 +130,13 @@
       },
       "projectSelection": {
         "sectionHeading": "Projekte, die durch diesen Fundraiser unterstützt werden.",
+        "viewModeSectionHeading": "Von dieser Fundraiser unterstützte Projekte",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
         "allocationLabel": "{percentage, number}%-Zuweisung",
         "projectImageAlt": "Bild für {name}",
+        "expandDescription": "Mehr lesen",
+        "collapseDescription": "Weniger lesen",
         "defaultCause": {
           "name": "Junge Menschen empowern und Wälder zurückbringen",
           "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen auf der ganzen Welt zu empowern und sich für den Klimaschutz einzusetzen. Wir stellen Wälder wieder her, klären die Öffentlichkeit auf und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
