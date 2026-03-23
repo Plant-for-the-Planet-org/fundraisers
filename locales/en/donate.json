@@ -46,7 +46,8 @@
         "placeholder": "State or province"
       },
       "savingAddressLoader": "Saving Address...",
-      "saveAddress": "Save Address"
+      "saveAddress": "Save Address",
+      "addNewAddress": "+ Add new address"
     }
   }
 }
