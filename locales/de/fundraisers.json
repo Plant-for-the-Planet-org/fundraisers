@@ -5,6 +5,7 @@
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByAnonymous": "von einem anonymen Gastgeber",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
@@ -24,6 +25,15 @@
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country} und ist steuerlich absetzbar in {country}.",
       "withoutTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country}."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Bearbeitungsgebühr",
+        "breakdown": "Spendenaufschlüsselung",
+        "total": "Gesamt",
+        "totalMonthly": "Gesamt jeden Monat",
+        "totalYearly": "Gesamt jedes Jahr"
+      }
     },
     "create": {
       "goalPreview": {
