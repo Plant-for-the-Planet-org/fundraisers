@@ -1,0 +1,53 @@
+{
+  "Donate": {
+    "preferences": {
+      "anonymousDonationLabel": "Meine Spende anonym machen",
+      "anonymousDonationDescription": "Ihr Name wird auf der Fundraising-Seite nicht öffentlich angezeigt"
+    },
+    "yourInfo": "Ihre Angaben",
+    "organization": "Organisation",
+    "userAddress": {
+      "selectAddress": {
+        "label": "Adresse auswählen",
+        "placeholder": "Adresse auswählen"
+      },
+
+      "country": {
+        "label": "Land *",
+        "placeholder": "Land auswählen",
+        "searchPlaceholder": "Länder suchen...",
+        "noResults": "Keine Länder gefunden",
+        "selectCountry": "Land auswählen"
+      },
+
+      "zipCode": {
+        "label": "Postleitzahl *",
+        "placeholder": "Postleitzahl"
+      },
+
+      "address": {
+        "label": "Adresse *",
+        "placeholder": "Straße und Hausnummer",
+        "addressType": "Adresstyp"
+      },
+
+      "address2": {
+        "label": "Adresszusatz",
+        "placeholder": "Wohnung, Suite, etc."
+      },
+
+      "city": {
+        "label": "Stadt *",
+        "placeholder": "Stadt"
+      },
+
+      "state": {
+        "label": "Bundesland/Region",
+        "placeholder": "Bundesland oder Region"
+      },
+
+      "savingAddressLoader": "Adresse wird gespeichert...",
+      "saveAddress": "Adresse speichern"
+    }
+  }
+}

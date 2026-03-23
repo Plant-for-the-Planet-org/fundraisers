@@ -1,0 +1,52 @@
+{
+  "Donate": {
+    "preferences": {
+      "anonymousDonationLabel": "Make my donation anonymous",
+      "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
+    },
+    "yourInfo": "Your Info",
+    "organization": "Organization",
+    "userAddress": {
+      "selectAddress": {
+        "label": "Select Address",
+        "placeholder": "Choose an address"
+      },
+
+      "country": {
+        "label": "Country *",
+        "placeholder": "Select country",
+        "searchPlaceholder": "Search countries...",
+        "noResults": "No countries found",
+        "selectCountry": "Select Country"
+      },
+
+      "zipCode": {
+        "label": "Zip Code *",
+        "placeholder": "Zip code"
+      },
+
+      "address": {
+        "label": "Address *",
+        "placeholder": "Street address",
+        "addressType": "Address Type"
+      },
+
+      "address2": {
+        "label": "Address Line 2",
+        "placeholder": "Apartment, suite, etc."
+      },
+
+      "city": {
+        "label": "City *",
+        "placeholder": "City"
+      },
+
+      "state": {
+        "label": "State/Province",
+        "placeholder": "State or province"
+      },
+      "savingAddressLoader": "Saving Address...",
+      "saveAddress": "Save Address"
+    }
+  }
+}
