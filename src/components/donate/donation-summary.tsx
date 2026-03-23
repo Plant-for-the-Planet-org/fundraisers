@@ -139,7 +139,7 @@ export function DonationSummary() {
               {renderFundraiserImage()}
             </div>
             <div className='flex-1 space-y-2 min-w-0'>
-              <h3 className='font-semibold leading-tight text-foreground'>
+              <h3 className='font-semibold leading-tight text-foreground wrap-anywhere'>
                 {fundraiser.title}
               </h3>
               <div className='flex items-center gap-2'>
