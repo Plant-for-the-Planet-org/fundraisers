@@ -1,5 +1,17 @@
 import { platformAPIClient, PlatformAPIError } from './external-client';
 
+export interface Address {
+  id: string;
+  type: string;
+  address: string;
+  address2: string | null;
+  city: string;
+  zipCode: string;
+  country: string;
+  state: string | null;
+  isPrimary: boolean;
+  name: string;
+}
 export interface UserProfileResponse {
   slug: string;
   type: 'individual' | 'organization';
@@ -20,18 +32,7 @@ export interface UserProfileResponse {
   isPrivate: boolean;
   getNews: boolean;
   bio: string | null;
-  addresses: Array<{
-    id: string;
-    type: string;
-    address: string;
-    address2: string | null;
-    city: string;
-    zipCode: string;
-    country: string;
-    state: string | null;
-    isPrimary: boolean;
-    name: string;
-  }>;
+  addresses: Address[];
   address: {
     address: string;
     city: string;
