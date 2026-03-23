@@ -1,3 +1,31 @@
+'use client';
+
+import { useAuthStore } from '@/stores/authStore';
+import { AuthenticatedUserView } from './authenticated-user-view';
+import { GuestUserView } from './guest-user-view';
+import { useTranslations } from 'next-intl';
+
 export function DonorInfo() {
-  return <div className='bg-white border-border border-2'>Donor Info</div>;
+  const tDonate = useTranslations('Donate');
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isValidProfile = useAuthStore(
+    state =>
+      state.user?.profile?.firstname &&
+      state.user?.profile?.lastname &&
+      state.user.profile.image
+  );
+
+  return (
+    <div className='flex flex-col gap-4'>
+      <h2 className='text-gray-900 text-lg font-semibold'>
+        {tDonate('yourInfo')}
+      </h2>
+
+      {isAuthenticated && isValidProfile ? (
+        <AuthenticatedUserView />
+      ) : (
+        <GuestUserView />
+      )}
+    </div>
+  );
 }
