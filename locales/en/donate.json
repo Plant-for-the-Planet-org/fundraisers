@@ -6,6 +6,27 @@
     },
     "yourInfo": "Your Info",
     "organization": "Organization",
+    "donorIdentity": {
+      "companyDonation": {
+        "label": "This donation is made by a Company"
+      },
+      "companyName": {
+        "label": "Company Name",
+        "placeholder": "Enter company name"
+      },
+      "email": {
+        "label": "Email *",
+        "placeholder": "Enter your email"
+      },
+      "firstName": {
+        "label": "First Name *",
+        "placeholder": "First name"
+      },
+      "lastName": {
+        "label": "Last Name *",
+        "placeholder": "Last name"
+      }
+    },
     "userAddress": {
       "selectAddress": {
         "label": "Select Address",

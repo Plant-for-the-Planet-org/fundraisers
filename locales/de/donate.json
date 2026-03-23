@@ -6,6 +6,27 @@
     },
     "yourInfo": "Ihre Angaben",
     "organization": "Organisation",
+    "donorIdentity": {
+      "companyDonation": {
+        "label": "Diese Spende wird von einem Unternehmen getätigt"
+      },
+      "companyName": {
+        "label": "Firmenname",
+        "placeholder": "Firmenname eingeben"
+      },
+      "email": {
+        "label": "E-Mail",
+        "placeholder": "Ihre E-Mail eingeben"
+      },
+      "firstName": {
+        "label": "Vorname",
+        "placeholder": "Vorname"
+      },
+      "lastName": {
+        "label": "Nachname",
+        "placeholder": "Nachname"
+      }
+    },
     "userAddress": {
       "selectAddress": {
         "label": "Adresse auswählen",
