@@ -5,6 +5,7 @@
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",
     "hostedByWithOthers": "by {hostName} and {othersCount, plural, one {1 other} other {# others}}",
+    "hostedByAnonymous": "by an anonymous host",
     "unknownHost": "Unknown",
     "anonymousHost": "Anonymous host",
     "coverImageAlt": "Cover image for {title}",
@@ -24,6 +25,15 @@
     "securityNotice": {
       "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
       "withoutTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b>."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Processing fee",
+        "breakdown": "Breakdown",
+        "total": "Total",
+        "totalMonthly": "Total every month",
+        "totalYearly": "Total every year"
+      }
     },
     "create": {
       "goalPreview": {
