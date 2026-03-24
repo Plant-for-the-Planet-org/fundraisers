@@ -1,8 +1,8 @@
 'use client';
 
-import { Check, ChevronDown, ChevronUp, Info } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
@@ -12,17 +12,44 @@ import type {
 } from '@/lib/types/payment-methods';
 
 import { useDonationForm } from '@/components/donate/donation-form-context';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 
-const VISIBLE_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
+const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
   'bank-transfer',
   'paypal',
   'card',
   'sepa-debit',
 ]);
+
+const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
+  'open-banking': 'methods.openBanking',
+  'bank-transfer': 'methods.bankTransfer',
+  paypal: 'methods.paypal',
+  card: 'methods.card',
+  'sepa-debit': 'methods.sepa',
+  'apple-pay': 'methods.applePay',
+  'google-pay': 'methods.googlePay',
+};
+
+const PROVIDER_TRANSLATION_KEYS: Record<
+  DerivedPaymentMethod['provider'],
+  string
+> = {
+  stripe: 'providers.stripe',
+  paypal: 'providers.paypal',
+  offline: 'providers.offline',
+  'open-banking': 'providers.open-banking',
+  planetcash: 'providers.planetcash',
+};
+
+const FEE_CURRENCY_FORMAT = {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+} as const;
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
@@ -38,41 +65,11 @@ export function PaymentMethods() {
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
   function getMethodLabel(methodId: PaymentMethodId) {
-    switch (methodId) {
-      case 'open-banking':
-        return t('methods.openBanking');
-      case 'bank-transfer':
-        return t('methods.bankTransfer');
-      case 'paypal':
-        return t('methods.paypal');
-      case 'card':
-        return t('methods.card');
-      case 'sepa-debit':
-        return t('methods.sepa');
-      case 'apple-pay':
-        return t('methods.applePay');
-      case 'google-pay':
-        return t('methods.googlePay');
-      default:
-        return t('selectMethodPlaceholder');
-    }
+    return t(METHOD_TRANSLATION_KEYS[methodId] as never);
   }
 
   function getProviderLabel(provider: DerivedPaymentMethod['provider']) {
-    switch (provider) {
-      case 'stripe':
-        return t('providers.stripe');
-      case 'paypal':
-        return t('providers.paypal');
-      case 'offline':
-        return t('providers.offline');
-      case 'open-banking':
-        return t('providers.open-banking');
-      case 'planetcash':
-        return t('providers.planetcash');
-      default:
-        return t('providers.offline');
-    }
+    return t(PROVIDER_TRANSLATION_KEYS[provider] as never);
   }
 
   function getFeeText(method: DerivedPaymentMethod, donationCurrency: string) {
@@ -84,7 +81,8 @@ export function PaymentMethods() {
       amount: formatCurrency(
         method.feeAmountCents,
         donationCurrency,
-        undefined
+        undefined,
+        FEE_CURRENCY_FORMAT
       ),
     });
   }
@@ -107,7 +105,8 @@ export function PaymentMethods() {
       amount: formatCurrency(
         method.feeAmountCents,
         donationCurrency,
-        undefined
+        undefined,
+        FEE_CURRENCY_FORMAT
       ),
       alternatives,
     });
@@ -130,7 +129,9 @@ export function PaymentMethods() {
   ]);
 
   const visibleMethods = useMemo(() => {
-    return availableMethods.filter(method => VISIBLE_METHOD_IDS.has(method.id));
+    return availableMethods.filter(method =>
+      SUPPORTED_METHOD_IDS.has(method.id)
+    );
   }, [availableMethods]);
 
   useEffect(() => {
@@ -217,14 +218,15 @@ export function PaymentMethods() {
               {feeCollectionEnabled &&
                 selectedMethod &&
                 selectedMethodFeeText && (
-                  <div className='flex items-center gap-1 mt-1'>
+                  <div className='mt-1 flex items-center gap-1'>
                     <span className='text-sm text-gray-500'>
                       {selectedMethodFeeText}
                     </span>
                     {selectedMethodFeeTooltip && (
                       <InfoTooltip
                         content={selectedMethodFeeTooltip}
-                        iconClassName='w-3 h-3 text-gray-400'
+                        className='inline-flex'
+                        iconClassName='h-3 w-3 text-gray-400'
                       />
                     )}
                   </div>
@@ -232,14 +234,14 @@ export function PaymentMethods() {
             </div>
           </div>
           {isExpanded ? (
-            <ChevronUp className='w-5 h-5 text-gray-400' />
+            <ChevronUp className='h-5 w-5 text-gray-400' />
           ) : (
-            <ChevronDown className='w-5 h-5 text-gray-400' />
+            <ChevronDown className='h-5 w-5 text-gray-400' />
           )}
         </button>
 
         {isExpanded && (
-          <div className='border-t border-gray-200 p-4 space-y-3'>
+          <div className='space-y-3 border-t border-gray-200 p-4'>
             {visibleMethods.map(method => {
               const methodLabel = getMethodLabel(method.id);
               const methodFeeText = getFeeText(method, donationData.currency);
@@ -254,10 +256,6 @@ export function PaymentMethods() {
                   type='button'
                   key={method.id}
                   onClick={() => {
-                    if (method.disabled) {
-                      return;
-                    }
-
                     setValue('selectedPaymentMethod', method.id, {
                       shouldDirty: true,
                       shouldTouch: true,
@@ -265,60 +263,45 @@ export function PaymentMethods() {
                     });
                     setIsExpanded(false);
                   }}
-                  disabled={method.disabled}
                   className={cn(
-                    'w-full p-3 border rounded-lg text-left transition-all',
-                    method.disabled
-                      ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
-                      : 'hover:border-gray-400 cursor-pointer',
-                    isSelected && !method.disabled
+                    'w-full rounded-lg border p-3 text-left transition-all hover:border-gray-400',
+                    isSelected
                       ? 'border-gray-900 bg-gray-50'
-                      : !method.disabled && 'border-gray-200 bg-white'
+                      : 'border-gray-200 bg-white'
                   )}
                 >
                   <div className='flex items-start justify-between'>
-                    <div className='flex items-start gap-3 flex-1'>
+                    <div className='flex flex-1 items-start gap-3'>
                       <div className='mt-0.5'>
                         <div
                           className={cn(
-                            'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all',
-                            method.disabled
-                              ? 'bg-gray-200 border-gray-300'
-                              : isSelected
-                                ? 'bg-gray-900 border-gray-900'
-                                : 'bg-white border-gray-300'
+                            'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all',
+                            isSelected
+                              ? 'border-gray-900 bg-gray-900'
+                              : 'border-gray-300 bg-white'
                           )}
                         >
-                          {isSelected && !method.disabled && (
-                            <Check className='w-2.5 h-2.5 text-white' />
+                          {isSelected && (
+                            <Check className='h-2.5 w-2.5 text-white' />
                           )}
                         </div>
                       </div>
 
                       <div className='flex-1 space-y-1'>
-                        <span
-                          className={cn(
-                            'text-sm font-medium',
-                            method.disabled ? 'text-gray-500' : 'text-gray-900'
-                          )}
-                        >
+                        <span className='text-sm font-medium'>
                           {methodLabel}
                         </span>
                       </div>
                     </div>
 
                     {feeCollectionEnabled && (
-                      <div
-                        className={cn(
-                          'ml-3 flex items-center gap-1',
-                          method.disabled ? 'text-gray-400' : 'text-gray-500'
-                        )}
-                      >
+                      <div className='ml-3 flex items-center gap-1'>
                         <span className='text-sm'>{methodFeeText}</span>
                         {methodFeeTooltip && (
                           <InfoTooltip
                             content={methodFeeTooltip}
-                            iconClassName='w-4 h-4'
+                            className='inline-flex'
+                            iconClassName='h-4 w-4 text-gray-400'
                           />
                         )}
                       </div>
@@ -331,116 +314,5 @@ export function PaymentMethods() {
         )}
       </div>
     </div>
-  );
-}
-
-interface InfoTooltipProps {
-  content: string;
-  iconClassName?: string;
-}
-
-function InfoTooltip({ content, iconClassName }: InfoTooltipProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const triggerRef = useRef<HTMLSpanElement | null>(null);
-  const tooltipRef = useRef<HTMLSpanElement | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const viewportPadding = 8;
-    const spacing = 8;
-
-    const updatePosition = () => {
-      const triggerElement = triggerRef.current;
-      const tooltipElement = tooltipRef.current;
-
-      if (!triggerElement || !tooltipElement) {
-        return;
-      }
-
-      const triggerRect = triggerElement.getBoundingClientRect();
-      const tooltipRect = tooltipElement.getBoundingClientRect();
-
-      let left =
-        triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
-      left = Math.max(
-        viewportPadding,
-        Math.min(left, window.innerWidth - tooltipRect.width - viewportPadding)
-      );
-
-      const spaceBelow =
-        window.innerHeight - triggerRect.bottom - viewportPadding;
-      const shouldPlaceAbove =
-        tooltipRect.height + spacing > spaceBelow &&
-        triggerRect.top - viewportPadding > spaceBelow;
-
-      const top = shouldPlaceAbove
-        ? Math.max(
-            viewportPadding,
-            triggerRect.top - tooltipRect.height - spacing
-          )
-        : triggerRect.bottom + spacing;
-
-      setPosition({ top, left });
-    };
-
-    const rafId = window.requestAnimationFrame(updatePosition);
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
-
-    return () => {
-      window.cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
-    };
-  }, [isOpen]);
-
-  return (
-    <span
-      className='relative inline-flex'
-      onMouseEnter={() => {
-        setIsOpen(true);
-      }}
-      onMouseLeave={() => {
-        setIsOpen(false);
-      }}
-    >
-      <span
-        ref={triggerRef}
-        className='inline-flex items-center cursor-help'
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          setIsOpen(prev => !prev);
-        }}
-      >
-        <Info
-          className={cn('text-gray-400', iconClassName)}
-          aria-label={content}
-        />
-      </span>
-
-      {isOpen && (
-        <span
-          ref={tooltipRef}
-          role='tooltip'
-          className='fixed z-50 rounded-md bg-gray-900 px-3 py-2 text-xs leading-relaxed text-white shadow-lg'
-          style={{
-            top: position.top,
-            left: position.left,
-            maxWidth: 'min(18rem, calc(100vw - 1rem))',
-          }}
-          onClick={event => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-        >
-          {content}
-        </span>
-      )}
-    </span>
   );
 }

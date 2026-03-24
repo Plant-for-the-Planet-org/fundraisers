@@ -2,6 +2,7 @@ import type {
   FeeRegion,
   PaymentMethodProvider,
 } from '@/lib/types/payment-methods';
+import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer';
 
 interface FeeStructure {
   percentage: number;
@@ -67,27 +68,6 @@ function getRegion(country: string | null | undefined): FeeRegion {
   return 'ROW';
 }
 
-function toInternalMethod(method: string) {
-  const normalized = method.toLowerCase().trim().replaceAll('_', '-');
-  if (normalized === 'sepa' || normalized === 'sepa-debit') {
-    return 'sepa-debit';
-  }
-  if (
-    normalized === 'card' ||
-    normalized === 'credit-card' ||
-    normalized === 'debit-card'
-  ) {
-    return 'card';
-  }
-  if (normalized === 'apple-pay' || normalized === 'applepay') {
-    return 'apple-pay';
-  }
-  if (normalized === 'google-pay' || normalized === 'googlepay') {
-    return 'google-pay';
-  }
-  return normalized;
-}
-
 export function getProcessingFee(
   provider: PaymentMethodProvider,
   method: string,
@@ -95,7 +75,7 @@ export function getProcessingFee(
   country: string | null | undefined
 ): FeeCalculation {
   const region = getRegion(country);
-  const paymentMethod = toInternalMethod(method);
+  const paymentMethod = normalizePaymentMethodId(method);
 
   if (
     provider === 'offline' ||

@@ -16,12 +16,17 @@ export type PaymentMethodProvider =
 
 export type FeeRegion = 'US' | 'EU' | 'ROW';
 
-export interface DerivedPaymentMethod {
+interface BaseDerivedPaymentMethod {
   id: PaymentMethodId;
   provider: PaymentMethodProvider;
-  labelKey: string;
-  disabled: boolean;
-  hasFee: boolean;
-  feeAmountCents: number;
-  feeRegion: FeeRegion;
+  // labelKey: string;
+  // disabled: boolean;
 }
+
+export type DerivedPaymentMethod =
+  | (BaseDerivedPaymentMethod & { hasFee: false })
+  | (BaseDerivedPaymentMethod & {
+      hasFee: true;
+      feeAmountCents: number;
+      feeRegion: FeeRegion;
+    });

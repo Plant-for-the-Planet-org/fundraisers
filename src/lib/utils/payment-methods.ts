@@ -5,6 +5,10 @@ import type {
 } from '@/lib/types/payment-methods';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
+import {
+  normalizePaymentMethodId,
+  normalizePaymentToken,
+} from '@/lib/utils/payment-method-normalizer';
 import { getProcessingFee } from '@/lib/utils/processing-fees';
 
 interface PaymentMethodContext {
@@ -13,7 +17,7 @@ interface PaymentMethodContext {
   donationAmountCents: number;
 }
 
-const LEGACY_METHOD_ORDER: PaymentMethodId[] = [
+const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
   'open-banking',
   'bank-transfer',
   'paypal',
@@ -23,94 +27,66 @@ const LEGACY_METHOD_ORDER: PaymentMethodId[] = [
   'google-pay',
 ];
 
-const METHOD_LABEL_KEYS: Record<PaymentMethodId, string> = {
-  'open-banking': 'methods.openBanking',
-  'bank-transfer': 'methods.bankTransfer',
-  paypal: 'methods.paypal',
-  card: 'methods.card',
-  'sepa-debit': 'methods.sepa',
-  'apple-pay': 'methods.applePay',
-  'google-pay': 'methods.googlePay',
-};
+// const METHOD_LABEL_KEYS: Record<PaymentMethodId, string> = {
+//   'open-banking': 'methods.openBanking',
+//   'bank-transfer': 'methods.bankTransfer',
+//   paypal: 'methods.paypal',
+//   card: 'methods.card',
+//   'sepa-debit': 'methods.sepa',
+//   'apple-pay': 'methods.applePay',
+//   'google-pay': 'methods.googlePay',
+// };
 
 type RawMethodEntry = {
   methodId: string;
   gateway: string;
 };
 
-function normalizePaymentMethodId(
+function resolveMethod(
   methodId: string,
   gateway: string
-): PaymentMethodId | null {
-  const normalized = methodId.toLowerCase().trim().replaceAll('_', '-');
-  const normalizedGateway = gateway.toLowerCase().trim().replaceAll('_', '-');
+): { methodId: PaymentMethodId; provider: PaymentMethodProvider } | null {
+  const normalizedMethodId = normalizePaymentMethodId(methodId);
+  const normalizedGateway = normalizePaymentToken(gateway);
 
-  if (
-    normalized === 'card' ||
-    normalized === 'credit-card' ||
-    normalized === 'debit-card'
-  ) {
-    return 'card';
+  let resolvedMethodId: PaymentMethodId | null = normalizedMethodId;
+
+  if (!resolvedMethodId) {
+    if (normalizedGateway === 'paypal') {
+      resolvedMethodId = 'paypal';
+    } else if (normalizedGateway === 'offline') {
+      resolvedMethodId = 'bank-transfer';
+    } else if (normalizedGateway === 'open-banking') {
+      resolvedMethodId = 'open-banking';
+    }
   }
-  if (normalized === 'sepa' || normalized === 'sepa-debit') {
-    return 'sepa-debit';
+
+  if (!resolvedMethodId) {
+    return null;
   }
-  if (normalized === 'paypal') {
-    return 'paypal';
+
+  if (resolvedMethodId === 'open-banking') {
+    return { methodId: resolvedMethodId, provider: 'open-banking' };
   }
-  if (normalized === 'bank-transfer' || normalized === 'offline') {
-    return 'bank-transfer';
+  if (resolvedMethodId === 'paypal') {
+    return { methodId: resolvedMethodId, provider: 'paypal' };
   }
-  if (normalized === 'open-banking' || normalized === 'openbanking') {
-    return 'open-banking';
-  }
-  if (normalized === 'apple-pay' || normalized === 'applepay') {
-    return 'apple-pay';
-  }
-  if (normalized === 'google-pay' || normalized === 'googlepay') {
-    return 'google-pay';
-  }
-  if (gateway === 'paypal') {
-    return 'paypal';
-  }
-  if (gateway === 'offline') {
-    return 'bank-transfer';
+  if (resolvedMethodId === 'bank-transfer') {
+    return { methodId: resolvedMethodId, provider: 'offline' };
   }
   if (normalizedGateway === 'open-banking') {
-    return 'open-banking';
-  }
-
-  return null;
-}
-
-function providerForMethod(
-  methodId: PaymentMethodId,
-  gateway: string
-): PaymentMethodProvider {
-  const normalizedGateway = gateway.toLowerCase().trim().replaceAll('_', '-');
-
-  if (methodId === 'open-banking') {
-    return 'open-banking';
-  }
-  if (methodId === 'paypal') {
-    return 'paypal';
-  }
-  if (methodId === 'bank-transfer') {
-    return 'offline';
-  }
-  if (normalizedGateway === 'open-banking') {
-    return 'open-banking';
+    return { methodId: resolvedMethodId, provider: 'open-banking' };
   }
   if (normalizedGateway === 'planetcash') {
-    return 'planetcash';
+    return { methodId: resolvedMethodId, provider: 'planetcash' };
   }
-  if (gateway === 'paypal') {
-    return 'paypal';
+  if (normalizedGateway === 'paypal') {
+    return { methodId: resolvedMethodId, provider: 'paypal' };
   }
-  if (gateway === 'offline') {
-    return 'offline';
+  if (normalizedGateway === 'offline') {
+    return { methodId: resolvedMethodId, provider: 'offline' };
   }
-  return 'stripe';
+  return { methodId: resolvedMethodId, provider: 'stripe' };
 }
 
 function isMethodAllowedForCurrency(
@@ -127,6 +103,7 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
   const entries: RawMethodEntry[] = [];
 
   for (const [gateway, config] of Object.entries(paymentOptions.gateways)) {
+    const normalizedGateway = normalizePaymentToken(gateway);
     const methods = config?.methods;
 
     if (Array.isArray(methods) && methods.length > 0) {
@@ -138,11 +115,11 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
       continue;
     }
 
-    if (gateway === 'paypal') {
+    if (normalizedGateway === 'paypal') {
       entries.push({ methodId: 'paypal', gateway });
-    } else if (gateway === 'offline') {
+    } else if (normalizedGateway === 'offline') {
       entries.push({ methodId: 'bank-transfer', gateway });
-    } else if (gateway === 'open-banking') {
+    } else if (normalizedGateway === 'open-banking') {
       entries.push({ methodId: 'open-banking', gateway });
     }
   }
@@ -158,37 +135,45 @@ export function derivePaymentMethods(
   const rawEntries = getRawMethodEntries(paymentOptions);
 
   for (const entry of rawEntries) {
-    const methodId = normalizePaymentMethodId(entry.methodId, entry.gateway);
+    const resolvedMethod = resolveMethod(entry.methodId, entry.gateway);
 
-    if (!methodId || deduped.has(methodId)) {
+    if (!resolvedMethod || deduped.has(resolvedMethod.methodId)) {
       continue;
     }
-    if (!isMethodAllowedForCurrency(methodId, context.currency)) {
+    if (
+      !isMethodAllowedForCurrency(resolvedMethod.methodId, context.currency)
+    ) {
       continue;
     }
 
-    const provider = providerForMethod(methodId, entry.gateway);
     const fee = getProcessingFee(
-      provider,
-      methodId,
+      resolvedMethod.provider,
+      resolvedMethod.methodId,
       context.donationAmountCents,
       context.country
     );
 
-    deduped.set(methodId, {
-      id: methodId,
-      provider,
-      labelKey: METHOD_LABEL_KEYS[methodId],
-      disabled: false,
-      hasFee: fee.hasFee,
-      feeAmountCents: fee.feeAmountCents,
-      feeRegion: fee.region,
-    });
+    deduped.set(
+      resolvedMethod.methodId,
+      fee.hasFee
+        ? {
+            id: resolvedMethod.methodId,
+            provider: resolvedMethod.provider,
+            hasFee: true,
+            feeAmountCents: fee.feeAmountCents,
+            feeRegion: fee.region,
+          }
+        : {
+            id: resolvedMethod.methodId,
+            provider: resolvedMethod.provider,
+            hasFee: false,
+          }
+    );
   }
 
   return Array.from(deduped.values()).sort((a, b) => {
-    const aIndex = LEGACY_METHOD_ORDER.indexOf(a.id);
-    const bIndex = LEGACY_METHOD_ORDER.indexOf(b.id);
+    const aIndex = PAYMENT_METHOD_ORDER.indexOf(a.id);
+    const bIndex = PAYMENT_METHOD_ORDER.indexOf(b.id);
     const normalizedAIndex = aIndex >= 0 ? aIndex : Number.MAX_SAFE_INTEGER;
     const normalizedBIndex = bIndex >= 0 ? bIndex : Number.MAX_SAFE_INTEGER;
     return normalizedAIndex - normalizedBIndex;
