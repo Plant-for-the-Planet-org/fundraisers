@@ -33,6 +33,39 @@
         "total": "Gesamt",
         "totalMonthly": "Gesamt jeden Monat",
         "totalYearly": "Gesamt jedes Jahr"
+      },
+      "paymentMethods": {
+        "title": "Zahlungsmethode",
+        "description": "Erhöhe die Wirkung deiner Spende. Manche Zahlungsanbieter berechnen Gebühren. Bei gebührenfreien Methoden kommt der volle Betrag dem Projekt zugute.",
+        "selectMethodPlaceholder": "Zahlungsmethode auswählen",
+        "empty": "Aktuell sind keine Zahlungsmethoden verfügbar.",
+        "methods": {
+          "openBanking": "Mit Bank bezahlen (Open Banking)",
+          "bankTransfer": "Banküberweisung",
+          "paypal": "PayPal",
+          "card": "Kredit- oder Debitkarte",
+          "sepa": "SEPA-Lastschrift",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "der Zahlungsanbieter",
+          "open-banking": "Open Banking",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "Keine Gebühr",
+          "feeAmount": "{amount} Gebühr",
+          "alternatives": {
+            "eu": "Open Banking oder Banküberweisung",
+            "default": "Banküberweisung"
+          },
+          "tooltip": {
+            "withFee": "{provider} berechnet uns {amount} für die Verarbeitung dieser Spende. Du kannst die Wirkung deiner Spende erhöhen, indem du {alternatives} auswählst."
+          }
+        }
       }
     },
     "create": {

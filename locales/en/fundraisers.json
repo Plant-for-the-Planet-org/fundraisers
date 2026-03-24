@@ -33,6 +33,39 @@
         "total": "Total",
         "totalMonthly": "Total every month",
         "totalYearly": "Total every year"
+      },
+      "paymentMethods": {
+        "title": "Payment Method",
+        "description": "Help your donation go further. Some payment providers charge us fees. Fee-free methods ensure full donation supports your cause.",
+        "selectMethodPlaceholder": "Select payment method",
+        "empty": "No payment methods are currently available.",
+        "methods": {
+          "openBanking": "Pay with your Bank (Open Banking)",
+          "bankTransfer": "Bank Transfer",
+          "paypal": "PayPal",
+          "card": "Credit or Debit Card",
+          "sepa": "SEPA Direct Debit",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "the payment provider",
+          "open-banking": "Open Banking",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "No fee",
+          "feeAmount": "{amount} fee",
+          "alternatives": {
+            "eu": "Open Banking or Bank Transfer",
+            "default": "Bank Transfer"
+          },
+          "tooltip": {
+            "withFee": "{provider} charges us {amount} to process this donation. Make your impact larger by choosing {alternatives}."
+          }
+        }
       }
     },
     "create": {
