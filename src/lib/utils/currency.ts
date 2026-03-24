@@ -55,13 +55,14 @@ export function formatCurrency(
   // Convert cents to major currency unit (divide by 100)
   const amount = amountInCents / 100;
 
-  const minimumFractionDigits = options?.minimumFractionDigits ?? 0;
-  const maximumFractionDigits = options?.maximumFractionDigits ?? 2;
+  // Show 2 decimal places only when the amount has a cent portion (e.g. €0.70),
+  // so round amounts stay clean (e.g. €20, not €20.00).
+  const minimumFractionDigits = amount % 1 !== 0 ? 2 : 0;
 
-  // Format the number with locale-specific decimal and thousands separators
+  // Format the number with locale-specific decimal and thousands separators.
   const formattedAmount = new Intl.NumberFormat(locale, {
     minimumFractionDigits,
-    maximumFractionDigits,
+    maximumFractionDigits: 2,
   }).format(amount);
 
   // Use symbol if available, otherwise use currency code
@@ -103,13 +104,14 @@ export function formatCurrencyFromDecimal(
 ): string {
   const currencyUpper = currency.toUpperCase();
 
-  const minimumFractionDigits = options?.minimumFractionDigits ?? 0;
-  const maximumFractionDigits = options?.maximumFractionDigits ?? 2;
+  // Show 2 decimal places only when the amount has a cent portion (e.g. €0.70),
+  // so round amounts stay clean (e.g. €20, not €20.00).
+  const minimumFractionDigits = amount % 1 !== 0 ? 2 : 0;
 
-  // Format the number with locale-specific decimal and thousands separators
+  // Format the number with locale-specific decimal and thousands separators.
   const formattedAmount = new Intl.NumberFormat(locale, {
     minimumFractionDigits,
-    maximumFractionDigits,
+    maximumFractionDigits: 2,
   }).format(amount);
 
   // Use symbol if available, otherwise use currency code

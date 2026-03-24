@@ -13,6 +13,7 @@ import { DonationSummary } from './donation-summary';
 import { PaymentMethods } from './payment-methods';
 import { DonateCTA } from './donate-cta';
 import { DonationFormProvider } from './donation-form-context';
+import { DonateOptions } from './donate-options';
 
 export interface DonationData {
   amount: number;
@@ -78,6 +79,7 @@ export function DonateOverlay({
           <>
             {/* Dedication - future implementation */}
             <DonationSummary />
+            <DonateOptions />
             <DonateCTA />
           </>
         }
