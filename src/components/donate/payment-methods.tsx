@@ -23,6 +23,10 @@ const VISIBLE_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
   'card',
   'sepa-debit',
 ]);
+const FEE_CURRENCY_FORMAT = {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+} as const;
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
@@ -81,7 +85,12 @@ export function PaymentMethods() {
     }
 
     return t('fees.feeAmount', {
-      amount: formatCurrency(method.feeAmountCents, donationCurrency),
+      amount: formatCurrency(
+        method.feeAmountCents,
+        donationCurrency,
+        undefined,
+        FEE_CURRENCY_FORMAT
+      ),
     });
   }
 
@@ -100,7 +109,12 @@ export function PaymentMethods() {
 
     return t('fees.tooltip.withFee', {
       provider: getProviderLabel(method.provider),
-      amount: formatCurrency(method.feeAmountCents, donationCurrency),
+      amount: formatCurrency(
+        method.feeAmountCents,
+        donationCurrency,
+        undefined,
+        FEE_CURRENCY_FORMAT
+      ),
       alternatives,
     });
   }

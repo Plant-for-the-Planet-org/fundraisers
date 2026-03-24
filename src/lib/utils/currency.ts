@@ -44,17 +44,24 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 export function formatCurrency(
   amountInCents: number,
   currency: string,
-  locale: string = 'en-US'
+  locale: string = 'en-US',
+  options?: {
+    minimumFractionDigits?: number;
+    maximumFractionDigits?: number;
+  }
 ): string {
   const currencyUpper = currency.toUpperCase();
 
   // Convert cents to major currency unit (divide by 100)
   const amount = amountInCents / 100;
 
+  const minimumFractionDigits = options?.minimumFractionDigits ?? 0;
+  const maximumFractionDigits = options?.maximumFractionDigits ?? 2;
+
   // Format the number with locale-specific decimal and thousands separators
   const formattedAmount = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    minimumFractionDigits,
+    maximumFractionDigits,
   }).format(amount);
 
   // Use symbol if available, otherwise use currency code
@@ -88,14 +95,21 @@ export function formatCurrency(
 export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
-  locale: string = 'en-US'
+  locale: string = 'en-US',
+  options?: {
+    minimumFractionDigits?: number;
+    maximumFractionDigits?: number;
+  }
 ): string {
   const currencyUpper = currency.toUpperCase();
 
+  const minimumFractionDigits = options?.minimumFractionDigits ?? 0;
+  const maximumFractionDigits = options?.maximumFractionDigits ?? 2;
+
   // Format the number with locale-specific decimal and thousands separators
   const formattedAmount = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    minimumFractionDigits,
+    maximumFractionDigits,
   }).format(amount);
 
   // Use symbol if available, otherwise use currency code
