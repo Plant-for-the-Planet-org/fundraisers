@@ -19,8 +19,6 @@ export type FeeRegion = 'US' | 'EU' | 'ROW';
 interface BaseDerivedPaymentMethod {
   id: PaymentMethodId;
   provider: PaymentMethodProvider;
-  // labelKey: string;
-  // disabled: boolean;
 }
 
 export type DerivedPaymentMethod =

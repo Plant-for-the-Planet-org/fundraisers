@@ -46,11 +46,6 @@ const PROVIDER_TRANSLATION_KEYS: Record<
   planetcash: 'providers.planetcash',
 };
 
-const FEE_CURRENCY_FORMAT = {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-} as const;
-
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -81,8 +76,7 @@ export function PaymentMethods() {
       amount: formatCurrency(
         method.feeAmountCents,
         donationCurrency,
-        undefined,
-        FEE_CURRENCY_FORMAT
+        undefined
       ),
     });
   }
@@ -105,8 +99,7 @@ export function PaymentMethods() {
       amount: formatCurrency(
         method.feeAmountCents,
         donationCurrency,
-        undefined,
-        FEE_CURRENCY_FORMAT
+        undefined
       ),
       alternatives,
     });
