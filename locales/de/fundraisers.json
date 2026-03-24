@@ -33,6 +33,12 @@
         "total": "Gesamt",
         "totalMonthly": "Gesamt jeden Monat",
         "totalYearly": "Gesamt jedes Jahr"
+      },
+      "options": {
+        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Zahlungsabwicklungsgebühren zu decken.",
+        "coverFeesTooltip": "Die Zahlungsabwicklungsgebühren werden auf die von diesem Fundraiser unterstützten Projekte verteilt.",
+        "coverFeesTooltipTriggerLabel": "Weitere Informationen zu Zahlungsabwicklungsgebühren",
+        "makeMonthly": "Meine Spende monatlich machen"
       }
     },
     "create": {

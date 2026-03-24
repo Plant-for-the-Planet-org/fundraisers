@@ -130,6 +130,8 @@ h6 {
   );
 }
 
-button:not(:disabled) {
-  cursor: pointer;
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
 }
