@@ -66,6 +66,7 @@
             "withFee": "{provider} charges us {amount} to process this donation. Make your impact larger by choosing {alternatives}."
           }
         }
+      },
       "options": {
         "coverFeesLabel": "Add {feeAmount} to cover payment processing fees.",
         "coverFeesTooltip": "Payment processing fees are distributed to the causes supported by this fundraiser.",

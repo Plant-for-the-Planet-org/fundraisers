@@ -44,11 +44,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 export function formatCurrency(
   amountInCents: number,
   currency: string,
-  locale: string = 'en-US',
-  options?: {
-    minimumFractionDigits?: number;
-    maximumFractionDigits?: number;
-  }
+  locale: string = 'en-US'
 ): string {
   const currencyUpper = currency.toUpperCase();
 
@@ -96,11 +92,7 @@ export function formatCurrency(
 export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
-  locale: string = 'en-US',
-  options?: {
-    minimumFractionDigits?: number;
-    maximumFractionDigits?: number;
-  }
+  locale: string = 'en-US'
 ): string {
   const currencyUpper = currency.toUpperCase();
 
