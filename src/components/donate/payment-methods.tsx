@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
@@ -214,12 +214,10 @@ export function PaymentMethods() {
                       {selectedMethodFeeText}
                     </span>
                     {selectedMethodFeeTooltip && (
-                      <span title={selectedMethodFeeTooltip}>
-                        <Info
-                          className='w-3 h-3 text-gray-400 cursor-help'
-                          aria-label={selectedMethodFeeTooltip}
-                        />
-                      </span>
+                      <InfoTooltip
+                        content={selectedMethodFeeTooltip}
+                        iconClassName='w-3 h-3 text-gray-400'
+                      />
                     )}
                   </div>
                 )}
@@ -310,12 +308,10 @@ export function PaymentMethods() {
                       >
                         <span className='text-sm'>{methodFeeText}</span>
                         {methodFeeTooltip && (
-                          <span title={methodFeeTooltip}>
-                            <Info
-                              className='w-4 h-4 cursor-help'
-                              aria-label={methodFeeTooltip}
-                            />
-                          </span>
+                          <InfoTooltip
+                            content={methodFeeTooltip}
+                            iconClassName='w-4 h-4'
+                          />
                         )}
                       </div>
                     )}
@@ -327,5 +323,116 @@ export function PaymentMethods() {
         )}
       </div>
     </div>
+  );
+}
+
+interface InfoTooltipProps {
+  content: string;
+  iconClassName?: string;
+}
+
+function InfoTooltip({ content, iconClassName }: InfoTooltipProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLSpanElement | null>(null);
+  const tooltipRef = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const viewportPadding = 8;
+    const spacing = 8;
+
+    const updatePosition = () => {
+      const triggerElement = triggerRef.current;
+      const tooltipElement = tooltipRef.current;
+
+      if (!triggerElement || !tooltipElement) {
+        return;
+      }
+
+      const triggerRect = triggerElement.getBoundingClientRect();
+      const tooltipRect = tooltipElement.getBoundingClientRect();
+
+      let left =
+        triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+      left = Math.max(
+        viewportPadding,
+        Math.min(left, window.innerWidth - tooltipRect.width - viewportPadding)
+      );
+
+      const spaceBelow =
+        window.innerHeight - triggerRect.bottom - viewportPadding;
+      const shouldPlaceAbove =
+        tooltipRect.height + spacing > spaceBelow &&
+        triggerRect.top - viewportPadding > spaceBelow;
+
+      const top = shouldPlaceAbove
+        ? Math.max(
+            viewportPadding,
+            triggerRect.top - tooltipRect.height - spacing
+          )
+        : triggerRect.bottom + spacing;
+
+      setPosition({ top, left });
+    };
+
+    const rafId = window.requestAnimationFrame(updatePosition);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
+
+  return (
+    <span
+      className='relative inline-flex'
+      onMouseEnter={() => {
+        setIsOpen(true);
+      }}
+      onMouseLeave={() => {
+        setIsOpen(false);
+      }}
+    >
+      <span
+        ref={triggerRef}
+        className='inline-flex items-center cursor-help'
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setIsOpen(prev => !prev);
+        }}
+      >
+        <Info
+          className={cn('text-gray-400', iconClassName)}
+          aria-label={content}
+        />
+      </span>
+
+      {isOpen && (
+        <span
+          ref={tooltipRef}
+          role='tooltip'
+          className='fixed z-50 rounded-md bg-gray-900 px-3 py-2 text-xs leading-relaxed text-white shadow-lg'
+          style={{
+            top: position.top,
+            left: position.left,
+            maxWidth: 'min(18rem, calc(100vw - 1rem))',
+          }}
+          onClick={event => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+        >
+          {content}
+        </span>
+      )}
+    </span>
   );
 }
