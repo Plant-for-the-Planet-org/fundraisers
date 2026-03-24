@@ -33,6 +33,12 @@
         "total": "Total",
         "totalMonthly": "Total every month",
         "totalYearly": "Total every year"
+      },
+      "options": {
+        "coverFeesLabel": "Add {feeAmount} to cover payment processing fees.",
+        "coverFeesTooltip": "Payment processing fees are distributed to the causes supported by this fundraiser.",
+        "coverFeesTooltipTriggerLabel": "More information about payment processing fees",
+        "makeMonthly": "Make my donation monthly"
       }
     },
     "create": {
