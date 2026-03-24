@@ -1,36 +1,42 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { useDonationForm } from './donation-form-context';
 import type { DonationFormValues } from './donation-form-context';
 
-// TODO: Replace with the real fee constant from a shared config once the payment methods
-// integration is complete. Keep in sync with donation-summary.tsx in the meantime.
-const FEE_CENTS = 70;
-
 export function DonateOptions() {
   const { control } = useFormContext<DonationFormValues>();
-  const { paymentOptions, donationData } = useDonationForm();
+  const selectedPaymentMethod = useWatch({
+    control,
+    name: 'selectedPaymentMethod',
+  });
+  const { fundraiser, paymentOptions, donationData } = useDonationForm();
   const t = useTranslations('Fundraisers');
 
-  // TODO: Replace with getProcessingFee() + isFeeCollectionEnabled() once payment
-  // methods are integrated. Until then fee collection is always enabled and uses
-  // the hardcoded FEE_CENTS constant.
-  const feeCollectionEnabled = true;
-  const processingFee = useMemo(
-    () => ({
-      hasFee: true,
-      displayAmount: formatCurrency(FEE_CENTS, donationData.currency),
-    }),
-    [donationData.currency]
-  );
+  const { feeCollectionEnabled, hasProcessingFee, processingFeeCents } =
+    useMemo(() => {
+      return getDonationProcessingFeeInfo({
+        paymentOptions,
+        donationAmountCents: donationData.amount,
+        donationCurrency: donationData.currency,
+        workspaceCountry: fundraiser.workspace?.country,
+        selectedPaymentMethod,
+      });
+    }, [
+      donationData.amount,
+      donationData.currency,
+      fundraiser.workspace?.country,
+      paymentOptions,
+      selectedPaymentMethod,
+    ]);
 
-  const showCoverFees = feeCollectionEnabled && processingFee.hasFee;
+  const showCoverFees = feeCollectionEnabled && hasProcessingFee;
   const showMakeMonthly =
     paymentOptions.recurrency.supported &&
     donationData.frequency === 'one-time';
@@ -59,7 +65,10 @@ export function DonateOptions() {
               className='cursor-pointer select-none text-sm font-medium text-foreground'
             >
               {t('donate.options.coverFeesLabel', {
-                feeAmount: processingFee.displayAmount,
+                feeAmount: formatCurrency(
+                  processingFeeCents,
+                  donationData.currency
+                ),
               })}
             </label>
             <InfoTooltip

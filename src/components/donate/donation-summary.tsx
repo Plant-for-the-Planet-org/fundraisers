@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
+import { useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useDonationForm } from './donation-form-context';
 import type { DonationFormValues } from './donation-form-context';
@@ -8,16 +9,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils/index';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 
-// TODO: move this constant to a config file or fetch from backend. The fee is currently fixed at 0.70 for all payment methods/currencies, but this will change in the future.
-const FEE_CENTS = 70;
-
 export function DonationSummary() {
-  const { fundraiser, donationData } = useDonationForm();
+  const { fundraiser, donationData, paymentOptions } = useDonationForm();
   const { watch } = useFormContext<DonationFormValues>();
   const coverFees = watch('coverFees');
   const makeMonthly = watch('makeMonthly');
+  const selectedPaymentMethod = useWatch({
+    name: 'selectedPaymentMethod',
+  });
   const t = useTranslations('Fundraisers');
 
   const fundraiserImageUrl = getImageUrl(
@@ -83,7 +85,25 @@ export function DonationSummary() {
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
   const isYearly = donationData.frequency === 'annual';
-  const totalCents = donationData.amount + (coverFees ? FEE_CENTS : 0);
+  const { hasProcessingFee, processingFeeCents } = useMemo(() => {
+    return getDonationProcessingFeeInfo({
+      paymentOptions,
+      donationAmountCents: donationData.amount,
+      donationCurrency: donationData.currency,
+      workspaceCountry: fundraiser.workspace?.country,
+      selectedPaymentMethod,
+    });
+  }, [
+    donationData.amount,
+    donationData.currency,
+    fundraiser.workspace?.country,
+    paymentOptions,
+    selectedPaymentMethod,
+  ]);
+
+  const totalCents =
+    donationData.amount +
+    (coverFees && hasProcessingFee ? processingFeeCents : 0);
   const totalLabel = isMonthly
     ? t('donate.summary.totalMonthly')
     : isYearly
@@ -109,13 +129,13 @@ export function DonationSummary() {
         </div>
       ))}
 
-      {coverFees && (
+      {coverFees && hasProcessingFee && (
         <div className='flex justify-between items-baseline gap-2'>
           <dt className='text-muted-foreground text-sm'>
             {t('donate.summary.processingFee')}
           </dt>
           <dd className='text-foreground text-sm font-medium'>
-            {formatCurrency(FEE_CENTS, donationData.currency)}
+            {formatCurrency(processingFeeCents, donationData.currency)}
           </dd>
         </div>
       )}

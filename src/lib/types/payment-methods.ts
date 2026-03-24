@@ -14,6 +14,13 @@ export type PaymentMethodProvider =
   | 'open-banking'
   | 'planetcash';
 
+export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
+  'bank-transfer',
+  'paypal',
+  'card',
+  'sepa-debit',
+]);
+
 export type FeeRegion = 'US' | 'EU' | 'ROW';
 
 interface BaseDerivedPaymentMethod {

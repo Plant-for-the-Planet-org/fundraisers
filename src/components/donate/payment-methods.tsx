@@ -17,13 +17,7 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
-
-const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
-  'bank-transfer',
-  'paypal',
-  'card',
-  'sepa-debit',
-]);
+import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   'open-banking': 'methods.openBanking',
