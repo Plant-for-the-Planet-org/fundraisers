@@ -166,10 +166,12 @@ export function PaymentMethods() {
     return (
       <div className='space-y-3'>
         <div className='space-y-2'>
-          <h2 className='text-gray-900 text-base font-medium'>{t('title')}</h2>
-          <p className='text-gray-600 text-sm'>{t('description')}</p>
+          <h2 className='text-foreground text-base font-medium'>
+            {t('title')}
+          </h2>
+          <p className='text-muted-foreground text-sm'>{t('description')}</p>
         </div>
-        <div className='border border-gray-200 rounded-lg p-4 text-sm text-gray-600'>
+        <div className='border border-border rounded-lg p-4 text-sm text-muted-foreground'>
           {t('empty')}
         </div>
       </div>
@@ -179,11 +181,11 @@ export function PaymentMethods() {
   return (
     <div className='space-y-3'>
       <div className='space-y-2'>
-        <h2 className='text-gray-900 text-base font-medium'>{t('title')}</h2>
-        <p className='text-gray-600 text-sm'>{t('description')}</p>
+        <h2 className='text-foreground font-medium'>{t('title')}</h2>
+        <p className='text-muted-foreground text-sm'>{t('description')}</p>
       </div>
 
-      <div className='border border-gray-200 rounded-lg'>
+      <div className='border border-border rounded-lg'>
         <button
           type='button'
           onClick={() => {
@@ -195,25 +197,25 @@ export function PaymentMethods() {
           )}
         >
           <div className='flex items-center gap-3'>
-            <div className='w-4 h-4 rounded-full bg-gray-900 flex items-center justify-center'>
+            <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
               <Check className='w-2.5 h-2.5 text-white' />
             </div>
             <div>
-              <span className='text-sm font-medium text-gray-900'>
+              <span className='text-sm font-medium text-foreground'>
                 {selectedMethodLabel}
               </span>
               {feeCollectionEnabled &&
                 selectedMethod &&
                 selectedMethodFeeText && (
                   <div className='mt-1 flex items-center gap-1'>
-                    <span className='text-sm text-gray-500'>
+                    <span className='text-sm text-muted-foreground'>
                       {selectedMethodFeeText}
                     </span>
                     {selectedMethodFeeTooltip && (
                       <InfoTooltip
                         content={selectedMethodFeeTooltip}
                         className='inline-flex'
-                        iconClassName='h-3 w-3 text-gray-400'
+                        iconClassName='text-muted-foreground'
                       />
                     )}
                   </div>
@@ -221,14 +223,14 @@ export function PaymentMethods() {
             </div>
           </div>
           {isExpanded ? (
-            <ChevronUp className='h-5 w-5 text-gray-400' />
+            <ChevronUp className='h-5 w-5 text-foreground' />
           ) : (
-            <ChevronDown className='h-5 w-5 text-gray-400' />
+            <ChevronDown className='h-5 w-5 text-foreground' />
           )}
         </button>
 
         {isExpanded && (
-          <div className='space-y-3 border-t border-gray-200 p-4'>
+          <div className='space-y-3 border-t border-border p-4'>
             {visibleMethods.map(method => {
               const methodLabel = getMethodLabel(method.id);
               const methodFeeText = getFeeText(method, donationData.currency);
@@ -253,8 +255,8 @@ export function PaymentMethods() {
                   className={cn(
                     'w-full rounded-lg border p-3 text-left transition-all hover:border-gray-400',
                     isSelected
-                      ? 'border-gray-900 bg-gray-50'
-                      : 'border-gray-200 bg-white'
+                      ? 'border-foreground bg-muted'
+                      : 'border-border bg-white'
                   )}
                 >
                   <div className='flex items-start justify-between'>
@@ -264,8 +266,8 @@ export function PaymentMethods() {
                           className={cn(
                             'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all',
                             isSelected
-                              ? 'border-gray-900 bg-gray-900'
-                              : 'border-gray-300 bg-white'
+                              ? 'border-foreground bg-foreground'
+                              : 'border-input bg-background'
                           )}
                         >
                           {isSelected && (
@@ -288,7 +290,6 @@ export function PaymentMethods() {
                           <InfoTooltip
                             content={methodFeeTooltip}
                             className='inline-flex'
-                            iconClassName='h-4 w-4 text-gray-400'
                           />
                         )}
                       </div>
