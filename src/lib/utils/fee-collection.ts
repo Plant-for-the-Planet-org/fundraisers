@@ -5,7 +5,7 @@
 export function isFeeCollectionEnabled(): boolean {
   const allowFeeCollection = process.env.NEXT_PUBLIC_ALLOW_FEE_COLLECTION;
 
-  if (allowFeeCollection === undefined || allowFeeCollection === null) {
+  if (allowFeeCollection === undefined) {
     return true;
   }
 
