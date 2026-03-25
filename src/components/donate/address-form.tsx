@@ -1,7 +1,7 @@
 'use client';
 import type { DonationFormValues } from './donation-form-context';
 
-import { useController, useFormContext } from 'react-hook-form';
+import { useController, useFormContext, useWatch } from 'react-hook-form';
 import { useRef, useState } from 'react';
 import {
   getAllCountries,
@@ -11,7 +11,6 @@ import {
 import { Check, ChevronDown, Loader2 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '../ui/button';
 import { addressService } from '@/lib/api/address-service';
@@ -28,6 +27,7 @@ export const AddressForm = () => {
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [saveAddressError, setSaveAddressError] = useState<string | null>(null);
 
   const countryDropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,8 +36,9 @@ export const AddressForm = () => {
     register,
     control,
     formState: { errors },
-    watch,
     setValue,
+    trigger,
+    getValues,
   } = useFormContext<DonationFormValues>();
 
   const {
@@ -52,10 +53,10 @@ export const AddressForm = () => {
     ? searchCountries(countrySearch, 'en')
     : allCountries;
 
-  const watchedFields = watch(['address', 'city', 'zipCode', 'country']);
+  const watchedFields = useWatch({
+    name: ['address', 'city', 'zipCode', 'country'],
+  });
   const isAddressValid = watchedFields.every(Boolean);
-
-  const { trigger, getValues } = useFormContext<DonationFormValues>();
 
   const handleCountrySelect = (code: string) => {
     setCountry(code);
@@ -68,6 +69,7 @@ export const AddressForm = () => {
     if (!isValid || !token) return;
 
     setIsLoading(true);
+    setSaveAddressError(null);
     try {
       const payload = buildAddressPayload(getValues());
 
@@ -76,7 +78,9 @@ export const AddressForm = () => {
       // Select the newly created address and exit new address mode
       setValue('selectedAddressId', createdAddress.id);
     } catch (err) {
-      console.error(err);
+      setSaveAddressError(
+        err instanceof Error ? err.message : 'Failed to save address'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +94,7 @@ export const AddressForm = () => {
           {/* Country Dropdown */}
           <FormField
             label={tDonate('country.label')}
-            error={errors.zipCode?.message}
+            error={errors.country?.message}
           >
             <div className='relative mt-2' ref={countryDropdownRef}>
               <div
@@ -155,9 +159,7 @@ export const AddressForm = () => {
             <Input
               {...register('zipCode')}
               placeholder={tDonate('zipCode.placeholder')}
-              className={cn(
-                'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-              )}
+              className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
             />
           </FormField>
         </div>
@@ -172,9 +174,7 @@ export const AddressForm = () => {
             <Input
               {...register('address')}
               placeholder={tDonate('address.placeholder')}
-              className={cn(
-                'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-              )}
+              className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
             />
           </FormField>
         </div>
@@ -182,9 +182,7 @@ export const AddressForm = () => {
           <Input
             {...register('city')}
             placeholder={tDonate('city.placeholder')}
-            className={cn(
-              'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-            )}
+            className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
           />
         </FormField>
       </div>
@@ -206,12 +204,13 @@ export const AddressForm = () => {
           <Input
             {...register('state')}
             placeholder={tDonate('state.placeholder')}
-            className={cn(
-              'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-            )}
+            className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
           />
         </FormField>
       </div>
+      {saveAddressError && (
+        <p className='text-sm text-red-500'>{saveAddressError}</p>
+      )}
       {isAuthenticated && (
         <div className='mt-5'>
           <Button
