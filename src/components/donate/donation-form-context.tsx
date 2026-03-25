@@ -37,6 +37,8 @@ export const donationFormSchema = z.object({
   makeMonthly: z.boolean(),
   coverFees: z.boolean(),
   selectedPaymentMethod: z.string().optional(),
+  isCompany: z.boolean(),
+  companyName: z.string().trim().optional(),
 });
 
 export type DonationFormValues = z.infer<typeof donationFormSchema>;
@@ -88,6 +90,7 @@ export function DonationFormProvider({
       state: '',
       country: '',
       isAnonymous: false,
+      isCompany: false,
       makeMonthly: false,
       coverFees: false,
       selectedPaymentMethod: '',
