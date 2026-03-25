@@ -1,4 +1,7 @@
+import type { DonationFormValues } from '@/components/donate/donation-form-context';
 import type { Address, UserProfile } from '../api/user-service';
+
+import { ADDRESS_TYPE_NAMES } from '../constants/address';
 
 /**
  * Returns the best possible display name for a user.
@@ -26,3 +29,25 @@ export const getDisplayName = (profile: UserProfile): string => {
  */
 export const getPrimaryAddress = (addresses: Address[]) =>
   addresses?.find(addr => addr.isPrimary) || addresses?.[0];
+
+export type AddressType = 'primary' | 'mailing' | 'other';
+
+export function buildAddressPayload(
+  values: Pick<
+    DonationFormValues,
+    'address' | 'address2' | 'city' | 'zipCode' | 'state' | 'country'
+  > & {
+    addressType: AddressType;
+  }
+) {
+  return {
+    type: values.addressType,
+    name: ADDRESS_TYPE_NAMES[values.addressType],
+    address1: values.address,
+    address2: values.address2 ?? undefined,
+    city: values.city,
+    zipCode: values.zipCode,
+    state: values.state ?? undefined,
+    country: values.country,
+  };
+}

@@ -17,11 +17,12 @@ import { Button } from '../ui/button';
 import { addressService } from '@/lib/api/address-service';
 import { AddressTypeRadioGroup } from './address-type-radio-group';
 import { FormField } from './form-field';
+import { buildAddressPayload } from '@/lib/utils/profile';
 
 export const AddressForm = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const token = useAuthStore(state => state.accessToken);
-
+  const refreshProfile = useAuthStore(state => state.refreshProfile);
   const tDonate = useTranslations('Donate.userAddress');
 
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -31,25 +32,13 @@ export const AddressForm = () => {
   const countryDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const allCountries = getAllCountries('en');
-
-  // Filter countries based on search
-  const filteredCountries = countrySearch
-    ? searchCountries(countrySearch, 'en')
-    : allCountries;
-
-  const handleCountrySelect = (code: string) => {
-    setCountry(code);
-    setIsCountryDropdownOpen(false);
-  };
   const {
     register,
     control,
     formState: { errors },
     watch,
+    setValue,
   } = useFormContext<DonationFormValues>();
-
-  const watchedFields = watch(['address', 'city', 'zipCode', 'country']);
-  const isAddressValid = watchedFields.every(Boolean);
 
   const {
     field: { value: country, onChange: setCountry },
@@ -58,36 +47,34 @@ export const AddressForm = () => {
     control,
   });
 
+  // Filter countries based on search
+  const filteredCountries = countrySearch
+    ? searchCountries(countrySearch, 'en')
+    : allCountries;
+
+  const watchedFields = watch(['address', 'city', 'zipCode', 'country']);
+  const isAddressValid = watchedFields.every(Boolean);
+
   const { trigger, getValues } = useFormContext<DonationFormValues>();
+
+  const handleCountrySelect = (code: string) => {
+    setCountry(code);
+    setIsCountryDropdownOpen(false);
+  };
 
   const handleSaveAddress = async () => {
     const isValid = await trigger(['address', 'city', 'zipCode', 'country']);
 
     if (!isValid || !token) return;
 
-    const { address, city, zipCode, country, address2, state, addressType } =
-      getValues();
     setIsLoading(true);
     try {
-      const addressData = {
-        type: addressType,
-        name:
-          addressType === 'primary'
-            ? 'Primary'
-            : addressType === 'mailing'
-              ? 'Mailing'
-              : 'Other',
-        address1: address,
-        address2: address2 || undefined,
-        city,
-        zipCode,
-        state: state || undefined,
-        country,
-      };
+      const payload = buildAddressPayload(getValues());
 
-      await addressService.createAddress(token, addressData);
-
-      //   await refreshProfile();
+      const createdAddress = await addressService.createAddress(token, payload);
+      await refreshProfile();
+      // Select the newly created address and exit new address mode
+      setValue('selectedAddressId', createdAddress.id);
     } catch (err) {
       console.error(err);
     } finally {
