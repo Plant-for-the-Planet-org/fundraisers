@@ -98,7 +98,7 @@ export const AddressForm = () => {
   return (
     <>
       {isAuthenticated && <AddressTypeRadioGroup register={register} />}
-      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3'>
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <div className='space-y-2 sm:col-span-2'>
           {/* Country Dropdown */}
           <FormField
@@ -176,8 +176,8 @@ export const AddressForm = () => {
         </div>
       </div>
       {/* Address + City */}
-      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3'>
-        <div className='space-y-2 sm:col-span-2'>
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+        <div className='sm:col-span-2'>
           <FormField
             label={tDonate('address.label')}
             error={errors.address?.message}
@@ -191,21 +191,19 @@ export const AddressForm = () => {
             />
           </FormField>
         </div>
-        <div className='space-y-2'>
-          <FormField label={tDonate('city.label')} error={errors.city?.message}>
-            <Input
-              {...register('city')}
-              placeholder={tDonate('city.placeholder')}
-              className={cn(
-                'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-              )}
-            />
-          </FormField>
-        </div>
+        <FormField label={tDonate('city.label')} error={errors.city?.message}>
+          <Input
+            {...register('city')}
+            placeholder={tDonate('city.placeholder')}
+            className={cn(
+              'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
+            )}
+          />
+        </FormField>
       </div>
       {/* Address2 + State */}
-      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3'>
-        <div className='space-y-2 sm:col-span-2'>
+      <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 '>
+        <div className='sm:col-span-2'>
           <FormField
             label={tDonate('address2.label')}
             error={errors.address2?.message}
@@ -217,23 +215,18 @@ export const AddressForm = () => {
             />
           </FormField>
         </div>
-        <div className='space-y-2'>
-          <FormField
-            label={tDonate('state.label')}
-            error={errors.state?.message}
-          >
-            <Input
-              {...register('state')}
-              placeholder={tDonate('state.placeholder')}
-              className={cn(
-                'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
-              )}
-            />
-          </FormField>
-        </div>
+        <FormField label={tDonate('state.label')} error={errors.state?.message}>
+          <Input
+            {...register('state')}
+            placeholder={tDonate('state.placeholder')}
+            className={cn(
+              'border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
+            )}
+          />
+        </FormField>
       </div>
       {isAuthenticated && (
-        <div className='space-y-2 mt-4'>
+        <div className='mt-5'>
           <Button
             type='button'
             onClick={handleSaveAddress}
