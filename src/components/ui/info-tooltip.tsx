@@ -25,7 +25,7 @@ export function InfoTooltip({
       <span
         role='button'
         tabIndex={0}
-        aria-describedby={visible ? tooltipId : undefined}
+        aria-describedby={visible ? `tooltip-${tooltipId}` : undefined}
         className='cursor-help rounded text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1'
         onClick={event => {
           event.preventDefault();
