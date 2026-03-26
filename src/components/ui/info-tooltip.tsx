@@ -8,36 +8,51 @@ interface InfoTooltipProps {
   content: string;
   triggerLabel?: string;
   className?: string;
+  iconClassName?: string;
 }
 
 export function InfoTooltip({
   content,
   triggerLabel,
   className,
+  iconClassName,
 }: InfoTooltipProps) {
   const tooltipId = useId();
   const [visible, setVisible] = useState(false);
 
   return (
     <div className={cn('relative flex items-center', className)}>
-      <button
-        type='button'
-        aria-describedby={visible ? tooltipId : undefined}
+      <span
+        role='button'
+        tabIndex={0}
+        aria-describedby={visible ? `tooltip-${tooltipId}` : undefined}
         className='cursor-help rounded text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1'
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setVisible(prev => !prev);
+        }}
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
         onFocus={() => setVisible(true)}
         onBlur={() => setVisible(false)}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            event.stopPropagation();
+            setVisible(prev => !prev);
+          }
+        }}
       >
-        <Info className='h-4 w-4' aria-hidden='true' />
-        {triggerLabel && <span className='sr-only'>{triggerLabel}</span>}
-      </button>
+        <Info className={cn('h-4 w-4', iconClassName)} aria-hidden='true' />
+        <span className='sr-only'>{triggerLabel ?? 'More information'}</span>
+      </span>
 
       {visible && (
         <span
           id={`tooltip-${tooltipId}`}
           role='tooltip'
-          className='absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg bg-foreground px-3 py-2 text-xs text-background'
+          className='absolute bottom-full left-1/2 z-10 mb-2 w-56 max-w-[calc(100vw-1rem)] -translate-x-1/2 rounded-lg bg-foreground px-3 py-2 text-xs text-background'
         >
           {content}
           <span

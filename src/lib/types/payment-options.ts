@@ -45,5 +45,11 @@ export interface PaymentOptions {
         accountId: string;
       };
     };
+    'planet-cash'?: {
+      account: string;
+      balance: number;
+      creditLimit: number;
+      available: number;
+    };
   };
 }
