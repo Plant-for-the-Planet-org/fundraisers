@@ -42,7 +42,8 @@ type RawMethodEntry = {
   gateway: string;
 };
 
-type GatewayConfig = PaymentOptions['gateways'][keyof PaymentOptions['gateways']];
+type GatewayConfig =
+  PaymentOptions['gateways'][keyof PaymentOptions['gateways']];
 type GatewayConfigWithMethods = Extract<GatewayConfig, { methods: string[] }>;
 
 function hasGatewayMethods(
