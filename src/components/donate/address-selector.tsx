@@ -14,12 +14,14 @@ import {
 } from '../ui/select';
 import { getCountry } from '@/lib/utils/country';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 export const cleanFieldValue = (value?: string | null) => {
   return value?.trim() || '';
 };
 
 export function AddressSelector() {
+  const [hasInteracted, setHasInteracted] = useState(false);
   const tDonate = useTranslations('Donate.userAddress');
   const { control } = useFormContext<DonationFormValues>();
   const locale = useLocale();
@@ -40,10 +42,17 @@ export function AddressSelector() {
         {tDonate('selectAddress.label')}
       </Label>
 
-      <Select value={selectedAddressId} onValueChange={onChange}>
+      <Select
+        value={selectedAddressId}
+        onValueChange={value => {
+          setHasInteracted(true);
+          onChange(value);
+        }}
+      >
         <SelectTrigger
           className={cn(
-            'w-full mt-2 min-h-[60px] h-auto px-3 py-3 flex items-center justify-between rounded-md focus:ring-0 focus-visible:ring-0 focus:outline-none focus:shadow-none data-[state=open]:border-gray-300 data-[state=open]:shadow-none data-[state=open]:ring-0 [&>span]:flex [&>span]:flex-col [&>span]:items-start border border-gray-300'
+            'w-full mt-2 min-h-[60px] h-auto px-3 py-3 flex items-center justify-between rounded-md focus:ring-0 focus-visible:ring-0 focus:outline-none focus:shadow-none data-[state=open]:border-gray-300 data-[state=open]:shadow-none data-[state=open]:ring-0 [&>span]:flex [&>span]:flex-col [&>span]:items-start border border-gray-300',
+            hasInteracted ? 'border border-black' : 'border-0'
           )}
         >
           <SelectValue placeholder={tDonate('selectAddress.placeholder')} />
