@@ -42,6 +42,20 @@ type RawMethodEntry = {
   gateway: string;
 };
 
+type GatewayConfig = PaymentOptions['gateways'][keyof PaymentOptions['gateways']];
+type GatewayConfigWithMethods = Extract<GatewayConfig, { methods: string[] }>;
+
+function hasGatewayMethods(
+  config: GatewayConfig
+): config is GatewayConfigWithMethods {
+  return (
+    typeof config === 'object' &&
+    config !== null &&
+    'methods' in config &&
+    Array.isArray(config.methods)
+  );
+}
+
 function resolveMethod(
   methodId: string,
   gateway: string
@@ -104,7 +118,7 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
 
   for (const [gateway, config] of Object.entries(paymentOptions.gateways)) {
     const normalizedGateway = normalizePaymentToken(gateway);
-    const methods = config?.methods;
+    const methods = hasGatewayMethods(config) ? config.methods : null;
 
     if (Array.isArray(methods) && methods.length > 0) {
       for (const method of methods) {

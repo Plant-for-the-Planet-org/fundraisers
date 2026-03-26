@@ -16,7 +16,7 @@ No saved-card/SEPA-account sub-dropdowns or card/IBAN forms in this slice.
 - Port fee calculation utilities from `gofundnature` into `fundraiser/lib`:
   - Region-based fee rules (US/EU/ROW), `No fee` handling, and tooltip copy generation.
   - Keep fee rendering behind fee-collection toggle parity (`NEXT_PUBLIC_ALLOW_FEE_COLLECTION`, default enabled).
-- Replace placeholder [`payment-methods.tsx`](/Volumes/WDSN5000/Plant-for-the-Planet/f/fundraiser/src/components/donate/payment-methods.tsx):
+- Replace placeholder `src/components/donate/payment-methods.tsx`:
   - Use `useDonationForm()` for `paymentOptions`, `donationData`, `fundraiser`.
   - Use RHF form state (`selectedPaymentMethod`) from `DonationFormContext`.
   - Auto-select first available method when empty/invalid; guard updates to avoid loops.

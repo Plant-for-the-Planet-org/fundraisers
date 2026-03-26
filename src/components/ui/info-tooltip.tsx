@@ -45,7 +45,7 @@ export function InfoTooltip({
         }}
       >
         <Info className={cn('h-4 w-4', iconClassName)} aria-hidden='true' />
-        {triggerLabel && <span className='sr-only'>{triggerLabel}</span>}
+        <span className='sr-only'>{triggerLabel ?? 'More information'}</span>
       </span>
 
       {visible && (
