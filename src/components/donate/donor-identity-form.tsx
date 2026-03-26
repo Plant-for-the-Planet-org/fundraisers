@@ -29,7 +29,7 @@ export const DonorIdentityForm = () => {
       <CheckboxField
         checked={value}
         onChange={onChange}
-        label='This donation is made by a Company'
+        label={tDonate('companyDonation.label')}
       />
 
       {isCompanyDonation && (
@@ -39,6 +39,7 @@ export const DonorIdentityForm = () => {
             error={errors.companyName?.message}
           >
             <Input
+              {...register('companyName')}
               placeholder={tDonate('companyName.placeholder')}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
             />
@@ -48,7 +49,7 @@ export const DonorIdentityForm = () => {
       <FormField label={tDonate('email.label')} error={errors.email?.message}>
         <Input
           type='email'
-          {...register('address')}
+          {...register('email')}
           placeholder={tDonate('email.placeholder')}
           className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
         />

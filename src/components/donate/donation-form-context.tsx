@@ -81,6 +81,7 @@ export function DonationFormProvider({
     defaultValues: {
       firstname: '',
       lastname: '',
+      companyName: '',
       email: '',
       address: '',
       address2: '',
