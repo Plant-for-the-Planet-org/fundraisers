@@ -37,7 +37,11 @@ export default async function FundraiserPage({
   try {
     fundraiser = await getCachedFundraiser(slug);
   } catch (e) {
-    if (e instanceof PlatformAPIError && e.status === 404) {
+    if (
+      e instanceof PlatformAPIError &&
+      e.status &&
+      [401, 403, 404].includes(e.status)
+    ) {
       return <FundraiserAuthRetry slug={slug} />;
     }
     throw e;
