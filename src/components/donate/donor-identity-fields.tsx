@@ -7,7 +7,7 @@ import { Input } from '../ui/input';
 import { useController, useFormContext } from 'react-hook-form';
 import { CheckboxField } from './checkbox-field';
 
-export const DonorIdentityForm = () => {
+export const DonorIdentityFields = () => {
   const tDonate = useTranslations('Donate.donorIdentity');
   const {
     register,

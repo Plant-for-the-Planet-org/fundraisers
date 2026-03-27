@@ -1,11 +1,11 @@
 import { AddressForm } from './address-form';
 import { AnonymousDonationField } from './anonymous-donation-field';
-import { DonorIdentityForm } from './donor-identity-form';
+import { DonorIdentityFields } from './donor-identity-fields';
 
 export const GuestUserView = () => {
   return (
     <>
-      <DonorIdentityForm />
+      <DonorIdentityFields />
       <AnonymousDonationField />
       <AddressForm />
     </>
