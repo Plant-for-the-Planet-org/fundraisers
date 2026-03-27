@@ -14,7 +14,6 @@ export const DonorIdentityFields = () => {
   const {
     register,
     formState: { errors },
-    control,
     setValue,
   } = useFormContext<DonationFormValues>();
 
@@ -22,12 +21,12 @@ export const DonorIdentityFields = () => {
     field: { value: isCompanyChecked, onChange: setIsCompanyChecked },
   } = useController({
     name: 'isCompany',
-    control,
   });
 
-  const handleCompanyDonationToggle = (checked: boolean) => {
-    setIsCompanyChecked(checked);
-    if (!checked) {
+  const handleCompanyDonationToggle = (checked: boolean | 'indeterminate') => {
+    const isChecked = checked === true;
+    setIsCompanyChecked(isChecked);
+    if (!isChecked) {
       // Prevent stale company name submission after switching back to individual donation.
       setValue('companyName', '', { shouldDirty: true, shouldValidate: true });
     }
@@ -56,6 +55,7 @@ export const DonorIdentityFields = () => {
         >
           <Input
             {...register('companyName')}
+            autoComplete='organization'
             placeholder={tDonate('companyName.placeholder')}
             className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
           />
@@ -69,6 +69,7 @@ export const DonorIdentityFields = () => {
         <Input
           type='email'
           {...register('email')}
+          autoComplete='email'
           placeholder={tDonate('email.placeholder')}
           className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
         />
@@ -81,6 +82,7 @@ export const DonorIdentityFields = () => {
         >
           <Input
             {...register('firstname')}
+            autoComplete='given-name'
             placeholder={tDonate('firstName.placeholder')}
             className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
           />
@@ -92,6 +94,7 @@ export const DonorIdentityFields = () => {
         >
           <Input
             {...register('lastname')}
+            autoComplete='family-name'
             placeholder={tDonate('lastName.placeholder')}
             className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
           />
