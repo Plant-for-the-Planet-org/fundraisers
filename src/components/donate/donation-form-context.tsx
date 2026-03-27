@@ -101,6 +101,9 @@ export function DonationFormProvider({
     reValidateMode: 'onChange',
   });
 
+  methods.register('country');
+  methods.register('selectedPaymentMethod');
+
   useEffect(() => {
     if (!isOpen) methods.reset();
   }, [isOpen, methods]);

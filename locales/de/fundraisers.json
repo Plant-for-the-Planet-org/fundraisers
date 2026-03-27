@@ -1,10 +1,11 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Fundraiser starten",
+    "startFundraiser": "Fundraiser erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByAnonymous": "von einem anonymen Gastgeber",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
@@ -12,23 +13,71 @@
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Veranstaltet von",
     "error": {
-      "title": "Etwas ist schiefgelaufen",
-      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut oder stöbere in anderen Fundraisern.",
+      "title": "Etwas ist schief gelaufen",
+      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut, oder durchstöbere andere Fundraiser.",
       "retry": "Erneut versuchen",
-      "browse": "Fundraiser durchsuchen"
+      "browse": "Fundraiser durchstöbern"
     },
     "closedForContribution": {
-      "title": "Vielen Dank für deine Unterstützung!",
-      "defaultMessage": "Diese Spendenaktion wurde archiviert und akzeptiert keine neuen Spenden mehr."
+      "title": "Vielen Dank für die Unterstützung!",
+      "defaultMessage": "Dieser Fundraiser wurde archiviert und sammelt keine Spenden mehr."
     },
     "securityNotice": {
-      "withTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country} und ist steuerlich absetzbar in {country}.",
-      "withoutTaxDeduction": "🔒 Diese Spende wird sicher verarbeitet von <b>{organization}</b>, {country}."
+      "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
+      "withoutTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Bearbeitungsgebühr",
+        "breakdown": "Spendenaufschlüsselung",
+        "total": "Gesamt",
+        "totalMonthly": "Gesamt jeden Monat",
+        "totalYearly": "Gesamt jedes Jahr"
+      },
+      "paymentMethods": {
+        "title": "Zahlungsmethode",
+        "description": "Erhöhe die Wirkung deiner Spende. Manche Zahlungsanbieter berechnen Gebühren. Bei gebührenfreien Methoden kommt der volle Betrag dem Projekt zugute.",
+        "selectMethodPlaceholder": "Zahlungsmethode auswählen",
+        "empty": "Aktuell sind keine Zahlungsmethoden verfügbar.",
+        "methods": {
+          "openBanking": "Mit Bank bezahlen (Open Banking)",
+          "bankTransfer": "Banküberweisung",
+          "paypal": "PayPal",
+          "card": "Kredit- oder Debitkarte",
+          "sepa": "SEPA-Lastschrift",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "der Zahlungsanbieter",
+          "open-banking": "Open Banking",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "Keine Gebühr",
+          "feeAmount": "{amount} Gebühr",
+          "alternatives": {
+            "eu": "Open Banking oder Banküberweisung",
+            "default": "Banküberweisung"
+          },
+          "tooltip": {
+            "withFee": "{provider} berechnet uns {amount} für die Verarbeitung dieser Spende. Du kannst die Wirkung deiner Spende erhöhen, indem du {alternatives} auswählst."
+          }
+        }
+      },
+      "options": {
+        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Zahlungsabwicklungsgebühren zu decken.",
+        "coverFeesTooltip": "Die Zahlungsabwicklungsgebühren werden auf die von diesem Fundraiser unterstützten Projekte verteilt.",
+        "coverFeesTooltipTriggerLabel": "Weitere Informationen zu Zahlungsabwicklungsgebühren",
+        "makeMonthly": "Meine Spende monatlich machen"
+      }
     },
     "create": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
-        "goalLine": "{amount} vom Ziel",
+        "goalLine": "{amount} vom gesetzten Ziel",
         "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
       },
       "donorsPreview": {
@@ -130,7 +179,7 @@
       },
       "projectSelection": {
         "sectionHeading": "Projekte, die durch diesen Fundraiser unterstützt werden.",
-        "viewModeSectionHeading": "Von dieser Fundraiser unterstützte Projekte",
+        "viewModeSectionHeading": "Projekte, die durch diesen Fundraiser unterstützt werden",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
         "allocationLabel": "{percentage, number}%-Zuweisung",
@@ -178,7 +227,7 @@
       "options": {
         "sectionHeading": "Fundraiser-Optionen",
         "status": {
-          "label": "Spenden für diesen Fundraiser sammeln",
+          "label": "Spenden mit diesen Fundraiser sammeln",
           "description": "Aktiviere das Spendensammeln und schalte den Fundraiser frei"
         },
         "visibility": {
@@ -189,7 +238,7 @@
       "contributionSettings": {
         "sectionHeading": "Spendeneinstellungen",
         "cardHeader": "Spende",
-        "giftTitle": "Widme jemandem diese Spende",
+        "giftTitle": "Widme deine Spende jemandem",
         "giftSubtitle": "Feiere, schenke oder erinnere an jemanden, indem du deinen Bäumen eine Widmung gibst.",
         "donateNow": "Jetzt spenden",
         "donateMonthly": "Monatlich spenden",

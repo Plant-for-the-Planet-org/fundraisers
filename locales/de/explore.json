@@ -1,9 +1,9 @@
 {
   "Explore": {
     "title": "Fundraiser entdecken",
-    "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorien.",
+    "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere in Kategorien.",
     "categories": {
-      "title": "Nach Kategorien stöbern",
+      "title": "In Kategorien stöbern",
       "loading": "Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
@@ -17,7 +17,7 @@
       "noFundraisersFound": "Derzeit sind keine Fundraiser verfügbar."
     },
     "fundraiserCities": {
-      "title": "Fundraiser in der Nähe",
+      "title": "Fundraiser in deiner Nähe",
       "loading": "Fundraiser in der Nähe werden geladen",
       "noCategoriesFound": "Derzeit sind keine Fundraiser in der Nähe verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
@@ -29,7 +29,7 @@
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",
-          "gross": "Höchstes Spendenaufkommen"
+          "gross": "Größtes Spendenaufkommen"
         },
         "noFundraisersFound": "Keine Fundraiser gefunden",
         "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Fundraiser in dieser Kategorie."
