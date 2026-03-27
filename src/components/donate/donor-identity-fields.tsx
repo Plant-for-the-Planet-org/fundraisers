@@ -19,7 +19,7 @@ export const DonorIdentityFields = () => {
 
   const {
     field: { value: isCompanyChecked, onChange: setIsCompanyChecked },
-  } = useController({
+  } = useController<DonationFormValues, 'isCompany'>({
     name: 'isCompany',
   });
 
