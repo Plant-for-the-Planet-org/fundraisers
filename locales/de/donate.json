@@ -12,8 +12,7 @@
       },
       "companyName": {
         "label": "Firmenname",
-        "placeholder": "Firmenname eingeben",
-        "required": "Firmenname ist erforderlich"
+        "placeholder": "Firmenname eingeben"
       },
       "email": {
         "label": "E-Mail",
@@ -70,6 +69,21 @@
 
       "savingAddressLoader": "Adresse wird gespeichert...",
       "saveAddress": "Adresse speichern"
+    },
+    "errors": {
+      "firstName": {
+        "required": "Vorname ist erforderlich"
+      },
+      "lastName": {
+        "required": "Nachname ist erforderlich"
+      },
+      "companyName": {
+        "required": "Firmenname ist erforderlich"
+      },
+      "email": {
+        "required": "E-Mail ist erforderlich",
+        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+      }
     }
   }
 }

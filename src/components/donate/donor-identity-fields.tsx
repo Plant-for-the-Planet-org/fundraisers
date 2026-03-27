@@ -6,9 +6,11 @@ import { FormField } from './form-field';
 import { Input } from '../ui/input';
 import { useController, useFormContext } from 'react-hook-form';
 import { Checkbox } from '../ui/checkbox';
+import { useFieldError } from './use-field-error';
 
 export const DonorIdentityFields = () => {
   const tDonate = useTranslations('Donate.donorIdentity');
+  const translateError = useFieldError();
   const {
     register,
     formState: { errors },
@@ -50,9 +52,7 @@ export const DonorIdentityFields = () => {
       {isCompanyChecked && (
         <FormField
           label={tDonate('companyName.label')}
-          error={
-            errors.companyName ? tDonate('companyName.required') : undefined
-          }
+          error={translateError(errors.companyName?.message)}
         >
           <Input
             {...register('companyName')}
@@ -62,7 +62,10 @@ export const DonorIdentityFields = () => {
         </FormField>
       )}
 
-      <FormField label={tDonate('email.label')} error={errors.email?.message}>
+      <FormField
+        label={tDonate('email.label')}
+        error={translateError(errors.email?.message)}
+      >
         <Input
           type='email'
           {...register('email')}
@@ -74,7 +77,7 @@ export const DonorIdentityFields = () => {
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
         <FormField
           label={tDonate('firstName.label')}
-          error={errors.firstname?.message}
+          error={translateError(errors.firstname?.message)}
         >
           <Input
             {...register('firstname')}
@@ -85,7 +88,7 @@ export const DonorIdentityFields = () => {
 
         <FormField
           label={tDonate('lastName.label')}
-          error={errors.lastname?.message}
+          error={translateError(errors.lastname?.message)}
         >
           <Input
             {...register('lastname')}

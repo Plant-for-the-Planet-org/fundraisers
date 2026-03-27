@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -21,9 +22,19 @@ const DevTool =
 
 export const donationFormSchema = z
   .object({
-    firstname: z.string().trim().min(1),
-    lastname: z.string().trim().min(1),
-    email: z.email(),
+    firstname: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['firstName.required'] }),
+    lastname: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['lastName.required'] }),
+    email: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['email.required'] })
+      .pipe(z.email({ error: DONATION_FORM_ERRORS['email.invalid'] })),
     // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
     address: z.string().trim(),
     address2: z.string().trim().optional(),
@@ -45,7 +56,7 @@ export const donationFormSchema = z
     if (values.isCompany && !values.companyName?.trim()) {
       ctx.addIssue({
         code: 'custom',
-        message: 'companyName.required',
+        message: DONATION_FORM_ERRORS['companyName.required'],
         path: ['companyName'],
       });
     }
