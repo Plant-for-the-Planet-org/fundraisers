@@ -4,10 +4,10 @@
 
 Collects donor identity and address info during the donation checkout. Renders one of two views depending on auth state.
 
-| Condition                                                    | View                    |
-| :----------------------------------------------------------- | :---------------------- |
-| Logged in + valid profile (`firstname`, `lastname`, `image`) | `AuthenticatedUserView` |
-| Otherwise                                                    | `GuestUserView`         |
+| Condition                                           | View                    |
+| :-------------------------------------------------- | :---------------------- |
+| Logged in + valid profile (`firstname`, `lastname`) | `AuthenticatedUserView` |
+| Otherwise                                           | `GuestUserView`         |
 
 ---
 
