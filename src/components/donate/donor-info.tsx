@@ -9,10 +9,7 @@ export function DonorInfo() {
   const tDonate = useTranslations('Donate');
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isValidProfile = useAuthStore(
-    state =>
-      state.user?.profile?.firstname &&
-      state.user?.profile?.lastname &&
-      state.user.profile.image
+    state => state.user?.profile?.firstname && state.user?.profile?.lastname
   );
 
   return (
