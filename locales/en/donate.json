@@ -11,8 +11,9 @@
         "label": "This donation is made by a Company"
       },
       "companyName": {
-        "label": "Company Name",
-        "placeholder": "Enter company name"
+        "label": "Company Name *",
+        "placeholder": "Enter company name",
+        "required": "Company name is required"
       },
       "email": {
         "label": "Email *",

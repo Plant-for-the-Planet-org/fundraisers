@@ -19,27 +19,37 @@ const DevTool =
       })
     : null;
 
-export const donationFormSchema = z.object({
-  firstname: z.string().trim().min(1),
-  lastname: z.string().trim().min(1),
-  email: z.email(),
-  // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
-  address: z.string().trim(),
-  address2: z.string().trim().optional(),
-  addressType: z.enum(['primary', 'mailing', 'other']),
-  zipCode: z.string().trim(),
-  state: z.string().trim().optional(),
-  city: z.string().trim(),
-  country: z.string(),
-  // Preferences
-  isAnonymous: z.boolean(),
-  selectedAddressId: z.string().min(1).optional(),
-  makeMonthly: z.boolean(),
-  coverFees: z.boolean(),
-  selectedPaymentMethod: z.string().optional(),
-  isCompany: z.boolean(),
-  companyName: z.string().trim().optional(),
-});
+export const donationFormSchema = z
+  .object({
+    firstname: z.string().trim().min(1),
+    lastname: z.string().trim().min(1),
+    email: z.email(),
+    // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
+    address: z.string().trim(),
+    address2: z.string().trim().optional(),
+    addressType: z.enum(['primary', 'mailing', 'other']),
+    zipCode: z.string().trim(),
+    state: z.string().trim().optional(),
+    city: z.string().trim(),
+    country: z.string(),
+    // Preferences
+    isAnonymous: z.boolean(),
+    selectedAddressId: z.string().min(1).optional(),
+    makeMonthly: z.boolean(),
+    coverFees: z.boolean(),
+    selectedPaymentMethod: z.string().optional(),
+    isCompany: z.boolean(),
+    companyName: z.string().trim().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.isCompany && !values.companyName?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'companyName.required',
+        path: ['companyName'],
+      });
+    }
+  });
 
 export type DonationFormValues = z.infer<typeof donationFormSchema>;
 

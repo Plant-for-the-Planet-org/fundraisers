@@ -12,7 +12,8 @@
       },
       "companyName": {
         "label": "Firmenname",
-        "placeholder": "Firmenname eingeben"
+        "placeholder": "Firmenname eingeben",
+        "required": "Firmenname ist erforderlich"
       },
       "email": {
         "label": "E-Mail",
