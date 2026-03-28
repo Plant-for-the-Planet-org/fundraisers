@@ -146,7 +146,10 @@ export const useAuthStore = create<AuthStore>()(
 
         try {
           const profile = await userService.getProfileSafe(accessToken);
-          if (!profile) return;
+          if (!profile) {
+            get().clearAuth();
+            return;
+          }
 
           set(
             { user: { ...user, profile }, error: null },
