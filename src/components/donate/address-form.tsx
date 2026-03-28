@@ -47,9 +47,15 @@ export const AddressForm = () => {
   );
 
   const handleSaveAddress = async () => {
+    if (!token) {
+      const message = tDonate('saveAddressError');
+      setSaveAddressError(message);
+      return;
+    }
+
     const isValid = await trigger(['address', 'city', 'zipCode', 'country']);
 
-    if (!isValid || !token) return;
+    if (!isValid) return;
 
     setIsLoading(true);
     setSaveAddressError(null);
@@ -61,11 +67,11 @@ export const AddressForm = () => {
       // Select the newly created address and exit new address mode
       setValue('selectedAddressId', createdAddress.id);
     } catch (err) {
-      setSaveAddressError(
+      const message =
         err instanceof Error && err.message
           ? err.message
-          : tDonate('saveAddressError')
-      );
+          : tDonate('saveAddressError');
+      setSaveAddressError(message);
     } finally {
       setIsLoading(false);
     }
@@ -143,11 +149,11 @@ export const AddressForm = () => {
           />
         </FormField>
       </div>
-      {saveAddressError && (
-        <p className='text-sm text-destructive'>{saveAddressError}</p>
-      )}
       {isAuthenticated && (
-        <div className='mt-5'>
+        <div className='space-y-1'>
+          {saveAddressError !== null && (
+            <p className='text-sm text-destructive'>{saveAddressError}</p>
+          )}
           <Button
             type='button'
             onClick={handleSaveAddress}

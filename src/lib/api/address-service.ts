@@ -35,7 +35,7 @@ export class AddressService {
   ): Promise<CreateAddressResponse> {
     try {
       const endpoint = '/addresses';
-      return await platformAPIClient.post<CreateAddressResponse>(
+      return await platformAPIClient.postAuthenticated<CreateAddressResponse>(
         endpoint,
         addressData,
         token
