@@ -16,6 +16,7 @@ import {
   getCurrencyForCountry,
   type AllowedCountry,
 } from '@/lib/utils/country-currency';
+import { CountryFlag } from '@/components/ui/country-flag';
 
 export function WorkspaceSelector() {
   const locale = useLocale();
@@ -31,6 +32,7 @@ export function WorkspaceSelector() {
     setValue('currency', getCurrencyForCountry(country as AllowedCountry));
   };
 
+  // Intentionally uses restricted workspace countries with currency metadata; separate from donate country source.
   const countries = getAllowedCountries(locale).map(c =>
     c.code === 'ROW' ? { ...c, name: t('restOfWorld') } : c
   );
@@ -50,12 +52,7 @@ export function WorkspaceSelector() {
           <SelectValue>
             {selected && (
               <span className='flex items-center gap-2'>
-                <span
-                  className="font-['Twemoji_Country_Flags',sans-serif]"
-                  aria-hidden='true'
-                >
-                  {selected.flag}
-                </span>
+                <CountryFlag flag={selected.flag} />
                 <span>{selected.name}</span>
               </span>
             )}
@@ -76,12 +73,7 @@ export function WorkspaceSelector() {
             >
               <div className='flex items-center justify-between gap-4 w-full'>
                 <span className='flex items-center gap-2'>
-                  <span
-                    className="font-['Twemoji_Country_Flags',sans-serif]"
-                    aria-hidden='true'
-                  >
-                    {country.flag}
-                  </span>
+                  <CountryFlag flag={country.flag} />
                   <span className='font-medium'>{country.name}</span>
                 </span>
                 <span

@@ -71,6 +71,9 @@
       "saveAddress": "Adresse speichern"
     },
     "errors": {
+      "country": {
+        "required": "Land ist erforderlich"
+      },
       "firstName": {
         "required": "Vorname ist erforderlich"
       },

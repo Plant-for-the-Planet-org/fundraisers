@@ -42,7 +42,10 @@ export const donationFormSchema = z
     zipCode: z.string().trim(),
     state: z.string().trim().optional(),
     city: z.string().trim(),
-    country: z.string(),
+    country: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['country.required'] }),
     // Preferences
     isAnonymous: z.boolean(),
     selectedAddressId: z.string().min(1).optional(),

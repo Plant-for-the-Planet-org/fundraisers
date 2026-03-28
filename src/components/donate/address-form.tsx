@@ -2,13 +2,8 @@
 import type { DonationFormValues } from './donation-form-context';
 
 import { useController, useFormContext, useWatch } from 'react-hook-form';
-import { useRef, useState } from 'react';
-import {
-  getAllCountries,
-  getCountryDisplay,
-  searchCountries,
-} from '@/lib/utils/country';
-import { Check, ChevronDown, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/stores/authStore';
@@ -17,24 +12,21 @@ import { addressService } from '@/lib/api/address-service';
 import { AddressTypeRadioGroup } from './address-type-radio-group';
 import { FormField } from './form-field';
 import { buildAddressPayload } from '@/lib/utils/profile';
+import { AddressCountrySelector } from './address-country-selector';
+import { useFieldError } from './use-field-error';
 
 export const AddressForm = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const token = useAuthStore(state => state.accessToken);
   const refreshProfile = useAuthStore(state => state.refreshProfile);
   const tDonate = useTranslations('Donate.userAddress');
+  const translateError = useFieldError();
 
-  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
-  const [countrySearch, setCountrySearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [saveAddressError, setSaveAddressError] = useState<string | null>(null);
 
-  const countryDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  const allCountries = getAllCountries('en');
   const {
     register,
-    control,
     formState: { errors },
     setValue,
     trigger,
@@ -42,26 +34,15 @@ export const AddressForm = () => {
   } = useFormContext<DonationFormValues>();
 
   const {
-    field: { value: country, onChange: setCountry },
-  } = useController({
+    field: { value: country, onChange: setCountry, onBlur: onCountryBlur },
+  } = useController<DonationFormValues, 'country'>({
     name: 'country',
-    control,
   });
-
-  // Filter countries based on search
-  const filteredCountries = countrySearch
-    ? searchCountries(countrySearch, 'en')
-    : allCountries;
 
   const watchedFields = useWatch({
     name: ['address', 'city', 'zipCode', 'country'],
   });
   const isAddressValid = watchedFields.every(Boolean);
-
-  const handleCountrySelect = (code: string) => {
-    setCountry(code);
-    setIsCountryDropdownOpen(false);
-  };
 
   const handleSaveAddress = async () => {
     const isValid = await trigger(['address', 'city', 'zipCode', 'country']);
@@ -91,65 +72,12 @@ export const AddressForm = () => {
       {isAuthenticated && <AddressTypeRadioGroup register={register} />}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <div className='space-y-2 sm:col-span-2'>
-          {/* Country Dropdown */}
-          <FormField
-            label={tDonate('country.label')}
-            error={errors.country?.message}
-          >
-            <div className='relative mt-2' ref={countryDropdownRef}>
-              <div
-                className='flex h-9 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm cursor-pointer hover:border-gray-400 focus-within:border-gray-500 focus-within:ring-1 focus-within:ring-gray-500'
-                onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-              >
-                {country ? (
-                  <span className='flex items-center gap-2'>
-                    {getCountryDisplay(country, 'en').display}
-                  </span>
-                ) : (
-                  <span className='text-gray-500'>
-                    {tDonate('country.selectCountry')}
-                  </span>
-                )}
-                <ChevronDown className='h-4 w-4 opacity-50' />
-              </div>
-
-              {isCountryDropdownOpen && (
-                <div className='absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-hidden'>
-                  <div className='p-2 border-b border-gray-100'>
-                    <Input
-                      placeholder={tDonate('country.searchPlaceholder')}
-                      value={countrySearch}
-                      onChange={e => setCountrySearch(e.target.value)}
-                      className='h-8 text-sm'
-                      autoFocus
-                    />
-                  </div>
-                  <div className='max-h-48 overflow-y-auto'>
-                    {filteredCountries.length > 0 ? (
-                      filteredCountries.map(countryOption => (
-                        <div
-                          key={countryOption.code}
-                          className='flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50 focus:bg-gray-50'
-                          onClick={() =>
-                            handleCountrySelect(countryOption.code)
-                          }
-                        >
-                          {countryOption.flag} {countryOption.name}
-                          {country === countryOption.code && (
-                            <Check className='h-4 w-4 ml-auto text-gray-900' />
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div className='px-3 py-2 text-sm text-gray-500'>
-                        {tDonate('country.noResults')}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </FormField>
+          <AddressCountrySelector
+            country={country}
+            onCountryChange={setCountry}
+            onCountryBlur={onCountryBlur}
+            error={translateError(errors.country?.message)}
+          />
         </div>
         <div className='space-y-2'>
           <FormField

@@ -71,6 +71,9 @@
       "addNewAddress": "+ Add new address"
     },
     "errors": {
+      "country": {
+        "required": "Country is required"
+      },
       "firstName": {
         "required": "First name is required"
       },

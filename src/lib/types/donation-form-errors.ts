@@ -1,6 +1,7 @@
 export const DONATION_FORM_ERRORS = {
   'firstName.required': 'firstName.required',
   'lastName.required': 'lastName.required',
+  'country.required': 'country.required',
   'email.required': 'email.required',
   'email.invalid': 'email.invalid',
   'companyName.required': 'companyName.required',
