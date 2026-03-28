@@ -5,7 +5,7 @@
       "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
     },
     "yourInfo": "Your Info",
-    "organization": "Organization",
+    "organization": "(Organization)",
     "donorIdentity": {
       "companyDonation": {
         "label": "This donation is made by a Company"

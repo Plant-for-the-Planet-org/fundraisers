@@ -5,7 +5,7 @@
       "anonymousDonationDescription": "Ihr Name wird auf der Fundraising-Seite nicht öffentlich angezeigt"
     },
     "yourInfo": "Ihre Angaben",
-    "organization": "Organisation",
+    "organization": "(Organisation)",
     "donorIdentity": {
       "companyDonation": {
         "label": "Diese Spende wird von einem Unternehmen getätigt"

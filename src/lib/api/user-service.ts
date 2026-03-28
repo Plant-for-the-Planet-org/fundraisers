@@ -1,3 +1,4 @@
+import type { UserType } from '@planet-sdk/common';
 import { platformAPIClient, PlatformAPIError } from './external-client';
 
 export interface Address {
@@ -14,7 +15,7 @@ export interface Address {
 }
 export interface UserProfileResponse {
   slug: string;
-  type: 'individual' | 'organization';
+  type: UserType;
   currency: string;
   name: string | null;
   firstname: string;
