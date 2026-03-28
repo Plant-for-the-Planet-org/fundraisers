@@ -52,7 +52,9 @@ export function DonateOverlay({
   if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
 
   function onSubmit(values: DonationFormValues) {
-    // TODO (Portion 4): build payload and call useDonation.submitDonation
+    // TODO (Portion 4): build payload and call useDonation.submitDonation.
+    // For authenticated users, send address_id (selectedAddressId), not raw address fields.
+    // address_id can be an existing address id or the id returned after creating a new address.
     console.log('donation form values', values);
   }
 

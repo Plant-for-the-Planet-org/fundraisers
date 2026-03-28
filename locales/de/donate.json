@@ -1,0 +1,108 @@
+{
+  "Donate": {
+    "preferences": {
+      "anonymousDonationLabel": "Meine Spende anonym machen",
+      "anonymousDonationDescription": "Ihr Name wird auf der Fundraising-Seite nicht öffentlich angezeigt"
+    },
+    "yourInfo": "Ihre Angaben",
+    "organization": "(Organisation)",
+    "donorIdentity": {
+      "companyDonation": {
+        "label": "Diese Spende wird von einem Unternehmen getätigt"
+      },
+      "companyName": {
+        "label": "Firmenname *",
+        "placeholder": "Firmenname eingeben"
+      },
+      "email": {
+        "label": "E-Mail *",
+        "placeholder": "Ihre E-Mail eingeben"
+      },
+      "firstName": {
+        "label": "Vorname *",
+        "placeholder": "Vorname"
+      },
+      "lastName": {
+        "label": "Nachname *",
+        "placeholder": "Nachname"
+      }
+    },
+    "userAddress": {
+      "selectAddress": {
+        "label": "Adresse auswählen",
+        "placeholder": "Adresse auswählen"
+      },
+
+      "country": {
+        "label": "Land *",
+        "placeholder": "Land auswählen",
+        "searchPlaceholder": "Länder suchen...",
+        "noResults": "Keine Länder gefunden",
+        "selectCountry": "Land auswählen"
+      },
+
+      "zipCode": {
+        "label": "Postleitzahl *",
+        "placeholder": "Postleitzahl"
+      },
+
+      "address": {
+        "label": "Adresse *",
+        "placeholder": "Straße und Hausnummer",
+        "addressType": "Adresstyp",
+        "addressTypeOptions": {
+          "primary": "Primär",
+          "mailing": "Post",
+          "other": "Sonstige"
+        }
+      },
+
+      "address2": {
+        "label": "Adresszusatz",
+        "placeholder": "Wohnung, Suite, etc."
+      },
+
+      "city": {
+        "label": "Stadt *",
+        "placeholder": "Stadt"
+      },
+
+      "state": {
+        "label": "Bundesland/Region",
+        "placeholder": "Bundesland oder Region"
+      },
+
+      "savingAddressLoader": "Adresse wird gespeichert...",
+      "saveAddress": "Adresse speichern",
+      "saveAddressError": "Adresse konnte nicht gespeichert werden",
+      "addNewAddress": "+ Neue Adresse hinzufügen"
+    },
+    "errors": {
+      "zipCode": {
+        "required": "Postleitzahl ist erforderlich"
+      },
+      "address": {
+        "required": "Adresse ist erforderlich"
+      },
+      "city": {
+        "required": "Stadt ist erforderlich"
+      },
+      "country": {
+        "required": "Land ist erforderlich"
+      },
+      "firstName": {
+        "required": "Vorname ist erforderlich"
+      },
+      "lastName": {
+        "required": "Nachname ist erforderlich"
+      },
+      "companyName": {
+        "required": "Firmenname ist erforderlich"
+      },
+      "email": {
+        "required": "E-Mail ist erforderlich",
+        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+      }
+    }
+  }
+}

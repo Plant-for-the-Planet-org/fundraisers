@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -19,21 +20,59 @@ const DevTool =
       })
     : null;
 
-export const donationFormSchema = z.object({
-  firstname: z.string().trim().min(1),
-  lastname: z.string().trim().min(1),
-  email: z.email(),
-  // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
-  address: z.string().trim().optional(),
-  zipCode: z.string().trim().optional(),
-  city: z.string().trim().optional(),
-  country: z.string().optional(),
-  // Preferences
-  isAnonymous: z.boolean(),
-  makeMonthly: z.boolean(),
-  coverFees: z.boolean(),
-  selectedPaymentMethod: z.string().optional(),
-});
+export const donationFormSchema = z
+  .object({
+    firstname: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['firstName.required'] }),
+    lastname: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['lastName.required'] }),
+    email: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['email.required'] })
+      .pipe(z.email({ error: DONATION_FORM_ERRORS['email.invalid'] })),
+    // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
+    address: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['address.required'] }),
+    address2: z.string().trim().optional(),
+    addressType: z.enum(['primary', 'mailing', 'other']),
+    zipCode: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['zipCode.required'] }),
+    state: z.string().trim().optional(),
+    city: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['city.required'] }),
+    country: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['country.required'] }),
+    // Preferences
+    isAnonymous: z.boolean(),
+    selectedAddressId: z.string().min(1).optional(),
+    makeMonthly: z.boolean(),
+    coverFees: z.boolean(),
+    selectedPaymentMethod: z.string().optional(),
+    isCompany: z.boolean(),
+    companyName: z.string().trim().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.isCompany && !values.companyName?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: DONATION_FORM_ERRORS['companyName.required'],
+        path: ['companyName'],
+      });
+    }
+  });
 
 export type DonationFormValues = z.infer<typeof donationFormSchema>;
 
@@ -75,15 +114,21 @@ export function DonationFormProvider({
     defaultValues: {
       firstname: '',
       lastname: '',
+      companyName: '',
       email: '',
       address: '',
+      address2: '',
+      selectedAddressId: '',
       zipCode: '',
       city: '',
+      state: '',
       country: '',
       isAnonymous: false,
+      isCompany: false,
       makeMonthly: false,
       coverFees: false,
       selectedPaymentMethod: '',
+      addressType: 'primary',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',

@@ -16,7 +16,7 @@ export function DonateOverlayLayout({
       className='fixed inset-0 z-50 bg-gray-50 overflow-auto'
       role='dialog'
       aria-modal='true'
-      aria-labelledby='donate-overlay-title'
+      aria-label='donation details'
     >
       <button
         type='button'

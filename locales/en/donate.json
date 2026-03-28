@@ -1,0 +1,107 @@
+{
+  "Donate": {
+    "preferences": {
+      "anonymousDonationLabel": "Make my donation anonymous",
+      "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
+    },
+    "yourInfo": "Your Info",
+    "organization": "(Organization)",
+    "donorIdentity": {
+      "companyDonation": {
+        "label": "This donation is made by a Company"
+      },
+      "companyName": {
+        "label": "Company Name *",
+        "placeholder": "Enter company name"
+      },
+      "email": {
+        "label": "Email *",
+        "placeholder": "Enter your email"
+      },
+      "firstName": {
+        "label": "First Name *",
+        "placeholder": "First name"
+      },
+      "lastName": {
+        "label": "Last Name *",
+        "placeholder": "Last name"
+      }
+    },
+    "userAddress": {
+      "selectAddress": {
+        "label": "Select Address",
+        "placeholder": "Choose an address"
+      },
+
+      "country": {
+        "label": "Country *",
+        "placeholder": "Select country",
+        "searchPlaceholder": "Search countries...",
+        "noResults": "No countries found",
+        "selectCountry": "Select Country"
+      },
+
+      "zipCode": {
+        "label": "Zip Code *",
+        "placeholder": "Zip code"
+      },
+
+      "address": {
+        "label": "Address *",
+        "placeholder": "Street address",
+        "addressType": "Address Type",
+        "addressTypeOptions": {
+          "primary": "Primary",
+          "mailing": "Mailing",
+          "other": "Other"
+        }
+      },
+
+      "address2": {
+        "label": "Address Line 2",
+        "placeholder": "Apartment, suite, etc."
+      },
+
+      "city": {
+        "label": "City *",
+        "placeholder": "City"
+      },
+
+      "state": {
+        "label": "State/Province",
+        "placeholder": "State or province"
+      },
+      "savingAddressLoader": "Saving Address...",
+      "saveAddress": "Save Address",
+      "saveAddressError": "Failed to save address",
+      "addNewAddress": "+ Add new address"
+    },
+    "errors": {
+      "zipCode": {
+        "required": "Zip code is required"
+      },
+      "address": {
+        "required": "Address is required"
+      },
+      "city": {
+        "required": "City is required"
+      },
+      "country": {
+        "required": "Country is required"
+      },
+      "firstName": {
+        "required": "First name is required"
+      },
+      "lastName": {
+        "required": "Last name is required"
+      },
+      "companyName": {
+        "required": "Company name is required"
+      },
+      "email": {
+        "required": "Email is required",
+        "invalid": "Please enter a valid email address"
+      }
+    }
+  }
+}
