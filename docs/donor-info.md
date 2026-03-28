@@ -43,10 +43,10 @@ Used in both `AuthenticatedUserView` and `GuestUserView`.
 
 ### `AddressSection`
 
-Syncs saved address data into the form via two `useEffect` hooks:
+Manages saved address selection and syncs address fields via two `useEffect` hooks:
 
-- On profile load → auto-selects primary address
-- On address change → populates or clears all address fields (`address`, `address2`, `zipCode`, `city`, `state`, `country`)
+- On profile load, keeps a valid existing selection when possible; otherwise falls back to primary address, then first saved address, then `new` when no addresses exist
+- On address change, populates or clears all address fields (`address`, `address2`, `zipCode`, `city`, `state`, `country`)
 
 Shows `AddressForm` only when `selectedAddressId === 'new'`.
 
