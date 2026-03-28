@@ -42,7 +42,9 @@ export const AddressForm = () => {
   const watchedFields = useWatch({
     name: ['address', 'city', 'zipCode', 'country'],
   });
-  const isAddressValid = watchedFields.every(Boolean);
+  const isAddressValid = watchedFields.every(value =>
+    typeof value === 'string' ? value.trim().length > 0 : Boolean(value)
+  );
 
   const handleSaveAddress = async () => {
     const isValid = await trigger(['address', 'city', 'zipCode', 'country']);
@@ -60,7 +62,9 @@ export const AddressForm = () => {
       setValue('selectedAddressId', createdAddress.id);
     } catch (err) {
       setSaveAddressError(
-        err instanceof Error ? err.message : 'Failed to save address'
+        err instanceof Error && err.message
+          ? err.message
+          : tDonate('saveAddressError')
       );
     } finally {
       setIsLoading(false);
@@ -82,7 +86,7 @@ export const AddressForm = () => {
         <div className='space-y-2'>
           <FormField
             label={tDonate('zipCode.label')}
-            error={errors.zipCode?.message}
+            error={translateError(errors.zipCode?.message)}
           >
             <Input
               {...register('zipCode')}
@@ -97,7 +101,7 @@ export const AddressForm = () => {
         <div className='sm:col-span-2'>
           <FormField
             label={tDonate('address.label')}
-            error={errors.address?.message}
+            error={translateError(errors.address?.message)}
           >
             <Input
               {...register('address')}
@@ -106,7 +110,10 @@ export const AddressForm = () => {
             />
           </FormField>
         </div>
-        <FormField label={tDonate('city.label')} error={errors.city?.message}>
+        <FormField
+          label={tDonate('city.label')}
+          error={translateError(errors.city?.message)}
+        >
           <Input
             {...register('city')}
             placeholder={tDonate('city.placeholder')}

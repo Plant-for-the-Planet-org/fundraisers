@@ -68,9 +68,19 @@
       },
 
       "savingAddressLoader": "Adresse wird gespeichert...",
-      "saveAddress": "Adresse speichern"
+      "saveAddress": "Adresse speichern",
+      "saveAddressError": "Adresse konnte nicht gespeichert werden"
     },
     "errors": {
+      "zipCode": {
+        "required": "Postleitzahl ist erforderlich"
+      },
+      "address": {
+        "required": "Adresse ist erforderlich"
+      },
+      "city": {
+        "required": "Stadt ist erforderlich"
+      },
       "country": {
         "required": "Land ist erforderlich"
       },

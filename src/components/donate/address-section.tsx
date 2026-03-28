@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { getPrimaryAddress } from '@/lib/utils/profile';
 
 export function AddressSection() {
-  const { watch, setValue } = useFormContext<DonationFormValues>();
+  const { watch, setValue, resetField } = useFormContext<DonationFormValues>();
 
   const selectedAddressId = watch('selectedAddressId');
 
@@ -44,15 +44,16 @@ export function AddressSection() {
     );
     if (!selectedAddress) return;
 
-    setValue('address', selectedAddress.address, { shouldDirty: false });
-    setValue('address2', selectedAddress.address2 ?? '', {
-      shouldDirty: false,
-    });
-    setValue('zipCode', selectedAddress.zipCode, { shouldDirty: false });
-    setValue('city', selectedAddress.city, { shouldDirty: false });
-    setValue('state', selectedAddress.state ?? '', { shouldDirty: false });
-    setValue('country', selectedAddress.country, { shouldDirty: false });
-  }, [selectedAddressId, profile, setValue]);
+    // When switching away from "new", AddressForm unmounts.
+    // Reset address-related fields to selected values so hidden form state
+    // (errors/touched/dirty) does not leak across mode switches.
+    resetField('address', { defaultValue: selectedAddress.address });
+    resetField('address2', { defaultValue: selectedAddress.address2 ?? '' });
+    resetField('zipCode', { defaultValue: selectedAddress.zipCode });
+    resetField('city', { defaultValue: selectedAddress.city });
+    resetField('state', { defaultValue: selectedAddress.state ?? '' });
+    resetField('country', { defaultValue: selectedAddress.country });
+  }, [selectedAddressId, profile, resetField, setValue]);
 
   return (
     <div className='space-y-4'>

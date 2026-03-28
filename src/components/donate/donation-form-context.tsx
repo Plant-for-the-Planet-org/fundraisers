@@ -36,12 +36,21 @@ export const donationFormSchema = z
       .min(1, { error: DONATION_FORM_ERRORS['email.required'] })
       .pipe(z.email({ error: DONATION_FORM_ERRORS['email.invalid'] })),
     // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
-    address: z.string().trim(),
+    address: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['address.required'] }),
     address2: z.string().trim().optional(),
     addressType: z.enum(['primary', 'mailing', 'other']),
-    zipCode: z.string().trim(),
+    zipCode: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['zipCode.required'] }),
     state: z.string().trim().optional(),
-    city: z.string().trim(),
+    city: z
+      .string()
+      .trim()
+      .min(1, { error: DONATION_FORM_ERRORS['city.required'] }),
     country: z
       .string()
       .trim()

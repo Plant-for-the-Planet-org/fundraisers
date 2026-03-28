@@ -68,9 +68,19 @@
       },
       "savingAddressLoader": "Saving Address...",
       "saveAddress": "Save Address",
+      "saveAddressError": "Failed to save address",
       "addNewAddress": "+ Add new address"
     },
     "errors": {
+      "zipCode": {
+        "required": "Zip code is required"
+      },
+      "address": {
+        "required": "Address is required"
+      },
+      "city": {
+        "required": "City is required"
+      },
       "country": {
         "required": "Country is required"
       },
