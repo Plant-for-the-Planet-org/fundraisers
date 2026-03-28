@@ -1,5 +1,5 @@
-import type { DonationFormValues } from '@/components/donate/donation-form-context';
 import type { Address, UserProfile } from '../api/user-service';
+import type { AddressPayloadInput } from '../types/address';
 
 import { ADDRESS_TYPE_NAMES } from '../constants/address';
 
@@ -30,16 +30,7 @@ export const getDisplayName = (profile: UserProfile): string => {
 export const getPrimaryAddress = (addresses: Address[]) =>
   addresses?.find(addr => addr.isPrimary) || addresses?.[0];
 
-export type AddressType = 'primary' | 'mailing' | 'other';
-
-export function buildAddressPayload(
-  values: Pick<
-    DonationFormValues,
-    'address' | 'address2' | 'city' | 'zipCode' | 'state' | 'country'
-  > & {
-    addressType: AddressType;
-  }
-) {
+export function buildAddressPayload(values: AddressPayloadInput) {
   return {
     type: values.addressType,
     name: ADDRESS_TYPE_NAMES[values.addressType],

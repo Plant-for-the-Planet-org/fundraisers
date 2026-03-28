@@ -11,19 +11,19 @@
         "label": "Diese Spende wird von einem Unternehmen getätigt"
       },
       "companyName": {
-        "label": "Firmenname",
+        "label": "Firmenname *",
         "placeholder": "Firmenname eingeben"
       },
       "email": {
-        "label": "E-Mail",
+        "label": "E-Mail *",
         "placeholder": "Ihre E-Mail eingeben"
       },
       "firstName": {
-        "label": "Vorname",
+        "label": "Vorname *",
         "placeholder": "Vorname"
       },
       "lastName": {
-        "label": "Nachname",
+        "label": "Nachname *",
         "placeholder": "Nachname"
       }
     },

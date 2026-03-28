@@ -1,4 +1,4 @@
-import type { AddressType } from '../utils/profile';
+import type { AddressType } from '../types/address';
 
 export const ADDRESS_TYPE_NAMES: Record<AddressType, string> = {
   primary: 'Primary',
