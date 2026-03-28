@@ -102,6 +102,11 @@
         "required": "Email is required",
         "invalid": "Please enter a valid email address"
       }
+    },
+    "cta": {
+      "donateNow": "Donate Now",
+      "donateMonthly": "Donate Monthly",
+      "donateYearly": "Donate Yearly"
     }
   }
 }
