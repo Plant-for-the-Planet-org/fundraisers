@@ -16,10 +16,6 @@ import { getCountry } from '@/lib/utils/country';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-export const cleanFieldValue = (value?: string | null) => {
-  return value?.trim() || '';
-};
-
 export function AddressSelector() {
   const [hasInteracted, setHasInteracted] = useState(false);
   const tDonate = useTranslations('Donate.userAddress');
@@ -29,7 +25,7 @@ export function AddressSelector() {
 
   const {
     field: { value: selectedAddressId, onChange },
-  } = useController({
+  } = useController<DonationFormValues, 'selectedAddressId'>({
     name: 'selectedAddressId',
     control,
   });
@@ -37,8 +33,11 @@ export function AddressSelector() {
   if (!profile) return null;
 
   return (
-    <div className='w-full space-y-2'>
-      <Label className='text-sm font-medium text-gray-700'>
+    <div className='address-selector w-full space-y-2'>
+      <Label
+        className='text-sm font-medium text-foreground'
+        htmlFor='address-select'
+      >
         {tDonate('selectAddress.label')}
       </Label>
 
@@ -50,9 +49,10 @@ export function AddressSelector() {
         }}
       >
         <SelectTrigger
+          id='address-select'
           className={cn(
-            'w-full mt-2 min-h-[60px] h-auto px-3 py-3 flex items-center justify-between rounded-md focus:ring-0 focus-visible:ring-0 focus:outline-none focus:shadow-none data-[state=open]:border-gray-300 data-[state=open]:shadow-none data-[state=open]:ring-0 [&>span]:flex [&>span]:flex-col [&>span]:items-start border border-gray-300',
-            hasInteracted ? 'border border-black' : 'border-0'
+            'w-full mt-2 min-h-[60px] h-auto px-3 py-3 flex items-center justify-between rounded-md focus:ring-0 focus-visible:ring-0 focus:outline-none focus:shadow-none data-[state=open]:border-gray-300 data-[state=open]:shadow-none data-[state=open]:ring-0 [&>span]:flex [&>span]:flex-col [&>span]:items-start border border-border',
+            hasInteracted ? 'border border-black' : 'border-border'
           )}
         >
           <SelectValue placeholder={tDonate('selectAddress.placeholder')} />
@@ -66,13 +66,15 @@ export function AddressSelector() {
             <SelectItem key={addr.id} value={addr.id}>
               <div className='flex flex-col text-left'>
                 <div className='flex items-center gap-2'>
-                  <span className='font-medium'>{addr.address}</span>
-                  <span className='px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full'>
+                  <span className='text-foreground font-medium'>
+                    {addr.address}
+                  </span>
+                  <span className='px-2 py-0.5 text-xs bg-gray-100 text-muted-foreground rounded-full'>
                     {addr.type.charAt(0).toUpperCase() + addr.type.slice(1)}
                   </span>
                 </div>
 
-                <span className='text-sm text-gray-500'>
+                <span className='text-sm text-muted-foreground'>
                   {addr.city} {addr.zipCode}, {getCountry(addr.country, locale)}
                 </span>
               </div>

@@ -49,7 +49,12 @@
       "address": {
         "label": "Adresse *",
         "placeholder": "Straße und Hausnummer",
-        "addressType": "Adresstyp"
+        "addressType": "Adresstyp",
+        "addressTypeOptions": {
+          "primary": "Primär",
+          "mailing": "Post",
+          "other": "Sonstige"
+        }
       },
 
       "address2": {
@@ -69,7 +74,8 @@
 
       "savingAddressLoader": "Adresse wird gespeichert...",
       "saveAddress": "Adresse speichern",
-      "saveAddressError": "Adresse konnte nicht gespeichert werden"
+      "saveAddressError": "Adresse konnte nicht gespeichert werden",
+      "addNewAddress": "+ Neue Adresse hinzufügen"
     },
     "errors": {
       "zipCode": {

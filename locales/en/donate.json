@@ -49,7 +49,12 @@
       "address": {
         "label": "Address *",
         "placeholder": "Street address",
-        "addressType": "Address Type"
+        "addressType": "Address Type",
+        "addressTypeOptions": {
+          "primary": "Primary",
+          "mailing": "Mailing",
+          "other": "Other"
+        }
       },
 
       "address2": {

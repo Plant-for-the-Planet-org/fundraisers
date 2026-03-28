@@ -144,7 +144,7 @@ export const AddressForm = () => {
         </FormField>
       </div>
       {saveAddressError && (
-        <p className='text-sm text-red-500'>{saveAddressError}</p>
+        <p className='text-sm text-destructive'>{saveAddressError}</p>
       )}
       {isAuthenticated && (
         <div className='mt-5'>

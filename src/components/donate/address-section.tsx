@@ -15,16 +15,29 @@ export function AddressSection() {
 
   const profile = useAuthStore(state => state.user?.profile);
 
-  // Set default address (only once when profile loads)
+  // Keep a valid selected address.
+  // If current selection is empty/invalid, initialize to the primary address.
+  // If no primary, select the first address.
+  // If no addresses, select "new" to show empty form.
   useEffect(() => {
     if (!profile) return;
 
+    const hasValidSelection =
+      selectedAddressId === 'new' ||
+      profile.addresses.some(address => address.id === selectedAddressId);
+    if (hasValidSelection) return;
+
     const primary = getPrimaryAddress(profile.addresses);
-    if (!primary) return;
+    if (primary) {
+      setValue('selectedAddressId', primary.id);
+      return;
+    }
 
-    setValue('selectedAddressId', primary.id);
-  }, [profile, setValue]);
+    const firstAddress = profile.addresses[0];
+    setValue('selectedAddressId', firstAddress?.id ?? 'new');
+  }, [profile, selectedAddressId, setValue]);
 
+  // Sync rhf form state with selected address when selection changes.
   useEffect(() => {
     if (!profile || !selectedAddressId) return;
 
@@ -56,9 +69,8 @@ export function AddressSection() {
   }, [selectedAddressId, profile, resetField, setValue]);
 
   return (
-    <div className='space-y-4'>
+    <div className='address-section space-y-4'>
       <AddressSelector />
-
       {selectedAddressId === 'new' && <AddressForm />}
     </div>
   );

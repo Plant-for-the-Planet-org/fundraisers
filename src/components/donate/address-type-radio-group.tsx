@@ -3,26 +3,41 @@ import type { UseFormRegister } from 'react-hook-form';
 import type { DonationFormValues } from './donation-form-context';
 
 import { useTranslations } from 'next-intl';
-import { Label } from '../ui/label';
 
 type Props = {
   register: UseFormRegister<DonationFormValues>;
 };
 
+type AddressTypeOption = {
+  value: DonationFormValues['addressType'];
+  label: string;
+};
+
 export const AddressTypeRadioGroup = ({ register }: Props) => {
-  const tDonate = useTranslations('Donate.userAddress');
+  const tDonate = useTranslations('Donate');
 
   const options = [
-    { value: 'primary', label: 'Primary' },
-    { value: 'mailing', label: 'Mailing' },
-    { value: 'other', label: 'Other' },
-  ];
+    {
+      value: 'primary',
+      label: tDonate('userAddress.address.addressTypeOptions.primary'),
+    },
+    {
+      value: 'mailing',
+      label: tDonate('userAddress.address.addressTypeOptions.mailing'),
+    },
+    {
+      value: 'other',
+      label: tDonate('userAddress.address.addressTypeOptions.other'),
+    },
+  ] satisfies AddressTypeOption[];
 
   return (
-    <div className='space-y-2'>
-      <Label>{tDonate('address.addressType')}</Label>
+    <fieldset className='space-y-2'>
+      <legend className='text-sm font-medium text-foreground'>
+        {tDonate('userAddress.address.addressType')}
+      </legend>
 
-      <div className='flex gap-4 mt-2'>
+      <div className='flex gap-4'>
         {options.map(option => (
           <label
             key={option.value}
@@ -32,12 +47,12 @@ export const AddressTypeRadioGroup = ({ register }: Props) => {
               type='radio'
               value={option.value}
               {...register('addressType')}
-              className='w-4 h-4 text-gray-900 border-gray-300 focus:ring-gray-500'
+              className='w-4 h-4 text-foreground border-gray-300 focus:ring-gray-500'
             />
-            <span>{option.label}</span>
+            <span className='text-sm'>{option.label}</span>
           </label>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 };
