@@ -23,6 +23,7 @@ export const AddressCountrySelector = ({
   const locale = useLocale();
   const tDonate = useTranslations('Donate.userAddress');
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const listboxRef = useRef<HTMLDivElement | null>(null);
 
   // Intentionally uses the full donate country source; do not couple with workspace selector data.
   const allCountries = getAllCountries(locale);
@@ -47,6 +48,20 @@ export const AddressCountrySelector = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen || !listboxRef.current || filteredCountries.length === 0)
+      return;
+
+    const activeCountry = filteredCountries[activeIndex];
+    if (!activeCountry) return;
+
+    const activeOptionId = `address-country-option-${activeCountry.code}`;
+    const activeOption = listboxRef.current.querySelector<HTMLElement>(
+      `#${activeOptionId}`
+    );
+    activeOption?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, activeIndex, filteredCountries]);
 
   const handleSelectCountry = (code: string) => {
     const countryOption = allCountries.find(c => c.code === code);
@@ -90,6 +105,11 @@ export const AddressCountrySelector = ({
 
   const listboxId = 'address-country-selector-listbox';
   const inputValue = isOpen ? query : (selectedCountry?.name ?? '');
+  const activeCountry = filteredCountries[activeIndex];
+  const activeDescendantId =
+    isOpen && activeCountry
+      ? `address-country-option-${activeCountry.code}`
+      : undefined;
 
   return (
     <FormField label={tDonate('country.label')} error={error}>
@@ -116,6 +136,7 @@ export const AddressCountrySelector = ({
           aria-expanded={isOpen}
           aria-controls={listboxId}
           aria-autocomplete='list'
+          aria-activedescendant={activeDescendantId}
           placeholder={tDonate('country.selectCountry')}
           className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
         />
@@ -123,6 +144,7 @@ export const AddressCountrySelector = ({
         {isOpen && (
           <div
             id={listboxId}
+            ref={listboxRef}
             role='listbox'
             className='absolute z-50 mt-1 max-h-72 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg'
           >
@@ -130,6 +152,7 @@ export const AddressCountrySelector = ({
               filteredCountries.map((countryOption, index) => (
                 <button
                   key={countryOption.code}
+                  id={`address-country-option-${countryOption.code}`}
                   type='button'
                   role='option'
                   aria-selected={countryOption.code === country}
