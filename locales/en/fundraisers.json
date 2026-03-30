@@ -210,6 +210,12 @@
         "successMessage": "Fundraiser created!",
         "errorMessage": "Error"
       }
+    },
+    "copyLinkButton": {
+      "label": "Copy Link",
+      "copiedLabel": "Copied!",
+      "successToast": "Link copied!",
+      "errorToast": "Could not copy link. Please copy the URL manually."
     }
   }
 }

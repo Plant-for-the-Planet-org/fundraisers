@@ -15,6 +15,7 @@ import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { Hosts } from '@/components/fundraisers/hosts';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { useTranslations } from 'next-intl';
+import { CopyLinkButton } from './CopyLinkButton';
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
@@ -72,6 +73,8 @@ export function FundraiserView({
 
         {/* Hosts */}
         <Hosts mode='display' fundraiser={fundraiser} />
+        {/** Copy link */}
+        {fundraiser.visibility === 'public' && <CopyLinkButton />}
       </SidebarPanel>
 
       <MainPanel>
