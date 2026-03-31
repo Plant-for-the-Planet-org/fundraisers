@@ -1,6 +1,12 @@
 import type { ProjectAllocation } from '../types/fundraiser';
 import type { LineItem } from '../types/donation';
 
+export interface LineItemCalculationResult {
+  lineItems: LineItem[];
+  totalAmount: number;
+  totalPercentage: number;
+}
+
 export class LineItemCalculator {
   /**
    * Calculate line items from total amount and project allocations
