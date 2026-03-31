@@ -15,7 +15,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
-    "find-typos": "cspell --words-only --unique . | sort --ignore-case > project-words.txt"
+    "find-typos": "cspell --words-only --unique . | sort --ignore-case > project-words.txt",
+    "preinstall": "node scripts/preinstall.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
