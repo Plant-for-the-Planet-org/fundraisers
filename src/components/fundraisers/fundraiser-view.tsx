@@ -15,7 +15,7 @@ import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { Hosts } from '@/components/fundraisers/hosts';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { useTranslations } from 'next-intl';
-import { CopyLinkButton } from './CopyLinkButton';
+import { CopyLinkButton } from './copy-link-button';
 
 function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
