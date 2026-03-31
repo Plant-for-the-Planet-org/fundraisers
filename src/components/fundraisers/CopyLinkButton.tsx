@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check, Link } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 type CopyLinkButtonProps = {
   url?: string;
@@ -27,17 +28,17 @@ export function CopyLinkButton({ url }: CopyLinkButtonProps) {
   };
 
   return (
-    <button
-      type='button'
+    <Button
+      variant='outline'
       onClick={handleCopy}
-      className='mt-3 flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium border border-gray-200 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all w-max'
+      className='mt-3 w-max border-border bg-white hover:bg-gray-50'
     >
       {copied ? (
-        <Check className='h-4 w-4 text-green-600' aria-hidden='true' />
+        <Check className='text-green-600' aria-hidden='true' />
       ) : (
-        <Link className='h-4 w-4' aria-hidden='true' />
+        <Link aria-hidden='true' />
       )}
       {copied ? t('copiedLabel') : t('label')}
-    </button>
+    </Button>
   );
 }
