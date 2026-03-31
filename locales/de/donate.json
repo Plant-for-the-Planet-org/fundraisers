@@ -104,6 +104,18 @@
         "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
       }
     },
+    "submissionErrors": {
+      "authRequired": "Bitte melden Sie sich an, um mit Ihrer Spende fortzufahren.",
+      "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "server": "Serverfehler. Bitte versuchen Sie es in wenigen Augenblicken erneut.",
+      "rateLimit": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+      "donationCreation": "Spende konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "validation": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
+      "accessDenied": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
+      "businessLogic": "Ungültige Spendendaten. Bitte überprüfen und erneut versuchen.",
+      "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
     "cta": {
       "donateNow": "Jetzt spenden",
       "donateMonthly": "Monatlich spenden",
