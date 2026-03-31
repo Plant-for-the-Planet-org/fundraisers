@@ -187,15 +187,6 @@ export class DonationService {
         throw error;
       }
 
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw new DonationError(
-          'Request timed out. Please try again.',
-          'api',
-          'TIMEOUT_ERROR',
-          408
-        );
-      }
-
       throw new DonationError(
         error instanceof Error ? error.message : 'Failed to submit donation',
         'api',
