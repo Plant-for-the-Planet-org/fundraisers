@@ -40,6 +40,7 @@ export interface DonorInfo {
   city?: string;
   state?: string;
   country?: string;
+  companyname?: string;
 }
 
 export interface CustomFieldValue {
@@ -70,6 +71,7 @@ export interface DonationFormData {
   frequency: string;
   isAnonymous: boolean;
   receiptAddress?: string;
+  companyName?: string;
   donor: {
     firstname: string;
     lastname: string;

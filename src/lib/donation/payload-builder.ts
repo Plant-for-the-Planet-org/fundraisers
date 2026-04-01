@@ -44,7 +44,7 @@ export function buildDonorInfo(
 ): DonationPayload['donor'] {
   // Use form data as primary source, fall back to profile data
   const primaryAddress = getPrimaryAddress(userProfile?.addresses ?? []);
-  return {
+  const donorInfo: DonationPayload['donor'] = {
     firstname: formData.donor.firstname || userProfile?.firstname || '',
     lastname: formData.donor.lastname || userProfile?.lastname || '',
     email: formData.donor.email || userProfile?.email || '',
@@ -57,6 +57,12 @@ export function buildDonorInfo(
       userProfile?.country ||
       '',
   };
+
+  if (formData.companyName) {
+    donorInfo.companyname = formData.companyName;
+  }
+
+  return donorInfo;
 }
 /**
  * Builds donor alias (display name) for the donation
@@ -113,6 +119,10 @@ export function assembleFormData(
     formData.donor.city = values.city;
     formData.donor.state = values.state;
     formData.donor.country = values.country;
+
+    if (values.isCompany && values.companyName) {
+      formData.companyName = values.companyName;
+    }
   }
 
   return formData;
