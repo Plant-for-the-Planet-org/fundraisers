@@ -5,22 +5,23 @@ import type { DonationFormValues } from './donation-form-context';
 import { useTranslations } from 'next-intl';
 import { useDonationForm } from './donation-form-context';
 import { Button } from '../ui/button';
-import { useFormContext } from 'react-hook-form';
-import { useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 export function DonateCTA() {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
-  const { handleSubmit, watch } = useFormContext<DonationFormValues>();
-  const makeMonthly = watch('makeMonthly');
+  const { handleSubmit } = useFormContext<DonationFormValues>();
+  const makeMonthly = useWatch<DonationFormValues, 'makeMonthly'>({
+    name: 'makeMonthly',
+  });
 
-  const buttonText = useMemo(() => {
-    const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
-    const isYearly = donationData.frequency === 'yearly';
-    if (isYearly) return t('cta.donateYearly');
-    if (isMonthly) return t('cta.donateMonthly');
-    return t('cta.donateNow');
-  }, [donationData.frequency, makeMonthly, t]);
+  const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
+  const isYearly = donationData.frequency === 'yearly';
+  const buttonText = isYearly
+    ? t('cta.donateYearly')
+    : isMonthly
+      ? t('cta.donateMonthly')
+      : t('cta.donateNow');
 
   return (
     <div className='space-y-6'>

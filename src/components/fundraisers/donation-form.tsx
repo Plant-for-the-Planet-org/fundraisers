@@ -1,5 +1,7 @@
 'use client';
 
+import type { DonationFrequency } from '@/lib/types/donation';
+
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
@@ -23,21 +25,24 @@ import type {
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
   currency?: string;
-  onDonate: (amount: number, isDedicated: boolean, frequency: string) => void;
+  onDonate: (
+    amount: number,
+    isDedicated: boolean,
+    frequency: DonationFrequency
+  ) => void;
 }
 
-const recurrencyToValue = (recurrency: RecurrencyType): string => {
+const recurrencyToValue = (recurrency: RecurrencyType): DonationFrequency => {
   switch (recurrency) {
-    case 'one_time':
-      return 'one-time';
+    case 'once':
+      return 'once';
     case 'monthly':
       return 'monthly';
-    case 'quarterly':
-      return 'quarterly';
-    case 'annual':
+    // case 'quarterly': // reserved for future use, update DonationFrequency type if enabled
+    case 'yearly':
       return 'yearly';
     default:
-      return 'one-time';
+      return 'once';
   }
 };
 
@@ -79,7 +84,7 @@ export function DonationForm({
   const [selectedAmount, setSelectedAmount] = useState<number>(defaultAmount);
   const [customAmount, setCustomAmount] = useState<number | undefined>();
   const [selectedFrequency, setSelectedFrequency] = useState(
-    recurrencyToUI(availableRecurrencyOptions[0] ?? 'one_time')
+    recurrencyToUI(availableRecurrencyOptions[0] ?? 'once')
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
@@ -92,8 +97,7 @@ export function DonationForm({
     switch (selectedFrequency.value) {
       case 'monthly':
         return `${amountText}${t('donateMonthly')}`;
-      case 'quarterly':
-        return `${amountText}${t('donateQuarterly')}`;
+      // case 'quarterly': // reserved for future use
       case 'yearly':
         return `${amountText}${t('donateYearly')}`;
       default:

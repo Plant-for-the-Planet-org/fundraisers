@@ -22,42 +22,23 @@ const DevTool =
 
 export const donationFormSchema = z
   .object({
-    firstname: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['firstName.required'] }),
-    lastname: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['lastName.required'] }),
-    email: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['email.required'] })
-      .pipe(z.email({ error: DONATION_FORM_ERRORS['email.invalid'] })),
-    // Address fields — optional at schema level; DonorInfo adds conditional validation based on auth state
-    address: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['address.required'] }),
+    firstname: z.string().trim(),
+    lastname: z.string().trim(),
+    email: z.string().trim(),
+    // Address fields — validated conditionally in superRefine based on whether selectedAddressId is present
+    address: z.string().trim(),
     address2: z.string().trim().optional(),
     addressType: z.enum(['primary', 'mailing', 'other']),
-    zipCode: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['zipCode.required'] }),
+    zipCode: z.string().trim(),
     state: z.string().trim().optional(),
-    city: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['city.required'] }),
-    country: z
-      .string()
-      .trim()
-      .min(1, { error: DONATION_FORM_ERRORS['country.required'] }),
+    city: z.string().trim(),
+    country: z.string().trim(),
     // Preferences
     isAnonymous: z.boolean(),
-    selectedAddressId: z.string().min(1).optional(),
+    selectedAddressId: z
+      .string()
+      .transform(val => (val === '' ? undefined : val))
+      .optional(),
     makeMonthly: z.boolean(),
     coverFees: z.boolean(),
     selectedPaymentMethod: z.string().optional(),
@@ -65,6 +46,67 @@ export const donationFormSchema = z
     companyName: z.string().trim().optional(),
   })
   .superRefine((values, ctx) => {
+    const hasAddressId = !!values.selectedAddressId?.trim();
+
+    // When no addressId is provided (guest user), require personal + address fields
+    if (!hasAddressId) {
+      if (!values.firstname) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['firstName.required'],
+          path: ['firstname'],
+        });
+      }
+      if (!values.lastname) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['lastName.required'],
+          path: ['lastname'],
+        });
+      }
+      if (!values.email) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['email.required'],
+          path: ['email'],
+        });
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['email.invalid'],
+          path: ['email'],
+        });
+      }
+      if (!values.address) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['address.required'],
+          path: ['address'],
+        });
+      }
+      if (!values.zipCode) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['zipCode.required'],
+          path: ['zipCode'],
+        });
+      }
+      if (!values.city) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['city.required'],
+          path: ['city'],
+        });
+      }
+      if (!values.country) {
+        ctx.addIssue({
+          code: 'custom',
+          message: DONATION_FORM_ERRORS['country.required'],
+          path: ['country'],
+        });
+      }
+    }
+
     if (values.isCompany && !values.companyName?.trim()) {
       ctx.addIssue({
         code: 'custom',

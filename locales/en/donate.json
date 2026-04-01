@@ -103,6 +103,18 @@
         "invalid": "Please enter a valid email address"
       }
     },
+    "submissionErrors": {
+      "authRequired": "Please log in to continue with your donation.",
+      "network": "Network error. Please check your connection and try again.",
+      "server": "Server error. Please try again in a few moments.",
+      "rateLimit": "Too many requests. Please wait a moment and try again.",
+      "donationCreation": "Failed to create donation. Please try again.",
+      "validation": "Please check your information and try again.",
+      "accessDenied": "You do not have permission to perform this action.",
+      "businessLogic": "Invalid donation data. Please review and try again.",
+      "threeDsMissingSecret": "Payment authentication failed. Please try again.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    },
     "cta": {
       "donateNow": "Donate Now",
       "donateMonthly": "Donate Monthly",

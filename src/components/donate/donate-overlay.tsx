@@ -2,7 +2,7 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
-import type { DonationFormValues } from './donation-form-context';
+import type { DonationFrequency } from '@/lib/types/donation';
 
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -14,11 +14,12 @@ import { PaymentMethods } from './payment-methods';
 import { DonateCTA } from './donate-cta';
 import { DonationFormProvider } from './donation-form-context';
 import { DonateOptions } from './donate-options';
+import { useDonationSubmit } from './use-donation-submit';
 
 export interface DonationData {
   amount: number;
   currency: string;
-  frequency: string;
+  frequency: DonationFrequency;
   dedicated: boolean;
 }
 
@@ -51,12 +52,32 @@ export function DonateOverlay({
   // Show skeleton while donation data is still being fetched
   if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
 
-  function onSubmit(values: DonationFormValues) {
-    // TODO (Portion 4): build payload and call useDonation.submitDonation.
-    // For authenticated users, send address_id (selectedAddressId), not raw address fields.
-    // address_id can be an existing address id or the id returned after creating a new address.
-    console.log('donation form values', values);
-  }
+  return (
+    <DonateOverlayInner
+      donationData={donationData}
+      fundraiser={fundraiser}
+      paymentOptions={paymentOptions}
+      onClose={onClose}
+      isOpen={isOpen}
+    />
+  );
+}
+
+/** Inner component rendered only when donationData is available, so hooks can depend on it safely */
+function DonateOverlayInner({
+  donationData,
+  fundraiser,
+  paymentOptions,
+  onClose,
+  isOpen,
+}: {
+  donationData: DonationData;
+  fundraiser: Fundraiser;
+  paymentOptions: PaymentOptions;
+  onClose: () => void;
+  isOpen: boolean;
+}) {
+  const { onSubmit } = useDonationSubmit(donationData, fundraiser);
 
   return createPortal(
     <DonationFormProvider

@@ -10,7 +10,7 @@ import type {
 } from '@/lib/types/payment-options';
 
 const DEFAULT_CONTRIBUTION_SETTINGS: Required<ContributionModuleSettings> = {
-  recurrency_options: ['one_time', 'monthly', 'annual'],
+  recurrency_options: ['once', 'monthly', 'yearly'],
   options: [
     { amount_cent: 1000, label: null, sub_label: null },
     { amount_cent: 2000, label: null, sub_label: null, default: true },
@@ -52,7 +52,7 @@ export function getAvailableRecurrencyOptions(
   moduleSettings?: ContributionModuleSettings
 ): RecurrencyType[] {
   const settings = getContributionSettings(moduleSettings);
-  return settings.allow_recurrency ? settings.recurrency_options : ['one_time'];
+  return settings.allow_recurrency ? settings.recurrency_options : ['once'];
 }
 
 export function getDefaultSelectedAmount(
@@ -116,9 +116,9 @@ function mapFrequencyOptions(
 }
 
 const API_FREQUENCY_TO_RECURRENCY: Record<string, RecurrencyType> = {
-  once: 'one_time',
+  once: 'once',
   monthly: 'monthly',
-  yearly: 'annual',
+  yearly: 'yearly',
 };
 
 export function mapPaymentOptionsToContributionSettings(
