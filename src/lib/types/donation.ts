@@ -68,7 +68,7 @@ export interface DonationMetadata {
 interface DonationFormDataBase {
   amount: number;
   currency: string;
-  frequency: string;
+  frequency: DonationFrequency;
   isAnonymous: boolean;
 }
 
@@ -95,9 +95,11 @@ export interface GuestFormData extends DonationFormDataBase {
 
 export type DonationFormData = AuthenticatedFormData | GuestFormData;
 
+export type DonationFrequency = 'once' | 'monthly' | 'yearly';
+
 interface DonationPayloadBase {
   currency: string;
-  frequency: string;
+  frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;

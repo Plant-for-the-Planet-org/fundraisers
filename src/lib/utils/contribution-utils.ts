@@ -10,7 +10,7 @@ import type {
 } from '@/lib/types/payment-options';
 
 const DEFAULT_CONTRIBUTION_SETTINGS: Required<ContributionModuleSettings> = {
-  recurrency_options: ['once', 'monthly', 'annual'],
+  recurrency_options: ['once', 'monthly', 'yearly'],
   options: [
     { amount_cent: 1000, label: null, sub_label: null },
     { amount_cent: 2000, label: null, sub_label: null, default: true },
@@ -118,7 +118,7 @@ function mapFrequencyOptions(
 const API_FREQUENCY_TO_RECURRENCY: Record<string, RecurrencyType> = {
   once: 'once',
   monthly: 'monthly',
-  yearly: 'annual',
+  yearly: 'yearly',
 };
 
 export function mapPaymentOptionsToContributionSettings(

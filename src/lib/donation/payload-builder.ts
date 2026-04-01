@@ -4,6 +4,7 @@ import type { DonationFormValues } from '@/components/donate/donation-form-conte
 import type { DonationData } from '@/components/donate/donate-overlay';
 import type {
   DonationFormData,
+  DonationFrequency,
   DonationPayload,
   DonorInfo,
   GuestFormData,
@@ -11,6 +12,16 @@ import type {
 
 import { getPrimaryAddress } from '../utils/profile';
 import { calculateLineItems } from './line-item-calculator';
+
+export function calculateFrequency(
+  frequency: DonationFrequency,
+  makeMonthly: boolean
+): DonationFrequency {
+  if (frequency === 'once') {
+    return makeMonthly ? 'monthly' : 'once';
+  }
+  return frequency;
+}
 
 /**
  * Builds donation metadata including fundraiser context and custom fields
@@ -104,7 +115,7 @@ export function assembleFormData(
   const base = {
     amount: donationData.amount || 0,
     currency: donationData.currency || fundraiser.currency || 'EUR',
-    frequency: donationData.frequency || 'once',
+    frequency: calculateFrequency(donationData.frequency, values.makeMonthly),
     isAnonymous: values.isAnonymous,
   };
 
