@@ -70,6 +70,7 @@ export function useDonationSubmit(
             token || undefined,
             donationIdempotencyKey
           );
+          // TODO - clear isLoading state after successful donation submission.
         }
       } catch (error) {
         console.error('Donation submission error:', error);
