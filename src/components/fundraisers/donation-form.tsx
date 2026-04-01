@@ -28,8 +28,8 @@ interface DonationFormProps {
 
 const recurrencyToValue = (recurrency: RecurrencyType): string => {
   switch (recurrency) {
-    case 'one_time':
-      return 'one-time';
+    case 'once':
+      return 'once';
     case 'monthly':
       return 'monthly';
     case 'quarterly':
@@ -37,7 +37,7 @@ const recurrencyToValue = (recurrency: RecurrencyType): string => {
     case 'annual':
       return 'yearly';
     default:
-      return 'one-time';
+      return 'once';
   }
 };
 
@@ -79,7 +79,7 @@ export function DonationForm({
   const [selectedAmount, setSelectedAmount] = useState<number>(defaultAmount);
   const [customAmount, setCustomAmount] = useState<number | undefined>();
   const [selectedFrequency, setSelectedFrequency] = useState(
-    recurrencyToUI(availableRecurrencyOptions[0] ?? 'one_time')
+    recurrencyToUI(availableRecurrencyOptions[0] ?? 'once')
   );
   const [isDedicated, setIsDedicated] = useState(false);
 

@@ -85,6 +85,7 @@ export interface DonationFormData {
 
 export interface DonationPayload {
   currency: string;
+  frequency: string;
   donor?: DonorInfo; // Optional when receiptAddress is provided
   lineItems: LineItem[];
   donorAlias?: string;

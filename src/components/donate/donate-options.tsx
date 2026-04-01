@@ -38,8 +38,7 @@ export function DonateOptions() {
 
   const showCoverFees = feeCollectionEnabled && hasProcessingFee;
   const showMakeMonthly =
-    paymentOptions.recurrency.supported &&
-    donationData.frequency === 'one-time';
+    paymentOptions.recurrency.supported && donationData.frequency === 'once';
 
   if (!showCoverFees && !showMakeMonthly) return null;
 

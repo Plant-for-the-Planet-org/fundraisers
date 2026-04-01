@@ -136,7 +136,7 @@ Shows:
   - `getImageUrl('fundraiser', 'small', fundraiser.image)` from `src/lib/utils/images.ts`
 - Per-project breakdown from `calculateLineItems`
   - Fallback: fundraiser title as single line item if no allocations
-- Frequency label (`one-time → "One-time"`, `monthly → "Monthly"`, `quarterly → "Quarterly"`, `yearly → "Yearly"`)
+- Frequency label (`once` → "One-time"`, `monthly → "Monthly"`, `quarterly → "Quarterly"`, `yearly → "Yearly"`)
 - Total amount row — `formatCurrency(amountCents, currency)` from `src/lib/utils/currency.ts`
 - Dedicated badge if `donationData.dedicated === true`
 
@@ -300,13 +300,13 @@ Remaining for Portion 4:
 
 ## Existing utilities to reuse
 
-| Utility                                 | Location                                          |
-| --------------------------------------- | ------------------------------------------------- |
-| `formatCurrency(amountCents, currency)` | `src/lib/utils/currency.ts`                       |
-| `getImageUrl(type, size, filename)`     | `src/lib/utils/images.ts`                         |
-| `platformAPIClient`                     | `src/lib/api/external-client.ts`                  |
-| `useAuthStore`                          | `src/stores/authStore.ts`                         |
-| `PaymentOptions` type                   | `src/lib/types/payment-options.ts`                |
-| `Fundraiser` type                       | `src/lib/types/fundraiser.ts`                     |
-| `DonationData` type                     | `src/components/donate/donate-overlay.tsx`        |
+| Utility                                                       | Location                                          |
+| ------------------------------------------------------------- | ------------------------------------------------- |
+| `formatCurrency(amountCents, currency)`                       | `src/lib/utils/currency.ts`                       |
+| `getImageUrl(type, size, filename)`                           | `src/lib/utils/images.ts`                         |
+| `platformAPIClient`                                           | `src/lib/api/external-client.ts`                  |
+| `useAuthStore`                                                | `src/stores/authStore.ts`                         |
+| `PaymentOptions` type                                         | `src/lib/types/payment-options.ts`                |
+| `Fundraiser` type                                             | `src/lib/types/fundraiser.ts`                     |
+| `DonationData` type                                           | `src/components/donate/donate-overlay.tsx`        |
 | `DonationFormValues`, `donationFormSchema`, `useDonationForm` | `src/components/donate/donation-form-context.tsx` |

@@ -95,7 +95,7 @@ export function assembleFormData(
   const formData: DonationFormData = {
     amount: donationData.amount || 0,
     currency: donationData.currency || fundraiser.currency || 'EUR',
-    frequency: donationData.frequency || 'one-time',
+    frequency: donationData.frequency || 'once',
     isAnonymous: values.isAnonymous,
     donor: {
       firstname: values.firstname,
@@ -158,6 +158,7 @@ export function buildDonationPayload(
 
   const payload: DonationPayload = {
     currency: formData.currency,
+    frequency: formData.frequency,
     lineItems,
     donorAlias,
     metadata,
