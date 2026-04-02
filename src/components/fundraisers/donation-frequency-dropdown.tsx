@@ -1,5 +1,7 @@
 'use client';
 
+import type { DonationFrequency } from '@/lib/types/donation';
+
 import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -9,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 interface FrequencyOption {
-  value: string;
+  value: DonationFrequency;
   label: string;
 }
 

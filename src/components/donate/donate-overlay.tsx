@@ -2,6 +2,7 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { DonationFrequency } from '@/lib/types/donation';
 
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -20,7 +21,7 @@ import { DonationFailureBanner } from './donation-failure-banner';
 export interface DonationData {
   amount: number;
   currency: string;
-  frequency: string;
+  frequency: DonationFrequency;
   dedicated: boolean;
 }
 

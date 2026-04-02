@@ -259,6 +259,12 @@
         "successMessage": "Fundraiser erstellt!",
         "errorMessage": "Fehler"
       }
+    },
+    "copyLinkButton": {
+      "label": "Link kopieren",
+      "copiedLabel": "Kopiert!",
+      "successToast": "Link kopiert!",
+      "errorToast": "Link konnte nicht kopiert werden. Bitte kopiere die URL manuell."
     }
   }
 }

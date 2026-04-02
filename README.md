@@ -13,7 +13,7 @@ The Plant-for-the-Planet fundraisers frontend. Built with Next.js App Router and
 ```bash
 git clone <repo-url>
 cd fundraisers
-npm install
+npm ci
 ```
 
 Copy `.env.example` to `.env.local` and fill in the values:
@@ -29,6 +29,20 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) — the root redirects to `/explore`.
+
+---
+
+## Dependency Management
+
+Always use `npm ci` to install dependencies unless you are deliberately adding or upgrading a package. `npm ci` installs exactly what is in `package-lock.json` and never modifies it.
+
+| Situation              | Command                           |
+| ---------------------- | --------------------------------- |
+| Day-to-day development | `npm ci`                          |
+| Adding a new package   | `npm install <package>`           |
+| Upgrading a package    | `npm install <package>@<version>` |
+
+When adding or upgrading a package, review the `package-lock.json` diff carefully before committing — it should only change in ways you expect.
 
 ---
 

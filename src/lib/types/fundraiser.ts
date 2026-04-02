@@ -1,6 +1,6 @@
 import type { Nullable } from './utility';
 
-export type RecurrencyType = 'one_time' | 'monthly' | 'quarterly' | 'annual';
+export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 
 export interface ContributionOption {
   amount_cent: number | 'custom';

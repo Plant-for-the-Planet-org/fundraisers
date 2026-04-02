@@ -26,6 +26,7 @@ export interface DonorInfo {
   city?: string;
   state?: string;
   country?: string;
+  companyname?: string;
 }
 
 export interface CustomFieldValue {
@@ -50,31 +51,57 @@ export interface DonationMetadata {
 }
 
 /** Intermediate form data assembled from donation context and user input */
-export interface DonationFormData {
+interface DonationFormDataBase {
   amount: number;
   currency: string;
-  frequency: string;
+  frequency: DonationFrequency;
   isAnonymous: boolean;
-  receiptAddress?: string;
+}
+
+export interface AuthenticatedFormData extends DonationFormDataBase {
+  type: 'authenticated';
+  receiptAddress: string;
+}
+
+export interface GuestFormData extends DonationFormDataBase {
+  type: 'guest';
+  companyName?: string;
   donor: {
     firstname: string;
     lastname: string;
     email: string;
-    address?: string;
+    address: string;
     address2?: string;
-    zipCode?: string;
-    city?: string;
+    zipCode: string;
+    city: string;
     state?: string;
-    country?: string;
+    country: string;
   };
 }
 
-export interface DonationPayload {
+export type DonationFormData = AuthenticatedFormData | GuestFormData;
+
+export type DonationFrequency = 'once' | 'monthly' | 'yearly';
+
+interface DonationPayloadBase {
   currency: string;
-  donor?: DonorInfo; // Optional when receiptAddress is provided
+  frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
-  prePaid?: boolean; // true for PlanetCash, omit for other methods
-  receiptAddress?: string; // Address ID for logged-in users
+  prePaid?: boolean;
 }
+
+export interface AuthenticatedDonationPayload extends DonationPayloadBase {
+  receiptAddress: string;
+  donor?: never;
+}
+
+export interface GuestDonationPayload extends DonationPayloadBase {
+  donor: DonorInfo;
+  receiptAddress?: never;
+}
+
+export type DonationPayload =
+  | AuthenticatedDonationPayload
+  | GuestDonationPayload;

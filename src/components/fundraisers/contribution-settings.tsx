@@ -17,7 +17,7 @@ export function ContributionSettings() {
         currency={currency}
         onDonate={(amount, isDedicated, frequency) => {
           alert(
-            `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency === 'one-time' ? 'once' : frequency}${isDedicated ? ' (dedicated)' : ''}`
+            `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency}${isDedicated ? ' (dedicated)' : ''}`
           );
         }}
       />

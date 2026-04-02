@@ -84,7 +84,7 @@ export function DonationSummary() {
   };
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
-  const isYearly = donationData.frequency === 'annual';
+  const isYearly = donationData.frequency === 'yearly';
   const { hasProcessingFee, processingFeeCents } = useMemo(() => {
     return getDonationProcessingFeeInfo({
       paymentOptions,
