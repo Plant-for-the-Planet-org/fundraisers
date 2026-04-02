@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -22,12 +23,14 @@ export function CardBase({ title, description, value, helper }: CardBaseProps) {
         <CardTitle>{title}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
-      <CardContent>
-        <p className='text-2xl font-bold'>{value}</p>
+      <CardContent className='grow'>
+        <p className='text-xl font-bold'>{value}</p>
+      </CardContent>
+      <CardFooter>
         {helper ? (
           <p className='text-xs text-muted-foreground mt-1'>{helper}</p>
         ) : null}
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 }

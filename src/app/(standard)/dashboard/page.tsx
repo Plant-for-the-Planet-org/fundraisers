@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { MyFundraisersCard } from '@/components/dashboard';
+import { MyFundraisersCard, TotalRaisedCard } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 import {
   getDashboardFundraiserStats,
@@ -15,8 +15,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 const INITIAL_FUNDRAISER_STATS: DashboardFundraiserStats = {
   activeFundraisersCount: 0,
-  totalRaised: 0,
-  totalRaisedCurrency: 'EUR',
+  totalRaisedByCurrency: [],
 };
 
 export default function DashboardPage() {
@@ -82,6 +81,7 @@ export default function DashboardPage() {
 
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
           <MyFundraisersCard count={fundraiserStats.activeFundraisersCount} />
+          <TotalRaisedCard summaries={fundraiserStats.totalRaisedByCurrency} />
         </div>
       </section>
     </AuthGuard>

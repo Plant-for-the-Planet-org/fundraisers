@@ -10,13 +10,16 @@
       "myFundraisers": {
         "title": "Meine Fundraiser",
         "description": "Verwalte deine aktiven Spendenaktionen",
-        "empty": "Keine aktiven Fundraiser"
+        "empty": "Keine aktiven Fundraiser",
+        "activeFundraisers": "Aktive Fundraiser"
       },
       "totalRaised": {
         "title": "Insgesamt gesammelt",
         "description": "Summe über alle Kampagnen",
-        "value": "€0",
-        "empty": "Starte deine erste Kampagne"
+        "value": "Nach Währungen zusammengefasst",
+        "summaryLine": "{amount} aus {count, plural, one {# Spendenaktion} other {# Spendenaktionen}}",
+        "empty": "Starte deine erste Kampagne",
+        "aggregatedByCurrency": "Nach Währungen zusammengefasst"
       },
       "donations": {
         "title": "Spenden",

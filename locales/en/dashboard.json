@@ -10,13 +10,16 @@
       "myFundraisers": {
         "title": "My Fundraisers",
         "description": "Manage your active fundraising campaigns",
-        "empty": "No active fundraisers"
+        "empty": "No active fundraisers",
+        "activeFundraisers": "Active fundraisers"
       },
       "totalRaised": {
         "title": "Total Raised",
         "description": "Amount raised across all campaigns",
-        "value": "€0",
-        "empty": "Start your first campaign"
+        "value": "Aggregated by currency",
+        "summaryLine": "{amount} from {count, plural, one {# fundraiser} other {# fundraisers}}",
+        "empty": "Start your first campaign",
+        "aggregatedByCurrency": "Aggregated by currency"
       },
       "donations": {
         "title": "Donations",

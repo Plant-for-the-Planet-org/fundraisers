@@ -10,8 +10,13 @@ interface FundraisersApiEnvelope {
 
 export interface DashboardFundraiserStats {
   activeFundraisersCount: number;
+  totalRaisedByCurrency: DashboardRaisedSummary[];
+}
+
+export interface DashboardRaisedSummary {
+  currency: string;
   totalRaised: number;
-  totalRaisedCurrency: string;
+  fundraiserCount: number;
 }
 
 function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
@@ -51,22 +56,40 @@ export function getDashboardFundraiserStats(
     fundraiser => fundraiser.canDonate === true
   ).length;
 
-  // TODO: This is a raw sum across all fundraiser currencies.
-  // Keep this value internal until we add currency conversion or per-currency totals.
-  const totalRaised = fundraisers.reduce((sum, fundraiser) => {
-    return (
-      sum +
-      (Number.isFinite(fundraiser.totalRaised) ? fundraiser.totalRaised : 0)
-    );
-  }, 0);
+  const byCurrency = new Map<string, DashboardRaisedSummary>();
 
-  const totalRaisedCurrency =
-    fundraisers.find(fundraiser => typeof fundraiser.currency === 'string')
-      ?.currency ?? 'EUR';
+  for (const fundraiser of fundraisers) {
+    if (typeof fundraiser.currency !== 'string' || fundraiser.currency === '') {
+      continue;
+    }
+
+    const currency = fundraiser.currency.toUpperCase();
+    const existing = byCurrency.get(currency);
+    const safeTotalRaised = Number.isFinite(fundraiser.totalRaised)
+      ? fundraiser.totalRaised
+      : 0;
+
+    if (existing) {
+      existing.totalRaised += safeTotalRaised;
+      existing.fundraiserCount += 1;
+      continue;
+    }
+
+    byCurrency.set(currency, {
+      currency,
+      totalRaised: safeTotalRaised,
+      fundraiserCount: 1,
+    });
+  }
+
+  const totalRaisedByCurrency = Array.from(byCurrency.values()).sort((a, b) => {
+    return (
+      b.totalRaised - a.totalRaised || a.currency.localeCompare(b.currency)
+    );
+  });
 
   return {
     activeFundraisersCount,
-    totalRaised,
-    totalRaisedCurrency,
+    totalRaisedByCurrency,
   };
 }

@@ -1,25 +1,55 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
+import type { DashboardRaisedSummary } from '@/lib/api/fundraisers-service';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 import { CardBase } from './card-base';
 
 interface TotalRaisedCardProps {
-  amount: number;
-  currency: string;
+  summaries: DashboardRaisedSummary[];
 }
 
-export function TotalRaisedCard({ amount, currency }: TotalRaisedCardProps) {
-  const t = useTranslations('Dashboard');
+export function TotalRaisedCard({ summaries }: TotalRaisedCardProps) {
+  const tTotalRaised = useTranslations('Dashboard.cards.totalRaised');
+  const locale = useLocale();
+
+  const displaySummaries =
+    summaries.length > 0
+      ? summaries
+      : [
+          { currency: 'EUR', totalRaised: 0, fundraiserCount: 0 },
+          { currency: 'USD', totalRaised: 0, fundraiserCount: 0 },
+        ];
+
+  const value = (
+    <span className='block'>
+      {displaySummaries.map(summary => {
+        const formattedAmount = formatCurrencyFromDecimal(
+          summary.totalRaised,
+          summary.currency,
+          locale
+        );
+
+        return (
+          <span key={summary.currency} className='block'>
+            {tTotalRaised('summaryLine', {
+              amount: formattedAmount,
+              count: summary.fundraiserCount,
+            })}
+          </span>
+        );
+      })}
+    </span>
+  );
 
   return (
     <CardBase
-      title={t('cards.totalRaised.title')}
-      description={t('cards.totalRaised.description')}
-      value={formatCurrencyFromDecimal(amount, currency)}
-      helper={amount <= 0 ? t('cards.totalRaised.empty') : undefined}
+      title={tTotalRaised('title')}
+      description={tTotalRaised('description')}
+      value={value}
+      helper={tTotalRaised('aggregatedByCurrency')}
     />
   );
 }

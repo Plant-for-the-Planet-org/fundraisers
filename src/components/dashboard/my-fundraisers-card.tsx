@@ -8,14 +8,18 @@ interface MyFundraisersCardProps {
 }
 
 export function MyFundraisersCard({ count }: MyFundraisersCardProps) {
-  const t = useTranslations('Dashboard');
+  const tMyFundraisers = useTranslations('Dashboard.cards.myFundraisers');
 
   return (
     <CardBase
-      title={t('cards.myFundraisers.title')}
-      description={t('cards.myFundraisers.description')}
+      title={tMyFundraisers('title')}
+      description={tMyFundraisers('description')}
       value={count.toLocaleString()}
-      helper={count === 0 ? t('cards.myFundraisers.empty') : undefined}
+      helper={
+        count === 0
+          ? tMyFundraisers('empty')
+          : tMyFundraisers('activeFundraisers')
+      }
     />
   );
 }
