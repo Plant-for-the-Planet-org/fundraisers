@@ -1,5 +1,6 @@
 // ===== Imports: Type-only =====
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationFormValues } from './donation-form-context';
 import type { DonationData } from './donate-overlay';
 import type { PaymentData } from '@/lib/types/payment';
@@ -19,7 +20,7 @@ import {
 import { submitStandardDonation } from '@/lib/donation/donation-submission';
 import { DonationError } from '@/lib/api/donation-service';
 import { PaymentError } from '@/lib/api/payment-service';
-import { PaymentOptionsError } from '@/lib/utils/payment-options';
+import { PaymentOptionsError } from '@/lib/utils/payment-request-builder';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 
@@ -61,7 +62,8 @@ function toSubmitError(error: unknown): DonationSubmitError {
  */
 export function useDonationSubmit(
   donationData: DonationData,
-  fundraiser: Fundraiser
+  fundraiser: Fundraiser,
+  paymentOptions: PaymentOptions
 ) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const donorProfile = useAuthStore(state => state.user?.profile);
@@ -122,7 +124,7 @@ export function useDonationSubmit(
               donationKeyRef.current,
               paymentKeyRef.current,
               values.selectedPaymentMethod,
-              fundraiser.id,
+              paymentOptions,
               cleanPaymentDetails(paymentDetails)
             );
 
@@ -161,7 +163,14 @@ export function useDonationSubmit(
         submittingRef.current = false;
       }
     },
-    [donationData, fundraiser, isAuthenticated, donorProfile, token]
+    [
+      donationData,
+      fundraiser,
+      paymentOptions,
+      isAuthenticated,
+      donorProfile,
+      token,
+    ]
   );
 
   const reset = useCallback(() => {

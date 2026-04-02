@@ -81,7 +81,8 @@ function DonateOverlayInner({
 }) {
   const { onSubmit, state, reset } = useDonationSubmit(
     donationData,
-    fundraiser
+    fundraiser,
+    paymentOptions
   );
   const { isSuccess, donationId, error, isLoading } = state;
   return createPortal(

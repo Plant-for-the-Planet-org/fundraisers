@@ -1,10 +1,10 @@
 import type { DonationPayload } from '../types/donation';
 import type { PaymentData, PaymentMethod } from '../types/payment';
+import type { PaymentOptions } from '../types/payment-options';
 
 import { DonationError, donationService } from '../api/donation-service';
 import { paymentService } from '../api/payment-service';
 import { buildPaymentRequest } from '../utils/payment-request-builder';
-import { getPaymentOptions } from '../api/payment-options-service';
 
 /** Standard payment: Two-step flow — create donation, then process payment */
 export async function submitStandardDonation(
@@ -13,7 +13,7 @@ export async function submitStandardDonation(
   donationIdempotencyKey: string,
   paymentIdempotencyKey: string,
   selectedPaymentMethod: PaymentMethod,
-  fundraiserId: string,
+  paymentOptions: PaymentOptions,
   paymentDetails: Record<string, string | number | boolean>
 ) {
   // Step 1: Create donation
@@ -38,11 +38,7 @@ export async function submitStandardDonation(
     paymentDetails: paymentDetails,
   };
 
-  const paymentOptionConfig = await getPaymentOptions(fundraiserId);
-  const paymentRequest = await buildPaymentRequest(
-    paymentData,
-    paymentOptionConfig
-  );
+  const paymentRequest = await buildPaymentRequest(paymentData, paymentOptions);
 
   const paymentResponse = await paymentService.processPayment(
     paymentData.donationId,

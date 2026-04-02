@@ -8,8 +8,17 @@ import type {
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
-import { PaymentOptionsError } from './payment-options';
-
+export class PaymentOptionsError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public status?: number,
+    public details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'PaymentOptionsError';
+  }
+}
 /**
  * Build payment source based on payment method
  */
