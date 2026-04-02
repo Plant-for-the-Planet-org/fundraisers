@@ -5,20 +5,6 @@ export interface DonationResponse {
   errors?: Record<string, string>;
 }
 
-export interface PaymentData {
-  donationId: string;
-  paymentMethod: 'card' | 'sepa-debit' | 'paypal' | 'bank-transfer' | string;
-  paymentDetails: {
-    savedMethodId?: string; // For saved payment methods
-    paymentMethodId?: string; // Stripe payment method ID for new payments
-    sourceId?: string; // Alternative field name for payment method ID
-    account?: string; // Account ID for the payment gateway
-    orderId?: string; // PayPal order ID from PayPal SDK
-    orderID?: string; // Alternative field name for PayPal order ID
-    [key: string]: string | number | boolean | undefined;
-  };
-}
-
 export interface LineItem {
   project: string;
   amount: number; // in full currency units

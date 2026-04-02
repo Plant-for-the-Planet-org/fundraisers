@@ -1,11 +1,13 @@
 import type { DonationPayload, DonationResponse } from '../types/donation';
+import type { ErrorType } from './http-error-classifier';
 
 import { API_BASE_URL } from '../constants/app-config';
+import { classifyHttpError } from './http-error-classifier';
 
 export class DonationError extends Error {
   constructor(
     message: string,
-    public type: 'validation' | 'api' | 'business' | 'user',
+    public type: ErrorType,
     public code: string,
     public status?: number,
     public details?: Record<string, unknown>
@@ -42,7 +44,7 @@ export class DonationService {
     return headers;
   }
 
-  private async safeJsonParse(response: Response): Promise<any> {
+  private async safeJsonParse(response: Response): Promise<unknown> {
     try {
       return await response.json();
     } catch {
@@ -69,94 +71,22 @@ export class DonationService {
   }
 
   private async handleErrorResponse(response: Response): Promise<never> {
-    const errorData = await this.safeJsonParse(response);
+    const { type, code, debugMessage, status, errorData } =
+      await classifyHttpError(response);
 
-    let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    const details: Record<string, unknown> = { details: errorData };
 
-    if (errorData && typeof errorData === 'object' && 'message' in errorData) {
-      errorMessage =
-        (errorData as { message?: string }).message || errorMessage;
+    // Preserve field-level errors for validation/business statuses
+    if (
+      (status === 400 || status === 422) &&
+      errorData &&
+      typeof errorData === 'object' &&
+      'errors' in errorData
+    ) {
+      details.errors = (errorData as { errors: unknown }).errors;
     }
 
-    switch (response.status) {
-      case 400:
-        throw new DonationError(
-          errorMessage,
-          'validation',
-          'VALIDATION_ERROR',
-          400,
-          {
-            errors:
-              typeof errorData === 'object' &&
-              errorData &&
-              'errors' in errorData
-                ? (errorData as any).errors
-                : {},
-            details: errorData,
-          }
-        );
-
-      case 401:
-        throw new DonationError(
-          'Authentication required or invalid',
-          'user',
-          'AUTH_ERROR',
-          401,
-          { details: errorData }
-        );
-
-      case 403:
-        throw new DonationError('Access denied', 'user', 'ACCESS_DENIED', 403, {
-          details: errorData,
-        });
-
-      case 422:
-        throw new DonationError(
-          errorMessage || 'Invalid donation data',
-          'business',
-          'BUSINESS_LOGIC_ERROR',
-          422,
-          {
-            errors:
-              typeof errorData === 'object' &&
-              errorData &&
-              'errors' in errorData
-                ? (errorData as any).errors
-                : {},
-            details: errorData,
-          }
-        );
-
-      case 429:
-        throw new DonationError(
-          'Too many requests. Please try again later.',
-          'api',
-          'RATE_LIMIT_ERROR',
-          429,
-          { details: errorData }
-        );
-
-      case 500:
-      case 502:
-      case 503:
-      case 504:
-        throw new DonationError(
-          'Server error. Please try again later.',
-          'api',
-          'SERVER_ERROR',
-          response.status,
-          { details: errorData }
-        );
-
-      default:
-        throw new DonationError(
-          errorMessage,
-          'api',
-          'HTTP_ERROR',
-          response.status,
-          { details: errorData }
-        );
-    }
+    throw new DonationError(debugMessage, type, code, status, details);
   }
 
   async submitDonation(

@@ -1,33 +1,20 @@
 import type { DonationPayload } from '../types/donation';
+import type { PaymentData, PaymentMethod } from '../types/payment';
 
 import { DonationError, donationService } from '../api/donation-service';
-
-export interface DonationSubmitError {
-  /** Maps to a next-intl key via the UI layer, e.g. 'AUTH_ERROR' */
-  code: string;
-  /** Optional interpolation values for the translation */
-  values?: Record<string, string | number>;
-}
-
-export interface DonationSubmitState {
-  isLoading: boolean;
-  isSuccess: boolean;
-  donationId: string | null;
-  error: DonationSubmitError | null;
-}
-
-export const INITIAL_DONATION_STATE: DonationSubmitState = {
-  isLoading: false,
-  isSuccess: false,
-  donationId: null,
-  error: null,
-};
+import { paymentService } from '../api/payment-service';
+import { buildPaymentRequest } from '../utils/payment-request-builder';
+import { getPaymentOptions } from '../api/payment-options-service';
 
 /** Standard payment: Two-step flow — create donation, then process payment */
 export async function submitStandardDonation(
   payload: DonationPayload,
   token: string | undefined,
-  donationIdempotencyKey: string
+  donationIdempotencyKey: string,
+  paymentIdempotencyKey: string,
+  selectedPaymentMethod: PaymentMethod,
+  fundraiserId: string,
+  paymentDetails: Record<string, string | number | boolean>
 ) {
   // Step 1: Create donation
   const donationResponse = await donationService.submitDonation(
@@ -45,7 +32,24 @@ export async function submitStandardDonation(
     );
   }
 
-  // TODO Step 2: Process payment against the created donation
+  const paymentData: PaymentData = {
+    donationId: donationResponse.donationId,
+    paymentMethod: selectedPaymentMethod,
+    paymentDetails: paymentDetails,
+  };
 
-  return { donationResponse };
+  const paymentOptionConfig = await getPaymentOptions(fundraiserId);
+  const paymentRequest = await buildPaymentRequest(
+    paymentData,
+    paymentOptionConfig
+  );
+
+  const paymentResponse = await paymentService.processPayment(
+    paymentData.donationId,
+    paymentRequest,
+    token,
+    paymentIdempotencyKey
+  );
+
+  return { donationResponse, paymentResponse };
 }
