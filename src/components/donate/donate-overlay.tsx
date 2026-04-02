@@ -82,7 +82,7 @@ function DonateOverlayInner({
     donationData,
     fundraiser
   );
-  const { isSuccess, donationId, error } = state;
+  const { isSuccess, donationId, error, isLoading } = state;
   return createPortal(
     <DonationFormProvider
       fundraiser={fundraiser}
@@ -111,7 +111,7 @@ function DonateOverlayInner({
             {/* Dedication - future implementation */}
             <DonationSummary />
             <DonateOptions />
-            <DonateCTA />
+            <DonateCTA isLoading={isLoading} isSuccess={isSuccess} />
           </>
         }
       />
