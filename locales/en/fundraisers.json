@@ -52,7 +52,6 @@
           "stripe": "Stripe",
           "paypal": "PayPal",
           "offline": "the payment provider",
-          "open-banking": "Open Banking",
           "planetcash": "PlanetCash"
         },
         "fees": {

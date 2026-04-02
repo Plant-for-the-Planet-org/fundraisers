@@ -29,9 +29,6 @@ export function normalizePaymentMethodId(
   if (normalized === 'bank-transfer' || normalized === 'offline') {
     return 'bank-transfer';
   }
-  if (normalized === 'open-banking' || normalized === 'openbanking') {
-    return 'open-banking';
-  }
   if (normalized === 'apple-pay' || normalized === 'applepay') {
     return 'apple-pay';
   }

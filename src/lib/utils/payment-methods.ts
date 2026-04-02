@@ -18,7 +18,6 @@ interface PaymentMethodContext {
 }
 
 const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
-  'open-banking',
   'bank-transfer',
   'paypal',
   'card',
@@ -28,7 +27,6 @@ const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
 ];
 
 // const METHOD_LABEL_KEYS: Record<PaymentMethodId, string> = {
-//   'open-banking': 'methods.openBanking',
 //   'bank-transfer': 'methods.bankTransfer',
 //   paypal: 'methods.paypal',
 //   card: 'methods.card',
@@ -71,8 +69,6 @@ function resolveMethod(
       resolvedMethodId = 'paypal';
     } else if (normalizedGateway === 'offline') {
       resolvedMethodId = 'bank-transfer';
-    } else if (normalizedGateway === 'open-banking') {
-      resolvedMethodId = 'open-banking';
     }
   }
 
@@ -80,17 +76,11 @@ function resolveMethod(
     return null;
   }
 
-  if (resolvedMethodId === 'open-banking') {
-    return { methodId: resolvedMethodId, provider: 'open-banking' };
-  }
   if (resolvedMethodId === 'paypal') {
     return { methodId: resolvedMethodId, provider: 'paypal' };
   }
   if (resolvedMethodId === 'bank-transfer') {
     return { methodId: resolvedMethodId, provider: 'offline' };
-  }
-  if (normalizedGateway === 'open-banking') {
-    return { methodId: resolvedMethodId, provider: 'open-banking' };
   }
   if (normalizedGateway === 'planetcash') {
     return { methodId: resolvedMethodId, provider: 'planetcash' };
@@ -134,8 +124,6 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
       entries.push({ methodId: 'paypal', gateway });
     } else if (normalizedGateway === 'offline') {
       entries.push({ methodId: 'bank-transfer', gateway });
-    } else if (normalizedGateway === 'open-banking') {
-      entries.push({ methodId: 'open-banking', gateway });
     }
   }
 
