@@ -275,7 +275,7 @@ export function PaymentMethods() {
   useEffect(() => {
     if (visibleMethods.length === 0) {
       if (selectedPaymentMethod) {
-        setValue('selectedPaymentMethod', '', {
+        setValue('selectedPaymentMethod', visibleMethods[0].id, {
           shouldDirty: false,
           shouldTouch: false,
           shouldValidate: false,
