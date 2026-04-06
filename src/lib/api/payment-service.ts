@@ -61,15 +61,11 @@ export class PaymentService {
 
       const data = await response.json();
 
-      return {
-        success: data.success === true,
-        paymentId: data.paymentId || data.id,
-        status: data.status || 'completed',
-        redirectUrl: data.redirectUrl,
-        message: data.message || 'Payment processed successfully',
-        type: data.type,
-        response: data.response,
-      };
+      // TODO: Confirm with backend that the following fields from the prior implementation
+      // are not returned by this API: success (boolean), paymentId, status 'completed',
+      // redirectUrl, message (on success), type (top-level). In real responses, type was
+      // nested inside data.response — the top-level field was never populated.
+      return data as PaymentResponse;
     } catch (error) {
       if (error instanceof PaymentError) {
         throw error;
