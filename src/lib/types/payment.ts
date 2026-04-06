@@ -10,67 +10,122 @@ export type PaymentMethod =
 // Payment providers supported by the platform
 export type PaymentProvider = 'stripe' | 'paypal' | 'offline' | 'planet-cash';
 
-export interface PaymentData {
+interface PaymentDataBase {
   donationId: string;
   paymentMethod: PaymentMethod;
+}
+
+export interface OfflinePaymentData extends PaymentDataBase {
+  paymentMethod: 'bank-transfer';
+  paymentDetails: Record<string, never>;
+}
+
+// TODO: discriminate Stripe and PayPal variants when implementing those payment flows
+export interface StripeOrPaypalPaymentData extends PaymentDataBase {
+  paymentMethod: Exclude<PaymentMethod, 'bank-transfer'>;
   paymentDetails: {
-    savedMethodId?: string; // For saved payment methods
-    paymentMethodId?: string; // Stripe payment method ID for new payments
-    sourceId?: string; // Alternative field name for payment method ID
-    account?: string; // Account ID for the payment gateway
-    orderId?: string; // PayPal order ID from PayPal SDK
-    orderID?: string; // Alternative field name for PayPal order ID
+    savedMethodId?: string;
+    paymentMethodId?: string;
+    sourceId?: string; // Alternative field name for paymentMethodId
+    account?: string;
+    orderId?: string;
+    orderID?: string; // Alternative field name for orderId
     [key: string]: string | number | boolean | undefined;
   };
 }
 
+export type PaymentData = OfflinePaymentData | StripeOrPaypalPaymentData;
+
+// TODO: verify structure for Stripe/Paypal while implementing relevant payment flow.
 export interface StripePaymentSource {
-  kind: 'stripe';
+  kind: 'stripe'; // TODO: confirm request type, is "kind" a valid property?
   id: string;
   object: 'payment_method';
 }
 
 export interface PayPalPaymentSource {
   type: 'server_order';
-  orderId: string;
+  orderID: string;
+  payerID: string;
+  paymentID: string;
+  billingToken: string | null;
+  facilitatorAccessToken: string;
+  paymentSource: string;
 }
 
 export type OfflinePaymentSource = Record<string, never>;
 
-// Discriminated union on `kind` — each branch is unambiguous
 export type PaymentSource =
   | StripePaymentSource
   | PayPalPaymentSource
   | OfflinePaymentSource;
 
-// Payment request structure sent to API
-export interface PaymentRequest {
+// Payment request structure sent to API — discriminated union on `gateway`
+interface StripePaymentRequest {
+  gateway: 'stripe';
   account: string;
-  gateway: PaymentProvider;
-  method: string;
-  source: PaymentSource;
-  savedMethod?: string; // For saved payment methods
+  method: 'card' | 'sepa_debit' | 'apple_pay' | 'google_pay';
+  source: StripePaymentSource;
+  savedMethod?: string; // TODO: confirm saved payment method structure with backend
 }
+
+interface PayPalPaymentRequest {
+  gateway: 'paypal';
+  account: string;
+  method: 'paypal';
+  source: PayPalPaymentSource;
+}
+
+interface OfflinePaymentRequest {
+  gateway: 'offline';
+  account: string;
+  method: 'offline';
+  source: OfflinePaymentSource;
+}
+
+export type PaymentRequest =
+  | StripePaymentRequest
+  | PayPalPaymentRequest
+  | OfflinePaymentRequest;
+
 // Payment response from API
-export interface PaymentResponse {
-  success: boolean;
-  paymentId?: string;
-  status?: 'completed' | 'pending' | 'failed';
-  redirectUrl?: string;
-  message?: string;
-  errors?: Record<string, string>;
+interface PaymentResponseBase {
+  id: string;
+  status: 'success' | 'action_required' | 'failed'; // TODO: confirm whether 'pending' is a real status with backend
+}
 
-  // Response type indicators
-  type?: 'transfer_required';
+interface BankAccountDetails {
+  beneficiary: string;
+  iban: string;
+  bic: string;
+  bankName: string;
+}
 
-  // Bank transfer fields (offline)
+interface PaymentResponseSuccess extends PaymentResponseBase {
+  status: 'success';
   response?: {
     type: 'transfer_required';
-    account: {
-      beneficiary: string;
-      iban: string;
-      bic: string;
-      bankName: string;
-    };
+    account: BankAccountDetails;
   };
 }
+
+interface PaymentResponseActionRequired extends PaymentResponseBase {
+  status: 'action_required';
+  response: {
+    type: 'cardAction';
+    requires_action: true;
+    payment_intent_client_secret: string;
+    account: string;
+  };
+}
+
+interface PaymentResponseFailed extends PaymentResponseBase {
+  status: 'failed';
+  errorCode: string | null;
+  message: string;
+}
+
+export type PaymentResponse =
+  | PaymentResponseSuccess
+  | PaymentResponseActionRequired
+  | PaymentResponseFailed;
