@@ -1,5 +1,11 @@
 {
   "Dashboard": {
+    "statsError": {
+      "title": "Dashboard-Statistiken konnten nicht geladen werden",
+      "description": "Beim Laden deiner Fundraiser-Daten ist etwas schiefgelaufen.",
+      "retry": "Erneut versuchen",
+      "exploreLinkText": "Fundraiser entdecken"
+    },
     "breadcrumb": {
       "home": "Startseite"
     },

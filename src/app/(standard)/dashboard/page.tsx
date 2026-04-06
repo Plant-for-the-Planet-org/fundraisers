@@ -1,17 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import type { DashboardFundraiserStats } from '@/lib/api/fundraisers-service';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { MyFundraisersCard, TotalRaisedCard } from '@/components/dashboard';
+import {
+  DashboardStatCardSkeleton,
+  DashboardStatsError,
+  MyFundraisersCard,
+  TotalRaisedCard,
+} from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 import {
   getDashboardFundraiserStats,
   getFundraisers,
 } from '@/lib/api/fundraisers-service';
-import type { DashboardFundraiserStats } from '@/lib/api/fundraisers-service';
 import { useAuthStore } from '@/stores/authStore';
+import { useTranslations } from 'next-intl';
+import { useCallback, useEffect, useState } from 'react';
 
 const INITIAL_FUNDRAISER_STATS: DashboardFundraiserStats = {
   activeFundraisersCount: 0,
@@ -22,6 +27,8 @@ export default function DashboardPage() {
   const t = useTranslations('Dashboard');
   const [fundraiserStats, setFundraiserStats] =
     useState<DashboardFundraiserStats>(INITIAL_FUNDRAISER_STATS);
+  const [isStatsLoading, setIsStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(false);
 
   const user = useAuthStore(state => state.user);
   const accessToken = useAuthStore(state => state.accessToken);
@@ -30,36 +37,43 @@ export default function DashboardPage() {
   const displayName =
     profile?.displayName || user?.name || user?.email || t('fallbackName');
 
-  useEffect(() => {
-    if (!accessToken) {
-      return;
-    }
+  const fetchDashboardStats = useCallback(
+    async (abort?: { cancelled: boolean }) => {
+      if (!accessToken) {
+        setIsStatsLoading(false);
+        return;
+      }
 
-    let isActive = true;
+      setIsStatsLoading(true);
+      setStatsError(false);
 
-    void (async () => {
       try {
         const fundraisers = await getFundraisers(accessToken);
-
-        if (!isActive) {
+        if (abort?.cancelled) {
           return;
         }
-
-        const stats = getDashboardFundraiserStats(fundraisers);
-        setFundraiserStats(stats);
+        setFundraiserStats(getDashboardFundraiserStats(fundraisers));
       } catch (error) {
-        if (!isActive) {
-          return;
+        if (!abort?.cancelled) {
+          console.error('[Dashboard] Failed to fetch fundraiser stats:', error);
+          setStatsError(true);
         }
-
-        console.error('[Dashboard] Failed to fetch fundraiser stats:', error);
+      } finally {
+        if (!abort?.cancelled) {
+          setIsStatsLoading(false);
+        }
       }
-    })();
+    },
+    [accessToken]
+  );
 
+  useEffect(() => {
+    const abort = { cancelled: false };
+    void fetchDashboardStats(abort);
     return () => {
-      isActive = false;
+      abort.cancelled = true;
     };
-  }, [accessToken]);
+  }, [fetchDashboardStats]);
 
   return (
     <AuthGuard>
@@ -70,6 +84,7 @@ export default function DashboardPage() {
             { label: t('dashboard') },
           ]}
         />
+
         <div>
           <h1 className='text-3xl font-bold text-foreground'>
             {t('dashboard')}
@@ -80,8 +95,23 @@ export default function DashboardPage() {
         </div>
 
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          <MyFundraisersCard count={fundraiserStats.activeFundraisersCount} />
-          <TotalRaisedCard summaries={fundraiserStats.totalRaisedByCurrency} />
+          {statsError ? (
+            <DashboardStatsError onRetry={() => void fetchDashboardStats()} />
+          ) : isStatsLoading ? (
+            <>
+              <DashboardStatCardSkeleton />
+              <DashboardStatCardSkeleton />
+            </>
+          ) : (
+            <>
+              <MyFundraisersCard
+                count={fundraiserStats.activeFundraisersCount}
+              />
+              <TotalRaisedCard
+                summaries={fundraiserStats.totalRaisedByCurrency}
+              />
+            </>
+          )}
         </div>
       </section>
     </AuthGuard>

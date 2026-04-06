@@ -1,5 +1,11 @@
 {
   "Dashboard": {
+    "statsError": {
+      "title": "Couldn't load dashboard stats",
+      "description": "Something went wrong while loading your fundraiser data.",
+      "retry": "Try again",
+      "exploreLinkText": "Discover Fundraisers"
+    },
     "breadcrumb": {
       "home": "Home"
     },

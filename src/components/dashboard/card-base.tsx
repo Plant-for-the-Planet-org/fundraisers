@@ -26,11 +26,11 @@ export function CardBase({ title, description, value, helper }: CardBaseProps) {
       <CardContent className='grow'>
         <p className='text-xl font-bold'>{value}</p>
       </CardContent>
-      <CardFooter>
-        {helper ? (
+      {helper && (
+        <CardFooter>
           <p className='text-xs text-muted-foreground mt-1'>{helper}</p>
-        ) : null}
-      </CardFooter>
+        </CardFooter>
+      )}
     </Card>
   );
 }

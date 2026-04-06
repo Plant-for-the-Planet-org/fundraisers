@@ -1,9 +1,9 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
-
 import type { DashboardRaisedSummary } from '@/lib/api/fundraisers-service';
+
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { CardBase } from './card-base';
 
@@ -15,13 +15,7 @@ export function TotalRaisedCard({ summaries }: TotalRaisedCardProps) {
   const tTotalRaised = useTranslations('Dashboard.cards.totalRaised');
   const locale = useLocale();
 
-  const displaySummaries =
-    summaries.length > 0
-      ? summaries
-      : [
-          { currency: 'EUR', totalRaised: 0, fundraiserCount: 0 },
-          { currency: 'USD', totalRaised: 0, fundraiserCount: 0 },
-        ];
+  const displaySummaries = summaries.length > 0 ? summaries : [];
 
   const value = (
     <span className='block'>
