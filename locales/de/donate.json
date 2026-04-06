@@ -119,7 +119,9 @@
     "cta": {
       "donateNow": "Jetzt spenden",
       "donateMonthly": "Monatlich spenden",
-      "donateYearly": "Jährlich spenden"
+      "donateYearly": "Jährlich spenden",
+      "processing": "Wird verarbeitet...",
+      "success": "Spende abgeschlossen"
     }
   }
 }
