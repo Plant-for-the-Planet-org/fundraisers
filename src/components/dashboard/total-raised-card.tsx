@@ -15,9 +15,10 @@ export function TotalRaisedCard({ summaries }: TotalRaisedCardProps) {
   const tTotalRaised = useTranslations('Dashboard.cards.totalRaised');
   const locale = useLocale();
 
-  const displaySummaries = summaries.length > 0 ? summaries : [];
+  const hasSummaries = summaries.length > 0;
+  const displaySummaries = hasSummaries ? summaries : [];
 
-  const value = (
+  const value = hasSummaries ? (
     <span className='block'>
       {displaySummaries.map(summary => {
         const formattedAmount = formatCurrencyFromDecimal(
@@ -36,6 +37,8 @@ export function TotalRaisedCard({ summaries }: TotalRaisedCardProps) {
         );
       })}
     </span>
+  ) : (
+    <span className='block'>{tTotalRaised('empty')}</span>
   );
 
   return (
