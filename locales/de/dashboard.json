@@ -24,7 +24,7 @@
         "description": "Summe über alle Kampagnen",
         "value": "Nach Währungen zusammengefasst",
         "summaryLine": "{amount} aus {count, plural, one {# Spendenaktion} other {# Spendenaktionen}}",
-        "empty": "Starte deine erste Kampagne",
+        "empty": "Keine Mittel gesammelt.",
         "aggregatedByCurrency": "Nach Währungen zusammengefasst"
       },
       "donations": {
