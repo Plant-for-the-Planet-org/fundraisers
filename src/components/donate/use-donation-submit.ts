@@ -134,7 +134,7 @@ export function useDonationSubmit(
 
           if (
             paymentResponse.status === 'success' &&
-            paymentResponse.response.type === 'transfer_required'
+            paymentResponse.response?.type === 'transfer_required'
           ) {
             // For bank transfers, the payment is created but requires manual transfer
             // The UI should show transfer instructions to the user

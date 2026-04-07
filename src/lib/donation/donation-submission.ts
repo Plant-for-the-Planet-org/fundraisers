@@ -32,11 +32,21 @@ export async function submitStandardDonation(
     );
   }
 
-  const paymentData: PaymentData = {
-    donationId: donationResponse.donationId,
-    paymentMethod: selectedPaymentMethod,
-    paymentDetails: paymentDetails,
-  };
+  // TODO: When implementing Stripe/PayPal, populate paymentDetails from the
+  // respective payment element refs (e.g. paymentMethodId for Stripe, orderId for PayPal)
+  // and extend this branch as needed.
+  const paymentData: PaymentData =
+    selectedPaymentMethod === 'bank-transfer'
+      ? {
+          donationId: donationResponse.donationId,
+          paymentMethod: 'bank-transfer',
+          paymentDetails: {},
+        }
+      : {
+          donationId: donationResponse.donationId,
+          paymentMethod: selectedPaymentMethod,
+          paymentDetails,
+        };
 
   const paymentRequest = await buildPaymentRequest(paymentData, paymentOptions);
 

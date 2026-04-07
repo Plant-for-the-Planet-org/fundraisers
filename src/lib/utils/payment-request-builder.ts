@@ -2,9 +2,7 @@ import type {
   OfflinePaymentSource,
   PaymentData,
   PaymentMethod,
-  PaymentProvider,
   PaymentRequest,
-  PaymentSource,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
@@ -19,55 +17,10 @@ export class PaymentOptionsError extends Error {
     this.name = 'PaymentOptionsError';
   }
 }
-/**
- * Build payment source based on payment method
- */
-function buildPaymentSource(
-  paymentMethod: PaymentMethod,
-  paymentDetails: PaymentData['paymentDetails']
-): PaymentSource {
-  switch (paymentMethod) {
-    case 'card':
-    case 'sepa-debit':
-    case 'apple-pay':
-    case 'google-pay': {
-      const id = paymentDetails.paymentMethodId || paymentDetails.sourceId;
-      if (!id) {
-        throw new PaymentOptionsError(
-          'Missing payment method ID for Stripe payment',
-          'MISSING_PAYMENT_METHOD_ID',
-          400
-        );
-      }
-      return { kind: 'stripe', id, object: 'payment_method' };
-    }
-
-    case 'paypal': {
-      const orderId = paymentDetails.orderId || paymentDetails.orderID;
-      if (!orderId) {
-        throw new PaymentOptionsError(
-          'Missing order ID for PayPal payment',
-          'MISSING_ORDER_ID',
-          400
-        );
-      }
-      return { type: 'server_order', orderId: String(orderId) };
-    }
-
-    case 'bank-transfer':
-      return {} as OfflinePaymentSource;
-    default:
-      throw new PaymentOptionsError(
-        `Unknown payment method: ${paymentMethod}`,
-        'UNKNOWN_PAYMENT_METHOD',
-        400
-      );
-  }
-}
 
 function getGatewayForPaymentMethod(
   paymentMethod: PaymentMethod
-): PaymentProvider {
+): 'stripe' | 'paypal' | 'offline' {
   switch (paymentMethod) {
     case 'card':
     case 'sepa-debit':
@@ -79,7 +32,11 @@ function getGatewayForPaymentMethod(
     case 'bank-transfer':
       return 'offline';
     default:
-      return 'stripe';
+      throw new PaymentOptionsError(
+        `Unknown payment method: ${paymentMethod}`,
+        'UNKNOWN_PAYMENT_METHOD',
+        400
+      );
   }
 }
 
@@ -131,31 +88,34 @@ export async function buildPaymentRequest(
       }
     }
 
-    // Handle saved payment methods
-    if (paymentDetails.savedMethodId) {
-      return {
-        account,
-        gateway,
-        method: mapPaymentMethodName(paymentMethod),
-        source: {}, // Source not needed for saved methods
-        savedMethod: paymentDetails.savedMethodId,
-      };
+    switch (gateway) {
+      case 'offline':
+        return {
+          gateway: 'offline',
+          account,
+          method: 'offline',
+          source: {} as OfflinePaymentSource,
+        };
+
+      case 'stripe':
+        // TODO: Implement Stripe payment source from Stripe Elements ref (paymentMethodId/sourceId).
+        // Also handle savedMethod for saved cards/SEPA.
+        throw new PaymentOptionsError(
+          'Stripe payment is not yet implemented',
+          'UNKNOWN_PAYMENT_METHOD',
+          400
+        );
+
+      case 'paypal':
+        // TODO: PayPal source must be built from the PayPal SDK button callback
+        // (orderID, payerID, paymentID, billingToken, facilitatorAccessToken, paymentSource).
+        // paymentDetails alone is insufficient — implement when wiring up the PayPal slice.
+        throw new PaymentOptionsError(
+          'PayPal payment is not yet implemented',
+          'UNKNOWN_PAYMENT_METHOD',
+          400
+        );
     }
-
-    // Handle new payment methods
-    const baseRequest = {
-      account,
-      gateway,
-      method: mapPaymentMethodName(paymentMethod),
-    };
-
-    // Add source based on payment method
-    const source = buildPaymentSource(paymentMethod, paymentDetails);
-
-    return {
-      ...baseRequest,
-      source,
-    };
   } catch (error) {
     if (error instanceof PaymentOptionsError) {
       throw error;

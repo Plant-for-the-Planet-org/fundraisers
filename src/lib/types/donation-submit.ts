@@ -6,7 +6,10 @@ export interface DonationSubmitState {
   isSuccess: boolean;
   donationId: string | null;
   uid: string | null;
-  transferDetails: PaymentResponse['response'] | null;
+  // TODO: refine this type to only include transfer details, not the full success response
+  transferDetails:
+    | Extract<PaymentResponse, { status: 'success' }>['response']
+    | null;
   error: DonationSubmitError | null;
 }
 

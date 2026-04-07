@@ -1,10 +1,13 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { DonationFormValues } from './donation-form-context';
 
 import { useTranslations } from 'next-intl';
 import { useDonationForm } from './donation-form-context';
 import { Button } from '../ui/button';
+import { CheckIcon } from '../ui/check-icon';
+import { Spinner } from '../ui/spinner';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 interface DonateCTAProps {
@@ -30,6 +33,25 @@ export function DonateCTA({ isLoading, isSuccess }: DonateCTAProps) {
       ? t('cta.donateMonthly')
       : t('cta.donateNow');
 
+  let buttonContent: ReactNode;
+  if (isLoading) {
+    buttonContent = (
+      <>
+        <Spinner />
+        {t('cta.processing')}
+      </>
+    );
+  } else if (isSuccess) {
+    buttonContent = (
+      <>
+        <CheckIcon />
+        {t('cta.success')}
+      </>
+    );
+  } else {
+    buttonContent = <span className='font-semibold'>{buttonText}</span>;
+  }
+
   return (
     <div className='space-y-6'>
       <Button
@@ -37,26 +59,15 @@ export function DonateCTA({ isLoading, isSuccess }: DonateCTAProps) {
         onClick={handleSubmit(onSubmit)}
         disabled={isLoading || isSuccess}
       >
-        {isLoading ? (
-          <div className='flex items-center gap-2'>
-            <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
-            {t('cta.processing')}
-          </div>
-        ) : isSuccess ? (
-          <div className='flex items-center gap-2'>
-            <svg className='w-4 h-4' viewBox='0 0 20 20' fill='currentColor'>
-              <path
-                fillRule='evenodd'
-                d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
-                clipRule='evenodd'
-              />
-            </svg>
-            {t('cta.success')}
-          </div>
-        ) : (
-          <div className='font-semibold'>{buttonText}</div>
-        )}
+        <div className='flex items-center gap-2'>{buttonContent}</div>
       </Button>
+      {/* Native Payments - for future implementation */}
+      {/* <Button
+        variant='outline'
+        className='w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium flex items-center gap-2'
+      >
+        Pay with Google
+      </Button> */}
     </div>
   );
 }
