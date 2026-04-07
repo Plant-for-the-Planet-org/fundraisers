@@ -20,7 +20,7 @@ export type ThankYouState =
 
 export interface DonationSubmitState {
   isLoading: boolean;
-  thankYou: ThankYouState | null;
+  thankYouState: ThankYouState | null;
   error: DonationSubmitError | null;
 }
 
@@ -31,6 +31,6 @@ export interface DonationSubmitError {
 
 export const INITIAL_DONATION_STATE: DonationSubmitState = {
   isLoading: false,
-  thankYou: null,
+  thankYouState: null,
   error: null,
 };

@@ -8,7 +8,7 @@ import { TransferDetailsList } from './transfer-details-list';
 import { ShareSection } from './share-section';
 
 interface DonationThankYouProps {
-  thankYou: ThankYouState;
+  thankYouState: ThankYouState;
   amountInCents: number;
   currency: string;
   frequency: DonationFrequency;
@@ -22,7 +22,7 @@ function formatTransferAmount(amountInCents: number, currency: string): string {
 }
 
 export function DonationThankYou({
-  thankYou,
+  thankYouState,
   amountInCents,
   currency,
   frequency,
@@ -31,17 +31,17 @@ export function DonationThankYou({
   const amount = formatTransferAmount(amountInCents, currency);
   return (
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
-      {thankYou.status === 'bankTransferPending' ? (
+      {thankYouState.status === 'bankTransferPending' ? (
         <ThankYouCard
           variant='bankTransferPending'
           frequency={frequency}
           formattedAmount={amount}
         >
           <TransferDetailsList
-            account={thankYou.transferAccount}
+            account={thankYouState.transferAccount}
             formattedAmount={amount}
-            donationId={thankYou.donationId}
-            uid={thankYou.uid}
+            donationId={thankYouState.donationId}
+            uid={thankYouState.uid}
           />
         </ThankYouCard>
       ) : (

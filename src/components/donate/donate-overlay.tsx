@@ -83,11 +83,11 @@ function DonateOverlayInner({
     fundraiser,
     paymentOptions
   );
-  const { thankYou, error, isLoading } = donationState;
+  const { thankYouState, error, isLoading } = donationState;
 
-  const leftColumn = thankYou ? (
+  const leftColumn = thankYouState ? (
     <DonationThankYou
-      thankYou={thankYou}
+      thankYouState={thankYouState}
       amountInCents={donationData.amount}
       currency={donationData.currency}
       frequency={donationData.frequency}
@@ -103,12 +103,12 @@ function DonateOverlayInner({
     </>
   );
 
-  const rightColumn = thankYou ? (
+  const rightColumn = thankYouState ? (
     <DonationSummary />
   ) : (
     <>
       <DonationSummary />
-      <DonateCTA isLoading={isLoading} isSuccess={!!thankYou} />
+      <DonateCTA isLoading={isLoading} isSuccess={!!thankYouState} />
     </>
   );
 

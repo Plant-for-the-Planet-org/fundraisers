@@ -120,7 +120,7 @@ export function useDonationSubmit(
       setDonationState(prev => ({
         ...prev,
         isLoading: true,
-        thankYou: null,
+        thankYouState: null,
         error: null,
       }));
 
@@ -178,17 +178,17 @@ export function useDonationSubmit(
             return;
           }
 
-          const thankYou = resolveThankYouState(
+          const thankYouState = resolveThankYouState(
             paymentResponse,
             donationResponse.donationId ?? null,
             donationResponse.uid ?? null
           );
 
-          if (thankYou) {
+          if (thankYouState) {
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
-              thankYou,
+              thankYouState,
             }));
             return;
           }
