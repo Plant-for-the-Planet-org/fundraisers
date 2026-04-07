@@ -273,16 +273,7 @@ export function PaymentMethods() {
   }, [availableMethods]);
 
   useEffect(() => {
-    if (visibleMethods.length === 0) {
-      if (selectedPaymentMethod) {
-        setValue('selectedPaymentMethod', visibleMethods[0].id, {
-          shouldDirty: false,
-          shouldTouch: false,
-          shouldValidate: false,
-        });
-      }
-      return;
-    }
+    if (visibleMethods.length === 0) return;
 
     const isSelectedMethodAvailable = visibleMethods.some(
       method => method.id === selectedPaymentMethod
