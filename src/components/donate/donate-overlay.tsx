@@ -90,6 +90,7 @@ function DonateOverlayInner({
       thankYou={thankYou}
       amountInCents={donationData.amount}
       currency={donationData.currency}
+      frequency={donationData.frequency}
       fundraiserSlug={fundraiser.slug}
     />
   ) : (

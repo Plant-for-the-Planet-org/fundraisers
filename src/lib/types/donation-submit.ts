@@ -12,7 +12,7 @@ interface BankAccountDetails {
 export type ThankYouState =
   | { status: 'completed'; donationId: string | null }
   | {
-      status: 'bank_transfer_pending';
+      status: 'bankTransferPending';
       donationId: string | null;
       uid: string | null;
       transferAccount: BankAccountDetails;

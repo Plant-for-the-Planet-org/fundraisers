@@ -137,7 +137,11 @@
       },
       "message": {
         "completed": "Wir haben Ihnen eine Spendenquittung per E-Mail zugesandt. Eine steuerlich absetzbare Bestätigung können Sie nach 60 Tagen herunterladen.",
-        "bankTransferPending": "Um Ihre Spende abzuschließen, überweisen Sie bitte den Betrag mit den untenstehenden Angaben. Eine Bestätigungs-E-Mail wurde an Sie gesendet."
+        "bankTransferPending": {
+          "monthly": "Ihre monatliche Spende über {amount} wurde eingeleitet. Um Ihre Spende abzuschließen, richten Sie bitte einen entsprechenden Dauerauftrag bei Ihrer Bank auf das unten angegebene Konto ein. Diese Informationen wurden Ihnen auch per E-Mail zugesandt.",
+          "yearly": "Ihre jährliche Spende über {amount} wurde eingeleitet. Um Ihre Spende abzuschließen, richten Sie bitte einen entsprechenden Dauerauftrag bei Ihrer Bank auf das unten angegebene Konto ein. Diese Informationen wurden Ihnen auch per E-Mail zugesandt.",
+          "once": "Ihre Spende über {amount} wurde eingeleitet. Um Ihre Spende abzuschließen, überweisen Sie bitte den Betrag mit den untenstehenden Angaben. Diese Informationen wurden Ihnen auch per E-Mail zugesandt."
+        }
       },
       "transfer": {
         "Heading": "Überweisungsdetails",

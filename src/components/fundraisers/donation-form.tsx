@@ -1,6 +1,10 @@
 'use client';
 
 import type { DonationFrequency } from '@/lib/types/donation';
+import type {
+  ContributionModuleSettings,
+  RecurrencyType,
+} from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -17,10 +21,6 @@ import {
   getCustomOption,
   getDefaultSelectedAmount,
 } from '@/lib/utils/contribution-utils';
-import type {
-  ContributionModuleSettings,
-  RecurrencyType,
-} from '@/lib/types/fundraiser';
 
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;

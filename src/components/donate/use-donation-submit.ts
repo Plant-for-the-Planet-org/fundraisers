@@ -46,7 +46,7 @@ function resolveThankYouState(
     case 'success':
       if (response.response?.type === 'transfer_required') {
         return {
-          status: 'bank_transfer_pending',
+          status: 'bankTransferPending',
           donationId,
           uid,
           transferAccount: response.response.account,

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { DonationFrequency } from '@/lib/types/donation';
 
 import { useTranslations } from 'next-intl';
 import { StatusBadge } from './status-badge';
@@ -9,11 +10,25 @@ type ThankYouVariant = 'completed' | 'bankTransferPending';
 
 interface ThankYouCardProps {
   variant: ThankYouVariant;
+  frequency?: DonationFrequency;
+  formattedAmount?: string;
   children?: ReactNode;
 }
 
-export function ThankYouCard({ variant, children }: ThankYouCardProps) {
+export function ThankYouCard({
+  variant,
+  frequency,
+  formattedAmount,
+  children,
+}: ThankYouCardProps) {
   const t = useTranslations('Donate.thankYou');
+
+  const message =
+    variant === 'bankTransferPending'
+      ? t(`message.bankTransferPending.${frequency ?? 'once'}`, {
+          amount: formattedAmount ?? '',
+        })
+      : t('message.completed');
 
   return (
     <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
@@ -26,7 +41,7 @@ export function ThankYouCard({ variant, children }: ThankYouCardProps) {
         <StatusBadge variant={variant} />
 
         <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
-          {t(`message.${variant}`)}
+          {message}
         </p>
       </div>
 
