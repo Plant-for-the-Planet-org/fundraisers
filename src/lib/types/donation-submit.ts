@@ -5,6 +5,7 @@ export interface DonationSubmitState {
   isLoading: boolean;
   isSuccess: boolean;
   donationId: string | null;
+  uid: string | null;
   transferDetails: PaymentResponse['response'] | null;
   error: DonationSubmitError | null;
 }
@@ -18,6 +19,7 @@ export const INITIAL_DONATION_STATE: DonationSubmitState = {
   isLoading: false,
   isSuccess: false,
   donationId: null,
+  uid: null,
   transferDetails: null,
   error: null,
 };

@@ -132,7 +132,10 @@ export function useDonationSubmit(
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
           paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
-          if (paymentResponse.response?.type === 'transfer_required') {
+          if (
+            paymentResponse.status === 'success' &&
+            paymentResponse.response.type === 'transfer_required'
+          ) {
             // For bank transfers, the payment is created but requires manual transfer
             // The UI should show transfer instructions to the user
             setState(prev => ({
@@ -140,6 +143,7 @@ export function useDonationSubmit(
               isLoading: false,
               isSuccess: true,
               donationId: donationResponse.donationId ?? null,
+              uid: donationResponse.uid ?? null,
               transferDetails: paymentResponse.response,
             }));
             return;

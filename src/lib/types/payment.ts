@@ -53,18 +53,10 @@ export interface PaymentRequest {
 }
 // Payment response from API
 export interface PaymentResponse {
-  success: boolean;
-  paymentId?: string;
-  status?: 'completed' | 'pending' | 'failed';
-  redirectUrl?: string;
-  message?: string;
-  errors?: Record<string, string>;
-
-  // Response type indicators
-  type?: 'transfer_required';
-
+  id: string;
+  status: 'success' | 'pending' | 'failed';
   // Bank transfer fields (offline)
-  response?: {
+  response: {
     type: 'transfer_required';
     account: {
       beneficiary: string;

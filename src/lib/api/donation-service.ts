@@ -66,6 +66,7 @@ export class DonationService {
     return {
       success: true,
       donationId: data.donationId || data.id,
+      uid: data.uid,
       message: data.message || 'Donation processed successfully',
     };
   }
@@ -110,7 +111,6 @@ export class DonationService {
       }
 
       const data = await this.safeJsonParse(response);
-
       return this.transformResponse(data);
     } catch (error) {
       if (error instanceof DonationError) {

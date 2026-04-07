@@ -1,6 +1,7 @@
 export interface DonationResponse {
   success: boolean;
   donationId?: string;
+  uid?: string;
   message?: string;
   errors?: Record<string, string>;
 }

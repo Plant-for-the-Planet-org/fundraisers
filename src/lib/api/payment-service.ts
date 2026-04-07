@@ -60,16 +60,7 @@ export class PaymentService {
       }
 
       const data = await response.json();
-
-      return {
-        success: data.success === true,
-        paymentId: data.paymentId || data.id,
-        status: data.status || 'completed',
-        redirectUrl: data.redirectUrl,
-        message: data.message || 'Payment processed successfully',
-        type: data.type,
-        response: data.response,
-      };
+      return data;
     } catch (error) {
       if (error instanceof PaymentError) {
         throw error;
