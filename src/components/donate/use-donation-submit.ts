@@ -1,4 +1,3 @@
-// ===== Imports: Type-only =====
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationFormValues } from './donation-form-context';
@@ -28,7 +27,7 @@ function cleanPaymentDetails(
   details: PaymentData['paymentDetails']
 ): Record<string, string | number | boolean> {
   return Object.fromEntries(
-    Object.entries(details).filter(([_, value]) => value !== undefined)
+    Object.entries(details).filter(([_key, value]) => value !== undefined)
   ) as Record<string, string | number | boolean>;
 }
 
