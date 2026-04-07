@@ -79,12 +79,12 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const { onSubmit, state, reset } = useDonationSubmit(
+  const { onSubmit, donationState, reset } = useDonationSubmit(
     donationData,
     fundraiser,
     paymentOptions
   );
-  const { isSuccess, donationId, error, isLoading } = state;
+  const { isSuccess, donationId, error, isLoading } = donationState;
   return createPortal(
     <DonationFormProvider
       fundraiser={fundraiser}
@@ -97,10 +97,10 @@ function DonateOverlayInner({
         onClose={onClose}
         leftColumn={
           <>
-            {error?.code && (
+            {error?.code !== undefined && (
               <DonationFailureBanner errorCode={error?.code} reset={reset} />
             )}
-            {isSuccess && donationId && (
+            {isSuccess && donationId !== null && (
               <DonationSuccessBanner donationId={donationId} />
             )}
             <DonorInfo />

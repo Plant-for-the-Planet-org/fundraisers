@@ -176,6 +176,7 @@ export function DonationFormProvider({
       isCompany: false,
       makeMonthly: false,
       coverFees: false,
+      // TODO: change default once other payment methods are implemented
       selectedPaymentMethod: 'bank-transfer',
       addressType: 'primary',
     },

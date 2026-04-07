@@ -68,7 +68,7 @@ export function useDonationSubmit(
   const donorProfile = useAuthStore(state => state.user?.profile);
   const token = useAuthStore(state => state.accessToken);
 
-  const [state, setState] = useState<DonationSubmitState>(
+  const [donationState, setDonationState] = useState<DonationSubmitState>(
     INITIAL_DONATION_STATE
   );
 
@@ -83,7 +83,7 @@ export function useDonationSubmit(
       submittingRef.current = true;
 
       // Reset stale success state on new submit
-      setState(prev => ({
+      setDonationState(prev => ({
         ...prev,
         isLoading: true,
         isSuccess: false,
@@ -137,7 +137,7 @@ export function useDonationSubmit(
           ) {
             // For bank transfers, the payment is created but requires manual transfer
             // The UI should show transfer instructions to the user
-            setState(prev => ({
+            setDonationState(prev => ({
               ...prev,
               isLoading: false,
               isSuccess: true,
@@ -148,7 +148,7 @@ export function useDonationSubmit(
           }
 
           // Success state for two-step flow
-          setState(prev => ({
+          setDonationState(prev => ({
             ...prev,
             isLoading: false,
             isSuccess: true,
@@ -156,7 +156,7 @@ export function useDonationSubmit(
           }));
         }
       } catch (error) {
-        setState(prev => ({
+        setDonationState(prev => ({
           ...prev,
           isLoading: false,
           error: toSubmitError(error),
@@ -176,10 +176,10 @@ export function useDonationSubmit(
   );
 
   const reset = useCallback(() => {
-    setState(INITIAL_DONATION_STATE);
+    setDonationState(INITIAL_DONATION_STATE);
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  return { state, onSubmit, reset };
+  return { donationState, onSubmit, reset };
 }
