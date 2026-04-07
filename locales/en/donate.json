@@ -118,7 +118,9 @@
     "cta": {
       "donateNow": "Donate Now",
       "donateMonthly": "Donate Monthly",
-      "donateYearly": "Donate Yearly"
+      "donateYearly": "Donate Yearly",
+      "processing": "Processing...",
+      "success": "Donation Complete"
     }
   }
 }

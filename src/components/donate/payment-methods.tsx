@@ -20,7 +20,6 @@ import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
-  'open-banking': 'methods.openBanking',
   'bank-transfer': 'methods.bankTransfer',
   paypal: 'methods.paypal',
   card: 'methods.card',
@@ -36,7 +35,6 @@ const PROVIDER_TRANSLATION_KEYS: Record<
   stripe: 'providers.stripe',
   paypal: 'providers.paypal',
   offline: 'providers.offline',
-  'open-banking': 'providers.open-banking',
   planetcash: 'providers.planetcash',
 };
 
@@ -275,16 +273,7 @@ export function PaymentMethods() {
   }, [availableMethods]);
 
   useEffect(() => {
-    if (visibleMethods.length === 0) {
-      if (selectedPaymentMethod) {
-        setValue('selectedPaymentMethod', '', {
-          shouldDirty: false,
-          shouldTouch: false,
-          shouldValidate: false,
-        });
-      }
-      return;
-    }
+    if (visibleMethods.length === 0) return;
 
     const isSelectedMethodAvailable = visibleMethods.some(
       method => method.id === selectedPaymentMethod

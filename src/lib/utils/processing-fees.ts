@@ -77,11 +77,7 @@ export function getProcessingFee(
   const region = getRegion(country);
   const paymentMethod = normalizePaymentMethodId(method);
 
-  if (
-    provider === 'offline' ||
-    provider === 'open-banking' ||
-    provider === 'planetcash'
-  ) {
+  if (provider === 'offline' || provider === 'planetcash') {
     return { feeAmountCents: 0, hasFee: false, region };
   }
 

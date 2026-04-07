@@ -1,5 +1,4 @@
 export type PaymentMethodId =
-  | 'open-banking'
   | 'bank-transfer'
   | 'paypal'
   | 'card'
@@ -11,7 +10,6 @@ export type PaymentMethodProvider =
   | 'stripe'
   | 'paypal'
   | 'offline'
-  | 'open-banking'
   | 'planetcash';
 
 export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([

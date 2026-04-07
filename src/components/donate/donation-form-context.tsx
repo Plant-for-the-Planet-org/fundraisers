@@ -41,7 +41,14 @@ export const donationFormSchema = z
       .optional(),
     makeMonthly: z.boolean(),
     coverFees: z.boolean(),
-    selectedPaymentMethod: z.string().optional(),
+    selectedPaymentMethod: z.enum([
+      'card',
+      'sepa-debit',
+      'apple-pay',
+      'google-pay',
+      'paypal',
+      'bank-transfer',
+    ]),
     isCompany: z.boolean(),
     companyName: z.string().trim().optional(),
   })
@@ -169,7 +176,8 @@ export function DonationFormProvider({
       isCompany: false,
       makeMonthly: false,
       coverFees: false,
-      selectedPaymentMethod: '',
+      // TODO: change default once other payment methods are implemented
+      selectedPaymentMethod: 'bank-transfer',
       addressType: 'primary',
     },
     mode: 'onBlur',

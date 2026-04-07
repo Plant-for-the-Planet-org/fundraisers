@@ -12,7 +12,7 @@ No saved-card/SEPA-account sub-dropdowns or card/IBAN forms in this slice.
   - Normalize method ids (`sepa_debit`/`sepa-debit`, `bank-transfer`/`offline`, etc.).
   - Dedupe and enforce stable legacy display order.
   - Filter rules aligned with legacy behavior (SEPA hidden for non-EUR).
-  - Include provider mapping needed for fee calculation (`stripe`, `paypal`, `offline`, `open-banking`).
+  - Include provider mapping needed for fee calculation (`stripe`, `paypal`, `offline`).
 - Port fee calculation utilities from `gofundnature` into `fundraiser/lib`:
   - Region-based fee rules (US/EU/ROW), `No fee` handling, and tooltip copy generation.
   - Keep fee rendering behind fee-collection toggle parity (`NEXT_PUBLIC_ALLOW_FEE_COLLECTION`, default enabled).

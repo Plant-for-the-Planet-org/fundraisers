@@ -15,6 +15,8 @@ import { DonateCTA } from './donate-cta';
 import { DonationFormProvider } from './donation-form-context';
 import { DonateOptions } from './donate-options';
 import { useDonationSubmit } from './use-donation-submit';
+import { DonationSuccessBanner } from './donation-success-banner';
+import { DonationFailureBanner } from './donation-failure-banner';
 
 export interface DonationData {
   amount: number;
@@ -77,8 +79,12 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const { onSubmit } = useDonationSubmit(donationData, fundraiser);
-
+  const { onSubmit, donationState, reset } = useDonationSubmit(
+    donationData,
+    fundraiser,
+    paymentOptions
+  );
+  const { isSuccess, donationId, error, isLoading } = donationState;
   return createPortal(
     <DonationFormProvider
       fundraiser={fundraiser}
@@ -91,8 +97,12 @@ function DonateOverlayInner({
         onClose={onClose}
         leftColumn={
           <>
-            {/* Error Message */}
-            {/* Success Message */}
+            {error?.code !== undefined && (
+              <DonationFailureBanner errorCode={error?.code} reset={reset} />
+            )}
+            {isSuccess && donationId !== null && (
+              <DonationSuccessBanner donationId={donationId} />
+            )}
             <DonorInfo />
             {/* Custom Fields Section - future implementation */}
             <PaymentMethods />
@@ -103,7 +113,7 @@ function DonateOverlayInner({
             {/* Dedication - future implementation */}
             <DonationSummary />
             <DonateOptions />
-            <DonateCTA />
+            <DonateCTA isLoading={isLoading} isSuccess={isSuccess} />
           </>
         }
       />

@@ -1,34 +1,31 @@
 import type { DonationPayload } from '../types/donation';
+import type { PaymentData, PaymentMethod } from '../types/payment';
+import type { PaymentOptions } from '../types/payment-options';
 
-import { DonationError, donationService } from '../api/donation-service';
+import { donationService } from '../api/donation-service';
+import { paymentService } from '../api/payment-service';
+import { buildPaymentRequest } from '../utils/payment-request-builder';
 
-export interface DonationSubmitError {
-  /** Maps to a next-intl key via the UI layer, e.g. 'AUTH_ERROR' */
-  code: string;
-  /** Optional interpolation values for the translation */
-  values?: Record<string, string | number>;
+interface SubmitStandardDonationOptions {
+  payload: DonationPayload;
+  token: string | undefined;
+  donationIdempotencyKey: string;
+  paymentIdempotencyKey: string;
+  selectedPaymentMethod: PaymentMethod;
+  paymentOptions: PaymentOptions;
+  paymentDetails: Record<string, string | number | boolean>;
 }
-
-export interface DonationSubmitState {
-  isLoading: boolean;
-  isSuccess: boolean;
-  donationId: string | null;
-  error: DonationSubmitError | null;
-}
-
-export const INITIAL_DONATION_STATE: DonationSubmitState = {
-  isLoading: false,
-  isSuccess: false,
-  donationId: null,
-  error: null,
-};
 
 /** Standard payment: Two-step flow — create donation, then process payment */
-export async function submitStandardDonation(
-  payload: DonationPayload,
-  token: string | undefined,
-  donationIdempotencyKey: string
-) {
+export async function submitStandardDonation({
+  payload,
+  token,
+  donationIdempotencyKey,
+  paymentIdempotencyKey,
+  selectedPaymentMethod,
+  paymentOptions,
+  paymentDetails,
+}: SubmitStandardDonationOptions) {
   // Step 1: Create donation
   const donationResponse = await donationService.submitDonation(
     payload,
@@ -36,16 +33,30 @@ export async function submitStandardDonation(
     donationIdempotencyKey
   );
 
-  if (!donationResponse.donationId) {
-    throw new DonationError(
-      'Failed to create donation',
-      'api',
-      'DONATION_CREATION_ERROR',
-      500
-    );
-  }
+  // TODO: When implementing Stripe/PayPal, populate paymentDetails from the
+  // respective payment element refs (e.g. paymentMethodId for Stripe, orderId for PayPal)
+  // and extend this branch as needed.
+  const paymentData: PaymentData =
+    selectedPaymentMethod === 'bank-transfer'
+      ? {
+          donationId: donationResponse.donationId,
+          paymentMethod: 'bank-transfer',
+          paymentDetails: {},
+        }
+      : {
+          donationId: donationResponse.donationId,
+          paymentMethod: selectedPaymentMethod,
+          paymentDetails,
+        };
 
-  // TODO Step 2: Process payment against the created donation
+  const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);
 
-  return { donationResponse };
+  const paymentResponse = await paymentService.processPayment(
+    paymentData.donationId,
+    paymentRequest,
+    token,
+    paymentIdempotencyKey
+  );
+
+  return { donationResponse, paymentResponse };
 }
