@@ -13,9 +13,8 @@ import { DonationSummary } from './donation-summary';
 import { PaymentMethods } from './payment-methods';
 import { DonateCTA } from './donate-cta';
 import { DonationFormProvider } from './donation-form-context';
-import { DonateOptions } from './donate-options';
 import { useDonationSubmit } from './use-donation-submit';
-import { DonationSuccessBanner } from './donation-success-banner';
+import { DonationThankYou } from './donation-thank-you';
 import { DonationFailureBanner } from './donation-failure-banner';
 
 export interface DonationData {
@@ -84,7 +83,37 @@ function DonateOverlayInner({
     fundraiser,
     paymentOptions
   );
-  const { isSuccess, donationId, error, isLoading } = state;
+  const { isSuccess, donationId, transferDetails, error, isLoading, uid } =
+    state;
+
+  const leftColumn = isSuccess ? (
+    <DonationThankYou
+      donationId={donationId}
+      uid={uid}
+      transferDetails={transferDetails}
+      amountInCents={donationData.amount}
+      currency={donationData.currency}
+      fundraiserSlug={fundraiser.slug}
+    />
+  ) : (
+    <>
+      {error?.code && (
+        <DonationFailureBanner errorCode={error.code} reset={reset} />
+      )}
+      <DonorInfo />
+      <PaymentMethods />
+    </>
+  );
+
+  const rightColumn = isSuccess ? (
+    <DonationSummary />
+  ) : (
+    <>
+      <DonationSummary />
+      <DonateCTA isLoading={isLoading} isSuccess={isSuccess} />
+    </>
+  );
+
   return createPortal(
     <DonationFormProvider
       fundraiser={fundraiser}
@@ -95,27 +124,8 @@ function DonateOverlayInner({
     >
       <DonateOverlayLayout
         onClose={onClose}
-        leftColumn={
-          <>
-            {error?.code && (
-              <DonationFailureBanner errorCode={error?.code} reset={reset} />
-            )}
-            {isSuccess && donationId && (
-              <DonationSuccessBanner donationId={donationId} />
-            )}
-            <DonorInfo />
-            {/* Custom Fields Section - future implementation */}
-            <PaymentMethods />
-          </>
-        }
-        rightColumn={
-          <>
-            {/* Dedication - future implementation */}
-            <DonationSummary />
-            <DonateOptions />
-            <DonateCTA isLoading={isLoading} isSuccess={isSuccess} />
-          </>
-        }
+        leftColumn={leftColumn}
+        rightColumn={rightColumn}
       />
     </DonationFormProvider>,
     document.body
