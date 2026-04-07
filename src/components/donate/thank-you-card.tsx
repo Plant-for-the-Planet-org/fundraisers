@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { DonationFrequency } from '@/lib/types/donation';
 
 import { useTranslations } from 'next-intl';
+import { CircleCheckBig } from 'lucide-react';
 import { StatusBadge } from './status-badge';
 
 type ThankYouVariant = 'completed' | 'bankTransferPending';
@@ -34,6 +35,13 @@ export function ThankYouCard({
     <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
       {/* Header band */}
       <div className='bg-[#fdf8f0] px-6 pt-8 pb-6 text-center'>
+        {variant === 'completed' && (
+          <CircleCheckBig
+            className='mx-auto mb-4 size-14 text-green-700'
+            strokeWidth={1.5}
+          />
+        )}
+
         <h2 className='mb-2 text-xl font-bold text-gray-900'>
           {t(`title.${variant}`)}
         </h2>
