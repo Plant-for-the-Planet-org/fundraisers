@@ -1,6 +1,7 @@
+// TODO: evaluate if the DonationResponse interface is accurate
 export interface DonationResponse {
   success: boolean;
-  donationId?: string;
+  donationId: string;
   message?: string;
   errors?: Record<string, string>;
 }

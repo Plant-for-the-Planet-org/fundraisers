@@ -37,6 +37,7 @@ export class PaymentService {
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      // TODO: update session id logic to generate a unique session ID per user session, rather than hardcoding 'web-client'
       'X-SESSION-ID': 'web-client',
     };
 

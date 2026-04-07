@@ -118,15 +118,15 @@ export function useDonationSubmit(
           // TODO: Implement PlanetCash donation flow
         } else {
           const { donationResponse, paymentResponse } =
-            await submitStandardDonation(
+            await submitStandardDonation({
               payload,
-              token || undefined,
-              donationKeyRef.current,
-              paymentKeyRef.current,
-              values.selectedPaymentMethod,
+              token: token || undefined,
+              donationIdempotencyKey: donationKeyRef.current,
+              paymentIdempotencyKey: paymentKeyRef.current,
+              selectedPaymentMethod: values.selectedPaymentMethod,
               paymentOptions,
-              cleanPaymentDetails(paymentDetails)
-            );
+              paymentDetails: cleanPaymentDetails(paymentDetails),
+            });
 
           // Rotate keys now that the server accepted this operation
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
@@ -142,7 +142,7 @@ export function useDonationSubmit(
               ...prev,
               isLoading: false,
               isSuccess: true,
-              donationId: donationResponse.donationId ?? null,
+              donationId: donationResponse.donationId,
               transferDetails: paymentResponse.response,
             }));
             return;
@@ -153,7 +153,7 @@ export function useDonationSubmit(
             ...prev,
             isLoading: false,
             isSuccess: true,
-            donationId: donationResponse.donationId ?? null,
+            donationId: donationResponse.donationId,
           }));
         }
       } catch (error) {

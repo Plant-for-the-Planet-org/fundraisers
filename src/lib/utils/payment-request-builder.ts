@@ -1,5 +1,4 @@
 import type {
-  OfflinePaymentSource,
   PaymentData,
   PaymentMethod,
   PaymentRequest,
@@ -57,10 +56,10 @@ function mapPaymentMethodName(paymentMethod: PaymentMethod): string {
   }
 }
 
-export async function buildPaymentRequest(
+export function buildPaymentRequest(
   paymentData: PaymentData,
   paymentOptionConfig: PaymentOptions
-): Promise<PaymentRequest> {
+): PaymentRequest {
   const { paymentMethod, paymentDetails } = paymentData;
 
   try {
@@ -91,10 +90,10 @@ export async function buildPaymentRequest(
     switch (gateway) {
       case 'offline':
         return {
-          gateway: 'offline',
+          gateway,
           account,
           method: 'offline',
-          source: {} as OfflinePaymentSource,
+          source: {},
         };
 
       case 'stripe':
