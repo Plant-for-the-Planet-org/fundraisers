@@ -120,6 +120,37 @@
       "donateNow": "Jetzt spenden",
       "donateMonthly": "Monatlich spenden",
       "donateYearly": "Jährlich spenden"
+    },
+
+    "thankYou": {
+      "title": {
+        "bankTransferPending": "Vielen Dank für das Starten Ihrer Spende"
+      },
+      "status": {
+        "label": "Status:",
+        "bankTransferPending": "Banküberweisung ausstehend"
+      },
+      "message": {
+        "bankTransferPending": "Um Ihre Spende abzuschließen, überweisen Sie bitte den Betrag mit den untenstehenden Angaben. Eine Bestätigungs-E-Mail wurde an Sie gesendet."
+      },
+      "transfer": {
+        "Heading": "Überweisungsdetails",
+        "amount": "Betrag",
+        "reference": "Verwendungszweck",
+        "beneficiary": "Begünstigter",
+        "iban": "IBAN",
+        "bic": "BIC",
+        "bank": "Bank",
+        "transactionId": "Transaktions-ID {id}"
+      },
+      "copy": {
+        "success": "Kopiert!",
+        "error": "Kopieren fehlgeschlagen"
+      },
+      "share": {
+        "title": "Diese Spendenaktion teilen",
+        "description": "Jede Weitergabe inspiriert mehr Menschen zu handeln."
+      }
     }
   }
 }

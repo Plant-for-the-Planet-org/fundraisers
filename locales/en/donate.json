@@ -121,6 +121,36 @@
       "donateYearly": "Donate Yearly",
       "processing": "Processing...",
       "success": "Donation Complete"
+    },
+    "thankYou": {
+      "title": {
+        "bankTransferPending": "Thank you for Initiating Your Donation"
+      },
+      "status": {
+        "label": "Status:",
+        "bankTransferPending": "Bank transfer pending"
+      },
+      "message": {
+        "bankTransferPending": "To complete your donation, please transfer the amount using the details below. A confirmation email has been sent to you."
+      },
+      "transfer": {
+        "Heading": "Transfer Details",
+        "amount": "Amount",
+        "reference": "Reference",
+        "beneficiary": "Beneficiary",
+        "iban": "IBAN",
+        "bic": "BIC",
+        "bank": "Bank",
+        "transactionId": "Transaction ID {id}"
+      },
+      "copy": {
+        "success": "Copied!",
+        "error": "Failed to copy"
+      },
+      "share": {
+        "title": "Share this fundraiser",
+        "description": "Every share inspires more people to act."
+      }
     }
   }
 }
