@@ -78,12 +78,12 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const { onSubmit, state, reset } = useDonationSubmit(
+  const { onSubmit, donationState, reset } = useDonationSubmit(
     donationData,
     fundraiser,
     paymentOptions
   );
-  const { thankYou, error, isLoading } = state;
+  const { thankYou, error, isLoading } = donationState;
 
   const leftColumn = thankYou ? (
     <DonationThankYou

@@ -1,4 +1,3 @@
-// ===== Imports: Type-only =====
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationFormValues } from './donation-form-context';
@@ -30,7 +29,7 @@ function cleanPaymentDetails(
   details: PaymentData['paymentDetails']
 ): Record<string, string | number | boolean> {
   return Object.fromEntries(
-    Object.entries(details).filter(([_, value]) => value !== undefined)
+    Object.entries(details).filter(([_key, value]) => value !== undefined)
   ) as Record<string, string | number | boolean>;
 }
 
@@ -103,7 +102,7 @@ export function useDonationSubmit(
   const donorProfile = useAuthStore(state => state.user?.profile);
   const token = useAuthStore(state => state.accessToken);
 
-  const [state, setState] = useState<DonationSubmitState>(
+  const [donationState, setDonationState] = useState<DonationSubmitState>(
     INITIAL_DONATION_STATE
   );
 
@@ -117,7 +116,8 @@ export function useDonationSubmit(
       if (submittingRef.current) return;
       submittingRef.current = true;
 
-      setState(prev => ({
+      // Reset stale success state on new submit
+      setDonationState(prev => ({
         ...prev,
         isLoading: true,
         thankYou: null,
@@ -149,22 +149,22 @@ export function useDonationSubmit(
           // TODO: Implement PlanetCash donation flow
         } else {
           const { donationResponse, paymentResponse } =
-            await submitStandardDonation(
+            await submitStandardDonation({
               payload,
-              token || undefined,
-              donationKeyRef.current,
-              paymentKeyRef.current,
-              values.selectedPaymentMethod,
+              token: token || undefined,
+              donationIdempotencyKey: donationKeyRef.current,
+              paymentIdempotencyKey: paymentKeyRef.current,
+              selectedPaymentMethod: values.selectedPaymentMethod,
               paymentOptions,
-              cleanPaymentDetails(paymentDetails)
-            );
+              paymentDetails: cleanPaymentDetails(paymentDetails),
+            });
 
           // Rotate keys now that the server accepted this operation
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
           paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
           if (paymentResponse.status === 'failed') {
-            setState(prev => ({
+            setDonationState(prev => ({
               ...prev,
               isLoading: false,
               error: {
@@ -185,7 +185,7 @@ export function useDonationSubmit(
           );
 
           if (thankYou) {
-            setState(prev => ({
+            setDonationState(prev => ({
               ...prev,
               isLoading: false,
               thankYou,
@@ -195,13 +195,13 @@ export function useDonationSubmit(
 
           // `action_required` or unexpected status — keep user in flow
           // Future: handle 3DS card authentication here
-          setState(prev => ({
+          setDonationState(prev => ({
             ...prev,
             isLoading: false,
           }));
         }
       } catch (error) {
-        setState(prev => ({
+        setDonationState(prev => ({
           ...prev,
           isLoading: false,
           error: toSubmitError(error),
@@ -221,10 +221,10 @@ export function useDonationSubmit(
   );
 
   const reset = useCallback(() => {
-    setState(INITIAL_DONATION_STATE);
+    setDonationState(INITIAL_DONATION_STATE);
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  return { state, onSubmit, reset };
+  return { donationState, onSubmit, reset };
 }
