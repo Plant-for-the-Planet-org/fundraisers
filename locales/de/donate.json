@@ -114,6 +114,7 @@
       "accessDenied": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
       "businessLogic": "Ungültige Spendendaten. Bitte überprüfen und erneut versuchen.",
       "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "paymentFailed": "Zahlung fehlgeschlagen. Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     },
     "cta": {
@@ -126,13 +127,16 @@
 
     "thankYou": {
       "title": {
+        "completed": "Vielen Dank für Ihre Spende!",
         "bankTransferPending": "Vielen Dank für das Starten Ihrer Spende"
       },
       "status": {
         "label": "Status:",
+        "completed": "Abgeschlossen",
         "bankTransferPending": "Banküberweisung ausstehend"
       },
       "message": {
+        "completed": "Wir haben Ihnen eine Spendenquittung per E-Mail zugesandt. Eine steuerlich absetzbare Bestätigung können Sie nach 60 Tagen herunterladen.",
         "bankTransferPending": "Um Ihre Spende abzuschließen, überweisen Sie bitte den Betrag mit den untenstehenden Angaben. Eine Bestätigungs-E-Mail wurde an Sie gesendet."
       },
       "transfer": {

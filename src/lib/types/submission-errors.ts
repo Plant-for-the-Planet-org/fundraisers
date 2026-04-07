@@ -36,6 +36,9 @@ export const SUBMISSION_ERROR_CODES = {
 
   // Donation creation
   DONATION_CREATION_ERROR: 'donationCreation',
+
+  // Payment response status
+  PAYMENT_FAILED: 'paymentFailed',
 } as const;
 
 export type ServiceErrorCode = keyof typeof SUBMISSION_ERROR_CODES;

@@ -5,9 +5,11 @@ import type { DonationFormValues } from './donation-form-context';
 import type { DonationData } from './donate-overlay';
 import type { PaymentData } from '@/lib/types/payment';
 import type { ServiceErrorCode } from '@/lib/types/submission-errors';
+import type { PaymentResponse } from '@/lib/types/payment';
 import type {
   DonationSubmitError,
   DonationSubmitState,
+  ThankYouState,
 } from '@/lib/types/donation-submit';
 
 import { useCallback, useRef, useState } from 'react';
@@ -30,6 +32,38 @@ function cleanPaymentDetails(
   return Object.fromEntries(
     Object.entries(details).filter(([_, value]) => value !== undefined)
   ) as Record<string, string | number | boolean>;
+}
+
+/**
+ * Maps a successful PaymentResponse to the appropriate ThankYouState,
+ * or returns null for statuses that should keep the user in the flow.
+ */
+function resolveThankYouState(
+  response: PaymentResponse,
+  donationId: string | null,
+  uid: string | null
+): ThankYouState | null {
+  switch (response.status) {
+    case 'success':
+      if (response.response?.type === 'transfer_required') {
+        return {
+          status: 'bank_transfer_pending',
+          donationId,
+          uid,
+          transferAccount: response.response.account,
+        };
+      }
+      return { status: 'completed', donationId };
+
+    case 'action_required':
+      // Future: handle 3DS / card authentication
+      return null;
+
+    case 'failed':
+      // Caller should handle this before calling resolveThankYouState,
+      // but guard against it reaching here
+      return null;
+  }
 }
 
 /** Maps a caught error to a UI-safe error with a translation key. */
@@ -83,13 +117,10 @@ export function useDonationSubmit(
       if (submittingRef.current) return;
       submittingRef.current = true;
 
-      // Reset stale success state on new submit
       setState(prev => ({
         ...prev,
         isLoading: true,
-        isSuccess: false,
-        donationId: null,
-        transferDetails: null,
+        thankYou: null,
         error: null,
       }));
 
@@ -132,29 +163,41 @@ export function useDonationSubmit(
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
           paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
-          if (
-            paymentResponse.status === 'success' &&
-            paymentResponse.response?.type === 'transfer_required'
-          ) {
-            // For bank transfers, the payment is created but requires manual transfer
-            // The UI should show transfer instructions to the user
+          if (paymentResponse.status === 'failed') {
             setState(prev => ({
               ...prev,
               isLoading: false,
-              isSuccess: true,
-              donationId: donationResponse.donationId ?? null,
-              uid: donationResponse.uid ?? null,
-              transferDetails: paymentResponse.response,
+              error: {
+                code: paymentResponse.errorCode
+                  ? (SUBMISSION_ERROR_CODES[
+                      paymentResponse.errorCode as ServiceErrorCode
+                    ] ?? 'paymentFailed')
+                  : 'paymentFailed',
+              },
             }));
             return;
           }
 
-          // Success state for two-step flow
+          const thankYou = resolveThankYouState(
+            paymentResponse,
+            donationResponse.donationId ?? null,
+            donationResponse.uid ?? null
+          );
+
+          if (thankYou) {
+            setState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYou,
+            }));
+            return;
+          }
+
+          // `action_required` or unexpected status — keep user in flow
+          // Future: handle 3DS card authentication here
           setState(prev => ({
             ...prev,
             isLoading: false,
-            isSuccess: true,
-            donationId: donationResponse.donationId ?? null,
           }));
         }
       } catch (error) {

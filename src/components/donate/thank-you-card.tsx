@@ -5,11 +5,14 @@ import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { StatusBadge } from './status-badge';
 
+type ThankYouVariant = 'completed' | 'bankTransferPending';
+
 interface ThankYouCardProps {
+  variant: ThankYouVariant;
   children?: ReactNode;
 }
 
-export function ThankYouCard({ children }: ThankYouCardProps) {
+export function ThankYouCard({ variant, children }: ThankYouCardProps) {
   const t = useTranslations('Donate.thankYou');
 
   return (
@@ -17,13 +20,13 @@ export function ThankYouCard({ children }: ThankYouCardProps) {
       {/* Header band */}
       <div className='bg-[#fdf8f0] px-6 pt-8 pb-6 text-center'>
         <h2 className='mb-2 text-xl font-bold text-gray-900'>
-          {t('title.bankTransferPending')}
+          {t(`title.${variant}`)}
         </h2>
 
-        <StatusBadge />
+        <StatusBadge variant={variant} />
 
         <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
-          {t(`message.bankTransferPending`)}
+          {t(`message.${variant}`)}
         </p>
       </div>
 

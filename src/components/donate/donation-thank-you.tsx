@@ -1,15 +1,13 @@
 'use client';
 
-import type { PaymentResponse } from '@/lib/types/payment';
+import type { ThankYouState } from '@/lib/types/donation-submit';
 
 import { ThankYouCard } from './thank-you-card';
 import { TransferDetailsList } from './transfer-details-list';
 import { ShareSection } from './share-section';
 
 interface DonationThankYouProps {
-  donationId: string | null;
-  uid: string | null;
-  transferDetails: PaymentResponse['response'] | null;
+  thankYou: ThankYouState;
   amountInCents: number;
   currency: string;
   fundraiserSlug: string;
@@ -22,27 +20,25 @@ function formatTransferAmount(amountInCents: number, currency: string): string {
 }
 
 export function DonationThankYou({
-  donationId,
-  uid,
-  transferDetails,
+  thankYou,
   amountInCents,
   currency,
   fundraiserSlug,
 }: DonationThankYouProps) {
-  const isBankTransferPending = transferDetails?.type === 'transfer_required';
-
   return (
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
-      <ThankYouCard>
-        {isBankTransferPending && transferDetails && (
+      {thankYou.status === 'bank_transfer_pending' ? (
+        <ThankYouCard variant='bankTransferPending'>
           <TransferDetailsList
-            transferResponse={transferDetails}
+            account={thankYou.transferAccount}
             formattedAmount={formatTransferAmount(amountInCents, currency)}
-            donationId={donationId}
-            uid={uid}
+            donationId={thankYou.donationId}
+            uid={thankYou.uid}
           />
-        )}
-      </ThankYouCard>
+        </ThankYouCard>
+      ) : (
+        <ThankYouCard variant='completed' />
+      )}
 
       <ShareSection fundraiserSlug={fundraiserSlug} />
     </div>

@@ -113,6 +113,7 @@
       "accessDenied": "You do not have permission to perform this action.",
       "businessLogic": "Invalid donation data. Please review and try again.",
       "threeDsMissingSecret": "Payment authentication failed. Please try again.",
+      "paymentFailed": "Payment failed. Please check your details and try again.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {
@@ -124,13 +125,16 @@
     },
     "thankYou": {
       "title": {
+        "completed": "Thank You for Your Donation!",
         "bankTransferPending": "Thank you for Initiating Your Donation"
       },
       "status": {
         "label": "Status:",
+        "completed": "Completed",
         "bankTransferPending": "Bank transfer pending"
       },
       "message": {
+        "completed": "We’ve sent you a donation receipt via email. You can download a tax-deductible confirmation after 60 days.",
         "bankTransferPending": "To complete your donation, please transfer the amount using the details below. A confirmation email has been sent to you."
       },
       "transfer": {

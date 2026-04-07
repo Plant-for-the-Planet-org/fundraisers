@@ -1,15 +1,26 @@
-import type { PaymentResponse } from '@/lib/types/payment';
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
+
+// Bank account details returned when a bank transfer is required
+interface BankAccountDetails {
+  beneficiary: string;
+  iban: string;
+  bic: string;
+  bankName: string;
+}
+
+// Discriminated union for thank-you screen variants
+export type ThankYouState =
+  | { status: 'completed'; donationId: string | null }
+  | {
+      status: 'bank_transfer_pending';
+      donationId: string | null;
+      uid: string | null;
+      transferAccount: BankAccountDetails;
+    };
 
 export interface DonationSubmitState {
   isLoading: boolean;
-  isSuccess: boolean;
-  donationId: string | null;
-  uid: string | null;
-  // TODO: refine this type to only include transfer details, not the full success response
-  transferDetails:
-    | Extract<PaymentResponse, { status: 'success' }>['response']
-    | null;
+  thankYou: ThankYouState | null;
   error: DonationSubmitError | null;
 }
 
@@ -20,9 +31,6 @@ export interface DonationSubmitError {
 
 export const INITIAL_DONATION_STATE: DonationSubmitState = {
   isLoading: false,
-  isSuccess: false,
-  donationId: null,
-  uid: null,
-  transferDetails: null,
+  thankYou: null,
   error: null,
 };

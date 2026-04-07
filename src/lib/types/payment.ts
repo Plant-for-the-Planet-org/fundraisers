@@ -100,7 +100,7 @@ interface PaymentResponseBase {
   status: 'success' | 'action_required' | 'failed'; // TODO: confirm whether 'pending' is a real status with backend
 }
 
-interface BankAccountDetails {
+export interface BankAccountDetails {
   beneficiary: string;
   iban: string;
   bic: string;

@@ -1,12 +1,11 @@
 'use client';
-
-import type { PaymentResponse } from '@/lib/types/payment';
+import type { BankAccountDetails } from '@/lib/types/payment';
 
 import { useTranslations } from 'next-intl';
 import { CopyFieldRow } from './copy-field-row';
 
 interface TransferDetailsListProps {
-  transferResponse: NonNullable<PaymentResponse['response']>;
+  account: BankAccountDetails;
   formattedAmount: string;
   donationId: string | null;
   uid: string | null;
@@ -18,13 +17,12 @@ interface FieldDef {
 }
 
 export function TransferDetailsList({
-  transferResponse,
+  account,
   formattedAmount,
   donationId,
   uid,
 }: TransferDetailsListProps) {
   const t = useTranslations('Donate.thankYou.transfer');
-  const { account } = transferResponse;
 
   const bankFields: FieldDef[] = [
     { label: t('amount'), value: formattedAmount },
