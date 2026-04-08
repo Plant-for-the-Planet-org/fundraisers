@@ -44,6 +44,7 @@ function resolveThankYouState(
 ): ThankYouState | null {
   switch (response.status) {
     case 'success':
+      // Future: handle other success responses from different payment methods here
       if (response.response?.type === 'transfer_required') {
         return {
           status: 'bankTransferPending',
@@ -61,6 +62,10 @@ function resolveThankYouState(
     case 'failed':
       // Caller should handle this before calling resolveThankYouState,
       // but guard against it reaching here
+      return null;
+
+    default:
+      console.warn('Received unrecognized payment response status:', response);
       return null;
   }
 }
@@ -141,7 +146,7 @@ export function useDonationSubmit(
         isPlanetCash
       );
 
-      // Build payment details based on selected payment method
+      // Future: Build payment details based on selected payment method
       const paymentDetails: PaymentData['paymentDetails'] = {};
 
       try {
@@ -193,8 +198,10 @@ export function useDonationSubmit(
             return;
           }
 
-          // `action_required` or unexpected status — keep user in flow
-          // Future: handle 3DS card authentication here
+          // `action_required` or unexpected status — keep user in flow.
+          // Future: handle 3DS card authentication here.
+          // NOTE: idempotency keys are intentionally NOT rotated here.
+          // When implementing 3DS, the re-submission after user authentication should reuse the same keys (treating it as a confirmation of the same payment intent, not a new attempt). Verify this against the Stripe API contract before rotating.
           setDonationState(prev => ({
             ...prev,
             isLoading: false,
