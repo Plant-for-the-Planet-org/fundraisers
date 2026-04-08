@@ -28,7 +28,7 @@ export const donationFormSchema = z
     // Address fields — validated conditionally in superRefine based on whether selectedAddressId is present
     address: z.string().trim(),
     address2: z.string().trim().optional(),
-    addressType: z.enum(['primary', 'mailing', 'other']),
+    addressType: z.enum(['primary', 'mailing', 'other']).optional(),
     zipCode: z.string().trim(),
     state: z.string().trim().optional(),
     city: z.string().trim(),

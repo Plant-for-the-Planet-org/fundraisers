@@ -60,7 +60,11 @@ export const AddressForm = () => {
     setIsLoading(true);
     setSaveAddressError(null);
     try {
-      const payload = buildAddressPayload(getValues());
+      const values = getValues();
+      const payload = buildAddressPayload({
+        ...values,
+        addressType: values.addressType ?? 'primary',
+      });
 
       const createdAddress = await addressService.createAddress(token, payload);
       await refreshProfile();
