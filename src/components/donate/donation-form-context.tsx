@@ -35,10 +35,7 @@ export const donationFormSchema = z
     country: z.string().trim(),
     // Preferences
     isAnonymous: z.boolean(),
-    selectedAddressId: z
-      .string()
-      .transform(val => (val === '' ? undefined : val))
-      .optional(),
+    selectedAddressId: z.string().optional(),
     makeMonthly: z.boolean(),
     coverFees: z.boolean(),
     selectedPaymentMethod: z.enum([

@@ -117,11 +117,13 @@ export function assembleFormData(
     isAnonymous: values.isAnonymous,
   };
 
-  if (isAuthenticated && values.selectedAddressId) {
+  const selectedAddressId = values.selectedAddressId || undefined;
+
+  if (isAuthenticated && selectedAddressId) {
     return {
       ...base,
       type: 'authenticated' as const,
-      receiptAddress: values.selectedAddressId,
+      receiptAddress: selectedAddressId,
     };
   }
 
