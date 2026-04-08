@@ -75,7 +75,7 @@ export const donationFormSchema = z
           message: DONATION_FORM_ERRORS['email.required'],
           path: ['email'],
         });
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+      } else if (!z.email().safeParse(values.email).success) {
         ctx.addIssue({
           code: 'custom',
           message: DONATION_FORM_ERRORS['email.invalid'],
