@@ -50,7 +50,8 @@ export const donationFormSchema = z
     companyName: z.string().trim().optional(),
   })
   .superRefine((values, ctx) => {
-    const hasAddressId = !!values.selectedAddressId?.trim();
+    const hasAddressId =
+      !!values.selectedAddressId?.trim() && values.selectedAddressId !== 'new';
 
     // When no addressId is provided (guest user), require personal + address fields
     if (!hasAddressId) {
