@@ -40,7 +40,7 @@ export function CopyFieldRow({ label, value }: CopyFieldRowProps) {
         type='button'
         onClick={handleCopy}
         className='ml-3 shrink-0 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600'
-        aria-label={`Copy ${label}`}
+        aria-label={t('label', { field: label })}
       >
         {copied ? (
           <Check className='size-4 text-green-500' />

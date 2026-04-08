@@ -155,6 +155,7 @@
         "error": "Überweisungsdetails nicht gefunden. Bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für Hilfe."
       },
       "copy": {
+        "label": "{field} kopieren",
         "success": "Kopiert!",
         "error": "Kopieren fehlgeschlagen"
       },
