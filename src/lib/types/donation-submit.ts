@@ -1,12 +1,5 @@
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
-
-// Bank account details returned when a bank transfer is required
-interface BankAccountDetails {
-  beneficiary: string;
-  iban: string;
-  bic: string;
-  bankName: string;
-}
+import type { BankAccountDetails } from './payment';
 
 // Discriminated union for thank-you screen variants
 export type ThankYouState =
