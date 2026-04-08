@@ -31,6 +31,7 @@ export function DonationThankYou({
   const amount = formatTransferAmount(amountInCents, currency);
   return (
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
+      {/* If we add more thank you states in the future, consider moving away from a ternary and using a switch  */}
       {thankYouState.status === 'bankTransferPending' ? (
         <ThankYouCard
           variant='bankTransferPending'

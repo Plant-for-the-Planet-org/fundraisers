@@ -103,12 +103,12 @@ function DonateOverlayInner({
     </>
   );
 
-  const rightColumn = thankYouState ? (
-    <DonationSummary />
-  ) : (
+  const rightColumn = (
     <>
       <DonationSummary />
-      <DonateCTA isLoading={isLoading} isSuccess={!!thankYouState} />
+      {thankYouState === null && (
+        <DonateCTA isLoading={isLoading} isSuccess={false} />
+      )}
     </>
   );
 
