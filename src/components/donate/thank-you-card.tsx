@@ -9,6 +9,7 @@ import { StatusBadge } from './status-badge';
 
 type ThankYouVariant = 'completed' | 'bankTransferPending';
 
+// It may be worth discriminating the props by variant if we add more variants in the future with more divergent content requirements
 interface ThankYouCardProps {
   variant: ThankYouVariant;
   frequency?: DonationFrequency;

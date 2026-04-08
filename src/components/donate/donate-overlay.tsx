@@ -39,7 +39,7 @@ export function DonateOverlay({
   fundraiser,
   paymentOptions,
 }: DonateOverlayProps) {
-  const mounted = typeof window !== 'undefined';
+  const isClient = typeof window !== 'undefined';
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -48,7 +48,7 @@ export function DonateOverlay({
     };
   }, [isOpen]);
 
-  if (!mounted || !isOpen) return null;
+  if (!isClient || !isOpen) return null;
 
   // Show skeleton while donation data is still being fetched
   if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
