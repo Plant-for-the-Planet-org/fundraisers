@@ -144,14 +144,15 @@
         }
       },
       "transfer": {
-        "Heading": "Überweisungsdetails",
+        "heading": "Überweisungsdetails",
         "amount": "Betrag",
         "reference": "Verwendungszweck",
         "beneficiary": "Begünstigter",
         "iban": "IBAN",
         "bic": "BIC",
         "bank": "Bank",
-        "transactionId": "Transaktions-ID {id}"
+        "transactionId": "Transaktions-ID {id}",
+        "error": "Überweisungsdetails nicht gefunden. Bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für Hilfe."
       },
       "copy": {
         "success": "Kopiert!",

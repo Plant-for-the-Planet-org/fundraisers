@@ -37,19 +37,38 @@ export function TransferDetailsList({
     (f): f is FieldDef & { value: string } => !!f.value
   );
 
-  if (visibleBank.length === 0) return null;
+  if (visibleBank.length === 0) {
+    return (
+      <div className='space-y-2'>
+        <p className='text-sm text-gray-500'>
+          {t.rich('error', {
+            link: chunks => (
+              <a
+                href='mailto:support@plant-for-the-planet.org'
+                className='underline'
+              >
+                {chunks}
+              </a>
+            ),
+          })}
+        </p>
+        {donationId !== null && (
+          <p className='text-center text-xs text-gray-400'>
+            {t('transactionId', { id: donationId })}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-4'>
-      {visibleBank.length > 0 && (
-        <FieldGroup heading={t('Heading')}>
-          {visibleBank.map(f => (
-            <CopyFieldRow key={f.label} label={f.label} value={f.value} />
-          ))}
-        </FieldGroup>
-      )}
-
-      {donationId && (
+      <FieldGroup heading={t('heading')}>
+        {visibleBank.map(f => (
+          <CopyFieldRow key={f.label} label={f.label} value={f.value} />
+        ))}
+      </FieldGroup>
+      {donationId !== null && (
         <p className='text-center text-xs text-gray-400'>
           {t('transactionId', { id: donationId })}
         </p>
