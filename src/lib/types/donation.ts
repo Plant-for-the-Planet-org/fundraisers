@@ -41,7 +41,7 @@ export interface DonationMetadata {
   utm_campaign: string; // fundraiser ID
   fundraiser: {
     id: string;
-    source: string;
+    source?: string;
     referrer?: string;
     user_id?: string;
     privacy: {
