@@ -13,7 +13,7 @@ The donation form is now driven by the `GET /paymentOptions/{fundraiserId}` endp
 Key differences from the old approach:
 
 - Preset amounts come from `frequencies.{once,monthly,yearly}[].quantity` (full currency units) — the mapper multiplies by 100 to get cent values
-- Which frequency tabs to show comes from the keys present in `frequencies` (`once` → `one_time`, `monthly` → `monthly`, `yearly` → `annual`)
+- Which frequency tabs to show comes from the keys present in `frequencies` (`once` → `once`, `monthly` → `monthly`, `yearly` → `annual`)
 - Whether recurrency is supported comes from `recurrency.supported` (replaces `allow_recurrency`)
 - `allow_dedication` and `show_totals_on_fundraiser` still come from `fundraiser.settings.modules.contribution` since the `paymentOptions` endpoint does not expose them
 - The response also includes `gateways` (Stripe publishable key, PayPal client ID, offline account) — these will be needed for the checkout step
@@ -110,7 +110,7 @@ lineItems = fundraiser.projectAllocations.map(allocation => ({
   project: allocation.project.id,
   amount: (donationData.amount / 100) * (allocation.percentage / 100),
   // €20 total, 60% allocation → 20 * 0.6 = 12.0
-}))
+}));
 ```
 
 ### Donor details form
@@ -124,7 +124,7 @@ The overlay's RHF form needs to be expanded:
 
 ### Recurring donations
 
-The `frequency` field from the donation form (`'one-time'`, `'monthly'`, `'quarterly'`, `'yearly'`) needs to map to the API payload. The exact field name and accepted values should be verified against the staging API — check how the old project's `donate-overlay.tsx` passes `frequency` to `useDonation`.
+The `frequency` field from the donation form (`'once'`, `'monthly'`, `'quarterly'`, `'yearly'`) needs to map to the API payload. The exact field name and accepted values should be verified against the staging API — check how the old project's `donate-overlay.tsx` passes `frequency` to `useDonation`.
 
 ### Custom fields
 
@@ -132,14 +132,20 @@ The `frequency` field from the donation form (`'one-time'`, `'monthly'`, `'quart
 
 ---
 
+## Implementation plan
+
+See [donation-implementation-plan.md](./donation-implementation-plan.md) for the full breakdown of what to build and in what order.
+
+---
+
 ## Key files
 
-| File | Purpose |
-|------|---------|
-| `src/components/fundraisers/donation-section.tsx` | Client boundary; owns overlay state |
-| `src/components/fundraisers/donate-overlay.tsx` | Full-page overlay; placeholder RHF form |
-| `src/components/fundraisers/donation-form.tsx` | Amount/frequency/dedication UI |
-| `src/lib/utils/contribution-utils.ts` | Settings mapping and defaults |
-| `src/lib/types/fundraiser.ts` | `ContributionModuleSettings`, `FundraiserSettings` types |
-| `src/lib/types/payment-options.ts` | `PaymentOptions` type |
-| `src/lib/api/payment-options-service.ts` | `getPaymentOptions(fundraiserId)` |
+| File                                              | Purpose                                                  |
+| ------------------------------------------------- | -------------------------------------------------------- |
+| `src/components/fundraisers/donation-section.tsx` | Client boundary; owns overlay state                      |
+| `src/components/fundraisers/donate-overlay.tsx`   | Full-page overlay; placeholder RHF form                  |
+| `src/components/fundraisers/donation-form.tsx`    | Amount/frequency/dedication UI                           |
+| `src/lib/utils/contribution-utils.ts`             | Settings mapping and defaults                            |
+| `src/lib/types/fundraiser.ts`                     | `ContributionModuleSettings`, `FundraiserSettings` types |
+| `src/lib/types/payment-options.ts`                | `PaymentOptions` type                                    |
+| `src/lib/api/payment-options-service.ts`          | `getPaymentOptions(fundraiserId)`                        |

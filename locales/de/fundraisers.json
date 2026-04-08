@@ -5,6 +5,7 @@
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByAnonymous": "von einem anonymen Gastgeber",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
@@ -24,6 +25,53 @@
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
       "withoutTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Bearbeitungsgebühr",
+        "breakdown": "Spendenaufschlüsselung",
+        "total": "Gesamt",
+        "totalMonthly": "Gesamt jeden Monat",
+        "totalYearly": "Gesamt jedes Jahr"
+      },
+      "paymentMethods": {
+        "title": "Zahlungsmethode",
+        "description": "Erhöhe die Wirkung deiner Spende. Manche Zahlungsanbieter berechnen Gebühren. Bei gebührenfreien Methoden kommt der volle Betrag dem Projekt zugute.",
+        "selectMethodPlaceholder": "Zahlungsmethode auswählen",
+        "empty": "Aktuell sind keine Zahlungsmethoden verfügbar.",
+        "methods": {
+          "openBanking": "Mit Bank bezahlen (Open Banking)",
+          "bankTransfer": "Banküberweisung",
+          "paypal": "PayPal",
+          "card": "Kredit- oder Debitkarte",
+          "sepa": "SEPA-Lastschrift",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "der Zahlungsanbieter",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "Keine Gebühr",
+          "feeAmount": "{amount} Gebühr",
+          "alternatives": {
+            "eu": "Open Banking oder Banküberweisung",
+            "default": "Banküberweisung"
+          },
+          "tooltip": {
+            "withFee": "{provider} berechnet uns {amount} für die Verarbeitung dieser Spende. Du kannst die Wirkung deiner Spende erhöhen, indem du {alternatives} auswählst."
+          }
+        }
+      },
+      "options": {
+        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Zahlungsabwicklungsgebühren zu decken.",
+        "coverFeesTooltip": "Die Zahlungsabwicklungsgebühren werden auf die von diesem Fundraiser unterstützten Projekte verteilt.",
+        "coverFeesTooltipTriggerLabel": "Weitere Informationen zu Zahlungsabwicklungsgebühren",
+        "makeMonthly": "Meine Spende monatlich machen"
+      }
     },
     "create": {
       "goalPreview": {

@@ -5,6 +5,7 @@
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",
     "hostedByWithOthers": "by {hostName} and {othersCount, plural, one {1 other} other {# others}}",
+    "hostedByAnonymous": "by an anonymous host",
     "unknownHost": "Unknown",
     "anonymousHost": "Anonymous host",
     "coverImageAlt": "Cover image for {title}",
@@ -24,6 +25,53 @@
     "securityNotice": {
       "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
       "withoutTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b>."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Processing fee",
+        "breakdown": "Breakdown",
+        "total": "Total",
+        "totalMonthly": "Total every month",
+        "totalYearly": "Total every year"
+      },
+      "paymentMethods": {
+        "title": "Payment Method",
+        "description": "Help your donation go further. Some payment providers charge us fees. Fee-free methods ensure your full donation supports your cause.",
+        "selectMethodPlaceholder": "Select payment method",
+        "empty": "No payment methods are currently available.",
+        "methods": {
+          "openBanking": "Pay with your Bank (Open Banking)",
+          "bankTransfer": "Bank Transfer",
+          "paypal": "PayPal",
+          "card": "Credit or Debit Card",
+          "sepa": "SEPA Direct Debit",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "the payment provider",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "No fee",
+          "feeAmount": "{amount} fee",
+          "alternatives": {
+            "eu": "Open Banking or Bank Transfer",
+            "default": "Bank Transfer"
+          },
+          "tooltip": {
+            "withFee": "{provider} charges us {amount} to process this donation. Make your impact larger by choosing {alternatives}."
+          }
+        }
+      },
+      "options": {
+        "coverFeesLabel": "Add {feeAmount} to cover payment processing fees.",
+        "coverFeesTooltip": "Payment processing fees are distributed to the causes supported by this fundraiser.",
+        "coverFeesTooltipTriggerLabel": "More information about payment processing fees",
+        "makeMonthly": "Make my donation monthly"
+      }
     },
     "create": {
       "goalPreview": {

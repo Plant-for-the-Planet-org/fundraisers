@@ -12,7 +12,7 @@ export default function TitleDisplay({ value, className }: TitleDisplayProps) {
 
   return (
     <h1
-      className={cn('text-4xl font-bold break-all', className)}
+      className={cn('text-4xl font-bold wrap-anywhere', className)}
       style={{ fontFamily: 'var(--theme-title-font)' }}
     >
       {value}

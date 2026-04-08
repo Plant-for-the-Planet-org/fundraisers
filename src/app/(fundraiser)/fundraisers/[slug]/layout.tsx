@@ -23,7 +23,11 @@ export default async function FundraiserLayout({
     const fundraiser = await getCachedFundraiser(slug);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
-    if (e instanceof PlatformAPIError && e.status === 404) {
+    if (
+      e instanceof PlatformAPIError &&
+      e.status &&
+      [401, 403, 404].includes(e.status)
+    ) {
       theme = DEFAULT_THEME;
     } else {
       throw e;

@@ -1,10 +1,10 @@
 'use client';
 
-import type { DonationData } from './donate-overlay';
+import type { DonationData } from '../donate/donate-overlay';
 
 import { useState } from 'react';
 import { DonationForm } from './donation-form';
-import { DonateOverlay } from './donate-overlay';
+import { DonateOverlay } from '../donate/donate-overlay';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
@@ -49,6 +49,7 @@ export function DonationSection({
         }}
         donationData={donationData}
         fundraiser={fundraiser}
+        paymentOptions={paymentOptions}
       />
     </>
   );
