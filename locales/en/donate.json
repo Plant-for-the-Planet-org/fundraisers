@@ -106,6 +106,7 @@
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
+      "timeout": "The request took too long. Please try again.",
       "server": "Server error. Please try again in a few moments.",
       "rateLimit": "Too many requests. Please wait a moment and try again.",
       "donationCreation": "Failed to create donation. Please try again.",
