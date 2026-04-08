@@ -1,4 +1,5 @@
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
+import type { DonationFrequency } from '@/lib/types/donation';
 import type { BankAccountDetails } from './payment';
 
 // Discriminated union for thank-you screen variants
@@ -8,6 +9,9 @@ export type ThankYouState =
       status: 'bankTransferPending';
       donationId: string | null;
       uid: string | null;
+      amount: number; // decimal, as returned by the API
+      currency: string;
+      frequency: DonationFrequency;
       transferAccount: BankAccountDetails;
     };
 

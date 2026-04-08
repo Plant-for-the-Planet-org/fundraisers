@@ -3,6 +3,9 @@ export interface DonationResponse {
   success: boolean;
   donationId: string;
   uid: string;
+  amount: number; // decimal, e.g. 2.5 for €2.50
+  currency: string;
+  frequency: DonationFrequency;
   message?: string;
   errors?: Record<string, string>;
 }

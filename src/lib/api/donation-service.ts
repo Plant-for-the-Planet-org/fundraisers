@@ -67,6 +67,9 @@ export class DonationService {
       success: true,
       donationId: data.donationId || data.id,
       uid: data.uid,
+      amount: data.amount,
+      currency: data.currency,
+      frequency: data.frequency ?? 'once',
       message: data.message || 'Donation processed successfully',
     };
   }

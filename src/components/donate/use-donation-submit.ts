@@ -5,6 +5,7 @@ import type { DonationData } from './donate-overlay';
 import type { PaymentData } from '@/lib/types/payment';
 import type { ServiceErrorCode } from '@/lib/types/submission-errors';
 import type { PaymentResponse } from '@/lib/types/payment';
+import type { DonationResponse } from '@/lib/types/donation';
 import type {
   DonationSubmitError,
   DonationSubmitState,
@@ -39,9 +40,9 @@ function cleanPaymentDetails(
  */
 function resolveThankYouState(
   response: PaymentResponse,
-  donationId: string | null,
-  uid: string | null
+  donationResponse: DonationResponse
 ): ThankYouState | null {
+  const { donationId, uid, amount, currency, frequency } = donationResponse;
   switch (response.status) {
     case 'success':
       // Future: handle other success responses from different payment methods here
@@ -50,6 +51,9 @@ function resolveThankYouState(
           status: 'bankTransferPending',
           donationId,
           uid,
+          amount,
+          currency,
+          frequency,
           transferAccount: response.response.account,
         };
       }
@@ -185,8 +189,7 @@ export function useDonationSubmit(
 
           const thankYouState = resolveThankYouState(
             paymentResponse,
-            donationResponse.donationId ?? null,
-            donationResponse.uid ?? null
+            donationResponse
           );
 
           if (thankYouState) {

@@ -88,9 +88,6 @@ function DonateOverlayInner({
   const leftColumn = thankYouState ? (
     <DonationThankYou
       thankYouState={thankYouState}
-      amountInCents={donationData.amount}
-      currency={donationData.currency}
-      frequency={donationData.frequency}
       fundraiserSlug={fundraiser.slug}
     />
   ) : (
