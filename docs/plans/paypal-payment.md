@@ -23,11 +23,11 @@ Reference implementations:
 - [x] Install `@paypal/react-paypal-js`
 - [x] Create `paypal-button.tsx` component (UI only, stub callbacks)
 - [x] Wire `PayPalButton` into `donate-cta.tsx` (render PayPal button when PayPal selected)
-- [ ] Create `paypal-order-service.ts` (`POST /donations/{id}/paypal/orders`)
-- [ ] Implement `case 'paypal'` in `payment-request-builder.ts`
-- [ ] Add `onPayPalCreateOrder` + `onPayPalApproved` to `use-donation-submit.ts`
-- [ ] Connect real callbacks in `donate-cta.tsx` and `donate-overlay.tsx`
-- [ ] Add PayPal error translation keys to locales
+- [x] Create `paypal-order-service.ts` (`POST /donations/{id}/paypal/orders`)
+- [x] Implement `case 'paypal'` in `payment-request-builder.ts`
+- [x] Add `onPayPalCreateOrder` + `onPayPalApproved` + `onPayPalError` to `use-donation-submit.ts`
+- [x] Connect real callbacks in `donate-cta.tsx` and `donate-overlay.tsx`
+- [x] Add PayPal error translation keys to locales
 
 ---
 
@@ -184,7 +184,13 @@ Add `paypalDonationIdRef` to share `donationId` between the two PayPal callbacks
 
 `paypalAccount` from `paymentOptions.gateways.paypal?.account`.
 
-Return `{ donationState, onSubmit, onPayPalCreateOrder, onPayPalApproved, reset }`.
+**`onPayPalError(): void`**
+
+- Sets `{ code: 'paypalPaymentError' }` error state
+- Resets `isLoading` and releases `submittingRef`
+- Handles SDK-level errors (popup blocked, JS load failure, internal SDK errors)
+
+Return `{ donationState, onSubmit, onPayPalCreateOrder, onPayPalApproved, onPayPalError, reset }`.
 
 ---
 
@@ -192,8 +198,8 @@ Return `{ donationState, onSubmit, onPayPalCreateOrder, onPayPalApproved, reset 
 
 In `donate-overlay.tsx` (`DonateOverlayInner`):
 
-- Destructure `onPayPalCreateOrder` and `onPayPalApproved` from `useDonationSubmit`
-- Pass them as props to `<DonateCTA>`
+- Destructure `onPayPalCreateOrder`, `onPayPalApproved`, and `onPayPalError` from `useDonationSubmit`
+- Pass all three as props to `<DonateCTA>`
 
 In `donate-cta.tsx`:
 
@@ -203,13 +209,18 @@ In `donate-cta.tsx`:
 
 ### Task 8 — Translation keys
 
-Add to `locales/en/common.json` and `locales/de/common.json`:
+Add to `locales/en/donate.json` and `locales/de/donate.json` under `Donate.submissionErrors`:
 
 - `paypalOrderCreationError` — `createOrder` API call fails
 - `paypalCaptureError` — `onApprove` processing fails
-- `paypalPaymentError` — SDK-level error
+- `paypalPaymentError` — SDK-level `onError` fires
 
-Map via the existing `toSubmitError` path in `use-donation-submit.ts`.
+Add to `SUBMISSION_ERROR_CODES` in `src/lib/types/submission-errors.ts`:
+- `PAYPAL_ORDER_ERROR: 'paypalOrderCreationError'`
+- `PAYPAL_CAPTURE_ERROR: 'paypalCaptureError'`
+- `PAYPAL_SDK_ERROR: 'paypalPaymentError'`
+
+Add `PaypalOrderError` to the `instanceof` check in `toSubmitError` in `use-donation-submit.ts`.
 
 ---
 
@@ -223,7 +234,8 @@ Map via the existing `toSubmitError` path in `use-donation-submit.ts`.
 | `src/lib/utils/payment-request-builder.ts`          | Modify — implement `case 'paypal'`          |
 | `src/components/donate/use-donation-submit.ts`      | Modify — add PayPal handlers                |
 | `src/components/donate/donate-overlay.tsx`          | Modify — pass real callbacks to `DonateCTA` |
-| `locales/en/common.json` + `locales/de/common.json` | Modify — PayPal error keys                  |
+| `src/lib/types/submission-errors.ts`                | Modify — add PayPal error codes             |
+| `locales/en/donate.json` + `locales/de/donate.json` | Modify — PayPal error keys                  |
 
 ---
 

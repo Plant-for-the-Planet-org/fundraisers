@@ -114,6 +114,9 @@
       "accessDenied": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
       "businessLogic": "Ungültige Spendendaten. Bitte überprüfen und erneut versuchen.",
       "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "paypalOrderCreationError": "PayPal-Bestellung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "paypalCaptureError": "PayPal-Zahlung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.",
+      "paypalPaymentError": "PayPal-Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     },
     "cta": {

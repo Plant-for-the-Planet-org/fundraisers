@@ -15,7 +15,6 @@ import { PayPalButton } from './paypal-button';
 interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
-  // TODO (task 7): pass real handlers from useDonationSubmit once implemented
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
@@ -47,7 +46,6 @@ export function DonateCTA({
     return (
       <PayPalButton
         isSuccess={isSuccess}
-        // TODO (task 7): replace stubs with real handlers from useDonationSubmit
         onPayPalCreateOrder={onPayPalCreateOrder ?? (() => Promise.resolve(''))}
         onPayPalApproved={onPayPalApproved ?? (() => Promise.resolve())}
         onPayPalError={onPayPalError ?? (() => undefined)}

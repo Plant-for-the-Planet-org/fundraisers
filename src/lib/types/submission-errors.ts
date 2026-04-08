@@ -36,6 +36,11 @@ export const SUBMISSION_ERROR_CODES = {
 
   // Donation creation
   DONATION_CREATION_ERROR: 'donationCreation',
+
+  // PayPal
+  PAYPAL_ORDER_ERROR: 'paypalOrderCreationError',
+  PAYPAL_CAPTURE_ERROR: 'paypalCaptureError',
+  PAYPAL_SDK_ERROR: 'paypalPaymentError',
 } as const;
 
 export type ServiceErrorCode = keyof typeof SUBMISSION_ERROR_CODES;

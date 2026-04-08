@@ -113,6 +113,9 @@
       "accessDenied": "You do not have permission to perform this action.",
       "businessLogic": "Invalid donation data. Please review and try again.",
       "threeDsMissingSecret": "Payment authentication failed. Please try again.",
+      "paypalOrderCreationError": "Failed to create PayPal order. Please try again.",
+      "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
+      "paypalPaymentError": "PayPal payment failed. Please try again.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {
