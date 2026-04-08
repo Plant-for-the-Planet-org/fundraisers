@@ -77,6 +77,8 @@ User clicks "Donate Now"
       ← PaymentResponse (discriminated union)
 ```
 
+`DonationResponse` carries `{ donationId, uid, amount, currency, frequency }`. `amount` is a decimal (e.g. `2.5` for €2.50). `frequency` is `null` in the API for one-time donations and mapped to `'once'` in `donation-service.ts`.
+
 ### 2. State Resolution
 
 `resolveThankYouState()` in `use-donation-submit.ts` maps the API response to a `ThankYouState`:
@@ -89,6 +91,9 @@ type ThankYouState =
       status: 'bankTransferPending';
       donationId: string | null;
       uid: string | null;
+      amount: number; // decimal, as returned by the API
+      currency: string;
+      frequency: DonationFrequency;
       transferAccount: BankAccountDetails;
     };
 ```
@@ -130,8 +135,8 @@ thankYouState === null  →  <DonationForm />
 
 - **File:** `thank-you-card.tsx`
 - **Responsibility:** Reusable presentation card with a warm header band (`#fdf8f0`), optional `CircleCheckBig` icon (completed variant), localized title, status badge, message body, and `children` slot.
-- **Props:** `status`, `title`, `message`, `children`.
-- **Behavior:** Renders the checkmark icon only for `completed` status. Message supports i18n placeholders and frequency-aware copy for bank transfers.
+- **Props:** `variant: ThankYouVariant`, `frequency?: DonationFrequency`, `formattedAmount?: string`, `children?: ReactNode`.
+- **Behavior:** Renders the checkmark icon only for `completed` variant. For `bankTransferPending`, `frequency` and `formattedAmount` are required for the message — enforced by the call site via `ThankYouState` typing.
 
 ### `StatusBadge`
 
@@ -143,8 +148,8 @@ thankYouState === null  →  <DonationForm />
 
 - **File:** `transfer-details-list.tsx`
 - **Responsibility:** Renders bank account details (amount, reference/uid, beneficiary, IBAN, BIC, bank name) as a list of `CopyFieldRow` components.
-- **Props:** `transferAccount: BankAccountDetails`, `uid`, `donationId`.
-- **Behavior:** Each field is independently copyable. Transaction ID shown at the bottom.
+- **Props:** `account: BankAccountDetails`, `formattedAmount: string`, `uid: string | null`, `donationId: string | null`.
+- **Behavior:** Each field is independently copyable. Transaction ID shown at the bottom as plain text. If all fields resolve to empty/null, renders an error message with a support email link and the transaction ID (if available).
 
 ### `CopyFieldRow`
 
