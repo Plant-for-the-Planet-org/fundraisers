@@ -88,11 +88,13 @@ export function formatCurrency(
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
  * @param locale - The locale for number formatting (defaults to 'en-US')
+ * @param currencyDisplay - 'symbol' (default, e.g. €12.34) or 'code' (e.g. EUR 12.34)
  */
 export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
-  locale: string = 'en-US'
+  locale: string = 'en-US',
+  currencyDisplay: 'symbol' | 'code' = 'symbol'
 ): string {
   const currencyUpper = currency.toUpperCase();
 
@@ -105,6 +107,10 @@ export function formatCurrencyFromDecimal(
     minimumFractionDigits,
     maximumFractionDigits: 2,
   }).format(amount);
+
+  if (currencyDisplay === 'code') {
+    return `${currencyUpper} ${formattedAmount}`;
+  }
 
   // Use symbol if available, otherwise use currency code
   const symbol = CURRENCY_SYMBOLS[currencyUpper];

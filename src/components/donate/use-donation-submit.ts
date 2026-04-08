@@ -4,9 +4,12 @@ import type { DonationFormValues } from './donation-form-context';
 import type { DonationData } from './donate-overlay';
 import type { PaymentData } from '@/lib/types/payment';
 import type { ServiceErrorCode } from '@/lib/types/submission-errors';
+import type { PaymentResponse } from '@/lib/types/payment';
+import type { DonationResponse } from '@/lib/types/donation';
 import type {
   DonationSubmitError,
   DonationSubmitState,
+  ThankYouState,
 } from '@/lib/types/donation-submit';
 
 import { useCallback, useRef, useState } from 'react';
@@ -29,6 +32,46 @@ function cleanPaymentDetails(
   return Object.fromEntries(
     Object.entries(details).filter(([_key, value]) => value !== undefined)
   ) as Record<string, string | number | boolean>;
+}
+
+/**
+ * Maps a successful PaymentResponse to the appropriate ThankYouState,
+ * or returns null for statuses that should keep the user in the flow.
+ */
+function resolveThankYouState(
+  response: PaymentResponse,
+  donationResponse: DonationResponse
+): ThankYouState | null {
+  const { donationId, uid, amount, currency, frequency } = donationResponse;
+  switch (response.status) {
+    case 'success':
+      // Future: handle other success responses from different payment methods here
+      if (response.response?.type === 'transfer_required') {
+        return {
+          status: 'bankTransferPending',
+          donationId,
+          uid,
+          amount,
+          currency,
+          frequency,
+          transferAccount: response.response.account,
+        };
+      }
+      return { status: 'completed', donationId };
+
+    case 'action_required':
+      // Future: handle 3DS / card authentication
+      return null;
+
+    case 'failed':
+      // Caller should handle this before calling resolveThankYouState,
+      // but guard against it reaching here
+      return null;
+
+    default:
+      console.warn('Received unrecognized payment response status:', response);
+      return null;
+  }
 }
 
 /** Maps a caught error to a UI-safe error with a translation key. */
@@ -86,9 +129,7 @@ export function useDonationSubmit(
       setDonationState(prev => ({
         ...prev,
         isLoading: true,
-        isSuccess: false,
-        donationId: null,
-        transferDetails: null,
+        thankYouState: null,
         error: null,
       }));
 
@@ -109,7 +150,7 @@ export function useDonationSubmit(
         isPlanetCash
       );
 
-      // Build payment details based on selected payment method
+      // Future: Build payment details based on selected payment method
       const paymentDetails: PaymentData['paymentDetails'] = {};
 
       try {
@@ -131,28 +172,42 @@ export function useDonationSubmit(
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
           paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
-          if (
-            paymentResponse.status === 'success' &&
-            paymentResponse.response?.type === 'transfer_required'
-          ) {
-            // For bank transfers, the payment is created but requires manual transfer
-            // The UI should show transfer instructions to the user
+          if (paymentResponse.status === 'failed') {
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
-              isSuccess: true,
-              donationId: donationResponse.donationId,
-              transferDetails: paymentResponse.response,
+              error: {
+                code: paymentResponse.errorCode
+                  ? (SUBMISSION_ERROR_CODES[
+                      paymentResponse.errorCode as ServiceErrorCode
+                    ] ?? 'paymentFailed')
+                  : 'paymentFailed',
+              },
             }));
             return;
           }
 
-          // Success state for two-step flow
+          const thankYouState = resolveThankYouState(
+            paymentResponse,
+            donationResponse
+          );
+
+          if (thankYouState) {
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYouState,
+            }));
+            return;
+          }
+
+          // `action_required` or unexpected status — keep user in flow.
+          // Future: handle 3DS card authentication here.
+          // NOTE: idempotency keys are intentionally NOT rotated here.
+          // When implementing 3DS, the re-submission after user authentication should reuse the same keys (treating it as a confirmation of the same payment intent, not a new attempt). Verify this against the Stripe API contract before rotating.
           setDonationState(prev => ({
             ...prev,
             isLoading: false,
-            isSuccess: true,
-            donationId: donationResponse.donationId,
           }));
         }
       } catch (error) {
