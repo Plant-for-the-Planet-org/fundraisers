@@ -2,8 +2,8 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useTranslations } from 'next-intl';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from './typography';
 

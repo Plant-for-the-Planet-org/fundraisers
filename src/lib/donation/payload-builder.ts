@@ -1,7 +1,6 @@
-import type { UserProfileResponse } from '../api/user-service';
-import type { Fundraiser } from '../types/fundraiser';
-import type { DonationFormValues } from '@/components/donate/donation-form-context';
 import type { DonationData } from '@/components/donate/donate-overlay';
+import type { DonationFormValues } from '@/components/donate/donation-form-context';
+import type { UserProfileResponse } from '../api/user-service';
 import type {
   DonationFormData,
   DonationFrequency,
@@ -9,6 +8,7 @@ import type {
   DonorInfo,
   GuestFormData,
 } from '../types/donation';
+import type { Fundraiser } from '../types/fundraiser';
 
 import { getPrimaryAddress } from '../utils/profile';
 import { calculateLineItems } from './line-item-calculator';

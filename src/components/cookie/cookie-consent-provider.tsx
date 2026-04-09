@@ -1,7 +1,7 @@
 'use client';
 
-import { COOKIE_CONSENT_CONFIG } from '@/lib/constants/cookie-consent-config';
 import { useEffect } from 'react';
+import { COOKIE_CONSENT_CONFIG } from '@/lib/constants/cookie-consent-config';
 
 /**
  * Initializes vanilla-cookieconsent on mount.

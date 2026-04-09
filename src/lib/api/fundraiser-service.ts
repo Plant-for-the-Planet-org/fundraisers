@@ -1,5 +1,6 @@
-import { cache } from 'react';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+
+import { cache } from 'react';
 import { platformAPIClient } from './external-client';
 
 export async function getFundraiser(slug: string): Promise<Fundraiser> {

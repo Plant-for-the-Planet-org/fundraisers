@@ -1,20 +1,20 @@
 'use client';
 
-import type { Control } from 'react-hook-form';
 import type { ReactNode } from 'react';
+import type { Control } from 'react-hook-form';
 
-import { usePathname } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
+import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { getThemeForPath } from '@/lib/theme/route-themes';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import {
   ALLOWED_COUNTRIES,
-  SUPPORTED_CURRENCIES,
   getCurrencyForCountry,
+  SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
+import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 const DevTool =

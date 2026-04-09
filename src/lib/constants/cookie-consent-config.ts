@@ -1,7 +1,7 @@
 import type { CookieConsentConfig } from 'vanilla-cookieconsent';
 
-import enRaw from '../../../locales/en/cookie.json';
 import deRaw from '../../../locales/de/cookie.json';
+import enRaw from '../../../locales/en/cookie.json';
 
 export const COOKIE_CATEGORIES = {
   NECESSARY: 'necessary',

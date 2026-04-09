@@ -1,12 +1,13 @@
 'use client';
 
+import type { ContributionOption } from '@/lib/types/fundraiser';
+
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/cn';
 import { formatCurrency, getCurrencySymbol } from '@/lib/utils/currency';
-import type { ContributionOption } from '@/lib/types/fundraiser';
+import { Button } from '@/components/ui/button';
 
 interface DonationAmountsProps {
   amounts: number[];

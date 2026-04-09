@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { getSignInPath } from '@/lib/auth/sign-in-redirect';
-import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { getSignInPath } from '@/lib/auth/sign-in-redirect';
+import { Button } from '@/components/ui/button';
 
 interface SignInButtonProps {
   redirectTo?: string;

@@ -1,5 +1,5 @@
-import { Skeleton } from '@/components/ui/skeleton';
 import { FundraiserCardSkeletonGrid } from '@/components/explore/fundraiser-card-skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Create a skeleton that mirrors the full section layout
 export function FeaturedFundraisersSkeleton() {

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAuthStore } from '@/stores/authStore';
 import {
   exchangeCodeForTokens,
   getAccessTokenSilently,
 } from '@/lib/auth/auth0-config';
+import { useAuthStore } from '@/stores/authStore';
 import { isTokenExpired } from '../../lib/auth/jwt-utils';
 
 function cleanUrl(params: string[]) {

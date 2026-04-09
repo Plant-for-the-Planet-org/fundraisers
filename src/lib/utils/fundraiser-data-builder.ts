@@ -1,8 +1,8 @@
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import type {
   CreateFundraiserRequest,
   FundraiserSettings,
 } from '@/lib/types/fundraiser';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
 export const DEFAULT_MODULES: FundraiserSettings['modules'] = {
   leaderboard: {

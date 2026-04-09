@@ -1,7 +1,6 @@
-import { ProfileCard } from './profile-card';
-
-import { AnonymousDonationField } from './anonymous-donation-field';
 import { AddressSection } from './address-section';
+import { AnonymousDonationField } from './anonymous-donation-field';
+import { ProfileCard } from './profile-card';
 
 export const AuthenticatedUserView = () => {
   return (

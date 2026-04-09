@@ -1,12 +1,13 @@
 import type {
-  Theme,
   AccentColor,
-  FontId,
-  ThemeMode,
   AnimationType,
+  FontId,
   FundraiserThemeSettings,
+  Theme,
+  ThemeMode,
 } from './types';
-import { THEMES, DEFAULT_THEME } from './themes';
+
+import { DEFAULT_THEME,THEMES } from './themes';
 
 const VALID_ACCENTS = new Set<string>([
   'blue',

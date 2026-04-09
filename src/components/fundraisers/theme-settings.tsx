@@ -1,13 +1,13 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 import type { AccentColor } from '@/lib/theme/types';
+import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
+import { useController } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useController } from 'react-hook-form';
-import { THEMES } from '@/lib/theme/themes';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { THEMES } from '@/lib/theme/themes';
 import { useThemeStore } from '@/stores/theme-store';
 import {
   Select,

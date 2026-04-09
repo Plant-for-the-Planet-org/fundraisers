@@ -1,5 +1,6 @@
-import { useTranslations } from 'next-intl';
 import type { DonationFormErrorKey } from '@/lib/types/donation-form-errors';
+
+import { useTranslations } from 'next-intl';
 import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
 
 export function useFieldError() {

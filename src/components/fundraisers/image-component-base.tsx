@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Target } from 'lucide-react';
 import { useMemo } from 'react';
+import { Target } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 interface ImageComponentBaseProps {

@@ -1,20 +1,21 @@
 import type { Metadata } from 'next';
 
-import { headers } from 'next/headers';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getLocale } from 'next-intl/server';
 import {
-  Open_Sans,
   Inter,
-  Poppins,
+  Open_Sans,
   Playfair_Display,
+  Poppins,
   Roboto,
 } from 'next/font/google';
-import { LocaleInitializer } from '@/components/locale-initializer';
-import './globals.css';
+import { headers } from 'next/headers';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { CookieConsentProvider } from '@/components/cookie/cookie-consent-provider';
+import { LocaleInitializer } from '@/components/locale-initializer';
+
+import './globals.css';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
 
 const openSans = Open_Sans({

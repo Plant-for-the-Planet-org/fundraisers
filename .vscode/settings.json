@@ -1,3 +1,10 @@
 {
 	"css.lint.unknownAtRules": "ignore",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+	"eslint.codeActionsOnSave.rules": [
+		"simple-import-sort/imports",
+		"simple-import-sort/exports"
+	]
 }

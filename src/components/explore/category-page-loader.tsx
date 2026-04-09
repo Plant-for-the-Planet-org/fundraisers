@@ -5,8 +5,8 @@ import type {
 
 import { notFound } from 'next/navigation';
 import { categoriesService } from '@/lib/api/categories-service';
-import { CategoryPageHeader } from './category-page-header';
 import { CategoryFundraisers } from './category-fundraisers';
+import { CategoryPageHeader } from './category-page-header';
 
 interface CategoryPageLoaderProps {
   slug: string;

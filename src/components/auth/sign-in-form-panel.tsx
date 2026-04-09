@@ -1,12 +1,12 @@
 'use client';
 
-import { AppleIcon, FacebookIcon, GoogleIcon } from '../icons/social';
-import { EmailSignInForm } from '@/components/auth/email-sign-in-form';
-import { SignInWithButton } from '@/components/auth/sign-in-with-button';
-import { SignUpButton } from './sign-up-button';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { buildSocialAuthorizeUrl } from '@/lib/auth/auth0-config';
+import { EmailSignInForm } from '@/components/auth/email-sign-in-form';
+import { SignInWithButton } from '@/components/auth/sign-in-with-button';
+import { AppleIcon, FacebookIcon, GoogleIcon } from '../icons/social';
+import { SignUpButton } from './sign-up-button';
 
 export function SignInFormPanel({ redirectTo }: { redirectTo: string }) {
   const tAuth = useTranslations('Auth');

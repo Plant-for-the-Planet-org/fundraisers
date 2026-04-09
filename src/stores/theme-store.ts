@@ -1,5 +1,6 @@
-import { create } from 'zustand';
 import type { Theme } from '@/lib/theme/types';
+
+import { create } from 'zustand';
 
 interface ThemeOverrideState {
   selectedTheme: Theme | null;

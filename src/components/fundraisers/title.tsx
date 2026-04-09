@@ -1,10 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+
 import { useCallback, useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 const TITLE_MAX_LENGTH = 50;

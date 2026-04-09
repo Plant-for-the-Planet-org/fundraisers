@@ -1,10 +1,8 @@
 'use client';
 
-import Placeholder from '@tiptap/extension-placeholder';
-import { TextStyle } from '@tiptap/extension-text-style';
-import Underline from '@tiptap/extension-underline';
-import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import type { ReactNode } from 'react';
+
+import { useEffect } from 'react';
 import {
   Bold,
   Italic,
@@ -15,9 +13,11 @@ import {
   Strikethrough,
   Underline as UnderlineIcon,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { useEffect } from 'react';
-
+import Placeholder from '@tiptap/extension-placeholder';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 
 interface RichTextEditorProps {

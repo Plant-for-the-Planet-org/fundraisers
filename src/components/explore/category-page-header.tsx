@@ -1,8 +1,8 @@
 import type { Category } from '@/lib/types/category';
 
-import { useTranslations, useLocale } from 'next-intl';
-import { CategoryIcon } from './category-icon';
+import { useLocale,useTranslations } from 'next-intl';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
+import { CategoryIcon } from './category-icon';
 
 interface CategoryPageHeaderProps {
   category: Category;

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
-import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
 import { Loader } from '@/components/ui/loader';
+import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 
 export default function LoginPage() {
   const router = useRouter();
