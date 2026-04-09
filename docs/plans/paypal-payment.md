@@ -283,3 +283,101 @@ PayPal always maps to `status: 'completed'` — bank transfer pending is not app
 3. **Validation**: Submit with empty required fields → PayPal popup blocked, form errors shown
 4. **Error path**: Mock `createPaypalOrder` to fail → error banner shown in overlay
 5. **Idempotency**: Click PayPal button, abandon, click again → no duplicate donations (key unchanged until success)
+
+---
+
+## Future improvements
+
+### F1 — Extract `usePayPalFlow` when adding Stripe
+
+**File:** `src/components/donate/use-donation-submit.ts`
+
+When implementing Stripe, extract `onPayPalCreateOrder`, `onPayPalApproved`, and `onPayPalError` into a `usePayPalFlow(sharedRefs, deps)` composable. Create a parallel `useStripeFlow(sharedRefs, deps)`. Keep `useDonationSubmit` as the orchestrator that owns shared state (`submittingRef`, `donationKeyRef`, `paymentKeyRef`, `donationState`) and passes them as arguments to each flow hook, then merges the returned callbacks into its return value. This avoids lifting state or prop drilling.
+
+A comment marking this point already exists at line ~248 in `use-donation-submit.ts`.
+
+---
+
+### F2 — Make PayPal callback props required in `DonateCTA`
+
+**File:** `src/components/donate/donate-cta.tsx`
+
+`onPayPalCreateOrder`, `onPayPalApproved`, and `onPayPalError` are currently optional (`?`) with stub fallbacks:
+
+```typescript
+onPayPalCreateOrder ?? (() => Promise.resolve(''))
+onPayPalApproved    ?? (() => Promise.resolve())
+onPayPalError       ?? (() => undefined)
+```
+
+The props are always provided from `donate-overlay.tsx` — the optionality exists for no real reason and the empty-string fallback for `onPayPalCreateOrder` would cause a silent PayPal failure if ever hit.
+
+Remove the `?` from all three props in `DonateCTAProps`. Remove the stub fallbacks — pass the props directly to `<PayPalButton>`. TypeScript will enforce that callers always provide them.
+
+---
+
+### F3 — Thread `isLoading` through to `PayPalButton`
+
+**Files:** `src/components/donate/donate-cta.tsx`, `src/components/donate/paypal-button.tsx`
+
+`isLoading` is `true` during `onPayPalCreateOrder` (the donation + order creation API calls before the PayPal popup opens), but `PayPalButton` doesn't receive it. There is no loading indicator during this window — the PayPal SDK button shows its own spinner only after `createOrder` is called, not before.
+
+1. Add `isLoading: boolean` to `PayPalButtonProps` and `PayPalButtonsInnerProps` in `paypal-button.tsx`
+2. Pass it to `disabled={isProcessing || isLoading || isSuccess}` in `PayPalButtonsInner`
+3. Forward `isLoading={isLoading}` from `DonateCTA` to `<PayPalButton>`
+
+---
+
+### F4 — Consistent `null` for absent optional PayPal fields
+
+**File:** `src/lib/utils/payment-request-builder.ts`
+
+In `case 'paypal'`, absent optional fields are handled inconsistently — `billingToken` becomes `null` when falsy, while `payerID`, `paymentID`, `facilitatorAccessToken`, and `paymentSource` become `''`. Use `null` for all:
+
+```typescript
+source: {
+  type: 'server_order',
+  orderID: String(orderID),
+  payerID: payerID ? String(payerID) : null,
+  paymentID: paymentID ? String(paymentID) : null,
+  billingToken: billingToken ? String(billingToken) : null,
+  facilitatorAccessToken: facilitatorAccessToken ? String(facilitatorAccessToken) : null,
+  paymentSource: paymentSource ? String(paymentSource) : null,
+},
+```
+
+Verify the `PayPalPaymentRequest` source type accepts `null` for these fields and update if needed.
+
+---
+
+### F5 — Fix nested `details` in `PaypalOrderError`
+
+**File:** `src/lib/api/paypal-order-service.ts`
+
+When throwing on a non-ok HTTP response, `errorData` is nested under `details`:
+
+```typescript
+// Current — creates error.details.details nesting:
+throw new PaypalOrderError(debugMessage, type, code, status, { details: errorData });
+
+// Fix — nest under a clear key:
+throw new PaypalOrderError(debugMessage, type, code, status, { errorData });
+```
+
+---
+
+### F6 — Validate `orderId` type in `paypal-order-service.ts`
+
+**File:** `src/lib/api/paypal-order-service.ts`
+
+The current check validates existence but not type. If the API returns a non-string `orderId`, the `as string` cast does nothing at runtime:
+
+```typescript
+// Current:
+if (!data?.orderId) { throw ... }
+return data.orderId as string;
+
+// Fix:
+if (!data?.orderId || typeof data.orderId !== 'string') { throw ... }
+return data.orderId;
+```
