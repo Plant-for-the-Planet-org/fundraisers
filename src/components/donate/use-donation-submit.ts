@@ -336,12 +336,27 @@ export function useDonationSubmit(
 
       try {
         const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);
-        await paymentService.processPayment(
+        const paymentResponse = await paymentService.processPayment(
           donationId,
           paymentRequest,
           token || undefined,
           paymentKeyRef.current
         );
+
+        if (paymentResponse.status === 'failed') {
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: {
+              code: paymentResponse.errorCode
+                ? (SUBMISSION_ERROR_CODES[
+                    paymentResponse.errorCode as ServiceErrorCode
+                  ] ?? 'paymentFailed')
+                : 'paymentFailed',
+            },
+          }));
+          return;
+        }
 
         donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
         paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
