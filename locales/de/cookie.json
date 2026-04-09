@@ -1,7 +1,7 @@
 {
   "consentModal": {
     "title": "Hallo, es ist Zeit für Cookies!",
-    "description": "Wir verwenden Cookies auf unserer Website. Mit deiner Zustimmung verwenden wir auch Analyse-Cookies. Du kannst deine Zustimmung jederzeit ändern.",
+    "description": "Wir verwenden Cookies auf unserer Website. Mit deiner Zustimmung verwenden wir auch Analyse-Cookies. Du kannst die Zustimmung jederzeit ändern.",
     "acceptAllBtn": "Alle akzeptieren",
     "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Einstellungen verwalten",
@@ -9,7 +9,7 @@
     "footer": "<a href=\"https://www.plant-for-the-planet.org/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/privacy/terms\">Datenschutz</a><a href=\"https://www.plant-for-the-planet.org/terms-and-conditions\">Allgemeine Geschäftsbedingungen</a>"
   },
   "preferencesModal": {
-    "title": "Cookie-Einstellungs Center",
+    "title": "Cookie-Einstellungen",
     "acceptAllBtn": "Alle akzeptieren",
     "acceptNecessaryBtn": "Optionale ablehnen",
     "savePreferencesBtn": "Einstellungen speichern",
@@ -32,7 +32,7 @@
       },
       "moreInfo": {
         "title": "Weitere Informationen",
-        "description": "Wenn du Fragen zu unserer Cookie-Politik und deinen Wahlmöglichkeiten hast, wenden dich bitte an uns."
+        "description": "Wenn du Fragen zu unseren Cookies und deinen Wahlmöglichkeiten hast, wende dich bitte an uns."
       }
     }
   }

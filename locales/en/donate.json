@@ -32,7 +32,6 @@
         "label": "Select Address",
         "placeholder": "Choose an address"
       },
-
       "country": {
         "label": "Country *",
         "placeholder": "Select country",
@@ -40,12 +39,10 @@
         "noResults": "No countries found",
         "selectCountry": "Select Country"
       },
-
       "zipCode": {
         "label": "Zip Code *",
         "placeholder": "Zip code"
       },
-
       "address": {
         "label": "Address *",
         "placeholder": "Street address",
@@ -56,17 +53,14 @@
           "other": "Other"
         }
       },
-
       "address2": {
         "label": "Address Line 2",
         "placeholder": "Apartment, suite, etc."
       },
-
       "city": {
         "label": "City *",
         "placeholder": "City"
       },
-
       "state": {
         "label": "State/Province",
         "placeholder": "State or province"
@@ -134,7 +128,7 @@
         "bankTransferPending": "Bank transfer pending"
       },
       "message": {
-        "completed": "We’ve sent you a donation receipt via email. You can download a tax-deductible confirmation after 60 days.",
+        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
         "bankTransferPending": {
           "monthly": "Your monthly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
           "yearly": "Your yearly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
