@@ -17,7 +17,10 @@ const eslint = new ESLint({
   ],
 });
 
-const results = await eslint.lintFiles(['src/**/*.{ts,tsx}']);
+const targets = process.argv.slice(2);
+const files = targets.length > 0 ? targets : ['src/**/*.{ts,tsx}'];
+
+const results = await eslint.lintFiles(files);
 await ESLint.outputFixes(results);
 
 const fixedFiles = results.filter(r => r.output !== undefined).length;
