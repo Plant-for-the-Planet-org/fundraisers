@@ -15,7 +15,7 @@
     "cards": {
       "myFundraisers": {
         "title": "Meine Spendenaufrufe",
-        "description": "Verwalte deine aktiven Spendenaufrufe",
+        "description": "Verwalte deine aktiven Spendeaufrufe",
         "empty": "Keine aktiven Spendenaufrufe",
         "activeFundraisers": "Aktive Spendenaufrufe"
       },
