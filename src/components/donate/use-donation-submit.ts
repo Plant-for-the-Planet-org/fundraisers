@@ -241,6 +241,7 @@ export function useDonationSubmit(
     ]
   );
 
+  // TODO: PayPal callbacks share submittingRef, donationKeyRef, paymentKeyRef, and the other hook deps with onSubmit. When adding Stripe, consider extracting usePayPalFlow / useStripeFlow as internal composables that receive shared refs/state as arguments, keeping useDonationSubmit as the orchestrator.
   const onPayPalCreateOrder = useCallback(
     async (values: DonationFormValues): Promise<string> => {
       if (submittingRef.current)
