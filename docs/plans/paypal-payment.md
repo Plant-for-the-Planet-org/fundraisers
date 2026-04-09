@@ -28,6 +28,7 @@ Reference implementations:
 - [x] Add `onPayPalCreateOrder` + `onPayPalApproved` + `onPayPalError` to `use-donation-submit.ts`
 - [x] Connect real callbacks in `donate-cta.tsx` and `donate-overlay.tsx`
 - [x] Add PayPal error translation keys to locales
+- [x] Adapt PayPal handlers to `ThankYouState` shape (post thank-you-feature merge)
 
 ---
 
@@ -221,6 +222,42 @@ Add to `SUBMISSION_ERROR_CODES` in `src/lib/types/submission-errors.ts`:
 - `PAYPAL_SDK_ERROR: 'paypalPaymentError'`
 
 Add `PaypalOrderError` to the `instanceof` check in `toSubmitError` in `use-donation-submit.ts`.
+
+---
+
+### Task 9 — Adapt to `ThankYouState` (post thank-you-feature merge)
+
+The `feature/thank-you-screen` branch replaced `isSuccess: boolean` and `donationId: string | null` in `DonationSubmitState` with `thankYouState: ThankYouState | null` (see `docs/thank-you-feature.md`). After merging, the two PayPal handlers required updates:
+
+**`onPayPalCreateOrder`** — reset block used stale fields `isSuccess`, `donationId`, `transferDetails`:
+
+```typescript
+// Before (broken after merge):
+setDonationState(prev => ({
+  ...prev, isLoading: true, isSuccess: false, donationId: null, transferDetails: null, error: null,
+}));
+
+// After:
+setDonationState(prev => ({
+  ...prev, isLoading: true, thankYouState: null, error: null,
+}));
+```
+
+**`onPayPalApproved`** — success block set stale fields instead of `thankYouState`:
+
+```typescript
+// Before (broken after merge):
+setDonationState(prev => ({
+  ...prev, isLoading: false, isSuccess: true, donationId,
+}));
+
+// After:
+setDonationState(prev => ({
+  ...prev, isLoading: false, thankYouState: { status: 'completed', donationId },
+}));
+```
+
+PayPal always maps to `status: 'completed'` — bank transfer pending is not applicable to PayPal.
 
 ---
 

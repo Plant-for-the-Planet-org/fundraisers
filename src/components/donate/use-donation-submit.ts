@@ -250,9 +250,7 @@ export function useDonationSubmit(
       setDonationState(prev => ({
         ...prev,
         isLoading: true,
-        isSuccess: false,
-        donationId: null,
-        transferDetails: null,
+        thankYouState: null,
         error: null,
       }));
 
@@ -350,8 +348,7 @@ export function useDonationSubmit(
         setDonationState(prev => ({
           ...prev,
           isLoading: false,
-          isSuccess: true,
-          donationId,
+          thankYouState: { status: 'completed', donationId },
         }));
       } catch (error) {
         setDonationState(prev => ({
