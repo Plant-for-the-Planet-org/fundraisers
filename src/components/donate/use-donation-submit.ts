@@ -11,6 +11,7 @@ import type {
   DonationSubmitState,
   ThankYouState,
 } from '@/lib/types/donation-submit';
+import type { OnApproveData } from '@paypal/paypal-js';
 
 import { useCallback, useRef, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
@@ -20,9 +21,16 @@ import {
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
 import { submitStandardDonation } from '@/lib/donation/donation-submission';
-import { DonationError } from '@/lib/api/donation-service';
-import { PaymentError } from '@/lib/api/payment-service';
-import { PaymentOptionsError } from '@/lib/utils/payment-request-builder';
+import { donationService, DonationError } from '@/lib/api/donation-service';
+import { paymentService, PaymentError } from '@/lib/api/payment-service';
+import {
+  buildPaymentRequest,
+  PaymentOptionsError,
+} from '@/lib/utils/payment-request-builder';
+import {
+  createPaypalOrder,
+  PaypalOrderError,
+} from '@/lib/api/paypal-order-service';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 
@@ -81,7 +89,8 @@ function toSubmitError(error: unknown): DonationSubmitError {
   if (
     error instanceof DonationError ||
     error instanceof PaymentError ||
-    error instanceof PaymentOptionsError
+    error instanceof PaymentOptionsError ||
+    error instanceof PaypalOrderError
   ) {
     serviceCode = error.code;
   }
@@ -119,6 +128,8 @@ export function useDonationSubmit(
   // Stable idempotency keys across retries
   const donationKeyRef = useRef(generateIdempotencyKeyWithPrefix('donation'));
   const paymentKeyRef = useRef(generateIdempotencyKeyWithPrefix('payment'));
+  // Shares donationId between the two PayPal callbacks
+  const paypalDonationIdRef = useRef<string | null>(null);
 
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
@@ -230,11 +241,172 @@ export function useDonationSubmit(
     ]
   );
 
+  // TODO: PayPal callbacks share submittingRef, donationKeyRef, paymentKeyRef, and the other hook deps with onSubmit. When adding Stripe, consider extracting usePayPalFlow / useStripeFlow as internal composables that receive shared refs/state as arguments, keeping useDonationSubmit as the orchestrator.
+  const onPayPalCreateOrder = useCallback(
+    async (values: DonationFormValues): Promise<string> => {
+      if (submittingRef.current)
+        throw new Error('Submission already in progress');
+      submittingRef.current = true;
+
+      setDonationState(prev => ({
+        ...prev,
+        isLoading: true,
+        thankYouState: null,
+        error: null,
+      }));
+
+      const formData = assembleFormData(
+        donationData,
+        fundraiser,
+        values,
+        isAuthenticated
+      );
+
+      const isPlanetCash =
+        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
+
+      const payload = buildDonationPayload(
+        formData,
+        fundraiser,
+        donorProfile,
+        isPlanetCash
+      );
+
+      try {
+        const donationResponse = await donationService.submitDonation(
+          payload,
+          token || undefined,
+          donationKeyRef.current
+        );
+        paypalDonationIdRef.current = donationResponse.donationId;
+
+        const paypalAccount = paymentOptions.gateways.paypal?.account;
+        if (!paypalAccount) {
+          throw new PaypalOrderError(
+            'Missing PayPal account configuration',
+            'api',
+            'PAYPAL_ACCOUNT_MISSING'
+          );
+        }
+        const orderId = await createPaypalOrder(
+          donationResponse.donationId,
+          paypalAccount,
+          token || undefined
+        );
+
+        return orderId;
+      } catch (error) {
+        setDonationState(prev => ({
+          ...prev,
+          error: toSubmitError(error),
+        }));
+        throw error;
+      } finally {
+        setDonationState(prev => ({ ...prev, isLoading: false }));
+        submittingRef.current = false;
+      }
+    },
+    [
+      donationData,
+      fundraiser,
+      paymentOptions,
+      isAuthenticated,
+      donorProfile,
+      token,
+    ]
+  );
+
+  const onPayPalApproved = useCallback(
+    async (data: OnApproveData): Promise<void> => {
+      const donationId = paypalDonationIdRef.current;
+      if (!donationId) {
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: { code: 'unexpected' },
+        }));
+        submittingRef.current = false;
+        return;
+      }
+
+      const paymentData: PaymentData = {
+        donationId,
+        paymentMethod: 'paypal',
+        paymentDetails: {
+          orderID: data.orderID,
+          payerID: data.payerID ?? undefined,
+          paymentID: data.paymentID ?? undefined,
+          billingToken: data.billingToken ?? undefined,
+          facilitatorAccessToken: data.facilitatorAccessToken ?? undefined,
+        },
+      };
+
+      try {
+        const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);
+        const paymentResponse = await paymentService.processPayment(
+          donationId,
+          paymentRequest,
+          token || undefined,
+          paymentKeyRef.current
+        );
+
+        if (paymentResponse.status === 'failed') {
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: {
+              code: paymentResponse.errorCode
+                ? (SUBMISSION_ERROR_CODES[
+                    paymentResponse.errorCode as ServiceErrorCode
+                  ] ?? 'paymentFailed')
+                : 'paymentFailed',
+            },
+          }));
+          return;
+        }
+
+        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
+        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          thankYouState: { status: 'completed', donationId },
+        }));
+      } catch (error) {
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: toSubmitError(error),
+        }));
+      } finally {
+        submittingRef.current = false;
+      }
+    },
+    [paymentOptions, token]
+  );
+
+  const onPayPalError = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paypalPaymentError' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  return { donationState, onSubmit, reset };
+  return {
+    donationState,
+    onSubmit,
+    onPayPalCreateOrder,
+    onPayPalApproved,
+    onPayPalError,
+    reset,
+  };
 }

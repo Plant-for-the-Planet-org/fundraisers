@@ -105,15 +105,37 @@ export function buildPaymentRequest(
           400
         );
 
-      case 'paypal':
-        // TODO: PayPal source must be built from the PayPal SDK button callback
-        // (orderID, payerID, paymentID, billingToken, facilitatorAccessToken, paymentSource).
-        // paymentDetails alone is insufficient — implement when wiring up the PayPal slice.
-        throw new PaymentOptionsError(
-          'PayPal payment is not yet implemented',
-          'UNKNOWN_PAYMENT_METHOD',
-          400
-        );
+      case 'paypal': {
+        const {
+          orderID,
+          payerID,
+          paymentID,
+          billingToken,
+          facilitatorAccessToken,
+          paymentSource,
+        } = paymentDetails;
+        if (!orderID) {
+          throw new PaymentOptionsError(
+            'Missing PayPal order ID',
+            'MISSING_ORDER_ID',
+            400
+          );
+        }
+        return {
+          gateway: 'paypal',
+          account,
+          method: 'paypal',
+          source: {
+            type: 'server_order',
+            orderID: String(orderID),
+            payerID: String(payerID ?? ''),
+            paymentID: String(paymentID ?? ''),
+            billingToken: billingToken ? String(billingToken) : null,
+            facilitatorAccessToken: String(facilitatorAccessToken ?? ''),
+            paymentSource: String(paymentSource ?? ''),
+          },
+        };
+      }
     }
   } catch (error) {
     if (error instanceof PaymentOptionsError) {
