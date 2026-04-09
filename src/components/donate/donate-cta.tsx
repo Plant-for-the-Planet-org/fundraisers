@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import type { DonationFormValues } from './donation-form-context';
+import type { OnApproveData } from '@paypal/paypal-js';
 
 import { useTranslations } from 'next-intl';
 import { useDonationForm } from './donation-form-context';
@@ -9,20 +10,48 @@ import { Button } from '../ui/button';
 import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
 import { useFormContext, useWatch } from 'react-hook-form';
+import { PayPalButton } from './paypal-button';
 
 interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
+  onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
+  onPayPalApproved?: (data: OnApproveData) => Promise<void>;
+  onPayPalError?: () => void;
 }
 
-export function DonateCTA({ isLoading, isSuccess }: DonateCTAProps) {
+export function DonateCTA({
+  isLoading,
+  isSuccess,
+  onPayPalCreateOrder,
+  onPayPalApproved,
+  onPayPalError,
+}: DonateCTAProps) {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
   const { handleSubmit } = useFormContext<DonationFormValues>();
 
+  const selectedPaymentMethod = useWatch<
+    DonationFormValues,
+    'selectedPaymentMethod'
+  >({
+    name: 'selectedPaymentMethod',
+  });
+
   const makeMonthly = useWatch<DonationFormValues, 'makeMonthly'>({
     name: 'makeMonthly',
   });
+
+  if (selectedPaymentMethod === 'paypal') {
+    return (
+      <PayPalButton
+        isSuccess={isSuccess}
+        onPayPalCreateOrder={onPayPalCreateOrder ?? (() => Promise.resolve(''))}
+        onPayPalApproved={onPayPalApproved ?? (() => Promise.resolve())}
+        onPayPalError={onPayPalError ?? (() => undefined)}
+      />
+    );
+  }
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
   const isYearly = donationData.frequency === 'yearly';

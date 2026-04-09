@@ -78,11 +78,14 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const { onSubmit, donationState, reset } = useDonationSubmit(
-    donationData,
-    fundraiser,
-    paymentOptions
-  );
+  const {
+    onSubmit,
+    donationState,
+    reset,
+    onPayPalCreateOrder,
+    onPayPalApproved,
+    onPayPalError,
+  } = useDonationSubmit(donationData, fundraiser, paymentOptions);
   const { thankYouState, error, isLoading } = donationState;
 
   const leftColumn = thankYouState ? (
@@ -104,7 +107,13 @@ function DonateOverlayInner({
     <>
       <DonationSummary />
       {thankYouState === null && (
-        <DonateCTA isLoading={isLoading} isSuccess={false} />
+        <DonateCTA
+          isLoading={isLoading}
+          isSuccess={false}
+          onPayPalCreateOrder={onPayPalCreateOrder}
+          onPayPalApproved={onPayPalApproved}
+          onPayPalError={onPayPalError}
+        />
       )}
     </>
   );
