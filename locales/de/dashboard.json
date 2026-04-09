@@ -1,5 +1,37 @@
 {
   "Dashboard": {
-    "dashboard": "Dashboard"
+    "statsError": {
+      "title": "Dashboard-Statistiken konnten nicht geladen werden",
+      "description": "Beim Laden deiner Fundraiser-Daten ist etwas schiefgelaufen.",
+      "retry": "Erneut versuchen",
+      "exploreLinkText": "Fundraiser entdecken"
+    },
+    "breadcrumb": {
+      "home": "Startseite"
+    },
+    "dashboard": "Dashboard",
+    "welcome": "Willkommen zurück, {displayName}!",
+    "fallbackName": "dort",
+    "cards": {
+      "myFundraisers": {
+        "title": "Meine Fundraiser",
+        "description": "Verwalte deine aktiven Spendenaktionen",
+        "empty": "Keine aktiven Fundraiser",
+        "activeFundraisers": "Aktive Fundraiser"
+      },
+      "totalRaised": {
+        "title": "Insgesamt gesammelt",
+        "description": "Summe über alle Kampagnen",
+        "value": "Nach Währungen zusammengefasst",
+        "summaryLine": "{amount} aus {count, plural, one {# Spendenaktion} other {# Spendenaktionen}}",
+        "empty": "Keine Mittel gesammelt.",
+        "aggregatedByCurrency": "Nach Währungen zusammengefasst"
+      },
+      "donations": {
+        "title": "Spenden",
+        "description": "Deine Spendenhistorie",
+        "empty": "Noch keine Spenden"
+      }
+    }
   }
 }

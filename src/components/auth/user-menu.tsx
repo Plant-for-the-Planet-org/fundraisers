@@ -92,7 +92,7 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className='cursor-pointer'>
-          <Link href='/dash' className='flex items-center'>
+          <Link href='/dashboard' className='flex items-center'>
             <CreditCard className='mr-2 h-4 w-4' />
             <span>{tDashboard('dashboard')}</span>
           </Link>

@@ -19,6 +19,8 @@ fundraiser/
 │   │       │   └── [category]/
 │   │       │       ├── page.tsx
 │   │       │       └── not-found.tsx
+│   │       ├── dashboard/
+│   │       │   └── page.tsx
 │   │       └── fundraisers/
 │   │           └── create/
 │   │               └── page.tsx
@@ -29,6 +31,7 @@ fundraiser/
 │   │   ├── header/                 # Header component and sub-components
 │   │   ├── footer/                 # Footer component and sub-components
 │   │   ├── explore/                # Explore feature components
+│   │   ├── dashboard/              # Dashboard feature components
 │   │   └── fundraisers/            # Create fundraiser flow components
 │   │
 │   ├── lib/

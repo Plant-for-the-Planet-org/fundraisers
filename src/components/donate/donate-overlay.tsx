@@ -13,9 +13,8 @@ import { DonationSummary } from './donation-summary';
 import { PaymentMethods } from './payment-methods';
 import { DonateCTA } from './donate-cta';
 import { DonationFormProvider } from './donation-form-context';
-import { DonateOptions } from './donate-options';
 import { useDonationSubmit } from './use-donation-submit';
-import { DonationSuccessBanner } from './donation-success-banner';
+import { DonationThankYou } from './donation-thank-you';
 import { DonationFailureBanner } from './donation-failure-banner';
 
 export interface DonationData {
@@ -40,7 +39,7 @@ export function DonateOverlay({
   fundraiser,
   paymentOptions,
 }: DonateOverlayProps) {
-  const mounted = typeof window !== 'undefined';
+  const isClient = typeof window !== 'undefined';
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -49,7 +48,7 @@ export function DonateOverlay({
     };
   }, [isOpen]);
 
-  if (!mounted || !isOpen) return null;
+  if (!isClient || !isOpen) return null;
 
   // Show skeleton while donation data is still being fetched
   if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
@@ -87,7 +86,38 @@ function DonateOverlayInner({
     onPayPalApproved,
     onPayPalError,
   } = useDonationSubmit(donationData, fundraiser, paymentOptions);
-  const { isSuccess, donationId, error, isLoading } = donationState;
+  const { thankYouState, error, isLoading } = donationState;
+
+  const leftColumn = thankYouState ? (
+    <DonationThankYou
+      thankYouState={thankYouState}
+      fundraiserSlug={fundraiser.slug}
+    />
+  ) : (
+    <>
+      {error?.code && (
+        <DonationFailureBanner errorCode={error.code} reset={reset} />
+      )}
+      <DonorInfo />
+      <PaymentMethods />
+    </>
+  );
+
+  const rightColumn = (
+    <>
+      <DonationSummary />
+      {thankYouState === null && (
+        <DonateCTA
+          isLoading={isLoading}
+          isSuccess={false}
+          onPayPalCreateOrder={onPayPalCreateOrder}
+          onPayPalApproved={onPayPalApproved}
+          onPayPalError={onPayPalError}
+        />
+      )}
+    </>
+  );
+
   return createPortal(
     <DonationFormProvider
       fundraiser={fundraiser}
@@ -98,33 +128,8 @@ function DonateOverlayInner({
     >
       <DonateOverlayLayout
         onClose={onClose}
-        leftColumn={
-          <>
-            {error?.code !== undefined && (
-              <DonationFailureBanner errorCode={error?.code} reset={reset} />
-            )}
-            {isSuccess && donationId !== null && (
-              <DonationSuccessBanner donationId={donationId} />
-            )}
-            <DonorInfo />
-            {/* Custom Fields Section - future implementation */}
-            <PaymentMethods />
-          </>
-        }
-        rightColumn={
-          <>
-            {/* Dedication - future implementation */}
-            <DonationSummary />
-            <DonateOptions />
-            <DonateCTA
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-              onPayPalCreateOrder={onPayPalCreateOrder}
-              onPayPalApproved={onPayPalApproved}
-              onPayPalError={onPayPalError}
-            />
-          </>
-        }
+        leftColumn={leftColumn}
+        rightColumn={rightColumn}
       />
     </DonationFormProvider>,
     document.body
