@@ -1,8 +1,7 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { Slot } from 'radix-ui';
 import { ChevronRight } from 'lucide-react';
-
+import { Slot } from 'radix-ui';
 import { cn } from '@/lib/utils';
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<'nav'>) {
@@ -126,9 +125,9 @@ function BreadcrumbTrail({
 
 export {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbTrail,

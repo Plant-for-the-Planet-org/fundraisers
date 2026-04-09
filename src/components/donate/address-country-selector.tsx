@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getAllCountries, searchCountries } from '@/lib/utils/country';
-import { FormField } from './form-field';
-import { Input } from '../ui/input';
 import { CountryFlag } from '../ui/country-flag';
+import { Input } from '../ui/input';
+import { FormField } from './form-field';
 
 type AddressCountrySelectorProps = {
   country: string | undefined;

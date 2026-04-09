@@ -1,8 +1,8 @@
 import type { UserProfile } from '@/lib/api/user-service';
 
 import { create } from 'zustand';
-import { userService } from '@/lib/api/user-service';
 import { devtools } from 'zustand/middleware';
+import { userService } from '@/lib/api/user-service';
 
 interface User {
   sub: string;

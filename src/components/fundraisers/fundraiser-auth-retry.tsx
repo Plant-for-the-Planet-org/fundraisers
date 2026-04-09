@@ -1,14 +1,15 @@
 'use client';
 
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
+
 import { useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
-import { useAuthStore } from '@/stores/authStore';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { buildTheme } from '@/lib/theme/build-theme';
+import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/theme-store';
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentOptions } from '@/lib/types/payment-options';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
 export function FundraiserAuthRetry({ slug }: { slug: string }) {

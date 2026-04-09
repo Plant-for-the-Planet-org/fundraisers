@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { ThemeShell } from '@/components/theme/theme-shell';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { MainContent } from '@/components/ui/main-content';
+
 import { Toaster } from 'sonner';
+import { Footer } from '@/components/footer';
+import { Header } from '@/components/header';
+import { ThemeShell } from '@/components/theme/theme-shell';
+import { MainContent } from '@/components/ui/main-content';
 
 export default function StandardLayout({ children }: { children: ReactNode }) {
   return (

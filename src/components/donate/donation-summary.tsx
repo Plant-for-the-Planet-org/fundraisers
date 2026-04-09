@@ -1,16 +1,17 @@
 'use client';
 
+import type { DonationFormValues } from './donation-form-context';
+
 import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { useDonationForm } from './donation-form-context';
-import type { DonationFormValues } from './donation-form-context';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils/index';
 import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
+import { cn } from '@/lib/utils/index';
+import { Avatar, AvatarFallback,AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { useDonationForm } from './donation-form-context';
 
 export function DonationSummary() {
   const { fundraiser, donationData, paymentOptions } = useDonationForm();

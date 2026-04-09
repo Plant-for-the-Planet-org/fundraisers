@@ -1,13 +1,13 @@
 'use client';
 
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from '../donate/donate-overlay';
 
 import { useState } from 'react';
-import { DonationForm } from './donation-form';
-import { DonateOverlay } from '../donate/donate-overlay';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentOptions } from '@/lib/types/payment-options';
+import { DonateOverlay } from '../donate/donate-overlay';
+import { DonationForm } from './donation-form';
 
 interface DonationSectionProps {
   fundraiser: Fundraiser;

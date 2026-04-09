@@ -1,10 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { useWatch } from 'react-hook-form';
-import { SectionHeader } from './typography';
-import { DonationForm } from './donation-form';
+import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
+import { DonationForm } from './donation-form';
+import { SectionHeader } from './typography';
 
 export function ContributionSettings() {
   const t = useTranslations('Fundraisers.create.contributionSettings');

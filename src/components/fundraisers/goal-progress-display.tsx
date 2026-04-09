@@ -1,5 +1,5 @@
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { useTranslations } from 'next-intl';
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 interface GoalProgressDisplayProps {
   raisedAmount: number;

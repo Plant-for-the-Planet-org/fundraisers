@@ -3,10 +3,10 @@ import type { DonationFormValues } from './donation-form-context';
 
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { AddressSelector } from './address-selector';
-import { AddressForm } from './address-form';
-import { useAuthStore } from '@/stores/authStore';
 import { getPrimaryAddress } from '@/lib/utils/profile';
+import { useAuthStore } from '@/stores/authStore';
+import { AddressForm } from './address-form';
+import { AddressSelector } from './address-selector';
 
 export function AddressSection() {
   const { watch, setValue, resetField } = useFormContext<DonationFormValues>();

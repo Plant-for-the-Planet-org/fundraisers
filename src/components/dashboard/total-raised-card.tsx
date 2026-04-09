@@ -2,9 +2,8 @@
 
 import type { DashboardRaisedSummary } from '@/lib/api/fundraisers-service';
 
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { useLocale, useTranslations } from 'next-intl';
-
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { CardBase } from './card-base';
 
 interface TotalRaisedCardProps {

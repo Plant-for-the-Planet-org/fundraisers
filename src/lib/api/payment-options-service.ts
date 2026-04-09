@@ -1,4 +1,5 @@
 import type { PaymentOptions } from '@/lib/types/payment-options';
+
 import { platformAPIClient } from './external-client';
 
 export async function getPaymentOptions(

@@ -1,5 +1,5 @@
-import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 import type { DonationFrequency } from '@/lib/types/donation';
+import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 import type { BankAccountDetails } from './payment';
 
 // Discriminated union for thank-you screen variants

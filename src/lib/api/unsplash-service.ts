@@ -1,10 +1,10 @@
-import { createApi } from 'unsplash-js';
-
-import { getImageCategoriesFallback } from '@/lib/constants/image-categories';
 import type {
   UnsplashPhoto,
   UnsplashSearchResponse,
 } from '@/lib/types/image-selection';
+
+import { createApi } from 'unsplash-js';
+import { getImageCategoriesFallback } from '@/lib/constants/image-categories';
 
 const DEFAULT_FALLBACK_QUERY = 'fundraising community charity helping';
 

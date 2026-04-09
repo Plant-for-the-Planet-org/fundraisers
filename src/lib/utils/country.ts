@@ -4,10 +4,9 @@
  */
 
 import countries from 'i18n-iso-countries';
-
+import deLocale from 'i18n-iso-countries/langs/de.json';
 // Register supported locales
 import enLocale from 'i18n-iso-countries/langs/en.json';
-import deLocale from 'i18n-iso-countries/langs/de.json';
 
 // Register the locales
 countries.registerLocale(enLocale);

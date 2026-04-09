@@ -1,4 +1,5 @@
 import type { UserType } from '@planet-sdk/common';
+
 import { platformAPIClient, PlatformAPIError } from './external-client';
 
 export interface Address {

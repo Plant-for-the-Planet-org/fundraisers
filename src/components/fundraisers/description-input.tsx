@@ -1,11 +1,12 @@
 'use client';
 
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+
+import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
-import { Controller, useFormContext } from 'react-hook-form';
 
 export default function DescriptionInput() {
   const t = useTranslations('Fundraisers.create.description');

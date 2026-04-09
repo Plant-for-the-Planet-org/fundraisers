@@ -1,15 +1,15 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { DonationFormValues } from './donation-form-context';
 import type { OnApproveData } from '@paypal/paypal-js';
+import type { DonationFormValues } from './donation-form-context';
 
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { useDonationForm } from './donation-form-context';
 import { Button } from '../ui/button';
 import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useDonationForm } from './donation-form-context';
 import { PayPalButton } from './paypal-button';
 
 interface DonateCTAProps {

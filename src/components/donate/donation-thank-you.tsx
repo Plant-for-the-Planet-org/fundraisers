@@ -4,9 +4,9 @@ import type { ThankYouState } from '@/lib/types/donation-submit';
 
 import { useLocale } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
 import { TransferDetailsList } from './transfer-details-list';
-import { ShareSection } from './share-section';
 
 interface DonationThankYouProps {
   thankYouState: ThankYouState;

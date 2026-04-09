@@ -2,12 +2,12 @@
 
 import type { Dispatch, SetStateAction } from 'react';
 
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { buildUniversalLoginAuthorizeUrl } from '@/lib/auth/auth0-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { buildUniversalLoginAuthorizeUrl } from '@/lib/auth/auth0-config';
-import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 
 interface EmailSignInFormProps {
   email: string;

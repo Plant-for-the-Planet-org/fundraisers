@@ -1,13 +1,14 @@
 'use client';
 
+import type { ReactNode } from 'react';
+import type { Theme } from '@/lib/theme/types';
+
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
-import { getThemeForPath } from '@/lib/theme/route-themes';
-import { getFontStack } from '@/lib/theme/font-utils';
 import { getAccentColor } from '@/lib/theme/accent-utils';
+import { getFontStack } from '@/lib/theme/font-utils';
+import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
-import type { Theme } from '@/lib/theme/types';
 
 export function ThemeShell({
   children,

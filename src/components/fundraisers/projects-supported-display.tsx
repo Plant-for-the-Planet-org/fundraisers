@@ -5,8 +5,8 @@ import type { ProjectAllocation } from '@/lib/types/fundraiser';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { SectionHeader } from '@/components/fundraisers/typography';
 import { getImageUrl } from '@/lib/utils/images';
+import { SectionHeader } from '@/components/fundraisers/typography';
 
 const DESCRIPTION_TRUNCATION_THRESHOLD = 180;
 

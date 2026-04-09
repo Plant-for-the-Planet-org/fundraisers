@@ -1,14 +1,15 @@
 'use client';
 
+import type { DonationFormValues } from './donation-form-context';
+
 import { useMemo } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
+import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { useDonationForm } from './donation-form-context';
-import type { DonationFormValues } from './donation-form-context';
 
 export function DonateOptions() {
   const { control } = useFormContext<DonationFormValues>();

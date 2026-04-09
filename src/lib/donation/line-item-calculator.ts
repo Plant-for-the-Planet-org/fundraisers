@@ -1,5 +1,5 @@
-import type { ProjectAllocation } from '../types/fundraiser';
 import type { LineItem } from '../types/donation';
+import type { ProjectAllocation } from '../types/fundraiser';
 
 export interface LineItemCalculationResult {
   lineItems: LineItem[];
