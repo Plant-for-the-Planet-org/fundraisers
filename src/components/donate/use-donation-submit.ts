@@ -280,7 +280,14 @@ export function useDonationSubmit(
         );
         paypalDonationIdRef.current = donationResponse.donationId;
 
-        const paypalAccount = paymentOptions.gateways.paypal?.account ?? '';
+        const paypalAccount = paymentOptions.gateways.paypal?.account;
+        if (!paypalAccount) {
+          throw new PaypalOrderError(
+            'Missing PayPal account configuration',
+            'api',
+            'PAYPAL_ACCOUNT_MISSING'
+          );
+        }
         const orderId = await createPaypalOrder(
           donationResponse.donationId,
           paypalAccount,
