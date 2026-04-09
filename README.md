@@ -55,6 +55,7 @@ When adding or upgrading a package, review the `package-lock.json` diff carefull
 | `start`        | Start the production server                 |
 | `lint`         | Run ESLint                                  |
 | `lint:fix`     | Run ESLint and auto-fix                     |
+| `imports:sort` | Sort imports across `src/` (or pass a path) |
 | `format`       | Format all source files with Prettier       |
 | `format:check` | Check formatting without writing            |
 | `type-check`   | TypeScript type check (no emit)             |
@@ -70,6 +71,12 @@ When adding or upgrading a package, review the `package-lock.json` diff carefull
 
 - Clean up `console.log` before merging; `console.warn` and `console.error` are allowed
 - Unused variables must be prefixed with `_` to suppress the warning
+
+**Import order** — Imports are enforced in two groups: type imports first, then value imports, with CSS/side-effect imports last. Each group is separated by a blank line. Within each group, `next`/`next-intl` imports come first, followed by other external packages, then internal `@/` paths, then relative imports.
+
+- `npm run imports:sort` — fix the whole `src/` directory
+- `npm run imports:sort src/some/file.ts` — fix a specific file or folder
+- Saving a file in VSCode auto-fixes import order (requires the ESLint extension)
 
 **Spell checking** — cspell is configured in `cspell.json`. Run `npm run find-typos` to surface unrecognized words. If a word is a false positive (technical term, proper noun, abbreviation), add it to the `words` array in `cspell.json`.
 
