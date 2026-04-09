@@ -1,10 +1,10 @@
 {
   "Dashboard": {
     "statsError": {
-      "title": "Dashboard-Statistiken konnten nicht geladen werden",
-      "description": "Beim Laden deiner Fundraiser-Daten ist etwas schiefgelaufen.",
+      "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
+      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schief gelaufen.",
       "retry": "Erneut versuchen",
-      "exploreLinkText": "Fundraiser entdecken"
+      "exploreLinkText": "Spendenaufrufe entdecken"
     },
     "breadcrumb": {
       "home": "Startseite"
@@ -14,22 +14,22 @@
     "fallbackName": "dort",
     "cards": {
       "myFundraisers": {
-        "title": "Meine Fundraiser",
-        "description": "Verwalte deine aktiven Spendenaktionen",
-        "empty": "Keine aktiven Fundraiser",
-        "activeFundraisers": "Aktive Fundraiser"
+        "title": "Meine Spendenaufrufe",
+        "description": "Verwalte deine aktiven Spendenaufrufe",
+        "empty": "Keine aktiven Spendenaufrufe",
+        "activeFundraisers": "Aktive Spendenaufrufe"
       },
       "totalRaised": {
         "title": "Insgesamt gesammelt",
-        "description": "Summe über alle Kampagnen",
-        "value": "Nach Währungen zusammengefasst",
-        "summaryLine": "{amount} aus {count, plural, one {# Spendenaktion} other {# Spendenaktionen}}",
-        "empty": "Keine Mittel gesammelt.",
-        "aggregatedByCurrency": "Nach Währungen zusammengefasst"
+        "description": "Gesamtbetrag, der über alle Aufrufe gesammelt wurde",
+        "value": "Zusammengefasst nach Währung",
+        "summaryLine": "{amount} von {count, plural, one {# Spendenaufruf} other {# Spendenaufrufen}}",
+        "empty": "Keine Spenden gesammelt",
+        "aggregatedByCurrency": "Zusammengefasst nach Währung"
       },
       "donations": {
         "title": "Spenden",
-        "description": "Deine Spendenhistorie",
+        "description": "Dein Spendenverlauf",
         "empty": "Noch keine Spenden"
       }
     }
