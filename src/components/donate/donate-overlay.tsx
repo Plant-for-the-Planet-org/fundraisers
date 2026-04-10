@@ -3,9 +3,13 @@
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocale } from 'next-intl';
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '@/lib/utils/get-stripe';
 import { DonateCTA } from './donate-cta';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 import { DonateOverlaySkeleton } from './donate-overlay-skeleton';
@@ -78,6 +82,14 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
+  const locale = useLocale();
+  const sepaFormRef = useRef<StripeSepaFormHandle>(null);
+
+  const stripeConfig = paymentOptions.gateways.stripe;
+  const stripePromise = stripeConfig
+    ? getStripe(stripeConfig.authorization.stripePublishableKey, locale)
+    : null;
+
   const {
     onSubmit,
     donationState,
@@ -85,7 +97,7 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
-  } = useDonationSubmit(donationData, fundraiser, paymentOptions);
+  } = useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef);
   const { thankYouState, error, isLoading } = donationState;
 
   const leftColumn = thankYouState ? (
@@ -119,19 +131,22 @@ function DonateOverlayInner({
   );
 
   return createPortal(
-    <DonationFormProvider
-      fundraiser={fundraiser}
-      donationData={donationData}
-      paymentOptions={paymentOptions}
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-    >
-      <DonateOverlayLayout
-        onClose={onClose}
-        leftColumn={leftColumn}
-        rightColumn={rightColumn}
-      />
-    </DonationFormProvider>,
+    <Elements stripe={stripePromise}>
+      <DonationFormProvider
+        fundraiser={fundraiser}
+        donationData={donationData}
+        paymentOptions={paymentOptions}
+        onSubmit={onSubmit}
+        sepaFormRef={sepaFormRef}
+        isOpen={isOpen}
+      >
+        <DonateOverlayLayout
+          onClose={onClose}
+          leftColumn={leftColumn}
+          rightColumn={rightColumn}
+        />
+      </DonationFormProvider>
+    </Elements>,
     document.body
   );
 }

@@ -2,6 +2,7 @@ import type {
   PaymentData,
   PaymentMethod,
   PaymentRequest,
+  StripePaymentMethod,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
@@ -96,14 +97,22 @@ export function buildPaymentRequest(
           source: {},
         };
 
-      case 'stripe':
-        // TODO: Implement Stripe payment source from Stripe Elements ref (paymentMethodId/sourceId).
-        // Also handle savedMethod for saved cards/SEPA.
-        throw new PaymentOptionsError(
-          'Stripe payment is not yet implemented',
-          'UNKNOWN_PAYMENT_METHOD',
-          400
-        );
+      case 'stripe': {
+        const id = paymentDetails.paymentMethodId || paymentDetails.sourceId;
+        if (!id) {
+          throw new PaymentOptionsError(
+            'Missing payment method ID for Stripe payment',
+            'MISSING_PAYMENT_METHOD_ID',
+            400
+          );
+        }
+        return {
+          gateway: 'stripe',
+          account,
+          method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+          source: { id: String(id), object: 'payment_method' },
+        };
+      }
 
       case 'paypal': {
         const {
