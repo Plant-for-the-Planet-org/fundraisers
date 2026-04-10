@@ -52,11 +52,14 @@ function normalizeProject(project: unknown): ProjectData | null {
 }
 
 export class ProjectsService {
-  async getProjects(country?: string): Promise<ProjectData[]> {
+  async getProjects(country?: string, locale?: string): Promise<ProjectData[]> {
     const url = new URL(`${API_BASE_URL}/projects`);
 
     if (country) {
       url.searchParams.append('country', country);
+    }
+    if (locale) {
+      url.searchParams.append('locale', locale);
     }
 
     const response = await fetch(url.toString(), {
@@ -79,8 +82,11 @@ export class ProjectsService {
     return projects.map(normalizeProject).filter(project => project !== null);
   }
 
-  async getCauseSelectableProjects(country?: string): Promise<ProjectData[]> {
-    const projects = await this.getProjects(country);
+  async getCauseSelectableProjects(
+    country?: string,
+    locale?: string
+  ): Promise<ProjectData[]> {
+    const projects = await this.getProjects(country, locale);
 
     return projects.filter(project => project.allowDonations === true);
   }

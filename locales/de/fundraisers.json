@@ -181,7 +181,7 @@
         "viewModeSectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}%-Zuweisung",
+        "allocationLabel": "{percentage, number}% Zuweisung",
         "projectImageAlt": "Bild für {name}",
         "expandDescription": "Mehr lesen",
         "collapseDescription": "Weniger lesen",
