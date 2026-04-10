@@ -1,8 +1,10 @@
 import type { NextConfig } from 'next';
+
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  poweredByHeader: false,
   redirects: async () => {
     return [
       {
@@ -23,6 +25,7 @@ const withNextIntl = createNextIntlPlugin({
       './locales/en/fundraisers.json',
       './locales/en/auth.json',
       './locales/en/dashboard.json',
+      './locales/en/donate.json',
     ],
   },
 });

@@ -5,12 +5,13 @@
     "languageSelectionLabel": "Sprache:",
     "legalLinks": {
       "privacy": "Datenschutz",
-      "terms": "AGB",
+      "terms": "Allgemeine Geschäftsbedingungen",
       "imprint": "Impressum"
     },
+    "cookieSettings": "Cookie-Einstellungen",
     "headerLinks": {
-      "explore": "Fundraiser Entdecken",
-      "startFundraiser": "Fundraiser erstellen"
+      "explore": "Spendenaufrufe entdecken",
+      "startFundraiser": "Spendenaufruf erstellen"
     }
   }
 }

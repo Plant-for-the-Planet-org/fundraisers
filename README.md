@@ -13,7 +13,7 @@ The Plant-for-the-Planet fundraisers frontend. Built with Next.js App Router and
 ```bash
 git clone <repo-url>
 cd fundraisers
-npm install
+npm ci
 ```
 
 Copy `.env.example` to `.env.local` and fill in the values:
@@ -32,6 +32,20 @@ Open [http://localhost:3000](http://localhost:3000) — the root redirects to `/
 
 ---
 
+## Dependency Management
+
+Always use `npm ci` to install dependencies unless you are deliberately adding or upgrading a package. `npm ci` installs exactly what is in `package-lock.json` and never modifies it.
+
+| Situation              | Command                           |
+| ---------------------- | --------------------------------- |
+| Day-to-day development | `npm ci`                          |
+| Adding a new package   | `npm install <package>`           |
+| Upgrading a package    | `npm install <package>@<version>` |
+
+When adding or upgrading a package, review the `package-lock.json` diff carefully before committing — it should only change in ways you expect.
+
+---
+
 ## Available Scripts
 
 | Script         | Description                                 |
@@ -41,6 +55,7 @@ Open [http://localhost:3000](http://localhost:3000) — the root redirects to `/
 | `start`        | Start the production server                 |
 | `lint`         | Run ESLint                                  |
 | `lint:fix`     | Run ESLint and auto-fix                     |
+| `imports:sort` | Sort imports project-wide (or pass a path)  |
 | `format`       | Format all source files with Prettier       |
 | `format:check` | Check formatting without writing            |
 | `type-check`   | TypeScript type check (no emit)             |
@@ -56,6 +71,12 @@ Open [http://localhost:3000](http://localhost:3000) — the root redirects to `/
 
 - Clean up `console.log` before merging; `console.warn` and `console.error` are allowed
 - Unused variables must be prefixed with `_` to suppress the warning
+
+**Import order** — Imports are enforced in two groups: type imports first, then value imports, with CSS/side-effect imports last. Each group is separated by a blank line. Within each group, `next`/`next-intl` imports come first, followed by other external packages, then internal `@/` paths, then relative imports.
+
+- `npm run imports:sort` — fix the whole project
+- `npm run imports:sort src/some/file.ts` — fix a specific file or folder
+- Saving a file in VSCode auto-fixes import order (requires the ESLint extension)
 
 **Spell checking** — cspell is configured in `cspell.json`. Run `npm run find-typos` to surface unrecognized words. If a word is a false positive (technical term, proper noun, abbreviation), add it to the `words` array in `cspell.json`.
 

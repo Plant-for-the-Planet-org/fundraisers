@@ -1,6 +1,6 @@
-import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { hasLocale } from 'next-intl';
+import { getRequestConfig } from 'next-intl/server';
 import { routing } from './routing';
 
 export default getRequestConfig(async () => {
@@ -21,6 +21,7 @@ export default getRequestConfig(async () => {
       ...(await import(`../../locales/${locale}/fundraisers.json`)).default,
       ...(await import(`../../locales/${locale}/auth.json`)).default,
       ...(await import(`../../locales/${locale}/dashboard.json`)).default,
+      ...(await import(`../../locales/${locale}/donate.json`)).default,
     },
   };
 });

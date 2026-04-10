@@ -4,7 +4,7 @@ export const HEADER_LINKS = [
     labelKey: 'explore',
   },
   {
-    href: '/dash/raise/new',
+    href: '/fundraisers/create',
     labelKey: 'startFundraiser',
   },
 ] as const;

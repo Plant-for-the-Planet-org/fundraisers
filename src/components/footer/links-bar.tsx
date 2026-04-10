@@ -1,4 +1,7 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
+import { CookieSettingsButton } from '../cookie/cookie-settings-button';
 import { FOOTER_LINKS } from './config';
 
 export function LinksBar() {
@@ -24,8 +27,8 @@ export function LinksBar() {
             </a>
           </li>
         ))}
-        {/* <span className='text-zinc-300'>•</span> */}
-        {/* CookieSettings */}
+        <span className='text-zinc-300'>•</span>
+        <CookieSettingsButton className='text-xs text-zinc-500 hover:text-zinc-700 p-0 h-auto' />
       </ul>
     </nav>
   );

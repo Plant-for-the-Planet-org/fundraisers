@@ -1,43 +1,43 @@
 {
   "Explore": {
-    "title": "Entdecke Fundraiser",
-    "description": "Entdecke beliebte Fundraiser in deiner Nähe oder stöbere nach Kategorien.",
+    "title": "Spendenaufrufe entdecken",
+    "description": "Entdecke beliebte Spendenaufrufe in deiner Nähe oder stöbere in Kategorien.",
     "categories": {
-      "title": "Nach Kategorien stöbern",
+      "title": "In Kategorien stöbern",
       "loading": "Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
-      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
+      "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
     "featuredFundraisers": {
-      "title": "Beliebte Fundraiser",
+      "title": "Beliebte Spendenaufrufe",
       "tabs": {
         "popular": "Beliebt",
-        "gross": "Meiste Spenden"
+        "gross": "Größtes Spendenaufkommen"
       },
-      "noFundraisersFound": "Derzeit sind keine Fundraiser verfügbar."
+      "noFundraisersFound": "Derzeit sind keine Spendenaufrufe verfügbar."
     },
     "fundraiserCities": {
-      "title": "Fundraiser in der Nähe",
-      "loading": "Fundraiser in der Nähe werden geladen",
-      "noCategoriesFound": "Derzeit sind keine Fundraiser in der Nähe verfügbar.",
-      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}"
+      "title": "Spendenaufrufe in deiner Nähe",
+      "loading": "Spendenaufrufe in deiner Nähe werden geladen",
+      "noCategoriesFound": "Derzeit sind keine Spendenaufrufe in deiner Nähe verfügbar.",
+      "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
     "categoryPage": {
-      "fundraiserCount": "{count, plural, =0 {0 Fundraiser} one {1 Fundraiser} other {{formattedCount} Fundraiser}}",
+      "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}",
       "fundraisers": {
-        "title": "Fundraiser",
+        "title": "Spendenaufruf",
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",
-          "gross": "Meiste Spenden"
+          "gross": "Größtes Spendenvolumen"
         },
-        "noFundraisersFound": "Keine Fundraiser gefunden",
-        "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Fundraiser in dieser Kategorie."
+        "noFundraisersFound": "Keine Spendenaufrufe gefunden",
+        "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Spendenaufrufe in dieser Kategorie."
       },
       "notFound": {
-        "title": "Seite nicht gefunden",
+        "title": "Seite wurde nicht gefunden",
         "description": "Diese Seite existiert nicht oder wurde möglicherweise entfernt.",
-        "exploreLinkText": "Fundraiser entdecken"
+        "exploreLinkText": "Spendenaufrufe entdecken"
       }
     }
   }

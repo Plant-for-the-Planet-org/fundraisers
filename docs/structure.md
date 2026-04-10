@@ -2,41 +2,58 @@
 
 > This is a living document. Update it when the directory structure or conventions change.
 
-```
-fundraisers/
+```text
+fundraiser/
 ├── src/
 │   ├── app/                        # Next.js App Router routes
 │   │   ├── layout.tsx              # Root layout — font loading, theme mode
 │   │   ├── globals.css             # Global styles, Tailwind theme config (@theme)
 │   │   ├── page.tsx                # Root — redirects to /explore
-│   │   └── (standard)/            # Route group: shared header/footer layout
-│   │       └── explore/
-│   │           ├── page.tsx
-│   │           └── [category]/
-│   │               ├── page.tsx
-│   │               └── not-found.tsx
+│   │   ├── api/
+│   │   │   └── images/
+│   │   │       └── unsplash/
+│   │   │           └── route.ts    # Server proxy for Unsplash image APIs
+│   │   └── (standard)/             # Route group: shared header/footer layout
+│   │       ├── explore/
+│   │       │   ├── page.tsx
+│   │       │   └── [category]/
+│   │       │       ├── page.tsx
+│   │       │       └── not-found.tsx
+│   │       ├── dashboard/
+│   │       │   └── page.tsx
+│   │       └── fundraisers/
+│   │           └── create/
+│   │               └── page.tsx
 │   │
 │   ├── components/
 │   │   ├── ui/                     # Reusable UI primitives (no business logic)
 │   │   ├── theme/                  # Theme context provider
 │   │   ├── header/                 # Header component and sub-components
 │   │   ├── footer/                 # Footer component and sub-components
-│   │   └── explore/                # Explore feature components
+│   │   ├── explore/                # Explore feature components
+│   │   ├── dashboard/              # Dashboard feature components
+│   │   └── fundraisers/            # Create fundraiser flow components
 │   │
 │   ├── lib/
-│   │   ├── api/                    # API service classes
-│   │   ├── constants/              # App-wide constants (validated with Zod)
+│   │   ├── api/                    # API service classes (categories, unsplash)
+│   │   ├── constants/              # App-wide constants
 │   │   ├── theme/                  # Theme types, registry, and utilities
-│   │   ├── types/                  # Shared TypeScript interfaces
-│   │   └── utils/                  # Pure utility functions
+│   │   ├── types/                  # Shared TypeScript interfaces and form contracts
+│   │   └── utils/                  # Pure utility functions (formatting, image helpers)
 │   │
 │   ├── stores/                     # Zustand state stores
 │   ├── i18n/                       # next-intl routing and request config
 │   └── proxy.ts                    # Sets x-pathname header for server components
 │
 ├── locales/                        # Translation files
-│   ├── en/common.json
-│   └── de/common.json
+│   ├── en/
+│   │   ├── common.json
+│   │   ├── explore.json
+│   │   └── fundraisers.json
+│   └── de/
+│       ├── common.json
+│       ├── explore.json
+│       └── fundraisers.json
 │
 ├── docs/                           # Project documentation
 ├── public/                         # Static assets
@@ -53,7 +70,7 @@ fundraisers/
 
 **`src/stores/`** — Zustand stores for client-side state that needs to persist or be shared across the tree (e.g. locale).
 
-**`locales/`** — Translation files at the root level, outside `src/`. Add new keys to both `en/common.json` and `de/common.json` together.
+**`locales/`** — Translation files at the root level, outside `src/`. Add feature keys in both `en/*` and `de/*` files together.
 
 ## Component Co-location
 
@@ -69,3 +86,18 @@ components/explore/
 ```
 
 Keep server components (data fetching, async) and client components (`'use client'`) in the same folder — the file name and directive make the distinction clear without needing a naming suffix.
+
+## Recent Additions (Create Fundraiser Project Selection)
+
+```text
+src/
+├── components/fundraisers/
+│   ├── create-fundraiser-form-context.tsx
+│   ├── project-selection.tsx
+│   └── project-selection-overlay.tsx
+└── lib/
+    ├── api/projects-service.ts
+    ├── constants/project-selection.ts
+    ├── types/project-selection.ts
+    └── utils/project-selection.ts
+```

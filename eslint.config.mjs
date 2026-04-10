@@ -3,6 +3,7 @@ import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTypescript from 'eslint-config-next/typescript';
 import prettierConfig from 'eslint-config-prettier';
 import prettierPlugin from 'eslint-plugin-prettier';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -11,8 +12,44 @@ const eslintConfig = defineConfig([
   {
     plugins: {
       prettier: prettierPlugin,
+      'simple-import-sort': simpleImportSort,
     },
     rules: {
+      // Import sorting
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // Group 1: type imports
+            [
+              '^react.*\\u0000$',
+              '^next.*\\u0000$', // matches next/* and next-intl (alphabetical: next < next-intl)
+              '^[^@.].*\\u0000$', // other external (non-scoped)
+              '^@(?!/).*\\u0000$', // scoped external (@radix-ui, etc.)
+              '^@/lib/.*\\u0000$',
+              '^@/stores/.*\\u0000$',
+              '^@/components/.*\\u0000$',
+              '.*\\u0000$', // remaining (other @/ paths, relative)
+            ],
+            // Group 2: value imports
+            [
+              '^react',
+              '^next', // matches next/* and next-intl (alphabetical: next < next-intl)
+              '^[^@.\\u0000]', // other external (non-scoped)
+              '^@(?!/)', // scoped external
+              '^@/lib/',
+              '^@/stores/',
+              '^@/components/',
+              '^\\.\\.', // relative parent (../)
+              '^\\./', // relative sibling (./)
+            ],
+            // Group 3: side-effect imports (CSS, bare imports)
+            ['^\\u0000'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
+
       // Prettier rules
       'prettier/prettier': 'error',
 
@@ -52,6 +89,7 @@ const eslintConfig = defineConfig([
     'coverage/**',
     'next-env.d.ts',
     '*.tsbuildinfo',
+    'locales/**/*.d.json.ts',
   ]),
 ]);
 

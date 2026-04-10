@@ -5,6 +5,7 @@
 
 import type { Category } from '@/lib/types/category';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+
 import { API_BASE_URL } from '@/lib/constants/app-config';
 
 export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {

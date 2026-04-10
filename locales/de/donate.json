@@ -1,0 +1,163 @@
+{
+  "Donate": {
+    "preferences": {
+      "anonymousDonationLabel": "Mache meine Spende anonym",
+      "anonymousDonationDescription": "Dein Name wird nicht öffentlich auf der Seite des Spendenaufrufs gezeigt."
+    },
+    "yourInfo": "Deine Informationen",
+    "organization": "(Organisation)",
+    "donorIdentity": {
+      "companyDonation": {
+        "label": "Diese Spende ist von einem Unternehmen"
+      },
+      "companyName": {
+        "label": "Firmenname *",
+        "placeholder": "Firmenname eingeben"
+      },
+      "email": {
+        "label": "E-Mail *",
+        "placeholder": "E-Mail eingeben"
+      },
+      "firstName": {
+        "label": "Vorname *",
+        "placeholder": "Vorname"
+      },
+      "lastName": {
+        "label": "Nachname *",
+        "placeholder": "Nachname"
+      }
+    },
+    "userAddress": {
+      "selectAddress": {
+        "label": "Adresse auswählen",
+        "placeholder": "Wähle eine Adresse aus"
+      },
+      "country": {
+        "label": "Land *",
+        "placeholder": "Land auswählen",
+        "searchPlaceholder": "Länder durchsuchen",
+        "noResults": "Keine Länder gefunden",
+        "selectCountry": "Land auswählen"
+      },
+      "zipCode": {
+        "label": "Postleitzahl *",
+        "placeholder": "Postleitzahl"
+      },
+      "address": {
+        "label": "Adresse *",
+        "placeholder": "Straße und Hausnummer",
+        "addressType": "Adress-Typ",
+        "addressTypeOptions": {
+          "primary": "Primär",
+          "mailing": "Mailing",
+          "other": "Andere"
+        }
+      },
+      "address2": {
+        "label": "Adress-Zeile 2",
+        "placeholder": "Wohnung, Appartement, etc."
+      },
+      "city": {
+        "label": "Stadt *",
+        "placeholder": "Stadt"
+      },
+      "state": {
+        "label": "Bundesland/Provinz",
+        "placeholder": "Bundesland oder Provinz"
+      },
+      "savingAddressLoader": "Adresse wird gespeichert...",
+      "saveAddress": "Adresse speichern",
+      "saveAddressError": "Adresse konnte nicht gespeichert werden",
+      "addNewAddress": "+ Neue Adresse hinzufügen"
+    },
+    "errors": {
+      "zipCode": {
+        "required": "Postleitzahl ist erforderlich"
+      },
+      "address": {
+        "required": "Adresse ist erforderlich"
+      },
+      "city": {
+        "required": "Stadt ist erforderlich"
+      },
+      "country": {
+        "required": "Land ist erforderlich"
+      },
+      "firstName": {
+        "required": "Vorname ist erforderlich"
+      },
+      "lastName": {
+        "required": "Nachname ist erforderlich"
+      },
+      "companyName": {
+        "required": "Firmenname ist erforderlich"
+      },
+      "email": {
+        "required": "E-Mail ist erforderlich",
+        "invalid": "Bitte gib eine gültige E-Mail Adresse ein"
+      }
+    },
+    "submissionErrors": {
+      "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
+      "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+      "server": "Server-Fehler. Bitte versuche es in ein paar Minuten erneut.",
+      "rateLimit": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut.",
+      "donationCreation": "Spende konnte nicht durchgeführt werden. Bitte versuche es erneut.",
+      "validation": "Bitte überprüfe deine Angaben und versuche es nochmal.",
+      "accessDenied": "Du hast nicht die Berechtigung, diese Aktion durchzuführen.",
+      "businessLogic": "Ungültige Spendendaten. Bitte überprüfe die Daten und versuche es erneut.",
+      "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuche es nochmal.",
+      "paypalOrderCreationError": "PayPal-Spende konnte nicht erstellt werden. Bitte versuche es nochmal.",
+      "paypalCaptureError": "Die PayPal-Zahlung konnte nicht abgeschlossen werden. Bitte versuche es nochmal.",
+      "paypalPaymentError": "PayPal-Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+      "paymentFailed": "Zahlung fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es nochmal.",
+      "unexpected": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es nochmal."
+    },
+    "cta": {
+      "donateNow": "Jetzt spenden",
+      "donateMonthly": "Monatlich spenden",
+      "donateYearly": "Jährlich spenden",
+      "processing": "Verarbeitung läuft...",
+      "success": "Spende abgeschlossen"
+    },
+    "thankYou": {
+      "title": {
+        "completed": "Vielen Dank für deine Spende!",
+        "bankTransferPending": "Danke, dass du deine Spende angefangen hast"
+      },
+      "status": {
+        "label": "Status:",
+        "completed": "Abgeschlossen",
+        "bankTransferPending": "Banküberweisung ausstehend"
+      },
+      "message": {
+        "completed": "Wir haben dir eine Spendenbestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst eine steuerlich absetzbare Zuwendungsbescheinigung herunterladen.",
+        "bankTransferPending": {
+          "monthly": "Deine monatliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "yearly": "Deine jährliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "once": "Deine Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, überweise bitte den Betrag auf das unten stehende Konto. Diese Informationen wurden dir auch per E-Mail zugeschickt."
+        }
+      },
+      "transfer": {
+        "heading": "Bankinformationen",
+        "amount": "Betrag",
+        "reference": "Verwendungszweck",
+        "beneficiary": "Begünstigter",
+        "iban": "IBAN",
+        "bic": "BIC",
+        "bank": "Bank",
+        "transactionId": "Transaktions-ID {id}",
+        "error": "Überweisungsdetails nicht gefunden, bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
+      },
+      "copy": {
+        "label": "Kopieren {field}",
+        "success": "Kopiert!",
+        "error": "Kopieren fehlgeschlagen"
+      },
+      "share": {
+        "title": "Diesen Spendenaufruf teilen",
+        "description": "Jeder Beitrag inspiriert mehr Menschen zum Handeln."
+      }
+    }
+  }
+}

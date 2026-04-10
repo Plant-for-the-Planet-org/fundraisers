@@ -1,5 +1,37 @@
 {
   "Dashboard": {
-    "dashboard": "Dashboard"
+    "statsError": {
+      "title": "Couldn't load dashboard stats",
+      "description": "Something went wrong while loading your fundraiser data.",
+      "retry": "Try again",
+      "exploreLinkText": "Discover Fundraisers"
+    },
+    "breadcrumb": {
+      "home": "Home"
+    },
+    "dashboard": "Dashboard",
+    "welcome": "Welcome back, {displayName}!",
+    "fallbackName": "there",
+    "cards": {
+      "myFundraisers": {
+        "title": "My Fundraisers",
+        "description": "Manage your active fundraising campaigns",
+        "empty": "No active fundraisers",
+        "activeFundraisers": "Active fundraisers"
+      },
+      "totalRaised": {
+        "title": "Total Raised",
+        "description": "Amount raised across all campaigns",
+        "value": "Aggregated by currency",
+        "summaryLine": "{amount} from {count, plural, one {# fundraiser} other {# fundraisers}}",
+        "empty": "No funds raised.",
+        "aggregatedByCurrency": "Aggregated by currency"
+      },
+      "donations": {
+        "title": "Donations",
+        "description": "Your contribution history",
+        "empty": "No donations yet"
+      }
+    }
   }
 }

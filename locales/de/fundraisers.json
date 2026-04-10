@@ -1,15 +1,269 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Fundraiser starten",
+    "startFundraiser": "Spendenaufrufe erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
-    "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 anderem} other {# anderen}}",
+    "hostedByAnonymous": "von einem anonymen Gastgeber",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
-    "hostedByLabel": "Veranstaltet von"
+    "hostedByLabel": "Veranstaltet von",
+    "error": {
+      "title": "Etwas ist schief gelaufen",
+      "description": "Dieser Spendenaufruf konnte nicht geladen werden. Bitte versuche es erneut, oder durchstöbere andere Spendenaufrufe.",
+      "retry": "Erneut versuchen",
+      "browse": "Spendenaufrufe durchstöbern"
+    },
+    "closedForContribution": {
+      "title": "Vielen Dank für die Unterstützung!",
+      "defaultMessage": "Dieser Spendenaufruf wurde archiviert und sammelt keine Spenden mehr."
+    },
+    "securityNotice": {
+      "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
+      "withoutTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt."
+    },
+    "donate": {
+      "summary": {
+        "processingFee": "Bearbeitungsgebühr",
+        "breakdown": "Aufschlüsselung",
+        "total": "Insgesamt",
+        "totalMonthly": "Jeden Monat insgesamt",
+        "totalYearly": "Jedes Jahr insgesamt"
+      },
+      "paymentMethods": {
+        "title": "Zahlungsmethode",
+        "description": "Helfe mit, dass deine Spende ankommt. Einige Zahlungsanbieter berechnen uns Gebühren. Mit gebührenfreien Methoden kannst du sicherstellen, dass deine Spende in vollem Umfang der Sache zugute kommt.",
+        "selectMethodPlaceholder": "Zahlungsmethode auswählen",
+        "empty": "Derzeit sind keine Zahlungsmöglichkeiten verfügbar.",
+        "methods": {
+          "openBanking": "Bezahlen mit Ihrer Bank (Open Banking)",
+          "bankTransfer": "Banküberweisung",
+          "paypal": "PayPal",
+          "card": "Kredit- oder Debitkarte",
+          "sepa": "SEPA-Lastschriftverfahren",
+          "applePay": "Apple Pay",
+          "googlePay": "Google Pay"
+        },
+        "providers": {
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "offline": "den Zahlungsdienstleister",
+          "planetcash": "PlanetCash"
+        },
+        "fees": {
+          "noFee": "Keine Gebühren",
+          "feeAmount": "{amount} Gebühren",
+          "alternatives": {
+            "eu": "Open Banking oder Banküberweisung",
+            "default": "Banküberweisung"
+          },
+          "tooltip": {
+            "withFee": "{provider} berechnet uns {amount} für die Bearbeitung dieser Spende. Vergrößere die Wirkung, indem du {alternatives} wählst."
+          }
+        }
+      },
+      "options": {
+        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Gebühren für die Zahlungsabwicklung zu decken.",
+        "coverFeesTooltip": "Die Gebühren für die Zahlungsabwicklung werden unter den durch diese Spendenaufruf unterstützten Projekte aufgeteilt.",
+        "coverFeesTooltipTriggerLabel": "Weitere Informationen über Zahlungsgebühren",
+        "makeMonthly": "Meine Spende monatlich machen"
+      }
+    },
+    "create": {
+      "goalPreview": {
+        "raised": "{amount} gesammelt",
+        "goalLine": "{amount} vom gesetzten Ziel",
+        "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
+      },
+      "donorsPreview": {
+        "donorCount": "{count, plural, one {# Spender} other {# Spender}}",
+        "others": " und {count, plural, one {# Anderer} other {# Andere}}"
+      },
+      "theme": {
+        "sectionHeading": "Thema",
+        "labelAccentColor": "Akzentfarbe",
+        "selectAccent": "Wähle {accent} als Akzentfarbe"
+      },
+      "title": {
+        "label": "Name des Spendenaufrufs",
+        "placeholder": "Name des Spendenaufrufs",
+        "errors": {
+          "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
+          "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
+        }
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
+        "errors": {
+          "required": "Bitte gib eine Beschreibung für den Spendenaufruf ein."
+        }
+      },
+      "image": {
+        "previewAlt": "Vorschaubild des Spendenaufrufs",
+        "states": {
+          "loadingDefault": "Defaultbild laden...",
+          "loading": "Bilder werden geladen...",
+          "defaultError": "Defaultbild konnte nicht geladen werden.",
+          "loadError": "Bilder konnten nicht geladen werden. Bitte versuche es erneut.",
+          "errorTitle": "Bilder konnten nicht geladen werden",
+          "noResultsTitle": "Keine Bilder gefunden",
+          "noResultsDescription": "Versuche es mit einem anderen Suchbegriff oder einer anderen Kategorie.",
+          "noResultsWithQuery": "Keine Bilder entsprechen \"{query}\""
+        },
+        "actions": {
+          "changeAria": "Bild ändern",
+          "retry": "Wiederholen",
+          "tryAgain": "Erneut versuchen",
+          "closeAria": "Bildauswahl schließen",
+          "selectImageAria": "Bild auswählen"
+        },
+        "overlay": {
+          "title": "Wähle ein Bild aus",
+          "uploadTitle": "Ziehen und Ablegen oder Klicken zum Hochladen",
+          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash aus",
+          "searchPlaceholder": "Bilder suchen...",
+          "uploadInputAria": "Bilddatei hochladen"
+        },
+        "attribution": {
+          "photoBy": "Foto von",
+          "unsplashLink": "Unsplash"
+        },
+        "errors": {
+          "fileTooLarge": "Das Bild darf maximal {maxMb}MB groß sein.",
+          "invalidFileType": "Bitte lade ein JPG-, PNG-, WEBP- oder GIF-Bild hoch.",
+          "emptyFile": "Die ausgewählte Datei ist leer."
+        },
+        "categories": {
+          "outdoors": "Draußen",
+          "nature": "Natur",
+          "birthday": "Geburtstag",
+          "wedding": "Hochzeit",
+          "halloween": "Halloween",
+          "thanksgiving": "Erntedankfest",
+          "christmas": "Weihnachten",
+          "new-year": "Neujahr",
+          "valentines": "Valentinstag",
+          "easter": "Ostern",
+          "summer": "Sommer",
+          "back-to-school": "Schulanfang",
+          "diwali": "Diwali",
+          "mothers-day": "Muttertag",
+          "fathers-day": "Vatertag",
+          "oktoberfest": "Oktoberfest",
+          "chinese-new-year": "Mond-Neujahrsfest",
+          "holi": "Holi",
+          "ramadan": "Ramadan"
+        }
+      },
+      "countryEntity": {
+        "label": "Land",
+        "restOfWorld": "Rest der Welt",
+        "currencyLabel": "{currency} Währung",
+        "info": {
+          "general": "Das von dir gewählte Land bestimmt die steuerliche Absetzbarkeit von Spenden und welche Projekte für deinen Spendenaufruf in Frage kommen.",
+          "taxReceiptEligible": "Du erhälst eine steuerlich abzugsfähige Spendenbescheinigung für {country}.",
+          "notTaxReceiptEligible": "{country, select, ROW {Steuerlich abzugsfähige Steuerbescheinigungen sind nicht verfügbar.} other {Steuerlich abzugsfähige Spendenbescheinigungen für {country} sind nicht verfügbar.}}"
+        }
+      },
+      "goal": {
+        "label": "Spenden-Ziel",
+        "errors": {
+          "required": "Bitte gib ein Spenden-Ziel ein."
+        }
+      },
+      "projectSelection": {
+        "sectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden.",
+        "viewModeSectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden",
+        "addCause": "Projekt hinzufügen",
+        "removeCause": "Projekt entfernen",
+        "allocationLabel": "{percentage, number}%-Zuweisung",
+        "projectImageAlt": "Bild für {name}",
+        "expandDescription": "Mehr lesen",
+        "collapseDescription": "Weniger lesen",
+        "defaultCause": {
+          "name": "Junge Menschen empowern und Wälder zurückbringen",
+          "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen auf der ganzen Welt zu empowern und sich für den Klimaschutz einzusetzen. Wir stellen Wälder wieder her, klären die Öffentlichkeit auf und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
+        },
+        "aria": {
+          "closeModal": "Projektauswahl schließen",
+          "selectCause": "Projekt {name} hinzufügen"
+        },
+        "modal": {
+          "title": "Projekt hinzufügen",
+          "subtitle": "Wähle zusätzliche Projekte zur Unterstützung",
+          "searchPlaceholder": "Suche Projekte...",
+          "searchAriaLabel": "Suche Projekte",
+          "tabs": {
+            "top": "Top-Projekte",
+            "all": "Alle Projekte"
+          },
+          "resultsCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
+          "loading": "Projekte laden...",
+          "errorTitle": "Projekte konnten nicht geladen werden",
+          "errorMessage": "Es können keine Projekte geladen werden. Bitte versuche es erneut.",
+          "retry": "Erneut versuchen",
+          "byOrganization": "von {organization}",
+          "tags": {
+            "topProject": "Top-Projekt",
+            "restoration": "Renaturierung",
+            "conservation": "Waldschutz",
+            "learnMore": "Mehr erfahren",
+            "restOfWorld": "Rest der Welt"
+          },
+          "add": "Hinzufügen",
+          "emptySearchTitle": "Keine Projekte gefunden",
+          "emptySearchDescription": "Keine Projekte entsprechen \"{query}\"",
+          "clearSearch": "Suche löschen",
+          "emptyAllTitle": "Alle Projekte hinzugefügt",
+          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt"
+        }
+      },
+      "options": {
+        "sectionHeading": "Spendenaufruf-Optionen",
+        "status": {
+          "label": "Spenden mit diesem Spendenaufruf sammeln",
+          "description": "Aktiviere das Spendensammeln und schalte den Spendenaufruf frei"
+        },
+        "visibility": {
+          "label": "Mache den Spendenaufruf entdeckbar",
+          "description": "Ermögliche es anderen, diesen Spendenaufruf über die Suche zu finden und zu entdecken"
+        }
+      },
+      "contributionSettings": {
+        "sectionHeading": "Spendeneinstellungen",
+        "cardHeader": "Spende",
+        "giftTitle": "Widme deine Spende jemandem",
+        "giftSubtitle": "Feiere, schenke oder erinnere an jemanden, indem du deinen Bäumen eine Widmung gibst.",
+        "donateNow": "Jetzt spenden",
+        "donateMonthly": "Monatlich spenden",
+        "donateQuarterly": "Vierteljährlich spenden",
+        "donateYearly": "Jährlich spenden",
+        "frequency": {
+          "oneTime": "Einmalig",
+          "monthly": "Monatlich",
+          "quarterly": "Vierteljährlich",
+          "yearly": "Jährlich"
+        },
+        "customAmount": "Benutzerdefinierter Betrag",
+        "enterAmount": "Betrag eingeben"
+      },
+      "formSubmission": {
+        "buttonProcessing": "Spendenaufruf erstellen...",
+        "buttonSubmit": "Spendenaufruf erstellen",
+        "successMessage": "Spendenaufruf erstellt!",
+        "errorMessage": "Fehler"
+      }
+    },
+    "copyLinkButton": {
+      "label": "Link kopieren",
+      "copiedLabel": "Kopiert!",
+      "successToast": "Link kopiert!",
+      "errorToast": "Der Link konnte nicht kopiert werden. Bitte kopiere die URL manuell."
+    }
   }
 }

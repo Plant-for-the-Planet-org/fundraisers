@@ -1,5 +1,6 @@
 import type { Theme } from './types';
-import { THEMES, DEFAULT_THEME } from './themes';
+
+import { DEFAULT_THEME,THEMES } from './themes';
 
 // Maps route path prefixes → theme ID.
 // To change a page's theme, edit this map only.
@@ -7,6 +8,8 @@ import { THEMES, DEFAULT_THEME } from './themes';
 const ROUTE_THEME_MAP: Record<string, string> = {
   '/': 'spring',
   '/explore': 'stratospheric',
+  '/login': 'sunset',
+  '/fundraisers/create': 'spring',
 };
 
 export function getThemeForPath(pathname: string): Theme {

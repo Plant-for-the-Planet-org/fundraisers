@@ -1,0 +1,46 @@
+import type { ReactNode } from 'react';
+
+import { Toaster } from 'sonner';
+import { PlatformAPIError } from '@/lib/api/external-client';
+import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
+import { buildTheme } from '@/lib/theme/build-theme';
+import { DEFAULT_THEME } from '@/lib/theme/themes';
+import { Footer } from '@/components/footer';
+import { Header } from '@/components/header';
+import { ThemeShell } from '@/components/theme/theme-shell';
+import { MainContent } from '@/components/ui/main-content';
+
+export default async function FundraiserLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  let theme;
+  try {
+    const fundraiser = await getCachedFundraiser(slug);
+    theme = buildTheme(fundraiser.settings?.theme ?? null);
+  } catch (e) {
+    if (
+      e instanceof PlatformAPIError &&
+      e.status &&
+      [401, 403, 404].includes(e.status)
+    ) {
+      theme = DEFAULT_THEME;
+    } else {
+      throw e;
+    }
+  }
+
+  return (
+    <ThemeShell initialTheme={theme}>
+      <Header />
+      <MainContent>{children}</MainContent>
+      <Footer />
+      <Toaster richColors />
+    </ThemeShell>
+  );
+}

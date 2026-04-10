@@ -16,17 +16,27 @@ Documents the current implementation, architectural decisions, and plans for the
 
 ## Current Status
 
-**Phase 1 is complete.** The following was delivered:
+**Phase 1 is complete.** Delivered:
 
 - **All theme types and utilities** — `types.ts`, `themes.ts` (14 predefined themes), `font-utils.ts`, `accent-utils.ts`, `build-theme.ts`, `route-themes.ts` — the full theme library with no external dependencies
-- **Flash-free theme rendering on static routes** — the server layout resolves the theme from the route map and applies background, fonts, mode, and accent before the HTML leaves the server; no client-side effect fires to set the theme
-- **Class-based dark mode** — replaced `@media (prefers-color-scheme: dark)` with `@variant dark (&:is(.dark *))` in `globals.css`; mode is now controlled by the server layout, not the OS
+- **Flash-free theme rendering on static routes** — the server root layout resolves the theme from the route map and applies the mode class to `<html>` before the HTML leaves the server; no client-side effect fires on initial load
+- **Class-based dark mode** — replaced `@media (prefers-color-scheme: dark)` with `@variant dark (&:is(.dark *))` in `globals.css`; mode is controlled by the theme system, not the OS
 - **5 fonts loaded** — Open Sans, Inter, Poppins, Playfair Display, and Roboto are loaded in the root layout and available document-wide via CSS variables
 - **Route → theme config** — changing a route's theme requires editing only `route-themes.ts`; layout code is untouched
-- **`useTheme()` hook** — client components can read the current theme (accent, mode, fonts, etc.) without any fetch or effect
 - **Theme infrastructure ready for Phase 2** — `buildTheme` and all utilities are in place; only the fundraiser data service and its layout are missing
 
-**Phase 2 is deferred.** Per-fundraiser themes from the DB are not yet wired up. The fundraiser page (`raise/[id]`) doesn't exist yet.
+**Phase 1b is complete.** Delivered:
+
+- **`ThemeShell`** — client component that owns all theme rendering; reads `usePathname()` + Zustand store, updates the theme reactively on client navigation and user selection
+- **`useThemeStore`** — Zustand store for user-selected theme overrides on the create/edit flow
+- **Live theme selector** — `ThemeSettings` component in the create fundraiser sidebar: featured theme dropdown + accent color picker
+- **Dark mode switching** — `ThemeShell` syncs `activeTheme.mode` to `<html>` via `useEffect`, so body-level CSS variables and `dark:` utilities work correctly when the user switches to a dark theme
+
+**Phase 2 is complete.** Per-fundraiser themes are now wired up end-to-end:
+
+- **`(fundraiser)` route group** — `src/app/(fundraiser)/fundraisers/[slug]/layout.tsx` server-fetches the fundraiser and passes `buildTheme(fundraiser.settings?.theme)` to `ThemeShell` as `initialTheme`; the correct theme is in the SSR HTML before any JS runs
+- **`ThemeShell` `initialTheme` prop** — `activeTheme = selectedTheme ?? initialTheme ?? getThemeForPath(pathname)`; owners of non-public fundraisers see a brief theme transition (spring → actual theme) after the client-side auth retry resolves
+- **Cross-route-group theme isolation** — `ThemeShell` clears `selectedTheme` on unmount so a theme set during the auth retry doesn't bleed into other route groups' `ThemeShell` instances
 
 ---
 
@@ -35,6 +45,8 @@ Documents the current implementation, architectural decisions, and plans for the
 ```
 src/
   proxy.ts                          ← stamps x-pathname header on every request
+  stores/
+    theme-store.ts                  ← Zustand store: selectedTheme override for create/edit flow
   lib/
     theme/
       types.ts                      ← all theme TypeScript types
@@ -45,31 +57,36 @@ src/
       route-themes.ts               ← route path prefix → theme ID config
   app/
     globals.css                     ← @variant dark, @theme tokens, :root/:dark vars, font rules
-    layout.tsx                      ← root layout: font loading, html lang + mode class
+    layout.tsx                      ← root layout: font loading, html lang + mode class (SSR only)
     (standard)/
-      layout.tsx                    ← standard layout: reads path, applies theme, renders Header/Footer
+      layout.tsx                    ← minimal server component; renders ThemeShell
   components/
     theme/
-      theme-provider.tsx            ← 'use client' context bridge; useTheme() hook
+      theme-shell.tsx               ← 'use client'; owns theme div + mode sync; reads store + pathname
+    fundraisers/
+      theme-settings.tsx            ← 'use client'; theme dropdown + accent picker for create sidebar
 ```
 
 ---
 
 ## How the theme renders without flash
 
-The key insight: the server layout knows the theme at render time and bakes it directly into the HTML. Before any JavaScript runs, the browser has:
+`ThemeShell` is a `'use client'` component, but `usePathname()` is available during the SSR pass in the App Router, and the Zustand store starts empty — so `activeTheme = selectedTheme ?? getThemeForPath(pathname)` resolves correctly on the server. Before any JavaScript runs, the browser has:
 
-1. The correct `dark`/`light` class on `<html>` → activates `.dark` CSS variable block
-2. The correct gradient/background class on a fixed `<div>` → renders as the visual background
-3. The correct font CSS variables and `--accent-color` set via inline `style` → body font and accent immediately correct
+1. The correct `dark`/`light` class on `<html>` (set by the root layout from `x-pathname`) → activates `.dark` CSS variable block for body-level rules
+2. The correct `dark`/`light` class on the `ThemeShell` div → Tailwind `dark:` utilities work for all content
+3. The correct gradient/background class on a fixed `<div>` → renders as the visual background
+4. The correct font CSS variables and `--accent-color` set via inline `style` → body font and accent immediately correct
 
-No client-side effect fires after hydration to set the theme. The server layout sets everything.
+No flash, no layout shift. After hydration, `ThemeShell` has the same `activeTheme` the server used — React reconciles with no DOM changes.
 
-**Client-side navigation** (Next.js `<Link>`) is also fine: when you navigate, the App Router fetches the new RSC payload from the server, which already has the new route's theme applied by its server layout. React reconciles in one DOM update. The `transition-colors duration-300` on the background layer makes the change smooth.
+**Client-side navigation** (Next.js `<Link>`) updates the theme reactively: `ThemeShell` reads `usePathname()`, which changes on navigation. It recomputes `activeTheme = getThemeForPath(newPathname)` and updates the div's classes, inline styles, and CSS variables in one React re-render. The `transition-colors duration-300` on the background layer makes the change smooth.
 
 ---
 
 ## Data flow — step by step
+
+**SSR — initial request `/explore`:**
 
 ```
 1. Browser requests /explore
@@ -77,44 +94,69 @@ No client-side effect fires after hydration to set the theme. The server layout 
 3. Root layout (RSC):
      - reads x-pathname → '/explore'
      - calls getThemeForPath('/explore') → THEMES.stratospheric
-     - renders <html lang="en" className="light">  ← mode activates CSS var block
+     - renders <html lang="en" className="light">  ← mode class on <html> for body-level CSS vars
      - renders <body> with all 5 font CSS variables as className
-4. StandardLayout (RSC, nested inside root):
-     - reads x-pathname → '/explore'  (same header, same pure lookup)
-     - calls getThemeForPath('/explore') → THEMES.stratospheric
+4. StandardLayout (RSC):
+     - renders <ThemeShell> wrapping Header / MainContent / Footer
+5. ThemeShell (client component, SSR pass):
+     - usePathname() = '/explore'
+     - selectedTheme = null  (Zustand store starts empty)
+     - activeTheme = getThemeForPath('/explore') = stratospheric
      - renders:
-         <ThemeProvider theme={stratospheric}>
-           <div class="light relative min-h-screen flex flex-col"
-                style="font-family: var(--font-poppins-var)...;
-                       --theme-title-font: var(--font-poppins-var)...;
-                       --accent-color: #d97706">
-             <div class="fixed inset-0 bg-gradient-to-br from-yellow-100/40 ..."/>
-             <div class="relative z-10 ...">
-               <Header />
-               <main>...</main>
-               <Footer />
-             </div>
+         <div class="theme-stratospheric light relative min-h-screen flex flex-col"
+              data-theme="stratospheric"
+              style="font-family: var(--font-poppins-var)...;
+                     --theme-title-font: var(--font-poppins-var)...;
+                     --accent-color: #0ea5e9">
+           <div class="fixed inset-0 bg-linear-to-br ..."/>
+           <div class="relative z-10 ...">
+             <Header />
+             <MainContent>...</MainContent>
+             <Footer />
            </div>
-         </ThemeProvider>
-5. ThemeProvider serialises theme into RSC payload
-6. On the client, React hydrates — ThemeContext already has the correct value
-7. Client components call useTheme() → get the theme with no fetch
+         </div>
+6. React hydrates — ThemeShell already has the correct activeTheme; no re-render needed
+```
+
+**Client navigation → `/fundraisers/create`:**
+
+```
+1. usePathname() updates to '/fundraisers/create'
+2. ThemeShell pathname-change useEffect clears selectedTheme → null
+3. activeTheme = getThemeForPath('/fundraisers/create') = spring
+4. ThemeShell div class / style / background updates → theme changes live
+5. Mode useEffect syncs activeTheme.mode to <html> → CSS variables update document-wide
+```
+
+**User picks a theme on `/fundraisers/create`:**
+
+```
+1. ThemeSettings calls setSelectedTheme(THEMES['dark-ocean'])
+2. useThemeStore updates → ThemeShell re-renders
+3. activeTheme = dark-ocean (overrides route default spring)
+4. ThemeShell div updates → live preview: background, fonts, accent, mode all change
+5. Mode useEffect fires → document.documentElement switches to 'dark'
 ```
 
 ---
 
 ## The `theme.mode` class: where it lives and why
 
-`theme.mode` (`"light"` or `"dark"`) currently appears in two places:
+`theme.mode` (`"light"` or `"dark"`) appears in three places:
 
-| Location                                                           | Element           | Why                                                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [layout.tsx:62](../src/app/layout.tsx#L62)                         | `<html>`          | CSS custom properties in `.dark { ... }` cascade from their element downward. Placing `.dark` on `<html>` means `body`'s `background-color: hsl(var(--background))` and `color: hsl(var(--foreground))` resolve correctly. Removing it from `<html>` leaves `body` using the `:root` (light) values regardless of theme. |
-| [(standard)/layout.tsx:24](<../src/app/(standard)/layout.tsx#L24>) | outermost `<div>` | This is the semantic theme boundary — the div where all theme styles are applied (background, fonts, accent). Placing the mode class here makes Tailwind `dark:` utilities work for all descendants and prepares for Phase 2, where a fundraiser layout can override the mode for its subtree independently.             |
+| Location                                           | Element                            | When it updates                                          |
+| -------------------------------------------------- | ---------------------------------- | -------------------------------------------------------- |
+| [layout.tsx:62](../src/app/layout.tsx#L62) (root)  | `<html>`                           | Server-rendered once; never changes after hydration      |
+| `ThemeShell` div                                   | outermost theme div                | Updates reactively on every `activeTheme` change         |
+| `ThemeShell` `useEffect`                           | `<html>` via `document.documentElement` | Syncs on every `activeTheme.mode` change            |
 
-The duplication is intentional. Both read from the same `getThemeForPath()` call so they always agree. `getThemeForPath` is a pure in-memory lookup with no I/O, so calling it twice is harmless.
+**Why both the div and `<html>` need the mode class:**
 
-> **Phase 2 note:** When fundraiser pages arrive, the fundraiser's layout will have its own outer div with `theme.mode` from the fundraiser's DB settings. This could be `dark` even if the route-level theme on `<html>` is `light`. The fundraiser div's mode class correctly scopes Tailwind `dark:` utilities for all content inside it. The `<html>` mode class sets the CSS variable baseline for `body`-level rules — there will be a mismatch for fundraisers with modes different from the route default. This is acceptable for Phase 1 and will be addressed in Phase 2 alongside the fundraiser layout.
+CSS custom properties cascade _downward_ from the element they're declared on. `body` is a child of `<html>` but a _parent_ of the `ThemeShell` div — placing `.dark` only on the div cannot affect `body { color: hsl(var(--foreground)) }`, because `body` is an ancestor of the div, not a descendant. Without syncing to `<html>`, switching to a dark theme would update all content _inside_ `ThemeShell` but leave the body's text color, background, and scrollbar in light-mode values.
+
+The `ThemeShell` `useEffect` solves this by calling `document.documentElement.classList.remove('light', 'dark')` and then `.add(activeTheme.mode)` whenever the active theme's mode changes.
+
+> **Phase 2 note:** When fundraiser pages arrive with their own `ThemeShell` (or an equivalent), the same `useEffect` pattern handles the case where a fundraiser's mode differs from the route default. The `<html>` mode class is always kept in sync with the innermost active theme.
 
 ---
 
@@ -128,7 +170,7 @@ Defines all TypeScript types. Nothing imported from outside the `theme/` directo
 - `FontId` — 5 supported font identifiers
 - `AnimationType` — `none | snow | confetti | hearts | particles`
 - `ThemeMode` — `light | dark`
-- `ThemeCategory` — `minimal | celebration | nature | business | atmospheric`
+- `ThemeCategory` — `atmospheric | celebration | nature | minimal | business | system | seasonal | corporate | simple | dark`
 - `Theme` — the complete theme object used throughout the app
 - `FundraiserThemeSettings` — shape stored in `fundraiser.settings.theme` in the DB; uses snake_case and looser string types to match the DB record format; `base_id` references a predefined theme as the base for field-level overrides
 
@@ -196,6 +238,7 @@ The single source of truth for which theme a route uses.
 const ROUTE_THEME_MAP: Record<string, string> = {
   '/': 'spring',
   '/explore': 'stratospheric',
+  '/fundraisers/create': 'spring',
 };
 ```
 
@@ -205,9 +248,11 @@ const ROUTE_THEME_MAP: Record<string, string> = {
 
 ### `src/proxy.ts`
 
-Next.js 16 proxy (what Next.js 15 called Middleware). Stamps every request with `x-pathname: <current-path>` so server layouts can read the current URL via `await headers()` — Next.js layouts don't receive the pathname as a prop.
+Next.js 16 proxy (what Next.js 15 called Middleware). Stamps every request with `x-pathname: <current-path>` so server components can read the current URL via `await headers()` — Next.js layouts don't receive the pathname as a prop.
 
-Adding this header makes all routes that read it dynamic (no static caching). For a fundraiser app serving live data, this is expected.
+Only the **root layout** reads `x-pathname` (to set the initial `<html>` mode class for SSR). `ThemeShell` uses `usePathname()` directly — no header reads needed on the client. Standard layout no longer reads `x-pathname` at all.
+
+Adding this header makes all routes dynamic (no static caching). For a fundraiser app serving live data, this is expected.
 
 ---
 
@@ -215,7 +260,7 @@ Adding this header makes all routes that read it dynamic (no static caching). Fo
 
 Key responsibilities:
 
-- **`@variant dark (&:is(.dark *))`** — class-based dark mode. Tailwind's `dark:` utilities activate when any ancestor has `class="dark"`. OS preference is intentionally ignored; mode is controlled entirely by the server layout.
+- **`@variant dark (&:is(.dark *))`** — class-based dark mode. Tailwind's `dark:` utilities activate when any ancestor has `class="dark"`. OS preference is intentionally ignored; mode is controlled entirely by the theme system (`ThemeShell`).
 - **`@theme` block** — maps Next.js font CSS variables to Tailwind font tokens, defines semantic color tokens (`--color-background`, `--color-foreground`, etc.), border radius tokens, and the `xs` breakpoint.
 - **`:root`** — light-mode CSS variable defaults.
 - **`.dark`** — dark-mode variable overrides. Applied when an ancestor has `class="dark"`.
@@ -235,49 +280,70 @@ Key responsibilities:
 
 ### `src/app/(standard)/layout.tsx`
 
-Applies the full theme to the standard pages:
+A minimal server component. No theme logic — just renders `ThemeShell` wrapping the page structure:
 
-```
-<ThemeProvider theme={theme}>
-  <div class="theme-{theme.id} {theme.mode} relative min-h-screen flex flex-col"
-       data-theme="{theme.id}"
-       style="font-family: ...; --theme-title-font: ...; --accent-color: ...">
-    <div class="fixed inset-0 {theme.background} transition-colors duration-300" />  ← background
-    <div class="relative z-10 flex flex-col min-h-screen">
+```tsx
+export default function StandardLayout({ children }: { children: ReactNode }) {
+  return (
+    <ThemeShell>
       <Header />
       <MainContent>{children}</MainContent>
       <Footer />
-    </div>
-  </div>
-</ThemeProvider>
+    </ThemeShell>
+  );
+}
 ```
 
-- `theme-{id}` class and `data-theme="{id}"` attribute on the outer div identify the active theme. Both are present: the class for CSS targeting via `.theme-spring { }`, the attribute for CSS targeting via `[data-theme="spring"]` and JS access via `el.dataset.theme`. Both attribute and class selectors share the same specificity `(0,0,1,0)`.
-- `font-family` is set as a direct inline style (not via `--theme-body-font` CSS variable). This overrides the `body` font for the entire themed subtree.
-- `--theme-title-font` is set as a CSS variable, which cascades to all `h1–h6` descendants.
-- `--accent-color` is set as a CSS variable for use in non-Tailwind contexts.
-- The fixed background layer covers the viewport behind all content.
-- `backdrop-blur-[10px]` on the content wrapper creates a frosted-glass effect over the gradient.
+All theme rendering is delegated to `ThemeShell`. `Header`, `MainContent`, and `Footer` are RSC children passed through as opaque React nodes — they are server components and never re-render when the theme changes.
 
 ---
 
-### `src/components/theme/theme-provider.tsx`
+### `src/components/theme/theme-shell.tsx`
 
-A minimal `'use client'` context bridge. Renders no DOM elements — only `<ThemeContext.Provider>`.
+`'use client'` component that owns all theme rendering. Runs on both server (SSR pass) and client.
 
-- `ThemeProvider` — receives the theme as a prop from the server layout and provides it to the React tree.
-- `useTheme()` — hook for client components to read the current theme. Throws if called outside a `ThemeProvider`.
+```
+<div class="theme-{activeTheme.id} {activeTheme.mode} relative min-h-screen flex flex-col"
+     data-theme="{activeTheme.id}"
+     style="font-family: ...; --theme-title-font: ...; --accent-color: ...">
+  <div class="fixed inset-0 {activeTheme.background} transition-colors duration-300" />
+  <div class="relative z-10 flex flex-col min-h-screen">
+    {children}
+  </div>
+</div>
+```
 
-Because the theme value is a prop from the server (not fetched client-side), it's serialised into the RSC payload and available at first hydration. Client components that call `useTheme()` render correctly on the first pass — no mismatch, no re-render.
+- `theme-{id}` class and `data-theme="{id}"` attribute identify the active theme for CSS/JS targeting.
+- `font-family` inline style overrides the `body` font for the entire themed subtree.
+- `--theme-title-font` cascades to all `h1–h6` descendants.
+- `--accent-color` is a CSS variable for non-Tailwind contexts (SVG, canvas).
+- The fixed background layer covers the viewport behind all content.
+- Three `useEffect`s: one clears `selectedTheme` when the pathname changes (same-instance navigation); one clears `selectedTheme` on unmount (prevents bleed when navigating between route groups, each of which has its own `ThemeShell` instance); one syncs `activeTheme.mode` to `document.documentElement`.
 
-`ThemeProvider` is used by **both** server layouts, with different theme sources:
+---
 
-| Layout                              | Theme source                                         |
-| ----------------------------------- | ---------------------------------------------------- |
-| `(standard)/layout.tsx`             | `getThemeForPath(pathname)` — static route map       |
-| `raise/[id]/layout.tsx` _(Phase 2)_ | `buildTheme(fundraiser.settings?.theme)` — DB record |
+### `src/stores/theme-store.ts`
 
-The provider itself is identical in both cases; only the value passed to it differs. This is why it stays as a pure context bridge with no routing, fetching, or DOM concerns of its own.
+Zustand store with a single slice:
+
+```ts
+interface ThemeOverrideState {
+  selectedTheme: Theme | null;
+  setSelectedTheme: (theme: Theme | null) => void;
+}
+```
+
+`ThemeShell` reads `selectedTheme` and calls `setSelectedTheme(null)` on route change. `ThemeSettings` calls `setSelectedTheme(theme)` when the user picks a theme or accent. Both are client components with direct store access — no React context or prop drilling needed.
+
+---
+
+### `src/components/fundraisers/theme-settings.tsx`
+
+`'use client'` component rendered in the create fundraiser sidebar. Gives the user a live theme preview while building their fundraiser:
+
+- **Theme dropdown** — lists only `featured` themes (filtered via `theme.featured`). Selecting one calls `setSelectedTheme(theme)`.
+- **Accent color picker** — renders the active theme's `colorOptions` as coloured dots. Clicking one calls `setSelectedTheme({ ...activeTheme, accent })`, preserving all other theme properties.
+- Reads `useThemeStore()` + `usePathname()` to compute `activeTheme = selectedTheme ?? getThemeForPath(pathname)`, mirroring the same logic as `ThemeShell` so the displayed selection always matches what the user sees.
 
 ---
 
@@ -299,6 +365,16 @@ The current approach eliminates this entirely by resolving the theme in server l
 
 ---
 
+## Abandoned approach: ThemeProvider as the client-side theme bridge
+
+The Phase 1b plan initially kept `ThemeProvider` (a React context bridge) alongside the new Zustand store. The idea was: `ThemeShell` wraps children in `<ThemeProvider theme={activeTheme}>`, and client components call `useTheme()` to read the current theme without importing the store.
+
+This was dropped because it introduced pointless duplication. `ThemeShell` (the producer) and `ThemeSettings` (the consumer) are both client components — they can both import `useThemeStore` directly. There is no server/client boundary between them that would require a context bridge. Two sources of truth for the same value is a bug waiting to happen.
+
+The conclusion: if all components that need to read a value are client components, use a Zustand store. `ThemeProvider` / `useTheme()` were deleted.
+
+---
+
 ## Abandoned approach: hardcoded per-route theme in the layout
 
 The original Phase 1 plan (in `docs/legacy/theme-system-plan.md`) proposed hardcoding the theme directly in the server layout component:
@@ -309,7 +385,7 @@ export default function StandardLayout({ children }) {
   return (
     <ThemeProvider theme={THEMES.spring}>
       <div className='light relative ...'>
-        <div className='fixed inset-0 bg-gradient-to-br from-emerald-300/25 ...' />
+        <div className='fixed inset-0 bg-linear-to-br from-emerald-300/25 ...' />
         ...
       </div>
     </ThemeProvider>
@@ -321,18 +397,15 @@ This was replaced by the route-theme map approach (`route-themes.ts`), which kee
 
 ---
 
-## Phase 2 — per-fundraiser themes (deferred)
+## Phase 2 — per-fundraiser themes (complete)
 
-Prerequisite: a `getCachedFundraiser(id)` data service must exist first.
+Fundraiser view routes live under the `(fundraiser)` route group with their own layout, so they don't inherit the `(standard)` layout's `ThemeShell`.
 
-Once that exists, the implementation order is:
+`src/app/(fundraiser)/fundraisers/[slug]/layout.tsx` server-fetches the fundraiser, calls `buildTheme`, and passes the result to `ThemeShell` as `initialTheme`. On 404 (non-public fundraiser), it falls back to `DEFAULT_THEME` and lets the page render `FundraiserAuthRetry`, which retries with the auth token and calls `setSelectedTheme` once the fundraiser resolves.
 
-1. **`src/lib/types/fundraiser.ts`** — extend `Fundraiser` with `settings?: { theme?: FundraiserThemeSettings; [key: string]: unknown }`
-2. **`src/styles/theme-safelist.ts`** — all gradient class combinations as string literals; add `@source "../src/styles/theme-safelist.ts"` to `globals.css`
-3. **`src/components/theme/animation-layer.tsx`** — `'use client'` component for snow/confetti/hearts animations, conditionally rendered by the fundraiser layout
-4. **`src/app/raise/[id]/layout.tsx`** — fetches the fundraiser server-side, calls `buildTheme(fundraiser.settings?.theme)`, applies the full theme (background, fonts, accent, mode, animation) to the wrapper div
+`ThemeShell` clears `selectedTheme` on unmount (in addition to on pathname change) so a theme set by the auth retry doesn't persist into other route groups.
 
-The fundraiser layout follows the same structural pattern as StandardLayout: `ThemeProvider` wrapping a div with mode class, fixed background layer, and inline CSS variables for fonts and accent.
+**Still deferred:** `src/styles/theme-safelist.ts` — all gradient class combinations as string literals for custom DB gradients. Freeform gradient strings set by a fundraiser editor would never appear in source files and would be purged by Tailwind. This is needed only once a gradient editor exists.
 
 ---
 

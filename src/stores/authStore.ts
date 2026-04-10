@@ -1,10 +1,10 @@
 import type { UserProfile } from '@/lib/api/user-service';
 
 import { create } from 'zustand';
-import { userService } from '@/lib/api/user-service';
 import { devtools } from 'zustand/middleware';
 import { isProtectedRoute } from '@/lib/utils/auth';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
+import { userService } from '@/lib/api/user-service';
 
 interface User {
   sub: string;
@@ -26,6 +26,7 @@ interface AuthStore {
   loadUserProfile: () => Promise<void>;
   logout: (customReturnTo?: string | undefined) => void;
   clearAuth: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const isBrowser = typeof window !== 'undefined';
@@ -140,6 +141,33 @@ export const useAuthStore = create<AuthStore>()(
           undefined,
           'auth/clear_auth'
         );
+      },
+
+      refreshProfile: async () => {
+        const { accessToken, user } = get();
+
+        if (!accessToken || !user) return;
+
+        try {
+          const profile = await userService.getProfileSafe(accessToken);
+          if (!profile) {
+            get().clearAuth();
+            return;
+          }
+
+          set(
+            { user: { ...user, profile }, error: null },
+            undefined,
+            'auth/refresh_profile'
+          );
+        } catch (err) {
+          console.error('Failed to refresh profile:', err);
+          set(
+            { error: 'Failed to refresh profile' },
+            undefined,
+            'auth/refresh_profile_error'
+          );
+        }
       },
     }),
     {
