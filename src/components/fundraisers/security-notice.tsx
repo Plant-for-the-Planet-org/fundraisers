@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale,useTranslations } from 'next-intl';
 
 interface SecurityNoticeProps {
   organizationName: string;

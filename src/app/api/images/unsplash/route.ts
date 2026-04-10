@@ -1,9 +1,9 @@
 import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 
+import { NextResponse } from 'next/server';
 import {
-  UnsplashServiceError,
   unsplashService,
+  UnsplashServiceError,
 } from '@/lib/api/unsplash-service';
 
 const MAX_COUNT = 50;

@@ -3,11 +3,11 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { HandCoins, UsersRound } from 'lucide-react';
-import { FundraiserCardImage } from './fundraiser-card-image';
+import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { FundraiserCardImage } from './fundraiser-card-image';
 
 interface FundraiserCardProps {
   fundraiser: Fundraiser;

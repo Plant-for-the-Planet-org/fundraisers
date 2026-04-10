@@ -1,15 +1,15 @@
 import { Suspense } from 'react';
-import { PageHeader } from '@/components/explore/page-header';
-import {
-  FundraiserCategories,
-  CategoriesSkeleton,
-} from '@/components/explore/fundraiser-categories';
 import { FeaturedFundraisersLoader } from '@/components/explore/featured-fundraisers-loader';
 import { FeaturedFundraisersSkeleton } from '@/components/explore/featured-fundraisers-skeleton';
+import {
+  CategoriesSkeleton,
+  FundraiserCategories,
+} from '@/components/explore/fundraiser-categories';
 import {
   FundraiserCities,
   FundraiserCitiesSkeleton,
 } from '@/components/explore/fundraiser-cities';
+import { PageHeader } from '@/components/explore/page-header';
 
 export default function ExplorePage() {
   return (

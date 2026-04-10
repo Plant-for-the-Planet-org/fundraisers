@@ -2,8 +2,8 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useLocale, useTranslations } from 'next-intl';
 import { useWatch } from 'react-hook-form';
+import { useLocale, useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 

@@ -1,9 +1,9 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/stores/authStore';
 import { AuthenticatedUserView } from './authenticated-user-view';
 import { GuestUserView } from './guest-user-view';
-import { useTranslations } from 'next-intl';
 
 export function DonorInfo() {
   const tDonate = useTranslations('Donate');

@@ -1,17 +1,17 @@
 'use client';
 
-import type { Control } from 'react-hook-form';
 import type { ReactNode, RefObject } from 'react';
+import type { Control } from 'react-hook-form';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from './donate-overlay';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { createContext, useContext, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
+import dynamic from 'next/dynamic';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
 
 const DevTool =

@@ -1,9 +1,9 @@
 import type { DerivedPaymentMethod } from '@/lib/types/payment-methods';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
+import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
-import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 
 interface DonationProcessingFeeInfoParams {
   paymentOptions: PaymentOptions;

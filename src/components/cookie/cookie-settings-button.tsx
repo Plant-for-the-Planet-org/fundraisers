@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { cookieConsent } from '@/lib/cookie-consent';
+import { Button } from '@/components/ui/button';
 
 interface CookieSettingsButtonProps {
   variant?: 'default' | 'ghost' | 'link';

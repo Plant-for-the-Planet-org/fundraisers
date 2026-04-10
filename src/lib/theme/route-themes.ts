@@ -1,5 +1,6 @@
 import type { Theme } from './types';
-import { THEMES, DEFAULT_THEME } from './themes';
+
+import { DEFAULT_THEME,THEMES } from './themes';
 
 // Maps route path prefixes → theme ID.
 // To change a page's theme, edit this map only.

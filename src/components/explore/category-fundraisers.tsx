@@ -1,13 +1,13 @@
 'use client';
 
-import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { FundraiserSortOptions } from '@/lib/api/categories-service';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { isFundraiserSortOption } from '@/lib/api/categories-service';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent,TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FundraiserCard } from './fundraiser-card';
 import { FundraiserCardSkeletonGrid } from './fundraiser-card-skeleton';
 

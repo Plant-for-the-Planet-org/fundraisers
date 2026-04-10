@@ -1,21 +1,21 @@
 'use client';
 
-import { createPortal } from 'react-dom';
-import { Search, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { Search, X } from 'lucide-react';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import {
   DEFAULT_IMAGE_CATEGORY_ID,
   getVisibleImageCategories,
 } from '@/lib/constants/image-categories';
-import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
 import { cn } from '@/lib/utils/cn';
 import {
-  MAX_IMAGE_FILE_SIZE_MB,
   createUnsplashSelectedImage,
   createUploadedSelectedImage,
+  MAX_IMAGE_FILE_SIZE_MB,
   validateImageFile,
 } from '@/lib/utils/image-selection';
 

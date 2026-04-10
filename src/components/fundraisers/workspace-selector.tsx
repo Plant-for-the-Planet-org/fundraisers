@@ -2,8 +2,14 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useLocale, useTranslations } from 'next-intl';
 import { useController, useFormContext } from 'react-hook-form';
+import { useLocale, useTranslations } from 'next-intl';
+import {
+  type AllowedCountry,
+  getAllowedCountries,
+  getCurrencyForCountry,
+} from '@/lib/utils/country-currency';
+import { CountryFlag } from '@/components/ui/country-flag';
 import {
   Select,
   SelectContent,
@@ -11,12 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  getAllowedCountries,
-  getCurrencyForCountry,
-  type AllowedCountry,
-} from '@/lib/utils/country-currency';
-import { CountryFlag } from '@/components/ui/country-flag';
 
 export function WorkspaceSelector() {
   const locale = useLocale();

@@ -1,9 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/stores/authStore';
-import { LogOut } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { LogOut } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { Button } from '@/components/ui/button';
 
 export function SignOutButton() {
   const tAuth = useTranslations('Auth');

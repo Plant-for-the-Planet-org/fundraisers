@@ -4,7 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Tabs, TabsContent,TabsList, TabsTrigger } from '../ui/tabs';
 import { FundraiserCard } from './fundraiser-card';
 
 interface FeaturedFundraisersProps {

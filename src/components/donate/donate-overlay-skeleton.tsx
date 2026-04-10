@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
-import { DonateOverlayLayout } from './donate-overlay-layout';
 import { Skeleton } from '../ui/skeleton';
+import { DonateOverlayLayout } from './donate-overlay-layout';
 
 export function DonateOverlaySkeleton({ onClose }: { onClose: () => void }) {
   return createPortal(

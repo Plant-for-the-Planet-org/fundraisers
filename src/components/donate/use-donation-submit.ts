@@ -1,38 +1,38 @@
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentOptions } from '@/lib/types/payment-options';
-import type { DonationFormValues } from './donation-form-context';
-import type { DonationData } from './donate-overlay';
-import type { PaymentData } from '@/lib/types/payment';
-import type { ServiceErrorCode } from '@/lib/types/submission-errors';
-import type { PaymentResponse } from '@/lib/types/payment';
+import type { OnApproveData } from '@paypal/paypal-js';
 import type { DonationResponse } from '@/lib/types/donation';
 import type {
   DonationSubmitError,
   DonationSubmitState,
   ThankYouState,
 } from '@/lib/types/donation-submit';
-import type { OnApproveData } from '@paypal/paypal-js';
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentData } from '@/lib/types/payment';
+import type { PaymentResponse } from '@/lib/types/payment';
+import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { ServiceErrorCode } from '@/lib/types/submission-errors';
+import type { DonationData } from './donate-overlay';
+import type { DonationFormValues } from './donation-form-context';
 
 import { useCallback, useRef, useState } from 'react';
-import { useAuthStore } from '@/stores/authStore';
-import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
-import {
-  assembleFormData,
-  buildDonationPayload,
-} from '@/lib/donation/payload-builder';
-import { submitStandardDonation } from '@/lib/donation/donation-submission';
-import { donationService, DonationError } from '@/lib/api/donation-service';
-import { paymentService, PaymentError } from '@/lib/api/payment-service';
-import {
-  buildPaymentRequest,
-  PaymentOptionsError,
-} from '@/lib/utils/payment-request-builder';
+import { DonationError,donationService } from '@/lib/api/donation-service';
+import { PaymentError,paymentService } from '@/lib/api/payment-service';
 import {
   createPaypalOrder,
   PaypalOrderError,
 } from '@/lib/api/paypal-order-service';
-import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
+import { submitStandardDonation } from '@/lib/donation/donation-submission';
+import {
+  assembleFormData,
+  buildDonationPayload,
+} from '@/lib/donation/payload-builder';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
+import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
+import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
+import {
+  buildPaymentRequest,
+  PaymentOptionsError,
+} from '@/lib/utils/payment-request-builder';
+import { useAuthStore } from '@/stores/authStore';
 
 function cleanPaymentDetails(
   details: PaymentData['paymentDetails']

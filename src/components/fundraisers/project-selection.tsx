@@ -1,19 +1,19 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 import type { SelectedProject } from '@/lib/types/project-selection';
+import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useTranslations } from 'next-intl';
-import { Target } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
+import { Target } from 'lucide-react';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
 import { getImageUrl } from '@/lib/utils/images';
 import {
   calculateProjectAllocations,
   createDefaultCause,
 } from '@/lib/utils/project-selection';
+import { Button } from '@/components/ui/button';
 import { ProjectSelectionOverlay } from './project-selection-overlay';
 import { SectionHeader } from './typography';
 

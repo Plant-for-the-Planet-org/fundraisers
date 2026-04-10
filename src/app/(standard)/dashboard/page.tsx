@@ -2,6 +2,13 @@
 
 import type { DashboardFundraiserStats } from '@/lib/api/fundraisers-service';
 
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import {
+  getDashboardFundraiserStats,
+  getFundraisers,
+} from '@/lib/api/fundraisers-service';
+import { useAuthStore } from '@/stores/authStore';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import {
   DashboardStatCardSkeleton,
@@ -10,13 +17,6 @@ import {
   TotalRaisedCard,
 } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
-import {
-  getDashboardFundraiserStats,
-  getFundraisers,
-} from '@/lib/api/fundraisers-service';
-import { useAuthStore } from '@/stores/authStore';
-import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useState } from 'react';
 
 const INITIAL_FUNDRAISER_STATS: DashboardFundraiserStats = {
   activeFundraisersCount: 0,

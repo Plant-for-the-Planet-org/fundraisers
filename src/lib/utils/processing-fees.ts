@@ -2,6 +2,7 @@ import type {
   FeeRegion,
   PaymentMethodProvider,
 } from '@/lib/types/payment-methods';
+
 import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer';
 
 interface FeeStructure {

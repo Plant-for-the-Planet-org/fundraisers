@@ -1,10 +1,13 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
+import { useTranslations } from 'next-intl';
+import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
+import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
@@ -12,9 +15,6 @@ import TitleDisplay from '@/components/fundraisers/title-display';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { Hosts } from '@/components/fundraisers/hosts';
-import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
-import { useTranslations } from 'next-intl';
 import { CopyLinkButton } from './copy-link-button';
 
 function getDaysLeft(endDate: string): number {

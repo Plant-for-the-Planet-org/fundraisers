@@ -1,10 +1,10 @@
 import type { Category } from '@/lib/types/category';
 
-import { Skeleton } from '@/components/ui/skeleton';
-import { categoriesService } from '@/lib/api/categories-service';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { categoriesService } from '@/lib/api/categories-service';
+import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdaptedCategory extends Category {
   displayCount: string;

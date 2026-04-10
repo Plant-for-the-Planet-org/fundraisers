@@ -1,22 +1,22 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import type {
   ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { projectsService } from '@/lib/api/projects-service';
-import { getImageUrl } from '@/lib/utils/images';
-import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
-import { Search, Target, X } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useWatch } from 'react-hook-form';
+import { useLocale, useTranslations } from 'next-intl';
+import { Search, Target, X } from 'lucide-react';
+import { projectsService } from '@/lib/api/projects-service';
+import { getImageUrl } from '@/lib/utils/images';
+import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type ProjectSelectionTab = 'top' | 'all';
 

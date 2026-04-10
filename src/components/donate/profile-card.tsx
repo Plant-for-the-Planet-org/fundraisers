@@ -1,10 +1,10 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDisplayName } from '@/lib/utils/profile';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useAuthStore } from '@/stores/authStore';
-import { useTranslations } from 'next-intl';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export const ProfileCard = () => {
   const tDonate = useTranslations('Donate');

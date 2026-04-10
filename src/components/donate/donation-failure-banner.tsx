@@ -4,8 +4,8 @@
 // Currently used only for testing and basic user feedback after donation success.
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 
-import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { X } from 'lucide-react';
 
 export const DonationFailureBanner = ({
   errorCode,
