@@ -41,7 +41,8 @@ function getProjectImageSource(image?: string): string | null {
 }
 
 function buildLearnMoreUrl(projectId: string): string {
-  return `${API_BASE_URL}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
+  const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, '');
+  return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
 function normalizeCountryForProjects(countryCode?: string): string | undefined {
@@ -64,7 +65,7 @@ export function ProjectSelectionOverlay({
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
     name: 'country',
   });
-  const lastFetchedCountryRef = useRef<string | undefined>(undefined);
+  const lastFetchedCountryLocaleKeyRef = useRef<string | undefined>(undefined);
 
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,11 +111,14 @@ export function ProjectSelectionOverlay({
     const normalizedCountry = normalizeCountryForProjects(country);
     const fetchKey = `${normalizedCountry ?? ''}|${locale}`;
 
-    if (allProjects.length > 0 && lastFetchedCountryRef.current === fetchKey) {
+    if (
+      allProjects.length > 0 &&
+      lastFetchedCountryLocaleKeyRef.current === fetchKey
+    ) {
       return;
     }
 
-    lastFetchedCountryRef.current = fetchKey;
+    lastFetchedCountryLocaleKeyRef.current = fetchKey;
     void fetchProjects(normalizedCountry, locale);
   }, [allProjects.length, country, fetchProjects, isLoading, isOpen, locale]);
 
