@@ -97,6 +97,10 @@
         "invalid": "Please enter a valid email address"
       }
     },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "mandate": "By providing your IBAN and confirming this payment, you authorise Plant-for-the-Planet Foundation to send instructions to your bank to debit your account, and your bank to debit your account in accordance with those instructions. You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited."
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",

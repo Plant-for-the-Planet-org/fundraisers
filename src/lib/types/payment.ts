@@ -36,9 +36,7 @@ export interface StripeOrPaypalPaymentData extends PaymentDataBase {
 
 export type PaymentData = OfflinePaymentData | StripeOrPaypalPaymentData;
 
-// TODO: verify structure for Stripe/Paypal while implementing relevant payment flow.
 export interface StripePaymentSource {
-  kind: 'stripe'; // TODO: confirm request type, is "kind" a valid property?
   id: string;
   object: 'payment_method';
 }

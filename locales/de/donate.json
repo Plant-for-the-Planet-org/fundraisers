@@ -97,6 +97,10 @@
         "invalid": "Bitte gib eine gültige E-Mail Adresse ein"
       }
     },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "mandate": "Indem Sie Ihre IBAN angeben und diese Zahlung bestätigen, ermächtigen Sie die Plant-for-the-Planet Foundation, Ihrer Bank Anweisungen zu erteilen, Ihr Konto zu belasten, und Ihre Bank, Ihr Konto gemäß diesen Anweisungen zu belasten. Sie haben Anspruch auf eine Rückerstattung von Ihrer Bank gemäß den Bedingungen Ihrer Vereinbarung mit Ihrer Bank. Eine Rückerstattung muss innerhalb von 8 Wochen ab dem Datum der Belastung Ihres Kontos beantragt werden."
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
       "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es erneut.",

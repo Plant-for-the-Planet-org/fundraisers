@@ -1,10 +1,11 @@
 'use client';
 
 import type { Control } from 'react-hook-form';
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from './donate-overlay';
+import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { createContext, useContext, useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -130,6 +131,7 @@ interface DonationFormContextValue {
   donationData: DonationData;
   paymentOptions: PaymentOptions;
   onSubmit: (values: DonationFormValues) => void;
+  sepaFormRef: RefObject<StripeSepaFormHandle | null>;
 }
 
 const DonationFormContext = createContext<DonationFormContextValue | null>(
@@ -141,6 +143,7 @@ interface DonationFormProviderProps {
   donationData: DonationData;
   paymentOptions: PaymentOptions;
   onSubmit: (values: DonationFormValues) => void;
+  sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   isOpen: boolean;
   children: ReactNode;
 }
@@ -155,6 +158,7 @@ export function DonationFormProvider({
   donationData,
   paymentOptions,
   onSubmit,
+  sepaFormRef,
   isOpen,
   children,
 }: DonationFormProviderProps) {
@@ -193,7 +197,13 @@ export function DonationFormProvider({
 
   return (
     <DonationFormContext.Provider
-      value={{ fundraiser, donationData, paymentOptions, onSubmit }}
+      value={{
+        fundraiser,
+        donationData,
+        paymentOptions,
+        onSubmit,
+        sepaFormRef,
+      }}
     >
       <FormProvider {...methods}>
         {children}
