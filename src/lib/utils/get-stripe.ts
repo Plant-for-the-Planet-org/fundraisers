@@ -1,4 +1,5 @@
 import type { Stripe, StripeElementLocale } from '@stripe/stripe-js';
+
 import { loadStripe } from '@stripe/stripe-js';
 
 // Cache is unbounded but practically small — one entry per publishable key + locale pair.

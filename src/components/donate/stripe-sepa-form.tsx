@@ -1,10 +1,11 @@
 'use client';
 
-import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import type { StripeIbanElementChangeEvent } from '@stripe/stripe-js';
+
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
+import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { FormField } from './form-field';

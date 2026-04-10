@@ -16,8 +16,8 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   'bank-transfer': 'methods.bankTransfer',
