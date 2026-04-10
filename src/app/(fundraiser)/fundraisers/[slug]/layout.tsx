@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { getLocale } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
@@ -18,10 +19,11 @@ export default async function FundraiserLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const locale = await getLocale();
 
   let theme;
   try {
-    const fundraiser = await getCachedFundraiser(slug);
+    const fundraiser = await getCachedFundraiser(slug, locale);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
     if (
