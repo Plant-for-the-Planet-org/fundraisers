@@ -29,12 +29,16 @@ Reference implementations:
 
 - [x] Install `@stripe/stripe-js` and `@stripe/react-stripe-js`
 - [x] Fix `StripePaymentSource` type — remove `kind` field
+- [x] Install `@stripe/stripe-js` and `@stripe/react-stripe-js`
+- [x] Fix `StripePaymentSource` type — remove `kind` field
 - [x] Create `stripe-sepa-form.tsx` (IbanElement + mandate text + ref handle)
 - [x] Add SEPA translation keys to locales
 - [x] Add `sepaFormRef` to `DonationFormContext`
 - [x] Create `src/lib/utils/get-stripe.ts` (cached `loadStripe` utility)
 - [x] Wire `<Elements>` provider into `donate-overlay.tsx` + create `sepaFormRef`
 - [x] Render `StripeSepaForm` in `payment-methods.tsx` when sepa-debit is selected
+- [x] Expand `stripe-sepa-form.tsx` — Account Holder Name field + mandate consent checkbox
+- [x] Expand SEPA translation keys — mandate section text, account holder fields, validation messages
 - [ ] Implement `case 'stripe'` in `payment-request-builder.ts`
 - [ ] Implement SEPA submit flow in `use-donation-submit.ts`
 
@@ -137,6 +141,29 @@ async confirmSepaDebitPayment(clientSecret) {
 
 ---
 
+### Task 3b — Expand `stripe-sepa-form.tsx` with Account Holder Name and mandate consent
+
+Confirmed requirements:
+
+1. **Account Holder Name** — plain text input, empty by default (no prepopulation). The user must type the name intentionally — prepopulating risks the user skipping review, which can cause bank rejections if the name doesn't match the account holder. Required: if empty when `createPaymentMethod` is called, show an inline error and return `{ error }` to block submission.
+
+2. **Mandate consent checkbox** — must be checked before submission. If unchecked when `createPaymentMethod` is called, show an inline error and return `{ error }`.
+
+3. **Mandate section UI** — bordered section with creditor info grid (Creditor name + Creditor ID) and rights text, following the structure used in gofundnature.
+
+4. **`billing_details.name`** — `createPaymentMethod` uses the internal `accountHolderName` value, not the `name` in the `billingDetails` argument from the caller. This keeps Task 9 unchanged — the caller still passes `firstname + lastname`; the form overrides it with its own value.
+
+**Creditor ID:**
+
+```typescript
+// TODO: make creditor ID dynamic (source TBD)
+const CREDITOR_ID = 'DE98ZZZ09999999999';
+```
+
+**Testable:** Click Donate with SEPA selected but no name and mandate unchecked → both inline errors appear. Fill name and check mandate → errors clear. Submit with valid IBAN and both fields satisfied → proceeds to API call.
+
+---
+
 ### Task 4 — Add SEPA translation keys to locales
 
 Add to `locales/en/donate.json` under `Donate`:
@@ -151,6 +178,34 @@ Add to `locales/en/donate.json` under `Donate`:
 Add corresponding German translation to `locales/de/donate.json`.
 
 **Testable:** No missing-key warnings in console. Mandate text visible in UI when SEPA is selected.
+
+---
+
+### Task 4b — Expand SEPA translation keys
+
+Replace the existing `sepa` block in both locale files with the full set of keys required by Task 3b.
+
+`locales/en/donate.json`:
+
+```json
+"sepa": {
+  "ibanLabel": "IBAN",
+  "accountHolderName": "Account Holder Name",
+  "accountHolderNameRequired": "Account holder name is required",
+  "mandateTitle": "SEPA Direct Debit Mandate",
+  "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
+  "creditor": "Creditor",
+  "creditorName": "Plant-for-the-Planet Foundation",
+  "creditorId": "Creditor ID",
+  "mandateRights": "Your rights: You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
+  "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
+  "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
+}
+```
+
+Add corresponding German translation to `locales/de/donate.json`.
+
+**Testable:** Switch locale to `de` → all mandate text, labels, and errors appear in German. No missing-key warnings in console.
 
 ---
 
@@ -399,7 +454,7 @@ const {
 | File                                              | Action                                                                        |
 | ------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `src/lib/utils/get-stripe.ts`                     | Create — cached `getStripe(publishableKey, locale)` utility                   |
-| `src/components/donate/stripe-sepa-form.tsx`      | Create — IbanElement + mandate text + ref handle                              |
+| `src/components/donate/stripe-sepa-form.tsx`      | Modify — add Account Holder Name field, mandate consent checkbox, creditor info |
 | `src/lib/types/payment.ts`                        | Modify — remove `kind` from `StripePaymentSource`                             |
 | `src/lib/utils/payment-request-builder.ts`        | Modify — implement `case 'stripe'`, add `mapStripeMethodName`                 |
 | `src/components/donate/donate-overlay.tsx`        | Modify — add `<Elements>` wrapper, `sepaFormRef`, pass to `useDonationSubmit` |
@@ -435,20 +490,6 @@ A comment at line ~244 already flags this. When adding card/native pay, extract 
 **File:** `src/components/donate/donate-overlay.tsx` (the `<Elements>` provider)
 
 Pass an `options` prop with an `appearance` object to match the project's theme tokens (font family, border radius, color variables). Currently `<Elements>` is initialised with `stripe` only.
-
-### F4 — Account Holder Name field and Mandate checkbox
-
-**Pending confirmation from stakeholders.**
-
-The gofundnature implementation includes two UI elements not yet in `stripe-sepa-form.tsx`:
-
-1. **Account Holder Name field** — a plain `<Input>` pre-filled from `firstname + lastname`, editable in case the bank account is held under a different name (e.g. a company). The value is passed to Stripe as `billing_details.name` at submit time.
-
-2. **Mandate acceptance checkbox** — a plain `<Checkbox>` the donor must check before submitting. Stripe doesn't enforce this, but it's a stronger signal of informed consent and common practice for SEPA flows. gofundnature also displays the Creditor ID alongside the mandate text.
-
-Note: Stripe Elements only provides the `IbanElement` — name and mandate checkbox are custom fields. The gofundnature implementation uses a plain text input for IBAN instead of `IbanElement`, but our implementation correctly uses `IbanElement` for real-time validation and secure input.
-
-If both are required: add them to `stripe-sepa-form.tsx`, wire the name field value into `createPaymentMethod`'s `billing_details.name`, and block submission (return early from `createPaymentMethod`) if the checkbox is unchecked.
 
 ### F3 — Saved SEPA methods
 

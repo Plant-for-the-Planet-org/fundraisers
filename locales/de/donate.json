@@ -99,7 +99,16 @@
     },
     "sepa": {
       "ibanLabel": "IBAN",
-      "mandate": "Indem Sie Ihre IBAN angeben und diese Zahlung bestätigen, ermächtigen Sie die Plant-for-the-Planet Foundation, Ihrer Bank Anweisungen zu erteilen, Ihr Konto zu belasten, und Ihre Bank, Ihr Konto gemäß diesen Anweisungen zu belasten. Sie haben Anspruch auf eine Rückerstattung von Ihrer Bank gemäß den Bedingungen Ihrer Vereinbarung mit Ihrer Bank. Eine Rückerstattung muss innerhalb von 8 Wochen ab dem Datum der Belastung Ihres Kontos beantragt werden."
+      "accountHolderName": "Kontoinhaber",
+      "accountHolderNameRequired": "Kontoinhaber ist erforderlich",
+      "mandateTitle": "SEPA-Lastschriftmandat",
+      "mandateIntro": "Mit der Unterzeichnung dieses Mandatsformulars ermächtigen Sie die Plant-for-the-Planet Foundation, Zahlungen von Ihrem Konto mittels Lastschrift einzuziehen. Zugleich weisen Sie Ihr Kreditinstitut an, die von der Plant-for-the-Planet Foundation auf Ihr Konto gezogenen Lastschriften einzulösen.",
+      "creditor": "Gläubiger",
+      "creditorName": "Plant-for-the-Planet Foundation",
+      "creditorId": "Gläubiger-ID",
+      "mandateRights": "Ihre Rechte: Sie haben Anspruch auf eine Rückerstattung von Ihrer Bank gemäß den Bedingungen Ihrer Vereinbarung mit Ihrer Bank. Eine Rückerstattung muss innerhalb von 8 Wochen ab dem Datum der Belastung Ihres Kontos beantragt werden.",
+      "mandateConsent": "Ich stimme dem SEPA-Lastschriftmandat zu und ermächtige die Belastung meines Kontos",
+      "mandateRequired": "Sie müssen dem SEPA-Lastschriftmandat zustimmen, um fortzufahren"
     },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
