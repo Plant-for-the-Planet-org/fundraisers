@@ -29,14 +29,10 @@ const IBAN_ELEMENT_OPTIONS = {
   style: {
     base: {
       fontSize: '14px',
-      color: 'hsl(var(--foreground))',
-      '::placeholder': {
-        color: 'hsl(var(--muted-foreground))',
-      },
+      color: '#030712',
+      '::placeholder': { color: '#6b7280' },
     },
-    invalid: {
-      color: 'hsl(var(--destructive))',
-    },
+    invalid: { color: '#dc2626' },
   },
 };
 
@@ -49,6 +45,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
 
+    const [ibanComplete, setIbanComplete] = useState(false);
     const [ibanError, setIbanError] = useState<string | null>(null);
     const [accountHolderName, setAccountHolderName] = useState('');
     const [nameError, setNameError] = useState<string | null>(null);
@@ -59,6 +56,10 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
       async createPaymentMethod(billingDetails) {
         let hasError = false;
 
+        if (!ibanComplete) {
+          if (!ibanError) setIbanError(t('ibanRequired'));
+          hasError = true;
+        }
         if (!accountHolderName.trim()) {
           setNameError(t('accountHolderNameRequired'));
           hasError = true;
@@ -95,6 +96,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     }));
 
     const handleIbanChange = (event: StripeIbanElementChangeEvent) => {
+      setIbanComplete(event.complete);
       setIbanError(event.error?.message ?? null);
     };
 

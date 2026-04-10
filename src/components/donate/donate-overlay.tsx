@@ -97,7 +97,7 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
-  } = useDonationSubmit(donationData, fundraiser, paymentOptions);
+  } = useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef);
   const { thankYouState, error, isLoading } = donationState;
 
   const leftColumn = thankYouState ? (

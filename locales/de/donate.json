@@ -99,6 +99,7 @@
     },
     "sepa": {
       "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN ist erforderlich",
       "accountHolderName": "Kontoinhaber",
       "accountHolderNameRequired": "Kontoinhaber ist erforderlich",
       "mandateTitle": "SEPA-Lastschriftmandat",

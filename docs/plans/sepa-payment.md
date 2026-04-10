@@ -39,8 +39,8 @@ Reference implementations:
 - [x] Render `StripeSepaForm` in `payment-methods.tsx` when sepa-debit is selected
 - [x] Expand `stripe-sepa-form.tsx` — Account Holder Name field + mandate consent checkbox
 - [x] Expand SEPA translation keys — mandate section text, account holder fields, validation messages
-- [ ] Implement `case 'stripe'` in `payment-request-builder.ts`
-- [ ] Implement SEPA submit flow in `use-donation-submit.ts`
+- [x] Implement `case 'stripe'` in `payment-request-builder.ts`
+- [x] Implement SEPA submit flow in `use-donation-submit.ts`
 
 ---
 
@@ -317,27 +317,6 @@ No validity gating on the CTA button — if the IBAN is invalid or incomplete, `
 
 ### Task 8 — Implement `case 'stripe'` in `src/lib/utils/payment-request-builder.ts`
 
-Add a `mapStripeMethodName` helper and implement the stripe branch.
-
-```typescript
-import type { StripePaymentMethod } from '../types/payment';
-
-function mapStripeMethodName(
-  paymentMethod: PaymentMethod
-): StripePaymentMethod {
-  switch (paymentMethod) {
-    case 'sepa-debit':
-      return 'sepa_debit';
-    case 'apple-pay':
-      return 'apple_pay';
-    case 'google-pay':
-      return 'google_pay';
-    default:
-      return 'card';
-  }
-}
-```
-
 Replace the `case 'stripe'` throw with:
 
 ```typescript
@@ -353,11 +332,13 @@ case 'stripe': {
   return {
     gateway: 'stripe',
     account,
-    method: mapStripeMethodName(paymentMethod),
+    method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
     source: { id: String(id), object: 'payment_method' },
   };
 }
 ```
+
+Note: a separate `mapStripeMethodName` was considered but rejected — `mapPaymentMethodName` already handles all Stripe method names correctly; the cast to `StripePaymentMethod` is sufficient.
 
 **Testable:** Call `buildPaymentRequest` with mock `PaymentData` for `sepa-debit` and a `paymentMethodId` — assert the returned object matches the expected `StripePaymentRequest` shape.
 
@@ -445,6 +426,18 @@ const {
 } = useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef);
 ```
 
+**Billing details — address for authenticated users:** `donorProfile` has both a flat `address` object and an `addresses` array. The `values.selectedAddressId` identifies which address the user selected. The lookup priority is:
+
+1. Match `values.selectedAddressId` against `donorProfile.addresses`
+2. Fall back to `donorProfile.address` (flat default)
+3. For guest users, `formData.donor` fields take precedence over profile data
+
+**Fixes applied during implementation:**
+
+- **IBAN validation not firing on empty submit:** `createPaymentMethod` returned early when name/mandate failed, so the IbanElement was never validated. Fixed by tracking `ibanComplete` from the `IbanElement` `onChange` event and including IBAN completeness in the upfront validation block alongside name and mandate — all three errors now surface together.
+- **`IbanElement` style options:** Stripe does not support `hsl()` colors or CSS custom properties in its style configuration. Fixed by using hardcoded hex values (`#030712`, `#6b7280`, `#dc2626`) that approximate the theme tokens. A proper theme-aware solution requires loading the font and resolving colors via `<Elements options={{ appearance }}>` (see F2 in Future improvements).
+```
+
 **Testable:** Select SEPA, enter test IBAN `DE89370400440532013000`, fill donor info, click Donate → API calls fire, thank-you screen appears. Enter declined IBAN `DE62370400440532013001` → error banner shown.
 
 ---
@@ -456,7 +449,7 @@ const {
 | `src/lib/utils/get-stripe.ts`                     | Create — cached `getStripe(publishableKey, locale)` utility                   |
 | `src/components/donate/stripe-sepa-form.tsx`      | Modify — add Account Holder Name field, mandate consent checkbox, creditor info |
 | `src/lib/types/payment.ts`                        | Modify — remove `kind` from `StripePaymentSource`                             |
-| `src/lib/utils/payment-request-builder.ts`        | Modify — implement `case 'stripe'`, add `mapStripeMethodName`                 |
+| `src/lib/utils/payment-request-builder.ts`        | Modify — implement `case 'stripe'`                                            |
 | `src/components/donate/donate-overlay.tsx`        | Modify — add `<Elements>` wrapper, `sepaFormRef`, pass to `useDonationSubmit` |
 | `src/components/donate/donation-form-context.tsx` | Modify — add `sepaFormRef` to context                                         |
 | `src/components/donate/payment-methods.tsx`       | Modify — render `<StripeSepaForm>` when sepa-debit selected                   |
@@ -490,6 +483,11 @@ A comment at line ~244 already flags this. When adding card/native pay, extract 
 **File:** `src/components/donate/donate-overlay.tsx` (the `<Elements>` provider)
 
 Pass an `options` prop with an `appearance` object to match the project's theme tokens (font family, border radius, color variables). Currently `<Elements>` is initialised with `stripe` only.
+
+The `IbanElement` currently uses hardcoded hex colors (`#030712`, `#6b7280`, `#dc2626`) that approximate the default theme but do not adapt to theme changes or dark mode. Resolving this properly requires:
+
+1. Loading the active theme font in Stripe's iframe via `<Elements options={{ fonts }}>` — the font URL must be passed explicitly since Stripe's iframe cannot inherit `next/font` variables from the parent page
+2. Computing resolved color values to pass to the element style — Stripe does not support `hsl()` or CSS custom properties; colors must be `rgb()` or hex
 
 ### F3 — Saved SEPA methods
 

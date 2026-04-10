@@ -99,6 +99,7 @@
     },
     "sepa": {
       "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN is required",
       "accountHolderName": "Account Holder Name",
       "accountHolderNameRequired": "Account holder name is required",
       "mandateTitle": "SEPA Direct Debit Mandate",
