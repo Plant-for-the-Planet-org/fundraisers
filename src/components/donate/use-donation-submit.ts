@@ -210,6 +210,39 @@ export function useDonationSubmit(
             paymentDetails = { paymentMethodId: sepaResult.paymentMethodId };
           }
 
+          if (values.selectedPaymentMethod === 'card') {
+            const donor = formData.type === 'guest' ? formData.donor : null;
+            const addressFromList = donorProfile?.addresses.find(
+              a => a.id === values.selectedAddressId
+            );
+            const selectedAddress = addressFromList ?? donorProfile?.address;
+            const cardResult = await cardFormRef.current?.createPaymentMethod({
+              email: donor?.email ?? donorProfile?.email ?? '',
+              donorAddress: {
+                line1: donor?.address ?? selectedAddress?.address ?? '',
+                city: donor?.city ?? selectedAddress?.city ?? '',
+                state: donor?.state ?? addressFromList?.state ?? undefined,
+                zipCode: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
+                country:
+                  donor?.country ??
+                  selectedAddress?.country ??
+                  donorProfile?.country ??
+                  '',
+              },
+            });
+
+            if (!cardResult || 'error' in cardResult) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            paymentDetails = { paymentMethodId: cardResult.paymentMethodId };
+          }
+
           const { donationResponse, paymentResponse } =
             await submitStandardDonation({
               payload,
@@ -254,10 +287,101 @@ export function useDonationSubmit(
             return;
           }
 
-          // `action_required` or unexpected status — keep user in flow.
-          // Future: handle 3DS card authentication here.
-          // NOTE: idempotency keys are intentionally NOT rotated here.
-          // When implementing 3DS, the re-submission after user authentication should reuse the same keys (treating it as a confirmation of the same payment intent, not a new attempt). Verify this against the Stripe API contract before rotating.
+          // NOTE: idempotency keys are intentionally NOT rotated before action_required handling.
+          // For SEPA and card 3DS, the re-submission reuses the same keys (confirmation of the same
+          // payment intent, not a new attempt). Keys are rotated only after a successful resolution.
+          if (
+            paymentResponse.status === 'action_required' &&
+            paymentResponse.response.type === 'cardAction' &&
+            values.selectedPaymentMethod === 'card'
+          ) {
+            const actionResult = (await cardFormRef.current?.handleCardAction(
+              paymentResponse.response.payment_intent_client_secret
+            )) ?? { error: 'No card form available' };
+
+            if ('error' in actionResult) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            const confirmRequest: StripeCardActionConfirmRequest = {
+              gateway: 'stripe',
+              account: paymentResponse.response.account,
+              source: {
+                id: actionResult.paymentIntentId,
+                object: 'payment_intent',
+              },
+            };
+            const finalResponse = await paymentService.processPayment(
+              donationResponse.donationId,
+              confirmRequest,
+              token || undefined,
+              paymentKeyRef.current
+            );
+
+            if (finalResponse.status === 'failed') {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            donationKeyRef.current =
+              generateIdempotencyKeyWithPrefix('donation');
+            paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYouState: {
+                status: 'completed',
+                donationId: donationResponse.donationId,
+              },
+            }));
+            return;
+          }
+
+          if (
+            paymentResponse.status === 'action_required' &&
+            paymentResponse.response.type === 'cardPayment' &&
+            values.selectedPaymentMethod === 'card'
+          ) {
+            const confirmResult =
+              (await cardFormRef.current?.confirmCardPayment(
+                paymentResponse.response.payment_intent_client_secret,
+                paymentResponse.response.payment_method
+              )) ?? { error: 'No card form available' };
+
+            if (confirmResult.error) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            donationKeyRef.current =
+              generateIdempotencyKeyWithPrefix('donation');
+            paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYouState: {
+                status: 'completed',
+                donationId: donationResponse.donationId,
+              },
+            }));
+            return;
+          }
+
           if (
             paymentResponse.status === 'action_required' &&
             values.selectedPaymentMethod === 'sepa-debit'
@@ -309,6 +433,7 @@ export function useDonationSubmit(
       donorProfile,
       token,
       sepaFormRef,
+      cardFormRef,
     ]
   );
 
