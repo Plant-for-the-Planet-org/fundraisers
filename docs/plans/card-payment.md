@@ -27,7 +27,14 @@ Reference implementations:
 
 SEPA `action_required` only needs `confirmSepaDebitPayment`, no second PUT.
 
-**Design choice — no separate Cardholder Name field:** Card billing name is not used for authorization (unlike SEPA where bank rejection risk is real). Billing details (including name) are passed to `createPaymentMethod` by the caller from donor info already entered.
+**Card-specific billing fields:** The card form collects additional fields not present in the SEPA form:
+
+- **Cardholder Name** — passed to Stripe as `billing_details.name`; owned by the form (not passed by the caller)
+- **Billing address** — passed to Stripe as `billing_details.address`; needed for AVS (Address Verification System) which checks postal code and street number against card issuer records
+
+By default, the form reuses the donor's address via a "Use billing address from my donor info" checkbox (checked by default). When unchecked, separate billing address fields (line1, line2, city, state, zip, country) are shown and validated. This keeps the card's billing address distinct from the donor's mailing address while avoiding double data entry in the common case.
+
+Only `email` and `donorAddress` are passed in by the caller. The form resolves the final billing address from either source and sends `{ name, email, address: { line1, line2, city, state, postal_code, country } }` to Stripe.
 
 **`<Elements>` provider:** Already in place in `donate-overlay.tsx`. No changes needed — `StripeCardForm` uses `useStripe()` / `useElements()` from the existing provider.
 
@@ -97,17 +104,50 @@ export type PaymentRequest =
 
 ---
 
+### Task 2a — Refactor `src/components/donate/address-country-selector.tsx`
+
+Make the component reusable without changing its external interface for existing callers.
+
+**Two changes only:**
+
+1. **Unique IDs via `React.useId()`** — prevents `id`/`aria-controls` collisions when two instances render on the same page (donor address form + card billing address):
+```typescript
+const uid = useId();
+const listboxId = `${uid}-listbox`;
+// option ids: `${uid}-option-${countryOption.code}`
+```
+
+2. **Optional display-string props** — `label`, `placeholder`, `noResultsText` with defaults from the existing `Donate.userAddress` translations, so existing call sites need no changes:
+```typescript
+type AddressCountrySelectorProps = {
+  country: string | undefined;
+  onCountryChange: (code: string) => void;
+  onCountryBlur: () => void;
+  error?: string;
+  label?: string;
+  placeholder?: string;
+  noResultsText?: string;
+};
+// Defaults inside component:
+const resolvedLabel = label ?? tDonate('country.label');
+const resolvedPlaceholder = placeholder ?? tDonate('country.selectCountry');
+const resolvedNoResults = noResultsText ?? tDonate('country.noResults');
+```
+
+The card form passes `t('countryLabel')`, `t('countryPlaceholder')`, `t('countryNoResults')` from the `Donate.card` namespace.
+
+---
+
 ### Task 2 — Create `src/components/donate/stripe-card-form.tsx`
 
 New `'use client'` component. Mirrors `stripe-sepa-form.tsx`: `forwardRef<StripeCardFormHandle>` + `useImperativeHandle`.
 
-**Handle interface — two Stripe methods matching the two `action_required` subtypes:**
+**Handle interface:**
 ```typescript
 export interface StripeCardFormHandle {
-  createPaymentMethod(billingDetails: {
-    name: string;
+  createPaymentMethod(options: {
     email: string;
-    address: { line1: string; city: string; postal_code: string; country: string };
+    donorAddress: { line1: string; city: string; state?: string; zipCode: string; country: string };
   }): Promise<{ paymentMethodId: string } | { error: string }>;
 
   handleCardAction(clientSecret: string): Promise<{ paymentIntentId: string } | { error: string }>;
@@ -118,53 +158,55 @@ export interface StripeCardFormHandle {
 }
 ```
 
-**State — one complete flag and one error string per element:**
+**State:**
+
+Stripe elements (complete flag + error string each):
 - `cardNumberComplete`, `cardNumberError`
 - `cardExpiryComplete`, `cardExpiryError`
 - `cardCvcComplete`, `cardCvcError`
 
-Each element's `onChange` sets its completion boolean and error string (same pattern as `IbanElement` in SEPA form).
+Text inputs (value + error):
+- `cardholderName`, `cardholderNameError`
+
+Billing address toggle + fields:
+- `useDonorAddress: boolean` (default `true`) — checkbox state
+- When `false`: `billingLine1`, `billingLine1Error`, `billingLine2` (optional), `billingCity`, `billingCityError`, `billingState` (optional), `billingZip`, `billingZipError`, `billingCountry`, `billingCountryError`
 
 **Element style options** — same hardcoded hex values as `stripe-sepa-form.tsx` (Stripe does not support `hsl()` or CSS custom properties):
 ```typescript
 const CARD_ELEMENT_OPTIONS = {
   style: {
-    base: {
-      fontSize: '14px',
-      color: '#030712',
-      '::placeholder': { color: '#6b7280' },
-    },
+    base: { fontSize: '14px', color: '#030712', '::placeholder': { color: '#6b7280' } },
     invalid: { color: '#dc2626' },
   },
 };
 ```
 
-**`createPaymentMethod` — validate all three fields first, then call Stripe:**
+**`createPaymentMethod` — validate, resolve billing address, then call Stripe:**
+
+When `useDonorAddress` is true, billing address comes from `options.donorAddress`; when false, from the form's own billing fields. Validation of billing fields only runs when `useDonorAddress` is false.
+
 ```typescript
-async createPaymentMethod(billingDetails) {
+async createPaymentMethod({ email, donorAddress }) {
   let hasError = false;
-  if (!cardNumberComplete) {
-    if (!cardNumberError) setCardNumberError(t('cardNumberRequired'));
-    hasError = true;
-  }
-  if (!cardExpiryComplete) {
-    if (!cardExpiryError) setCardExpiryError(t('expiryRequired'));
-    hasError = true;
-  }
-  if (!cardCvcComplete) {
-    if (!cardCvcError) setCardCvcError(t('cvcRequired'));
-    hasError = true;
+  // Stripe element validation (unchanged) ...
+  if (!cardholderName.trim()) { setCardholderNameError(...); hasError = true; }
+  if (!useDonorAddress) {
+    if (!billingLine1.trim()) { setBillingLine1Error(...); hasError = true; }
+    if (!billingCity.trim()) { setBillingCityError(...); hasError = true; }
+    if (!billingZip.trim()) { setBillingZipError(...); hasError = true; }
+    if (!billingCountry) { setBillingCountryError(...); hasError = true; }
   }
   if (hasError) return { error: 'Validation failed' };
 
-  if (!stripe || !elements) return { error: 'Stripe not initialized' };
-  const cardNumberElement = elements.getElement(CardNumberElement);
-  if (!cardNumberElement) return { error: 'Card element not found' };
+  const billingAddress = useDonorAddress
+    ? { line1: donorAddress.line1, city: donorAddress.city, state: donorAddress.state, postal_code: donorAddress.zipCode, country: donorAddress.country }
+    : { line1: billingLine1.trim(), line2: billingLine2.trim() || undefined, city: billingCity.trim(), state: billingState.trim() || undefined, postal_code: billingZip.trim(), country: billingCountry };
 
   const { paymentMethod, error } = await stripe.createPaymentMethod({
     type: 'card',
     card: cardNumberElement,
-    billing_details: billingDetails,
+    billing_details: { name: cardholderName.trim(), email, address: billingAddress },
   });
 
   if (error) return { error: error.message ?? 'Payment method creation failed' };
@@ -172,59 +214,26 @@ async createPaymentMethod(billingDetails) {
 }
 ```
 
-**`handleCardAction` — for `cardAction` response type (second PUT required):**
-```typescript
-async handleCardAction(clientSecret) {
-  if (!stripe) return { error: 'Stripe not initialized' };
-  const { paymentIntent, error } = await stripe.handleCardAction(clientSecret);
-  if (error) return { error: error.message ?? 'Card action failed' };
-  return { paymentIntentId: paymentIntent.id };
-}
+**UI layout:**
+```
+Card Number (full width)
+Expiry | CVC (grid-cols-2)
+Cardholder Name (full width)
+☑ Use billing address from my donor info  (Checkbox)
+[if unchecked]
+  Address Line 1 (full width, required)
+  Address Line 2 (full width, optional)
+  City | State (grid-cols-2; State optional)
+  Zip Code | Country (grid-cols-2; both required; Country uses AddressCountrySelector)
 ```
 
-**`confirmCardPayment` — for `cardPayment` response type (recurring; no second PUT):**
-```typescript
-async confirmCardPayment(clientSecret, paymentMethod) {
-  if (!stripe) return { error: 'Stripe not initialized' };
-  const { error } = await stripe.confirmCardPayment(
-    clientSecret,
-    paymentMethod ? { payment_method: paymentMethod } : undefined
-  );
-  return { error: error?.message };
-}
-```
-
-**UI layout — CardNumberElement full width, CardExpiryElement + CardCvcElement in a 2-column grid:**
-```tsx
-<div className='space-y-4'>
-  <FormField label={t('cardNumberLabel')} error={cardNumberError ?? undefined}>
-    <div className='border border-border rounded-lg p-3'>
-      <CardNumberElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardNumberChange} />
-    </div>
-  </FormField>
-
-  <div className='grid grid-cols-2 gap-3'>
-    <FormField label={t('expiryLabel')} error={cardExpiryError ?? undefined}>
-      <div className='border border-border rounded-lg p-3'>
-        <CardExpiryElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardExpiryChange} />
-      </div>
-    </FormField>
-    <FormField label={t('cvcLabel')} error={cardCvcError ?? undefined}>
-      <div className='border border-border rounded-lg p-3'>
-        <CardCvcElement options={CARD_ELEMENT_OPTIONS} onChange={handleCardCvcChange} />
-      </div>
-    </FormField>
-  </div>
-</div>
-```
-
-**Testable:** Render inside a test `<Elements>` wrapper → three card inputs appear. Click Donate without filling any → all three error messages surface simultaneously. Enter test card `4242424242424242`, valid expiry, valid CVC → no errors. Call `createPaymentMethod` with billing details → returns `{ paymentMethodId: 'pm_...' }`.
+**Testable:** Check/uncheck the checkbox → billing fields appear/disappear. Submit with unchecked + empty fields → line1/city/zip/country errors surface. Submit with donor address checked → no billing field errors.
 
 ---
 
 ### Task 3 — Add card translation keys to locales
 
-**`locales/en/donate.json`** — add `"card"` block inside `"Donate"` (alongside the existing `"sepa"` block):
+**`locales/en/donate.json`** — full `"card"` block:
 ```json
 "card": {
   "cardNumberLabel": "Card Number",
@@ -232,11 +241,26 @@ async confirmCardPayment(clientSecret, paymentMethod) {
   "expiryLabel": "Expiry Date",
   "expiryRequired": "Expiry date is required",
   "cvcLabel": "CVC",
-  "cvcRequired": "CVC is required"
+  "cvcRequired": "CVC is required",
+  "cardholderNameLabel": "Cardholder Name",
+  "cardholderNameRequired": "Cardholder name is required",
+  "useDonorAddressLabel": "Use billing address from my donor info",
+  "addressLine1Label": "Address Line 1",
+  "addressLine1Required": "Address is required",
+  "addressLine2Label": "Address Line 2",
+  "cityLabel": "City",
+  "cityRequired": "City is required",
+  "stateLabel": "State / Province",
+  "billingZipLabel": "Zip / Postal Code",
+  "billingZipRequired": "Zip code is required",
+  "countryLabel": "Country",
+  "countryRequired": "Country is required",
+  "countryPlaceholder": "Select country",
+  "countryNoResults": "No countries found"
 }
 ```
 
-**`locales/de/donate.json`** — add German equivalents:
+**`locales/de/donate.json`** — German equivalents:
 ```json
 "card": {
   "cardNumberLabel": "Kartennummer",
@@ -244,7 +268,22 @@ async confirmCardPayment(clientSecret, paymentMethod) {
   "expiryLabel": "Ablaufdatum",
   "expiryRequired": "Ablaufdatum ist erforderlich",
   "cvcLabel": "CVC",
-  "cvcRequired": "CVC ist erforderlich"
+  "cvcRequired": "CVC ist erforderlich",
+  "cardholderNameLabel": "Name des Karteninhabers",
+  "cardholderNameRequired": "Name des Karteninhabers ist erforderlich",
+  "useDonorAddressLabel": "Rechnungsadresse aus meinen Spenderdaten verwenden",
+  "addressLine1Label": "Adresszeile 1",
+  "addressLine1Required": "Adresse ist erforderlich",
+  "addressLine2Label": "Adresszeile 2",
+  "cityLabel": "Stadt",
+  "cityRequired": "Stadt ist erforderlich",
+  "stateLabel": "Bundesland / Kanton",
+  "billingZipLabel": "PLZ",
+  "billingZipRequired": "Postleitzahl ist erforderlich",
+  "countryLabel": "Land",
+  "countryRequired": "Land ist erforderlich",
+  "countryPlaceholder": "Land auswählen",
+  "countryNoResults": "Keine Länder gefunden"
 }
 ```
 
@@ -314,30 +353,22 @@ No validity gating on the CTA — incomplete card fields are caught inside `crea
 3. Add `cardFormRef: RefObject<StripeCardFormHandle | null>` as 5th parameter
 4. Add both `sepaFormRef` and `cardFormRef` to the `onSubmit` `useCallback` deps — the `react-hooks/exhaustive-deps` rule requires it; ref objects are stable so this does not cause extra re-renders
 
-**In `onSubmit`, declare `cardPaymentMethodId` at the same scope as `paymentDetails`, then add the card block after the SEPA block:**
+**In `onSubmit`, add the card block after the SEPA block:**
 
 ```typescript
-let cardPaymentMethodId: string | undefined;
-
 if (values.selectedPaymentMethod === 'card') {
   const donor = formData.type === 'guest' ? formData.donor : null;
   const selectedAddress =
     donorProfile?.addresses.find(a => a.id === values.selectedAddressId) ??
     donorProfile?.address;
   const cardResult = await cardFormRef.current?.createPaymentMethod({
-    name: donor
-      ? `${donor.firstname} ${donor.lastname}`
-      : `${donorProfile?.firstname ?? ''} ${donorProfile?.lastname ?? ''}`.trim(),
     email: donor?.email ?? donorProfile?.email ?? '',
-    address: {
+    donorAddress: {
       line1: donor?.address ?? selectedAddress?.address ?? '',
       city: donor?.city ?? selectedAddress?.city ?? '',
-      postal_code: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
-      country:
-        donor?.country ??
-        selectedAddress?.country ??
-        donorProfile?.country ??
-        '',
+      state: donor?.state ?? selectedAddress?.state ?? undefined,
+      zipCode: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
+      country: donor?.country ?? selectedAddress?.country ?? donorProfile?.country ?? '',
     },
   });
 
@@ -350,8 +381,7 @@ if (values.selectedPaymentMethod === 'card') {
     return; // submittingRef.current reset by finally
   }
 
-  cardPaymentMethodId = cardResult.paymentMethodId;
-  paymentDetails = { paymentMethodId: cardPaymentMethodId };
+  paymentDetails = { paymentMethodId: cardResult.paymentMethodId };
 }
 ```
 
@@ -447,7 +477,8 @@ if (
 | File | Action |
 |------|--------|
 | `src/lib/types/payment.ts` | Modify — add `'cardPayment'` to `action_required` response type; add `StripeCardActionConfirmRequest` to `PaymentRequest` union |
-| `src/components/donate/stripe-card-form.tsx` | Create — split CardElement inputs + `StripeCardFormHandle` ref |
+| `src/components/donate/address-country-selector.tsx` | Modify — add optional `label`/`placeholder`/`noResultsText` props; use `React.useId()` for unique element IDs |
+| `src/components/donate/stripe-card-form.tsx` | Create — split CardElement inputs, cardholder name, billing address toggle + full address fields, `StripeCardFormHandle` ref |
 | `locales/en/donate.json` | Modify — add `Donate.card.*` keys |
 | `locales/de/donate.json` | Modify — add `Donate.card.*` keys (German) |
 | `src/components/donate/donation-form-context.tsx` | Modify — add `cardFormRef` to context |
@@ -464,10 +495,13 @@ if (
 
 ## Verification
 
-1. Select Card in the payment method dropdown → CardNumberElement, CardExpiryElement, CardCvcElement appear in the expected layout
-2. Click Donate without filling card fields → all three error messages surface simultaneously
-3. Enter test card `4242424242424242`, valid expiry, valid CVC, fill donor info, click Donate → success screen
-4. Enter declined card `4000000000000002` → error banner shown in overlay
-5. Enter 3DS card `4000000000003220` (`cardAction` path) → Stripe 3DS modal appears; complete authentication → second PUT fires → success screen
-6. Switch locale to `de` → all card labels and errors appear in German
-7. `npm run build` completes without TypeScript errors
+1. Select Card → three Stripe element fields, Cardholder Name, and the billing address checkbox appear
+2. Checkbox checked by default; uncheck → Line 1, Line 2, City, State, Zip, Country fields appear; re-check → they disappear
+3. Two country selectors on the same page (donor address + card billing) → no duplicate `id` or `aria-controls` attributes in the DOM
+4. Click Donate with all fields empty → card element errors, cardholder name error, and (if unchecked) billing address errors all surface simultaneously
+5. Enter test card `4242424242424242`, valid expiry, valid CVC, fill cardholder name, leave checkbox checked, fill donor info → success screen
+6. Uncheck checkbox, fill billing address fields with a different address → success screen; Stripe receives the billing address from the card form, not the donor address
+7. Enter declined card `4000000000000002` → error banner shown
+8. Enter 3DS card `4000000000003220` (`cardAction` path) → Stripe 3DS modal → second PUT → success screen
+9. Switch locale to `de` → all card labels and errors appear in German
+10. `npm run build` completes without TypeScript errors
