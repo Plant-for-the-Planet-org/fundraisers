@@ -73,6 +73,16 @@ interface StripePaymentRequest {
   savedMethod?: string; // TODO: confirm saved payment method structure with backend
 }
 
+// Second PUT after a cardAction 3DS challenge — no method field, source is a payment_intent
+export interface StripeCardActionConfirmRequest {
+  gateway: 'stripe';
+  account: string;
+  source: {
+    id: string;
+    object: 'payment_intent';
+  };
+}
+
 interface PayPalPaymentRequest {
   gateway: 'paypal';
   account: string;
@@ -89,6 +99,7 @@ interface OfflinePaymentRequest {
 
 export type PaymentRequest =
   | StripePaymentRequest
+  | StripeCardActionConfirmRequest
   | PayPalPaymentRequest
   | OfflinePaymentRequest;
 
@@ -113,15 +124,28 @@ interface PaymentResponseSuccess extends PaymentResponseBase {
   };
 }
 
-interface PaymentResponseActionRequired extends PaymentResponseBase {
-  status: 'action_required';
-  response: {
-    type: 'cardAction';
-    requires_action: true;
-    payment_intent_client_secret: string;
-    account: string;
-  };
-}
+type PaymentResponseActionRequired =
+  | {
+      id: string;
+      status: 'action_required';
+      response: {
+        type: 'cardAction';
+        requires_action: true;
+        payment_intent_client_secret: string;
+        account: string;
+      };
+    }
+  | {
+      id: string;
+      status: 'action_required';
+      response: {
+        type: 'cardPayment';
+        requires_action: true;
+        payment_intent_client_secret: string;
+        account: string;
+        payment_method: string; // required here
+      };
+    };
 
 interface PaymentResponseFailed extends PaymentResponseBase {
   status: 'failed';

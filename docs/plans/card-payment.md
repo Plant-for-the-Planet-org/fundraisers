@@ -35,7 +35,7 @@ SEPA `action_required` only needs `confirmSepaDebitPayment`, no second PUT.
 
 ## Tasks
 
-- [ ] Update `src/lib/types/payment.ts` — extend `action_required` response type + add `StripeCardActionConfirmRequest`
+- [x] Update `src/lib/types/payment.ts` — extend `action_required` response type + add `StripeCardActionConfirmRequest`
 - [ ] Create `stripe-card-form.tsx` (split CardElement inputs + ref handle)
 - [ ] Add card translation keys to locales
 - [ ] Add `cardFormRef` to `DonationFormContext`
@@ -47,72 +47,53 @@ SEPA `action_required` only needs `confirmSepaDebitPayment`, no second PUT.
 
 ## Implementation
 
-### Task 1 — Extend `src/lib/types/payment.ts`
+### Task 1 — Extend `src/lib/types/payment.ts` ✓ done
 
-Two changes are needed to support the 3DS re-submission flow.
+`PaymentResponseActionRequired` refactored into a proper discriminated union on `response.type`. The two variants have different shapes:
 
-**1a — Add `'cardPayment'` to `PaymentResponseActionRequired`:**
+- **`cardAction`** — 3DS for one-off card payments. Client calls `handleCardAction`, then re-submits payment server-side (second PUT).
+- **`cardPayment`** — 3DS for **recurring donations**. The backend has already saved the payment method; it returns `payment_method: string` which the client must pass to `confirmCardPayment`. No second PUT.
 
 ```typescript
-// Before:
-interface PaymentResponseActionRequired extends PaymentResponseBase {
-  status: 'action_required';
-  response: {
-    type: 'cardAction';
-    requires_action: true;
-    payment_intent_client_secret: string;
-    account: string;
-  };
-}
-
-// After:
-interface PaymentResponseActionRequired extends PaymentResponseBase {
-  status: 'action_required';
-  response: {
-    type: 'cardAction' | 'cardPayment';
-    requires_action: true;
-    payment_intent_client_secret: string;
-    account: string;
-  };
-}
+type PaymentResponseActionRequired =
+  | {
+      id: string;
+      status: 'action_required';
+      response: {
+        type: 'cardAction';
+        requires_action: true;
+        payment_intent_client_secret: string;
+        account: string;
+      };
+    }
+  | {
+      id: string;
+      status: 'action_required';
+      response: {
+        type: 'cardPayment';
+        requires_action: true;
+        payment_intent_client_secret: string;
+        account: string;
+        payment_method: string;
+      };
+    };
 ```
 
-**1b — Add `StripeCardActionConfirmRequest` to the `PaymentRequest` union:**
-
-The second PUT after a `cardAction` sends `{ gateway, account, source: { id: pi_xxx, object: 'payment_intent' } }` with **no `method` field** (confirmed from planet-donations `PaymentFunctions.ts`). This does not fit the existing `StripePaymentRequest` shape (which requires `method` and `object: 'payment_method'`), so a new type is needed:
+`StripeCardActionConfirmRequest` added for the second PUT after `cardAction` (no `method` field, `object: 'payment_intent'`) and added to the `PaymentRequest` union:
 
 ```typescript
-// New type — add after StripePaymentRequest
-interface StripeCardActionConfirmRequest {
+export interface StripeCardActionConfirmRequest {
   gateway: 'stripe';
   account: string;
-  source: {
-    id: string;
-    object: 'payment_intent';
-  };
+  source: { id: string; object: 'payment_intent' };
 }
 
-// Export it (used in use-donation-submit.ts)
-export type { StripeCardActionConfirmRequest };
-
-// Update the union:
-// Before:
-export type PaymentRequest =
-  | StripePaymentRequest
-  | PayPalPaymentRequest
-  | OfflinePaymentRequest;
-
-// After:
 export type PaymentRequest =
   | StripePaymentRequest
   | StripeCardActionConfirmRequest
   | PayPalPaymentRequest
   | OfflinePaymentRequest;
 ```
-
-`paymentService.processPayment` already accepts `PaymentRequest`, so no changes to the service layer.
-
-**Testable:** TypeScript compiles. No changes to existing behavior.
 
 ---
 
@@ -130,7 +111,10 @@ export interface StripeCardFormHandle {
   }): Promise<{ paymentMethodId: string } | { error: string }>;
 
   handleCardAction(clientSecret: string): Promise<{ paymentIntentId: string } | { error: string }>;
-  confirmCardPayment(clientSecret: string): Promise<{ error?: string }>;
+
+  // paymentMethod required for cardPayment (recurring) — the backend returns the
+  // saved pm_xxx that must be passed to stripe.confirmCardPayment
+  confirmCardPayment(clientSecret: string, paymentMethod?: string): Promise<{ error?: string }>;
 }
 ```
 
@@ -198,11 +182,14 @@ async handleCardAction(clientSecret) {
 }
 ```
 
-**`confirmCardPayment` — for `cardPayment` response type (no second PUT):**
+**`confirmCardPayment` — for `cardPayment` response type (recurring; no second PUT):**
 ```typescript
-async confirmCardPayment(clientSecret) {
+async confirmCardPayment(clientSecret, paymentMethod) {
   if (!stripe) return { error: 'Stripe not initialized' };
-  const { error } = await stripe.confirmCardPayment(clientSecret);
+  const { error } = await stripe.confirmCardPayment(
+    clientSecret,
+    paymentMethod ? { payment_method: paymentMethod } : undefined
+  );
   return { error: error?.message };
 }
 ```
@@ -425,10 +412,11 @@ if (
   }
 
   if (paymentResponse.response.type === 'cardPayment') {
-    // confirmCardPayment — no second PUT; show thank you directly
+    // confirmCardPayment — recurring donation; no second PUT; show thank you directly
     const confirmResult =
       (await cardFormRef.current?.confirmCardPayment(
-        paymentResponse.response.payment_intent_client_secret
+        paymentResponse.response.payment_intent_client_secret,
+        paymentResponse.response.payment_method
       )) ?? { error: 'No card form available' };
 
     if (confirmResult.error) {
