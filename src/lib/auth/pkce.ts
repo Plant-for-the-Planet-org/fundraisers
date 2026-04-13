@@ -40,7 +40,7 @@ export function generateCodeVerifier(): string {
 export async function generateCodeChallenge(
   codeVerifier: string
 ): Promise<string> {
-  if (!isBrowser) {
+  if (!isBrowser || !window.crypto.subtle) {
     throw new Error(
       'generateCodeChallenge is not available in a non-browser environment'
     );
