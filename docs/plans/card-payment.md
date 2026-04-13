@@ -36,11 +36,11 @@ SEPA `action_required` only needs `confirmSepaDebitPayment`, no second PUT.
 ## Tasks
 
 - [x] Update `src/lib/types/payment.ts` — extend `action_required` response type + add `StripeCardActionConfirmRequest`
-- [ ] Create `stripe-card-form.tsx` (split CardElement inputs + ref handle)
-- [ ] Add card translation keys to locales
-- [ ] Add `cardFormRef` to `DonationFormContext`
-- [ ] Wire `cardFormRef` in `donate-overlay.tsx` + pass to `useDonationSubmit`
-- [ ] Render `StripeCardForm` in `payment-methods.tsx` when card is selected
+- [x] Create `stripe-card-form.tsx` (split CardElement inputs + ref handle)
+- [x] Add card translation keys to locales
+- [x] Add `cardFormRef` to `DonationFormContext`
+- [x] Wire `cardFormRef` in `donate-overlay.tsx` + pass to `useDonationSubmit`
+- [x] Render `StripeCardForm` in `payment-methods.tsx` when card is selected
 - [ ] Implement card submit + 3DS flow in `use-donation-submit.ts`
 
 ---
@@ -312,7 +312,7 @@ No validity gating on the CTA — incomplete card fields are caught inside `crea
 1. Import `StripeCardFormHandle` from `./stripe-card-form`
 2. Import `StripeCardActionConfirmRequest` from `@/lib/types/payment`
 3. Add `cardFormRef: RefObject<StripeCardFormHandle | null>` as 5th parameter
-4. Do **not** add `cardFormRef` to the `useCallback` deps — refs are stable; `sepaFormRef` is also excluded
+4. Add both `sepaFormRef` and `cardFormRef` to the `onSubmit` `useCallback` deps — the `react-hooks/exhaustive-deps` rule requires it; ref objects are stable so this does not cause extra re-renders
 
 **In `onSubmit`, declare `cardPaymentMethodId` at the same scope as `paymentDetails`, then add the card block after the SEPA block:**
 

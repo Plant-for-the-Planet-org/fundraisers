@@ -3,6 +3,7 @@
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { useEffect, useRef } from 'react';
@@ -84,6 +85,7 @@ function DonateOverlayInner({
 }) {
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
+  const cardFormRef = useRef<StripeCardFormHandle>(null);
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = stripeConfig
@@ -97,7 +99,13 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
-  } = useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef);
+  } = useDonationSubmit(
+    donationData,
+    fundraiser,
+    paymentOptions,
+    sepaFormRef,
+    cardFormRef
+  );
   const { thankYouState, error, isLoading } = donationState;
 
   const leftColumn = thankYouState ? (
@@ -138,6 +146,7 @@ function DonateOverlayInner({
         paymentOptions={paymentOptions}
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
+        cardFormRef={cardFormRef}
         isOpen={isOpen}
       >
         <DonateOverlayLayout

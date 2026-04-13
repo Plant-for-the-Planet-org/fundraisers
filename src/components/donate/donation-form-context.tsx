@@ -5,6 +5,7 @@ import type { Control } from 'react-hook-form';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from './donate-overlay';
+import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { createContext, useContext, useEffect } from 'react';
@@ -132,6 +133,7 @@ interface DonationFormContextValue {
   paymentOptions: PaymentOptions;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
+  cardFormRef: RefObject<StripeCardFormHandle | null>;
 }
 
 const DonationFormContext = createContext<DonationFormContextValue | null>(
@@ -144,6 +146,7 @@ interface DonationFormProviderProps {
   paymentOptions: PaymentOptions;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
+  cardFormRef: RefObject<StripeCardFormHandle | null>;
   isOpen: boolean;
   children: ReactNode;
 }
@@ -159,6 +162,7 @@ export function DonationFormProvider({
   paymentOptions,
   onSubmit,
   sepaFormRef,
+  cardFormRef,
   isOpen,
   children,
 }: DonationFormProviderProps) {
@@ -203,6 +207,7 @@ export function DonationFormProvider({
         paymentOptions,
         onSubmit,
         sepaFormRef,
+        cardFormRef,
       }}
     >
       <FormProvider {...methods}>

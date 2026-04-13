@@ -111,6 +111,14 @@
       "mandateConsent": "Ich stimme dem SEPA-Lastschriftmandat zu und ermächtige die Belastung meines Kontos",
       "mandateRequired": "Sie müssen dem SEPA-Lastschriftmandat zustimmen, um fortzufahren"
     },
+    "card": {
+      "cardNumberLabel": "Kartennummer",
+      "cardNumberRequired": "Kartennummer ist erforderlich",
+      "expiryLabel": "Ablaufdatum",
+      "expiryRequired": "Ablaufdatum ist erforderlich",
+      "cvcLabel": "CVC",
+      "cvcRequired": "CVC ist erforderlich"
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
       "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es erneut.",

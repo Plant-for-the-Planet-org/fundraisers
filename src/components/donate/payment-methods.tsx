@@ -16,6 +16,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
+import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -188,7 +189,7 @@ export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { fundraiser, donationData, paymentOptions, sepaFormRef } =
+  const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
     useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
@@ -399,6 +400,7 @@ export function PaymentMethods() {
         )}
       </div>
 
+      {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}
       {selectedPaymentMethod === 'sepa-debit' && (
         <StripeSepaForm ref={sepaFormRef} />
       )}

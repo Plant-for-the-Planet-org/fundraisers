@@ -7,17 +7,21 @@ import type {
   ThankYouState,
 } from '@/lib/types/donation-submit';
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentData } from '@/lib/types/payment';
+import type {
+  PaymentData,
+  StripeCardActionConfirmRequest,
+} from '@/lib/types/payment';
 import type { PaymentResponse } from '@/lib/types/payment';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { ServiceErrorCode } from '@/lib/types/submission-errors';
 import type { DonationData } from './donate-overlay';
 import type { DonationFormValues } from './donation-form-context';
+import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { useCallback, useRef, useState } from 'react';
-import { DonationError,donationService } from '@/lib/api/donation-service';
-import { PaymentError,paymentService } from '@/lib/api/payment-service';
+import { DonationError, donationService } from '@/lib/api/donation-service';
+import { PaymentError, paymentService } from '@/lib/api/payment-service';
 import {
   createPaypalOrder,
   PaypalOrderError,
@@ -117,7 +121,8 @@ export function useDonationSubmit(
   donationData: DonationData,
   fundraiser: Fundraiser,
   paymentOptions: PaymentOptions,
-  sepaFormRef: RefObject<StripeSepaFormHandle | null>
+  sepaFormRef: RefObject<StripeSepaFormHandle | null>,
+  cardFormRef: RefObject<StripeCardFormHandle | null>
 ) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const donorProfile = useAuthStore(state => state.user?.profile);
@@ -303,6 +308,7 @@ export function useDonationSubmit(
       isAuthenticated,
       donorProfile,
       token,
+      sepaFormRef,
     ]
   );
 

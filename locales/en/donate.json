@@ -111,6 +111,14 @@
       "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
       "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
     },
+    "card": {
+      "cardNumberLabel": "Card Number",
+      "cardNumberRequired": "Card number is required",
+      "expiryLabel": "Expiry Date",
+      "expiryRequired": "Expiry date is required",
+      "cvcLabel": "CVC",
+      "cvcRequired": "CVC is required"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
