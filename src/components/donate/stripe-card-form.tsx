@@ -15,16 +15,19 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { AddressCountrySelector } from './address-country-selector';
 import { FormField } from './form-field';
 
 export interface StripeCardFormHandle {
-  createPaymentMethod(billingDetails: {
-    name: string;
+  createPaymentMethod(options: {
     email: string;
-    address: {
+    donorAddress: {
       line1: string;
       city: string;
-      postal_code: string;
+      state?: string;
+      zipCode: string;
       country: string;
     };
   }): Promise<{ paymentMethodId: string } | { error: string }>;
@@ -60,9 +63,32 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const [cardExpiryError, setCardExpiryError] = useState<string | null>(null);
     const [cardCvcComplete, setCardCvcComplete] = useState(false);
     const [cardCvcError, setCardCvcError] = useState<string | null>(null);
+    const [cardholderName, setCardholderName] = useState('');
+    const [cardholderNameError, setCardholderNameError] = useState<
+      string | null
+    >(null);
+    const [useDonorAddress, setUseDonorAddress] = useState(true);
+    const [billingAddress, setBillingAddress] = useState('');
+    const [billingAddressError, setBillingAddressError] = useState<
+      string | null
+    >(null);
+    const [billingAddress2, setBillingAddress2] = useState('');
+    const [billingCity, setBillingCity] = useState('');
+    const [billingCityError, setBillingCityError] = useState<string | null>(
+      null
+    );
+    const [billingState, setBillingState] = useState('');
+    const [billingZipCode, setbillingZipCode] = useState('');
+    const [billingZipCodeError, setbillingZipCodeError] = useState<
+      string | null
+    >(null);
+    const [billingCountry, setBillingCountry] = useState('');
+    const [billingCountryError, setBillingCountryError] = useState<
+      string | null
+    >(null);
 
     useImperativeHandle(ref, () => ({
-      async createPaymentMethod(billingDetails) {
+      async createPaymentMethod({ email, donorAddress }) {
         let hasError = false;
 
         if (!cardNumberComplete) {
@@ -77,16 +103,59 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           if (!cardCvcError) setCardCvcError(t('cvcRequired'));
           hasError = true;
         }
+        if (!cardholderName.trim()) {
+          setCardholderNameError(t('cardholderNameRequired'));
+          hasError = true;
+        }
+        if (!useDonorAddress) {
+          if (!billingAddress.trim()) {
+            setBillingAddressError(t('address.required'));
+            hasError = true;
+          }
+          if (!billingCity.trim()) {
+            setBillingCityError(t('cityRequired'));
+            hasError = true;
+          }
+          if (!billingZipCode.trim()) {
+            setbillingZipCodeError(t('billingZipCodeRequired'));
+            hasError = true;
+          }
+          if (!billingCountry) {
+            setBillingCountryError(t('countryRequired'));
+            hasError = true;
+          }
+        }
         if (hasError) return { error: 'Validation failed' };
 
         if (!stripe || !elements) return { error: 'Stripe not initialized' };
         const cardNumberElement = elements.getElement(CardNumberElement);
         if (!cardNumberElement) return { error: 'Card element not found' };
 
+        const stripeAddress = useDonorAddress
+          ? {
+              line1: donorAddress.line1,
+              city: donorAddress.city,
+              state: donorAddress.state,
+              postal_code: donorAddress.zipCode,
+              country: donorAddress.country,
+            }
+          : {
+              line1: billingAddress.trim(),
+              line2: billingAddress2.trim() || undefined,
+              city: billingCity.trim(),
+              state: billingState.trim() || undefined,
+              postal_code: billingZipCode.trim(),
+              country: billingCountry,
+            };
+
         const { paymentMethod, error } = await stripe.createPaymentMethod({
           type: 'card',
           card: cardNumberElement,
-          billing_details: billingDetails,
+          billing_details: {
+            name: cardholderName.trim(),
+            email,
+            address: stripeAddress,
+          },
         });
 
         if (error)
@@ -138,7 +207,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           label={t('cardNumberLabel')}
           error={cardNumberError ?? undefined}
         >
-          <div className='border border-border rounded-lg p-3'>
+          <div className='mt-2 border border-border rounded-lg p-3'>
             <CardNumberElement
               options={CARD_ELEMENT_OPTIONS}
               onChange={handleCardNumberChange}
@@ -151,7 +220,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             label={t('expiryLabel')}
             error={cardExpiryError ?? undefined}
           >
-            <div className='border border-border rounded-lg p-3'>
+            <div className='mt-2 border border-border rounded-lg p-3'>
               <CardExpiryElement
                 options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardExpiryChange}
@@ -159,7 +228,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             </div>
           </FormField>
           <FormField label={t('cvcLabel')} error={cardCvcError ?? undefined}>
-            <div className='border border-border rounded-lg p-3'>
+            <div className='mt-2 border border-border rounded-lg p-3'>
               <CardCvcElement
                 options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardCvcChange}
@@ -167,6 +236,115 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             </div>
           </FormField>
         </div>
+
+        <FormField
+          label={t('cardholderNameLabel')}
+          error={cardholderNameError ?? undefined}
+        >
+          <Input
+            value={cardholderName}
+            onChange={e => {
+              setCardholderName(e.target.value);
+              if (cardholderNameError) setCardholderNameError(null);
+            }}
+            placeholder='Jane Doe'
+            className='mt-2'
+          />
+        </FormField>
+
+        <div className='flex items-center gap-2'>
+          <Checkbox
+            id='card-use-donor-address'
+            checked={useDonorAddress}
+            onCheckedChange={checked => setUseDonorAddress(checked === true)}
+          />
+          <label
+            htmlFor='card-use-donor-address'
+            className='text-sm cursor-pointer'
+          >
+            {t('useDonorAddressLabel')}
+          </label>
+        </div>
+
+        {!useDonorAddress && (
+          <div className='space-y-4'>
+            <FormField
+              label={t('address.label')}
+              error={billingAddressError ?? undefined}
+            >
+              <Input
+                value={billingAddress}
+                onChange={e => {
+                  setBillingAddress(e.target.value);
+                  if (billingAddressError) setBillingAddressError(null);
+                }}
+                className='mt-2'
+              />
+            </FormField>
+
+            <FormField label={t('address2.label')}>
+              <Input
+                value={billingAddress2}
+                onChange={e => setBillingAddress2(e.target.value)}
+                className='mt-2'
+              />
+            </FormField>
+
+            <div className='grid grid-cols-2 gap-3'>
+              <FormField
+                label={t('cityLabel')}
+                error={billingCityError ?? undefined}
+              >
+                <Input
+                  value={billingCity}
+                  onChange={e => {
+                    setBillingCity(e.target.value);
+                    if (billingCityError) setBillingCityError(null);
+                  }}
+                  className='mt-2'
+                />
+              </FormField>
+              <FormField label={t('stateLabel')}>
+                <Input
+                  value={billingState}
+                  onChange={e => setBillingState(e.target.value)}
+                  className='mt-2'
+                />
+              </FormField>
+            </div>
+
+            <div className='grid grid-cols-2 gap-3'>
+              <AddressCountrySelector
+                country={billingCountry || undefined}
+                onCountryChange={code => {
+                  setBillingCountry(code);
+                  if (billingCountryError) setBillingCountryError(null);
+                }}
+                onCountryBlur={() => {
+                  if (!billingCountry)
+                    setBillingCountryError(t('countryRequired'));
+                }}
+                error={billingCountryError ?? undefined}
+                label={t('countryLabel')}
+                placeholder={t('countryPlaceholder')}
+                noResultsText={t('countryNoResults')}
+              />
+              <FormField
+                label={t('billingZipCodeLabel')}
+                error={billingZipCodeError ?? undefined}
+              >
+                <Input
+                  value={billingZipCode}
+                  onChange={e => {
+                    setbillingZipCode(e.target.value);
+                    if (billingZipCodeError) setbillingZipCodeError(null);
+                  }}
+                  className='mt-2'
+                />
+              </FormField>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

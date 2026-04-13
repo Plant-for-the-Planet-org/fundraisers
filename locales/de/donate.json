@@ -117,7 +117,26 @@
       "expiryLabel": "Ablaufdatum",
       "expiryRequired": "Ablaufdatum ist erforderlich",
       "cvcLabel": "CVC",
-      "cvcRequired": "CVC ist erforderlich"
+      "cvcRequired": "CVC ist erforderlich",
+      "cardholderNameLabel": "Name des Karteninhabers *",
+      "cardholderNameRequired": "Name des Karteninhabers ist erforderlich",
+      "useDonorAddressLabel": "Rechnungsadresse aus meinen Spenderdaten verwenden",
+      "address": {
+        "label": "Adresse *",
+        "required": "Adresse ist erforderlich"
+      },
+      "address2": {
+        "label": "Adresszeile 2"
+      },
+      "cityLabel": "Stadt *",
+      "cityRequired": "Stadt ist erforderlich",
+      "stateLabel": "Bundesland / Kanton",
+      "billingZipCodeLabel": "PLZ *",
+      "billingZipCodeRequired": "Postleitzahl ist erforderlich",
+      "countryLabel": "Land *",
+      "countryRequired": "Land ist erforderlich",
+      "countryPlaceholder": "Land auswählen",
+      "countryNoResults": "Keine Länder gefunden"
     },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",

@@ -20,10 +20,10 @@ Reference implementations:
 
 **Key architectural difference from SEPA — 3D Secure:** When the backend returns `action_required`, the `response.type` field determines what to do:
 
-| `response.type` | Stripe call | Second PUT? |
-|---|---|---|
-| `'cardAction'` | `stripe.handleCardAction(clientSecret)` → returns a `PaymentIntent` | Yes — sends `source: { id: pi_xxx, object: 'payment_intent' }` with **no `method` field** |
-| `'cardPayment'` | `stripe.confirmCardPayment(clientSecret)` | No — show thank you directly |
+| `response.type` | Stripe call                                                         | Second PUT?                                                                               |
+| --------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `'cardAction'`  | `stripe.handleCardAction(clientSecret)` → returns a `PaymentIntent` | Yes — sends `source: { id: pi_xxx, object: 'payment_intent' }` with **no `method` field** |
+| `'cardPayment'` | `stripe.confirmCardPayment(clientSecret)`                           | No — show thank you directly                                                              |
 
 SEPA `action_required` only needs `confirmSepaDebitPayment`, no second PUT.
 
@@ -111,6 +111,7 @@ Make the component reusable without changing its external interface for existing
 **Two changes only:**
 
 1. **Unique IDs via `React.useId()`** — prevents `id`/`aria-controls` collisions when two instances render on the same page (donor address form + card billing address):
+
 ```typescript
 const uid = useId();
 const listboxId = `${uid}-listbox`;
@@ -118,6 +119,7 @@ const listboxId = `${uid}-listbox`;
 ```
 
 2. **Optional display-string props** — `label`, `placeholder`, `noResultsText` with defaults from the existing `Donate.userAddress` translations, so existing call sites need no changes:
+
 ```typescript
 type AddressCountrySelectorProps = {
   country: string | undefined;
@@ -143,40 +145,60 @@ The card form passes `t('countryLabel')`, `t('countryPlaceholder')`, `t('country
 New `'use client'` component. Mirrors `stripe-sepa-form.tsx`: `forwardRef<StripeCardFormHandle>` + `useImperativeHandle`.
 
 **Handle interface:**
+
 ```typescript
 export interface StripeCardFormHandle {
   createPaymentMethod(options: {
     email: string;
-    donorAddress: { line1: string; city: string; state?: string; zipCode: string; country: string };
+    donorAddress: {
+      line1: string;
+      city: string;
+      state?: string;
+      zipCode: string;
+      country: string;
+    };
   }): Promise<{ paymentMethodId: string } | { error: string }>;
 
-  handleCardAction(clientSecret: string): Promise<{ paymentIntentId: string } | { error: string }>;
+  handleCardAction(
+    clientSecret: string
+  ): Promise<{ paymentIntentId: string } | { error: string }>;
 
   // paymentMethod required for cardPayment (recurring) — the backend returns the
   // saved pm_xxx that must be passed to stripe.confirmCardPayment
-  confirmCardPayment(clientSecret: string, paymentMethod?: string): Promise<{ error?: string }>;
+  confirmCardPayment(
+    clientSecret: string,
+    paymentMethod?: string
+  ): Promise<{ error?: string }>;
 }
 ```
 
 **State:**
 
 Stripe elements (complete flag + error string each):
+
 - `cardNumberComplete`, `cardNumberError`
 - `cardExpiryComplete`, `cardExpiryError`
 - `cardCvcComplete`, `cardCvcError`
 
 Text inputs (value + error):
+
 - `cardholderName`, `cardholderNameError`
 
 Billing address toggle + fields:
+
 - `useDonorAddress: boolean` (default `true`) — checkbox state
-- When `false`: `billingLine1`, `billingLine1Error`, `billingLine2` (optional), `billingCity`, `billingCityError`, `billingState` (optional), `billingZip`, `billingZipError`, `billingCountry`, `billingCountryError`
+- When `false`: `billingLine1`, `billingLine1Error`, `billingLine2` (optional), `billingCity`, `billingCityError`, `billingState` (optional), `billingZipCode`, `billingZipCodeError`, `billingCountry`, `billingCountryError`
 
 **Element style options** — same hardcoded hex values as `stripe-sepa-form.tsx` (Stripe does not support `hsl()` or CSS custom properties):
+
 ```typescript
 const CARD_ELEMENT_OPTIONS = {
   style: {
-    base: { fontSize: '14px', color: '#030712', '::placeholder': { color: '#6b7280' } },
+    base: {
+      fontSize: '14px',
+      color: '#030712',
+      '::placeholder': { color: '#6b7280' },
+    },
     invalid: { color: '#dc2626' },
   },
 };
@@ -194,14 +216,14 @@ async createPaymentMethod({ email, donorAddress }) {
   if (!useDonorAddress) {
     if (!billingLine1.trim()) { setBillingLine1Error(...); hasError = true; }
     if (!billingCity.trim()) { setBillingCityError(...); hasError = true; }
-    if (!billingZip.trim()) { setBillingZipError(...); hasError = true; }
+    if (!billingZipCode.trim()) { setbillingZipCodeError(...); hasError = true; }
     if (!billingCountry) { setBillingCountryError(...); hasError = true; }
   }
   if (hasError) return { error: 'Validation failed' };
 
   const billingAddress = useDonorAddress
     ? { line1: donorAddress.line1, city: donorAddress.city, state: donorAddress.state, postal_code: donorAddress.zipCode, country: donorAddress.country }
-    : { line1: billingLine1.trim(), line2: billingLine2.trim() || undefined, city: billingCity.trim(), state: billingState.trim() || undefined, postal_code: billingZip.trim(), country: billingCountry };
+    : { line1: billingLine1.trim(), line2: billingLine2.trim() || undefined, city: billingCity.trim(), state: billingState.trim() || undefined, postal_code: billingZipCode.trim(), country: billingCountry };
 
   const { paymentMethod, error } = await stripe.createPaymentMethod({
     type: 'card',
@@ -215,6 +237,7 @@ async createPaymentMethod({ email, donorAddress }) {
 ```
 
 **UI layout:**
+
 ```
 Card Number (full width)
 Expiry | CVC (grid-cols-2)
@@ -234,6 +257,7 @@ Cardholder Name (full width)
 ### Task 3 — Add card translation keys to locales
 
 **`locales/en/donate.json`** — full `"card"` block:
+
 ```json
 "card": {
   "cardNumberLabel": "Card Number",
@@ -251,8 +275,8 @@ Cardholder Name (full width)
   "cityLabel": "City",
   "cityRequired": "City is required",
   "stateLabel": "State / Province",
-  "billingZipLabel": "Zip / Postal Code",
-  "billingZipRequired": "Zip code is required",
+  "billingZipCodeLabel": "Zip / Postal Code",
+  "billingZipCodeRequired": "Zip code is required",
   "countryLabel": "Country",
   "countryRequired": "Country is required",
   "countryPlaceholder": "Select country",
@@ -261,6 +285,7 @@ Cardholder Name (full width)
 ```
 
 **`locales/de/donate.json`** — German equivalents:
+
 ```json
 "card": {
   "cardNumberLabel": "Kartennummer",
@@ -278,8 +303,8 @@ Cardholder Name (full width)
   "cityLabel": "Stadt",
   "cityRequired": "Stadt ist erforderlich",
   "stateLabel": "Bundesland / Kanton",
-  "billingZipLabel": "PLZ",
-  "billingZipRequired": "Postleitzahl ist erforderlich",
+  "billingZipCodeLabel": "PLZ",
+  "billingZipCodeRequired": "Postleitzahl ist erforderlich",
   "countryLabel": "Land",
   "countryRequired": "Land ist erforderlich",
   "countryPlaceholder": "Land auswählen",
@@ -316,8 +341,20 @@ In `DonateOverlayInner`:
 4. Pass `cardFormRef` as 5th argument to `useDonationSubmit`:
 
 ```typescript
-const { onSubmit, donationState, reset, onPayPalCreateOrder, onPayPalApproved, onPayPalError } =
-  useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef, cardFormRef);
+const {
+  onSubmit,
+  donationState,
+  reset,
+  onPayPalCreateOrder,
+  onPayPalApproved,
+  onPayPalError,
+} = useDonationSubmit(
+  donationData,
+  fundraiser,
+  paymentOptions,
+  sepaFormRef,
+  cardFormRef
+);
 ```
 
 **Testable:** Overlay opens without console errors.
@@ -333,9 +370,9 @@ const { onSubmit, donationState, reset, onPayPalCreateOrder, onPayPalApproved, o
 3. Add conditional render below the existing SEPA conditional:
 
 ```tsx
-{selectedPaymentMethod === 'card' && (
-  <StripeCardForm ref={cardFormRef} />
-)}
+{
+  selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />;
+}
 ```
 
 No validity gating on the CTA — incomplete card fields are caught inside `createPaymentMethod`.
@@ -368,7 +405,11 @@ if (values.selectedPaymentMethod === 'card') {
       city: donor?.city ?? selectedAddress?.city ?? '',
       state: donor?.state ?? selectedAddress?.state ?? undefined,
       zipCode: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
-      country: donor?.country ?? selectedAddress?.country ?? donorProfile?.country ?? '',
+      country:
+        donor?.country ??
+        selectedAddress?.country ??
+        donorProfile?.country ??
+        '',
     },
   });
 
@@ -394,10 +435,9 @@ if (
 ) {
   if (paymentResponse.response.type === 'cardAction') {
     // handleCardAction → second PUT with payment_intent source (no method field)
-    const handleResult =
-      (await cardFormRef.current?.handleCardAction(
-        paymentResponse.response.payment_intent_client_secret
-      )) ?? { error: 'No card form available' };
+    const handleResult = (await cardFormRef.current?.handleCardAction(
+      paymentResponse.response.payment_intent_client_secret
+    )) ?? { error: 'No card form available' };
 
     if ('error' in handleResult) {
       setDonationState(prev => ({
@@ -436,18 +476,20 @@ if (
     setDonationState(prev => ({
       ...prev,
       isLoading: false,
-      thankYouState: { status: 'completed', donationId: donationResponse.donationId },
+      thankYouState: {
+        status: 'completed',
+        donationId: donationResponse.donationId,
+      },
     }));
     return;
   }
 
   if (paymentResponse.response.type === 'cardPayment') {
     // confirmCardPayment — recurring donation; no second PUT; show thank you directly
-    const confirmResult =
-      (await cardFormRef.current?.confirmCardPayment(
-        paymentResponse.response.payment_intent_client_secret,
-        paymentResponse.response.payment_method
-      )) ?? { error: 'No card form available' };
+    const confirmResult = (await cardFormRef.current?.confirmCardPayment(
+      paymentResponse.response.payment_intent_client_secret,
+      paymentResponse.response.payment_method
+    )) ?? { error: 'No card form available' };
 
     if (confirmResult.error) {
       setDonationState(prev => ({
@@ -461,7 +503,10 @@ if (
     setDonationState(prev => ({
       ...prev,
       isLoading: false,
-      thankYouState: { status: 'completed', donationId: donationResponse.donationId },
+      thankYouState: {
+        status: 'completed',
+        donationId: donationResponse.donationId,
+      },
     }));
     return;
   }
@@ -474,19 +519,20 @@ if (
 
 ## Files to create/modify
 
-| File | Action |
-|------|--------|
-| `src/lib/types/payment.ts` | Modify — add `'cardPayment'` to `action_required` response type; add `StripeCardActionConfirmRequest` to `PaymentRequest` union |
-| `src/components/donate/address-country-selector.tsx` | Modify — add optional `label`/`placeholder`/`noResultsText` props; use `React.useId()` for unique element IDs |
-| `src/components/donate/stripe-card-form.tsx` | Create — split CardElement inputs, cardholder name, billing address toggle + full address fields, `StripeCardFormHandle` ref |
-| `locales/en/donate.json` | Modify — add `Donate.card.*` keys |
-| `locales/de/donate.json` | Modify — add `Donate.card.*` keys (German) |
-| `src/components/donate/donation-form-context.tsx` | Modify — add `cardFormRef` to context |
-| `src/components/donate/donate-overlay.tsx` | Modify — create `cardFormRef`, pass to provider and hook |
-| `src/components/donate/payment-methods.tsx` | Modify — render `<StripeCardForm>` when card selected |
-| `src/components/donate/use-donation-submit.ts` | Modify — add `cardFormRef`, card submit + 3DS branching flow |
+| File                                                 | Action                                                                                                                          |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/types/payment.ts`                           | Modify — add `'cardPayment'` to `action_required` response type; add `StripeCardActionConfirmRequest` to `PaymentRequest` union |
+| `src/components/donate/address-country-selector.tsx` | Modify — add optional `label`/`placeholder`/`noResultsText` props; use `React.useId()` for unique element IDs                   |
+| `src/components/donate/stripe-card-form.tsx`         | Create — split CardElement inputs, cardholder name, billing address toggle + full address fields, `StripeCardFormHandle` ref    |
+| `locales/en/donate.json`                             | Modify — add `Donate.card.*` keys                                                                                               |
+| `locales/de/donate.json`                             | Modify — add `Donate.card.*` keys (German)                                                                                      |
+| `src/components/donate/donation-form-context.tsx`    | Modify — add `cardFormRef` to context                                                                                           |
+| `src/components/donate/donate-overlay.tsx`           | Modify — create `cardFormRef`, pass to provider and hook                                                                        |
+| `src/components/donate/payment-methods.tsx`          | Modify — render `<StripeCardForm>` when card selected                                                                           |
+| `src/components/donate/use-donation-submit.ts`       | Modify — add `cardFormRef`, card submit + 3DS branching flow                                                                    |
 
 **Unchanged:**
+
 - `src/lib/utils/payment-request-builder.ts` — `case 'stripe'` already handles card
 - `src/lib/types/payment-methods.ts` — `SUPPORTED_METHOD_IDS` already includes `'card'`
 - `src/lib/api/payment-service.ts` — `processPayment` accepts `PaymentRequest`; no changes needed

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getAllCountries, searchCountries } from '@/lib/utils/country';
 import { CountryFlag } from '../ui/country-flag';
@@ -12,6 +12,9 @@ type AddressCountrySelectorProps = {
   onCountryChange: (code: string) => void;
   onCountryBlur: () => void;
   error?: string;
+  label?: string;
+  placeholder?: string;
+  noResultsText?: string;
 };
 
 export const AddressCountrySelector = ({
@@ -19,11 +22,15 @@ export const AddressCountrySelector = ({
   onCountryChange,
   onCountryBlur,
   error,
+  label,
+  placeholder,
+  noResultsText,
 }: AddressCountrySelectorProps) => {
   const locale = useLocale();
   const tDonate = useTranslations('Donate.userAddress');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
+  const uid = useId();
 
   // Intentionally uses the full donate country source; do not couple with workspace selector data.
   const allCountries = getAllCountries(locale);
@@ -56,9 +63,9 @@ export const AddressCountrySelector = ({
     const activeCountry = filteredCountries[activeIndex];
     if (!activeCountry) return;
 
-    const activeOptionId = `address-country-option-${activeCountry.code}`;
+    const activeOptionId = `country-selector-option-${activeCountry.code}-${uid}`;
     const activeOption = listboxRef.current.querySelector<HTMLElement>(
-      `#${activeOptionId}`
+      `#${CSS.escape(activeOptionId)}`
     );
     activeOption?.scrollIntoView({ block: 'nearest' });
   }, [isOpen, activeIndex, filteredCountries]);
@@ -103,16 +110,20 @@ export const AddressCountrySelector = ({
     }
   };
 
-  const listboxId = 'address-country-selector-listbox';
+  const listboxId = `country-selector-listbox-${uid}`;
   const inputValue = isOpen ? query : (selectedCountry?.name ?? '');
   const activeCountry = filteredCountries[activeIndex];
   const activeDescendantId =
     isOpen && activeCountry
-      ? `address-country-option-${activeCountry.code}`
+      ? `country-selector-option-${activeCountry.code}-${uid}`
       : undefined;
 
+  const resolvedLabel = label ?? tDonate('country.label');
+  const resolvedPlaceholder = placeholder ?? tDonate('country.selectCountry');
+  const resolvedNoResults = noResultsText ?? tDonate('country.noResults');
+
   return (
-    <FormField label={tDonate('country.label')} error={error}>
+    <FormField label={resolvedLabel} error={error}>
       <div className='relative mt-2' ref={containerRef}>
         <Input
           value={inputValue}
@@ -137,7 +148,7 @@ export const AddressCountrySelector = ({
           aria-controls={listboxId}
           aria-autocomplete='list'
           aria-activedescendant={activeDescendantId}
-          placeholder={tDonate('country.selectCountry')}
+          placeholder={resolvedPlaceholder}
           className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
         />
 
@@ -152,7 +163,7 @@ export const AddressCountrySelector = ({
               filteredCountries.map((countryOption, index) => (
                 <button
                   key={countryOption.code}
-                  id={`address-country-option-${countryOption.code}`}
+                  id={`country-selector-option-${countryOption.code}-${uid}`}
                   type='button'
                   role='option'
                   aria-selected={countryOption.code === country}
@@ -169,7 +180,7 @@ export const AddressCountrySelector = ({
               ))
             ) : (
               <div className='px-3 py-2 text-sm text-muted-foreground'>
-                {tDonate('country.noResults')}
+                {resolvedNoResults}
               </div>
             )}
           </div>

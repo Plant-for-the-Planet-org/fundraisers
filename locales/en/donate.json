@@ -117,7 +117,26 @@
       "expiryLabel": "Expiry Date",
       "expiryRequired": "Expiry date is required",
       "cvcLabel": "CVC",
-      "cvcRequired": "CVC is required"
+      "cvcRequired": "CVC is required",
+      "cardholderNameLabel": "Cardholder Name *",
+      "cardholderNameRequired": "Cardholder name is required",
+      "useDonorAddressLabel": "Use billing address from my donor info",
+      "address": {
+        "label": "Address *",
+        "required": "Address is required"
+      },
+      "address2": {
+        "label": "Address Line 2"
+      },
+      "cityLabel": "City *",
+      "cityRequired": "City is required",
+      "stateLabel": "State / Province",
+      "billingZipCodeLabel": "Zip / Postal Code *",
+      "billingZipCodeRequired": "Zip code is required",
+      "countryLabel": "Country *",
+      "countryRequired": "Country is required",
+      "countryPlaceholder": "Select country",
+      "countryNoResults": "No countries found"
     },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
