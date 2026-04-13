@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+
+import { getLocale } from 'next-intl/server';
+import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
-import { PlatformAPIError } from '@/lib/api/external-client';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
@@ -11,8 +13,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const locale = await getLocale();
   try {
-    const fundraiser = await getCachedFundraiser(slug);
+    const fundraiser = await getCachedFundraiser(slug, locale);
     return {
       title: fundraiser.title,
       description: fundraiser.description ?? undefined,
@@ -32,10 +35,11 @@ export default async function FundraiserPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const locale = await getLocale();
 
   let fundraiser;
   try {
-    fundraiser = await getCachedFundraiser(slug);
+    fundraiser = await getCachedFundraiser(slug, locale);
   } catch (e) {
     if (
       e instanceof PlatformAPIError &&

@@ -1,14 +1,14 @@
 {
   "Donate": {
     "preferences": {
-      "anonymousDonationLabel": "Meine Spende anonym machen",
-      "anonymousDonationDescription": "Ihr Name wird auf der Fundraising-Seite nicht öffentlich angezeigt"
+      "anonymousDonationLabel": "Mache meine Spende anonym",
+      "anonymousDonationDescription": "Dein Name wird nicht öffentlich auf der Seite des Spendenaufrufs gezeigt."
     },
-    "yourInfo": "Ihre Angaben",
+    "yourInfo": "Deine Informationen",
     "organization": "(Organisation)",
     "donorIdentity": {
       "companyDonation": {
-        "label": "Diese Spende wird von einem Unternehmen getätigt"
+        "label": "Diese Spende ist von einem Unternehmen"
       },
       "companyName": {
         "label": "Firmenname *",
@@ -16,7 +16,7 @@
       },
       "email": {
         "label": "E-Mail *",
-        "placeholder": "Ihre E-Mail eingeben"
+        "placeholder": "E-Mail eingeben"
       },
       "firstName": {
         "label": "Vorname *",
@@ -30,48 +30,41 @@
     "userAddress": {
       "selectAddress": {
         "label": "Adresse auswählen",
-        "placeholder": "Adresse auswählen"
+        "placeholder": "Wähle eine Adresse aus"
       },
-
       "country": {
         "label": "Land *",
         "placeholder": "Land auswählen",
-        "searchPlaceholder": "Länder suchen...",
+        "searchPlaceholder": "Länder durchsuchen",
         "noResults": "Keine Länder gefunden",
         "selectCountry": "Land auswählen"
       },
-
       "zipCode": {
         "label": "Postleitzahl *",
         "placeholder": "Postleitzahl"
       },
-
       "address": {
         "label": "Adresse *",
         "placeholder": "Straße und Hausnummer",
-        "addressType": "Adresstyp",
+        "addressType": "Adress-Typ",
         "addressTypeOptions": {
           "primary": "Primär",
-          "mailing": "Post",
-          "other": "Sonstige"
+          "mailing": "Mailing",
+          "other": "Andere"
         }
       },
-
       "address2": {
-        "label": "Adresszusatz",
-        "placeholder": "Wohnung, Suite, etc."
+        "label": "Adress-Zeile 2",
+        "placeholder": "Wohnung, Appartement, etc."
       },
-
       "city": {
         "label": "Stadt *",
         "placeholder": "Stadt"
       },
-
       "state": {
-        "label": "Bundesland/Region",
-        "placeholder": "Bundesland oder Region"
+        "label": "Bundesland/Provinz",
+        "placeholder": "Bundesland oder Provinz"
       },
-
       "savingAddressLoader": "Adresse wird gespeichert...",
       "saveAddress": "Adresse speichern",
       "saveAddressError": "Adresse konnte nicht gespeichert werden",
@@ -101,8 +94,22 @@
       },
       "email": {
         "required": "E-Mail ist erforderlich",
-        "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein"
+        "invalid": "Bitte gib eine gültige E-Mail Adresse ein"
       }
+    },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN ist erforderlich",
+      "accountHolderName": "Kontoinhaber",
+      "accountHolderNameRequired": "Kontoinhaber ist erforderlich",
+      "mandateTitle": "SEPA-Lastschriftmandat",
+      "mandateIntro": "Mit der Unterzeichnung dieses Mandatsformulars ermächtigen Sie die Plant-for-the-Planet Foundation, Zahlungen von Ihrem Konto mittels Lastschrift einzuziehen. Zugleich weisen Sie Ihr Kreditinstitut an, die von der Plant-for-the-Planet Foundation auf Ihr Konto gezogenen Lastschriften einzulösen.",
+      "creditor": "Gläubiger",
+      "creditorName": "Plant-for-the-Planet Foundation",
+      "creditorId": "Gläubiger-ID",
+      "mandateRights": "Ihre Rechte: Sie haben Anspruch auf eine Rückerstattung von Ihrer Bank gemäß den Bedingungen Ihrer Vereinbarung mit Ihrer Bank. Eine Rückerstattung muss innerhalb von 8 Wochen ab dem Datum der Belastung Ihres Kontos beantragt werden.",
+      "mandateConsent": "Ich stimme dem SEPA-Lastschriftmandat zu und ermächtige die Belastung meines Kontos",
+      "mandateRequired": "Sie müssen dem SEPA-Lastschriftmandat zustimmen, um fortzufahren"
     },
     "submissionErrors": {
       "authRequired": "Bitte melden Sie sich an, um mit Ihrer Spende fortzufahren.",
@@ -115,14 +122,57 @@
       "accessDenied": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
       "businessLogic": "Ungültige Spendendaten. Bitte überprüfen und erneut versuchen.",
       "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "paypalOrderCreationError": "PayPal-Spende konnte nicht erstellt werden. Bitte versuche es nochmal.",
+      "paypalCaptureError": "Die PayPal-Zahlung konnte nicht abgeschlossen werden. Bitte versuche es nochmal.",
+      "paypalPaymentError": "PayPal-Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+      "paymentFailed": "Zahlung fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es nochmal."
     },
     "cta": {
       "donateNow": "Jetzt spenden",
       "donateMonthly": "Monatlich spenden",
       "donateYearly": "Jährlich spenden",
-      "processing": "Wird verarbeitet...",
+      "processing": "Verarbeitung läuft...",
       "success": "Spende abgeschlossen"
+    },
+    "thankYou": {
+      "title": {
+        "completed": "Vielen Dank für deine Spende!",
+        "bankTransferPending": "Danke, dass du deine Spende angefangen hast"
+      },
+      "status": {
+        "label": "Status:",
+        "completed": "Abgeschlossen",
+        "bankTransferPending": "Banküberweisung ausstehend"
+      },
+      "message": {
+        "completed": "Wir haben dir eine Spendenbestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst eine steuerlich absetzbare Zuwendungsbescheinigung herunterladen.",
+        "bankTransferPending": {
+          "monthly": "Deine monatliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "yearly": "Deine jährliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "once": "Deine Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, überweise bitte den Betrag auf das unten stehende Konto. Diese Informationen wurden dir auch per E-Mail zugeschickt."
+        }
+      },
+      "transfer": {
+        "heading": "Bankinformationen",
+        "amount": "Betrag",
+        "reference": "Verwendungszweck",
+        "beneficiary": "Begünstigter",
+        "iban": "IBAN",
+        "bic": "BIC",
+        "bank": "Bank",
+        "transactionId": "Transaktions-ID {id}",
+        "error": "Überweisungsdetails nicht gefunden, bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
+      },
+      "copy": {
+        "label": "Kopieren {field}",
+        "success": "Kopiert!",
+        "error": "Kopieren fehlgeschlagen"
+      },
+      "share": {
+        "title": "Diesen Spendenaufruf teilen",
+        "description": "Jeder Beitrag inspiriert mehr Menschen zum Handeln."
+      }
     }
   }
 }

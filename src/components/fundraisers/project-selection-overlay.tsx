@@ -1,22 +1,23 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import type {
   ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { projectsService } from '@/lib/api/projects-service';
-import { getImageUrl } from '@/lib/utils/images';
-import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
-import { Search, Target, X } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useWatch } from 'react-hook-form';
+import { useLocale, useTranslations } from 'next-intl';
+import { Search, Target, X } from 'lucide-react';
+import { projectsService } from '@/lib/api/projects-service';
+import { API_BASE_URL } from '@/lib/constants/app-config';
+import { getImageUrl } from '@/lib/utils/images';
+import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type ProjectSelectionTab = 'top' | 'all';
 
@@ -40,7 +41,8 @@ function getProjectImageSource(image?: string): string | null {
 }
 
 function buildLearnMoreUrl(projectId: string): string {
-  return `https://web.plant-for-the-planet.org/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
+  const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, '');
+  return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
 function normalizeCountryForProjects(countryCode?: string): string | undefined {
@@ -63,7 +65,7 @@ export function ProjectSelectionOverlay({
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
     name: 'country',
   });
-  const lastFetchedCountryRef = useRef<string | undefined>(undefined);
+  const lastFetchedCountryLocaleKeyRef = useRef<string | undefined>(undefined);
 
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,20 +83,25 @@ export function ProjectSelectionOverlay({
     setIsMounted(true);
   }, []);
 
-  const fetchProjects = useCallback(async (countryCode?: string) => {
-    setIsLoading(true);
-    setLoadError(false);
+  const fetchProjects = useCallback(
+    async (countryCode?: string, locale?: string) => {
+      setIsLoading(true);
+      setLoadError(false);
 
-    try {
-      const projects =
-        await projectsService.getCauseSelectableProjects(countryCode);
-      setAllProjects(projects);
-    } catch {
-      setLoadError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      try {
+        const projects = await projectsService.getCauseSelectableProjects(
+          countryCode,
+          locale
+        );
+        setAllProjects(projects);
+      } catch {
+        setLoadError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!isOpen || isLoading) {
@@ -102,17 +109,18 @@ export function ProjectSelectionOverlay({
     }
 
     const normalizedCountry = normalizeCountryForProjects(country);
+    const fetchKey = `${normalizedCountry ?? ''}|${locale}`;
 
     if (
       allProjects.length > 0 &&
-      lastFetchedCountryRef.current === normalizedCountry
+      lastFetchedCountryLocaleKeyRef.current === fetchKey
     ) {
       return;
     }
 
-    lastFetchedCountryRef.current = normalizedCountry;
-    void fetchProjects(normalizedCountry);
-  }, [allProjects.length, country, fetchProjects, isLoading, isOpen]);
+    lastFetchedCountryLocaleKeyRef.current = fetchKey;
+    void fetchProjects(normalizedCountry, locale);
+  }, [allProjects.length, country, fetchProjects, isLoading, isOpen, locale]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -305,7 +313,7 @@ export function ProjectSelectionOverlay({
                 variant='outline'
                 size='sm'
                 onClick={() =>
-                  fetchProjects(normalizeCountryForProjects(country))
+                  fetchProjects(normalizeCountryForProjects(country), locale)
                 }
               >
                 {t('modal.retry')}

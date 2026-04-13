@@ -2,8 +2,8 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { useWatch } from 'react-hook-form';
+import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 
 const PREVIEW_PROGRESS_PERCENTAGE = 40;
 const PREVIEW_DAYS_LEFT = 42;

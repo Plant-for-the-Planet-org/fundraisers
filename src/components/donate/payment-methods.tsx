@@ -1,23 +1,23 @@
 'use client';
 
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-
-import type { DonationFormValues } from '@/components/donate/donation-form-context';
 import type {
   DerivedPaymentMethod,
   PaymentMethodId,
 } from '@/lib/types/payment-methods';
+import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { useDonationForm } from '@/components/donate/donation-form-context';
-import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
-import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
+import { useDonationForm } from '@/components/donate/donation-form-context';
+import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   'bank-transfer': 'methods.bankTransfer',
@@ -188,7 +188,8 @@ export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { fundraiser, donationData, paymentOptions } = useDonationForm();
+  const { fundraiser, donationData, paymentOptions, sepaFormRef } =
+    useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
     control,
@@ -397,6 +398,10 @@ export function PaymentMethods() {
           </div>
         )}
       </div>
+
+      {selectedPaymentMethod === 'sepa-debit' && (
+        <StripeSepaForm ref={sepaFormRef} />
+      )}
     </div>
   );
 }

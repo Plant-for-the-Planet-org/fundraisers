@@ -1,27 +1,40 @@
-import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentOptions } from '@/lib/types/payment-options';
-import type { DonationFormValues } from './donation-form-context';
-import type { DonationData } from './donate-overlay';
-import type { PaymentData } from '@/lib/types/payment';
-import type { ServiceErrorCode } from '@/lib/types/submission-errors';
+import type { RefObject } from 'react';
+import type { OnApproveData } from '@paypal/paypal-js';
+import type { DonationResponse } from '@/lib/types/donation';
 import type {
   DonationSubmitError,
   DonationSubmitState,
+  ThankYouState,
 } from '@/lib/types/donation-submit';
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { PaymentData } from '@/lib/types/payment';
+import type { PaymentResponse } from '@/lib/types/payment';
+import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { ServiceErrorCode } from '@/lib/types/submission-errors';
+import type { DonationData } from './donate-overlay';
+import type { DonationFormValues } from './donation-form-context';
+import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { useCallback, useRef, useState } from 'react';
-import { useAuthStore } from '@/stores/authStore';
-import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
+import { DonationError,donationService } from '@/lib/api/donation-service';
+import { PaymentError,paymentService } from '@/lib/api/payment-service';
+import {
+  createPaypalOrder,
+  PaypalOrderError,
+} from '@/lib/api/paypal-order-service';
+import { submitStandardDonation } from '@/lib/donation/donation-submission';
 import {
   assembleFormData,
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
-import { submitStandardDonation } from '@/lib/donation/donation-submission';
-import { DonationError } from '@/lib/api/donation-service';
-import { PaymentError } from '@/lib/api/payment-service';
-import { PaymentOptionsError } from '@/lib/utils/payment-request-builder';
-import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
+import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
+import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
+import {
+  buildPaymentRequest,
+  PaymentOptionsError,
+} from '@/lib/utils/payment-request-builder';
+import { useAuthStore } from '@/stores/authStore';
 
 function cleanPaymentDetails(
   details: PaymentData['paymentDetails']
@@ -31,6 +44,46 @@ function cleanPaymentDetails(
   ) as Record<string, string | number | boolean>;
 }
 
+/**
+ * Maps a successful PaymentResponse to the appropriate ThankYouState,
+ * or returns null for statuses that should keep the user in the flow.
+ */
+function resolveThankYouState(
+  response: PaymentResponse,
+  donationResponse: DonationResponse
+): ThankYouState | null {
+  const { donationId, uid, amount, currency, frequency } = donationResponse;
+  switch (response.status) {
+    case 'success':
+      // Future: handle other success responses from different payment methods here
+      if (response.response?.type === 'transfer_required') {
+        return {
+          status: 'bankTransferPending',
+          donationId,
+          uid,
+          amount,
+          currency,
+          frequency,
+          transferAccount: response.response.account,
+        };
+      }
+      return { status: 'completed', donationId };
+
+    case 'action_required':
+      // Future: handle 3DS / card authentication
+      return null;
+
+    case 'failed':
+      // Caller should handle this before calling resolveThankYouState,
+      // but guard against it reaching here
+      return null;
+
+    default:
+      console.warn('Received unrecognized payment response status:', response);
+      return null;
+  }
+}
+
 /** Maps a caught error to a UI-safe error with a translation key. */
 function toSubmitError(error: unknown): DonationSubmitError {
   let serviceCode: string | undefined;
@@ -38,7 +91,8 @@ function toSubmitError(error: unknown): DonationSubmitError {
   if (
     error instanceof DonationError ||
     error instanceof PaymentError ||
-    error instanceof PaymentOptionsError
+    error instanceof PaymentOptionsError ||
+    error instanceof PaypalOrderError
   ) {
     serviceCode = error.code;
   }
@@ -62,7 +116,8 @@ function toSubmitError(error: unknown): DonationSubmitError {
 export function useDonationSubmit(
   donationData: DonationData,
   fundraiser: Fundraiser,
-  paymentOptions: PaymentOptions
+  paymentOptions: PaymentOptions,
+  sepaFormRef: RefObject<StripeSepaFormHandle | null>
 ) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const donorProfile = useAuthStore(state => state.user?.profile);
@@ -76,6 +131,8 @@ export function useDonationSubmit(
   // Stable idempotency keys across retries
   const donationKeyRef = useRef(generateIdempotencyKeyWithPrefix('donation'));
   const paymentKeyRef = useRef(generateIdempotencyKeyWithPrefix('payment'));
+  // Shares donationId between the two PayPal callbacks
+  const paypalDonationIdRef = useRef<string | null>(null);
 
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
@@ -86,9 +143,7 @@ export function useDonationSubmit(
       setDonationState(prev => ({
         ...prev,
         isLoading: true,
-        isSuccess: false,
-        donationId: null,
-        transferDetails: null,
+        thankYouState: null,
         error: null,
       }));
 
@@ -109,13 +164,47 @@ export function useDonationSubmit(
         isPlanetCash
       );
 
-      // Build payment details based on selected payment method
-      const paymentDetails: PaymentData['paymentDetails'] = {};
+      let paymentDetails: PaymentData['paymentDetails'] = {};
 
       try {
         if (isPlanetCash) {
           // TODO: Implement PlanetCash donation flow
         } else {
+          if (values.selectedPaymentMethod === 'sepa-debit') {
+            const donor = formData.type === 'guest' ? formData.donor : null;
+            const selectedAddress =
+              donorProfile?.addresses.find(
+                a => a.id === values.selectedAddressId
+              ) ?? donorProfile?.address;
+            const sepaResult = await sepaFormRef.current?.createPaymentMethod({
+              name: donor
+                ? `${donor.firstname} ${donor.lastname}`
+                : `${donorProfile?.firstname ?? ''} ${donorProfile?.lastname ?? ''}`.trim(),
+              email: donor?.email ?? donorProfile?.email ?? '',
+              address: {
+                line1: donor?.address ?? selectedAddress?.address ?? '',
+                city: donor?.city ?? selectedAddress?.city ?? '',
+                postal_code: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
+                country:
+                  donor?.country ??
+                  selectedAddress?.country ??
+                  donorProfile?.country ??
+                  '',
+              },
+            });
+
+            if (!sepaResult || 'error' in sepaResult) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            paymentDetails = { paymentMethodId: sepaResult.paymentMethodId };
+          }
+
           const { donationResponse, paymentResponse } =
             await submitStandardDonation({
               payload,
@@ -131,28 +220,70 @@ export function useDonationSubmit(
           donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
           paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
-          if (
-            paymentResponse.status === 'success' &&
-            paymentResponse.response?.type === 'transfer_required'
-          ) {
-            // For bank transfers, the payment is created but requires manual transfer
-            // The UI should show transfer instructions to the user
+          if (paymentResponse.status === 'failed') {
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
-              isSuccess: true,
-              donationId: donationResponse.donationId,
-              transferDetails: paymentResponse.response,
+              error: {
+                code: paymentResponse.errorCode
+                  ? (SUBMISSION_ERROR_CODES[
+                      paymentResponse.errorCode as ServiceErrorCode
+                    ] ?? 'paymentFailed')
+                  : 'paymentFailed',
+              },
             }));
             return;
           }
 
-          // Success state for two-step flow
+          const thankYouState = resolveThankYouState(
+            paymentResponse,
+            donationResponse
+          );
+
+          if (thankYouState) {
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYouState,
+            }));
+            return;
+          }
+
+          // `action_required` or unexpected status — keep user in flow.
+          // Future: handle 3DS card authentication here.
+          // NOTE: idempotency keys are intentionally NOT rotated here.
+          // When implementing 3DS, the re-submission after user authentication should reuse the same keys (treating it as a confirmation of the same payment intent, not a new attempt). Verify this against the Stripe API contract before rotating.
+          if (
+            paymentResponse.status === 'action_required' &&
+            values.selectedPaymentMethod === 'sepa-debit'
+          ) {
+            const sepaResult =
+              (await sepaFormRef.current?.confirmSepaDebitPayment(
+                paymentResponse.response.payment_intent_client_secret
+              )) ?? { error: 'No SEPA form available' };
+
+            if (sepaResult.error) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+            } else {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                thankYouState: {
+                  status: 'completed',
+                  donationId: donationResponse.donationId,
+                },
+              }));
+            }
+            return;
+          }
+
           setDonationState(prev => ({
             ...prev,
             isLoading: false,
-            isSuccess: true,
-            donationId: donationResponse.donationId,
           }));
         }
       } catch (error) {
@@ -175,11 +306,172 @@ export function useDonationSubmit(
     ]
   );
 
+  // TODO: PayPal callbacks share submittingRef, donationKeyRef, paymentKeyRef, and the other hook deps with onSubmit. When adding Stripe, consider extracting usePayPalFlow / useStripeFlow as internal composables that receive shared refs/state as arguments, keeping useDonationSubmit as the orchestrator.
+  const onPayPalCreateOrder = useCallback(
+    async (values: DonationFormValues): Promise<string> => {
+      if (submittingRef.current)
+        throw new Error('Submission already in progress');
+      submittingRef.current = true;
+
+      setDonationState(prev => ({
+        ...prev,
+        isLoading: true,
+        thankYouState: null,
+        error: null,
+      }));
+
+      const formData = assembleFormData(
+        donationData,
+        fundraiser,
+        values,
+        isAuthenticated
+      );
+
+      const isPlanetCash =
+        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
+
+      const payload = buildDonationPayload(
+        formData,
+        fundraiser,
+        donorProfile,
+        isPlanetCash
+      );
+
+      try {
+        const donationResponse = await donationService.submitDonation(
+          payload,
+          token || undefined,
+          donationKeyRef.current
+        );
+        paypalDonationIdRef.current = donationResponse.donationId;
+
+        const paypalAccount = paymentOptions.gateways.paypal?.account;
+        if (!paypalAccount) {
+          throw new PaypalOrderError(
+            'Missing PayPal account configuration',
+            'api',
+            'PAYPAL_ACCOUNT_MISSING'
+          );
+        }
+        const orderId = await createPaypalOrder(
+          donationResponse.donationId,
+          paypalAccount,
+          token || undefined
+        );
+
+        return orderId;
+      } catch (error) {
+        setDonationState(prev => ({
+          ...prev,
+          error: toSubmitError(error),
+        }));
+        throw error;
+      } finally {
+        setDonationState(prev => ({ ...prev, isLoading: false }));
+        submittingRef.current = false;
+      }
+    },
+    [
+      donationData,
+      fundraiser,
+      paymentOptions,
+      isAuthenticated,
+      donorProfile,
+      token,
+    ]
+  );
+
+  const onPayPalApproved = useCallback(
+    async (data: OnApproveData): Promise<void> => {
+      const donationId = paypalDonationIdRef.current;
+      if (!donationId) {
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: { code: 'unexpected' },
+        }));
+        submittingRef.current = false;
+        return;
+      }
+
+      const paymentData: PaymentData = {
+        donationId,
+        paymentMethod: 'paypal',
+        paymentDetails: {
+          orderID: data.orderID,
+          payerID: data.payerID ?? undefined,
+          paymentID: data.paymentID ?? undefined,
+          billingToken: data.billingToken ?? undefined,
+          facilitatorAccessToken: data.facilitatorAccessToken ?? undefined,
+        },
+      };
+
+      try {
+        const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);
+        const paymentResponse = await paymentService.processPayment(
+          donationId,
+          paymentRequest,
+          token || undefined,
+          paymentKeyRef.current
+        );
+
+        if (paymentResponse.status === 'failed') {
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: {
+              code: paymentResponse.errorCode
+                ? (SUBMISSION_ERROR_CODES[
+                    paymentResponse.errorCode as ServiceErrorCode
+                  ] ?? 'paymentFailed')
+                : 'paymentFailed',
+            },
+          }));
+          return;
+        }
+
+        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
+        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          thankYouState: { status: 'completed', donationId },
+        }));
+      } catch (error) {
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: toSubmitError(error),
+        }));
+      } finally {
+        submittingRef.current = false;
+      }
+    },
+    [paymentOptions, token]
+  );
+
+  const onPayPalError = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paypalPaymentError' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  return { donationState, onSubmit, reset };
+  return {
+    donationState,
+    onSubmit,
+    onPayPalCreateOrder,
+    onPayPalApproved,
+    onPayPalError,
+    reset,
+  };
 }

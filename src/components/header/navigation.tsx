@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { HEADER_LINKS } from './config';
 import { useTranslations } from 'next-intl';
+import { HEADER_LINKS } from './config';
 
 export function Navigation() {
   const tHeaderLinks = useTranslations('Common.headerLinks');

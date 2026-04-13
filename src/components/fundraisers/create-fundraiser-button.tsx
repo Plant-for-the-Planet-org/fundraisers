@@ -1,19 +1,19 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 import type { SelectedImage } from '@/lib/types/image-selection';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { toast } from 'sonner';
 import { createFundraiser } from '@/lib/api/create-fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
-import { imageToBase64 } from '@/lib/utils/image-processor';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
-import { toast } from 'sonner';
+import { imageToBase64 } from '@/lib/utils/image-processor';
+import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {

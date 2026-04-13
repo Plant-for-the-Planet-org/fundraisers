@@ -2,10 +2,10 @@ import type { Category } from '@/lib/types/category';
 
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { CategoryIcon } from './category-icon';
-import { Skeleton } from '../ui/skeleton';
 import { categoriesService } from '@/lib/api/categories-service';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { Skeleton } from '../ui/skeleton';
+import { CategoryIcon } from './category-icon';
 
 interface AdaptedCategory extends Category {
   displayCount: string;

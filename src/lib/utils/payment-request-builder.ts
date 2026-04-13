@@ -2,6 +2,7 @@ import type {
   PaymentData,
   PaymentMethod,
   PaymentRequest,
+  StripePaymentMethod,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
@@ -96,24 +97,54 @@ export function buildPaymentRequest(
           source: {},
         };
 
-      case 'stripe':
-        // TODO: Implement Stripe payment source from Stripe Elements ref (paymentMethodId/sourceId).
-        // Also handle savedMethod for saved cards/SEPA.
-        throw new PaymentOptionsError(
-          'Stripe payment is not yet implemented',
-          'UNKNOWN_PAYMENT_METHOD',
-          400
-        );
+      case 'stripe': {
+        const id = paymentDetails.paymentMethodId || paymentDetails.sourceId;
+        if (!id) {
+          throw new PaymentOptionsError(
+            'Missing payment method ID for Stripe payment',
+            'MISSING_PAYMENT_METHOD_ID',
+            400
+          );
+        }
+        return {
+          gateway: 'stripe',
+          account,
+          method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+          source: { id: String(id), object: 'payment_method' },
+        };
+      }
 
-      case 'paypal':
-        // TODO: PayPal source must be built from the PayPal SDK button callback
-        // (orderID, payerID, paymentID, billingToken, facilitatorAccessToken, paymentSource).
-        // paymentDetails alone is insufficient — implement when wiring up the PayPal slice.
-        throw new PaymentOptionsError(
-          'PayPal payment is not yet implemented',
-          'UNKNOWN_PAYMENT_METHOD',
-          400
-        );
+      case 'paypal': {
+        const {
+          orderID,
+          payerID,
+          paymentID,
+          billingToken,
+          facilitatorAccessToken,
+          paymentSource,
+        } = paymentDetails;
+        if (!orderID) {
+          throw new PaymentOptionsError(
+            'Missing PayPal order ID',
+            'MISSING_ORDER_ID',
+            400
+          );
+        }
+        return {
+          gateway: 'paypal',
+          account,
+          method: 'paypal',
+          source: {
+            type: 'server_order',
+            orderID: String(orderID),
+            payerID: String(payerID ?? ''),
+            paymentID: String(paymentID ?? ''),
+            billingToken: billingToken ? String(billingToken) : null,
+            facilitatorAccessToken: String(facilitatorAccessToken ?? ''),
+            paymentSource: String(paymentSource ?? ''),
+          },
+        };
+      }
     }
   } catch (error) {
     if (error instanceof PaymentOptionsError) {

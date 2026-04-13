@@ -1,13 +1,13 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
+import { isTokenExpired } from '@/lib/auth/jwt-utils';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { useAuthStore } from '@/stores/authStore';
-import { useTranslations } from 'next-intl';
 import { Loader } from '../ui/loader';
-import { useRouter } from 'next/navigation';
-import { isTokenExpired } from '@/lib/auth/jwt-utils';
-import { useEffect } from 'react';
-import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
 
 interface AuthGuardProps {
   children: React.ReactNode;

@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { FOOTER_LINKS } from './config';
 import { CookieSettingsButton } from '../cookie/cookie-settings-button';
+import { FOOTER_LINKS } from './config';
 
 export function LinksBar() {
   const tLinks = useTranslations('Common.legalLinks');

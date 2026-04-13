@@ -1,10 +1,10 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Fundraiser erstellen",
+    "startFundraiser": "Spendenaufrufe erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
-    "hostedByWithOthers": "von {hostName} und {otherCount, plural, one {1 anderem} other {{othersCount} anderen}}",
+    "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 anderem} other {# anderen}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber",
     "unknownHost": "Unbekannt",
     "anonymousHost": "Anonymer Gastgeber",
@@ -14,13 +14,13 @@
     "hostedByLabel": "Veranstaltet von",
     "error": {
       "title": "Etwas ist schief gelaufen",
-      "description": "Dieser Fundraiser konnte nicht geladen werden. Bitte versuche es erneut, oder durchstöbere andere Fundraiser.",
+      "description": "Dieser Spendenaufruf konnte nicht geladen werden. Bitte versuche es erneut, oder durchstöbere andere Spendenaufrufe.",
       "retry": "Erneut versuchen",
-      "browse": "Fundraiser durchstöbern"
+      "browse": "Spendenaufrufe durchstöbern"
     },
     "closedForContribution": {
       "title": "Vielen Dank für die Unterstützung!",
-      "defaultMessage": "Dieser Fundraiser wurde archiviert und sammelt keine Spenden mehr."
+      "defaultMessage": "Dieser Spendenaufruf wurde archiviert und sammelt keine Spenden mehr."
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
@@ -29,47 +29,47 @@
     "donate": {
       "summary": {
         "processingFee": "Bearbeitungsgebühr",
-        "breakdown": "Spendenaufschlüsselung",
-        "total": "Gesamt",
-        "totalMonthly": "Gesamt jeden Monat",
-        "totalYearly": "Gesamt jedes Jahr"
+        "breakdown": "Aufschlüsselung",
+        "total": "Insgesamt",
+        "totalMonthly": "Jeden Monat insgesamt",
+        "totalYearly": "Jedes Jahr insgesamt"
       },
       "paymentMethods": {
         "title": "Zahlungsmethode",
-        "description": "Erhöhe die Wirkung deiner Spende. Manche Zahlungsanbieter berechnen Gebühren. Bei gebührenfreien Methoden kommt der volle Betrag dem Projekt zugute.",
+        "description": "Helfe mit, dass deine Spende ankommt. Einige Zahlungsanbieter berechnen uns Gebühren. Mit gebührenfreien Methoden kannst du sicherstellen, dass deine Spende in vollem Umfang der Sache zugute kommt.",
         "selectMethodPlaceholder": "Zahlungsmethode auswählen",
-        "empty": "Aktuell sind keine Zahlungsmethoden verfügbar.",
+        "empty": "Derzeit sind keine Zahlungsmöglichkeiten verfügbar.",
         "methods": {
-          "openBanking": "Mit Bank bezahlen (Open Banking)",
+          "openBanking": "Bezahlen mit Ihrer Bank (Open Banking)",
           "bankTransfer": "Banküberweisung",
           "paypal": "PayPal",
           "card": "Kredit- oder Debitkarte",
-          "sepa": "SEPA-Lastschrift",
+          "sepa": "SEPA-Lastschriftverfahren",
           "applePay": "Apple Pay",
           "googlePay": "Google Pay"
         },
         "providers": {
           "stripe": "Stripe",
           "paypal": "PayPal",
-          "offline": "der Zahlungsanbieter",
+          "offline": "den Zahlungsdienstleister",
           "planetcash": "PlanetCash"
         },
         "fees": {
-          "noFee": "Keine Gebühr",
-          "feeAmount": "{amount} Gebühr",
+          "noFee": "Keine Gebühren",
+          "feeAmount": "{amount} Gebühren",
           "alternatives": {
             "eu": "Open Banking oder Banküberweisung",
             "default": "Banküberweisung"
           },
           "tooltip": {
-            "withFee": "{provider} berechnet uns {amount} für die Verarbeitung dieser Spende. Du kannst die Wirkung deiner Spende erhöhen, indem du {alternatives} auswählst."
+            "withFee": "{provider} berechnet uns {amount} für die Bearbeitung dieser Spende. Vergrößere die Wirkung, indem du {alternatives} wählst."
           }
         }
       },
       "options": {
-        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Zahlungsabwicklungsgebühren zu decken.",
-        "coverFeesTooltip": "Die Zahlungsabwicklungsgebühren werden auf die von diesem Fundraiser unterstützten Projekte verteilt.",
-        "coverFeesTooltipTriggerLabel": "Weitere Informationen zu Zahlungsabwicklungsgebühren",
+        "coverFeesLabel": "Füge {feeAmount} hinzu, um die Gebühren für die Zahlungsabwicklung zu decken.",
+        "coverFeesTooltip": "Die Gebühren für die Zahlungsabwicklung werden unter den durch diese Spendenaufruf unterstützten Projekte aufgeteilt.",
+        "coverFeesTooltipTriggerLabel": "Weitere Informationen über Zahlungsgebühren",
         "makeMonthly": "Meine Spende monatlich machen"
       }
     },
@@ -89,22 +89,22 @@
         "selectAccent": "Wähle {accent} als Akzentfarbe"
       },
       "title": {
-        "label": "Name des Fundraisers",
-        "placeholder": "Name des Fundraisers",
+        "label": "Name des Spendenaufrufs",
+        "placeholder": "Name des Spendenaufrufs",
         "errors": {
-          "required": "Bitte gib einen Namen für den Fundraiser ein.",
-          "maxLength": "Der Name des Fundraisers darf nicht länger als {max, number} Zeichen lang sein."
+          "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
+          "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
         }
       },
       "description": {
         "label": "Beschreibung",
-        "placeholder": "Erzähle anderen von deinem Fundraiser...",
+        "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
         "errors": {
-          "required": "Bitte gib eine Beschreibung für den Fundraiser ein."
+          "required": "Bitte gib eine Beschreibung für den Spendenaufruf ein."
         }
       },
       "image": {
-        "previewAlt": "Vorschaubild des Fundraisers",
+        "previewAlt": "Vorschaubild des Spendenaufrufs",
         "states": {
           "loadingDefault": "Defaultbild laden...",
           "loading": "Bilder werden geladen...",
@@ -165,23 +165,23 @@
         "restOfWorld": "Rest der Welt",
         "currencyLabel": "{currency} Währung",
         "info": {
-          "general": "Das von dir gewählte Land bestimmt die steuerliche Absetzbarkeit von Spenden und welche Projekte für deine Spendenaktion in Frage kommen.",
+          "general": "Das von dir gewählte Land bestimmt die steuerliche Absetzbarkeit von Spenden und welche Projekte für deinen Spendenaufruf in Frage kommen.",
           "taxReceiptEligible": "Du erhälst eine steuerlich abzugsfähige Spendenbescheinigung für {country}.",
           "notTaxReceiptEligible": "{country, select, ROW {Steuerlich abzugsfähige Steuerbescheinigungen sind nicht verfügbar.} other {Steuerlich abzugsfähige Spendenbescheinigungen für {country} sind nicht verfügbar.}}"
         }
       },
       "goal": {
-        "label": "Fundraiser-Ziel",
+        "label": "Spenden-Ziel",
         "errors": {
-          "required": "Bitte gib ein Fundraiser-Ziel ein."
+          "required": "Bitte gib ein Spenden-Ziel ein."
         }
       },
       "projectSelection": {
-        "sectionHeading": "Projekte, die durch diesen Fundraiser unterstützt werden.",
-        "viewModeSectionHeading": "Projekte, die durch diesen Fundraiser unterstützt werden",
+        "sectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden.",
+        "viewModeSectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}%-Zuweisung",
+        "allocationLabel": "{percentage, number} % Zuweisung",
         "projectImageAlt": "Bild für {name}",
         "expandDescription": "Mehr lesen",
         "collapseDescription": "Weniger lesen",
@@ -190,8 +190,8 @@
           "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen auf der ganzen Welt zu empowern und sich für den Klimaschutz einzusetzen. Wir stellen Wälder wieder her, klären die Öffentlichkeit auf und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
         },
         "aria": {
-          "closeModal": "Auswahl der Projekte schließen",
-          "selectCause": "Projekt hinzufügen {name}"
+          "closeModal": "Projektauswahl schließen",
+          "selectCause": "Projekt {name} hinzufügen"
         },
         "modal": {
           "title": "Projekt hinzufügen",
@@ -220,18 +220,18 @@
           "emptySearchDescription": "Keine Projekte entsprechen \"{query}\"",
           "clearSearch": "Suche löschen",
           "emptyAllTitle": "Alle Projekte hinzugefügt",
-          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deinem Fundraiser hinzugefügt"
+          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt"
         }
       },
       "options": {
-        "sectionHeading": "Fundraiser-Optionen",
+        "sectionHeading": "Spendenaufruf-Optionen",
         "status": {
-          "label": "Spenden mit diesen Fundraiser sammeln",
-          "description": "Aktiviere das Spendensammeln und schalte den Fundraiser frei"
+          "label": "Spenden mit diesem Spendenaufruf sammeln",
+          "description": "Aktiviere das Spendensammeln und schalte den Spendenaufruf frei"
         },
         "visibility": {
-          "label": "Mache den Fundraiser entdeckbar",
-          "description": "Ermögliche es anderen, diesen Fundraiser über die Suche zu finden und zu entdecken"
+          "label": "Mache den Spendenaufruf entdeckbar",
+          "description": "Ermögliche es anderen, diesen Spendenaufruf über die Suche zu finden und zu entdecken"
         }
       },
       "contributionSettings": {
@@ -253,9 +253,9 @@
         "enterAmount": "Betrag eingeben"
       },
       "formSubmission": {
-        "buttonProcessing": "Fundraiser erstellen...",
-        "buttonSubmit": "Fundraiser erstellen",
-        "successMessage": "Fundraiser erstellt!",
+        "buttonProcessing": "Spendenaufruf erstellen...",
+        "buttonSubmit": "Spendenaufruf erstellen",
+        "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler"
       }
     },
@@ -263,7 +263,7 @@
       "label": "Link kopieren",
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
-      "errorToast": "Link konnte nicht kopiert werden. Bitte kopiere die URL manuell."
+      "errorToast": "Der Link konnte nicht kopiert werden. Bitte kopiere die URL manuell."
     }
   }
 }

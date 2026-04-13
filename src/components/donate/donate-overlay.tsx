@@ -1,22 +1,25 @@
 'use client';
 
+import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
-import type { DonationFrequency } from '@/lib/types/donation';
+import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocale } from 'next-intl';
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '@/lib/utils/get-stripe';
+import { DonateCTA } from './donate-cta';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 import { DonateOverlaySkeleton } from './donate-overlay-skeleton';
-import { DonorInfo } from './donor-info';
-import { DonationSummary } from './donation-summary';
-import { PaymentMethods } from './payment-methods';
-import { DonateCTA } from './donate-cta';
-import { DonationFormProvider } from './donation-form-context';
-import { DonateOptions } from './donate-options';
-import { useDonationSubmit } from './use-donation-submit';
-import { DonationSuccessBanner } from './donation-success-banner';
 import { DonationFailureBanner } from './donation-failure-banner';
+import { DonationFormProvider } from './donation-form-context';
+import { DonationSummary } from './donation-summary';
+import { DonationThankYou } from './donation-thank-you';
+import { DonorInfo } from './donor-info';
+import { PaymentMethods } from './payment-methods';
+import { useDonationSubmit } from './use-donation-submit';
 
 export interface DonationData {
   amount: number;
@@ -40,7 +43,7 @@ export function DonateOverlay({
   fundraiser,
   paymentOptions,
 }: DonateOverlayProps) {
-  const mounted = typeof window !== 'undefined';
+  const isClient = typeof window !== 'undefined';
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -49,7 +52,7 @@ export function DonateOverlay({
     };
   }, [isOpen]);
 
-  if (!mounted || !isOpen) return null;
+  if (!isClient || !isOpen) return null;
 
   // Show skeleton while donation data is still being fetched
   if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
@@ -79,45 +82,71 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
-  const { onSubmit, donationState, reset } = useDonationSubmit(
-    donationData,
-    fundraiser,
-    paymentOptions
+  const locale = useLocale();
+  const sepaFormRef = useRef<StripeSepaFormHandle>(null);
+
+  const stripeConfig = paymentOptions.gateways.stripe;
+  const stripePromise = stripeConfig
+    ? getStripe(stripeConfig.authorization.stripePublishableKey, locale)
+    : null;
+
+  const {
+    onSubmit,
+    donationState,
+    reset,
+    onPayPalCreateOrder,
+    onPayPalApproved,
+    onPayPalError,
+  } = useDonationSubmit(donationData, fundraiser, paymentOptions, sepaFormRef);
+  const { thankYouState, error, isLoading } = donationState;
+
+  const leftColumn = thankYouState ? (
+    <DonationThankYou
+      thankYouState={thankYouState}
+      fundraiserSlug={fundraiser.slug}
+    />
+  ) : (
+    <>
+      {error?.code && (
+        <DonationFailureBanner errorCode={error.code} reset={reset} />
+      )}
+      <DonorInfo />
+      <PaymentMethods />
+    </>
   );
-  const { isSuccess, donationId, error, isLoading } = donationState;
+
+  const rightColumn = (
+    <>
+      <DonationSummary />
+      {thankYouState === null && (
+        <DonateCTA
+          isLoading={isLoading}
+          isSuccess={false}
+          onPayPalCreateOrder={onPayPalCreateOrder}
+          onPayPalApproved={onPayPalApproved}
+          onPayPalError={onPayPalError}
+        />
+      )}
+    </>
+  );
+
   return createPortal(
-    <DonationFormProvider
-      fundraiser={fundraiser}
-      donationData={donationData}
-      paymentOptions={paymentOptions}
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-    >
-      <DonateOverlayLayout
-        onClose={onClose}
-        leftColumn={
-          <>
-            {error?.code !== undefined && (
-              <DonationFailureBanner errorCode={error?.code} reset={reset} />
-            )}
-            {isSuccess && donationId !== null && (
-              <DonationSuccessBanner donationId={donationId} />
-            )}
-            <DonorInfo />
-            {/* Custom Fields Section - future implementation */}
-            <PaymentMethods />
-          </>
-        }
-        rightColumn={
-          <>
-            {/* Dedication - future implementation */}
-            <DonationSummary />
-            <DonateOptions />
-            <DonateCTA isLoading={isLoading} isSuccess={isSuccess} />
-          </>
-        }
-      />
-    </DonationFormProvider>,
+    <Elements stripe={stripePromise}>
+      <DonationFormProvider
+        fundraiser={fundraiser}
+        donationData={donationData}
+        paymentOptions={paymentOptions}
+        onSubmit={onSubmit}
+        sepaFormRef={sepaFormRef}
+        isOpen={isOpen}
+      >
+        <DonateOverlayLayout
+          onClose={onClose}
+          leftColumn={leftColumn}
+          rightColumn={rightColumn}
+        />
+      </DonationFormProvider>
+    </Elements>,
     document.body
   );
 }

@@ -1,6 +1,6 @@
 import type {
-  ProjectData,
   ProjectAllocationPreview,
+  ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';

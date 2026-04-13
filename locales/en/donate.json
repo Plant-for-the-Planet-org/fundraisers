@@ -32,7 +32,6 @@
         "label": "Select Address",
         "placeholder": "Choose an address"
       },
-
       "country": {
         "label": "Country *",
         "placeholder": "Select country",
@@ -40,12 +39,10 @@
         "noResults": "No countries found",
         "selectCountry": "Select Country"
       },
-
       "zipCode": {
         "label": "Zip Code *",
         "placeholder": "Zip code"
       },
-
       "address": {
         "label": "Address *",
         "placeholder": "Street address",
@@ -56,17 +53,14 @@
           "other": "Other"
         }
       },
-
       "address2": {
         "label": "Address Line 2",
         "placeholder": "Apartment, suite, etc."
       },
-
       "city": {
         "label": "City *",
         "placeholder": "City"
       },
-
       "state": {
         "label": "State/Province",
         "placeholder": "State or province"
@@ -103,6 +97,20 @@
         "invalid": "Please enter a valid email address"
       }
     },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN is required",
+      "accountHolderName": "Account Holder Name",
+      "accountHolderNameRequired": "Account holder name is required",
+      "mandateTitle": "SEPA Direct Debit Mandate",
+      "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
+      "creditor": "Creditor",
+      "creditorName": "Plant-for-the-Planet Foundation",
+      "creditorId": "Creditor ID",
+      "mandateRights": "Your rights: You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
+      "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
+      "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
@@ -114,6 +122,10 @@
       "accessDenied": "You do not have permission to perform this action.",
       "businessLogic": "Invalid donation data. Please review and try again.",
       "threeDsMissingSecret": "Payment authentication failed. Please try again.",
+      "paypalOrderCreationError": "Failed to create PayPal order. Please try again.",
+      "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
+      "paypalPaymentError": "PayPal payment failed. Please try again.",
+      "paymentFailed": "Payment failed. Please check your details and try again.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {
@@ -122,6 +134,45 @@
       "donateYearly": "Donate Yearly",
       "processing": "Processing...",
       "success": "Donation Complete"
+    },
+    "thankYou": {
+      "title": {
+        "completed": "Thank You for Your Donation!",
+        "bankTransferPending": "Thank you for Initiating Your Donation"
+      },
+      "status": {
+        "label": "Status:",
+        "completed": "Completed",
+        "bankTransferPending": "Bank transfer pending"
+      },
+      "message": {
+        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
+        "bankTransferPending": {
+          "monthly": "Your monthly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
+          "yearly": "Your yearly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
+          "once": "Your donation of {amount} has been initiated. To complete your donation, please transfer the amount using the details below. This information was also emailed to you."
+        }
+      },
+      "transfer": {
+        "heading": "Transfer Details",
+        "amount": "Amount",
+        "reference": "Reference",
+        "beneficiary": "Beneficiary",
+        "iban": "IBAN",
+        "bic": "BIC",
+        "bank": "Bank",
+        "transactionId": "Transaction ID {id}",
+        "error": "Transfer details not found, please reach out to <link>support@plant-for-the-planet.org</link> for help."
+      },
+      "copy": {
+        "label": "Copy {field}",
+        "success": "Copied!",
+        "error": "Failed to copy"
+      },
+      "share": {
+        "title": "Share this fundraiser",
+        "description": "Every share inspires more people to act."
+      }
     }
   }
 }

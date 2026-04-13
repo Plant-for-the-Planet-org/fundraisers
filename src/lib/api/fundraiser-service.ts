@@ -1,9 +1,22 @@
-import { cache } from 'react';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+
+import { cache } from 'react';
 import { platformAPIClient } from './external-client';
 
-export async function getFundraiser(slug: string): Promise<Fundraiser> {
-  return platformAPIClient.get<Fundraiser>(`/fundraisers/${slug}`);
+function fundraiserPath(slug: string, locale?: string): string {
+  const path = `/fundraisers/${slug}`;
+  if (!locale) {
+    return path;
+  }
+  const params = new URLSearchParams({ locale });
+  return `${path}?${params.toString()}`;
+}
+
+export async function getFundraiser(
+  slug: string,
+  locale?: string
+): Promise<Fundraiser> {
+  return platformAPIClient.get<Fundraiser>(fundraiserPath(slug, locale));
 }
 
 export async function getFundraiserAuthenticated(
@@ -16,6 +29,8 @@ export async function getFundraiserAuthenticated(
   );
 }
 
-export const getCachedFundraiser = cache(async (slug: string) => {
-  return getFundraiser(slug);
-});
+export const getCachedFundraiser = cache(
+  async (slug: string, locale: string) => {
+    return getFundraiser(slug, locale);
+  }
+);

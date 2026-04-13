@@ -1,7 +1,7 @@
-import { SectionHeader } from '@/components/fundraisers/typography';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { sanitizeDescriptionHtml } from '@/lib/utils/sanitize-html';
-import { useTranslations } from 'next-intl';
+import { SectionHeader } from '@/components/fundraisers/typography';
 
 interface DescriptionDisplayProps {
   value: string | null;

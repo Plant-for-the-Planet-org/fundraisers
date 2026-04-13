@@ -2,11 +2,11 @@
 
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
+import { useLocale, useTranslations } from 'next-intl';
 import { getCurrencySymbol } from '@/lib/utils/currency';
+import { Input } from '@/components/ui/input';
 
 export function GoalInput() {
   const locale = useLocale();

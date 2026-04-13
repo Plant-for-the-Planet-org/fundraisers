@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react';
-import { ThemeShell } from '@/components/theme/theme-shell';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
-import { MainContent } from '@/components/ui/main-content';
+
+import { getLocale } from 'next-intl/server';
 import { Toaster } from 'sonner';
+import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { DEFAULT_THEME } from '@/lib/theme/themes';
-import { PlatformAPIError } from '@/lib/api/external-client';
+import { Footer } from '@/components/footer';
+import { Header } from '@/components/header';
+import { ThemeShell } from '@/components/theme/theme-shell';
+import { MainContent } from '@/components/ui/main-content';
 
 export default async function FundraiserLayout({
   children,
@@ -17,10 +19,11 @@ export default async function FundraiserLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const locale = await getLocale();
 
   let theme;
   try {
-    const fundraiser = await getCachedFundraiser(slug);
+    const fundraiser = await getCachedFundraiser(slug, locale);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
     if (
