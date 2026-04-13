@@ -97,9 +97,24 @@
         "invalid": "Please enter a valid email address"
       }
     },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN is required",
+      "accountHolderName": "Account Holder Name",
+      "accountHolderNameRequired": "Account holder name is required",
+      "mandateTitle": "SEPA Direct Debit Mandate",
+      "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
+      "creditor": "Creditor",
+      "creditorName": "Plant-for-the-Planet Foundation",
+      "creditorId": "Creditor ID",
+      "mandateRights": "Your rights: You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
+      "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
+      "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
+      "timeout": "The request took too long. Please try again.",
       "server": "Server error. Please try again in a few moments.",
       "rateLimit": "Too many requests. Please wait a moment and try again.",
       "donationCreation": "Failed to create donation. Please try again.",

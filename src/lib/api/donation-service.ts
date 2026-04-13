@@ -17,6 +17,8 @@ export class DonationError extends Error {
   }
 }
 
+const DONATION_TIMEOUT_MS = 30_000;
+
 export class DonationService {
   private baseURL: string;
 
@@ -107,6 +109,7 @@ export class DonationService {
         method: 'POST',
         headers,
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(DONATION_TIMEOUT_MS),
       });
 
       if (!response.ok) {
@@ -118,6 +121,19 @@ export class DonationService {
     } catch (error) {
       if (error instanceof DonationError) {
         throw error;
+      }
+
+      if (
+        error instanceof DOMException &&
+        (error.name === 'TimeoutError' || error.name === 'AbortError')
+      ) {
+        throw new DonationError(
+          'Donation request timed out',
+          'api',
+          'TIMEOUT_ERROR',
+          0,
+          { originalError: error }
+        );
       }
 
       throw new DonationError(
