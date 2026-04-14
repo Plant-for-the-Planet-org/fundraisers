@@ -170,6 +170,8 @@ export function useDonationSubmit(
       );
 
       let paymentDetails: PaymentData['paymentDetails'] = {};
+      const donationAttemptKey = donationKeyRef.current;
+      const paymentAttemptKey = paymentKeyRef.current;
 
       try {
         if (isPlanetCash) {
@@ -247,16 +249,12 @@ export function useDonationSubmit(
             await submitStandardDonation({
               payload,
               token: token || undefined,
-              donationIdempotencyKey: donationKeyRef.current,
-              paymentIdempotencyKey: paymentKeyRef.current,
+              donationIdempotencyKey: donationAttemptKey,
+              paymentIdempotencyKey: paymentAttemptKey,
               selectedPaymentMethod: values.selectedPaymentMethod,
               paymentOptions,
               paymentDetails: cleanPaymentDetails(paymentDetails),
             });
-
-          // Rotate keys now that the server accepted this operation
-          donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-          paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
           if (paymentResponse.status === 'failed') {
             setDonationState(prev => ({
@@ -287,9 +285,8 @@ export function useDonationSubmit(
             return;
           }
 
-          // NOTE: idempotency keys are intentionally NOT rotated before action_required handling.
-          // For SEPA and card 3DS, the re-submission reuses the same keys (confirmation of the same
-          // payment intent, not a new attempt). Keys are rotated only after a successful resolution.
+          // NOTE: Reuse attempt-scoped idempotency keys for action_required follow-up calls.
+          // Keys are rotated after this submit attempt completes (in finally).
           if (
             paymentResponse.status === 'action_required' &&
             paymentResponse.response.type === 'cardAction' &&
@@ -320,7 +317,7 @@ export function useDonationSubmit(
               donationResponse.donationId,
               confirmRequest,
               token || undefined,
-              paymentKeyRef.current
+              paymentAttemptKey
             );
 
             if (finalResponse.status === 'failed') {
@@ -331,10 +328,6 @@ export function useDonationSubmit(
               }));
               return;
             }
-
-            donationKeyRef.current =
-              generateIdempotencyKeyWithPrefix('donation');
-            paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
             setDonationState(prev => ({
               ...prev,
@@ -366,10 +359,6 @@ export function useDonationSubmit(
               }));
               return;
             }
-
-            donationKeyRef.current =
-              generateIdempotencyKeyWithPrefix('donation');
-            paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
             setDonationState(prev => ({
               ...prev,
@@ -422,6 +411,9 @@ export function useDonationSubmit(
           error: toSubmitError(error),
         }));
       } finally {
+        // Rotate keys once per completed submit attempt.
+        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
+        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
         submittingRef.current = false;
       }
     },
