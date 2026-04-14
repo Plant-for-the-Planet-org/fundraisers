@@ -73,13 +73,9 @@ function resolveThankYouState(
       }
       return { status: 'completed', donationId };
 
+    // thank you state is only associated with "success" status
     case 'action_required':
-      // Future: handle 3DS / card authentication
-      return null;
-
     case 'failed':
-      // Caller should handle this before calling resolveThankYouState,
-      // but guard against it reaching here
       return null;
 
     default:
