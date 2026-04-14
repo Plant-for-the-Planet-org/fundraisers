@@ -119,19 +119,25 @@
       "cvcLabel": "CVC",
       "cvcRequired": "CVC ist erforderlich",
       "cardholderNameLabel": "Name des Karteninhabers *",
+      "cardholderNamePlaceholder": "Name des Karteninhabers eingeben",
       "cardholderNameRequired": "Name des Karteninhabers ist erforderlich",
       "useDonorAddressLabel": "Rechnungsadresse aus meinen Spenderdaten verwenden",
       "address": {
         "label": "Adresse *",
+        "placeholder": "Adresse eingeben",
         "required": "Adresse ist erforderlich"
       },
       "address2": {
-        "label": "Adresszeile 2"
+        "label": "Adresszeile 2",
+        "placeholder": "Wohnung, Zusatz, Einheit usw."
       },
       "cityLabel": "Stadt *",
+      "cityPlaceholder": "Stadt eingeben",
       "cityRequired": "Stadt ist erforderlich",
       "stateLabel": "Bundesland / Kanton",
+      "statePlaceholder": "Bundesland oder Kanton eingeben",
       "billingZipCodeLabel": "PLZ *",
+      "billingZipCodePlaceholder": "PLZ eingeben",
       "billingZipCodeRequired": "Postleitzahl ist erforderlich",
       "countryLabel": "Land *",
       "countryRequired": "Land ist erforderlich",

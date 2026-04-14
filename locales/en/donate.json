@@ -119,19 +119,25 @@
       "cvcLabel": "CVC",
       "cvcRequired": "CVC is required",
       "cardholderNameLabel": "Cardholder Name *",
+      "cardholderNamePlaceholder": "Enter cardholder name",
       "cardholderNameRequired": "Cardholder name is required",
       "useDonorAddressLabel": "Use billing address from my donor info",
       "address": {
         "label": "Address *",
+        "placeholder": "Enter address",
         "required": "Address is required"
       },
       "address2": {
-        "label": "Address Line 2"
+        "label": "Address Line 2",
+        "placeholder": "Apartment, suite, unit, etc."
       },
       "cityLabel": "City *",
+      "cityPlaceholder": "Enter city",
       "cityRequired": "City is required",
       "stateLabel": "State / Province",
+      "statePlaceholder": "Enter state or province",
       "billingZipCodeLabel": "Zip / Postal Code *",
+      "billingZipCodePlaceholder": "Enter zip or postal code",
       "billingZipCodeRequired": "Zip code is required",
       "countryLabel": "Country *",
       "countryRequired": "Country is required",

@@ -249,7 +249,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               setCardholderName(e.target.value);
               if (cardholderNameError) setCardholderNameError(null);
             }}
-            placeholder='Jane Doe'
+            placeholder={t('cardholderNamePlaceholder')}
             className='mt-2'
           />
         </FormField>
@@ -280,6 +280,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                   setBillingAddress(e.target.value);
                   if (billingAddressError) setBillingAddressError(null);
                 }}
+                placeholder={t('address.placeholder')}
                 className='mt-2'
               />
             </FormField>
@@ -288,6 +289,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <Input
                 value={billingAddress2}
                 onChange={e => setBillingAddress2(e.target.value)}
+                placeholder={t('address2.placeholder')}
                 className='mt-2'
               />
             </FormField>
@@ -303,6 +305,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                     setBillingCity(e.target.value);
                     if (billingCityError) setBillingCityError(null);
                   }}
+                  placeholder={t('cityPlaceholder')}
                   className='mt-2'
                 />
               </FormField>
@@ -310,6 +313,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                 <Input
                   value={billingState}
                   onChange={e => setBillingState(e.target.value)}
+                  placeholder={t('statePlaceholder')}
                   className='mt-2'
                 />
               </FormField>
@@ -341,6 +345,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                     setBillingZipCode(e.target.value);
                     if (billingZipCodeError) setBillingZipCodeError(null);
                   }}
+                  placeholder={t('billingZipCodePlaceholder')}
                   className='mt-2'
                 />
               </FormField>
