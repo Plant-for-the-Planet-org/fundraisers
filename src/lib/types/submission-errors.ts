@@ -17,6 +17,7 @@ export const SUBMISSION_ERROR_CODES = {
   RATE_LIMIT_ERROR: 'rateLimit',
   SERVER_ERROR: 'server',
   NETWORK_ERROR: 'network',
+  TIMEOUT_ERROR: 'timeout',
   INVALID_RESPONSE: 'server',
   HTTP_ERROR: 'server',
 

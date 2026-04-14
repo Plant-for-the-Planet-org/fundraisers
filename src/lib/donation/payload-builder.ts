@@ -33,15 +33,13 @@ export function buildDonationMetadata(
   sourceUrl?: string,
   referrer?: string
 ): DonationPayload['metadata'] {
+  const source = sourceUrl || getSourceUrl(fundraiserData.id);
+
   return {
     utm_campaign: fundraiserData.id,
     fundraiser: {
       id: fundraiserData.id,
-      source:
-        sourceUrl ||
-        (typeof window !== 'undefined'
-          ? `${window.location.origin}/${fundraiserData.id}`
-          : `https://example.com/${fundraiserData.id}`),
+      ...(source && { source }),
       referrer: referrer || 'direct',
       user_id: userProfile?.id,
       privacy: {
@@ -119,11 +117,13 @@ export function assembleFormData(
     isAnonymous: values.isAnonymous,
   };
 
-  if (isAuthenticated && values.selectedAddressId) {
+  const selectedAddressId = values.selectedAddressId || undefined;
+
+  if (isAuthenticated && selectedAddressId) {
     return {
       ...base,
       type: 'authenticated' as const,
-      receiptAddress: values.selectedAddressId,
+      receiptAddress: selectedAddressId,
     };
   }
 

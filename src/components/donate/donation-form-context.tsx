@@ -30,17 +30,14 @@ export const donationFormSchema = z
     // Address fields — validated conditionally in superRefine based on whether selectedAddressId is present
     address: z.string().trim(),
     address2: z.string().trim().optional(),
-    addressType: z.enum(['primary', 'mailing', 'other']),
+    addressType: z.enum(['primary', 'mailing', 'other']).optional(),
     zipCode: z.string().trim(),
     state: z.string().trim().optional(),
     city: z.string().trim(),
     country: z.string().trim(),
     // Preferences
     isAnonymous: z.boolean(),
-    selectedAddressId: z
-      .string()
-      .transform(val => (val === '' ? undefined : val))
-      .optional(),
+    selectedAddressId: z.string().optional(),
     makeMonthly: z.boolean(),
     coverFees: z.boolean(),
     selectedPaymentMethod: z.enum([
@@ -55,7 +52,8 @@ export const donationFormSchema = z
     companyName: z.string().trim().optional(),
   })
   .superRefine((values, ctx) => {
-    const hasAddressId = !!values.selectedAddressId?.trim();
+    const hasAddressId =
+      !!values.selectedAddressId?.trim() && values.selectedAddressId !== 'new';
 
     // When no addressId is provided (guest user), require personal + address fields
     if (!hasAddressId) {
@@ -79,7 +77,7 @@ export const donationFormSchema = z
           message: DONATION_FORM_ERRORS['email.required'],
           path: ['email'],
         });
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+      } else if (!z.email().safeParse(values.email).success) {
         ctx.addIssue({
           code: 'custom',
           message: DONATION_FORM_ERRORS['email.invalid'],
