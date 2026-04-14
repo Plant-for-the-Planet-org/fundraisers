@@ -48,7 +48,7 @@ Only `email` and `donorAddress` are passed in by the caller. The form resolves t
 - [x] Add `cardFormRef` to `DonationFormContext`
 - [x] Wire `cardFormRef` in `donate-overlay.tsx` + pass to `useDonationSubmit`
 - [x] Render `StripeCardForm` in `payment-methods.tsx` when card is selected
-- [ ] Implement card submit + 3DS flow in `use-donation-submit.ts`
+- [x] Implement card submit + 3DS flow in `use-donation-submit.ts`
 
 ---
 

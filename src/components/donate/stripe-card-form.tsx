@@ -78,8 +78,8 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
       null
     );
     const [billingState, setBillingState] = useState('');
-    const [billingZipCode, setbillingZipCode] = useState('');
-    const [billingZipCodeError, setbillingZipCodeError] = useState<
+    const [billingZipCode, setBillingZipCode] = useState('');
+    const [billingZipCodeError, setBillingZipCodeError] = useState<
       string | null
     >(null);
     const [billingCountry, setBillingCountry] = useState('');
@@ -117,7 +117,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             hasError = true;
           }
           if (!billingZipCode.trim()) {
-            setbillingZipCodeError(t('billingZipCodeRequired'));
+            setBillingZipCodeError(t('billingZipCodeRequired'));
             hasError = true;
           }
           if (!billingCountry) {
@@ -336,8 +336,8 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                 <Input
                   value={billingZipCode}
                   onChange={e => {
-                    setbillingZipCode(e.target.value);
-                    if (billingZipCodeError) setbillingZipCodeError(null);
+                    setBillingZipCode(e.target.value);
+                    if (billingZipCodeError) setBillingZipCodeError(null);
                   }}
                   className='mt-2'
                 />
