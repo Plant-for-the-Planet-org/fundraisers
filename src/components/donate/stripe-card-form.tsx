@@ -25,6 +25,7 @@ export interface StripeCardFormHandle {
     email: string;
     donorAddress: {
       line1: string;
+      line2?: string;
       city: string;
       state?: string;
       zipCode: string;
@@ -134,6 +135,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         const stripeAddress = useDonorAddress
           ? {
               line1: donorAddress.line1,
+              line2: donorAddress.line2,
               city: donorAddress.city,
               state: donorAddress.state,
               postal_code: donorAddress.zipCode,

@@ -182,7 +182,7 @@ export function useDonationSubmit(
             const selectedAddress =
               donorProfile?.addresses.find(
                 a => a.id === values.selectedAddressId
-              ) ?? donorProfile?.address;
+              ) ?? donorProfile?.addresses[0];
             const sepaResult = await sepaFormRef.current?.createPaymentMethod({
               name: donor
                 ? `${donor.firstname} ${donor.lastname}`
@@ -214,16 +214,18 @@ export function useDonationSubmit(
 
           if (values.selectedPaymentMethod === 'card') {
             const donor = formData.type === 'guest' ? formData.donor : null;
-            const addressFromList = donorProfile?.addresses.find(
-              a => a.id === values.selectedAddressId
-            );
-            const selectedAddress = addressFromList ?? donorProfile?.address;
+            const selectedAddress =
+              donorProfile?.addresses.find(
+                a => a.id === values.selectedAddressId
+              ) ?? donorProfile?.addresses[0];
             const cardResult = await cardFormRef.current?.createPaymentMethod({
               email: donor?.email ?? donorProfile?.email ?? '',
               donorAddress: {
                 line1: donor?.address ?? selectedAddress?.address ?? '',
+                line2:
+                  donor?.address2 ?? selectedAddress?.address2 ?? undefined,
                 city: donor?.city ?? selectedAddress?.city ?? '',
-                state: donor?.state ?? addressFromList?.state ?? undefined,
+                state: donor?.state ?? selectedAddress?.state ?? undefined,
                 zipCode: donor?.zipCode ?? selectedAddress?.zipCode ?? '',
                 country:
                   donor?.country ??
