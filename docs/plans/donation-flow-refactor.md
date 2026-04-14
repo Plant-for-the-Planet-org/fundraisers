@@ -73,6 +73,9 @@ src/components/donate/
         Builds PayPal payment request, calls processPayment.
 
   donation-address.ts
+    — resolveDonationContact(formData, donorProfile, selectedAddressId)
+      Resolves the shared `donor` / `selectedAddress` inputs currently
+      duplicated in both SEPA and card branches.
     — resolveSelectedAddress(donorProfile, selectedAddressId)
         Returns the matching address from addresses array or falls back to
         addresses[0].
@@ -89,6 +92,10 @@ src/components/donate/
         Extracted pure function, currently inline in use-donation-submit.ts.
     — cleanPaymentDetails(details): Record<string, string | number | boolean>
         Extracted pure function, currently inline in use-donation-submit.ts.
+    — shouldSurfaceSubmissionBanner(resultError)
+      Distinguishes inline validation failures from real submission failures
+      for `createPaymentMethod` results. This requires first enriching the
+      Stripe form handle return shape beyond `{ error: string }`.
 ```
 
 ### `payment-methods` split
@@ -148,13 +155,16 @@ Do this in three PRs, each no-behavior-change:
 **PR A — Extract pure functions from `use-donation-submit.ts`**
 
 - Move `resolveThankYouState`, `toSubmitError`, `cleanPaymentDetails` to their own files.
-- Move `resolveSelectedAddress` and `buildDonorBillingAddress` to `donation-address.ts`.
+- Move `resolveDonationContact`, `resolveSelectedAddress`, and `buildDonorBillingAddress` to `donation-address.ts`.
 - Import them back into the hook. Hook line count drops by ~80 lines.
 
 **PR B — Extract Stripe and PayPal flow steps**
 
 - Move all Stripe-specific branches into `stripe-submit-flow.ts` as pure async functions.
 - Move PayPal create/approve logic into `paypal-submit-flow.ts`.
+- Update Stripe form handle return types so validation-only `createPaymentMethod`
+  failures can be handled inline without triggering the global
+  `paymentFailed` banner.
 - The hook becomes an orchestrator that calls these functions and updates state.
 - Hook line count drops to ~150–200 lines.
 
