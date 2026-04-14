@@ -108,6 +108,16 @@ function DonateOverlayInner({
   );
   const { thankYouState, error, isLoading } = donationState;
 
+  const errorBannerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error?.code) {
+      errorBannerRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [error?.code]);
+
   const leftColumn = thankYouState ? (
     <DonationThankYou
       thankYouState={thankYouState}
@@ -116,7 +126,9 @@ function DonateOverlayInner({
   ) : (
     <>
       {error?.code && (
-        <DonationFailureBanner errorCode={error.code} reset={reset} />
+        <div ref={errorBannerRef}>
+          <DonationFailureBanner errorCode={error.code} reset={reset} />
+        </div>
       )}
       <DonorInfo />
       <PaymentMethods />
