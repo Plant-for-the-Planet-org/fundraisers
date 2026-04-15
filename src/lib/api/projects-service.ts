@@ -1,6 +1,13 @@
 import type { ProjectData } from '@/lib/types/project-selection';
+import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { API_BASE_URL } from '@/lib/constants/app-config';
+
+type ApiCountry = Exclude<AllowedCountry, 'ROW'>;
+
+function resolveProjectsApiCountry(countryCode: AllowedCountry): ApiCountry {
+  return countryCode === 'ROW' ? 'DE' : countryCode;
+}
 
 interface ProjectsApiEnvelope {
   projects?: unknown[];
@@ -28,7 +35,7 @@ function normalizeProject(project: unknown): ProjectData | null {
   }
 
   const rawProject = project as Record<string, unknown>;
-  const id = typeof rawProject.id === 'string' ? rawProject.id : '';
+  const id = typeof rawProject.guid === 'string' ? rawProject.guid : '';
   const name = typeof rawProject.name === 'string' ? rawProject.name : '';
 
   if (!id || !name) {
@@ -52,12 +59,14 @@ function normalizeProject(project: unknown): ProjectData | null {
 }
 
 export class ProjectsService {
-  async getProjects(country?: string, locale?: string): Promise<ProjectData[]> {
-    const url = new URL(`${API_BASE_URL}/projects`);
+  private readonly cache = new Map<string, ProjectData[]>();
 
-    if (country) {
-      url.searchParams.append('country', country);
-    }
+  async getProjects(
+    country: AllowedCountry,
+    locale?: string
+  ): Promise<ProjectData[]> {
+    const apiCountry = resolveProjectsApiCountry(country);
+    const url = new URL(`${API_BASE_URL}/countryProjects/${apiCountry}`);
     if (locale) {
       url.searchParams.append('locale', locale);
     }
@@ -83,12 +92,23 @@ export class ProjectsService {
   }
 
   async getCauseSelectableProjects(
-    country?: string,
+    country: AllowedCountry,
     locale?: string
   ): Promise<ProjectData[]> {
-    const projects = await this.getProjects(country, locale);
+    const apiCountry = resolveProjectsApiCountry(country);
+    const cacheKey = `${apiCountry}|${locale ?? ''}`;
 
-    return projects.filter(project => project.allowDonations === true);
+    const cached = this.cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const projects = await this.getProjects(country, locale);
+    const selectable = projects.filter(
+      project => project.allowDonations === true
+    );
+    this.cache.set(cacheKey, selectable);
+    return selectable;
   }
 }
 
