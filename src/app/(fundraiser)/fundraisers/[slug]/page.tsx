@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
@@ -14,18 +14,39 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const locale = await getLocale();
+  const tMetadata = await getTranslations({
+    locale,
+    namespace: 'Fundraisers.metadata',
+  });
+
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
+
+    if (fundraiser.visibility !== 'public') {
+      return {
+        title: fundraiser.title,
+        robots: 'noindex, nofollow',
+      };
+    }
+
     return {
       title: fundraiser.title,
       description: fundraiser.description ?? undefined,
       openGraph: {
         title: fundraiser.title,
+        description: fundraiser.description ?? undefined,
+        type: 'website',
+        images: fundraiser.image ? [fundraiser.image] : undefined,
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: fundraiser.title,
+        description: fundraiser.description ?? undefined,
         images: fundraiser.image ? [fundraiser.image] : undefined,
       },
     };
   } catch {
-    return { title: 'Fundraiser' };
+    return { title: tMetadata('fallbackTitle') };
   }
 }
 

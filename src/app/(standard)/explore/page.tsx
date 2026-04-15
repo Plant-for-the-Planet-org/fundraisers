@@ -1,4 +1,7 @@
+import type { Metadata } from 'next';
+
 import { Suspense } from 'react';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { FeaturedFundraisersLoader } from '@/components/explore/featured-fundraisers-loader';
 import { FeaturedFundraisersSkeleton } from '@/components/explore/featured-fundraisers-skeleton';
 import {
@@ -10,6 +13,28 @@ import {
   FundraiserCitiesSkeleton,
 } from '@/components/explore/fundraiser-cities';
 import { PageHeader } from '@/components/explore/page-header';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const tExplore = await getTranslations({ locale, namespace: 'Explore' });
+  const title = tExplore('title');
+  const description = tExplore('description');
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default function ExplorePage() {
   return (

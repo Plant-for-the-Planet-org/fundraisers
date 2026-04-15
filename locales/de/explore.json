@@ -23,6 +23,10 @@
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
     "categoryPage": {
+      "metadata": {
+        "title": "{categoryName} Spendenaufrufe",
+        "description": "Entdecke Spendenaufrufe zum Thema {categoryName} und unterstütze Anliegen, die dir wichtig sind."
+      },
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}",
       "fundraisers": {
         "title": "Spendenaufruf",
