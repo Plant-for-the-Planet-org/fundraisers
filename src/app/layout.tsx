@@ -47,6 +47,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.BASE_URL || 'http://localhost:3000'),
   title: 'Fundraisers',
   description: 'Fundraising platform',
 };

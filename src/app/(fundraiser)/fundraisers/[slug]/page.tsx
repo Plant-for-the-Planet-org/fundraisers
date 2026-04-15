@@ -4,11 +4,13 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
+import { getFundraiserUrl } from '@/lib/utils/fundraiser';
+import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
-const MAX_METADATA_DESCRIPTION_LENGTH = 160;
+const MAX_METADATA_DESCRIPTION_LENGTH = 200;
 
 function getMetadataDescription(
   description: string | null | undefined
@@ -38,6 +40,20 @@ function getMetadataDescription(
   return `${readableDescription}...`;
 }
 
+function getFundraiserMetadataImage(
+  image: string | null | undefined
+): string | undefined {
+  if (!image) {
+    return undefined;
+  }
+
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
+
+  return getImageUrl('fundraiser', 'large', image) ?? undefined;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -53,6 +69,11 @@ export async function generateMetadata({
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
     const description = getMetadataDescription(fundraiser.description);
+    const canonicalUrl = getFundraiserUrl({
+      id: fundraiser.id,
+      slug: fundraiser.slug || fundraiser.hid,
+    });
+    const imageUrl = getFundraiserMetadataImage(fundraiser.image);
 
     if (fundraiser.visibility !== 'public') {
       return {
@@ -64,17 +85,30 @@ export async function generateMetadata({
     return {
       title: fundraiser.title,
       description,
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title: fundraiser.title,
         description,
         type: 'website',
-        images: fundraiser.image ? [fundraiser.image] : undefined,
+        url: canonicalUrl,
+        images: imageUrl
+          ? [
+              {
+                url: imageUrl,
+                width: 1200,
+                height: 630,
+                alt: fundraiser.title,
+              },
+            ]
+          : undefined,
       },
       twitter: {
         card: 'summary_large_image',
         title: fundraiser.title,
         description,
-        images: fundraiser.image ? [fundraiser.image] : undefined,
+        images: imageUrl ? [imageUrl] : undefined,
       },
     };
   } catch {
