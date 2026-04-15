@@ -4,8 +4,39 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
+import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
+
+const MAX_METADATA_DESCRIPTION_LENGTH = 160;
+
+function getMetadataDescription(
+  description: string | null | undefined
+): string | undefined {
+  if (!description) {
+    return undefined;
+  }
+
+  const plainTextDescription = getRichTextTextContent(description);
+  if (!plainTextDescription) {
+    return undefined;
+  }
+
+  if (plainTextDescription.length <= MAX_METADATA_DESCRIPTION_LENGTH) {
+    return plainTextDescription;
+  }
+
+  const truncatedDescription = plainTextDescription
+    .slice(0, MAX_METADATA_DESCRIPTION_LENGTH - 3)
+    .trimEnd();
+  const lastWordBoundary = truncatedDescription.lastIndexOf(' ');
+  const readableDescription =
+    lastWordBoundary > 0
+      ? truncatedDescription.slice(0, lastWordBoundary)
+      : truncatedDescription;
+
+  return `${readableDescription}...`;
+}
 
 export async function generateMetadata({
   params,
@@ -21,6 +52,7 @@ export async function generateMetadata({
 
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
+    const description = getMetadataDescription(fundraiser.description);
 
     if (fundraiser.visibility !== 'public') {
       return {
@@ -31,17 +63,17 @@ export async function generateMetadata({
 
     return {
       title: fundraiser.title,
-      description: fundraiser.description ?? undefined,
+      description,
       openGraph: {
         title: fundraiser.title,
-        description: fundraiser.description ?? undefined,
+        description,
         type: 'website',
         images: fundraiser.image ? [fundraiser.image] : undefined,
       },
       twitter: {
         card: 'summary_large_image',
         title: fundraiser.title,
-        description: fundraiser.description ?? undefined,
+        description,
         images: fundraiser.image ? [fundraiser.image] : undefined,
       },
     };
