@@ -12,6 +12,7 @@ import { useLocale } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { DonateCTA } from './donate-cta';
+import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 import { DonateOverlaySkeleton } from './donate-overlay-skeleton';
 import { DonationFailureBanner } from './donation-failure-banner';
@@ -139,13 +140,16 @@ function DonateOverlayInner({
     <>
       <DonationSummary />
       {thankYouState === null && (
-        <DonateCTA
-          isLoading={isLoading}
-          isSuccess={false}
-          onPayPalCreateOrder={onPayPalCreateOrder}
-          onPayPalApproved={onPayPalApproved}
-          onPayPalError={onPayPalError}
-        />
+        <>
+          <DonateOptions />
+          <DonateCTA
+            isLoading={isLoading}
+            isSuccess={false}
+            onPayPalCreateOrder={onPayPalCreateOrder}
+            onPayPalApproved={onPayPalApproved}
+            onPayPalError={onPayPalError}
+          />
+        </>
       )}
     </>
   );
