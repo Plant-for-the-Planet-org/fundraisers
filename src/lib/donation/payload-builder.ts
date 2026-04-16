@@ -10,7 +10,6 @@ import type {
 } from '../types/donation';
 import type { Fundraiser } from '../types/fundraiser';
 
-import { getPrimaryAddress } from '../utils/profile';
 import { calculateLineItems } from './line-item-calculator';
 
 export function calculateFrequency(
@@ -50,25 +49,23 @@ export function buildDonationMetadata(
 }
 /**
  * Maps guest form data to API donor structure.
- * Pre-populates missing fields from user profile if available.
+ * Currently only called for guest users — userProfile fallbacks are unused in practice
+ * but kept for when guest and authenticated flows are unified.
  */
 export function buildDonorInfo(
   formData: GuestFormData,
   userProfile?: UserProfileResponse
 ): DonorInfo {
-  const primaryAddress = getPrimaryAddress(userProfile?.addresses ?? []);
   const donorInfo: DonorInfo = {
     firstname: formData.donor.firstname || userProfile?.firstname || '',
     lastname: formData.donor.lastname || userProfile?.lastname || '',
     email: formData.donor.email || userProfile?.email || '',
-    address: formData.donor.address || primaryAddress.address,
-    zipCode: formData.donor.zipCode || primaryAddress.zipCode || '',
-    city: formData.donor.city || primaryAddress.city || '',
-    country:
-      formData.donor.country ||
-      primaryAddress.country ||
-      userProfile?.country ||
-      '',
+    address: formData.donor.address,
+    address2: formData.donor.address2 || undefined,
+    zipCode: formData.donor.zipCode,
+    city: formData.donor.city,
+    state: formData.donor.state || undefined,
+    country: formData.donor.country || userProfile?.country || '',
   };
 
   if (formData.companyName) {
