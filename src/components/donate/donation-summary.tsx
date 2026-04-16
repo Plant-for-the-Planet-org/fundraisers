@@ -9,7 +9,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
-import { Avatar, AvatarFallback,AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDonationForm } from './donation-form-context';
 
