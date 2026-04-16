@@ -4,9 +4,10 @@ import type {
   ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
+import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useWatch } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
@@ -45,15 +46,6 @@ function buildLearnMoreUrl(projectId: string): string {
   return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
-function normalizeCountryForProjects(countryCode?: string): string | undefined {
-  if (!countryCode) {
-    return undefined;
-  }
-
-  const normalized = countryCode.trim().toUpperCase();
-  return normalized === 'ROW' ? 'DE' : normalized;
-}
-
 export function ProjectSelectionOverlay({
   isOpen,
   onClose,
@@ -65,8 +57,6 @@ export function ProjectSelectionOverlay({
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
     name: 'country',
   });
-  const lastFetchedCountryLocaleKeyRef = useRef<string | undefined>(undefined);
-
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -84,7 +74,7 @@ export function ProjectSelectionOverlay({
   }, []);
 
   const fetchProjects = useCallback(
-    async (countryCode?: string, locale?: string) => {
+    async (countryCode: AllowedCountry, locale?: string) => {
       setIsLoading(true);
       setLoadError(false);
 
@@ -108,18 +98,12 @@ export function ProjectSelectionOverlay({
       return;
     }
 
-    const normalizedCountry = normalizeCountryForProjects(country);
-    const fetchKey = `${normalizedCountry ?? ''}|${locale}`;
-
-    if (
-      allProjects.length > 0 &&
-      lastFetchedCountryLocaleKeyRef.current === fetchKey
-    ) {
+    if (!country) {
+      setLoadError(true);
       return;
     }
 
-    lastFetchedCountryLocaleKeyRef.current = fetchKey;
-    void fetchProjects(normalizedCountry, locale);
+    fetchProjects(country, locale);
   }, [allProjects.length, country, fetchProjects, isLoading, isOpen, locale]);
 
   useEffect(() => {
@@ -312,9 +296,7 @@ export function ProjectSelectionOverlay({
               <Button
                 variant='outline'
                 size='sm'
-                onClick={() =>
-                  fetchProjects(normalizeCountryForProjects(country), locale)
-                }
+                onClick={() => country && fetchProjects(country, locale)}
               >
                 {t('modal.retry')}
               </Button>
