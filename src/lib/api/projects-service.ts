@@ -1,7 +1,11 @@
-import type { ProjectData } from '@/lib/types/project-selection';
+import type {
+  ProjectData,
+  ProjectPurpose,
+} from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { API_BASE_URL } from '@/lib/constants/app-config';
+import { PROJECT_PURPOSES } from '@/lib/types/project-selection';
 
 type ApiCountry = Exclude<AllowedCountry, 'ROW'>;
 
@@ -11,6 +15,20 @@ function resolveProjectsApiCountry(countryCode: AllowedCountry): ApiCountry {
 
 interface ProjectsApiEnvelope {
   projects?: unknown[];
+}
+
+const PROJECT_PURPOSE_SET: ReadonlySet<string> = new Set(PROJECT_PURPOSES);
+
+function isProjectPurpose(value: string): value is ProjectPurpose {
+  return PROJECT_PURPOSE_SET.has(value);
+}
+
+function normalizePurpose(purpose: unknown): ProjectPurpose | undefined {
+  if (typeof purpose !== 'string') {
+    return undefined;
+  }
+
+  return isProjectPurpose(purpose) ? purpose : undefined;
 }
 
 function normalizeTpo(tpo: unknown): ProjectData['tpo'] | undefined {
@@ -51,8 +69,7 @@ function normalizeProject(project: unknown): ProjectData | null {
     allowDonations: rawProject.allowDonations === true,
     isTopProject: rawProject.isTopProject === true,
     country: typeof rawProject.country === 'string' ? rawProject.country : '',
-    purpose:
-      typeof rawProject.purpose === 'string' ? rawProject.purpose : undefined,
+    purpose: normalizePurpose(rawProject.purpose),
     image: typeof rawProject.image === 'string' ? rawProject.image : undefined,
     tpo: normalizeTpo(rawProject.tpo),
   };
@@ -105,7 +122,9 @@ export class ProjectsService {
 
     const projects = await this.getProjects(country, locale);
     const selectable = projects.filter(
-      project => project.allowDonations === true
+      project =>
+        project.allowDonations === true &&
+        (project.purpose === 'trees' || project.purpose === 'conservation')
     );
     this.cache.set(cacheKey, selectable);
     return selectable;

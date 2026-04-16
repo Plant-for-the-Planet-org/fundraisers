@@ -1,5 +1,21 @@
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
+export const PROJECT_PURPOSES = [
+  'trees',
+  'conservation',
+  'funds',
+  'academy',
+  'endowment',
+  'forest-protection',
+  'sponsorship',
+  'membership',
+  'planet-cash',
+  'reforestation',
+  'bouquet',
+] as const;
+
+export type ProjectPurpose = (typeof PROJECT_PURPOSES)[number];
+
 export interface ProjectData {
   id: string;
   slug?: string;
@@ -8,7 +24,7 @@ export interface ProjectData {
   allowDonations: boolean;
   isTopProject: boolean;
   country: string;
-  purpose?: string;
+  purpose?: ProjectPurpose;
   image?: string;
   tpo?: {
     name: string;
