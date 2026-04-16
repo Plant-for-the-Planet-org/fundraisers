@@ -68,12 +68,6 @@ export async function generateMetadata({
 
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
-    const description = getMetadataDescription(fundraiser.description);
-    const canonicalUrl = getFundraiserUrl({
-      id: fundraiser.id,
-      slug: fundraiser.slug || fundraiser.hid,
-    });
-    const imageUrl = getFundraiserMetadataImage(fundraiser.image);
 
     if (fundraiser.visibility !== 'public') {
       return {
@@ -81,6 +75,13 @@ export async function generateMetadata({
         robots: 'noindex, nofollow',
       };
     }
+
+    const description = getMetadataDescription(fundraiser.description);
+    const canonicalUrl = getFundraiserUrl({
+      id: fundraiser.id,
+      slug: fundraiser.slug || fundraiser.hid,
+    });
+    const imageUrl = getFundraiserMetadataImage(fundraiser.image);
 
     return {
       title: fundraiser.title,
