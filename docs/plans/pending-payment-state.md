@@ -1,7 +1,7 @@
 # Pending Payment State Plan
 
 **Status:** Planned  
-**Last Updated:** 14 April 2026
+**Last Updated:** 16 April 2026
 
 ---
 
@@ -25,57 +25,21 @@ SEPA Direct Debit (`sepa-debit`) is a separate Stripe payment method that resolv
 
 1. **PUT → payment intent confirmed.** The PUT `/donations/{id}` call establishes a payment method. It does not confirm the donation is finalized.
 2. **GET → donation status confirmed.** After the payment PUT succeeds, fetch the donation record and derive the final state from it.
-3. **No false "completed" screen.** The user should see a distinct in-progress view between form submission and the confirmed outcome.
-4. **Graceful degradation.** If polling exceeds retry bounds, show a safe "payment is being processed" message rather than an error or a fake success.
+3. **No false "completed" screen.** The user must not see a "completed" screen while the donation is still being processed.
+4. **Don't make the user wait.** Payment settlement latency is unpredictable (the HAR evidence shows ~60 seconds for SEPA). Keeping the user on a spinner for an unknown duration is poor UX. Show a result immediately.
 
 ---
 
-## New `DonationSubmitState` Shape
+## Approach: Single GET, Immediate Result
 
-Replace the current flat interface:
+Rather than polling until the payment settles, do **one GET immediately after the PUT**:
 
-```ts
-// CURRENT — avoid (flat boolean obscures state machine)
-interface DonationSubmitState {
-  isLoading: boolean;
-  thankYouState: ThankYouState | null;
-  error: DonationSubmitError | null;
-}
-```
+- If `paymentStatus === 'paid'` → show the completed thank-you screen.
+- If anything else (`pending`, `failed`, GET error, or unknown status) → show a `paymentProcessing` thank-you screen: _"Your payment is being processed. You will receive an email when it is confirmed."_
 
-With a discriminated union:
+**Why not poll?** The HAR evidence shows settlement can take ~60 seconds. There is no way to know in advance how long any given payment will take. Making the user wait on a spinner for up to a minute (or longer) is not acceptable. The single GET is a best-effort check: if the payment happens to have settled by the time the GET fires, we show the confirmed state; otherwise we give the user an informational view and let the email notification carry the confirmation.
 
-```ts
-// PROPOSED
-type DonationSubmitState =
-  | { phase: 'idle'; error: null; thankYouState: null }
-  | { phase: 'submitting'; error: null; thankYouState: null }
-  | {
-      phase: 'paymentPending';
-      donationId: string;
-      error: null;
-      thankYouState: null;
-    }
-  | { phase: 'completed'; error: null; thankYouState: ThankYouState }
-  | { phase: 'failed'; error: DonationSubmitError; thankYouState: null };
-```
-
-### Initial value
-
-```ts
-const INITIAL_STATE: DonationSubmitState = {
-  phase: 'idle',
-  error: null,
-  thankYouState: null,
-};
-```
-
-### `isLoading` derived property for backward compat (if needed at call sites)
-
-```ts
-const isLoading =
-  state.phase === 'submitting' || state.phase === 'paymentPending';
-```
+**Why not skip the GET entirely?** A single GET costs ~400 ms and has a reasonable chance of catching fast-settling card payments. It is worth the call.
 
 ---
 
@@ -110,6 +74,23 @@ interface DonationStatusResponse {
 
 ---
 
+## New Utility Function
+
+Add `resolveThankYouStateFromGet` to a new `src/lib/donation/resolve-donation-status.ts`:
+
+```ts
+// Calls GET /donations/{donationId} once and maps the result to a ThankYouState.
+// paid         → { status: 'completed', donationId }
+// anything else → { status: 'paymentProcessing', donationId }
+// GET error    → { status: 'paymentProcessing', donationId }  (safe fallback — never surfaces a confusing error for a payment the user has already submitted)
+async function resolveThankYouStateFromGet(
+  donationId: string,
+  token?: string
+): Promise<ThankYouState>
+```
+
+---
+
 ## Revised Submission Flow
 
 ### Card (both `cardAction` and `cardPayment` paths)
@@ -119,10 +100,9 @@ POST /donations
   ↓ success
 PUT /donations/{id}   (+ handleCardAction / confirmCardPayment if action_required)
   ↓ status === 'success'
-[NEW] → transition to { phase: 'paymentPending', donationId }
-[NEW] GET /donations/{id}
-  ↓ paymentStatus resolved
-→ transition to { phase: 'completed', thankYouState } or { phase: 'failed' }
+[NEW] GET /donations/{id}  (single call, immediate)
+  ↓ paid    → thankYouState: { status: 'completed' }
+  ↓ pending → thankYouState: { status: 'paymentProcessing' }
 ```
 
 ### PayPal
@@ -134,10 +114,9 @@ PayPal SDK → onApprove fires
   ↓
 PUT /donations/{id}
   ↓ success
-[NEW] → transition to { phase: 'paymentPending', donationId }
-[NEW] GET /donations/{id}
-  ↓ paymentStatus resolved
-→ transition to { phase: 'completed', thankYouState } or { phase: 'failed' }
+[NEW] GET /donations/{id}  (single call, immediate)
+  ↓ paid    → thankYouState: { status: 'completed' }
+  ↓ pending → thankYouState: { status: 'paymentProcessing' }
 ```
 
 ### SEPA Direct Debit
@@ -147,10 +126,9 @@ POST /donations
   ↓ success
 PUT /donations/{id}
   ↓ if status === 'action_required' → confirmSepaDebitPayment
-[NEW] → transition to { phase: 'paymentPending', donationId }
-[NEW] GET /donations/{id}
-  ↓ paymentStatus resolved
-→ transition to { phase: 'completed', thankYouState } or { phase: 'failed' }
+[NEW] GET /donations/{id}  (single call, immediate)
+  ↓ paid    → thankYouState: { status: 'completed' }
+  ↓ pending → thankYouState: { status: 'paymentProcessing' }
 ```
 
 ### Bank Transfer (offline)
@@ -171,7 +149,7 @@ A recorded SEPA Direct Debit donation on the staging environment confirms the fo
 
 Only two fields are returned: `id` (the donation ID) and `status`. No separate `donationId` key.
 
-### Polling pattern
+### Settlement latency (HAR polling log)
 
 After the PUT completed, 5 XHR requests were made to the backend API at a constant ~12.5 second interval:
 
@@ -185,43 +163,14 @@ After the PUT completed, 5 XHR requests were made to the backend API at a consta
 
 The donation resolved on the 5th poll (~60 seconds after the PUT). The `paymentDate` field was `null` for all `"pending"` responses and populated (`"2026-04-14 07:08:13"`) in the `"paid"` response.
 
-This confirms that `GET /donations/{id}` is a real, stable endpoint on the backend.
-
----
-
-## Polling Strategy
-
-A single GET after the PUT may hit the donation while it's still processing. If the first fetch returns a non-final status, retry with a fixed 12.5 s interval (matching observed behavior):
-
-| Attempt | Delay before attempt |
-| ------- | -------------------- |
-| 1st     | 0 ms (immediate)     |
-| 2nd     | 12 500 ms            |
-| 3rd     | 12 500 ms            |
-| 4th     | 12 500 ms            |
-| 5th     | 12 500 ms            |
-| give up | — show pending UI    |
-
-"Final" statuses: `paid` (→ `completed`), `failed` (→ `failed`)  
-"Non-final" statuses: `pending` (and any other non-final values TBC with backend)
-
-```
-resolveFromFetch(donationId, token, retries = 0):
-  response = GET /donations/{id}
-  if response.paymentStatus ∈ final → return resolved ThankYouState
-  if retries >= MAX_RETRIES         → return { phase: 'completed', thankYouState: 'processingTimeout' }
-  await delay(POLL_INTERVAL_MS)
-  return resolveFromFetch(donationId, token, retries + 1)
-```
-
-`MAX_RETRIES = 5`, `POLL_INTERVAL_MS = 12_500` — based on observed behavior; `processingTimeout` is reached after ~62 seconds total.
+This confirms that `GET /donations/{id}` is a real, stable endpoint on the backend. It also shows why polling is not used: a ~60 second wait is unacceptable.
 
 ---
 
 ## `ThankYouState` Changes
 
 ```ts
-// Add a new status for the "we gave up polling" case
+// Add a new status for payments that are submitted but not yet confirmed
 type ThankYouState =
   | { status: 'completed'; donationId: string | null }
   | {
@@ -233,52 +182,60 @@ type ThankYouState =
       frequency: string;
       transferAccount: TransferAccount;
     }
-  | { status: 'processingTimeout'; donationId: string }; // NEW
+  | { status: 'paymentProcessing'; donationId: string }; // NEW
 ```
 
-`processingTimeout` shows the user a message like "Your payment is being processed. You will receive an email when it is confirmed." — different from an error, different from a success.
+`paymentProcessing` shows the user: _"Your payment is being processed. You will receive an email when it is confirmed."_ — different from an error, and not a false success.
+
+### UI for `paymentProcessing`
+
+Rendered by an existing `ThankYouCard` variant (no new component needed):
+- No icon (consistent with `bankTransferPending` style)
+- Amber status badge labelled "Processing"
+- Informational message directing the user to check their email
 
 ---
 
-## UI Changes
+## `DonationSubmitState`
 
-### `donate-overlay.tsx`
-
-Add a third branch alongside `thankYouState ≠ null` and the form:
-
-```tsx
-{
-  state.phase === 'paymentPending' && (
-    <PaymentProcessingView donationId={state.donationId} />
-  );
-}
-```
-
-`PaymentProcessingView` is a simple spinner + message ("We're confirming your payment…"). It is replaced automatically when polling resolves.
-
-### `thank-you.tsx` (or equivalent)
-
-Add a branch to render the `processingTimeout` state — an informational non-error view directing the user to check their email.
+The existing flat interface is **not changed**. The `isLoading: true` state during the brief GET call is indistinguishable from the submission loading state from the user's perspective — both are covered by the disabled/loading CTA button. A discriminated union refactor would add complexity without a meaningful UX benefit given the single-call approach.
 
 ---
 
 ## Implementation Tasks
 
-1. **Backend alignment** — confirm exact `paymentStatus` values and expected transition latency. Update the `PaymentResponseBase` TODO comment.
-2. **`DonationStatusResponse` type** — add to `src/lib/types/donation-submit.ts` (or a new `donation-types.ts`).
-3. **`donationService.getDonation`** — implement in `donation-service.ts`.
-4. **`resolveFromFetch` utility** — pure async function with retry loop; lives in `resolve-donation-status.ts`.
-5. **Refactor `DonationSubmitState`** — replace flat interface with discriminated union in `donation-submit.ts`. Update consumers (`donate-overlay.tsx`, `use-donation-submit.ts`).
-6. **`use-donation-submit.ts`** — replace terminal `thankYouState: { status: 'completed' }` assignments in card and PayPal paths with `paymentPending` transition + `resolveFromFetch` call.
-7. **`PaymentProcessingView` component** — create minimal spinner view.
-8. **`donate-overlay.tsx`** — add `paymentPending` render branch.
-9. **`thank-you.tsx`** — add `processingTimeout` render branch.
-10. **Update `thank-you-feature.md`** — document the new three-phase flow.
+- [ ] **Backend alignment** — confirm exact `paymentStatus` values and expected transition latency. Update the `PaymentResponseBase` TODO comment.
+- [ ] **`DonationStatusResponse` type** — add to `src/lib/types/donation.ts` (alongside existing `DonationResponse`).
+- [ ] **`donationService.getDonation`** — implement in `donation-service.ts`.
+- [ ] **`resolveThankYouStateFromGet` utility** — pure async function; lives in `src/lib/donation/resolve-donation-status.ts`.
+- [ ] **`use-donation-submit.ts`** — replace the 5 direct `thankYouState: { status: 'completed' }` assignments (4 in `onSubmit`, 1 in `onPayPalApproved`) with `resolveThankYouStateFromGet` calls. The `bankTransferPending` path in `resolveThankYouState` is not affected.
+- [ ] **`ThankYouState`** — add `paymentProcessing` variant to `src/lib/types/donation-submit.ts`.
+- [ ] **`donation-thank-you.tsx`** — replace the ternary with a switch to handle `paymentProcessing`.
+- [ ] **`thank-you-card.tsx`** — add `paymentProcessing` variant (no icon, amber badge, informational message).
+- [ ] **`status-badge.tsx`** — add `paymentProcessing` variant (amber styling).
+- [ ] **Locale files** — add `paymentProcessing` keys to `locales/en/donate.json` and `locales/de/donate.json`.
+
+---
+
+## Considered and Abandoned Approaches
+
+### ~~Polling loop (original design)~~
+
+The original plan described polling `GET /donations/{id}` up to 5 times at 12.5 s intervals (max ~62 seconds total), based on the HAR evidence showing a SEPA payment taking ~60 seconds to settle.
+
+**Why abandoned:** Settlement latency is unpredictable. The ~60 s SEPA observation is not representative of all payment methods — card payments may settle faster, others may take longer. There is no safe upper bound. Keeping the user on a spinner for an unknown duration (potentially >60 s) is unacceptable UX. A single immediate GET is a best-effort check; if it returns `pending`, the `paymentProcessing` view communicates the state honestly without making the user wait.
+
+### ~~`DonationSubmitState` discriminated union~~
+
+The original plan proposed replacing the flat `{ isLoading, thankYouState, error }` interface with a discriminated union that included a `paymentPending` phase to display a spinner view during polling.
+
+**Why abandoned:** The `paymentPending` phase was only needed because polling could take tens of seconds — long enough that the form needed to be replaced with a visible "waiting" UI. With a single immediate GET (~400 ms), the existing `isLoading: true` loading state is sufficient. Adding the discriminated union refactor would increase the scope and diff size of this change without a meaningful UX improvement.
 
 ---
 
 ## Out of Scope for This Plan
 
 - Changes to the `bank-transfer` (offline) flow.
-- WebSocket or server-sent events (polling is sufficient for now).
+- Polling / WebSocket / server-sent events.
+- Refactoring `DonationSubmitState` to a discriminated union.
 - The donation flow refactor (separate plan: `donation-flow-refactor.md`). However, doing this plan after PR A of the refactor plan (pure function extraction) will be cleaner.
