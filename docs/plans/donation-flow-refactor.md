@@ -1,7 +1,7 @@
 # Donation Flow Refactor Plan
 
-**Status:** Planned  
-**Last Updated:** 14 April 2026
+**Status:** PR A complete, PR B–C planned  
+**Last Updated:** 15 April 2026
 
 ---
 
@@ -152,11 +152,34 @@ src/components/donate/
 
 Do this in three PRs, each no-behavior-change:
 
-**PR A — Extract pure functions from `use-donation-submit.ts`**
+**PR A — Extract pure functions from `use-donation-submit.ts`** ✓ complete
 
-- Move `resolveThankYouState`, `toSubmitError`, `cleanPaymentDetails` to their own files.
-- Move `resolveDonationContact`, `resolveSelectedAddress`, and `buildDonorBillingAddress` to `donation-address.ts`.
-- Import them back into the hook. Hook line count drops by ~80 lines.
+Delivered:
+- `resolveThankYouState` → `src/lib/donation/resolve-thank-you-state.ts`
+- `toSubmitError` → `src/lib/donation/donation-submit-errors.ts`
+- `buildDonorBillingAddress` → `src/lib/donation/donation-address.ts`
+- `cleanPaymentDetails` → private function inside `donation-submission.ts`
+- `StripeSepaFormHandle.createPaymentMethod` address shape aligned with card form
+
+Deviations from plan:
+
+- **File location**: Files landed in `src/lib/donation/` rather than `src/components/donate/`.
+  These are pure functions with no React/DOM dependencies — `lib/` is the correct layer.
+
+- **`cleanPaymentDetails`**: Made private inside `donation-submission.ts` rather than its own file.
+  It has a single consumer (`submitStandardDonation`) and no reason to be exported.
+
+- **`resolveDonationContact` and `resolveSelectedAddress` not extracted**: The planned grouping
+  of `donor` + `selectedAddress` into `resolveDonationContact` turned out to be an artificial
+  coupling — the two derivations are independent. `resolveSelectedAddress` is an implementation
+  detail of `buildDonorBillingAddress` and was made private inside it. `donor` is a one-liner
+  inlined at the call site.
+
+- **`StripeSepaFormHandle` fix (unplanned)**: While wiring up `buildDonorBillingAddress`, the
+  SEPA form handle's address shape was found to be inconsistent with the card form — it used
+  Stripe's `postal_code` field name and was missing `line2` and `state`. Fixed in the same PR:
+  address now uses `zipCode` (matching the card form), Stripe field mapping moved inside the
+  form handle, and the unused `name` parameter was removed.
 
 **PR B — Extract Stripe and PayPal flow steps**
 

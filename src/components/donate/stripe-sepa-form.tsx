@@ -12,12 +12,13 @@ import { FormField } from './form-field';
 
 export interface StripeSepaFormHandle {
   createPaymentMethod(billingDetails: {
-    name: string;
     email: string;
     address: {
       line1: string;
+      line2?: string;
       city: string;
-      postal_code: string;
+      state?: string;
+      zipCode: string;
       country: string;
     };
   }): Promise<{ paymentMethodId: string } | { error: string }>;
@@ -78,8 +79,16 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           type: 'sepa_debit',
           sepa_debit: ibanElement,
           billing_details: {
-            ...billingDetails,
             name: accountHolderName.trim(),
+            email: billingDetails.email,
+            address: {
+              line1: billingDetails.address.line1,
+              line2: billingDetails.address.line2 || undefined,
+              city: billingDetails.address.city,
+              state: billingDetails.address.state || undefined,
+              postal_code: billingDetails.address.zipCode,
+              country: billingDetails.address.country,
+            },
           },
         });
 
