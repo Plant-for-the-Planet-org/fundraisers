@@ -32,6 +32,7 @@ export interface DonorInfo {
   state?: string;
   country?: string;
   companyname?: string;
+  tin: string | null;
 }
 
 export interface CustomFieldValue {
@@ -61,6 +62,7 @@ interface DonationFormDataBase {
   currency: string;
   frequency: DonationFrequency;
   isAnonymous: boolean;
+  tin?: string;
 }
 
 export interface AuthenticatedFormData extends DonationFormDataBase {
@@ -99,12 +101,11 @@ interface DonationPayloadBase {
 
 export interface AuthenticatedDonationPayload extends DonationPayloadBase {
   receiptAddress: string;
-  donor?: never;
+  donor: DonorInfo;
 }
 
 export interface GuestDonationPayload extends DonationPayloadBase {
   donor: DonorInfo;
-  receiptAddress?: never;
 }
 
 export type DonationPayload =

@@ -8,6 +8,7 @@ export const DONATION_FORM_ERRORS = {
   'email.required': 'email.required',
   'email.invalid': 'email.invalid',
   'companyName.required': 'companyName.required',
+  'tin.required': 'tin.required',
 } as const;
 
 export type DonationFormErrorKey = keyof typeof DONATION_FORM_ERRORS;

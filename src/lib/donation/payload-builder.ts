@@ -2,6 +2,7 @@ import type { DonationData } from '@/components/donate/donate-overlay';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 import type { UserProfileResponse } from '../api/user-service';
 import type {
+  AuthenticatedFormData,
   DonationFormData,
   DonationFrequency,
   DonationPayload,
@@ -69,6 +70,7 @@ export function buildDonorInfo(
       primaryAddress.country ||
       userProfile?.country ||
       '',
+    tin: formData.tin || null,
   };
 
   if (formData.companyName) {
@@ -77,6 +79,31 @@ export function buildDonorInfo(
 
   return donorInfo;
 }
+/**
+ * Maps authenticated form data to API donor structure.
+ * Personal details come from the profile; address fields come from the saved
+ * address identified by `receiptAddress`.
+ */
+export function buildAuthenticatedDonorInfo(
+  formData: AuthenticatedFormData,
+  userProfile?: UserProfileResponse
+): DonorInfo {
+  const selectedAddress = userProfile?.addresses.find(
+    addr => addr.id === formData.receiptAddress
+  );
+
+  return {
+    firstname: userProfile?.firstname || '',
+    lastname: userProfile?.lastname || '',
+    email: userProfile?.email || '',
+    address: selectedAddress?.address,
+    zipCode: selectedAddress?.zipCode,
+    city: selectedAddress?.city,
+    country: selectedAddress?.country || userProfile?.country || '',
+    tin: formData.tin || null,
+  };
+}
+
 /**
  * Builds donor alias (display name) for the donation.
  * Guest donors use form-supplied names; authenticated donors use their profile.
@@ -115,6 +142,7 @@ export function assembleFormData(
     currency: donationData.currency || fundraiser.currency || 'EUR',
     frequency: calculateFrequency(donationData.frequency, values.makeMonthly),
     isAnonymous: values.isAnonymous,
+    tin: values.tin?.trim() || undefined,
   };
 
   const selectedAddressId = values.selectedAddressId || undefined;
@@ -197,9 +225,9 @@ export function buildDonationPayload(
     return {
       ...base,
       receiptAddress: formData.receiptAddress,
+      donor: buildAuthenticatedDonorInfo(formData, donorProfile),
     };
   }
 
-  const donor = buildDonorInfo(formData, donorProfile);
-  return { ...base, donor };
+  return { ...base, donor: buildDonorInfo(formData, donorProfile) };
 }
