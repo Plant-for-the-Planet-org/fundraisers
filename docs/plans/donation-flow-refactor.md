@@ -55,22 +55,26 @@ src/components/donate/
     — resolveSepaPaymentDetails(values, formData, donorProfile, sepaFormRef)
         Builds name/email/address, calls sepaFormRef.current.createPaymentMethod,
         returns { paymentMethodId } or error.
-    — handleCardAction(cardFormRef, paymentResponse, donationResponse, paymentAttemptKey, token)
+    — handleCardAction(cardFormRef, paymentResponse, donationId, paymentAttemptKey, token)
         Handles action_required → cardAction branch:
         calls handleCardAction on form ref, builds confirmRequest,
-        calls paymentService.processPayment.
-    — handleCardPayment(cardFormRef, paymentResponse)
+        calls paymentService.processPayment, then resolveThankYouStateFromGet.
+        Returns ThankYouState or error.
+    — handleCardPayment(cardFormRef, paymentResponse, donationId, token)
         Handles action_required → cardPayment branch:
-        calls confirmCardPayment on form ref.
-    — handleSepaAction(sepaFormRef, paymentResponse)
+        calls confirmCardPayment on form ref, then resolveThankYouStateFromGet.
+        Returns ThankYouState or error.
+    — handleSepaAction(sepaFormRef, paymentResponse, donationId, token)
         Handles action_required → sepa-debit branch:
-        calls confirmSepaDebitPayment on form ref.
+        calls confirmSepaDebitPayment on form ref, then resolveThankYouStateFromGet.
+        Returns ThankYouState or error.
 
   paypal-submit-flow.ts
     — createPayPalOrder(formData, fundraiser, donorProfile, token, paymentOptions, donationIdempotencyKey)
         Builds payload, submits donation, creates PayPal order.
     — processPayPalApproval(donationId, data, paymentOptions, token, paymentIdempotencyKey)
-        Builds PayPal payment request, calls processPayment.
+        Builds PayPal payment request, calls processPayment, then resolveThankYouStateFromGet.
+        Returns ThankYouState or error.
 
   donation-address.ts
     — resolveDonationContact(formData, donorProfile, selectedAddressId)
@@ -188,6 +192,13 @@ Deviations from plan:
 - Update Stripe form handle return types so validation-only `createPaymentMethod`
   failures can be handled inline without triggering the global
   `paymentFailed` banner.
+- Restructure `onSubmit` branching: check `action_required` before `success`. Once the
+  `action_required` branches are handled, only `status === 'success'` remains and
+  `resolveThankYouStateFromGet` can be called directly — eliminating the intermediate
+  `resolveThankYouState` / `initialThankYouState` call entirely. Note: the bank transfer
+  GET-failure fallback (currently `initialThankYouState`) is lost; a GET error on a
+  successful bank transfer PUT will fall back to `paymentProcessing` instead of
+  `bankTransferPending`.
 - The hook becomes an orchestrator that calls these functions and updates state.
 - Hook line count drops to ~150–200 lines.
 
@@ -197,6 +208,16 @@ Deviations from plan:
 - Extract `useDerivedPaymentMethods` hook.
 - Extract schema, defaults, and context into separate files.
 - No functional change.
+
+**PR D — Rename `ThankYou*` → `DonationConfirmation*`**
+
+`ThankYouState`, `ThankYouCard`, `thankYouState`, and `donation-thank-you.tsx` use "thank you" as a label for the post-submission screen. "Confirmation" better reflects the screen's purpose — it is always reached after a successful PUT, confirming the submission regardless of the backend settlement state.
+
+- Rename `ThankYouState` → `DonationConfirmationState` (type)
+- Rename `thankYouState` → `donationConfirmation` (state field)
+- Rename `ThankYouCard` → `DonationConfirmationCard` (component + file)
+- Rename `donation-thank-you.tsx` → `donation-confirmation.tsx` (component + file)
+- No functional change. Must follow PR C to avoid merge conflicts.
 
 ---
 
