@@ -40,7 +40,8 @@ export const TinField = () => {
       <Input
         {...register('tin')}
         placeholder={tDonate('tin.placeholder')}
-        className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
+        readOnly={Boolean(profileTin)}
+        className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2 read-only:bg-gray-100 read-only:cursor-not-allowed'
       />
     </FormField>
   );
