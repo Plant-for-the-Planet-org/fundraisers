@@ -1,13 +1,13 @@
 'use client';
 
-import { Loader } from '@/components/ui/loader';
-import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
-import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
-import { getSafeRedirectPath } from '@/lib/utils/auth';
-import { useAuthStore } from '@/stores/authStore';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
+import { getSafeRedirectPath } from '@/lib/utils/auth';
+import { useAuthStore } from '@/stores/authStore';
+import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
+import { Loader } from '@/components/ui/loader';
+import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 
 export default function LoginPage() {
   const tAuth = useTranslations('Auth');
@@ -18,11 +18,15 @@ export default function LoginPage() {
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
-  if (isAuthInitializing) return <Loader text={tAuth('redirecting')} />;
+  useEffect(() => {
+    if (isAuthInitializing) return;
+    if (isAuthenticated) {
+      router.replace(safeRedirectPath);
+    }
+  }, [isAuthInitializing, isAuthenticated, router, safeRedirectPath]);
 
-  if (isAuthenticated) {
-    router.replace(DEFAULT_REDIRECT_PATH);
-    return;
+  if (isAuthInitializing || isAuthenticated) {
+    return <Loader text={tAuth('redirecting')} />;
   }
 
   return (

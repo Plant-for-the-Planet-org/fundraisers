@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
+import { isTokenExpired } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { Loader } from '../ui/loader';
-import { isTokenExpired } from '@/lib/utils/auth';
-import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -15,12 +15,17 @@ interface AuthGuardProps {
 }
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const tAuth = useTranslations('Auth');
   const accessToken = useAuthStore(state => state.accessToken);
   const setAccessToken = useAuthStore(state => state.setAccessToken);
   const clearAuth = useAuthStore(state => state.clearAuth);
+
+  const search = searchParams.toString();
+  const currentPath = search ? `${pathname}?${search}` : pathname;
 
   useEffect(() => {
     const checkToken = async () => {
@@ -36,28 +41,34 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
           }
 
           clearAuth();
-          router.replace(getSignInPath());
+          router.replace(getSignInPath(currentPath));
         } catch (err) {
           console.error('Silent auth failed:', err);
           clearAuth();
-          router.replace(getSignInPath());
+          router.replace(getSignInPath(currentPath));
         }
       }
     };
 
     checkToken();
-  }, [accessToken, isAuthInitializing, setAccessToken, clearAuth, router]);
+  }, [
+    accessToken,
+    isAuthInitializing,
+    setAccessToken,
+    clearAuth,
+    router,
+    currentPath,
+  ]);
 
-  /**
-   * Show loader while auth state is initializing
-   */
-  if (isAuthInitializing) {
+  useEffect(() => {
+    if (isAuthInitializing) return;
+    if (!isAuthenticated) {
+      router.replace(getSignInPath(currentPath));
+    }
+  }, [isAuthInitializing, isAuthenticated, router, currentPath]);
+
+  if (isAuthInitializing || !isAuthenticated) {
     return fallback ?? <Loader text={tAuth('redirecting')} />;
-  }
-
-  if (!isAuthenticated) {
-    router.replace(getSignInPath());
-    return null;
   }
 
   return <>{children}</>;
