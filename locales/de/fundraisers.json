@@ -173,7 +173,8 @@
       "goal": {
         "label": "Spenden-Ziel",
         "errors": {
-          "required": "Bitte gib ein Spenden-Ziel ein."
+          "required": "Bitte gib ein Spenden-Ziel ein.",
+          "minAmount": "Das Ziel muss mindestens {formattedAmount} betragen."
         }
       },
       "projectSelection": {

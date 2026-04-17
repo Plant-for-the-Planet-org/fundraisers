@@ -1,11 +1,15 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
 import { useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
-import { getCurrencySymbol } from '@/lib/utils/currency';
+import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
+import {
+  formatCurrencyFromDecimal,
+  getCurrencySymbol,
+} from '@/lib/utils/currency';
 import { Input } from '@/components/ui/input';
 
 export function GoalInput() {
@@ -76,7 +80,15 @@ export function GoalInput() {
       </span>
       {fieldState.error && (
         <p id='form-goal-amount-error' className='text-sm text-destructive'>
-          {t('errors.required')}
+          {fieldState.error.message === 'minAmount'
+            ? t('errors.minAmount', {
+                formattedAmount: formatCurrencyFromDecimal(
+                  GOAL_AMOUNT_MIN,
+                  currency,
+                  locale
+                ),
+              })
+            : t('errors.required')}
         </p>
       )}
     </div>
