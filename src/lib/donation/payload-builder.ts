@@ -53,7 +53,7 @@ export function buildDonationMetadata(
  * Maps guest form data to API donor structure.
  * Pre-populates missing fields from user profile if available.
  */
-export function buildDonorInfo(
+export function buildGuestDonorInfo(
   formData: GuestFormData,
   userProfile?: UserProfileResponse
 ): DonorInfo {
@@ -224,10 +224,9 @@ export function buildDonationPayload(
   if (formData.type === 'authenticated') {
     return {
       ...base,
-      receiptAddress: formData.receiptAddress,
       donor: buildAuthenticatedDonorInfo(formData, donorProfile),
     };
   }
 
-  return { ...base, donor: buildDonorInfo(formData, donorProfile) };
+  return { ...base, donor: buildGuestDonorInfo(formData, donorProfile) };
 }

@@ -90,24 +90,12 @@ export type DonationFormData = AuthenticatedFormData | GuestFormData;
 
 export type DonationFrequency = 'once' | 'monthly' | 'yearly';
 
-interface DonationPayloadBase {
+export interface DonationPayload {
   currency: string;
   frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
   prePaid?: boolean;
-}
-
-export interface AuthenticatedDonationPayload extends DonationPayloadBase {
-  receiptAddress: string;
   donor: DonorInfo;
 }
-
-export interface GuestDonationPayload extends DonationPayloadBase {
-  donor: DonorInfo;
-}
-
-export type DonationPayload =
-  | AuthenticatedDonationPayload
-  | GuestDonationPayload;
