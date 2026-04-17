@@ -1,7 +1,7 @@
 import type { RedirectPath } from '../types/auth';
 
-import { ALLOWED_REDIRECT_PATHS } from '../types/auth';
-import { PROTECTED_PATH, DEFAULT_REDIRECT_PATH } from '../constants/auth';
+import { DEFAULT_REDIRECT_PATH, PROTECTED_PATH } from '../constants/auth';
+import { ALLOWED_REDIRECT_ROOTS } from '../types/auth';
 
 type JwtPayload = {
   exp?: number;
@@ -12,9 +12,23 @@ export function isProtectedRoute(path: string) {
   return PROTECTED_PATH.some(route => path.startsWith(route));
 }
 
-// Type guard to ensure the path is one of the allowed redirect paths
+// Type guard: path is a same-origin path under an allowed root.
+// Rejects protocol-relative (`//...`, `/\...`) and foreign roots like `/exploremore`.
 export function isAllowedRedirect(path: string): path is RedirectPath {
-  return ALLOWED_REDIRECT_PATHS.includes(path as RedirectPath);
+  if (
+    !path.startsWith('/') ||
+    path.startsWith('//') ||
+    path.startsWith('/\\')
+  ) {
+    return false;
+  }
+
+  // Strip query/hash before matching the route root
+  const pathname = path.split(/[?#]/, 1)[0];
+
+  return ALLOWED_REDIRECT_ROOTS.some(
+    root => pathname === root || pathname.startsWith(`${root}/`)
+  );
 }
 
 // Return a safe redirect path; fallback to default if invalid
