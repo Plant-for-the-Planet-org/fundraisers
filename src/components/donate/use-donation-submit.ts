@@ -27,6 +27,7 @@ import {
   assembleFormData,
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
+import { resolveThankYouStateFromGet } from '@/lib/donation/resolve-donation-status';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
@@ -174,12 +175,30 @@ export function useDonationSubmit(
             return;
           }
 
-          const thankYouState = resolveThankYouState(
+          const initialState = resolveThankYouState(
             paymentResponse,
             donationResponse
           );
 
-          if (thankYouState) {
+          if (initialState?.status === 'bankTransferPending') {
+            const thankYouState = await resolveThankYouStateFromGet(
+              donationResponse.donationId,
+              token ?? undefined,
+              initialState
+            );
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              thankYouState,
+            }));
+            return;
+          }
+
+          if (initialState?.status === 'completed') {
+            const thankYouState = await resolveThankYouStateFromGet(
+              donationResponse.donationId,
+              token ?? undefined
+            );
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
@@ -232,13 +251,14 @@ export function useDonationSubmit(
               return;
             }
 
+            const thankYouState = await resolveThankYouStateFromGet(
+              donationResponse.donationId,
+              token ?? undefined
+            );
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
-              thankYouState: {
-                status: 'completed',
-                donationId: donationResponse.donationId,
-              },
+              thankYouState,
             }));
             return;
           }
@@ -263,13 +283,14 @@ export function useDonationSubmit(
               return;
             }
 
+            const thankYouState = await resolveThankYouStateFromGet(
+              donationResponse.donationId,
+              token ?? undefined
+            );
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
-              thankYouState: {
-                status: 'completed',
-                donationId: donationResponse.donationId,
-              },
+              thankYouState,
             }));
             return;
           }
@@ -290,13 +311,14 @@ export function useDonationSubmit(
                 error: { code: 'paymentFailed' },
               }));
             } else {
+              const thankYouState = await resolveThankYouStateFromGet(
+                donationResponse.donationId,
+                token ?? undefined
+              );
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                thankYouState: {
-                  status: 'completed',
-                  donationId: donationResponse.donationId,
-                },
+                thankYouState,
               }));
             }
             return;
@@ -459,10 +481,14 @@ export function useDonationSubmit(
         donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
         paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
+        const thankYouState = await resolveThankYouStateFromGet(
+          donationId,
+          token ?? undefined
+        );
         setDonationState(prev => ({
           ...prev,
           isLoading: false,
-          thankYouState: { status: 'completed', donationId },
+          thankYouState,
         }));
       } catch (error) {
         setDonationState(prev => ({

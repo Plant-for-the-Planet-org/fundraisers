@@ -1,7 +1,7 @@
 # Pending Payment State Plan
 
-**Status:** Planned  
-**Last Updated:** 16 April 2026
+**Status:** Implementation complete (pending PR review)  
+**Last Updated:** 17 April 2026
 
 ---
 
@@ -16,8 +16,6 @@ The same problem applies to PayPal: `onPayPalApproved` goes directly to `thankYo
 **Note:** `bankTransferPending` is unaffected. This state is only reached when the PUT response contains `type: 'transfer_required'`, which is specific to the offline `bank-transfer` payment method. Those donations are _designed_ to be in a pending state and already show a distinct "transfer pending" thank-you view. No change needed there.
 
 SEPA Direct Debit (`sepa-debit`) is a separate Stripe payment method that resolves directly to `{ status: 'completed' }` after `confirmSepaDebitPayment` — it has the same problem as card and PayPal and is equally in scope for this fix.
-
-> **TODO before implementation:** `GET /donations/{id}` is confirmed to exist (see HAR evidence below). The confirmed field is `paymentStatus`; known values are `"pending"` and `"paid"`. Confirm with the backend team what other values are possible (e.g. `"failed"`, `"refunded"`) and whether `"processing"` is a distinct intermediate state.
 
 ---
 
@@ -35,7 +33,8 @@ SEPA Direct Debit (`sepa-debit`) is a separate Stripe payment method that resolv
 Rather than polling until the payment settles, do **one GET immediately after the PUT**:
 
 - If `paymentStatus === 'paid'` → show the completed thank-you screen.
-- If anything else (`pending`, `failed`, GET error, or unknown status) → show a `paymentProcessing` thank-you screen: _"Your payment is being processed. You will receive an email when it is confirmed."_
+- If anything else → show a `paymentProcessing` thank-you screen with copy appropriate to the payment result group (see below).
+- If the GET errors → treat as `paymentProcessing` with a "processing" message (safe fallback — never surfaces a confusing error for a payment the user has already submitted).
 
 **Why not poll?** The HAR evidence shows settlement can take ~60 seconds. There is no way to know in advance how long any given payment will take. Making the user wait on a spinner for up to a minute (or longer) is not acceptable. The single GET is a best-effort check: if the payment happens to have settled by the time the GET fires, we show the confirmed state; otherwise we give the user an informational view and let the email notification carry the confirmation.
 
@@ -57,18 +56,30 @@ getDonation(donationId: string, token?: string): Promise<DonationStatusResponse>
 ### `DonationStatusResponse` type
 
 ```ts
-// Confirmed from HAR: "pending" and "paid".
-// Additional values (e.g. "failed", "refunded") TBC with backend.
-type DonationPaymentStatus = 'pending' | 'paid' | 'failed' | string;
+// Confirmed with backend. Practically: 'pending', 'initiated', 'paid'.
+// Terminal non-paid statuses are unlikely after a successful PUT but enumerated for completeness.
+// 'draft' is never returned once a payment exists.
+type DonationPaymentStatus =
+  | 'pending'
+  | 'initiated'
+  | 'paid'
+  | 'failed'
+  | 'canceled'
+  | 'refunded'
+  | 'referred'
+  | 'in-dispute'
+  | 'dispute-lost';
 
 interface DonationStatusResponse {
   id: string;
-  paymentStatus: DonationPaymentStatus; // field confirmed from HAR
-  paymentDate: string | null; // null while pending, populated once settled
+  gateway: string;                      // 'offline' for bank transfer
+  paymentStatus: DonationPaymentStatus; // confirmed from HAR
+  paymentDate: string | null;           // null while pending, populated once settled
   uid: string;
   amount: number;
   currency: string;
   frequency: string | null;
+  account?: BankAccountDetails;         // present for offline (bank transfer) donations
 }
 ```
 
@@ -76,16 +87,18 @@ interface DonationStatusResponse {
 
 ## New Utility Function
 
-Add `resolveThankYouStateFromGet` to a new `src/lib/donation/resolve-donation-status.ts`:
+`resolveThankYouStateFromGet` in `src/lib/donation/resolve-donation-status.ts`:
 
 ```ts
 // Calls GET /donations/{donationId} once and maps the result to a ThankYouState.
-// paid         → { status: 'completed', donationId }
-// anything else → { status: 'paymentProcessing', donationId }
-// GET error    → { status: 'paymentProcessing', donationId }  (safe fallback — never surfaces a confusing error for a payment the user has already submitted)
+// paid                           → { status: 'completed', donationId }
+// gateway === 'offline' + account → { status: 'bankTransferPending', ...GET data }
+// anything else                  → { status: 'paymentProcessing', donationId, paymentResult }
+// GET error                      → fallback if provided, otherwise { status: 'paymentProcessing', paymentResult: 'pending' }
 async function resolveThankYouStateFromGet(
   donationId: string,
-  token?: string
+  token?: string,
+  fallback?: ThankYouState
 ): Promise<ThankYouState>
 ```
 
@@ -102,7 +115,7 @@ PUT /donations/{id}   (+ handleCardAction / confirmCardPayment if action_require
   ↓ status === 'success'
 [NEW] GET /donations/{id}  (single call, immediate)
   ↓ paid    → thankYouState: { status: 'completed' }
-  ↓ pending → thankYouState: { status: 'paymentProcessing' }
+  ↓ other   → thankYouState: { status: 'paymentProcessing', paymentResult }
 ```
 
 ### PayPal
@@ -116,7 +129,7 @@ PUT /donations/{id}
   ↓ success
 [NEW] GET /donations/{id}  (single call, immediate)
   ↓ paid    → thankYouState: { status: 'completed' }
-  ↓ pending → thankYouState: { status: 'paymentProcessing' }
+  ↓ other   → thankYouState: { status: 'paymentProcessing', paymentResult }
 ```
 
 ### SEPA Direct Debit
@@ -128,12 +141,22 @@ PUT /donations/{id}
   ↓ if status === 'action_required' → confirmSepaDebitPayment
 [NEW] GET /donations/{id}  (single call, immediate)
   ↓ paid    → thankYouState: { status: 'completed' }
-  ↓ pending → thankYouState: { status: 'paymentProcessing' }
+  ↓ other   → thankYouState: { status: 'paymentProcessing', paymentResult }
 ```
 
 ### Bank Transfer (offline)
 
-No change. `bankTransferPending` remains a direct terminal state — reached only when the PUT response contains `type: 'transfer_required'`. `GET /donations/{id}` is not needed here.
+```
+POST /donations
+  ↓ success
+PUT /donations/{id}   (response: type === 'transfer_required')
+  ↓ resolveThankYouState → initialState: { status: 'bankTransferPending', ...PUT data }
+[NEW] GET /donations/{id}  (single call, immediate)
+  ↓ gateway === 'offline' + account → thankYouState: { status: 'bankTransferPending', ...GET data }
+  ↓ GET error                       → thankYouState: initialState (PUT data fallback)
+```
+
+GET is used as the source of truth so the screen has access to the full donation record. `initialState` from the PUT response is passed as the fallback so the screen still works correctly if the GET fails.
 
 ---
 
@@ -170,7 +193,6 @@ This confirms that `GET /donations/{id}` is a real, stable endpoint on the backe
 ## `ThankYouState` Changes
 
 ```ts
-// Add a new status for payments that are submitted but not yet confirmed
 type ThankYouState =
   | { status: 'completed'; donationId: string | null }
   | {
@@ -182,17 +204,31 @@ type ThankYouState =
       frequency: string;
       transferAccount: TransferAccount;
     }
-  | { status: 'paymentProcessing'; donationId: string }; // NEW
+  | { status: 'paymentProcessing'; donationId: string; paymentResult: DonationPaymentStatus }; // NEW
 ```
 
-`paymentProcessing` shows the user: _"Your payment is being processed. You will receive an email when it is confirmed."_ — different from an error, and not a false success.
+`paymentResult` carries the raw backend status so the UI can show appropriate copy per status group (see below). This differs from the original plan which proposed a single "processing" message for all non-paid cases.
+
+### Payment result groups
+
+`paymentResult` is mapped to one of five display groups in `thank-you-card.tsx`:
+
+| Group | Statuses | UI copy intent |
+|-------|----------|----------------|
+| `processing` | `pending`, `initiated` | "Being processed, check your email" |
+| `failed` | `failed`, `canceled` | "Unsuccessful, please try again" |
+| `refunded` | `refunded` | "Has been refunded" |
+| `disputed` | `in-dispute`, `dispute-lost` | "Under review" |
+| `error` | `referred`, `draft`, unknown | "Error — contact support with donation details" |
+
+GET errors fall back to `paymentResult: 'pending'` → `processing` group, which is the safest message when the actual status is unknown.
 
 ### UI for `paymentProcessing`
 
-Rendered by an existing `ThankYouCard` variant (no new component needed):
+Rendered by a new `ThankYouCard` variant (no new component needed):
 - No icon (consistent with `bankTransferPending` style)
-- Amber status badge labelled "Processing"
-- Informational message directing the user to check their email
+- Amber status badge with group-specific label
+- Message varies by group (see locale files)
 
 ---
 
@@ -204,16 +240,16 @@ The existing flat interface is **not changed**. The `isLoading: true` state duri
 
 ## Implementation Tasks
 
-- [ ] **Backend alignment** — confirm exact `paymentStatus` values and expected transition latency. Update the `PaymentResponseBase` TODO comment.
-- [ ] **`DonationStatusResponse` type** — add to `src/lib/types/donation.ts` (alongside existing `DonationResponse`).
-- [ ] **`donationService.getDonation`** — implement in `donation-service.ts`.
-- [ ] **`resolveThankYouStateFromGet` utility** — pure async function; lives in `src/lib/donation/resolve-donation-status.ts`.
-- [ ] **`use-donation-submit.ts`** — replace the 5 direct `thankYouState: { status: 'completed' }` assignments (4 in `onSubmit`, 1 in `onPayPalApproved`) with `resolveThankYouStateFromGet` calls. The `bankTransferPending` path in `resolveThankYouState` is not affected.
-- [ ] **`ThankYouState`** — add `paymentProcessing` variant to `src/lib/types/donation-submit.ts`.
-- [ ] **`donation-thank-you.tsx`** — replace the ternary with a switch to handle `paymentProcessing`.
-- [ ] **`thank-you-card.tsx`** — add `paymentProcessing` variant (no icon, amber badge, informational message).
-- [ ] **`status-badge.tsx`** — add `paymentProcessing` variant (amber styling).
-- [ ] **Locale files** — add `paymentProcessing` keys to `locales/en/donate.json` and `locales/de/donate.json`.
+- [x] **`DonationStatusResponse` type** — added to `src/lib/types/donation.ts`. `DonationPaymentStatus` enumerates all confirmed backend values.
+- [x] **`donationService.getDonation`** — implemented in `donation-service.ts` with private `transformStatusResponse`.
+- [x] **`resolveThankYouStateFromGet` utility** — created in `src/lib/donation/resolve-donation-status.ts`.
+- [x] **`ThankYouState`** — `paymentProcessing` variant added to `src/lib/types/donation-submit.ts` (includes `paymentResult: DonationPaymentStatus`).
+- [x] **`use-donation-submit.ts`** — all 5 direct `thankYouState: { status: 'completed' }` assignments replaced with `resolveThankYouStateFromGet` calls.
+- [x] **`donation-thank-you.tsx`** — ternary replaced with switch (3 cases: `bankTransferPending`, `paymentProcessing`, `completed`).
+- [x] **`thank-you-card.tsx`** — `paymentProcessing` variant added. `PaymentResultGroup` type and `getPaymentResultGroup` helper defined here. `PaymentResultGroup` exported for use by `status-badge.tsx`.
+- [x] **`status-badge.tsx`** — `paymentProcessing` variant added (amber). Exports `PaymentResultGroup` type.
+- [x] **Locale files** — `paymentProcessing` keys added to `locales/en/donate.json` and `locales/de/donate.json` under `thankYou.title`, `thankYou.status`, and `thankYou.message`, one entry per group.
+- [x] **Backend alignment** — `paymentStatus` values confirmed with backend team during implementation (see type definition). `PaymentResponseBase` TODO comment in `src/lib/types/payment.ts` removed.
 
 ---
 
@@ -231,11 +267,22 @@ The original plan proposed replacing the flat `{ isLoading, thankYouState, error
 
 **Why abandoned:** The `paymentPending` phase was only needed because polling could take tens of seconds — long enough that the form needed to be replaced with a visible "waiting" UI. With a single immediate GET (~400 ms), the existing `isLoading: true` loading state is sufficient. Adding the discriminated union refactor would increase the scope and diff size of this change without a meaningful UX improvement.
 
+### ~~Bank transfer excluded from GET~~
+
+The original plan scoped out bank transfer entirely — `bankTransferPending` was set directly from the PUT response and no GET was made.
+
+**Why changed:** The GET response for offline donations contains the full donation record (including account details, uid, amount, currency). Using the PUT response meant the screen could only ever show data available at payment time. Using the GET response as source of truth means the screen has access to the complete donation record, making it straightforward to add additional details or support deep-linking to the thank-you screen later. `initialState` from the PUT response is passed as a fallback, so the screen still works correctly if the GET fails.
+
+### ~~Single `paymentProcessing` message for all non-paid statuses~~
+
+The original plan used a single "Your payment is being processed" message for all non-`paid` results from the GET.
+
+**Why changed:** Backend confirmed a full set of terminal statuses (`failed`, `canceled`, `refunded`, `in-dispute`, `dispute-lost`, `referred`, `draft`) that can appear in the GET response. Showing a "processing" message for a definitively failed or refunded payment would be misleading. `paymentResult` is now carried through `ThankYouState` and mapped to one of five display groups with appropriate copy.
+
 ---
 
 ## Out of Scope for This Plan
 
-- Changes to the `bank-transfer` (offline) flow.
 - Polling / WebSocket / server-sent events.
 - Refactoring `DonationSubmitState` to a discriminated union.
 - The donation flow refactor (separate plan: `donation-flow-refactor.md`). However, doing this plan after PR A of the refactor plan (pure function extraction) will be cleaner.
