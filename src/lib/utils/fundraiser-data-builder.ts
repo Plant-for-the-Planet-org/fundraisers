@@ -48,7 +48,7 @@ export function buildCreateFundraiserRequest(
   return {
     title: values.title,
     description: values.description,
-    country: values.country,
+    country: values.country === 'ROW' ? 'DE' : values.country, // ROW maps to DE (default workspace country) for the API
     currency: values.currency,
     goalAmount: values.goalAmount,
     visibility: values.visibility,

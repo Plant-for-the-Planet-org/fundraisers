@@ -4,7 +4,11 @@ import { getCurrencySymbol } from './currency';
 /**
  * List of supported currencies on the platform
  */
-export const SUPPORTED_CURRENCIES = ['USD', 'EUR', 'CHF', 'CZK'] as const;
+export const SUPPORTED_CURRENCIES = [
+  'EUR',
+  'CHF',
+  /*  'USD', 'CZK' */
+] as const;
 
 /**
  * Type for Supported currencies on the platform
@@ -16,7 +20,14 @@ export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number];
  * These countries have full platform support including tax deductibility
  * Plus "Rest of the World" option
  */
-export const ALLOWED_COUNTRIES = ['DE', 'US', 'ES', 'CZ', 'CH', 'ROW'] as const;
+export const ALLOWED_COUNTRIES = [
+  'DE',
+  'ES',
+  'CH',
+  'ROW',
+  // 'US',
+  // 'CZ'
+] as const;
 
 /**
  * Type for Allowed countries for fundraiser creation
@@ -28,11 +39,11 @@ export type AllowedCountry = (typeof ALLOWED_COUNTRIES)[number];
  */
 const COUNTRY_CURRENCY_MAP: Record<AllowedCountry, SupportedCurrency> = {
   DE: 'EUR', // Germany
-  US: 'USD', // USA
+  // US: 'USD', // USA
   ES: 'EUR', // Spain
-  CZ: 'CZK', // Czechia
+  // CZ: 'CZK', // Czechia
   CH: 'CHF', // Switzerland
-  ROW: 'EUR', // Rest of World
+  ROW: 'EUR', // Rest of World — maps to DE (default workspace country)
 };
 
 /**
@@ -50,9 +61,9 @@ export function getCurrencyForCountry(countryCode: string): SupportedCurrency {
  */
 const CURRENCY_NAMES: Record<SupportedCurrency, string> = {
   EUR: 'Euro',
-  USD: 'US Dollar',
   CHF: 'Swiss Franc',
-  CZK: 'Czech Koruna',
+  /* CZK: 'Czech Koruna',
+	USD: 'US Dollar', */
 };
 
 /**
@@ -104,7 +115,7 @@ export function getAllowedCountries(locale: string = 'en'): Array<{
 
 const TAX_DEDUCTIBLE_COUNTRIES: ReadonlySet<string> = new Set([
   'DE',
-  'US',
+  // 'US',
   'ES',
 ]);
 
@@ -122,12 +133,12 @@ export function getTaxDeductibilityInfo(
   countryName: string;
 } {
   const code = countryCode.toUpperCase() as AllowedCountry;
+  const resolvedCode = code === 'ROW' ? 'DE' : code; // ROW uses DE as the default workspace country
   const countryName =
-    code === 'ROW'
-      ? code
-      : (new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code);
+    new Intl.DisplayNames([locale], { type: 'region' }).of(resolvedCode) ??
+    resolvedCode;
   return {
-    isDeductible: TAX_DEDUCTIBLE_COUNTRIES.has(code),
+    isDeductible: TAX_DEDUCTIBLE_COUNTRIES.has(resolvedCode),
     countryName,
   };
 }
