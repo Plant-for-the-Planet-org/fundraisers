@@ -13,7 +13,7 @@ import { useWatch } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
 import { Search, Target, X } from 'lucide-react';
 import { projectsService } from '@/lib/api/projects-service';
-import { API_BASE_URL } from '@/lib/constants/app-config';
+import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { getImageUrl } from '@/lib/utils/images';
 import { mapProjectToSelectedCause } from '@/lib/utils/project-selection';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,7 @@ function getProjectImageSource(image?: string): string | null {
 }
 
 function buildLearnMoreUrl(projectId: string): string {
-  const normalizedBaseUrl = API_BASE_URL.replace(/\/+$/, '');
+  const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
   return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
