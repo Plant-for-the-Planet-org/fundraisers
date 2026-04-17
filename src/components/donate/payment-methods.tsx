@@ -8,6 +8,7 @@ import type { DonationFormValues } from '@/components/donate/donation-form-conte
 
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
@@ -37,6 +38,15 @@ const PROVIDER_TRANSLATION_KEYS: Record<
   paypal: 'providers.paypal',
   offline: 'providers.offline',
   planetcash: 'providers.planetcash',
+};
+
+const METHOD_LOGOS: Record<PaymentMethodId, string | null> = {
+  'bank-transfer': '/bank-transfer.png',
+  paypal: '/PayPal-Monogram-FullColor-RGB.png',
+  card: '/credit-card.png',
+  'sepa-debit': '/SepaLogoEN.jpg',
+  'apple-pay': null,
+  'google-pay': null,
 };
 
 type MethodFeeDetailsProps = {
@@ -126,6 +136,7 @@ const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
   methodLabel: string;
+  methodLogo?: string | null;
   isSelected: boolean;
   showFeeDetails: boolean;
   methodFeeText: string | null;
@@ -136,6 +147,7 @@ type PaymentMethodOptionProps = {
 const PaymentMethodOption = memo(function PaymentMethodOption({
   methodId,
   methodLabel,
+  methodLogo,
   isSelected,
   showFeeDetails,
   methodFeeText,
@@ -168,6 +180,17 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
             </div>
           </div>
 
+          {methodLogo && (
+            <div className='relative h-5 w-12 shrink-0'>
+              <Image
+                src={methodLogo}
+                alt={methodLabel}
+                fill
+                className='object-contain'
+              />
+            </div>
+          )}
+
           <div className='flex-1 space-y-1'>
             <span className='text-sm font-medium'>{methodLabel}</span>
           </div>
@@ -187,7 +210,6 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
     useDonationForm();
@@ -295,6 +317,7 @@ export function PaymentMethods() {
       visibleMethods.map(method => ({
         id: method.id,
         label: getMethodLabel(method.id),
+        logo: METHOD_LOGOS[method.id] ?? null,
         feeText: feeCollectionEnabled
           ? getFeeText(method, donationData.currency)
           : null,
@@ -329,10 +352,6 @@ export function PaymentMethods() {
     feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
   );
 
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded(prev => !prev);
-  }, []);
-
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
       setValue('selectedPaymentMethod', methodId, {
@@ -340,7 +359,6 @@ export function PaymentMethods() {
         shouldTouch: true,
         shouldValidate: true,
       });
-      setIsExpanded(false);
     },
     [setValue]
   );
@@ -369,16 +387,17 @@ export function PaymentMethods() {
       </div>
 
       <div className='border border-border rounded-lg'>
-        <SelectedMethodTrigger
+        {/* <SelectedMethodTrigger
           isExpanded={isExpanded}
           selectedMethodLabel={selectedMethodLabel}
           showFeeDetails={showSelectedMethodFeeDetails}
           selectedMethodFeeText={selectedMethodFeeText}
           selectedMethodFeeTooltip={selectedMethodFeeTooltip}
           onToggle={toggleExpanded}
-        />
+        /> */}
 
-        {isExpanded && (
+        {true && (
+          // {isExpanded && (
           <div className='space-y-3 border-t border-border p-4'>
             {visibleMethodOptions.map(method => {
               const isSelected = selectedPaymentMethod === method.id;
@@ -388,6 +407,7 @@ export function PaymentMethods() {
                   key={method.id}
                   methodId={method.id}
                   methodLabel={method.label}
+                  methodLogo={method.logo}
                   isSelected={isSelected}
                   showFeeDetails={feeCollectionEnabled}
                   methodFeeText={method.feeText}
