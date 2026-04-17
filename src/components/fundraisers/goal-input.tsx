@@ -76,9 +76,7 @@ export function GoalInput() {
       </span>
       {fieldState.error && (
         <p id='form-goal-amount-error' className='text-sm text-destructive'>
-          {String(fieldState.error.message) === 'minAmount'
-            ? t('errors.minAmount', { amount: 50 })
-            : t('errors.required')}
+          {t('errors.required')}
         </p>
       )}
     </div>

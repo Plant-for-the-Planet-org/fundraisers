@@ -54,7 +54,7 @@ export const createFundraiserFormSchema = z.object({
   image: selectedImageSchema.nullable(),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
-  goalAmount: z.number({ error: 'required' }).int().min(50, 'minAmount'),
+  goalAmount: z.number({ error: 'required' }).int().min(1, 'required'),
   visibility: z.enum(['public', 'unlisted']),
   status: z.enum(['draft', 'active']),
   projectAllocations: z.array(projectAllocationSchema).min(1, 'required'),
@@ -94,7 +94,7 @@ export function CreateFundraiserFormProvider({
       image: null,
       country: defaultCountry,
       currency: getCurrencyForCountry(defaultCountry),
-      goalAmount: undefined,
+      goalAmount: 5000,
       visibility: 'public',
       status: 'draft',
       projectAllocations: [
