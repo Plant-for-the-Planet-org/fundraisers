@@ -173,7 +173,8 @@
       "goal": {
         "label": "Fundraiser Goal",
         "errors": {
-          "required": "Please enter a fundraiser goal."
+          "required": "Please enter a fundraiser goal.",
+          "minAmount": "Please enter a goal of at least {amount, number}."
         }
       },
       "projectSelection": {
