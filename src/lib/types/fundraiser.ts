@@ -139,6 +139,20 @@ export interface Fundraiser {
   settings: Nullable<FundraiserSettings>;
 }
 
+export interface UpdateFundraiserRequest {
+  title?: string;
+  description?: string;
+  goalAmount?: number;
+  visibility?: FundraiserVisibility;
+  status?: FundraiserStatus;
+  projectAllocations?: Array<{
+    percentage: number;
+    project_id: string;
+  }>;
+  settings?: Pick<FundraiserSettings, 'theme'>;
+  imageFile?: string; // base64 encoded, only sent when image changed
+}
+
 export interface CreateFundraiserRequest {
   /** Needs to be unique. Database error if duplicate */
   slug?: string;

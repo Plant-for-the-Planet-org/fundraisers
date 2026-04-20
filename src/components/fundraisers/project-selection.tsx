@@ -3,7 +3,7 @@
 import type { SelectedProject } from '@/lib/types/project-selection';
 import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Target } from 'lucide-react';
@@ -29,10 +29,15 @@ function getProjectImageSource(image?: string): string | null {
   return getImageUrl('project', 'small', image);
 }
 
-export function ProjectSelection() {
-  const t = useTranslations('Fundraisers.create.projectSelection');
-  const { control, getValues, setValue } =
-    useFormContext<CreateFundraiserFormValues>();
+interface ProjectSelectionProps {
+  initialExtraProjects?: SelectedProject[];
+}
+
+export function ProjectSelection({
+  initialExtraProjects,
+}: ProjectSelectionProps = {}) {
+  const t = useTranslations('Fundraisers.form.projectSelection');
+  const { control, setValue } = useFormContext<CreateFundraiserFormValues>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
@@ -40,7 +45,11 @@ export function ProjectSelection() {
     name: 'country',
   });
 
-  const [extraProjects, setExtraProjects] = useState<SelectedProject[]>([]);
+  const [extraProjects, setExtraProjects] = useState<SelectedProject[]>(
+    () => initialExtraProjects ?? []
+  );
+
+  const lastAllocationsSnapshotRef = useRef<string | null>(null);
 
   const defaultCause = useMemo(
     () =>
@@ -72,25 +81,27 @@ export function ProjectSelection() {
       project_id: project.id,
       percentage: project.percentage,
     }));
-    const currentAllocations = getValues('projectAllocations') ?? [];
+    const snapshot = nextAllocations
+      .map(allocation => `${allocation.project_id}:${allocation.percentage}`)
+      .join('|');
 
-    const isSame =
-      currentAllocations.length === nextAllocations.length &&
-      currentAllocations.every((allocation, index) => {
-        const next = nextAllocations[index];
-        return (
-          allocation?.project_id === next?.project_id &&
-          allocation?.percentage === next?.percentage
-        );
-      });
-
-    if (!isSame) {
-      setValue('projectAllocations', nextAllocations, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
+    // Skip the first run so mounting never dirties the form (survives Strict Mode double-invoke).
+    if (lastAllocationsSnapshotRef.current === null) {
+      lastAllocationsSnapshotRef.current = snapshot;
+      return;
     }
-  }, [getValues, projectAllocations, setValue]);
+
+    if (lastAllocationsSnapshotRef.current === snapshot) {
+      return;
+    }
+
+    lastAllocationsSnapshotRef.current = snapshot;
+
+    setValue('projectAllocations', nextAllocations, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [projectAllocations, setValue]);
 
   function handleSelectProject(project: SelectedProject) {
     if (project.id === defaultCauseId) {

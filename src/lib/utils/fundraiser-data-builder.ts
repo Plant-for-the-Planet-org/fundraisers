@@ -1,8 +1,30 @@
+import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import type {
   CreateFundraiserRequest,
   FundraiserSettings,
+  UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+
+export type UpdateDirtyFields = Partial<
+  Readonly<FieldNamesMarkedBoolean<CreateFundraiserFormValues>>
+>;
+
+function isThemeDirty(dirty: UpdateDirtyFields): boolean {
+  const theme = dirty.settings?.theme;
+  if (!theme) return false;
+  if (typeof theme === 'boolean') return theme;
+  return Object.values(theme).some(Boolean);
+}
+
+function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
+  const allocations = dirty.projectAllocations;
+  if (!allocations) return false;
+  if (!Array.isArray(allocations)) return Boolean(allocations);
+  return allocations.some(entry =>
+    entry ? Object.values(entry).some(Boolean) : false
+  );
+}
 
 export const DEFAULT_MODULES: FundraiserSettings['modules'] = {
   leaderboard: {
@@ -39,6 +61,29 @@ function getDateOffsetString(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() + days);
   return date.toISOString().split('T')[0]!;
+}
+
+export function buildUpdateFundraiserRequest(
+  values: CreateFundraiserFormValues,
+  dirtyFields: UpdateDirtyFields,
+  imageFile?: string
+): UpdateFundraiserRequest {
+  const request: UpdateFundraiserRequest = {};
+
+  if (dirtyFields.title) request.title = values.title;
+  if (dirtyFields.description) request.description = values.description;
+  if (dirtyFields.goalAmount) request.goalAmount = values.goalAmount;
+  if (dirtyFields.visibility) request.visibility = values.visibility;
+  if (dirtyFields.status) request.status = values.status;
+  if (isProjectAllocationsDirty(dirtyFields)) {
+    request.projectAllocations = values.projectAllocations;
+  }
+  if (isThemeDirty(dirtyFields)) {
+    request.settings = { theme: values.settings.theme };
+  }
+  if (imageFile) request.imageFile = imageFile;
+
+  return request;
 }
 
 export function buildCreateFundraiserRequest(

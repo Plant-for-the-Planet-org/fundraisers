@@ -18,9 +18,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export function WorkspaceSelector() {
+interface WorkspaceSelectorProps {
+  disabled?: boolean;
+}
+
+export function WorkspaceSelector({
+  disabled = false,
+}: WorkspaceSelectorProps = {}) {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.countryEntity');
+  const t = useTranslations('Fundraisers.form.countryEntity');
 
   const { setValue } = useFormContext<CreateFundraiserFormValues>();
   const { field } = useController<CreateFundraiserFormValues, 'country'>({
@@ -44,7 +50,11 @@ export function WorkspaceSelector() {
       <label className='text-sm font-medium' htmlFor='form-country'>
         {t('label')}
       </label>
-      <Select value={field.value} onValueChange={handleCountryChange}>
+      <Select
+        value={field.value}
+        onValueChange={handleCountryChange}
+        disabled={disabled}
+      >
         <SelectTrigger
           className='w-full bg-transparent border-border hover:bg-muted/5'
           id='form-country'
