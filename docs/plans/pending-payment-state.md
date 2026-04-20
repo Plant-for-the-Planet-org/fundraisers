@@ -87,7 +87,7 @@ interface DonationStatusResponse {
 
 ## New Utility Function
 
-`resolveThankYouStateFromGet` in `src/lib/donation/resolve-donation-status.ts`:
+`resolveThankYouStateFromDonation` in `src/lib/donation/resolve-donation-status.ts`:
 
 ```ts
 // Calls GET /donations/{donationId} once and maps the result to a ThankYouState.
@@ -95,7 +95,7 @@ interface DonationStatusResponse {
 // gateway === 'offline' + account → { status: 'bankTransferPending', ...GET data }
 // anything else                  → { status: 'paymentProcessing', donationId, paymentResult }
 // GET error                      → fallback if provided, otherwise { status: 'paymentProcessing', paymentResult: 'pending' }
-async function resolveThankYouStateFromGet(
+async function resolveThankYouStateFromDonation(
   donationId: string,
   token?: string,
   fallback?: ThankYouState
@@ -242,9 +242,9 @@ The existing flat interface is **not changed**. The `isLoading: true` state duri
 
 - [x] **`DonationStatusResponse` type** — added to `src/lib/types/donation.ts`. `DonationPaymentStatus` enumerates all confirmed backend values.
 - [x] **`donationService.getDonation`** — implemented in `donation-service.ts` with private `transformStatusResponse`.
-- [x] **`resolveThankYouStateFromGet` utility** — created in `src/lib/donation/resolve-donation-status.ts`.
+- [x] **`resolveThankYouStateFromDonation` utility** — created in `src/lib/donation/resolve-donation-status.ts`.
 - [x] **`ThankYouState`** — `paymentProcessing` variant added to `src/lib/types/donation-submit.ts` (includes `paymentResult: DonationPaymentStatus`).
-- [x] **`use-donation-submit.ts`** — all 5 direct `thankYouState: { status: 'completed' }` assignments replaced with `resolveThankYouStateFromGet` calls.
+- [x] **`use-donation-submit.ts`** — all 5 direct `thankYouState: { status: 'completed' }` assignments replaced with `resolveThankYouStateFromDonation` calls.
 - [x] **`donation-thank-you.tsx`** — ternary replaced with switch (3 cases: `bankTransferPending`, `paymentProcessing`, `completed`).
 - [x] **`thank-you-card.tsx`** — `paymentProcessing` variant added. `PaymentResultGroup` type and `getPaymentResultGroup` helper defined here. `PaymentResultGroup` exported for use by `status-badge.tsx`.
 - [x] **`status-badge.tsx`** — `paymentProcessing` variant added (amber). Exports `PaymentResultGroup` type.

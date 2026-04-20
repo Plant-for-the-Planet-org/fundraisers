@@ -10,7 +10,7 @@ import { donationService } from '../api/donation-service';
  * - anything else                 → { status: 'paymentProcessing', donationId, paymentResult }
  * - GET error                     → fallback if provided, otherwise { status: 'paymentProcessing', paymentResult: 'pending' }
  */
-export async function resolveThankYouStateFromGet(
+export async function resolveThankYouStateFromDonation(
   donationId: string,
   token?: string,
   fallback?: ThankYouState

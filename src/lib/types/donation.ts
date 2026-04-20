@@ -1,3 +1,5 @@
+import type { BankAccountDetails } from './payment';
+
 // TODO: evaluate if the DonationResponse interface is accurate
 export interface DonationResponse {
   success: boolean;
@@ -9,8 +11,6 @@ export interface DonationResponse {
   message?: string;
   errors?: Record<string, string>;
 }
-
-import type { BankAccountDetails } from './payment';
 
 // Confirmed with backend. Practically: 'pending', 'initiated', 'paid'.
 // Terminal non-paid statuses are unlikely after a successful PUT but enumerated for completeness.

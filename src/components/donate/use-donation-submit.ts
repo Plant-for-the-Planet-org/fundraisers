@@ -27,7 +27,7 @@ import {
   assembleFormData,
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
-import { resolveThankYouStateFromGet } from '@/lib/donation/resolve-donation-status';
+import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
@@ -182,7 +182,7 @@ export function useDonationSubmit(
             );
 
             if (initialThankYouState?.status === 'bankTransferPending') {
-              const thankYouState = await resolveThankYouStateFromGet(
+              const thankYouState = await resolveThankYouStateFromDonation(
                 donationResponse.donationId,
                 token ?? undefined,
                 initialThankYouState
@@ -196,7 +196,7 @@ export function useDonationSubmit(
             }
 
             if (initialThankYouState?.status === 'completed') {
-              const thankYouState = await resolveThankYouStateFromGet(
+              const thankYouState = await resolveThankYouStateFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
@@ -253,7 +253,7 @@ export function useDonationSubmit(
                 return;
               }
 
-              const thankYouState = await resolveThankYouStateFromGet(
+              const thankYouState = await resolveThankYouStateFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
@@ -284,7 +284,7 @@ export function useDonationSubmit(
                 return;
               }
 
-              const thankYouState = await resolveThankYouStateFromGet(
+              const thankYouState = await resolveThankYouStateFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
@@ -309,7 +309,7 @@ export function useDonationSubmit(
                   error: { code: 'paymentFailed' },
                 }));
               } else {
-                const thankYouState = await resolveThankYouStateFromGet(
+                const thankYouState = await resolveThankYouStateFromDonation(
                   donationResponse.donationId,
                   token ?? undefined
                 );
@@ -480,7 +480,7 @@ export function useDonationSubmit(
         donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
         paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
-        const thankYouState = await resolveThankYouStateFromGet(
+        const thankYouState = await resolveThankYouStateFromDonation(
           donationId,
           token ?? undefined
         );

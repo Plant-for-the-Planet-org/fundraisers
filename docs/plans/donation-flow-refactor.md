@@ -58,22 +58,22 @@ src/components/donate/
     — handleCardAction(cardFormRef, paymentResponse, donationId, paymentAttemptKey, token)
         Handles action_required → cardAction branch:
         calls handleCardAction on form ref, builds confirmRequest,
-        calls paymentService.processPayment, then resolveThankYouStateFromGet.
+        calls paymentService.processPayment, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
     — handleCardPayment(cardFormRef, paymentResponse, donationId, token)
         Handles action_required → cardPayment branch:
-        calls confirmCardPayment on form ref, then resolveThankYouStateFromGet.
+        calls confirmCardPayment on form ref, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
     — handleSepaAction(sepaFormRef, paymentResponse, donationId, token)
         Handles action_required → sepa-debit branch:
-        calls confirmSepaDebitPayment on form ref, then resolveThankYouStateFromGet.
+        calls confirmSepaDebitPayment on form ref, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
 
   paypal-submit-flow.ts
     — createPayPalOrder(formData, fundraiser, donorProfile, token, paymentOptions, donationIdempotencyKey)
         Builds payload, submits donation, creates PayPal order.
     — processPayPalApproval(donationId, data, paymentOptions, token, paymentIdempotencyKey)
-        Builds PayPal payment request, calls processPayment, then resolveThankYouStateFromGet.
+        Builds PayPal payment request, calls processPayment, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
 
   donation-address.ts
@@ -194,7 +194,7 @@ Deviations from plan:
   `paymentFailed` banner.
 - Restructure `onSubmit` branching: check `action_required` before `success`. Once the
   `action_required` branches are handled, only `status === 'success'` remains and
-  `resolveThankYouStateFromGet` can be called directly — eliminating the intermediate
+  `resolveThankYouStateFromDonation` can be called directly — eliminating the intermediate
   `resolveThankYouState` / `initialThankYouState` call entirely. Note: the bank transfer
   GET-failure fallback (currently `initialThankYouState`) is lost; a GET error on a
   successful bank transfer PUT will fall back to `paymentProcessing` instead of
