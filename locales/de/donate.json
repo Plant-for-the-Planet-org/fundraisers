@@ -25,6 +25,10 @@
       "lastName": {
         "label": "Nachname *",
         "placeholder": "Nachname"
+      },
+      "tin": {
+        "label": "Steueridentifikationsnummer (TIN) *",
+        "placeholder": "Geben Sie Ihre Steueridentifikationsnummer ein"
       }
     },
     "userAddress": {

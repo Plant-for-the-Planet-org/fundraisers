@@ -8,7 +8,7 @@ import type { DonationData } from './donate-overlay';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
@@ -22,36 +22,40 @@ const DevTool =
       })
     : null;
 
-export const donationFormSchema = z
-  .object({
-    firstname: z.string().trim(),
-    lastname: z.string().trim(),
-    email: z.string().trim(),
-    // Address fields — validated conditionally in superRefine based on whether selectedAddressId is present
-    address: z.string().trim(),
-    address2: z.string().trim().optional(),
-    addressType: z.enum(['primary', 'mailing', 'other']).optional(),
-    zipCode: z.string().trim(),
-    state: z.string().trim().optional(),
-    city: z.string().trim(),
-    country: z.string().trim(),
-    // Preferences
-    isAnonymous: z.boolean(),
-    selectedAddressId: z.string().optional(),
-    makeMonthly: z.boolean(),
-    coverFees: z.boolean(),
-    selectedPaymentMethod: z.enum([
-      'card',
-      'sepa-debit',
-      'apple-pay',
-      'google-pay',
-      'paypal',
-      'bank-transfer',
-    ]),
-    isCompany: z.boolean(),
-    companyName: z.string().trim().optional(),
-  })
-  .superRefine((values, ctx) => {
+const donationFormFields = z.object({
+  firstname: z.string().trim(),
+  lastname: z.string().trim(),
+  email: z.string().trim(),
+  // Address fields — validated conditionally in superRefine based on whether selectedAddressId is present
+  address: z.string().trim(),
+  address2: z.string().trim().optional(),
+  addressType: z.enum(['primary', 'mailing', 'other']).optional(),
+  zipCode: z.string().trim(),
+  state: z.string().trim().optional(),
+  city: z.string().trim(),
+  country: z.string().trim(),
+  // Preferences
+  isAnonymous: z.boolean(),
+  selectedAddressId: z.string().optional(),
+  makeMonthly: z.boolean(),
+  coverFees: z.boolean(),
+  selectedPaymentMethod: z.enum([
+    'card',
+    'sepa-debit',
+    'apple-pay',
+    'google-pay',
+    'paypal',
+    'bank-transfer',
+  ]),
+  isCompany: z.boolean(),
+  companyName: z.string().trim().optional(),
+  tin: z.string().trim().optional(),
+});
+
+export type DonationFormValues = z.infer<typeof donationFormFields>;
+
+function createDonationFormSchema(fundraiserCountry: string) {
+  return donationFormFields.superRefine((values, ctx) => {
     const hasAddressId =
       !!values.selectedAddressId?.trim() && values.selectedAddressId !== 'new';
 
@@ -121,9 +125,16 @@ export const donationFormSchema = z
         path: ['companyName'],
       });
     }
-  });
 
-export type DonationFormValues = z.infer<typeof donationFormSchema>;
+    if (fundraiserCountry === 'ES' && !values.tin?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        message: DONATION_FORM_ERRORS['tin.required'],
+        path: ['tin'],
+      });
+    }
+  });
+}
 
 interface DonationFormContextValue {
   fundraiser: Fundraiser;
@@ -164,8 +175,13 @@ export function DonationFormProvider({
   isOpen,
   children,
 }: DonationFormProviderProps) {
+  const schema = useMemo(
+    () => createDonationFormSchema(fundraiser.workspace?.country ?? ''),
+    [fundraiser.workspace?.country]
+  );
+
   const methods = useForm<DonationFormValues>({
-    resolver: zodResolver(donationFormSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       firstname: '',
       lastname: '',
@@ -180,6 +196,7 @@ export function DonationFormProvider({
       country: '',
       isAnonymous: false,
       isCompany: false,
+      tin: '',
       makeMonthly: false,
       coverFees: false,
       // TODO: change default once other payment methods are implemented

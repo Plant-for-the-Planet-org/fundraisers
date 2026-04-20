@@ -25,6 +25,10 @@
       "lastName": {
         "label": "Last Name *",
         "placeholder": "Last name"
+      },
+      "tin": {
+        "label": "TIN (Tax Identification Number) *",
+        "placeholder": "Enter your TIN"
       }
     },
     "userAddress": {
@@ -95,6 +99,9 @@
       "email": {
         "required": "Email is required",
         "invalid": "Please enter a valid email address"
+      },
+      "tin": {
+        "required": "TIN is required"
       }
     },
     "sepa": {
