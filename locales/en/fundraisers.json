@@ -73,7 +73,7 @@
         "makeMonthly": "Make my donation monthly"
       }
     },
-    "create": {
+    "form": {
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
@@ -252,12 +252,28 @@
         },
         "customAmount": "Custom Amount",
         "enterAmount": "Enter Amount"
-      },
+      }
+    },
+    "create": {
       "formSubmission": {
         "buttonProcessing": "Creating Fundraiser...",
         "buttonSubmit": "Create Fundraiser",
         "successMessage": "Fundraiser created!",
         "errorMessage": "Error"
+      }
+    },
+    "edit": {
+      "loading": "Loading fundraiser...",
+      "notFoundTitle": "Fundraiser not found",
+      "notFoundDescription": "This fundraiser could not be loaded.",
+      "unauthorizedTitle": "You don't have permission to edit this fundraiser",
+      "unauthorizedDescription": "Only fundraiser hosts can edit this fundraiser.",
+      "backToDashboard": "Back to dashboard",
+      "formSubmission": {
+        "buttonProcessing": "Updating fundraiser...",
+        "buttonSubmit": "Update fundraiser",
+        "successMessage": "Fundraiser updated!",
+        "errorMessage": "Update failed"
       }
     },
     "copyLinkButton": {

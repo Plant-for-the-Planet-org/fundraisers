@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 
 export function GoalInput() {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.goal');
+  const t = useTranslations('Fundraisers.form.goal');
   const {
     field: { value, onChange, onBlur, name, ref },
     fieldState,

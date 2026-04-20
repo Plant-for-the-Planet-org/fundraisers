@@ -52,7 +52,7 @@ export function ProjectSelectionOverlay({
   onSelectProject,
   selectedProjectIds,
 }: ProjectSelectionOverlayProps) {
-  const t = useTranslations('Fundraisers.create.projectSelection');
+  const t = useTranslations('Fundraisers.form.projectSelection');
   const locale = useLocale();
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
     name: 'country',

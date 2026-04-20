@@ -51,7 +51,7 @@ export function DonationForm({
   currency = 'EUR',
   onDonate,
 }: DonationFormProps) {
-  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const t = useTranslations('Fundraisers.form.contributionSettings');
 
   const settings = getContributionSettings(contributionSettings);
   const availableRecurrencyOptions =

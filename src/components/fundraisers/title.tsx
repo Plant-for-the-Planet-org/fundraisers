@@ -19,7 +19,7 @@ function resizeToContent(element: HTMLTextAreaElement | null) {
 }
 
 export function Title() {
-  const t = useTranslations('Fundraisers.create.title');
+  const t = useTranslations('Fundraisers.form.title');
 
   return (
     <TitleInput

@@ -9,7 +9,7 @@ import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 
 export function WorkspaceInfo() {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.countryEntity.info');
+  const t = useTranslations('Fundraisers.form.countryEntity.info');
 
   const country = useWatch<CreateFundraiserFormValues, 'country'>({
     name: 'country',

@@ -73,7 +73,7 @@
         "makeMonthly": "Meine Spende monatlich machen"
       }
     },
-    "create": {
+    "form": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
         "goalLine": "{amount} vom gesetzten Ziel",
@@ -252,12 +252,28 @@
         },
         "customAmount": "Benutzerdefinierter Betrag",
         "enterAmount": "Betrag eingeben"
-      },
+      }
+    },
+    "create": {
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf erstellen...",
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler"
+      }
+    },
+    "edit": {
+      "loading": "Spendenaufruf wird geladen...",
+      "notFoundTitle": "Spendenaufruf nicht gefunden",
+      "notFoundDescription": "Dieser Spendenaufruf konnte nicht geladen werden.",
+      "unauthorizedTitle": "Du bist nicht berechtigt, diesen Spendenaufruf zu bearbeiten",
+      "unauthorizedDescription": "Nur Gastgeber können diesen Spendenaufruf bearbeiten.",
+      "backToDashboard": "Zurück zum Dashboard",
+      "formSubmission": {
+        "buttonProcessing": "Spendenaufruf aktualisieren...",
+        "buttonSubmit": "Spendenaufruf aktualisieren",
+        "successMessage": "Spendenaufruf aktualisiert!",
+        "errorMessage": "Aktualisierung fehlgeschlagen"
       }
     },
     "copyLinkButton": {

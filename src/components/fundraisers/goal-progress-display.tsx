@@ -16,7 +16,7 @@ export function GoalProgressDisplay({
   progressPercentage,
   daysLeft,
 }: GoalProgressDisplayProps) {
-  const t = useTranslations('Fundraisers.create.goalPreview');
+  const t = useTranslations('Fundraisers.form.goalPreview');
 
   return (
     <div className='goal-progress-display flex flex-col'>

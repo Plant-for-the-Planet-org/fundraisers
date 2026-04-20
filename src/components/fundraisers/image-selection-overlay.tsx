@@ -30,7 +30,7 @@ export function ImageSelectionOverlay({
   onClose,
   onImageSelect,
 }: ImageSelectionOverlayProps) {
-  const t = useTranslations('Fundraisers.create.image');
+  const t = useTranslations('Fundraisers.form.image');
 
   const categories = useMemo(() => getVisibleImageCategories(), []);
 

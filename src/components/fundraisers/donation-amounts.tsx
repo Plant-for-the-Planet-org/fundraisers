@@ -27,7 +27,7 @@ export function DonationAmounts({
   onCustomAmountChange,
   customOption,
 }: DonationAmountsProps) {
-  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const t = useTranslations('Fundraisers.form.contributionSettings');
   const [isCustomInputSelected, setIsCustomInputSelected] = useState(false);
   const [inputValue, setInputValue] = useState('');
 

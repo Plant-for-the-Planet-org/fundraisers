@@ -46,7 +46,7 @@ const THEME_OPTIONS = Object.values(THEMES).filter(theme => theme.featured);
 
 export function ThemeSettings() {
   const pathname = usePathname();
-  const tTheme = useTranslations('Fundraisers.create.theme');
+  const tTheme = useTranslations('Fundraisers.form.theme');
   const { selectedTheme, setSelectedTheme } = useThemeStore();
   const { field } = useController<CreateFundraiserFormValues, 'settings.theme'>(
     {

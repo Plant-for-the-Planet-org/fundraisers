@@ -9,7 +9,7 @@ import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 
 export default function DescriptionInput() {
-  const t = useTranslations('Fundraisers.create.description');
+  const t = useTranslations('Fundraisers.form.description');
   const descriptionId = 'form-description';
   const errorId = `${descriptionId}-error`;
 
