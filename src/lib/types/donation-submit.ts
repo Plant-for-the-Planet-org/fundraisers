@@ -1,4 +1,7 @@
-import type { DonationFrequency } from '@/lib/types/donation';
+import type {
+  DonationFrequency,
+  DonationPaymentStatus,
+} from '@/lib/types/donation';
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 import type { BankAccountDetails } from './payment';
 
@@ -13,6 +16,11 @@ export type ThankYouState =
       currency: string;
       frequency: DonationFrequency;
       transferAccount: BankAccountDetails;
+    }
+  | {
+      status: 'paymentProcessing';
+      donationId: string;
+      paymentResult: DonationPaymentStatus;
     };
 
 export interface DonationSubmitState {

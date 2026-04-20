@@ -1,3 +1,5 @@
+import type { BankAccountDetails } from './payment';
+
 // TODO: evaluate if the DonationResponse interface is accurate
 export interface DonationResponse {
   success: boolean;
@@ -8,6 +10,32 @@ export interface DonationResponse {
   frequency: DonationFrequency;
   message?: string;
   errors?: Record<string, string>;
+}
+
+// Confirmed with backend. Practically: 'pending', 'initiated', 'paid'.
+// Terminal non-paid statuses are unlikely after a successful PUT but enumerated for completeness.
+// 'draft' is never returned once a payment exists.
+export type DonationPaymentStatus =
+  | 'pending'
+  | 'initiated'
+  | 'paid'
+  | 'failed'
+  | 'canceled'
+  | 'refunded'
+  | 'referred'
+  | 'in-dispute'
+  | 'dispute-lost';
+
+export interface DonationStatusResponse {
+  id: string;
+  gateway: string;
+  paymentStatus: DonationPaymentStatus;
+  paymentDate: string | null; // null while pending, populated once settled
+  uid: string;
+  amount: number;
+  currency: string;
+  frequency: string | null;
+  account?: BankAccountDetails; // present for offline (bank transfer) donations
 }
 
 export interface LineItem {

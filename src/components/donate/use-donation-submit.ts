@@ -27,6 +27,7 @@ import {
   assembleFormData,
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
+import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
@@ -174,132 +175,152 @@ export function useDonationSubmit(
             return;
           }
 
-          const thankYouState = resolveThankYouState(
-            paymentResponse,
-            donationResponse
-          );
+          if (paymentResponse.status === 'success') {
+            const initialThankYouState = resolveThankYouState(
+              paymentResponse,
+              donationResponse
+            );
 
-          if (thankYouState) {
-            setDonationState(prev => ({
-              ...prev,
-              isLoading: false,
-              thankYouState,
-            }));
-            return;
+            if (initialThankYouState?.status === 'bankTransferPending') {
+              const thankYouState = await resolveThankYouStateFromDonation(
+                donationResponse.donationId,
+                token ?? undefined,
+                initialThankYouState
+              );
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                thankYouState,
+              }));
+              return;
+            }
+
+            if (initialThankYouState?.status === 'completed') {
+              const thankYouState = await resolveThankYouStateFromDonation(
+                donationResponse.donationId,
+                token ?? undefined
+              );
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                thankYouState,
+              }));
+              return;
+            }
           }
 
           // NOTE: Reuse attempt-scoped idempotency keys for action_required follow-up calls.
           // Keys are rotated after this submit attempt completes (in finally).
-          if (
-            paymentResponse.status === 'action_required' &&
-            paymentResponse.response.type === 'cardAction' &&
-            values.selectedPaymentMethod === 'card'
-          ) {
-            const actionResult = (await cardFormRef.current?.handleCardAction(
-              paymentResponse.response.payment_intent_client_secret
-            )) ?? { error: 'No card form available' };
-
-            if ('error' in actionResult) {
-              setDonationState(prev => ({
-                ...prev,
-                isLoading: false,
-                error: { code: 'paymentFailed' },
-              }));
-              return;
-            }
-
-            const confirmRequest: StripeCardActionConfirmRequest = {
-              gateway: 'stripe',
-              account: paymentResponse.response.account,
-              source: {
-                id: actionResult.paymentIntentId,
-                object: 'payment_intent',
-              },
-            };
-            const finalResponse = await paymentService.processPayment(
-              donationResponse.donationId,
-              confirmRequest,
-              token || undefined,
-              paymentAttemptKey
-            );
-
-            if (finalResponse.status === 'failed') {
-              setDonationState(prev => ({
-                ...prev,
-                isLoading: false,
-                error: { code: 'paymentFailed' },
-              }));
-              return;
-            }
-
-            setDonationState(prev => ({
-              ...prev,
-              isLoading: false,
-              thankYouState: {
-                status: 'completed',
-                donationId: donationResponse.donationId,
-              },
-            }));
-            return;
-          }
-
-          if (
-            paymentResponse.status === 'action_required' &&
-            paymentResponse.response.type === 'cardPayment' &&
-            values.selectedPaymentMethod === 'card'
-          ) {
-            const confirmResult =
-              (await cardFormRef.current?.confirmCardPayment(
-                paymentResponse.response.payment_intent_client_secret,
-                paymentResponse.response.payment_method
+          if (paymentResponse.status === 'action_required') {
+            if (
+              paymentResponse.response.type === 'cardAction' &&
+              values.selectedPaymentMethod === 'card'
+            ) {
+              const actionResult = (await cardFormRef.current?.handleCardAction(
+                paymentResponse.response.payment_intent_client_secret
               )) ?? { error: 'No card form available' };
 
-            if (confirmResult.error) {
+              if ('error' in actionResult) {
+                setDonationState(prev => ({
+                  ...prev,
+                  isLoading: false,
+                  error: { code: 'paymentFailed' },
+                }));
+                return;
+              }
+
+              const confirmRequest: StripeCardActionConfirmRequest = {
+                gateway: 'stripe',
+                account: paymentResponse.response.account,
+                source: {
+                  id: actionResult.paymentIntentId,
+                  object: 'payment_intent',
+                },
+              };
+              const finalResponse = await paymentService.processPayment(
+                donationResponse.donationId,
+                confirmRequest,
+                token || undefined,
+                paymentAttemptKey
+              );
+
+              if (finalResponse.status === 'failed') {
+                setDonationState(prev => ({
+                  ...prev,
+                  isLoading: false,
+                  error: { code: 'paymentFailed' },
+                }));
+                return;
+              }
+
+              const thankYouState = await resolveThankYouStateFromDonation(
+                donationResponse.donationId,
+                token ?? undefined
+              );
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                thankYouState,
               }));
               return;
             }
 
-            setDonationState(prev => ({
-              ...prev,
-              isLoading: false,
-              thankYouState: {
-                status: 'completed',
-                donationId: donationResponse.donationId,
-              },
-            }));
-            return;
-          }
+            if (
+              paymentResponse.response.type === 'cardPayment' &&
+              values.selectedPaymentMethod === 'card'
+            ) {
+              const confirmResult =
+                (await cardFormRef.current?.confirmCardPayment(
+                  paymentResponse.response.payment_intent_client_secret,
+                  paymentResponse.response.payment_method
+                )) ?? { error: 'No card form available' };
 
-          if (
-            paymentResponse.status === 'action_required' &&
-            values.selectedPaymentMethod === 'sepa-debit'
-          ) {
-            const sepaResult =
-              (await sepaFormRef.current?.confirmSepaDebitPayment(
-                paymentResponse.response.payment_intent_client_secret
-              )) ?? { error: 'No SEPA form available' };
+              if (confirmResult.error) {
+                setDonationState(prev => ({
+                  ...prev,
+                  isLoading: false,
+                  error: { code: 'paymentFailed' },
+                }));
+                return;
+              }
 
-            if (sepaResult.error) {
+              const thankYouState = await resolveThankYouStateFromDonation(
+                donationResponse.donationId,
+                token ?? undefined
+              );
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                thankYouState,
               }));
-            } else {
-              setDonationState(prev => ({
-                ...prev,
-                isLoading: false,
-                thankYouState: {
-                  status: 'completed',
-                  donationId: donationResponse.donationId,
-                },
-              }));
+              return;
             }
-            return;
+
+            if (values.selectedPaymentMethod === 'sepa-debit') {
+              const sepaResult =
+                (await sepaFormRef.current?.confirmSepaDebitPayment(
+                  paymentResponse.response.payment_intent_client_secret
+                )) ?? { error: 'No SEPA form available' };
+
+              if (sepaResult.error) {
+                setDonationState(prev => ({
+                  ...prev,
+                  isLoading: false,
+                  error: { code: 'paymentFailed' },
+                }));
+              } else {
+                const thankYouState = await resolveThankYouStateFromDonation(
+                  donationResponse.donationId,
+                  token ?? undefined
+                );
+                setDonationState(prev => ({
+                  ...prev,
+                  isLoading: false,
+                  thankYouState,
+                }));
+              }
+              return;
+            }
           }
 
           setDonationState(prev => ({
@@ -459,10 +480,14 @@ export function useDonationSubmit(
         donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
         paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
 
+        const thankYouState = await resolveThankYouStateFromDonation(
+          donationId,
+          token ?? undefined
+        );
         setDonationState(prev => ({
           ...prev,
           isLoading: false,
-          thankYouState: { status: 'completed', donationId },
+          thankYouState,
         }));
       } catch (error) {
         setDonationState(prev => ({

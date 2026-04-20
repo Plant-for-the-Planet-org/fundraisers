@@ -178,15 +178,36 @@
     "thankYou": {
       "title": {
         "completed": "Thank You for Your Donation!",
-        "bankTransferPending": "Thank you for Initiating Your Donation"
+        "bankTransferPending": "Thank you for Initiating Your Donation",
+        "paymentProcessing": {
+          "processing": "Payment in Progress",
+          "failed": "Payment Unsuccessful",
+          "refunded": "Payment Refunded",
+          "disputed": "Payment Under Review",
+          "error": "Something Went Wrong"
+        }
       },
       "status": {
         "label": "Status:",
         "completed": "Completed",
-        "bankTransferPending": "Bank transfer pending"
+        "bankTransferPending": "Bank transfer pending",
+        "paymentProcessing": {
+          "processing": "Processing",
+          "failed": "Unsuccessful",
+          "refunded": "Refunded",
+          "disputed": "Under Review",
+          "error": "Error"
+        }
       },
       "message": {
         "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
+        "paymentProcessing": {
+          "processing": "Your payment is being processed. You will receive an email when it is confirmed.",
+          "failed": "Unfortunately, your payment was unsuccessful. Please try again or use a different payment method.",
+          "refunded": "Your payment has been refunded.",
+          "disputed": "Your payment is currently under review. Please contact support if you need assistance.",
+          "error": "An error occurred with your payment. Please contact support@plant-for-the-planet.org with your donation details."
+        },
         "bankTransferPending": {
           "monthly": "Your monthly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
           "yearly": "Your yearly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
