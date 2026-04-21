@@ -155,7 +155,7 @@ export function DonationAmounts({
             </div>
           ) : (
             <div className='text-muted-foreground text-base font-normal'>
-              {customOption.label || t('customAmount')}
+              {t('customAmount')}
             </div>
           )}
           <div className='flex items-center gap-1 text-foreground font-bold pointer-events-none'>
