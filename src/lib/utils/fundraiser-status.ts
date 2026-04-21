@@ -1,6 +1,6 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-export function isActiveFundraiser(
+export function checkFundraiserIsActive(
   fundraiser: Fundraiser,
   now: Date = new Date()
 ): boolean {
