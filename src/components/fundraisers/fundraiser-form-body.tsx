@@ -24,12 +24,15 @@ interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
   initialExtraProjects?: SelectedProject[];
+  /** Server-reported raised amount. Only meaningful in edit mode. */
+  totalRaised?: number;
 }
 
 export function FundraiserFormBody({
   mode,
   submitButton,
   initialExtraProjects,
+  totalRaised,
 }: FundraiserFormBodyProps) {
   const isEdit = mode === 'edit';
 
@@ -37,7 +40,7 @@ export function FundraiserFormBody({
     <FundraiserLayout>
       <SidebarPanel>
         <ImageSelector autoLoadDefault={!isEdit} />
-        <GoalPreview />
+        <GoalPreview mode={mode} totalRaised={totalRaised} />
         <DonorsPreview />
         <Hosts mode='preview' />
         <ThemeSettings />

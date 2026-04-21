@@ -43,6 +43,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
         mode='edit'
         submitButton={<UpdateFundraiserButton fundraiserId={fundraiser.id} />}
         initialExtraProjects={initialExtraProjects}
+        totalRaised={fundraiser.totalRaised}
       />
     </EditFundraiserFormProvider>
   );
