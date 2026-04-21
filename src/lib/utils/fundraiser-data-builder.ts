@@ -4,6 +4,8 @@ import type {
 } from '@/lib/types/fundraiser';
 import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
 
+import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
+
 export const DEFAULT_MODULES: FundraiserSettings['modules'] = {
   leaderboard: {
     enabled: true,
@@ -48,7 +50,7 @@ export function buildCreateFundraiserRequest(
   return {
     title: values.title,
     description: values.description,
-    country: values.country,
+    country: values.country === 'ROW' ? 'DE' : values.country, // ROW maps to DE (default workspace country) for the API
     currency: values.currency,
     goalAmount: values.goalAmount,
     visibility: values.visibility,
@@ -59,7 +61,7 @@ export function buildCreateFundraiserRequest(
       modules: DEFAULT_MODULES,
     },
     startDate: getTodayString(),
-    endDate: getDateOffsetString(30),
+    endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),
     tags: [],
     content: {},
     metadata: {},
