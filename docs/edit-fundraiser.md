@@ -39,6 +39,7 @@ src/
       fundraiser-service.ts                   ← getFundraiserByIdAuthenticated, updateFundraiser
     utils/
       fundraiser-data-builder.ts              ← buildUpdateFundraiserRequest (dirty-field projection)
+      fundraiser.ts                           ← getDaysLeft, getFundraiserUrl
 locales/
   en/fundraisers.json                         ← Fundraisers.edit.* translation keys
   de/fundraisers.json
@@ -67,6 +68,8 @@ locales/
      - FundraiserFormBody mode='edit' renders the shared layout
        - WorkspaceSelector is disabled (country/workspace change is not supported on edit)
        - ImageSelector autoLoadDefault=false (existing image is already hydrated)
+       - GoalPreview receives totalRaised and endDate from the fetched fundraiser so
+         the sidebar shows real progress and days-left instead of the create-mode stubs
      - UpdateFundraiserButton is passed as the submitButton slot
 5. User edits some fields → react-hook-form tracks formState.dirtyFields
 6. User clicks Update fundraiser:
@@ -166,14 +169,31 @@ Noteworthy schema details:
 
 ### `src/components/fundraisers/fundraiser-form-body.tsx`
 
-Shared layout for the create and edit forms. Takes a `mode: 'create' | 'edit'` and a `submitButton` ReactNode, plus optional `initialExtraProjects` / `initialAllocations` used to seed `ProjectSelection` on edit.
+Shared layout for the create and edit forms. Takes a `mode: 'create' | 'edit'` and a `submitButton` ReactNode, plus optional `initialExtraProjects` / `initialAllocations` used to seed `ProjectSelection` on edit and optional `totalRaised` / `endDate` forwarded to `GoalPreview` on edit.
 
-Two edit-specific toggles via `const isEditMode = mode === 'edit'`:
+Three edit-specific branches via `const isEditMode = mode === 'edit'`:
 
 - `ImageSelector autoLoadDefault={!isEditMode}` — on edit the image is hydrated from the fundraiser, so the "load a default image" behavior is off
 - `WorkspaceSelector disabled={isEditMode}` — the workspace (and therefore country/currency) is immutable after creation
+- `GoalPreview isEditMode totalRaised endDate` — the sidebar preview is hydrated from server data in edit mode; on create it falls back to a stubbed preview derived from the watched goal amount (see `goal-preview.tsx` below)
 
-All other sections (`Title`, `ContributionSettings`, `DescriptionInput`, `GoalInput`, `WorkspaceInfo`, `ProjectSelection`, `ThemeSettings`, `Options`, previews) are mode-agnostic and read from the form context.
+All other sections (`Title`, `ContributionSettings`, `DescriptionInput`, `GoalInput`, `WorkspaceInfo`, `ProjectSelection`, `ThemeSettings`, `Options`, `DonorsPreview`) are mode-agnostic and read from the form context.
+
+---
+
+### `src/components/fundraisers/goal-preview.tsx`
+
+Sidebar preview showing raised amount, progress bar, and days-left. Reads `goalAmount` and `currency` from the form context via `useWatch` and branches on the `isEditMode` prop:
+
+- **Create mode** — `raisedAmount` is a 40% stub of the watched goal, `progressPercentage` is locked at `PREVIEW_PROGRESS_PERCENTAGE = 40`, and `daysLeft` is the `PREVIEW_DAYS_LEFT = 42` placeholder. The preview updates live as the user types the goal.
+- **Edit mode** — uses the server values passed in by `FundraiserFormBody`:
+  - `raisedAmount = toSafeNumber(totalRaised)` — `undefined`/`null`/`NaN` collapse to `0`
+  - `progressPercentage = min(100, round(raisedAmount / goalAmount * 100))`, guarded against a zero or missing goal
+  - `daysLeft = getDaysLeft(endDate)` from `@/lib/utils/fundraiser`; if `endDate` is missing the preview falls back to `PREVIEW_DAYS_LEFT` rather than crashing
+
+Why `goalAmount` still comes from the form even in edit mode: the user can change the goal, and the progress bar should re-scale live against the new target while `raisedAmount` stays anchored to the server value.
+
+`isEditMode` is passed in as a precomputed boolean (not the raw `mode` string) to keep the component decoupled from the create/edit vocabulary — it only cares whether it has real data or needs to stub.
 
 ---
 
