@@ -1,6 +1,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { categoriesService } from '@/lib/api/categories-service';
+import { isActiveFundraiser } from '@/lib/utils/fundraiser-status';
 import { FeaturedFundraisers } from './featured-fundraisers';
 
 async function fetchFundraisers(
@@ -13,7 +14,7 @@ async function fetchFundraisers(
         sort_by: sort,
       }
     );
-    return response.fundraisers;
+    return response.fundraisers.filter(f => isActiveFundraiser(f));
   } catch (error) {
     console.error(`Failed to fetch ${sort} fundraisers:`, error);
     return [];
