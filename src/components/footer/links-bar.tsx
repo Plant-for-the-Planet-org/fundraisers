@@ -1,11 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { CookieSettingsButton } from '../cookie/cookie-settings-button';
-import { FOOTER_LINKS } from './config';
+import { FOOTER_LINKS, getFooterLinkHref } from './config';
 
 export function LinksBar() {
   const tLinks = useTranslations('Common.legalLinks');
+  const locale = useLocale();
 
   return (
     <nav className='links-bar' aria-label='Legal links'>
@@ -18,7 +19,7 @@ export function LinksBar() {
               </span>
             )}
             <a
-              href={link.href}
+              href={getFooterLinkHref(link, locale)}
               target='_blank'
               rel='noopener noreferrer'
               className='hover:text-zinc-700'
