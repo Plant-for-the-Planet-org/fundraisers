@@ -168,10 +168,10 @@ Noteworthy schema details:
 
 Shared layout for the create and edit forms. Takes a `mode: 'create' | 'edit'` and a `submitButton` ReactNode, plus optional `initialExtraProjects` / `initialAllocations` used to seed `ProjectSelection` on edit.
 
-Two edit-specific toggles via `const isEdit = mode === 'edit'`:
+Two edit-specific toggles via `const isEditMode = mode === 'edit'`:
 
-- `ImageSelector autoLoadDefault={!isEdit}` — on edit the image is hydrated from the fundraiser, so the "load a default image" behavior is off
-- `WorkspaceSelector disabled={isEdit}` — the workspace (and therefore country/currency) is immutable after creation
+- `ImageSelector autoLoadDefault={!isEditMode}` — on edit the image is hydrated from the fundraiser, so the "load a default image" behavior is off
+- `WorkspaceSelector disabled={isEditMode}` — the workspace (and therefore country/currency) is immutable after creation
 
 All other sections (`Title`, `ContributionSettings`, `DescriptionInput`, `GoalInput`, `WorkspaceInfo`, `ProjectSelection`, `ThemeSettings`, `Options`, previews) are mode-agnostic and read from the form context.
 

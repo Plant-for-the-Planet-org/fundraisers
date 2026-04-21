@@ -37,13 +37,17 @@ export function FundraiserFormBody({
   totalRaised,
   endDate,
 }: FundraiserFormBodyProps) {
-  const isEdit = mode === 'edit';
+  const isEditMode = mode === 'edit';
 
   return (
     <FundraiserLayout>
       <SidebarPanel>
-        <ImageSelector autoLoadDefault={!isEdit} />
-        <GoalPreview mode={mode} totalRaised={totalRaised} endDate={endDate} />
+        <ImageSelector autoLoadDefault={!isEditMode} />
+        <GoalPreview
+          isEditMode={isEditMode}
+          totalRaised={totalRaised}
+          endDate={endDate}
+        />
         <DonorsPreview />
         <Hosts mode='preview' />
         <ThemeSettings />
@@ -53,7 +57,7 @@ export function FundraiserFormBody({
         <ContributionSettings />
         <DescriptionInput />
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <WorkspaceSelector disabled={isEdit} />
+          <WorkspaceSelector disabled={isEditMode} />
           <GoalInput />
         </div>
         <WorkspaceInfo />

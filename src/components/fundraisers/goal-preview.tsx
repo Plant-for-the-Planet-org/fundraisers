@@ -10,7 +10,7 @@ const PREVIEW_PROGRESS_PERCENTAGE = 40;
 const PREVIEW_DAYS_LEFT = 42;
 
 interface GoalPreviewProps {
-  mode: 'create' | 'edit';
+  isEditMode: boolean;
   /** Server-reported raised amount. Required for edit mode; ignored otherwise. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Required for edit mode; ignored otherwise. */
@@ -21,7 +21,11 @@ function toSafeNumber(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
 
-export function GoalPreview({ mode, totalRaised, endDate }: GoalPreviewProps) {
+export function GoalPreview({
+  isEditMode,
+  totalRaised,
+  endDate,
+}: GoalPreviewProps) {
   const goalAmount = useWatch<CreateFundraiserFormValues, 'goalAmount'>({
     name: 'goalAmount',
   });
@@ -30,19 +34,19 @@ export function GoalPreview({ mode, totalRaised, endDate }: GoalPreviewProps) {
   });
 
   const safeGoalAmount = toSafeNumber(goalAmount);
-  const isEdit = mode === 'edit';
 
-  const raisedAmount = isEdit
+  const raisedAmount = isEditMode
     ? toSafeNumber(totalRaised)
     : Math.round((safeGoalAmount * PREVIEW_PROGRESS_PERCENTAGE) / 100);
 
-  const progressPercentage = isEdit
+  const progressPercentage = isEditMode
     ? safeGoalAmount > 0
       ? Math.min(100, Math.round((raisedAmount / safeGoalAmount) * 100))
       : 0
     : PREVIEW_PROGRESS_PERCENTAGE;
 
-  const daysLeft = isEdit && endDate ? getDaysLeft(endDate) : PREVIEW_DAYS_LEFT;
+  const daysLeft =
+    isEditMode && endDate ? getDaysLeft(endDate) : PREVIEW_DAYS_LEFT;
 
   return (
     <GoalProgressDisplay
