@@ -20,3 +20,15 @@ export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   const identifier = fundraiser.slug || fundraiser.id;
   return `/fundraisers/${identifier}`;
 }
+
+/**
+ * Days remaining until `endDate`, rounded up, never negative.
+ */
+export function getDaysLeft(endDate: string): number {
+  const end = new Date(endDate);
+  const now = new Date();
+  return Math.max(
+    0,
+    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  );
+}

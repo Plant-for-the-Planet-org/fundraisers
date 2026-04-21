@@ -26,6 +26,8 @@ interface FundraiserFormBodyProps {
   initialExtraProjects?: SelectedProject[];
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
+  /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
+  endDate?: string;
 }
 
 export function FundraiserFormBody({
@@ -33,6 +35,7 @@ export function FundraiserFormBody({
   submitButton,
   initialExtraProjects,
   totalRaised,
+  endDate,
 }: FundraiserFormBodyProps) {
   const isEdit = mode === 'edit';
 
@@ -40,7 +43,7 @@ export function FundraiserFormBody({
     <FundraiserLayout>
       <SidebarPanel>
         <ImageSelector autoLoadDefault={!isEdit} />
-        <GoalPreview mode={mode} totalRaised={totalRaised} />
+        <GoalPreview mode={mode} totalRaised={totalRaised} endDate={endDate} />
         <DonorsPreview />
         <Hosts mode='preview' />
         <ThemeSettings />
