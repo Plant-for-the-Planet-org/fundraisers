@@ -106,7 +106,7 @@ export type PaymentRequest =
 // Payment response from API
 interface PaymentResponseBase {
   id: string;
-  status: 'success' | 'action_required' | 'failed'; // TODO: confirm whether 'pending' is a real status with backend
+  status: 'success' | 'action_required' | 'failed';
 }
 
 export interface BankAccountDetails {

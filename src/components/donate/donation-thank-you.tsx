@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
 
 import { useLocale } from 'next-intl';
@@ -18,10 +19,11 @@ export function DonationThankYou({
   fundraiserSlug,
 }: DonationThankYouProps) {
   const locale = useLocale();
-  return (
-    <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
-      {/* If we add more thank you states in the future, consider moving away from a ternary and using a switch  */}
-      {thankYouState.status === 'bankTransferPending' ? (
+
+  let card: ReactNode;
+  switch (thankYouState.status) {
+    case 'bankTransferPending':
+      card = (
         <ThankYouCard
           variant='bankTransferPending'
           frequency={thankYouState.frequency}
@@ -43,10 +45,23 @@ export function DonationThankYou({
             uid={thankYouState.uid}
           />
         </ThankYouCard>
-      ) : (
-        <ThankYouCard variant='completed' />
-      )}
+      );
+      break;
+    case 'paymentProcessing':
+      card = (
+        <ThankYouCard
+          variant='paymentProcessing'
+          paymentResult={thankYouState.paymentResult}
+        />
+      );
+      break;
+    default:
+      card = <ThankYouCard variant='completed' />;
+  }
 
+  return (
+    <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
+      {card}
       <ShareSection fundraiserSlug={fundraiserSlug} />
     </div>
   );

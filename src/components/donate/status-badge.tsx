@@ -2,19 +2,33 @@
 
 import { useTranslations } from 'next-intl';
 
-type BadgeVariant = 'completed' | 'bankTransferPending';
+export type PaymentResultGroup =
+  | 'processing'
+  | 'failed'
+  | 'refunded'
+  | 'disputed'
+  | 'error';
+
+type BadgeVariant = 'completed' | 'bankTransferPending' | 'paymentProcessing';
 
 const BADGE_STYLES: Record<BadgeVariant, string> = {
   completed: 'bg-green-50 text-green-700 ring-green-600/20',
   bankTransferPending: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  paymentProcessing: 'bg-amber-50 text-amber-700 ring-amber-600/20',
 };
 
 interface StatusBadgeProps {
   variant: BadgeVariant;
+  paymentResultGroup?: PaymentResultGroup;
 }
 
-export function StatusBadge({ variant }: StatusBadgeProps) {
+export function StatusBadge({ variant, paymentResultGroup }: StatusBadgeProps) {
   const t = useTranslations('Donate.thankYou.status');
+
+  const badgeText =
+    variant === 'paymentProcessing'
+      ? t(`paymentProcessing.${paymentResultGroup ?? 'processing'}`)
+      : t(variant);
 
   return (
     <div className='inline-flex items-center gap-1.5 text-xs'>
@@ -22,7 +36,7 @@ export function StatusBadge({ variant }: StatusBadgeProps) {
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-semibold ring-1 ring-inset ${BADGE_STYLES[variant]}`}
       >
-        {t(variant)}
+        {badgeText}
       </span>
     </div>
   );

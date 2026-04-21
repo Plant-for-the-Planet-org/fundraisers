@@ -1,20 +1,40 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { DonationFrequency } from '@/lib/types/donation';
+import type {
+  DonationFrequency,
+  DonationPaymentStatus,
+} from '@/lib/types/donation';
+import type { PaymentResultGroup } from './status-badge';
 
 import { useTranslations } from 'next-intl';
 import { CircleCheckBig } from 'lucide-react';
 import { StatusBadge } from './status-badge';
 
-type ThankYouVariant = 'completed' | 'bankTransferPending';
+type ThankYouVariant =
+  | 'completed'
+  | 'bankTransferPending'
+  | 'paymentProcessing';
 
-// It may be worth discriminating the props by variant if we add more variants in the future with more divergent content requirements
+function getPaymentResultGroup(
+  paymentResult: DonationPaymentStatus
+): PaymentResultGroup {
+  if (paymentResult === 'pending' || paymentResult === 'initiated')
+    return 'processing';
+  if (paymentResult === 'failed' || paymentResult === 'canceled')
+    return 'failed';
+  if (paymentResult === 'refunded') return 'refunded';
+  if (paymentResult === 'in-dispute' || paymentResult === 'dispute-lost')
+    return 'disputed';
+  return 'error';
+}
+
 interface ThankYouCardProps {
   variant: ThankYouVariant;
   frequency?: DonationFrequency;
   formattedAmount?: string;
   children?: ReactNode;
+  paymentResult?: DonationPaymentStatus;
 }
 
 export function ThankYouCard({
@@ -22,15 +42,29 @@ export function ThankYouCard({
   frequency,
   formattedAmount,
   children,
+  paymentResult,
 }: ThankYouCardProps) {
   const t = useTranslations('Donate.thankYou');
 
-  const message =
-    variant === 'bankTransferPending'
-      ? t(`message.bankTransferPending.${frequency ?? 'once'}`, {
-          amount: formattedAmount ?? '',
-        })
-      : t('message.completed');
+  let paymentResultGroup: PaymentResultGroup | undefined;
+  let title: string;
+  let message: string;
+
+  if (variant === 'paymentProcessing') {
+    paymentResultGroup = paymentResult
+      ? getPaymentResultGroup(paymentResult)
+      : 'processing';
+    title = t(`title.paymentProcessing.${paymentResultGroup}`);
+    message = t(`message.paymentProcessing.${paymentResultGroup}`);
+  } else if (variant === 'bankTransferPending') {
+    title = t('title.bankTransferPending');
+    message = t(`message.bankTransferPending.${frequency ?? 'once'}`, {
+      amount: formattedAmount ?? '',
+    });
+  } else {
+    title = t('title.completed');
+    message = t('message.completed');
+  }
 
   return (
     <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
@@ -43,11 +77,12 @@ export function ThankYouCard({
           />
         )}
 
-        <h2 className='mb-2 text-xl font-bold text-gray-900'>
-          {t(`title.${variant}`)}
-        </h2>
+        <h2 className='mb-2 text-xl font-bold text-gray-900'>{title}</h2>
 
-        <StatusBadge variant={variant} />
+        <StatusBadge
+          variant={variant}
+          paymentResultGroup={paymentResultGroup}
+        />
 
         <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
           {message}
@@ -55,7 +90,7 @@ export function ThankYouCard({
       </div>
 
       {/* Body — transfer details or other payment-specific content */}
-      {children && <div className='px-6 py-5'>{children}</div>}
+      {children !== undefined && <div className='px-6 py-5'>{children}</div>}
     </div>
   );
 }

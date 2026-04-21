@@ -175,15 +175,36 @@
     "thankYou": {
       "title": {
         "completed": "Vielen Dank für deine Spende!",
-        "bankTransferPending": "Danke, dass du deine Spende angefangen hast"
+        "bankTransferPending": "Danke, dass du deine Spende angefangen hast",
+        "paymentProcessing": {
+          "processing": "Zahlung wird bearbeitet",
+          "failed": "Zahlung fehlgeschlagen",
+          "refunded": "Zahlung erstattet",
+          "disputed": "Zahlung wird geprüft",
+          "error": "Ein Fehler ist aufgetreten"
+        }
       },
       "status": {
         "label": "Status:",
         "completed": "Abgeschlossen",
-        "bankTransferPending": "Banküberweisung ausstehend"
+        "bankTransferPending": "Banküberweisung ausstehend",
+        "paymentProcessing": {
+          "processing": "In Bearbeitung",
+          "failed": "Fehlgeschlagen",
+          "refunded": "Erstattet",
+          "disputed": "In Prüfung",
+          "error": "Fehler"
+        }
       },
       "message": {
         "completed": "Wir haben dir eine Spendenbestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst eine steuerlich absetzbare Zuwendungsbescheinigung herunterladen.",
+        "paymentProcessing": {
+          "processing": "Deine Zahlung wird bearbeitet. Du erhältst eine E-Mail, sobald sie bestätigt wurde.",
+          "failed": "Leider war deine Zahlung nicht erfolgreich. Bitte versuche es erneut oder verwende eine andere Zahlungsmethode.",
+          "refunded": "Deine Zahlung wurde erstattet.",
+          "disputed": "Deine Zahlung wird derzeit geprüft. Bitte kontaktiere den Support, falls du Hilfe benötigst.",
+          "error": "Bei deiner Zahlung ist ein Fehler aufgetreten. Bitte kontaktiere support@plant-for-the-planet.org mit deinen Spendeninformationen."
+        },
         "bankTransferPending": {
           "monthly": "Deine monatliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
           "yearly": "Deine jährliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
