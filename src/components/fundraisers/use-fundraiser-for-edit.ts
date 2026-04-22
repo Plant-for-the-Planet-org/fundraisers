@@ -3,6 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { useAuthStore } from '@/stores/authStore';
@@ -34,6 +35,7 @@ function isUserAuthorized(
 }
 
 export function useFundraiserForEdit(slug: string): FundraiserEditState {
+  const t = useTranslations('Fundraisers.edit');
   const accessToken = useAuthStore(state => state.accessToken);
   const userId = useAuthStore(state => state.user?.sub);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
@@ -90,8 +92,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
           }
         }
 
-        const message =
-          error instanceof Error ? error.message : 'Failed to load fundraiser';
+        const message = error instanceof Error ? error.message : t('loadError');
         setState({
           status: 'error',
           fundraiser: null,
@@ -103,7 +104,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
     return () => {
       shouldIgnore = true;
     };
-  }, [accessToken, slug, isAuthInitializing, userId]);
+  }, [accessToken, slug, isAuthInitializing, userId, t]);
 
   return state;
 }

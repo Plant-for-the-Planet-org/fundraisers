@@ -268,6 +268,7 @@
       "notFoundDescription": "Dieser Spendenaufruf konnte nicht geladen werden.",
       "unauthorizedTitle": "Du bist nicht berechtigt, diesen Spendenaufruf zu bearbeiten",
       "unauthorizedDescription": "Nur Gastgeber können diesen Spendenaufruf bearbeiten.",
+      "loadError": "Spendenaufruf konnte nicht geladen werden",
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf aktualisieren...",
