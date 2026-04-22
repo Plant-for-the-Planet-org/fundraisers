@@ -48,7 +48,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
       return;
     }
 
-    const abort = { cancelled: false };
+    let shouldIgnore = false;
 
     void (async () => {
       setState({ status: 'loading', fundraiser: null, errorMessage: null });
@@ -56,7 +56,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
       try {
         const fundraiser = await getFundraiserAuthenticated(slug, accessToken);
 
-        if (abort.cancelled) return;
+        if (shouldIgnore) return;
 
         if (!isUserAuthorized(fundraiser, userId)) {
           setState({
@@ -69,7 +69,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
 
         setState({ status: 'ready', fundraiser, errorMessage: null });
       } catch (error) {
-        if (abort.cancelled) return;
+        if (shouldIgnore) return;
 
         if (error instanceof PlatformAPIError) {
           if (error.status === 404) {
@@ -101,7 +101,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
     })();
 
     return () => {
-      abort.cancelled = true;
+      shouldIgnore = true;
     };
   }, [accessToken, slug, isAuthInitializing, userId]);
 
