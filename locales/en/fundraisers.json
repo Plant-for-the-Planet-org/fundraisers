@@ -269,6 +269,8 @@
       "unauthorizedTitle": "You don't have permission to edit this fundraiser",
       "unauthorizedDescription": "Only fundraiser hosts can edit this fundraiser.",
       "loadError": "Failed to load fundraiser",
+      "errorTitle": "Something went wrong",
+      "errorDescription": "An unexpected error occurred. Please try again.",
       "backToDashboard": "Back to dashboard",
       "formSubmission": {
         "buttonProcessing": "Updating fundraiser...",

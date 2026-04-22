@@ -50,6 +50,26 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
   );
 }
 
+function StatusMessage({
+  title,
+  description,
+  backLabel,
+}: {
+  title: string;
+  description: string;
+  backLabel: string;
+}) {
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 min-h-[50vh] text-center'>
+      <h1 className='text-2xl font-semibold'>{title}</h1>
+      <p className='text-muted-foreground'>{description}</p>
+      <Button asChild variant='outline'>
+        <Link href='/dashboard'>{backLabel}</Link>
+      </Button>
+    </div>
+  );
+}
+
 function EditFundraiserBody({ slug }: { slug: string }) {
   const t = useTranslations('Fundraisers.edit');
   const state = useFundraiserForEdit(slug);
@@ -60,39 +80,31 @@ function EditFundraiserBody({ slug }: { slug: string }) {
 
   if (state.status === 'not-found') {
     return (
-      <div className='flex flex-col items-center justify-center gap-4 min-h-[50vh] text-center'>
-        <h1 className='text-2xl font-semibold'>{t('notFoundTitle')}</h1>
-        <p className='text-muted-foreground'>{t('notFoundDescription')}</p>
-        <Button asChild variant='outline'>
-          <Link href='/dashboard'>{t('backToDashboard')}</Link>
-        </Button>
-      </div>
+      <StatusMessage
+        title={t('notFoundTitle')}
+        description={t('notFoundDescription')}
+        backLabel={t('backToDashboard')}
+      />
     );
   }
 
   if (state.status === 'unauthorized') {
     return (
-      <div className='flex flex-col items-center justify-center gap-4 min-h-[50vh] text-center'>
-        <h1 className='text-2xl font-semibold'>{t('unauthorizedTitle')}</h1>
-        <p className='text-muted-foreground'>{t('unauthorizedDescription')}</p>
-        <Button asChild variant='outline'>
-          <Link href='/dashboard'>{t('backToDashboard')}</Link>
-        </Button>
-      </div>
+      <StatusMessage
+        title={t('unauthorizedTitle')}
+        description={t('unauthorizedDescription')}
+        backLabel={t('backToDashboard')}
+      />
     );
   }
 
   if (state.status === 'error' || !state.fundraiser) {
     return (
-      <div className='flex flex-col items-center justify-center gap-4 min-h-[50vh] text-center'>
-        <h1 className='text-2xl font-semibold'>{t('notFoundTitle')}</h1>
-        <p className='text-muted-foreground'>
-          {state.errorMessage ?? t('notFoundDescription')}
-        </p>
-        <Button asChild variant='outline'>
-          <Link href='/dashboard'>{t('backToDashboard')}</Link>
-        </Button>
-      </div>
+      <StatusMessage
+        title={t('errorTitle')}
+        description={state.errorMessage ?? t('errorDescription')}
+        backLabel={t('backToDashboard')}
+      />
     );
   }
 
