@@ -50,9 +50,9 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
   );
 }
 
-function EditFundraiserBody({ id }: { id: string }) {
+function EditFundraiserBody({ slug }: { slug: string }) {
   const t = useTranslations('Fundraisers.edit');
-  const state = useFundraiserForEdit(id);
+  const state = useFundraiserForEdit(slug);
 
   if (state.status === 'idle' || state.status === 'loading') {
     return <Loader text={t('loading')} />;
@@ -102,13 +102,12 @@ function EditFundraiserBody({ id }: { id: string }) {
 export default function EditFundraiserPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = use(params);
-
+  const { slug } = use(params);
   return (
     <AuthGuard>
-      <EditFundraiserBody id={id} />
+      <EditFundraiserBody slug={slug} />
     </AuthGuard>
   );
 }

@@ -4,7 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
 import { PlatformAPIError } from '@/lib/api/external-client';
-import { getFundraiserByIdAuthenticated } from '@/lib/api/fundraiser-service';
+import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { useAuthStore } from '@/stores/authStore';
 
 export type FundraiserEditStatus =
@@ -33,7 +33,7 @@ function isUserAuthorized(
   );
 }
 
-export function useFundraiserForEdit(id: string): FundraiserEditState {
+export function useFundraiserForEdit(slug: string): FundraiserEditState {
   const accessToken = useAuthStore(state => state.accessToken);
   const userId = useAuthStore(state => state.user?.sub);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
@@ -44,7 +44,7 @@ export function useFundraiserForEdit(id: string): FundraiserEditState {
   });
 
   useEffect(() => {
-    if (isAuthInitializing || !accessToken || !id) {
+    if (isAuthInitializing || !accessToken || !slug) {
       return;
     }
 
@@ -54,10 +54,7 @@ export function useFundraiserForEdit(id: string): FundraiserEditState {
       setState({ status: 'loading', fundraiser: null, errorMessage: null });
 
       try {
-        const fundraiser = await getFundraiserByIdAuthenticated(
-          id,
-          accessToken
-        );
+        const fundraiser = await getFundraiserAuthenticated(slug, accessToken);
 
         if (abort.cancelled) return;
 
@@ -106,7 +103,7 @@ export function useFundraiserForEdit(id: string): FundraiserEditState {
     return () => {
       abort.cancelled = true;
     };
-  }, [accessToken, id, isAuthInitializing, userId]);
+  }, [accessToken, slug, isAuthInitializing, userId]);
 
   return state;
 }

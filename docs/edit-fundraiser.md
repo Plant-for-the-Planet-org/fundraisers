@@ -1,6 +1,6 @@
 # Fundraiser Edit Page
 
-Documents the implementation, data flow, and architecture of the fundraiser edit page at `/dashboard/fundraisers/edit/[id]`.
+Documents the implementation, data flow, and architecture of the fundraiser edit page at `/dashboard/fundraisers/edit/[slug]`.
 
 ---
 
@@ -8,7 +8,7 @@ Documents the implementation, data flow, and architecture of the fundraiser edit
 
 The edit page lets an authenticated **owner host** update an existing fundraiser. It reuses the same form body as the create page (`FundraiserFormBody`) but differs in three ways:
 
-1. **Data source** — the form is hydrated from an authenticated `GET /fundraisers/:id` call rather than built from defaults
+1. **Data source** — the form is hydrated from an authenticated `GET /fundraisers/:slug` call rather than built from defaults
 2. **Authorization** — only users listed as an `owner` in `fundraiser.hosts` are allowed through; everyone else sees an unauthorized screen
 3. **Submission** — the submit button issues `PUT /fundraisers/:id` with **only the dirty fields** of the form, keeping the payload minimal
 
@@ -25,7 +25,7 @@ src/
       dashboard/
         fundraisers/
           edit/
-            [id]/
+            [slug]/
               page.tsx                        ← route entry; AuthGuard + status-aware body
   components/
     fundraisers/
@@ -36,7 +36,7 @@ src/
       use-fundraiser-for-edit.ts              ← client hook: fetch + authorize; returns state machine
   lib/
     api/
-      fundraiser-service.ts                   ← getFundraiserByIdAuthenticated, updateFundraiser
+      fundraiser-service.ts                   ← getFundraiserAuthenticated, updateFundraiser
     utils/
       fundraiser-data-builder.ts              ← buildUpdateFundraiserRequest (dirty-field projection)
       fundraiser.ts                           ← getDaysLeft, getFundraiserUrl
@@ -52,11 +52,11 @@ locales/
 ### Happy path (owner opens their own fundraiser)
 
 ```
-1. Browser requests /dashboard/fundraisers/edit/<id>
+1. Browser requests /dashboard/fundraisers/edit/<slug>
 2. AuthGuard renders; waits for auth store to initialize and an accessToken to be present
-3. EditFundraiserBody calls useFundraiserForEdit(id):
+3. EditFundraiserBody calls useFundraiserForEdit(slug):
      - status = 'loading'
-     - getFundraiserByIdAuthenticated(id, token) → Fundraiser
+     - getFundraiserAuthenticated(slug, token) → Fundraiser
      - isUserAuthorized(fundraiser, userId) checks hosts for { role: 'owner', user.id === userId }
      - status = 'ready'
 4. EditFundraiserContent mounts:
@@ -98,7 +98,7 @@ locales/
 
 ## Modules
 
-### `src/app/(standard)/dashboard/fundraisers/edit/[id]/page.tsx`
+### `src/app/(standard)/dashboard/fundraisers/edit/[slug]/page.tsx`
 
 Client component. The file is intentionally thin:
 
@@ -125,7 +125,7 @@ return () => {
 };
 ```
 
-Every state update checks `abort.cancelled` first so a resolved fetch for a stale id cannot overwrite the current state.
+Every state update checks `abort.cancelled` first so a resolved fetch for a stale slug cannot overwrite the current state.
 
 **Authorization rule:** `isUserAuthorized` requires a host entry where `host.user?.id === userId` **and** `host.role === 'owner'`. Admin hosts are not allowed to edit — this mirrors the platform contract and is the reason an extra `unauthorized` status exists alongside the HTTP `401`/`403` branch.
 
@@ -236,7 +236,7 @@ Fields not supported in the update payload (e.g. `country`, `currency`, `status`
 
 Two edit-related exports:
 
-- **`getFundraiserByIdAuthenticated(id, token)`** — `GET /fundraisers/:id` with `Authorization: Bearer`. Used only by `useFundraiserForEdit`; the view flow uses the slug-based fetcher instead.
+- **`getFundraiserAuthenticated(slug, token)`** — `GET /fundraisers/:slug` with `Authorization: Bearer`. Shared with the view flow (`FundraiserAuthRetry`); used by `useFundraiserForEdit` for the edit flow.
 - **`updateFundraiser(id, data, token)`** — `PUT /fundraisers/:id` with `Authorization: Bearer`. Returns the updated `Fundraiser`.
 
 ---

@@ -38,16 +38,6 @@ export const getCachedFundraiser = cache(
   }
 );
 
-export async function getFundraiserByIdAuthenticated(
-  id: string,
-  token: string
-): Promise<Fundraiser> {
-  return platformAPIClient.getAuthenticated<Fundraiser>(
-    `/fundraisers/${id}`,
-    token
-  );
-}
-
 export async function updateFundraiser(
   id: string,
   data: UpdateFundraiserRequest,
