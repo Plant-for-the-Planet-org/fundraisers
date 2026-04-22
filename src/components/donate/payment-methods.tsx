@@ -6,11 +6,10 @@ import type {
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -78,60 +77,60 @@ const MethodFeeDetails = memo(function MethodFeeDetails({
   );
 });
 
-type SelectedMethodTriggerProps = {
-  isExpanded: boolean;
-  selectedMethodLabel: string;
-  showFeeDetails: boolean;
-  selectedMethodFeeText: string | null;
-  selectedMethodFeeTooltip: string | null;
-  onToggle: () => void;
-};
+// type SelectedMethodTriggerProps = {
+//   isExpanded: boolean;
+//   selectedMethodLabel: string;
+//   showFeeDetails: boolean;
+//   selectedMethodFeeText: string | null;
+//   selectedMethodFeeTooltip: string | null;
+//   onToggle: () => void;
+// };
 
-const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
-  isExpanded,
-  selectedMethodLabel,
-  showFeeDetails,
-  selectedMethodFeeText,
-  selectedMethodFeeTooltip,
-  onToggle,
-}: SelectedMethodTriggerProps) {
-  return (
-    <button
-      type='button'
-      onClick={onToggle}
-      aria-expanded={isExpanded}
-      className={cn(
-        'w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer',
-        isExpanded ? 'rounded-t-lg' : 'rounded-lg'
-      )}
-    >
-      <div className='flex items-center gap-3'>
-        <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
-          <Check className='w-2.5 h-2.5 text-white' />
-        </div>
-        <div>
-          <span className='text-sm font-medium text-foreground'>
-            {selectedMethodLabel}
-          </span>
-          {showFeeDetails && selectedMethodFeeText && (
-            <MethodFeeDetails
-              feeText={selectedMethodFeeText}
-              feeTooltip={selectedMethodFeeTooltip}
-              containerClassName='mt-1'
-              textClassName='text-muted-foreground'
-              iconClassName='text-muted-foreground'
-            />
-          )}
-        </div>
-      </div>
-      {isExpanded ? (
-        <ChevronUp className='h-5 w-5 text-foreground' />
-      ) : (
-        <ChevronDown className='h-5 w-5 text-foreground' />
-      )}
-    </button>
-  );
-});
+// const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
+//   isExpanded,
+//   selectedMethodLabel,
+//   showFeeDetails,
+//   selectedMethodFeeText,
+//   selectedMethodFeeTooltip,
+//   onToggle,
+// }: SelectedMethodTriggerProps) {
+//   return (
+//     <button
+//       type='button'
+//       onClick={onToggle}
+//       aria-expanded={isExpanded}
+//       className={cn(
+//         'w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer',
+//         isExpanded ? 'rounded-t-lg' : 'rounded-lg'
+//       )}
+//     >
+//       <div className='flex items-center gap-3'>
+//         <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
+//           <Check className='w-2.5 h-2.5 text-white' />
+//         </div>
+//         <div>
+//           <span className='text-sm font-medium text-foreground'>
+//             {selectedMethodLabel}
+//           </span>
+//           {showFeeDetails && selectedMethodFeeText && (
+//             <MethodFeeDetails
+//               feeText={selectedMethodFeeText}
+//               feeTooltip={selectedMethodFeeTooltip}
+//               containerClassName='mt-1'
+//               textClassName='text-muted-foreground'
+//               iconClassName='text-muted-foreground'
+//             />
+//           )}
+//         </div>
+//       </div>
+//       {isExpanded ? (
+//         <ChevronUp className='h-5 w-5 text-foreground' />
+//       ) : (
+//         <ChevronDown className='h-5 w-5 text-foreground' />
+//       )}
+//     </button>
+//   );
+// });
 
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
@@ -182,10 +181,9 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 
           {methodLogo && (
             <div className='relative h-5 w-12 shrink-0'>
-              <Image
+              <img
                 src={methodLogo}
                 alt={methodLabel}
-                fill
                 className='object-contain'
               />
             </div>
@@ -335,22 +333,22 @@ export function PaymentMethods() {
     ]
   );
 
-  const selectedMethodOption = useMemo(
-    () =>
-      visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
-    [selectedPaymentMethod, visibleMethodOptions]
-  );
+  // const selectedMethodOption = useMemo(
+  //   () =>
+  //     visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
+  //   [selectedPaymentMethod, visibleMethodOptions]
+  // );
 
-  const selectedMethodLabel = selectedMethodOption
-    ? selectedMethodOption.label
-    : t('selectMethodPlaceholder');
+  // const selectedMethodLabel = selectedMethodOption
+  //   ? selectedMethodOption.label
+  //   : t('selectMethodPlaceholder');
 
-  const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
+  // const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
 
-  const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
-  const showSelectedMethodFeeDetails = Boolean(
-    feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
-  );
+  // const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
+  // const showSelectedMethodFeeDetails = Boolean(
+  //   feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
+  // );
 
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
