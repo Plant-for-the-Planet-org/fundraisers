@@ -26,6 +26,7 @@ export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
  */
 export function getDaysLeft(endDate: string): number {
   const end = new Date(endDate);
+  if (isNaN(end.getTime())) return 0;
   const now = new Date();
   return Math.max(
     0,
