@@ -24,13 +24,13 @@ export function DonateOptions() {
     useMemo(() => {
       return getDonationProcessingFeeInfo({
         paymentOptions,
-        donationAmountCents: donationData.amount,
+        donationAmountCents: donationData.amountCents,
         donationCurrency: donationData.currency,
         workspaceCountry: fundraiser.workspace?.country,
         selectedPaymentMethod,
       });
     }, [
-      donationData.amount,
+      donationData.amountCents,
       donationData.currency,
       fundraiser.workspace?.country,
       paymentOptions,
@@ -49,10 +49,10 @@ export function DonateOptions() {
         <div className='flex items-start gap-3'>
           <Controller
             control={control}
-            name='coverFees'
+            name='willAbsorbFee'
             render={({ field }) => (
               <Checkbox
-                id='coverFees'
+                id='willAbsorbFee'
                 checked={field.value}
                 onCheckedChange={field.onChange}
                 className='mt-0.5'
@@ -61,7 +61,7 @@ export function DonateOptions() {
           />
           <div className='flex flex-1 items-start gap-2'>
             <label
-              htmlFor='coverFees'
+              htmlFor='willAbsorbFee'
               className='cursor-pointer select-none text-sm font-medium text-foreground'
             >
               {t('donate.options.coverFeesLabel', {

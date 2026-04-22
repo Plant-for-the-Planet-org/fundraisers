@@ -24,7 +24,7 @@ import { PaymentMethods } from './payment-methods';
 import { useDonationSubmit } from './use-donation-submit';
 
 export interface DonationData {
-  amount: number;
+  amountCents: number;
   currency: string;
   frequency: DonationFrequency;
   dedicated: boolean;

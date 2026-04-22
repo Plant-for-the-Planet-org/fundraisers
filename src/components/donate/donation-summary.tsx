@@ -16,7 +16,7 @@ import { useDonationForm } from './donation-form-context';
 export function DonationSummary() {
   const { fundraiser, donationData, paymentOptions } = useDonationForm();
   const { watch } = useFormContext<DonationFormValues>();
-  const coverFees = watch('coverFees');
+  const willAbsorbFee = watch('willAbsorbFee');
   const makeMonthly = watch('makeMonthly');
   const selectedPaymentMethod = useWatch({
     name: 'selectedPaymentMethod',
@@ -89,13 +89,13 @@ export function DonationSummary() {
   const { hasProcessingFee, processingFeeCents } = useMemo(() => {
     return getDonationProcessingFeeInfo({
       paymentOptions,
-      donationAmountCents: donationData.amount,
+      donationAmountCents: donationData.amountCents,
       donationCurrency: donationData.currency,
       workspaceCountry: fundraiser.workspace?.country,
       selectedPaymentMethod,
     });
   }, [
-    donationData.amount,
+    donationData.amountCents,
     donationData.currency,
     fundraiser.workspace?.country,
     paymentOptions,
@@ -103,8 +103,8 @@ export function DonationSummary() {
   ]);
 
   const totalCents =
-    donationData.amount +
-    (coverFees && hasProcessingFee ? processingFeeCents : 0);
+    donationData.amountCents +
+    (willAbsorbFee && hasProcessingFee ? processingFeeCents : 0);
   const totalLabel = isMonthly
     ? t('donate.summary.totalMonthly')
     : isYearly
@@ -123,14 +123,16 @@ export function DonationSummary() {
           </dt>
           <dd className='text-foreground text-sm'>
             {formatCurrency(
-              Math.round((allocation.percentage / 100) * donationData.amount),
+              Math.round(
+                (allocation.percentage / 100) * donationData.amountCents
+              ),
               donationData.currency
             )}
           </dd>
         </div>
       ))}
 
-      {coverFees && hasProcessingFee && (
+      {willAbsorbFee && hasProcessingFee && (
         <div className='flex justify-between items-baseline gap-2'>
           <dt className='text-muted-foreground text-sm'>
             {t('donate.summary.processingFee')}
