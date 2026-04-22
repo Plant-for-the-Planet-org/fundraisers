@@ -18,6 +18,9 @@
       "retry": "Try again",
       "browse": "Browse fundraisers"
     },
+    "metadata": {
+      "fallbackTitle": "Fundraiser"
+    },
     "closedForContribution": {
       "title": "Thank you for your support!",
       "defaultMessage": "This fundraiser has been archived and no longer accepts new donations."

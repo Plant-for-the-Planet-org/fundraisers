@@ -18,6 +18,9 @@
       "retry": "Erneut versuchen",
       "browse": "Spendenaufrufe durchstöbern"
     },
+    "metadata": {
+      "fallbackTitle": "Spendenaufruf"
+    },
     "closedForContribution": {
       "title": "Vielen Dank für die Unterstützung!",
       "defaultMessage": "Dieser Spendenaufruf wurde archiviert und sammelt keine Spenden mehr."
