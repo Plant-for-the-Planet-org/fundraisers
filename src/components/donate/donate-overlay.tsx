@@ -135,13 +135,13 @@ function DonateOverlayInner({
         </div>
       )}
       <DonorInfo />
-      <GiftSummary />
       <PaymentMethods />
     </>
   );
 
   const rightColumn = (
     <>
+      <GiftSummary />
       <DonationSummary />
       {thankYouState === null && (
         <>

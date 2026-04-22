@@ -63,9 +63,39 @@ The overlay, `DonationPayload` type, and `DonationData` interface stay largely u
 
 ---
 
-## Future: GiftSummary UI
+## GiftSummary UI
 
-`GiftSummary` is a temporary placeholder component — its layout and styling are subject to design review. Currently it renders a simple labelled list of the gift details (recipient name, email if present, message if present) in the overlay's left column between `DonorInfo` and `PaymentMethods`. The final design may replace or significantly restyle this component.
+`GiftSummary` sits in the **right column of the overlay, above `DonationSummary`**. It renders only when `donationData.dedicated === true` and a gift is present.
+
+### Visual structure
+
+```
+Dedicated to John Doe
+
+  "some message goes here"
+
+An email with your message and a certificate will be sent to johndoe@example.com
+```
+
+- **Heading**: "Dedicated to {recipientName}" — `font-semibold`
+- **Message block** (conditional — only when `message` is present): the message text in a blockquote-style indent, wrapped in typographic quotes (`"…"`)
+- **Email line** (conditional — only when `recipientEmail` is present): a single sentence informing the donor that an email and certificate will be sent
+
+### Translation keys needed
+
+Under `Donate.gift` (in `locales/{en,de}/donate.json`):
+
+| Key | EN value |
+|---|---|
+| `dedicatedTo` | `Dedicated to {recipientName}` |
+| `emailNotice` | `An email with your message and a certificate will be sent to {recipientEmail}` |
+| `emailNoticeNoMessage` | `A certificate will be sent to {recipientEmail}` |
+
+(`emailNoticeNoMessage` covers the case where email is present but no message was entered.)
+
+### Placement change
+
+The component moves from the **left column** (between `DonorInfo` and `PaymentMethods`) to the **right column** (above `DonationSummary`). The left column import and render are removed; the right column gains a `<GiftSummary />` before `<DonationSummary />`.
 
 ---
 
@@ -74,18 +104,21 @@ The overlay, `DonationPayload` type, and `DonationData` interface stay largely u
 | File | Change |
 |---|---|
 | `src/lib/types/donation.ts` | `gift?: SentInvitationGift` on `DonationFormDataBase` and `DonationPayload` |
-| `src/components/donate/donate-overlay.tsx` | `gift?: SentInvitationGift` added to `DonationData`; `<GiftSummary />` in left column |
+| `src/components/donate/donate-overlay.tsx` | `gift?: SentInvitationGift` added to `DonationData`; `<GiftSummary />` moved to right column above `<DonationSummary />` |
 | `src/components/fundraisers/donation-form.tsx` | Gift state + fields rendered below checkbox; validate + pass gift in `onDonate` |
 | `src/components/fundraisers/donation-section.tsx` | Thread `gift` from `onDonate` callback into `DonationData` |
 | `src/lib/donation/payload-builder.ts` | Pass `donationData.gift` through `assembleFormData` and into `buildDonationPayload` |
 | `locales/en/fundraisers.json` | Gift field labels, placeholders, error messages |
 | `locales/de/fundraisers.json` | German equivalents |
+| `src/components/donate/gift-summary.tsx` | Redesigned read-only gift summary (heading + message blockquote + email notice) |
+| `locales/en/donate.json` | `dedicatedTo`, `emailNotice`, `emailNoticeNoMessage` keys |
+| `locales/de/donate.json` | German equivalents |
 
 ## New Files
 
 | File | Purpose |
 |---|---|
-| `src/components/donate/gift-summary.tsx` | Read-only gift details in overlay (placeholder — UI TBD) |
+| `src/components/donate/gift-summary.tsx` | Read-only gift details in overlay right column |
 
 ---
 
