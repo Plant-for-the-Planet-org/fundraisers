@@ -1,5 +1,6 @@
 'use client';
 
+import type { ComponentType } from 'react';
 import type {
   DerivedPaymentMethod,
   PaymentMethodId,
@@ -19,6 +20,12 @@ import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import ApplePayIcon from '../../../public/donation/ApplePayIcon';
+import BankIcon from '../../../public/donation/BankIcon';
+import CreditCard from '../../../public/donation/CreditCard';
+import GooglePayIcon from '../../../public/donation/GooglePayIcon';
+import PaypalIcon from '../../../public/donation/PaypalIcon';
+import SepaIcon from '../../../public/donation/SepaIcon';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   'bank-transfer': 'methods.bankTransfer',
@@ -39,13 +46,20 @@ const PROVIDER_TRANSLATION_KEYS: Record<
   planetcash: 'providers.planetcash',
 };
 
-const METHOD_LOGOS: Record<PaymentMethodId, string | null> = {
-  'bank-transfer': '/bank-transfer.png',
-  paypal: '/PayPal-Monogram-FullColor-RGB.png',
-  card: '/credit-card.png',
-  'sepa-debit': '/SepaLogoEN.jpg',
-  'apple-pay': null,
-  'google-pay': null,
+type PaymentLogoProps = {
+  textColor: string;
+};
+
+const METHOD_LOGOS: Record<
+  PaymentMethodId,
+  ComponentType<PaymentLogoProps> | null
+> = {
+  'bank-transfer': BankIcon,
+  paypal: PaypalIcon,
+  card: CreditCard,
+  'sepa-debit': SepaIcon,
+  'apple-pay': ApplePayIcon,
+  'google-pay': GooglePayIcon,
 };
 
 type MethodFeeDetailsProps = {
@@ -135,7 +149,7 @@ const MethodFeeDetails = memo(function MethodFeeDetails({
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
   methodLabel: string;
-  methodLogo?: string | null;
+  methodLogo?: ComponentType<PaymentLogoProps> | null;
   isSelected: boolean;
   showFeeDetails: boolean;
   methodFeeText: string | null;
@@ -153,6 +167,8 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   methodFeeTooltip,
   onSelect,
 }: PaymentMethodOptionProps) {
+  const MethodLogo = methodLogo;
+
   return (
     <button
       type='button'
@@ -164,9 +180,9 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
         isSelected ? 'border-foreground bg-muted' : 'border-border bg-white'
       )}
     >
-      <div className='flex items-start justify-between'>
-        <div className='flex flex-1 items-start gap-3'>
-          <div className='mt-0.5'>
+      <div className='flex items-center justify-between'>
+        <div className='flex flex-1 items-center gap-3'>
+          <div>
             <div
               className={cn(
                 'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all',
@@ -179,17 +195,13 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
             </div>
           </div>
 
-          {methodLogo && (
-            <div className='relative h-5 w-12 shrink-0'>
-              <img
-                src={methodLogo}
-                alt={methodLabel}
-                className='object-contain'
-              />
+          {MethodLogo && (
+            <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
+              <MethodLogo textColor='#4d5153' />
             </div>
           )}
 
-          <div className='flex-1 space-y-1'>
+          <div className='flex-1'>
             <span className='text-sm font-medium'>{methodLabel}</span>
           </div>
         </div>
