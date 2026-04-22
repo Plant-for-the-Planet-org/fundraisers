@@ -109,6 +109,8 @@ Client component. The file is intentionally thin:
 
 `extractInitialExtraProjects` filters out the workspace's default cause (resolved via `getDefaultCauseId(workspaceCountry)`) because that allocation is treated implicitly by `ProjectSelection` and should not appear in the "extra projects" UI.
 
+The three non-happy branches (`not-found`, `unauthorized`, `error`) all render the same layout — a centered title, description, and a "back to dashboard" link. That layout lives in a single `StatusMessage` component in the same file so the three branches only differ by the translation keys they pass in. The `error` branch also handles the `!state.fundraiser` defensive case with the same component, using `state.errorMessage ?? t('errorDescription')` so a missing or non-`Error` failure still shows a localized description.
+
 ---
 
 ### `src/components/fundraisers/use-fundraiser-for-edit.ts`
@@ -118,18 +120,18 @@ Custom hook encapsulating the fetch + authorization lifecycle. Returns a discrim
 **Auth wait:** the effect short-circuits while `isAuthInitializing` is true or `accessToken` is missing; status stays `idle`. Once the token is available, a cancellation-guarded async IIFE runs:
 
 ```ts
-const abort = { cancelled: false };
+let shouldIgnore = false;
 // ...
 return () => {
-  abort.cancelled = true;
+  shouldIgnore = true;
 };
 ```
 
-Every state update checks `abort.cancelled` first so a resolved fetch for a stale slug cannot overwrite the current state.
+Every state update checks `shouldIgnore` first so a resolved fetch for a stale slug cannot overwrite the current state.
 
 **Authorization rule:** `isUserAuthorized` requires a host entry where `host.user?.id === userId` **and** `host.role === 'owner'`. Admin hosts are not allowed to edit — this mirrors the platform contract and is the reason an extra `unauthorized` status exists alongside the HTTP `401`/`403` branch.
 
-**Error mapping:** `PlatformAPIError` statuses are folded into `not-found` / `unauthorized`; everything else becomes `error` with the error's `message` surfaced to the UI.
+**Error mapping:** `PlatformAPIError` statuses are folded into `not-found` / `unauthorized`; everything else becomes `error`. The error's `message` is surfaced to the UI when the thrown value is an `Error`; anything else falls back to the `Fundraisers.edit.loadError` translation so users never see an empty or hard-coded English string.
 
 ---
 
@@ -189,7 +191,7 @@ Sidebar preview showing raised amount, progress bar, and days-left. Reads `goalA
 - **Edit mode** — uses the server values passed in by `FundraiserFormBody`:
   - `raisedAmount = toSafeNumber(totalRaised)` — `undefined`/`null`/`NaN` collapse to `0`
   - `progressPercentage = min(100, round(raisedAmount / goalAmount * 100))`, guarded against a zero or missing goal
-  - `daysLeft = getDaysLeft(endDate)` from `@/lib/utils/fundraiser`; if `endDate` is missing the preview falls back to `PREVIEW_DAYS_LEFT` rather than crashing
+  - `daysLeft = getDaysLeft(endDate)` from `@/lib/utils/fundraiser`; if `endDate` is missing the preview falls back to `PREVIEW_DAYS_LEFT` rather than crashing. If `endDate` is present but malformed, `getDaysLeft` returns `0` instead of `NaN` so the preview still renders cleanly
 
 Why `goalAmount` still comes from the form even in edit mode: the user can change the goal, and the progress bar should re-scale live against the new target while `raisedAmount` stays anchored to the server value.
 
@@ -270,6 +272,8 @@ Keys live under `Fundraisers.edit.*` in `locales/en/fundraisers.json` and `local
 - `loading`
 - `notFoundTitle`, `notFoundDescription`
 - `unauthorizedTitle`, `unauthorizedDescription`
+- `errorTitle`, `errorDescription` — rendered by the `StatusMessage` error branch; `errorDescription` is the fallback when `state.errorMessage` is null
+- `loadError` — localized fallback used inside `useFundraiserForEdit` when the thrown failure is not an `Error` instance
 - `backToDashboard`
 - `formSubmission.buttonProcessing`, `formSubmission.buttonSubmit`
 - `formSubmission.successMessage`, `formSubmission.errorMessage`
