@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
 import { getDaysLeft } from '@/lib/utils/fundraiser';
@@ -26,10 +26,10 @@ export function GoalPreview({
   totalRaised,
   endDate,
 }: GoalPreviewProps) {
-  const goalAmount = useWatch<CreateFundraiserFormValues, 'goalAmount'>({
+  const goalAmount = useWatch<FundraiserFormValues, 'goalAmount'>({
     name: 'goalAmount',
   });
-  const currency = useWatch<CreateFundraiserFormValues, 'currency'>({
+  const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
 

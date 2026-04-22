@@ -22,8 +22,8 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 
 3. Keep create-flow RHF behavior from current implementation.
 
-- `CreateFundraiserFormValues.projectAllocations` remains the source of truth for form submission.
-- `CreateFundraiserFormValues.projectAllocations` is the source of truth for API payloads.
+- `FundraiserFormValues.projectAllocations` remains the source of truth for form submission.
+- `FundraiserFormValues.projectAllocations` is the source of truth for API payloads.
 - Selected project details are maintained in component state only.
 - Country change still resets selected projects to default non-earmarked cause (legacy create-page behavior).
 - Allocation remains derived from selected projects via utility function.

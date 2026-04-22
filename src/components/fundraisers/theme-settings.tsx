@@ -1,7 +1,7 @@
 'use client';
 
 import type { AccentColor } from '@/lib/theme/types';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useController } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
@@ -48,7 +48,7 @@ export function ThemeSettings() {
   const pathname = usePathname();
   const tTheme = useTranslations('Fundraisers.form.theme');
   const { selectedTheme, setSelectedTheme } = useThemeStore();
-  const { field } = useController<CreateFundraiserFormValues, 'settings.theme'>(
+  const { field } = useController<FundraiserFormValues, 'settings.theme'>(
     {
       name: 'settings.theme',
     }

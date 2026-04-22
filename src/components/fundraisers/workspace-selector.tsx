@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useController, useFormContext } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
@@ -28,8 +28,8 @@ export function WorkspaceSelector({
   const locale = useLocale();
   const t = useTranslations('Fundraisers.form.countryEntity');
 
-  const { setValue } = useFormContext<CreateFundraiserFormValues>();
-  const { field } = useController<CreateFundraiserFormValues, 'country'>({
+  const { setValue } = useFormContext<FundraiserFormValues>();
+  const { field } = useController<FundraiserFormValues, 'country'>({
     name: 'country',
   });
 

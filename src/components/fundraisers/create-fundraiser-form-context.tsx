@@ -14,10 +14,7 @@ import {
   fundraiserFormSchema,
 } from './fundraiser-form-schema';
 
-export {
-  fundraiserFormSchema as createFundraiserFormSchema,
-  type FundraiserFormValues as CreateFundraiserFormValues,
-} from './fundraiser-form-schema';
+export { fundraiserFormSchema as createFundraiserFormSchema } from './fundraiser-form-schema';
 
 const DevTool =
   process.env.NODE_ENV === 'development'

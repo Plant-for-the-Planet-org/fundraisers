@@ -4,12 +4,12 @@ import type {
   FundraiserSettings,
   UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
 
 export type UpdateDirtyFields = Partial<
-  Readonly<FieldNamesMarkedBoolean<CreateFundraiserFormValues>>
+  Readonly<FieldNamesMarkedBoolean<FundraiserFormValues>>
 >;
 
 function isThemeDirty(dirty: UpdateDirtyFields): boolean {
@@ -66,7 +66,7 @@ function getDateOffsetString(days: number): string {
 }
 
 export function buildUpdateFundraiserRequest(
-  values: CreateFundraiserFormValues,
+  values: FundraiserFormValues,
   dirtyFields: UpdateDirtyFields,
   imageFile?: string
 ): UpdateFundraiserRequest {
@@ -89,7 +89,7 @@ export function buildUpdateFundraiserRequest(
 }
 
 export function buildCreateFundraiserRequest(
-  values: CreateFundraiserFormValues,
+  values: FundraiserFormValues,
   imageFile?: string
 ): CreateFundraiserRequest {
   return {

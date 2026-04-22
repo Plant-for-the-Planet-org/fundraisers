@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
 import { useController, useWatch } from 'react-hook-form';
@@ -18,11 +18,11 @@ export function GoalInput() {
   const {
     field: { value, onChange, onBlur, name, ref },
     fieldState,
-  } = useController<CreateFundraiserFormValues, 'goalAmount'>({
+  } = useController<FundraiserFormValues, 'goalAmount'>({
     name: 'goalAmount',
   });
 
-  const currency = useWatch<CreateFundraiserFormValues, 'currency'>({
+  const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
   const currencySymbol = getCurrencySymbol(currency);

@@ -1,14 +1,14 @@
 'use client';
 
 import type { Control, FieldPath, FieldPathValue } from 'react-hook-form';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from './typography';
 
-type FormValues = CreateFundraiserFormValues;
+type FormValues = FundraiserFormValues;
 
 interface SwitchFieldProps<TName extends FieldPath<FormValues>> {
   control: Control<FormValues>;

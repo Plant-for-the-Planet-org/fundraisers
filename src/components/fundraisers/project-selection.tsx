@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedProject } from '@/lib/types/project-selection';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -37,10 +37,10 @@ export function ProjectSelection({
   initialExtraProjects,
 }: ProjectSelectionProps = {}) {
   const t = useTranslations('Fundraisers.form.projectSelection');
-  const { control, setValue } = useFormContext<CreateFundraiserFormValues>();
+  const { control, setValue } = useFormContext<FundraiserFormValues>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  const country = useWatch<CreateFundraiserFormValues, 'country'>({
+  const country = useWatch<FundraiserFormValues, 'country'>({
     control,
     name: 'country',
   });

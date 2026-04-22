@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedImage } from '@/lib/types/image-selection';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -36,7 +36,7 @@ export function ImageSelector({
 
   const latestImageRef = useRef<SelectedImage | null>(null);
 
-  const { control, setValue } = useFormContext<CreateFundraiserFormValues>();
+  const { control, setValue } = useFormContext<FundraiserFormValues>();
 
   const currentImage =
     (useWatch({ control, name: 'image' }) as

@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
@@ -16,7 +16,7 @@ export default function DescriptionInput() {
   const {
     control,
     formState: { errors, touchedFields, isSubmitted },
-  } = useFormContext<CreateFundraiserFormValues>();
+  } = useFormContext<FundraiserFormValues>();
 
   const hasDescriptionError = Boolean(
     (touchedFields.description || isSubmitted) && errors.description

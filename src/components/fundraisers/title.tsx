@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -52,7 +52,7 @@ function TitleInput({
     control,
     register,
     formState: { errors, touchedFields, isSubmitted },
-  } = useFormContext<CreateFundraiserFormValues>();
+  } = useFormContext<FundraiserFormValues>();
   const titleValue = useWatch({ control, name: 'title' });
 
   const resizeTextarea = useCallback((element: HTMLTextAreaElement | null) => {

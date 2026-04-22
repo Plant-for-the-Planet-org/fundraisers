@@ -2,7 +2,7 @@
 
 import type { SelectedImage } from '@/lib/types/image-selection';
 import type { UpdateDirtyFields } from '@/lib/utils/fundraiser-data-builder';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
@@ -25,12 +25,12 @@ export function UpdateFundraiserButton({
 }: UpdateFundraiserButtonProps) {
   const t = useTranslations('Fundraisers.edit.formSubmission');
   const { control, handleSubmit, reset } =
-    useFormContext<CreateFundraiserFormValues>();
+    useFormContext<FundraiserFormValues>();
   const { isDirty, dirtyFields, defaultValues } = useFormState({ control });
   const accessToken = useAuthStore(state => state.accessToken);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (values: CreateFundraiserFormValues) => {
+  const onSubmit = async (values: FundraiserFormValues) => {
     if (!accessToken || !isDirty) return;
 
     setIsSubmitting(true);
