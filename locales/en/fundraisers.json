@@ -254,7 +254,31 @@
           "yearly": "Yearly"
         },
         "customAmount": "Custom Amount",
-        "enterAmount": "Enter Amount"
+        "enterAmount": "Enter Amount",
+        "gift": {
+          "sectionTitle": "Gift Details",
+          "recipientName": {
+            "label": "Recipient Name *",
+            "placeholder": "Enter recipient's name"
+          },
+          "recipientEmail": {
+            "label": "Recipient Email",
+            "placeholder": "Enter recipient's email (optional)"
+          },
+          "message": {
+            "label": "Personal Message",
+            "placeholder": "Write a personal message (optional)"
+          },
+          "errors": {
+            "recipientName": {
+              "required": "Recipient name is required"
+            },
+            "recipientEmail": {
+              "invalid": "Please enter a valid email address",
+              "requiredWithMessage": "Email is required when a message is added"
+            }
+          }
+        }
       },
       "formSubmission": {
         "buttonProcessing": "Creating Fundraiser...",

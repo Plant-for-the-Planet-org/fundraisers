@@ -143,6 +143,7 @@ export function assembleFormData(
     frequency: calculateFrequency(donationData.frequency, values.makeMonthly),
     isAnonymous: values.isAnonymous,
     tin: values.tin?.trim() || undefined,
+    ...(donationData.gift && { gift: donationData.gift }),
   };
 
   const selectedAddressId = values.selectedAddressId || undefined;
@@ -219,6 +220,7 @@ export function buildDonationPayload(
     donorAlias,
     metadata,
     ...(isPlanetCash && { prePaid: true }),
+    ...(formData.gift && { gift: formData.gift }),
   };
 
   if (formData.type === 'authenticated') {
