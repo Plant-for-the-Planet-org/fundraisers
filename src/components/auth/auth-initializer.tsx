@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   exchangeCodeForTokens,
@@ -26,9 +26,17 @@ export function AuthInitializer() {
   );
   const setAccessToken = useAuthStore(state => state.setAccessToken);
   const clearAuth = useAuthStore(state => state.clearAuth);
+  // Guard against effect re-runs caused by URL changes (cleanUrl() removing
+  // `code`, post-callback navigation, etc.). The async init must run exactly
+  // once per mount — a re-run while the first invocation is still in flight
+  // sees an empty localStorage and kicks off a redundant silent-auth call,
+  // whose setAccessToken then overwrites the one from the original exchange.
+  const didStartInit = useRef(false);
 
   useEffect(() => {
     if (logoutSuccess === 'true') return;
+    if (didStartInit.current) return;
+    didStartInit.current = true;
     const init = async () => {
       try {
         // 1. Handle PKCE code exchange
@@ -37,7 +45,6 @@ export function AuthInitializer() {
           await setAccessToken(token);
           return;
         }
-
         // 2. Previous auth failed
         if (error === 'auth_failed') {
           console.warn('Auth previously failed, skipping silent auth');
