@@ -9,7 +9,11 @@ import type {
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check } from 'lucide-react';
+import {
+  type DonationGiftErrors,
+  type DonationGiftValues,
+  validateDonationGift,
+} from '@/lib/donation/gift-validation';
 import {
   getAvailableRecurrencyOptions,
   getContributionSettings,
@@ -20,9 +24,9 @@ import {
 import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { DonationAmounts } from './donation-amounts';
 import { DonationFrequencyDropdown } from './donation-frequency-dropdown';
+import { DonationGiftSection } from './donation-gift-section';
 
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
@@ -48,9 +52,6 @@ const recurrencyToValue = (recurrency: RecurrencyType): DonationFrequency => {
       return 'once';
   }
 };
-
-const isValidEmail = (email: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export function DonationForm({
   contributionSettings,
@@ -94,13 +95,12 @@ export function DonationForm({
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
-  const [recipientName, setRecipientName] = useState('');
-  const [recipientEmail, setRecipientEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [giftErrors, setGiftErrors] = useState<{
-    recipientName?: string;
-    recipientEmail?: string;
-  }>({});
+  const [giftValues, setGiftValues] = useState<DonationGiftValues>({
+    recipientName: '',
+    recipientEmail: '',
+    message: '',
+  });
+  const [giftErrors, setGiftErrors] = useState<DonationGiftErrors>({});
 
   const getDonateButtonText = () => {
     const amount = customAmount || selectedAmount;
@@ -124,30 +124,69 @@ export function DonationForm({
     setGiftErrors({});
   };
 
+  const handleGiftFieldChange = (
+    field: keyof DonationGiftValues,
+    value: string
+  ) => {
+    setGiftValues(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'recipientName' && giftErrors.recipientName) {
+      setGiftErrors(prev => ({ ...prev, recipientName: undefined }));
+      return;
+    }
+
+    if (
+      (field === 'recipientEmail' || field === 'message') &&
+      giftErrors.recipientEmail
+    ) {
+      setGiftErrors(prev => ({ ...prev, recipientEmail: undefined }));
+    }
+  };
+
   const handleDonate = () => {
     if (isDedicated) {
-      const errors: typeof giftErrors = {};
-      if (!recipientName.trim()) {
-        errors.recipientName = t('gift.errors.recipientName.required');
-      }
-      if (recipientEmail && !isValidEmail(recipientEmail)) {
-        errors.recipientEmail = t('gift.errors.recipientEmail.invalid');
-      } else if (message && !recipientEmail) {
-        errors.recipientEmail = t(
-          'gift.errors.recipientEmail.requiredWithMessage'
-        );
-      }
-      if (Object.keys(errors).length > 0) {
+      const validationResult = validateDonationGift(giftValues);
+
+      if (!validationResult.success) {
+        const errors: DonationGiftErrors = {};
+
+        if (validationResult.errorCodes.recipientName) {
+          errors.recipientName = t('gift.errors.recipientName.required');
+        }
+
+        if (validationResult.errorCodes.recipientEmail) {
+          if (
+            validationResult.errorCodes.recipientEmail ===
+            'recipientEmail.requiredWithMessage'
+          ) {
+            errors.recipientEmail = t(
+              'gift.errors.recipientEmail.requiredWithMessage'
+            );
+          } else {
+            errors.recipientEmail = t('gift.errors.recipientEmail.invalid');
+          }
+        }
+
         setGiftErrors(errors);
         return;
       }
 
+      const {
+        recipientName: validatedRecipientName,
+        recipientEmail: validatedRecipientEmail,
+        message: validatedMessage,
+      } = validationResult.data;
+
       const gift: SentInvitationGift = {
         type: 'invitation',
-        recipientName: recipientName.trim(),
-        ...(recipientEmail.trim() && { recipientEmail: recipientEmail.trim() }),
-        ...(message.trim() && { message: message.trim() }),
+        recipientName: validatedRecipientName,
+        ...(validatedRecipientEmail && {
+          recipientEmail: validatedRecipientEmail,
+        }),
+        ...(validatedMessage && { message: validatedMessage }),
       };
+
+      setGiftErrors({});
       onDonate(
         customAmount || selectedAmount,
         true,
@@ -190,108 +229,13 @@ export function DonationForm({
         />
 
         {settings.allow_dedication && (
-          <>
-            <div className='flex items-start gap-2.5'>
-              <div className='w-6 h-6 flex justify-start items-start gap-3'>
-                <button
-                  type='button'
-                  onClick={handleDedicationToggle}
-                  className='flex-1 self-stretch relative'
-                >
-                  <div
-                    className={`w-5 h-5 left-px top-px absolute rounded shadow-sm border flex items-center justify-center transition-all ${
-                      isDedicated
-                        ? 'bg-foreground border-foreground'
-                        : 'bg-background border-input'
-                    }`}
-                  >
-                    {isDedicated && (
-                      <Check className='w-4 h-4 text-background' />
-                    )}
-                  </div>
-                </button>
-              </div>
-              <div className='flex-1 flex flex-col gap-1'>
-                <div className='text-foreground text-sm font-semibold'>
-                  {t('giftTitle')}
-                </div>
-                <div className='text-muted-foreground text-sm font-normal'>
-                  {t('giftSubtitle')}
-                </div>
-              </div>
-            </div>
-
-            {isDedicated && (
-              <div className='flex flex-col gap-3'>
-                <div className='flex flex-col gap-1'>
-                  <label className='text-sm font-medium text-foreground'>
-                    {t('gift.recipientName.label')}
-                  </label>
-                  <Input
-                    type='text'
-                    placeholder={t('gift.recipientName.placeholder')}
-                    value={recipientName}
-                    onChange={e => {
-                      setRecipientName(e.target.value);
-                      if (giftErrors.recipientName) {
-                        setGiftErrors(prev => ({
-                          ...prev,
-                          recipientName: undefined,
-                        }));
-                      }
-                    }}
-                    className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
-                    aria-invalid={!!giftErrors.recipientName}
-                  />
-                  {giftErrors.recipientName && (
-                    <p className='text-sm text-destructive'>
-                      {giftErrors.recipientName}
-                    </p>
-                  )}
-                </div>
-
-                <div className='flex flex-col gap-1'>
-                  <label className='text-sm font-medium text-foreground'>
-                    {t('gift.recipientEmail.label')}
-                  </label>
-                  <Input
-                    type='email'
-                    placeholder={t('gift.recipientEmail.placeholder')}
-                    value={recipientEmail}
-                    onChange={e => {
-                      setRecipientEmail(e.target.value);
-                      if (giftErrors.recipientEmail) {
-                        setGiftErrors(prev => ({
-                          ...prev,
-                          recipientEmail: undefined,
-                        }));
-                      }
-                    }}
-                    className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
-                    aria-invalid={!!giftErrors.recipientEmail}
-                  />
-                  {giftErrors.recipientEmail && (
-                    <p className='text-sm text-destructive'>
-                      {giftErrors.recipientEmail}
-                    </p>
-                  )}
-                </div>
-
-                <div className='flex flex-col gap-1'>
-                  <label className='text-sm font-medium text-foreground'>
-                    {t('gift.message.label')}
-                  </label>
-                  <textarea
-                    rows={2}
-                    placeholder={t('gift.message.placeholder')}
-                    value={message}
-                    onChange={e => setMessage(e.target.value)}
-                    className='border-input placeholder:text-muted-foreground flex w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none'
-                  />
-                </div>
-              </div>
-            )}
-          </>
+          <DonationGiftSection
+            isDedicated={isDedicated}
+            values={giftValues}
+            errors={giftErrors}
+            onToggleDedicated={handleDedicationToggle}
+            onFieldChange={handleGiftFieldChange}
+          />
         )}
 
         <Button
