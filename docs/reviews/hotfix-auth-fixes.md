@@ -22,12 +22,12 @@ The security fixes are well-implemented. One regression and several maintenance 
 
 ## Security — Fixed
 
-| Fix | Mechanism |
-|---|---|
-| OAuth CSRF via `state` param | `state` is now a random nonce (`crypto.randomUUID()`); the intended `redirectTo` is stored in `sessionStorage` keyed by nonce (`oauth_state_{nonce}`) |
-| Open redirect in callback route | Nonce-lookup approach prevents attackers from injecting redirect targets through the OAuth `state` param |
-| Protocol-relative URL bypass (`//evil.com`, `/\path`) | `isAllowedRedirect()` explicitly rejects both patterns before the allowlist check |
-| Render-phase `router.replace()` side-effects | All `router.replace()` calls moved into `useEffect` |
+| Fix                                                   | Mechanism                                                                                                                                             |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OAuth CSRF via `state` param                          | `state` is now a random nonce (`crypto.randomUUID()`); the intended `redirectTo` is stored in `sessionStorage` keyed by nonce (`oauth_state_{nonce}`) |
+| Open redirect in callback route                       | Nonce-lookup approach prevents attackers from injecting redirect targets through the OAuth `state` param                                              |
+| Protocol-relative URL bypass (`//evil.com`, `/\path`) | `isAllowedRedirect()` explicitly rejects both patterns before the allowlist check                                                                     |
+| Render-phase `router.replace()` side-effects          | All `router.replace()` calls moved into `useEffect`                                                                                                   |
 
 ---
 
@@ -59,6 +59,7 @@ localStorage.removeItem('access_token');
 `localStorage` is shared across same-origin frames. If this races against the main page's `setAccessToken` (which writes to `localStorage` after `loadUserProfile()` resolves), it **deletes the just-stored token from `localStorage`**. The Zustand store stays authenticated for the current session, but the token won't survive a page refresh — silent auth silently fails to persist.
 
 **Recommended fix:**
+
 ```ts
 // auth-initializer.tsx — top of the init useEffect
 if (typeof window !== 'undefined' && window.self !== window.top) return;
@@ -87,7 +88,7 @@ When `RedirectingPage` calls `router.replace('/dashboard')`, `useSearchParams()`
 
 - [ ] **Fix:** Extend `PROTECTED_PATH` to cover all auth-required routes, or invert the logic to a public-path allowlist
 
-**File:** `src/lib/constants/auth.ts`, `src/stores/authStore.ts:106-112`
+**File:** `src/lib/constants/auth.ts`, `src/stores/auth-store.ts:106-112`
 
 Logging out from e.g. `/fundraisers/create` redirects the user back to `/fundraisers/create` after Auth0 clears the session. `AuthGuard` then boots them to `/login` — a two-step redirect that exposes the login page on every logout from an authenticated fundraiser route.
 
@@ -96,6 +97,7 @@ Root cause: `PROTECTED_PATH = ['/dashboard']` is too narrow. `/dashboard` logout
 The `isAllowedRedirect` fix suggested for the medium issue below would not catch this either — `/fundraisers/create` is in the allowed roots.
 
 **Options:**
+
 - Extend `PROTECTED_PATH` to include `/fundraisers/create` (and any other auth-only sub-paths)
 - Invert the model: maintain an explicit public-path allowlist for post-logout redirects and default everything else to `DEFAULT_REDIRECT_PATH`
 
@@ -105,17 +107,18 @@ The `isAllowedRedirect` fix suggested for the medium issue below would not catch
 
 - [ ] **Fix:** Apply `getSafeRedirectPath` to `redirectAfterLogout` in `authStore.logout()`
 
-**File:** `src/stores/authStore.ts:106-127`
+**File:** `src/stores/auth-store.ts:106-127`
 
 ```ts
 const safeRedirect = isProtectedRoute(redirectAfterLogout)
   ? DEFAULT_REDIRECT_PATH
-  : redirectAfterLogout;  // validated only against PROTECTED_PATH, not ALLOWED_REDIRECT_ROOTS
+  : redirectAfterLogout; // validated only against PROTECTED_PATH, not ALLOWED_REDIRECT_ROOTS
 ```
 
 Any non-protected path the user is on gets embedded in the Auth0 `returnTo` URL without being checked against the allowlist. It's validated at receipt by `getSafeRedirectPath()` in `/redirecting`, so there is no open-redirect risk — but it's inconsistent with the validation posture applied everywhere else and could mislead future maintainers.
 
 **Recommended fix:**
+
 ```ts
 const safeRedirect = getSafeRedirectPath(redirectAfterLogout);
 ```
@@ -136,6 +139,7 @@ if (nonce) {
 ```
 
 Simplify:
+
 ```ts
 if (nonce) {
   const redirectTo = getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH;
@@ -190,32 +194,32 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 
 ## PR Description vs. Actual Code
 
-| Claim | Verdict |
-|---|---|
-| OAuth CSRF fix via nonce | ✅ Accurate |
-| sessionStorage nonce storage & cleanup | ✅ Accurate |
-| `/redirecting` page introduction | ✅ Accurate |
-| Simplified `/api/auth/callback` | ✅ Accurate |
-| Settled flag, error detection, iframe ordering | ✅ Accurate |
-| In-memory verifier for silent auth | ✅ Accurate |
-| Prevent login page for authenticated users | ✅ Accurate |
-| Increased timeout to 5s | ✅ Code correct — ❌ JSDoc on `getAccessTokenSilently` still says "3s" (`auth0-config.ts:121`) |
-| Decoupled exchange from redirect (race-free) | ❌ `AuthInitializer` and `RedirectingPage` run concurrently on the same URL; new races introduced, not eliminated |
-| Simplified AuthGuard by removing redirect useEffect | ❌ AuthGuard still has two `useEffect` blocks with `router.replace()` calls; render-phase redirect was moved *into* a useEffect, not removed |
-| `RedirectPath` branded type safety | ❌ Not mentioned — a meaningful cross-cutting change across 5+ files that reviewers won't know to look for |
-| `logout()` redirect validation gap | ❌ Not disclosed — inconsistent with the validation posture the PR establishes everywhere else |
+| Claim                                               | Verdict                                                                                                                                      |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| OAuth CSRF fix via nonce                            | ✅ Accurate                                                                                                                                  |
+| sessionStorage nonce storage & cleanup              | ✅ Accurate                                                                                                                                  |
+| `/redirecting` page introduction                    | ✅ Accurate                                                                                                                                  |
+| Simplified `/api/auth/callback`                     | ✅ Accurate                                                                                                                                  |
+| Settled flag, error detection, iframe ordering      | ✅ Accurate                                                                                                                                  |
+| In-memory verifier for silent auth                  | ✅ Accurate                                                                                                                                  |
+| Prevent login page for authenticated users          | ✅ Accurate                                                                                                                                  |
+| Increased timeout to 5s                             | ✅ Code correct — ❌ JSDoc on `getAccessTokenSilently` still says "3s" (`auth0-config.ts:121`)                                               |
+| Decoupled exchange from redirect (race-free)        | ❌ `AuthInitializer` and `RedirectingPage` run concurrently on the same URL; new races introduced, not eliminated                            |
+| Simplified AuthGuard by removing redirect useEffect | ❌ AuthGuard still has two `useEffect` blocks with `router.replace()` calls; render-phase redirect was moved _into_ a useEffect, not removed |
+| `RedirectPath` branded type safety                  | ❌ Not mentioned — a meaningful cross-cutting change across 5+ files that reviewers won't know to look for                                   |
+| `logout()` redirect validation gap                  | ❌ Not disclosed — inconsistent with the validation posture the PR establishes everywhere else                                               |
 
 ---
 
 ## Summary
 
-| Severity | Issue | Status |
-|---|---|---|
-| 🔴 High | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [ ] Open |
-| 🔴 High | Logout from authenticated `/fundraisers/*` routes bounces user to `/login` | [ ] Open |
-| 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams` | [ ] Open |
-| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL | [ ] Open |
-| 🟢 Low | Dead-code ternary in `redirecting/page.tsx` | [ ] Open |
-| 🟢 Low | `getValidStoredToken` / `cleanUrl` lack SSR guards | [ ] Open |
-| 🟢 Low | `getSignInPath` redundant `window.location` read | [ ] Open |
-| 🟢 Low | `AuthGuard` carries error query params through `redirectTo` | [ ] Open |
+| Severity  | Issue                                                                                                          | Status   |
+| --------- | -------------------------------------------------------------------------------------------------------------- | -------- |
+| 🔴 High   | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [ ] Open |
+| 🔴 High   | Logout from authenticated `/fundraisers/*` routes bounces user to `/login`                                     | [ ] Open |
+| 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [ ] Open |
+| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [ ] Open |
+| 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [ ] Open |
+| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [ ] Open |
+| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open |
+| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open |
