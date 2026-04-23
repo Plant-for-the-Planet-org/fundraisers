@@ -62,46 +62,68 @@ export function DonationGiftSection({
       {isDedicated && (
         <div className='flex flex-col gap-3'>
           <div className='flex flex-col gap-1'>
-            <label className='text-sm font-medium text-foreground'>
+            <label
+              htmlFor='gift-recipient-name'
+              className='text-sm font-medium text-foreground'
+            >
               {t('gift.recipientName.label')}
             </label>
             <Input
+              id='gift-recipient-name'
               type='text'
               placeholder={t('gift.recipientName.placeholder')}
               value={values.recipientName}
               onChange={e => onFieldChange('recipientName', e.target.value)}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
               aria-invalid={!!errors.recipientName}
+              aria-describedby='gift-recipient-name-error'
             />
             {errors.recipientName && (
-              <p className='text-sm text-destructive'>{errors.recipientName}</p>
+              <p
+                id='gift-recipient-name-error'
+                className='text-sm text-destructive'
+              >
+                {errors.recipientName}
+              </p>
             )}
           </div>
 
           <div className='flex flex-col gap-1'>
-            <label className='text-sm font-medium text-foreground'>
+            <label
+              htmlFor='gift-recipient-email'
+              className='text-sm font-medium text-foreground'
+            >
               {t('gift.recipientEmail.label')}
             </label>
             <Input
+              id='gift-recipient-email'
               type='email'
               placeholder={t('gift.recipientEmail.placeholder')}
               value={values.recipientEmail}
               onChange={e => onFieldChange('recipientEmail', e.target.value)}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
               aria-invalid={!!errors.recipientEmail}
+              aria-describedby='gift-recipient-email-error'
             />
             {errors.recipientEmail && (
-              <p className='text-sm text-destructive'>
+              <p
+                id='gift-recipient-email-error'
+                className='text-sm text-destructive'
+              >
                 {errors.recipientEmail}
               </p>
             )}
           </div>
 
           <div className='flex flex-col gap-1'>
-            <label className='text-sm font-medium text-foreground'>
+            <label
+              htmlFor='gift-message'
+              className='text-sm font-medium text-foreground'
+            >
               {t('gift.message.label')}
             </label>
             <Textarea
+              id='gift-message'
               rows={2}
               placeholder={t('gift.message.placeholder')}
               value={values.message}
