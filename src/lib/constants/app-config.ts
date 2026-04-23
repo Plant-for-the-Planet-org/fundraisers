@@ -15,4 +15,5 @@ const env = envSchema.parse({
 });
 
 export const API_BASE_URL = env.NEXT_PUBLIC_API_BASE_URL;
+export const PLATFORM_BASE_URL = 'https://web.plant-for-the-planet.org';
 export const CDN_BASE_URL = env.NEXT_PUBLIC_CDN_URL;

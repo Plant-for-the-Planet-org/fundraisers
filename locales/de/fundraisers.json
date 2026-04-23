@@ -18,6 +18,9 @@
       "retry": "Erneut versuchen",
       "browse": "Spendenaufrufe durchstöbern"
     },
+    "metadata": {
+      "fallbackTitle": "Spendenaufruf"
+    },
     "closedForContribution": {
       "title": "Vielen Dank für die Unterstützung!",
       "defaultMessage": "Dieser Spendenaufruf wurde archiviert und sammelt keine Spenden mehr."
@@ -173,7 +176,8 @@
       "goal": {
         "label": "Spenden-Ziel",
         "errors": {
-          "required": "Bitte gib ein Spenden-Ziel ein."
+          "required": "Bitte gib ein Spenden-Ziel ein.",
+          "minAmount": "Das Ziel muss mindestens {formattedAmount} betragen."
         }
       },
       "projectSelection": {
@@ -181,7 +185,7 @@
         "viewModeSectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden",
         "addCause": "Projekt hinzufügen",
         "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}%-Zuweisung",
+        "allocationLabel": "{percentage, number} % Zuweisung",
         "projectImageAlt": "Bild für {name}",
         "expandDescription": "Mehr lesen",
         "collapseDescription": "Weniger lesen",

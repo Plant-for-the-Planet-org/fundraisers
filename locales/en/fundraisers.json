@@ -18,6 +18,9 @@
       "retry": "Try again",
       "browse": "Browse fundraisers"
     },
+    "metadata": {
+      "fallbackTitle": "Fundraiser"
+    },
     "closedForContribution": {
       "title": "Thank you for your support!",
       "defaultMessage": "This fundraiser has been archived and no longer accepts new donations."
@@ -173,7 +176,8 @@
       "goal": {
         "label": "Fundraiser Goal",
         "errors": {
-          "required": "Please enter a fundraiser goal."
+          "required": "Please enter a fundraiser goal.",
+          "minAmount": "Goal must be at least {formattedAmount}."
         }
       },
       "projectSelection": {

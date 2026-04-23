@@ -6,6 +6,14 @@ import { donationService } from '../api/donation-service';
 import { paymentService } from '../api/payment-service';
 import { buildPaymentRequest } from '../utils/payment-request-builder';
 
+function cleanPaymentDetails(
+  details: Record<string, string | number | boolean | undefined>
+): Record<string, string | number | boolean> {
+  return Object.fromEntries(
+    Object.entries(details).filter(([_key, value]) => value !== undefined)
+  ) as Record<string, string | number | boolean>;
+}
+
 interface SubmitStandardDonationOptions {
   payload: DonationPayload;
   token: string | undefined;
@@ -13,7 +21,7 @@ interface SubmitStandardDonationOptions {
   paymentIdempotencyKey: string;
   selectedPaymentMethod: PaymentMethod;
   paymentOptions: PaymentOptions;
-  paymentDetails: Record<string, string | number | boolean>;
+  paymentDetails: Record<string, string | number | boolean | undefined>;
 }
 
 /** Standard payment: Two-step flow — create donation, then process payment */
@@ -46,7 +54,7 @@ export async function submitStandardDonation({
       : {
           donationId: donationResponse.donationId,
           paymentMethod: selectedPaymentMethod,
-          paymentDetails,
+          paymentDetails: cleanPaymentDetails(paymentDetails),
         };
 
   const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);

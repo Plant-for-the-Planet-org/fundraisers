@@ -42,3 +42,6 @@ next-env.d.ts
 
 # next-intl generated message type declarations
 locales/**/*.d.json.ts
+
+# Sentry Config File
+.env.sentry-build-plugin

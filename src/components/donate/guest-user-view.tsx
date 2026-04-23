@@ -1,6 +1,7 @@
 import { AddressForm } from './address-form';
 import { AnonymousDonationField } from './anonymous-donation-field';
 import { DonorIdentityFields } from './donor-identity-fields';
+import { TinField } from './tin-field';
 
 export const GuestUserView = () => {
   return (
@@ -8,6 +9,7 @@ export const GuestUserView = () => {
       <DonorIdentityFields />
       <AnonymousDonationField />
       <AddressForm />
+      <TinField />
     </>
   );
 };

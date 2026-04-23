@@ -1,3 +1,5 @@
+import type { BankAccountDetails } from './payment';
+
 // TODO: evaluate if the DonationResponse interface is accurate
 export interface DonationResponse {
   success: boolean;
@@ -8,6 +10,32 @@ export interface DonationResponse {
   frequency: DonationFrequency;
   message?: string;
   errors?: Record<string, string>;
+}
+
+// Confirmed with backend. Practically: 'pending', 'initiated', 'paid'.
+// Terminal non-paid statuses are unlikely after a successful PUT but enumerated for completeness.
+// 'draft' is never returned once a payment exists.
+export type DonationPaymentStatus =
+  | 'pending'
+  | 'initiated'
+  | 'paid'
+  | 'failed'
+  | 'canceled'
+  | 'refunded'
+  | 'referred'
+  | 'in-dispute'
+  | 'dispute-lost';
+
+export interface DonationStatusResponse {
+  id: string;
+  gateway: string;
+  paymentStatus: DonationPaymentStatus;
+  paymentDate: string | null; // null while pending, populated once settled
+  uid: string;
+  amount: number;
+  currency: string;
+  frequency: string | null;
+  account?: BankAccountDetails; // present for offline (bank transfer) donations
 }
 
 export interface LineItem {
@@ -32,6 +60,7 @@ export interface DonorInfo {
   state?: string;
   country?: string;
   companyname?: string;
+  tin: string | null;
 }
 
 export interface CustomFieldValue {
@@ -45,7 +74,7 @@ export interface DonationMetadata {
   utm_campaign: string; // fundraiser ID
   fundraiser: {
     id: string;
-    source: string;
+    source?: string;
     referrer?: string;
     user_id?: string;
     privacy: {
@@ -61,6 +90,7 @@ interface DonationFormDataBase {
   currency: string;
   frequency: DonationFrequency;
   isAnonymous: boolean;
+  tin?: string;
 }
 
 export interface AuthenticatedFormData extends DonationFormDataBase {
@@ -88,25 +118,12 @@ export type DonationFormData = AuthenticatedFormData | GuestFormData;
 
 export type DonationFrequency = 'once' | 'monthly' | 'yearly';
 
-interface DonationPayloadBase {
+export interface DonationPayload {
   currency: string;
   frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
   prePaid?: boolean;
-}
-
-export interface AuthenticatedDonationPayload extends DonationPayloadBase {
-  receiptAddress: string;
-  donor?: never;
-}
-
-export interface GuestDonationPayload extends DonationPayloadBase {
   donor: DonorInfo;
-  receiptAddress?: never;
 }
-
-export type DonationPayload =
-  | AuthenticatedDonationPayload
-  | GuestDonationPayload;

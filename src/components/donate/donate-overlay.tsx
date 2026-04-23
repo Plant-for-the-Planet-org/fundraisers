@@ -3,10 +3,16 @@
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { StripeCardFormHandle } from './stripe-card-form';
+import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocale } from 'next-intl';
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '@/lib/utils/get-stripe';
 import { DonateCTA } from './donate-cta';
+import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 import { DonateOverlaySkeleton } from './donate-overlay-skeleton';
 import { DonationFailureBanner } from './donation-failure-banner';
@@ -78,6 +84,15 @@ function DonateOverlayInner({
   onClose: () => void;
   isOpen: boolean;
 }) {
+  const locale = useLocale();
+  const sepaFormRef = useRef<StripeSepaFormHandle>(null);
+  const cardFormRef = useRef<StripeCardFormHandle>(null);
+
+  const stripeConfig = paymentOptions.gateways.stripe;
+  const stripePromise = stripeConfig
+    ? getStripe(stripeConfig.authorization.stripePublishableKey, locale)
+    : null;
+
   const {
     onSubmit,
     donationState,
@@ -85,8 +100,24 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
-  } = useDonationSubmit(donationData, fundraiser, paymentOptions);
+  } = useDonationSubmit(
+    donationData,
+    fundraiser,
+    paymentOptions,
+    sepaFormRef,
+    cardFormRef
+  );
   const { thankYouState, error, isLoading } = donationState;
+
+  const errorBannerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error?.code) {
+      errorBannerRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [error?.code]);
 
   const leftColumn = thankYouState ? (
     <DonationThankYou
@@ -96,7 +127,9 @@ function DonateOverlayInner({
   ) : (
     <>
       {error?.code && (
-        <DonationFailureBanner errorCode={error.code} reset={reset} />
+        <div ref={errorBannerRef}>
+          <DonationFailureBanner errorCode={error.code} reset={reset} />
+        </div>
       )}
       <DonorInfo />
       <PaymentMethods />
@@ -107,31 +140,38 @@ function DonateOverlayInner({
     <>
       <DonationSummary />
       {thankYouState === null && (
-        <DonateCTA
-          isLoading={isLoading}
-          isSuccess={false}
-          onPayPalCreateOrder={onPayPalCreateOrder}
-          onPayPalApproved={onPayPalApproved}
-          onPayPalError={onPayPalError}
-        />
+        <>
+          <DonateOptions />
+          <DonateCTA
+            isLoading={isLoading}
+            isSuccess={false}
+            onPayPalCreateOrder={onPayPalCreateOrder}
+            onPayPalApproved={onPayPalApproved}
+            onPayPalError={onPayPalError}
+          />
+        </>
       )}
     </>
   );
 
   return createPortal(
-    <DonationFormProvider
-      fundraiser={fundraiser}
-      donationData={donationData}
-      paymentOptions={paymentOptions}
-      onSubmit={onSubmit}
-      isOpen={isOpen}
-    >
-      <DonateOverlayLayout
-        onClose={onClose}
-        leftColumn={leftColumn}
-        rightColumn={rightColumn}
-      />
-    </DonationFormProvider>,
+    <Elements stripe={stripePromise}>
+      <DonationFormProvider
+        fundraiser={fundraiser}
+        donationData={donationData}
+        paymentOptions={paymentOptions}
+        onSubmit={onSubmit}
+        sepaFormRef={sepaFormRef}
+        cardFormRef={cardFormRef}
+        isOpen={isOpen}
+      >
+        <DonateOverlayLayout
+          onClose={onClose}
+          leftColumn={leftColumn}
+          rightColumn={rightColumn}
+        />
+      </DonationFormProvider>
+    </Elements>,
     document.body
   );
 }

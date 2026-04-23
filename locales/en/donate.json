@@ -25,6 +25,10 @@
       "lastName": {
         "label": "Last Name *",
         "placeholder": "Last name"
+      },
+      "tin": {
+        "label": "TIN (Tax Identification Number) *",
+        "placeholder": "Enter your TIN"
       }
     },
     "userAddress": {
@@ -95,11 +99,62 @@
       "email": {
         "required": "Email is required",
         "invalid": "Please enter a valid email address"
+      },
+      "tin": {
+        "required": "TIN is required"
       }
+    },
+    "sepa": {
+      "ibanLabel": "IBAN",
+      "ibanRequired": "IBAN is required",
+      "accountHolderName": "Account Holder Name",
+      "accountHolderNameRequired": "Account holder name is required",
+      "mandateTitle": "SEPA Direct Debit Mandate",
+      "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
+      "creditor": "Creditor",
+      "creditorName": "Plant-for-the-Planet Foundation",
+      "creditorId": "Creditor ID",
+      "mandateRights": "Your rights: You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
+      "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
+      "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
+    },
+    "card": {
+      "cardNumberLabel": "Card Number",
+      "cardNumberRequired": "Card number is required",
+      "expiryLabel": "Expiry Date",
+      "expiryRequired": "Expiry date is required",
+      "cvcLabel": "CVC",
+      "cvcRequired": "CVC is required",
+      "cardholderNameLabel": "Cardholder Name *",
+      "cardholderNamePlaceholder": "Enter cardholder name",
+      "cardholderNameRequired": "Cardholder name is required",
+      "useDonorAddressLabel": "Use billing address from my donor info",
+      "address": {
+        "label": "Address *",
+        "placeholder": "Enter address",
+        "required": "Address is required"
+      },
+      "address2": {
+        "label": "Address Line 2",
+        "placeholder": "Apartment, suite, unit, etc."
+      },
+      "cityLabel": "City *",
+      "cityPlaceholder": "Enter city",
+      "cityRequired": "City is required",
+      "stateLabel": "State / Province",
+      "statePlaceholder": "Enter state or province",
+      "billingZipCodeLabel": "Zip / Postal Code *",
+      "billingZipCodePlaceholder": "Enter zip or postal code",
+      "billingZipCodeRequired": "Zip code is required",
+      "countryLabel": "Country *",
+      "countryRequired": "Country is required",
+      "countryPlaceholder": "Select country",
+      "countryNoResults": "No countries found"
     },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
+      "timeout": "The request took too long. Please try again.",
       "server": "Server error. Please try again in a few moments.",
       "rateLimit": "Too many requests. Please wait a moment and try again.",
       "donationCreation": "Failed to create donation. Please try again.",
@@ -123,15 +178,36 @@
     "thankYou": {
       "title": {
         "completed": "Thank You for Your Donation!",
-        "bankTransferPending": "Thank you for Initiating Your Donation"
+        "bankTransferPending": "Thank you for Initiating Your Donation",
+        "paymentProcessing": {
+          "processing": "Payment in Progress",
+          "failed": "Payment Unsuccessful",
+          "refunded": "Payment Refunded",
+          "disputed": "Payment Under Review",
+          "error": "Something Went Wrong"
+        }
       },
       "status": {
         "label": "Status:",
         "completed": "Completed",
-        "bankTransferPending": "Bank transfer pending"
+        "bankTransferPending": "Bank transfer pending",
+        "paymentProcessing": {
+          "processing": "Processing",
+          "failed": "Unsuccessful",
+          "refunded": "Refunded",
+          "disputed": "Under Review",
+          "error": "Error"
+        }
       },
       "message": {
         "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
+        "paymentProcessing": {
+          "processing": "Your payment is being processed. You will receive an email when it is confirmed.",
+          "failed": "Unfortunately, your payment was unsuccessful. Please try again or use a different payment method.",
+          "refunded": "Your payment has been refunded.",
+          "disputed": "Your payment is currently under review. Please contact support if you need assistance.",
+          "error": "An error occurred with your payment. Please contact support@plant-for-the-planet.org with your donation details."
+        },
         "bankTransferPending": {
           "monthly": "Your monthly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
           "yearly": "Your yearly donation of {amount} has been initiated. To complete your donation, please set up an appropriate standing order with your bank to the account specified below. This information was also emailed to you.",
