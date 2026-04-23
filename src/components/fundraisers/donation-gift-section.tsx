@@ -24,7 +24,7 @@ export function DonationGiftSection({
   onToggleDedicated,
   onFieldChange,
 }: DonationGiftSectionProps) {
-  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const t = useTranslations('Fundraisers.form.contributionSettings');
 
   return (
     <>
