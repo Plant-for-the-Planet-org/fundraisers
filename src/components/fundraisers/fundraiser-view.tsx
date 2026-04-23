@@ -3,6 +3,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { useTranslations } from 'next-intl';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
+import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
@@ -16,15 +17,6 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
-
-function getDaysLeft(endDate: string): number {
-  const end = new Date(endDate);
-  const now = new Date();
-  return Math.max(
-    0,
-    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  );
-}
 
 export function FundraiserView({
   fundraiser,

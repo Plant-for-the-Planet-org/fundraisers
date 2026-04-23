@@ -1,15 +1,62 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { Control, FieldPath, FieldPathValue } from 'react-hook-form';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from './typography';
 
+type FormValues = FundraiserFormValues;
+
+interface SwitchFieldProps<TName extends FieldPath<FormValues>> {
+  control: Control<FormValues>;
+  name: TName;
+  label: string;
+  description: string;
+  descriptionId: string;
+  onValue: FieldPathValue<FormValues, TName>;
+  offValue: FieldPathValue<FormValues, TName>;
+}
+
+function SwitchField<TName extends FieldPath<FormValues>>({
+  control,
+  name,
+  label,
+  description,
+  descriptionId,
+  onValue,
+  offValue,
+}: SwitchFieldProps<TName>) {
+  return (
+    <label className='flex cursor-pointer items-center justify-between'>
+      <div className='flex flex-col'>
+        <span className='text-sm font-medium'>{label}</span>
+        <span id={descriptionId} className='text-xs text-muted-foreground'>
+          {description}
+        </span>
+      </div>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <Switch
+            aria-describedby={descriptionId}
+            checked={field.value === onValue}
+            onCheckedChange={checked =>
+              field.onChange(checked ? onValue : offValue)
+            }
+          />
+        )}
+      />
+    </label>
+  );
+}
+
 export function Options() {
-  const { control } = useFormContext<CreateFundraiserFormValues>();
-  const t = useTranslations('Fundraisers.create.options');
+  const { control } = useFormContext<FormValues>();
+  const t = useTranslations('Fundraisers.form.options');
 
   return (
     <div
@@ -19,49 +66,25 @@ export function Options() {
     >
       <SectionHeader>{t('sectionHeading')}</SectionHeader>
 
-      <label className='flex cursor-pointer items-center justify-between'>
-        <div className='flex flex-col'>
-          <span className='text-sm font-medium'>{t('status.label')}</span>
-          <span id='status-desc' className='text-xs text-muted-foreground'>
-            {t('status.description')}
-          </span>
-        </div>
-        <Controller
-          control={control}
-          name='status'
-          render={({ field }) => (
-            <Switch
-              aria-describedby='status-desc'
-              checked={field.value === 'active'}
-              onCheckedChange={checked =>
-                field.onChange(checked ? 'active' : 'draft')
-              }
-            />
-          )}
-        />
-      </label>
+      <SwitchField
+        control={control}
+        name='status'
+        label={t('status.label')}
+        description={t('status.description')}
+        descriptionId='status-desc'
+        onValue='active'
+        offValue='draft'
+      />
 
-      <label className='flex cursor-pointer items-center justify-between'>
-        <div className='flex flex-col'>
-          <span className='text-sm font-medium'>{t('visibility.label')}</span>
-          <span id='visibility-desc' className='text-xs text-muted-foreground'>
-            {t('visibility.description')}
-          </span>
-        </div>
-        <Controller
-          control={control}
-          name='visibility'
-          render={({ field }) => (
-            <Switch
-              aria-describedby='visibility-desc'
-              checked={field.value === 'public'}
-              onCheckedChange={checked =>
-                field.onChange(checked ? 'public' : 'unlisted')
-              }
-            />
-          )}
-        />
-      </label>
+      <SwitchField
+        control={control}
+        name='visibility'
+        label={t('visibility.label')}
+        description={t('visibility.description')}
+        descriptionId='visibility-desc'
+        onValue='public'
+        offValue='unlisted'
+      />
     </div>
   );
 }

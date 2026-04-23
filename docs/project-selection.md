@@ -22,10 +22,10 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 
 3. Keep create-flow RHF behavior from current implementation.
 
-- `CreateFundraiserFormValues.projectAllocations` remains the source of truth for form submission.
-- `CreateFundraiserFormValues.projectAllocations` is the source of truth for API payloads.
-- Selected project details are maintained in component state only.
-- Country change still resets selected projects to default non-earmarked cause (legacy create-page behavior).
+- `FundraiserFormValues.projectAllocations` is the single source of truth for both the UI and the API payload; the component reads it via `useWatch` rather than keeping a parallel `extraProjects` state.
+- Presentation-only project metadata (name, description, image) is cached in a local `sessionProjectDetails` map, merged with any `initialExtraProjects` prop into `projectDetailsById`. This map is never written back to the form.
+- Allocation writes go through a single `commitAllocations(nextIds)` helper that re-derives percentages via `calculateProjectAllocations` and calls `setValue('projectAllocations', …, { shouldDirty: true, shouldValidate: true })`.
+- Country change only swaps the stale default-cause id in the form for the new one: user-selected projects present in `projectDetailsById` are kept; any allocation that does not map to a known project (i.e. the previous default cause) is replaced by the new `defaultCauseId`. A short-circuit skips the update when allocations already reference the current `defaultCauseId`, so mount never dirties the form.
 - Allocation remains derived from selected projects via utility function.
 - `MIN_DEFAULT_CAUSE_PERCENT` is `25`.
 - Allocation behavior (legacy parity):
@@ -84,7 +84,7 @@ Add legacy project metadata tags in overlay cards: **Top Project**, **Country**,
 5. Verify create-flow behavior:
 
 - default non-earmarked cause exists initially
-- country change resets selected projects to default cause
+- country change swaps only the stale default cause id for the new one; previously selected extra projects stay in the list
 - allocation display remains correct
 
 ### Assumptions

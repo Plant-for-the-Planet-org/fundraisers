@@ -1,4 +1,7 @@
-import type { Fundraiser } from '@/lib/types/fundraiser';
+import type {
+  Fundraiser,
+  UpdateFundraiserRequest,
+} from '@/lib/types/fundraiser';
 
 import { cache } from 'react';
 import { platformAPIClient } from './external-client';
@@ -34,3 +37,15 @@ export const getCachedFundraiser = cache(
     return getFundraiser(slug, locale);
   }
 );
+
+export async function updateFundraiser(
+  id: string,
+  data: UpdateFundraiserRequest,
+  token: string
+): Promise<Fundraiser> {
+  return platformAPIClient.putAuthenticated<Fundraiser>(
+    `/fundraisers/${id}`,
+    data,
+    token
+  );
+}
