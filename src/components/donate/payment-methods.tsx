@@ -7,10 +7,11 @@ import type {
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Check } from 'lucide-react';
+import { Check, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -19,13 +20,15 @@ import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import {
+  ApplePayIcon,
+  BankIcon,
+  CreditCard,
+  GooglePayIcon,
+  PaypalIcon,
+  SepaIcon,
+} from '@/components/icons/donation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import ApplePayIcon from '../../../public/donation/ApplePayIcon';
-import BankIcon from '../../../public/donation/BankIcon';
-import CreditCard from '../../../public/donation/CreditCard';
-import GooglePayIcon from '../../../public/donation/GooglePayIcon';
-import PaypalIcon from '../../../public/donation/PaypalIcon';
-import SepaIcon from '../../../public/donation/SepaIcon';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   'bank-transfer': 'methods.bankTransfer',
@@ -50,10 +53,7 @@ type PaymentLogoProps = {
   textColor: string;
 };
 
-const METHOD_LOGOS: Record<
-  PaymentMethodId,
-  ComponentType<PaymentLogoProps> | null
-> = {
+const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
   'bank-transfer': BankIcon,
   paypal: PaypalIcon,
   card: CreditCard,
@@ -91,60 +91,60 @@ const MethodFeeDetails = memo(function MethodFeeDetails({
   );
 });
 
-// type SelectedMethodTriggerProps = {
-//   isExpanded: boolean;
-//   selectedMethodLabel: string;
-//   showFeeDetails: boolean;
-//   selectedMethodFeeText: string | null;
-//   selectedMethodFeeTooltip: string | null;
-//   onToggle: () => void;
-// };
+type SelectedMethodTriggerProps = {
+  isExpanded: boolean;
+  selectedMethodLabel: string;
+  showFeeDetails: boolean;
+  selectedMethodFeeText: string | null;
+  selectedMethodFeeTooltip: string | null;
+  onToggle: () => void;
+};
 
-// const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
-//   isExpanded,
-//   selectedMethodLabel,
-//   showFeeDetails,
-//   selectedMethodFeeText,
-//   selectedMethodFeeTooltip,
-//   onToggle,
-// }: SelectedMethodTriggerProps) {
-//   return (
-//     <button
-//       type='button'
-//       onClick={onToggle}
-//       aria-expanded={isExpanded}
-//       className={cn(
-//         'w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer',
-//         isExpanded ? 'rounded-t-lg' : 'rounded-lg'
-//       )}
-//     >
-//       <div className='flex items-center gap-3'>
-//         <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
-//           <Check className='w-2.5 h-2.5 text-white' />
-//         </div>
-//         <div>
-//           <span className='text-sm font-medium text-foreground'>
-//             {selectedMethodLabel}
-//           </span>
-//           {showFeeDetails && selectedMethodFeeText && (
-//             <MethodFeeDetails
-//               feeText={selectedMethodFeeText}
-//               feeTooltip={selectedMethodFeeTooltip}
-//               containerClassName='mt-1'
-//               textClassName='text-muted-foreground'
-//               iconClassName='text-muted-foreground'
-//             />
-//           )}
-//         </div>
-//       </div>
-//       {isExpanded ? (
-//         <ChevronUp className='h-5 w-5 text-foreground' />
-//       ) : (
-//         <ChevronDown className='h-5 w-5 text-foreground' />
-//       )}
-//     </button>
-//   );
-// });
+const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
+  isExpanded,
+  selectedMethodLabel,
+  showFeeDetails,
+  selectedMethodFeeText,
+  selectedMethodFeeTooltip,
+  onToggle,
+}: SelectedMethodTriggerProps) {
+  return (
+    <button
+      type='button'
+      onClick={onToggle}
+      aria-expanded={isExpanded}
+      className={cn(
+        'w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer',
+        isExpanded ? 'rounded-t-lg' : 'rounded-lg'
+      )}
+    >
+      <div className='flex items-center gap-3'>
+        <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
+          <Check className='w-2.5 h-2.5 text-white' />
+        </div>
+        <div>
+          <span className='text-sm font-medium text-foreground'>
+            {selectedMethodLabel}
+          </span>
+          {showFeeDetails && selectedMethodFeeText && (
+            <MethodFeeDetails
+              feeText={selectedMethodFeeText}
+              feeTooltip={selectedMethodFeeTooltip}
+              containerClassName='mt-1'
+              textClassName='text-muted-foreground'
+              iconClassName='text-muted-foreground'
+            />
+          )}
+        </div>
+      </div>
+      {isExpanded ? (
+        <ChevronUp className='h-5 w-5 text-foreground' />
+      ) : (
+        <ChevronDown className='h-5 w-5 text-foreground' />
+      )}
+    </button>
+  );
+});
 
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
@@ -219,6 +219,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 });
 
 export function PaymentMethods() {
+  const [isExpanded, setIsExpanded] = useState(true);
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
   const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
@@ -327,7 +328,7 @@ export function PaymentMethods() {
       visibleMethods.map(method => ({
         id: method.id,
         label: getMethodLabel(method.id),
-        logo: METHOD_LOGOS[method.id] ?? null,
+        logo: METHOD_LOGOS[method.id],
         feeText: feeCollectionEnabled
           ? getFeeText(method, donationData.currency)
           : null,
@@ -345,22 +346,26 @@ export function PaymentMethods() {
     ]
   );
 
-  // const selectedMethodOption = useMemo(
-  //   () =>
-  //     visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
-  //   [selectedPaymentMethod, visibleMethodOptions]
-  // );
+  const selectedMethodOption = useMemo(
+    () =>
+      visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
+    [selectedPaymentMethod, visibleMethodOptions]
+  );
 
-  // const selectedMethodLabel = selectedMethodOption
-  //   ? selectedMethodOption.label
-  //   : t('selectMethodPlaceholder');
+  const selectedMethodLabel = selectedMethodOption
+    ? selectedMethodOption.label
+    : t('selectMethodPlaceholder');
 
-  // const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
+  const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
 
-  // const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
-  // const showSelectedMethodFeeDetails = Boolean(
-  //   feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
-  // );
+  const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
+  const showSelectedMethodFeeDetails = Boolean(
+    feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
+  );
+
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
 
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
@@ -397,14 +402,16 @@ export function PaymentMethods() {
       </div>
 
       <div className='border border-border rounded-lg'>
-        {/* <SelectedMethodTrigger
-          isExpanded={isExpanded}
-          selectedMethodLabel={selectedMethodLabel}
-          showFeeDetails={showSelectedMethodFeeDetails}
-          selectedMethodFeeText={selectedMethodFeeText}
-          selectedMethodFeeTooltip={selectedMethodFeeTooltip}
-          onToggle={toggleExpanded}
-        /> */}
+        {false && (
+          <SelectedMethodTrigger
+            isExpanded={isExpanded}
+            selectedMethodLabel={selectedMethodLabel}
+            showFeeDetails={showSelectedMethodFeeDetails}
+            selectedMethodFeeText={selectedMethodFeeText}
+            selectedMethodFeeTooltip={selectedMethodFeeTooltip}
+            onToggle={toggleExpanded}
+          />
+        )}
 
         {true && (
           // {isExpanded && (

@@ -11,6 +11,8 @@ function AppleIcon({ textColor }: Props): ReactElement {
       width='100%'
       height='100%'
       viewBox='0 0 120.377 51.064'
+      role='img'
+      aria-label='Apple Pay'
     >
       <g
         fill={textColor ? textColor : '#fff'}

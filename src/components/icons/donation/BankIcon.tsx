@@ -12,6 +12,7 @@ function BankIcon(): ReactElement {
       xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 512 512 '
       height='20px'
+      aria-label='Bank Transfer'
     >
       <path
         fill='#4d5153'
