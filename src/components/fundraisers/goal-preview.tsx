@@ -1,36 +1,60 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
+import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 
 const PREVIEW_PROGRESS_PERCENTAGE = 40;
 const PREVIEW_DAYS_LEFT = 42;
 
-export function GoalPreview() {
-  const goalAmount = useWatch<CreateFundraiserFormValues, 'goalAmount'>({
+interface GoalPreviewProps {
+  isEditMode: boolean;
+  /** Server-reported raised amount. Required for edit mode; ignored otherwise. */
+  totalRaised?: number;
+  /** Fundraiser end date (ISO string). Required for edit mode; ignored otherwise. */
+  endDate?: string;
+}
+
+function toSafeNumber(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+
+export function GoalPreview({
+  isEditMode,
+  totalRaised,
+  endDate,
+}: GoalPreviewProps) {
+  const goalAmount = useWatch<FundraiserFormValues, 'goalAmount'>({
     name: 'goalAmount',
   });
-  const currency = useWatch<CreateFundraiserFormValues, 'currency'>({
+  const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
 
-  const safeGoalAmount =
-    typeof goalAmount === 'number' && Number.isFinite(goalAmount)
-      ? goalAmount
-      : 0;
-  const raisedAmount = Math.round(
-    (safeGoalAmount * PREVIEW_PROGRESS_PERCENTAGE) / 100
-  );
+  const safeGoalAmount = toSafeNumber(goalAmount);
+
+  const raisedAmount = isEditMode
+    ? toSafeNumber(totalRaised)
+    : Math.round((safeGoalAmount * PREVIEW_PROGRESS_PERCENTAGE) / 100);
+
+  const progressPercentage = isEditMode
+    ? safeGoalAmount > 0
+      ? Math.min(100, Math.round((raisedAmount / safeGoalAmount) * 100))
+      : 0
+    : PREVIEW_PROGRESS_PERCENTAGE;
+
+  const daysLeft =
+    isEditMode && endDate ? getDaysLeft(endDate) : PREVIEW_DAYS_LEFT;
 
   return (
     <GoalProgressDisplay
       raisedAmount={raisedAmount}
       goalAmount={safeGoalAmount}
       currency={currency ?? 'EUR'}
-      progressPercentage={PREVIEW_PROGRESS_PERCENTAGE}
-      daysLeft={PREVIEW_DAYS_LEFT}
+      progressPercentage={progressPercentage}
+      daysLeft={daysLeft}
     />
   );
 }

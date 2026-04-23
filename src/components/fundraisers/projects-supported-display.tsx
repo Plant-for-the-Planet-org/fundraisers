@@ -15,7 +15,7 @@ interface ProjectItemProps {
 }
 
 function ProjectItem({ project }: ProjectItemProps) {
-  const t = useTranslations('Fundraisers.create.projectSelection');
+  const t = useTranslations('Fundraisers.form.projectSelection');
   const [isExpanded, setIsExpanded] = useState(false);
 
   const imageSource = getImageUrl('project', 'small', project.image);
@@ -78,7 +78,7 @@ interface ProjectsSupportedDisplayProps {
 export function ProjectsSupportedDisplay({
   projectAllocations,
 }: ProjectsSupportedDisplayProps) {
-  const t = useTranslations('Fundraisers.create.projectSelection');
+  const t = useTranslations('Fundraisers.form.projectSelection');
 
   if (!projectAllocations?.length) return null;
 

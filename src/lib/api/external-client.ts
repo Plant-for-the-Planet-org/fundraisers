@@ -117,6 +117,29 @@ class PlatformAPIClient {
     }
     return this.post<T>(endpoint, body, token);
   }
+
+  async put<T>(endpoint: string, body: unknown, token?: string): Promise<T> {
+    return this.makeRequest<T>(
+      endpoint,
+      { method: 'PUT', body: JSON.stringify(body) },
+      token
+    );
+  }
+
+  async putAuthenticated<T>(
+    endpoint: string,
+    body: unknown,
+    token: string
+  ): Promise<T> {
+    if (!token) {
+      throw new PlatformAPIError(
+        'Authentication token required',
+        'AUTH_TOKEN_MISSING',
+        401
+      );
+    }
+    return this.put<T>(endpoint, body, token);
+  }
 }
 
 // Create a singleton instance

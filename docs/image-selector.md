@@ -74,8 +74,8 @@ Chosen decisions:
 
 ### 8. Expand RHF form contract for image field
 
-1. Update [create-fundraiser-form-context.tsx](/Volumes/WDSN5000/Plant-for-the-Planet/f/fundraiser/src/components/fundraisers/create-fundraiser-form-context.tsx).
-2. Extend `CreateFundraiserFormValues` with `image: SelectedImage | null`.
+1. Update [fundraiser-form-schema.ts](/Volumes/WDSN5000/Plant-for-the-Planet/f/fundraiser/src/components/fundraisers/fundraiser-form-schema.ts).
+2. Extend `FundraiserFormValues` with `image: SelectedImage | null`.
 3. Add schema validation for `image` shape (nullable, optional nested attribution metadata).
 4. Set default value `image: null`.
 5. Keep existing `title` validation behavior unchanged in this slice.
@@ -134,7 +134,7 @@ Chosen decisions:
 ## Public APIs / Interfaces / Types
 
 1. New `SelectedImage` domain contract in `src/lib/types/image-selection.ts`.
-2. New `CreateFundraiserFormValues.image: SelectedImage | null`.
+2. New `FundraiserFormValues.image: SelectedImage | null`.
 3. New internal API layer:
 4. `unsplashService` (server).
 5. `unsplashClient` (client).
@@ -152,7 +152,7 @@ Chosen decisions:
 8. Upload via drag/drop updates preview and closes overlay.
 9. Invalid file type/oversize file shows validation error and does not change selection.
 10. Category labels and UI strings render localized in both `en` and `de`.
-11. `CreateFundraiserFormValues.image` updates in RHF without runtime errors.
+11. `FundraiserFormValues.image` updates in RHF without runtime errors.
 12. Object URL cleanup occurs when replacing uploaded images or unmounting.
 13. Lint and type-check pass.
 

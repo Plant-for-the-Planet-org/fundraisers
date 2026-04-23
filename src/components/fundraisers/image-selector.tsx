@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedImage } from '@/lib/types/image-selection';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -18,8 +18,14 @@ import {
 import { ImageComponentBase } from '@/components/fundraisers/image-component-base';
 import { ImageSelectionOverlay } from '@/components/fundraisers/image-selection-overlay';
 
-export function ImageSelector() {
-  const t = useTranslations('Fundraisers.create.image');
+interface ImageSelectorProps {
+  autoLoadDefault?: boolean;
+}
+
+export function ImageSelector({
+  autoLoadDefault = true,
+}: ImageSelectorProps = {}) {
+  const t = useTranslations('Fundraisers.form.image');
 
   const [isImageOverlayOpen, setIsImageOverlayOpen] = useState(false);
   const [isLoadingDefaultImage, setIsLoadingDefaultImage] = useState(false);
@@ -30,7 +36,7 @@ export function ImageSelector() {
 
   const latestImageRef = useRef<SelectedImage | null>(null);
 
-  const { control, setValue } = useFormContext<CreateFundraiserFormValues>();
+  const { control, setValue } = useFormContext<FundraiserFormValues>();
 
   const currentImage =
     (useWatch({ control, name: 'image' }) as
@@ -93,12 +99,17 @@ export function ImageSelector() {
   }, [currentImage]);
 
   useEffect(() => {
-    if (currentImage || hasAttemptedDefaultLoad) {
+    if (!autoLoadDefault || currentImage || hasAttemptedDefaultLoad) {
       return;
     }
 
     void loadDefaultImage();
-  }, [currentImage, hasAttemptedDefaultLoad, loadDefaultImage]);
+  }, [
+    autoLoadDefault,
+    currentImage,
+    hasAttemptedDefaultLoad,
+    loadDefaultImage,
+  ]);
 
   useEffect(() => {
     return () => {

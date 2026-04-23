@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedImage } from '@/lib/types/image-selection';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -18,12 +18,12 @@ import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {
   const t = useTranslations('Fundraisers.create.formSubmission');
-  const { handleSubmit } = useFormContext<CreateFundraiserFormValues>();
+  const { handleSubmit } = useFormContext<FundraiserFormValues>();
   const accessToken = useAuthStore(state => state.accessToken);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (values: CreateFundraiserFormValues) => {
+  const onSubmit = async (values: FundraiserFormValues) => {
     if (!accessToken) return;
 
     setIsSubmitting(true);
