@@ -34,6 +34,12 @@ export function AuthInitializer() {
   const didStartInit = useRef(false);
 
   useEffect(() => {
+    // Silent auth opens a hidden iframe that lands on /redirecting?code=X.
+    // AuthInitializer lives in the root layout, so it mounts inside the iframe
+    // too — but that instance has no in-memory PKCE verifier and would fail
+    // the code exchange, then wipe access_token from localStorage (which is
+    // shared across same-origin frames).
+    if (typeof window !== 'undefined' && window.self !== window.top) return;
     if (logoutSuccess === 'true') return;
     if (didStartInit.current) return;
     didStartInit.current = true;
@@ -71,8 +77,8 @@ export function AuthInitializer() {
         if (fallbackToken) {
           await setAccessToken(fallbackToken);
         }
-      } catch (error) {
-        console.error('Auth init failed:', error);
+      } catch (err) {
+        console.error('Auth init failed:', err);
         clearAuth();
       } finally {
         setIsAuthInitializing(false);
