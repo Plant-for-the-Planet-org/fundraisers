@@ -14,8 +14,6 @@ import {
   fundraiserFormSchema,
 } from './fundraiser-form-schema';
 
-export { fundraiserFormSchema as createFundraiserFormSchema } from './fundraiser-form-schema';
-
 const DevTool =
   process.env.NODE_ENV === 'development'
     ? dynamic(() => import('@hookform/devtools').then(m => m.DevTool), {
