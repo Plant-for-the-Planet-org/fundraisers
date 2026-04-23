@@ -8,6 +8,7 @@ import type {
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface DonationGiftSectionProps {
   isDedicated: boolean;
@@ -100,12 +101,11 @@ export function DonationGiftSection({
             <label className='text-sm font-medium text-foreground'>
               {t('gift.message.label')}
             </label>
-            <textarea
+            <Textarea
               rows={2}
               placeholder={t('gift.message.placeholder')}
               value={values.message}
               onChange={e => onFieldChange('message', e.target.value)}
-              className='border-input placeholder:text-muted-foreground flex w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] resize-none'
             />
           </div>
         </div>
