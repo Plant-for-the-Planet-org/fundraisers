@@ -3,10 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Loader } from '@/components/ui/loader';
-import { cleanUrl, getSafeRedirectPath } from '@/lib/utils/auth';
 import { clearOAuthState, getStoredOAuthState } from '@/lib/auth/oauth-state';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
+import { cleanUrl, getSafeRedirectPath } from '@/lib/utils/auth';
+import { Loader } from '@/components/ui/loader';
 
 /**
  * Handles post-authentication and post-logout redirects.

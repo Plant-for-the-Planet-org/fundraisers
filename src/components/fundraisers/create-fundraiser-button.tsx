@@ -13,7 +13,7 @@ import { createFundraiser } from '@/lib/api/create-fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
 import { imageToBase64 } from '@/lib/utils/image-processor';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {

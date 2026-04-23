@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { LogOut } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 
 export function SignOutButton() {

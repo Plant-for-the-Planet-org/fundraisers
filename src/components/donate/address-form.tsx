@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { addressService } from '@/lib/api/address-service';
 import { buildAddressPayload } from '@/lib/utils/profile';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { AddressCountrySelector } from './address-country-selector';

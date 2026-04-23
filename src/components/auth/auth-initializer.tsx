@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   exchangeCodeForTokens,
   getAccessTokenSilently,
 } from '@/lib/auth/auth0-config';
-import { useSearchParams } from 'next/navigation';
 import { cleanUrl, getValidStoredToken } from '@/lib/utils/auth';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 async function handleCodeExchange(code: string) {
   cleanUrl(['code']);

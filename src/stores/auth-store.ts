@@ -2,9 +2,9 @@ import type { UserProfile } from '@/lib/api/user-service';
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { isProtectedRoute } from '@/lib/utils/auth';
-import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { userService } from '@/lib/api/user-service';
+import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
+import { isProtectedRoute } from '@/lib/utils/auth';
 
 interface User {
   sub: string;

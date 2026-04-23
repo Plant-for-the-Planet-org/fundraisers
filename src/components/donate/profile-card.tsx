@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDisplayName } from '@/lib/utils/profile';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export const ProfileCard = () => {

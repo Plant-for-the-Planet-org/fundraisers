@@ -1,6 +1,7 @@
 import type { RedirectPath } from '../types/auth';
 
 import { DEFAULT_REDIRECT_PATH } from '../constants/auth';
+import { storeOAuthState } from './oauth-state';
 import {
   clearStoredCodeVerifier,
   generateCodeChallenge,
@@ -8,7 +9,6 @@ import {
   getStoredCodeVerifier,
   storeCodeVerifier,
 } from './pkce';
-import { storeOAuthState } from './oauth-state';
 
 export const AUTH0_CONFIG = {
   domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN!,

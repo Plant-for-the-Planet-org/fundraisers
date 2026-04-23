@@ -8,7 +8,7 @@ import {
   getDashboardFundraiserStats,
   getFundraisers,
 } from '@/lib/api/fundraisers-service';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import {
   DashboardStatCardSkeleton,

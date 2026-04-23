@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { isTokenExpired } from '@/lib/utils/auth';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Loader } from '../ui/loader';
 
 interface AuthGuardProps {

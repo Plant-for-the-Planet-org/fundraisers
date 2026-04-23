@@ -14,8 +14,8 @@ import type { DonationData } from './donate-overlay';
 import type { DonationFormValues } from './donation-form-context';
 
 import { useCallback, useRef, useState } from 'react';
-import { DonationError,donationService } from '@/lib/api/donation-service';
-import { PaymentError,paymentService } from '@/lib/api/payment-service';
+import { DonationError, donationService } from '@/lib/api/donation-service';
+import { PaymentError, paymentService } from '@/lib/api/payment-service';
 import {
   createPaypalOrder,
   PaypalOrderError,
@@ -32,7 +32,7 @@ import {
   buildPaymentRequest,
   PaymentOptionsError,
 } from '@/lib/utils/payment-request-builder';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 function cleanPaymentDetails(
   details: PaymentData['paymentDetails']
