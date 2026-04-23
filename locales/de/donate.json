@@ -74,6 +74,11 @@
       "saveAddressError": "Adresse konnte nicht gespeichert werden",
       "addNewAddress": "+ Neue Adresse hinzufügen"
     },
+    "gift": {
+      "dedicatedTo": "Gewidmet an {recipientName}",
+      "emailNotice": "Eine E-Mail mit deiner Nachricht und einem Zertifikat wird an {recipientEmail} gesendet",
+      "emailNoticeNoMessage": "Ein Zertifikat wird an {recipientEmail} gesendet"
+    },
     "errors": {
       "zipCode": {
         "required": "Postleitzahl ist erforderlich"

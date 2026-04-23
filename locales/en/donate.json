@@ -74,6 +74,11 @@
       "saveAddressError": "Failed to save address",
       "addNewAddress": "+ Add new address"
     },
+    "gift": {
+      "dedicatedTo": "Dedicated to {recipientName}",
+      "emailNotice": "An email with your message and a certificate will be sent to {recipientEmail}",
+      "emailNoticeNoMessage": "A certificate will be sent to {recipientEmail}"
+    },
     "errors": {
       "zipCode": {
         "required": "Zip code is required"

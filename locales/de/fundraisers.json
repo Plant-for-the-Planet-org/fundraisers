@@ -254,7 +254,31 @@
           "yearly": "Jährlich"
         },
         "customAmount": "Benutzerdefinierter Betrag",
-        "enterAmount": "Betrag eingeben"
+        "enterAmount": "Betrag eingeben",
+        "gift": {
+          "sectionTitle": "Geschenkdetails",
+          "recipientName": {
+            "label": "Name des Empfängers *",
+            "placeholder": "Namen des Empfängers eingeben"
+          },
+          "recipientEmail": {
+            "label": "E-Mail des Empfängers",
+            "placeholder": "E-Mail des Empfängers (optional)"
+          },
+          "message": {
+            "label": "Persönliche Nachricht",
+            "placeholder": "Persönliche Nachricht schreiben (optional)"
+          },
+          "errors": {
+            "recipientName": {
+              "required": "Empfängername ist erforderlich"
+            },
+            "recipientEmail": {
+              "invalid": "Bitte gib eine gültige E-Mail-Adresse ein",
+              "requiredWithMessage": "E-Mail ist erforderlich, wenn eine Nachricht hinzugefügt wird"
+            }
+          }
+        }
       }
     },
     "create": {
