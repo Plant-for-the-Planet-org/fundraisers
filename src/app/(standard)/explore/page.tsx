@@ -14,6 +14,8 @@ import {
 } from '@/components/explore/fundraiser-cities';
 import { PageHeader } from '@/components/explore/page-header';
 
+const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const tExplore = await getTranslations({ locale, namespace: 'Explore' });
@@ -30,11 +32,20 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: 'website',
+      images: [
+        {
+          url: META_IMAGE_URL,
+          width: 600,
+          height: 314,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [META_IMAGE_URL],
     },
   };
 }
