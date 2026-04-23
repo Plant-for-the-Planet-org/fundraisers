@@ -25,11 +25,11 @@
     "categoryPage": {
       "metadata": {
         "title": "{categoryName} Spendenaufrufe",
-        "description": "Entdecke Spendenaufrufe zum Thema {categoryName} und unterstütze Anliegen, die dir wichtig sind."
+        "description": "Entdecke {categoryName} Spendenaufrufe und unterstütze Projekte, die dir am Herzen liegen."
       },
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}",
       "fundraisers": {
-        "title": "Spendenaufruf",
+        "title": "Spendenaufrufe",
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",

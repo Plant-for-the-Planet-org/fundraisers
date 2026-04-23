@@ -76,8 +76,8 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a certificate will be sent to {recipientEmail}",
-      "emailNoticeNoMessage": "A certificate will be sent to {recipientEmail}"
+      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to {recipientEmail}",
+      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to {recipientEmail}"
     },
     "errors": {
       "zipCode": {
@@ -141,7 +141,7 @@
       },
       "address2": {
         "label": "Address Line 2",
-        "placeholder": "Apartment, suite, unit, etc."
+        "placeholder": "Apartment, suite, etc."
       },
       "cityLabel": "City *",
       "cityPlaceholder": "Enter city",
