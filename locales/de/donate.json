@@ -1,22 +1,22 @@
 {
   "Donate": {
     "preferences": {
-      "anonymousDonationLabel": "Mache meine Spende anonym",
+      "anonymousDonationLabel": "Anonymisiere meine Spende.",
       "anonymousDonationDescription": "Dein Name wird nicht öffentlich auf der Seite des Spendenaufrufs gezeigt."
     },
     "yourInfo": "Deine Informationen",
-    "organization": "(Organisation)",
+    "organization": "(Firma/Organisation)",
     "donorIdentity": {
       "companyDonation": {
-        "label": "Diese Spende ist von einem Unternehmen"
+        "label": "Diese Spende ist von einer Firma/Organisation"
       },
       "companyName": {
-        "label": "Firmenname *",
-        "placeholder": "Firmenname eingeben"
+        "label": "Firmen-/Organisationsname *",
+        "placeholder": "Firmen-/Organisationsnamen eingeben"
       },
       "email": {
-        "label": "E-Mail *",
-        "placeholder": "E-Mail eingeben"
+        "label": "E-Mail Adresse *",
+        "placeholder": "E-Mail Adresse eingeben"
       },
       "firstName": {
         "label": "Vorname *",
@@ -27,8 +27,8 @@
         "placeholder": "Nachname"
       },
       "tin": {
-        "label": "Steueridentifikationsnummer (TIN) *",
-        "placeholder": "Geben Sie Ihre Steueridentifikationsnummer ein"
+        "label": "TIN (Steueridentifikationsnummer) *",
+        "placeholder": "Gib deine TIN ein"
       }
     },
     "userAddress": {
@@ -39,7 +39,7 @@
       "country": {
         "label": "Land *",
         "placeholder": "Land auswählen",
-        "searchPlaceholder": "Länder durchsuchen",
+        "searchPlaceholder": "Länder werden durchsucht...",
         "noResults": "Keine Länder gefunden",
         "selectCountry": "Land auswählen"
       },
@@ -53,7 +53,7 @@
         "addressType": "Adress-Typ",
         "addressTypeOptions": {
           "primary": "Primär",
-          "mailing": "Mailing",
+          "mailing": "Post",
           "other": "Andere"
         }
       },
@@ -66,109 +66,112 @@
         "placeholder": "Stadt"
       },
       "state": {
-        "label": "Bundesland/Provinz",
-        "placeholder": "Bundesland oder Provinz"
+        "label": "Bundesland/Kanton",
+        "placeholder": "Bundesland oder Kanton"
       },
       "savingAddressLoader": "Adresse wird gespeichert...",
       "saveAddress": "Adresse speichern",
-      "saveAddressError": "Adresse konnte nicht gespeichert werden",
+      "saveAddressError": "Die Adresse konnte nicht gespeichert werden",
       "addNewAddress": "+ Neue Adresse hinzufügen"
     },
     "gift": {
       "dedicatedTo": "Gewidmet an {recipientName}",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und einem Zertifikat wird an {recipientEmail} gesendet",
-      "emailNoticeNoMessage": "Ein Zertifikat wird an {recipientEmail} gesendet"
+      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an {recipientEmail} geschickt.",
+      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an {recipientEmail} geschickt."
     },
     "errors": {
       "zipCode": {
-        "required": "Postleitzahl ist erforderlich"
+        "required": "Die Postleitzahl ist erforderlich"
       },
       "address": {
-        "required": "Adresse ist erforderlich"
+        "required": "Die Adresse ist erforderlich"
       },
       "city": {
-        "required": "Stadt ist erforderlich"
+        "required": "Die Stadt ist erforderlich"
       },
       "country": {
-        "required": "Land ist erforderlich"
+        "required": "Das Land ist erforderlich"
       },
       "firstName": {
-        "required": "Vorname ist erforderlich"
+        "required": "Der Vorname ist erforderlich"
       },
       "lastName": {
-        "required": "Nachname ist erforderlich"
+        "required": "Der Nachname ist erforderlich"
       },
       "companyName": {
-        "required": "Firmenname ist erforderlich"
+        "required": "Der Firmen-/Organisationsname ist erforderlich"
       },
       "email": {
-        "required": "E-Mail ist erforderlich",
+        "required": "Die E-Mail Adresse ist erforderlich",
         "invalid": "Bitte gib eine gültige E-Mail Adresse ein"
+      },
+      "tin": {
+        "required": "Die TIN ist erforderlich"
       }
     },
     "sepa": {
       "ibanLabel": "IBAN",
-      "ibanRequired": "IBAN ist erforderlich",
-      "accountHolderName": "Kontoinhaber",
-      "accountHolderNameRequired": "Kontoinhaber ist erforderlich",
+      "ibanRequired": "Die IBAN ist erforderlich",
+      "accountHolderName": "Name des Kontoinhabers",
+      "accountHolderNameRequired": "Der Name des Kontoinhabers ist erforderlich",
       "mandateTitle": "SEPA-Lastschriftmandat",
-      "mandateIntro": "Mit der Unterzeichnung dieses Mandatsformulars ermächtigen Sie die Plant-for-the-Planet Foundation, Zahlungen von Ihrem Konto mittels Lastschrift einzuziehen. Zugleich weisen Sie Ihr Kreditinstitut an, die von der Plant-for-the-Planet Foundation auf Ihr Konto gezogenen Lastschriften einzulösen.",
+      "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
       "creditor": "Gläubiger",
       "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Gläubiger-ID",
-      "mandateRights": "Ihre Rechte: Sie haben Anspruch auf eine Rückerstattung von Ihrer Bank gemäß den Bedingungen Ihrer Vereinbarung mit Ihrer Bank. Eine Rückerstattung muss innerhalb von 8 Wochen ab dem Datum der Belastung Ihres Kontos beantragt werden.",
-      "mandateConsent": "Ich stimme dem SEPA-Lastschriftmandat zu und ermächtige die Belastung meines Kontos",
-      "mandateRequired": "Sie müssen dem SEPA-Lastschriftmandat zustimmen, um fortzufahren"
+      "mandateRights": "Deine Rechte: Du hast Anspruch auf eine Erstattung durch deine Bank gemäß den Bedingungen deines Vertrags mit der Bank. Die Erstattung muss innerhalb von 8 Wochen ab dem Datum der Abbuchung vom Konto beantragt werden.",
+      "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
+      "mandateRequired": "Du musst das SEPA-Lastschriftmandat akzeptieren, um fortzufahren."
     },
     "card": {
       "cardNumberLabel": "Kartennummer",
       "cardNumberRequired": "Kartennummer ist erforderlich",
-      "expiryLabel": "Ablaufdatum",
-      "expiryRequired": "Ablaufdatum ist erforderlich",
+      "expiryLabel": "Gültigkeitsdatum",
+      "expiryRequired": "Gültigkeitsdatum ist erforderlich",
       "cvcLabel": "CVC",
       "cvcRequired": "CVC ist erforderlich",
       "cardholderNameLabel": "Name des Karteninhabers *",
       "cardholderNamePlaceholder": "Name des Karteninhabers eingeben",
-      "cardholderNameRequired": "Name des Karteninhabers ist erforderlich",
+      "cardholderNameRequired": "Der Name des Karteninhabers ist erforderlich",
       "useDonorAddressLabel": "Rechnungsadresse aus meinen Spenderdaten verwenden",
       "address": {
         "label": "Adresse *",
         "placeholder": "Adresse eingeben",
-        "required": "Adresse ist erforderlich"
+        "required": "Die Adresse ist erforderlich"
       },
       "address2": {
-        "label": "Adresszeile 2",
-        "placeholder": "Wohnung, Zusatz, Einheit usw."
+        "label": "Adresse Zeile 2",
+        "placeholder": "Wohnung, Appartement, etc."
       },
       "cityLabel": "Stadt *",
       "cityPlaceholder": "Stadt eingeben",
-      "cityRequired": "Stadt ist erforderlich",
-      "stateLabel": "Bundesland / Kanton",
+      "cityRequired": "Die Stadt ist erforderlich",
+      "stateLabel": "Bundesland/Kanton",
       "statePlaceholder": "Bundesland oder Kanton eingeben",
-      "billingZipCodeLabel": "PLZ *",
-      "billingZipCodePlaceholder": "PLZ eingeben",
-      "billingZipCodeRequired": "Postleitzahl ist erforderlich",
+      "billingZipCodeLabel": "Postleitzahl *",
+      "billingZipCodePlaceholder": "Postleitzahl eingeben",
+      "billingZipCodeRequired": "Die Postleitzahl ist erforderlich",
       "countryLabel": "Land *",
-      "countryRequired": "Land ist erforderlich",
+      "countryRequired": "Das Land ist erforderlich",
       "countryPlaceholder": "Land auswählen",
       "countryNoResults": "Keine Länder gefunden"
     },
     "submissionErrors": {
-      "authRequired": "Bitte melden Sie sich an, um mit Ihrer Spende fortzufahren.",
-      "network": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-      "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
-      "server": "Serverfehler. Bitte versuchen Sie es in wenigen Augenblicken erneut.",
-      "rateLimit": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
-      "donationCreation": "Spende konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-      "validation": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut.",
-      "accessDenied": "Sie haben keine Berechtigung, diese Aktion durchzuführen.",
-      "businessLogic": "Ungültige Spendendaten. Bitte überprüfen und erneut versuchen.",
-      "threeDsMissingSecret": "Zahlungsauthentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-      "paypalOrderCreationError": "PayPal-Spende konnte nicht erstellt werden. Bitte versuche es nochmal.",
-      "paypalCaptureError": "Die PayPal-Zahlung konnte nicht abgeschlossen werden. Bitte versuche es nochmal.",
-      "paypalPaymentError": "PayPal-Zahlung fehlgeschlagen. Bitte versuche es erneut.",
-      "paymentFailed": "Zahlung fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es nochmal."
+      "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
+      "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es nochmal.",
+      "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
+      "server": "Server-Fehler. Bitte versuche es in ein paar Minuten nochmal.",
+      "rateLimit": "Es gibt zu viele Anfragen. Bitte warte einen Moment und versuche es nochmal.",
+      "donationCreation": "Die Spende konnte nicht durchgeführt werden. Bitte versuche es nochmal.",
+      "validation": "Bitte überprüfe deine Angaben und versuche es nochmal.",
+      "accessDenied": "Du hast nicht die Berechtigung, um diese Aktion durchzuführen.",
+      "businessLogic": "Die Spendendaten sind ungültig. Bitte überprüfe die Daten und versuche es nochmal.",
+      "threeDsMissingSecret": "Die Zahlungsauthentifizierung ist fehlgeschlagen. Bitte versuche es nochmal.",
+      "paypalOrderCreationError": "Die PayPal-Spende konnte nicht durchgeführt werden. Bitte versuche es nochmal.",
+      "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es nochmal.",
+      "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es nochmal.",
+      "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es nochmal.",
+      "unexpected": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es nochmal."
     },
     "cta": {
       "donateNow": "Jetzt spenden",
@@ -180,40 +183,40 @@
     "thankYou": {
       "title": {
         "completed": "Vielen Dank für deine Spende!",
-        "bankTransferPending": "Danke, dass du deine Spende angefangen hast",
+        "bankTransferPending": "Danke, dass du deine Spende überweisen möchtest",
         "paymentProcessing": {
-          "processing": "Zahlung wird bearbeitet",
-          "failed": "Zahlung fehlgeschlagen",
-          "refunded": "Zahlung erstattet",
-          "disputed": "Zahlung wird geprüft",
-          "error": "Ein Fehler ist aufgetreten"
+          "processing": "Die Zahlung wird bearbeitet",
+          "failed": "Die Zahlung ist fehlgeschlagen",
+          "refunded": "Die Zahlung wurde erstattet",
+          "disputed": "Die Zahlung wird geprüft",
+          "error": "Etwas ist schief gelaufen"
         }
       },
       "status": {
         "label": "Status:",
         "completed": "Abgeschlossen",
-        "bankTransferPending": "Banküberweisung ausstehend",
+        "bankTransferPending": "Die Banküberweisung steht aus",
         "paymentProcessing": {
-          "processing": "In Bearbeitung",
+          "processing": "Wird verarbeitet",
           "failed": "Fehlgeschlagen",
           "refunded": "Erstattet",
-          "disputed": "In Prüfung",
+          "disputed": "Wird überprüft",
           "error": "Fehler"
         }
       },
       "message": {
-        "completed": "Wir haben dir eine Spendenbestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst eine steuerlich absetzbare Zuwendungsbescheinigung herunterladen.",
+        "completed": "Wir haben dir eine Bestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst du eine steuerlich absetzbare Zuwendungsbescheinigung über pp.eco/profile herunterladen.",
         "paymentProcessing": {
-          "processing": "Deine Zahlung wird bearbeitet. Du erhältst eine E-Mail, sobald sie bestätigt wurde.",
-          "failed": "Leider war deine Zahlung nicht erfolgreich. Bitte versuche es erneut oder verwende eine andere Zahlungsmethode.",
-          "refunded": "Deine Zahlung wurde erstattet.",
-          "disputed": "Deine Zahlung wird derzeit geprüft. Bitte kontaktiere den Support, falls du Hilfe benötigst.",
-          "error": "Bei deiner Zahlung ist ein Fehler aufgetreten. Bitte kontaktiere support@plant-for-the-planet.org mit deinen Spendeninformationen."
+          "processing": "Deine Zahlung wird gerade bearbeitet. Du bekommst eine E-Mail, sobald sie bestätigt ist.",
+          "failed": "Leider ist deine Zahlung fehlgeschlagen. Bitte versuche es nochmal oder wähle eine andere Zahlungsweise aus.",
+          "refunded": "Deine Zahlung wurde zurückerstattet.",
+          "disputed": "Deine Zahlung wird derzeit geprüft. Bitte kontaktiere den Support, wenn Du Hilfe brauchst.",
+          "error": "Bei deiner Zahlung ist ein Fehler aufgetreten. Bitte kontaktiere support@plant-for-the-planet.org mit Angaben zur Spende."
         },
         "bankTransferPending": {
-          "monthly": "Deine monatliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
-          "yearly": "Deine jährliche Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
-          "once": "Deine Spende von {amount} wurde begonnen. Um deine Spende abzuschließen, überweise bitte den Betrag auf das unten stehende Konto. Diese Informationen wurden dir auch per E-Mail zugeschickt."
+          "monthly": "Deine monatliche Spende von {amount} wurde angelegt. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "yearly": "Deine jährliche Spende von {amount} wurde angelegt. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
+          "once": "Deine Spende über {amount} wurde angelegt. Um deine Spende abzuschließen, überweise bitte den Betrag auf das unten stehende Konto. Diese Informationen wurden dir auch per E-Mail zugeschickt."
         }
       },
       "transfer": {
@@ -230,7 +233,7 @@
       "copy": {
         "label": "Kopieren {field}",
         "success": "Kopiert!",
-        "error": "Kopieren fehlgeschlagen"
+        "error": "Das Kopieren ist fehlgeschlagen"
       },
       "share": {
         "title": "Diesen Spendenaufruf teilen",
