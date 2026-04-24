@@ -413,28 +413,24 @@ export function PaymentMethods() {
           />
         )}
 
-        {true && (
-          // {isExpanded && (
-          <div className='space-y-3 border-t border-border p-4'>
-            {visibleMethodOptions.map(method => {
-              const isSelected = selectedPaymentMethod === method.id;
-
-              return (
-                <PaymentMethodOption
-                  key={method.id}
-                  methodId={method.id}
-                  methodLabel={method.label}
-                  methodLogo={method.logo}
-                  isSelected={isSelected}
-                  showFeeDetails={feeCollectionEnabled}
-                  methodFeeText={method.feeText}
-                  methodFeeTooltip={method.feeTooltip}
-                  onSelect={handleMethodSelect}
-                />
-              );
-            })}
-          </div>
-        )}
+        <div className='space-y-3 border-t border-border p-4'>
+          {visibleMethodOptions.map(method => {
+            const isSelected = selectedPaymentMethod === method.id;
+            return (
+              <PaymentMethodOption
+                key={method.id}
+                methodId={method.id}
+                methodLabel={method.label}
+                methodLogo={method.logo}
+                isSelected={isSelected}
+                showFeeDetails={feeCollectionEnabled}
+                methodFeeText={method.feeText}
+                methodFeeTooltip={method.feeTooltip}
+                onSelect={handleMethodSelect}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}
