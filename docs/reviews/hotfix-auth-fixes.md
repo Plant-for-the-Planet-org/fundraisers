@@ -163,13 +163,15 @@ if (nonce) {
 
 ---
 
-### 🟢 LOW — `getValidStoredToken` and `cleanUrl` lack SSR guards
+### 🟢 LOW — ~~`getValidStoredToken` and `cleanUrl` lack SSR guards~~
 
-- [ ] **Fix:** Add `isBrowser` guards or restrict to a client-only module
+- [x] **Fix:** Add `isBrowser` guards or restrict to a client-only module
 
 **File:** `src/lib/utils/auth.ts:67-87`
 
 Both functions reference `localStorage` / `window.location` directly without a browser environment check. All current callers are `'use client'` components, so there's no runtime issue today. However, if either utility is imported in a server context (e.g., a future server action or route handler) it will throw at runtime with no warning at the import site.
+
+**Resolution:** Added a local `isBrowser()` guard in `src/lib/utils/auth.ts`. `getValidStoredToken` now returns `null` on the server and `cleanUrl` no-ops, so importing either from a server context is safe. (A shared `isBrowser` utility was not extracted — three files currently define their own one-liner; consolidation deferred.)
 
 ---
 
