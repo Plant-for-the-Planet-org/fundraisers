@@ -49,7 +49,7 @@ const PROVIDER_TRANSLATION_KEYS: Record<
 };
 
 type PaymentLogoProps = {
-  textColor: string;
+  textColor?: string;
 };
 
 const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
@@ -380,7 +380,7 @@ export function PaymentMethods() {
       </div>
 
       <div className='border border-border rounded-lg'>
-        <div className='space-y-3 border-t border-border p-4'>
+        <div className='space-y-3 p-4'>
           {visibleMethodOptions.map(method => {
             const isSelected = selectedPaymentMethod === method.id;
             return (

@@ -1,7 +1,7 @@
 import { type ReactElement } from 'react';
 
 interface Props {
-  textColor: string;
+  textColor?: string;
 }
 
 function GooglePayIcon({ textColor }: Props): ReactElement {
