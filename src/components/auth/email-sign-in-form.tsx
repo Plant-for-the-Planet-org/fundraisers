@@ -1,6 +1,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
+import type { RedirectPath } from '@/lib/types/auth';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 interface EmailSignInFormProps {
   email: string;
   setEmail: Dispatch<SetStateAction<string>>;
-  redirectTo: string;
+  redirectTo: RedirectPath;
 }
 
 export function EmailSignInForm({

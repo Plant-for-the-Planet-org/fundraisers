@@ -1,3 +1,7 @@
+import type { RedirectPath } from '../types/auth';
+
+import { DEFAULT_REDIRECT_PATH } from '../constants/auth';
+import { storeOAuthState } from './oauth-state';
 import {
   clearStoredCodeVerifier,
   generateCodeChallenge,
@@ -14,6 +18,8 @@ export const AUTH0_CONFIG = {
   scope: 'openid profile email',
 };
 
+const SILENT_AUTH_TIMEOUT = 5000;
+
 export interface Auth0TokenResponse {
   access_token: string;
   id_token: string;
@@ -22,8 +28,6 @@ export interface Auth0TokenResponse {
   scope?: string;
   refresh_token?: string;
 }
-
-const DEFAULT_REDIRECT_PATH = '/explore';
 
 /** Returns the OAuth callback URL based on current environment (browser vs server). */
 function getRedirectUri(): string {
@@ -40,14 +44,18 @@ function getRedirectUri(): string {
  * and merges in any extra params (e.g. prompt, connection, screen_hint).
  */
 async function createBaseAuthorizeParams(
-  redirectTo: string = '/explore',
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   extraParams?: Record<string, string>
 ): Promise<URLSearchParams> {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
+  const nonce = crypto.randomUUID();
 
   // Persist PKCE verifier for token exchange
   storeCodeVerifier(codeVerifier);
+
+  // Store redirect target mapped to nonce
+  storeOAuthState(nonce, redirectTo);
 
   const params = new URLSearchParams({
     response_type: 'code',
@@ -55,7 +63,7 @@ async function createBaseAuthorizeParams(
     redirect_uri: getRedirectUri(),
     scope: AUTH0_CONFIG.scope,
     audience: AUTH0_CONFIG.audience,
-    state: redirectTo, // (Can later be upgraded to secure state handling)
+    state: nonce,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
   });
@@ -81,9 +89,18 @@ function buildAuthorizeUrl(params: URLSearchParams): string {
  * Auth0 will attempt to reuse an existing session without showing any UI.
  */
 async function buildSilentAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH
+  inMemoryVerifier: string
 ): Promise<string> {
-  const params = await createBaseAuthorizeParams(redirectTo, {
+  const codeChallenge = await generateCodeChallenge(inMemoryVerifier);
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: AUTH0_CONFIG.clientId,
+    redirect_uri: getRedirectUri(),
+    scope: AUTH0_CONFIG.scope,
+    audience: AUTH0_CONFIG.audience,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
     prompt: 'none',
   });
 
@@ -91,53 +108,70 @@ async function buildSilentAuthorizeUrl(
 }
 
 /**
- * Attempts silent authentication using Auth0 in a hidden iframe.
+ * Attempts silent authentication with Auth0 using a hidden iframe.
  *
  * Flow:
- * 1. Loads the Auth0 `/authorize` endpoint with `prompt=none`.
- * 2. If a session exists, Auth0 redirects the iframe to `/api/auth/callback`
- *    with an authorization `code`.
- * 3. The code is extracted and exchanged for tokens.
+ * 1. Loads the Auth0 `/authorize` endpoint with `prompt=none` in a hidden iframe.
+ * 2. If the user already has an Auth0 session, Auth0 redirects to our callback
+ *    and eventually lands on our domain with an authorization `code`.
+ * 3. Once the iframe lands on our origin, we extract the `code` from the URL
+ *    and exchange it for tokens.
  *
- * Note:
- * Previously this flow redirected the main window using `window.location`,
- * which cancelled ongoing app initialization (e.g., profile fetching).
- * This implementation keeps the flow inside the iframe to avoid interrupting
- * the application lifecycle.
+ * Safety mechanisms:
+ * - A timeout (3s) prevents the app from waiting indefinitely if silent auth fails
+ *   (e.g., no Auth0 session or blocked third-party cookies).
+ * - `origin` check ensures we only read URLs from our own domain to avoid
+ *   cross-origin access errors.
+ * - `cleanup()` removes the iframe and clears timers once the flow completes.
  *
- * Returns the `access_token` on success, otherwise `null`.
+ * Returns:
+ * - `access_token` if silent authentication succeeds
+ * - `null` if no session exists or the operation times out
  */
-export async function getAccessTokenSilently(
-  redirectTo: string = DEFAULT_REDIRECT_PATH
-): Promise<string | null> {
+export async function getAccessTokenSilently(): Promise<string | null> {
   try {
-    const silentUrl = await buildSilentAuthorizeUrl(redirectTo);
+    const verifier = generateCodeVerifier();
+    const silentUrl = await buildSilentAuthorizeUrl(verifier);
 
     const code = await new Promise<string | null>(resolve => {
       const iframe = document.createElement('iframe');
       iframe.style.display = 'none';
-      iframe.src = silentUrl;
+      const settled = { current: false };
 
       const timeout = setTimeout(() => {
         cleanup();
         resolve(null);
-      }, 8000);
+      }, SILENT_AUTH_TIMEOUT);
 
       function cleanup() {
+        if (settled.current) return;
+        settled.current = true;
         clearTimeout(timeout);
         iframe.remove();
       }
 
       iframe.onload = () => {
+        if (settled.current) return;
         try {
-          const url = iframe.contentWindow?.location.href;
+          const urlStr = iframe.contentWindow?.location.href;
 
-          if (!url) return;
+          if (!urlStr) return;
 
-          if (url.includes('/api/auth/callback')) {
-            const code = new URL(url).searchParams.get('code');
+          const url = new URL(urlStr);
+
+          if (url.origin !== window.location.origin) return;
+
+          const code = url.searchParams.get('code');
+          const error = url.searchParams.get('error');
+
+          if (code) {
             cleanup();
             resolve(code);
+          }
+
+          if (error) {
+            cleanup();
+            resolve(null);
           }
         } catch {
           // Expected cross-origin error before redirect
@@ -148,13 +182,13 @@ export async function getAccessTokenSilently(
         cleanup();
         resolve(null);
       };
-
+      iframe.src = silentUrl;
       document.body.appendChild(iframe);
     });
 
     if (!code) return null;
 
-    const tokens = await exchangeCodeForTokens(code);
+    const tokens = await exchangeCodeForTokens(code, verifier);
     return tokens.access_token;
   } catch (err) {
     console.error('Silent auth failed:', err);
@@ -166,7 +200,7 @@ export async function getAccessTokenSilently(
  * Optionally accepts a login_hint to pre-fill the email field.
  */
 export async function buildUniversalLoginAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH,
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   loginHint?: string
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo);
@@ -183,7 +217,7 @@ export async function buildUniversalLoginAuthorizeUrl(
  * Optionally accepts a login_hint to pre-fill the email field.
  */
 export async function buildSignupAuthorizeUrl(
-  redirectTo: string = DEFAULT_REDIRECT_PATH,
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH,
   loginHint?: string
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo, {
@@ -203,7 +237,7 @@ export async function buildSignupAuthorizeUrl(
  */
 export async function buildSocialAuthorizeUrl(
   connection: string,
-  redirectTo: string = DEFAULT_REDIRECT_PATH
+  redirectTo: RedirectPath = DEFAULT_REDIRECT_PATH
 ): Promise<string> {
   const params = await createBaseAuthorizeParams(redirectTo, {
     connection,
@@ -218,9 +252,11 @@ export async function buildSocialAuthorizeUrl(
  * and clears the verifier from sessionStorage once the exchange is complete (success or failure).
  */
 export async function exchangeCodeForTokens(
-  code: string
+  code: string,
+  inMemoryVerifier?: string // optional verifier for silent auth
 ): Promise<Auth0TokenResponse> {
-  const codeVerifier = getStoredCodeVerifier();
+  // Use in-memory verifier if provided, otherwise fallback to sessionStorage
+  const codeVerifier = inMemoryVerifier ?? getStoredCodeVerifier();
 
   if (!codeVerifier) {
     throw new Error(
@@ -256,6 +292,15 @@ export async function exchangeCodeForTokens(
   } catch (error) {
     throw error;
   } finally {
-    clearStoredCodeVerifier();
+    /**
+     * Only clear sessionStorage verifier if we are using
+     * the redirect-based login flow.
+     *
+     * Silent auth keeps the verifier in memory, so it
+     * must NOT clear sessionStorage.
+     */
+    if (!inMemoryVerifier) {
+      clearStoredCodeVerifier();
+    }
   }
 }

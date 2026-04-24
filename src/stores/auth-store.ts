@@ -3,6 +3,8 @@ import type { UserProfile } from '@/lib/api/user-service';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
+import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
+import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
 
 interface User {
   sub: string;
@@ -58,7 +60,6 @@ export const useAuthStore = create<AuthStore>()(
         try {
           await get().loadUserProfile();
           const user = get().user;
-
           if (!user) throw new Error('User profile not loaded');
 
           if (isBrowser) {
@@ -103,17 +104,22 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: (customReturnTo?: string) => {
-        get().clearAuth();
-
         const currentPage = window.location.pathname + window.location.search;
         const redirectAfterLogout = customReturnTo || currentPage;
+
+        // If the redirect path is protected, fallback to default to avoid redirect loops
+        const uncheckedRedirect = isProtectedRoute(redirectAfterLogout)
+          ? DEFAULT_REDIRECT_PATH
+          : redirectAfterLogout;
+        // Ensure the redirect path is safe to prevent open redirect vulnerabilities
+        const safeRedirect = getSafeRedirectPath(uncheckedRedirect);
 
         const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
         const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
         const baseUrl = window.location.origin;
 
-        const logoutSuccessUrl = `${baseUrl}/login?logoutSuccess=true&redirectTo=${encodeURIComponent(
-          redirectAfterLogout
+        const logoutSuccessUrl = `${baseUrl}/redirecting?logoutSuccess=true&redirectTo=${encodeURIComponent(
+          safeRedirect
         )}`;
 
         const logoutUrl = new URL(`https://${auth0Domain}/v2/logout`);
@@ -132,6 +138,7 @@ export const useAuthStore = create<AuthStore>()(
             user: null,
             accessToken: null,
             isAuthenticated: false,
+            isAuthInitializing: false,
             error: null,
           },
           undefined,

@@ -4,7 +4,7 @@ import type { DonationFormValues } from './donation-form-context';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { getPrimaryAddress } from '@/lib/utils/profile';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { AddressForm } from './address-form';
 import { AddressSelector } from './address-selector';
 

@@ -1,10 +1,11 @@
 'use client';
+import type { RedirectPath } from '@/lib/types/auth';
 
 import { buildSignupAuthorizeUrl } from '@/lib/auth/auth0-config';
 
 interface SignUpButtonProps {
   children: React.ReactNode;
-  redirectTo?: string;
+  redirectTo?: RedirectPath;
   email: string;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { AuthenticatedUserView } from './authenticated-user-view';
 import { GuestUserView } from './guest-user-view';
 

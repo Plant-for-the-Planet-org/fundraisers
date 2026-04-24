@@ -1,4 +1,5 @@
 'use client';
+import type { RedirectPath } from '@/lib/types/auth';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -8,7 +9,7 @@ import { SignInWithButton } from '@/components/auth/sign-in-with-button';
 import { AppleIcon, FacebookIcon, GoogleIcon } from '../icons/social';
 import { SignUpButton } from './sign-up-button';
 
-export function SignInFormPanel({ redirectTo }: { redirectTo: string }) {
+export function SignInFormPanel({ redirectTo }: { redirectTo: RedirectPath }) {
   const tAuth = useTranslations('Auth');
   const [email, setEmail] = useState('');
 
