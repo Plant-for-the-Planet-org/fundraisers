@@ -177,13 +177,13 @@ Both functions reference `localStorage` / `window.location` directly without a b
 
 ---
 
-### 🟢 LOW — `getSignInPath` reads `window.location` as a redundant fallback
+### 🟢 ~~LOW — `getSignInPath` reads `window.location` as a redundant fallback~~
 
-- [ ] **Fix:** Remove the `window.location` read; rely solely on the parameter
+- [x] **Fixed:** `getSignInPath` now takes a required `currentPath: string` and parses pathname/search from it — no more `window.location` read or `typeof window` branch. `SignInButton` derives its `currentPath` from `usePathname()` / `useSearchParams()` (matching `AuthGuard`), and its unused `redirectTo` prop was dropped.
 
-**File:** `src/lib/auth/sign-in-redirect.ts:10-11`
+**File:** `src/lib/auth/sign-in-redirect.ts`
 
-The function accepts `redirectTo?: string` and also reads `window.location` internally. Both callers already supply a fully-formed `currentPath`, so the `window.location` read is a silent fallback that would produce an unexpected path if the function were ever called without the parameter in a different context.
+The function previously accepted `redirectTo?: string` and also read `window.location` internally. Both callers already supplied a fully-formed `currentPath`, so the `window.location` read was a silent fallback that would have produced an unexpected path if the function were ever called without the parameter in a different context.
 
 ---
 
@@ -241,5 +241,5 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 | 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed `cbf116c` |
 | 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [x] Fixed `9eae94d` |
 | 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [x] Fixed `4d4e8f4` |
-| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open            |
+| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [x] Fixed `d5dd8c5` |
 | 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open            |
