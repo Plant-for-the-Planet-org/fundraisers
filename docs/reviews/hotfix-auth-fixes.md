@@ -163,7 +163,7 @@ if (nonce) {
 
 ---
 
-### 🟢 LOW — ~~`getValidStoredToken` and `cleanUrl` lack SSR guards~~
+### ~~🟢 LOW — `getValidStoredToken` and `cleanUrl` lack SSR guards~~ ✅ Fixed (`9eae94d`)
 
 - [x] **Fix:** Add `isBrowser` guards or restrict to a client-only module
 
@@ -238,6 +238,6 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 | 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [x] Fixed `ecf892a` |
 | 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed         |
 | 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [ ] Open          |
-| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [ ] Open          |
+| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [x] Fixed `9eae94d` |
 | 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open          |
 | 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open          |
