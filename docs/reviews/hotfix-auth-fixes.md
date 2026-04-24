@@ -165,13 +165,15 @@ if (nonce) {
 
 ---
 
-### 🟢 LOW — `getValidStoredToken` and `cleanUrl` lack SSR guards
+### ~~🟢 LOW — `getValidStoredToken` and `cleanUrl` lack SSR guards~~ ✅ Fixed (`9eae94d`)
 
-- [ ] **Fix:** Add `isBrowser` guards or restrict to a client-only module
+- [x] **Fix:** Add `isBrowser` guards or restrict to a client-only module
 
 **File:** `src/lib/utils/auth.ts:67-87`
 
 Both functions reference `localStorage` / `window.location` directly without a browser environment check. All current callers are `'use client'` components, so there's no runtime issue today. However, if either utility is imported in a server context (e.g., a future server action or route handler) it will throw at runtime with no warning at the import site.
+
+**Resolution:** Added a local `isBrowser()` guard in `src/lib/utils/auth.ts`. `getValidStoredToken` now returns `null` on the server and `cleanUrl` no-ops, so importing either from a server context is safe. (A shared `isBrowser` utility was not extracted — three files currently define their own one-liner; consolidation deferred.)
 
 ---
 
@@ -231,13 +233,13 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 
 ## Summary
 
-| Severity  | Issue                                                                                                          | Status            |
-| --------- | -------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Severity  | Issue                                                                                                          | Status              |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------- |
 | 🔴 High   | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [x] Fixed `f700adc` |
 | 🔴 High   | Logout from authenticated `/fundraisers/*` routes bounces user to `/login`                                     | [x] Fixed `22cae9f` |
 | 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [x] Fixed `ecf892a` |
-| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed         |
+| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed `cbf116c` |
+| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [x] Fixed `9eae94d` |
 | 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [x] Fixed `4d4e8f4` |
-| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [ ] Open          |
-| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open          |
-| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open          |
+| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open            |
+| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open            |

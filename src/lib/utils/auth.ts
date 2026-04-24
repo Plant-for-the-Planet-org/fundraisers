@@ -63,8 +63,12 @@ export function isTokenExpired(token: string, bufferSeconds = 30): boolean {
   }
 }
 
+const isBrowser = () => typeof window !== 'undefined';
+
 // Get token from localStorage and return it only if still valid
 export const getValidStoredToken = () => {
+  if (!isBrowser()) return null;
+
   const token = localStorage.getItem('access_token');
 
   if (!token) return null;
@@ -81,6 +85,8 @@ export const getValidStoredToken = () => {
 // and updates the browser history without triggering a page reload.
 
 export function cleanUrl(params: string[]) {
+  if (!isBrowser()) return;
+
   const url = new URL(window.location.href);
   params.forEach(p => url.searchParams.delete(p));
   window.history.replaceState({}, '', url.pathname + url.search);
