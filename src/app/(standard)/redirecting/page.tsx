@@ -33,9 +33,7 @@ export default function RedirectingPage() {
   useEffect(() => {
     if (nonce) {
       cleanUrl(['state']);
-      const redirectTo = nonce
-        ? (getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH)
-        : DEFAULT_REDIRECT_PATH;
+      const redirectTo = getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH;
 
       clearOAuthState(nonce);
 
