@@ -46,10 +46,21 @@ export function DonationSummary() {
     );
   };
 
-  const publicHosts = fundraiser.hosts
+  // There should be at least one public host.
+  // TODO: As API is updated this overwrite should be removed.
+  const hostsWithAtLeastOnePublic = fundraiser.hosts.map((host, index) =>
+    index === 0
+      ? {
+          ...host,
+          isPublic: true,
+          displayName: host.displayName ?? host.user?.name,
+        }
+      : host
+  );
+
+  const publicHosts = hostsWithAtLeastOnePublic
     .filter(h => h.isPublic)
-    .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
-    .slice(0, 3);
+    .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
 
   const joinedNames = publicHosts
     .map(h => h.displayName)
