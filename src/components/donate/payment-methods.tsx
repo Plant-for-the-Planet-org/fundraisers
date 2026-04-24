@@ -1,15 +1,16 @@
 'use client';
 
+import type { ComponentType } from 'react';
 import type {
   DerivedPaymentMethod,
   PaymentMethodId,
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -18,6 +19,14 @@ import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import {
+  ApplePayIcon,
+  BankIcon,
+  CreditCard,
+  GooglePayIcon,
+  PaypalIcon,
+  SepaIcon,
+} from '@/components/icons/donation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
@@ -37,6 +46,19 @@ const PROVIDER_TRANSLATION_KEYS: Record<
   paypal: 'providers.paypal',
   offline: 'providers.offline',
   planetcash: 'providers.planetcash',
+};
+
+type PaymentLogoProps = {
+  textColor?: string;
+};
+
+const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
+  'bank-transfer': BankIcon,
+  paypal: PaypalIcon,
+  card: CreditCard,
+  'sepa-debit': SepaIcon,
+  'apple-pay': ApplePayIcon,
+  'google-pay': GooglePayIcon,
 };
 
 type MethodFeeDetailsProps = {
@@ -68,7 +90,8 @@ const MethodFeeDetails = memo(function MethodFeeDetails({
   );
 });
 
-type SelectedMethodTriggerProps = {
+// Preserved in case we want to switch back to a dropdown for payment method selection in the future
+/* type SelectedMethodTriggerProps = {
   isExpanded: boolean;
   selectedMethodLabel: string;
   showFeeDetails: boolean;
@@ -121,11 +144,12 @@ const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
       )}
     </button>
   );
-});
+}); */
 
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
   methodLabel: string;
+  methodLogo?: ComponentType<PaymentLogoProps> | null;
   isSelected: boolean;
   showFeeDetails: boolean;
   methodFeeText: string | null;
@@ -136,12 +160,15 @@ type PaymentMethodOptionProps = {
 const PaymentMethodOption = memo(function PaymentMethodOption({
   methodId,
   methodLabel,
+  methodLogo,
   isSelected,
   showFeeDetails,
   methodFeeText,
   methodFeeTooltip,
   onSelect,
 }: PaymentMethodOptionProps) {
+  const MethodLogo = methodLogo;
+
   return (
     <button
       type='button'
@@ -153,9 +180,9 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
         isSelected ? 'border-foreground bg-muted' : 'border-border bg-white'
       )}
     >
-      <div className='flex items-start justify-between'>
-        <div className='flex flex-1 items-start gap-3'>
-          <div className='mt-0.5'>
+      <div className='flex items-center justify-between'>
+        <div className='flex flex-1 items-center gap-3'>
+          <div>
             <div
               className={cn(
                 'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all',
@@ -168,7 +195,13 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
             </div>
           </div>
 
-          <div className='flex-1 space-y-1'>
+          {MethodLogo && (
+            <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
+              <MethodLogo textColor='#4d5153' />
+            </div>
+          )}
+
+          <div className='flex-1'>
             <span className='text-sm font-medium'>{methodLabel}</span>
           </div>
         </div>
@@ -187,7 +220,6 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
     useDonationForm();
@@ -295,6 +327,7 @@ export function PaymentMethods() {
       visibleMethods.map(method => ({
         id: method.id,
         label: getMethodLabel(method.id),
+        logo: METHOD_LOGOS[method.id],
         feeText: feeCollectionEnabled
           ? getFeeText(method, donationData.currency)
           : null,
@@ -312,27 +345,6 @@ export function PaymentMethods() {
     ]
   );
 
-  const selectedMethodOption = useMemo(
-    () =>
-      visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
-    [selectedPaymentMethod, visibleMethodOptions]
-  );
-
-  const selectedMethodLabel = selectedMethodOption
-    ? selectedMethodOption.label
-    : t('selectMethodPlaceholder');
-
-  const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
-
-  const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
-  const showSelectedMethodFeeDetails = Boolean(
-    feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
-  );
-
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded(prev => !prev);
-  }, []);
-
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
       setValue('selectedPaymentMethod', methodId, {
@@ -340,7 +352,6 @@ export function PaymentMethods() {
         shouldTouch: true,
         shouldValidate: true,
       });
-      setIsExpanded(false);
     },
     [setValue]
   );
@@ -369,35 +380,24 @@ export function PaymentMethods() {
       </div>
 
       <div className='border border-border rounded-lg'>
-        <SelectedMethodTrigger
-          isExpanded={isExpanded}
-          selectedMethodLabel={selectedMethodLabel}
-          showFeeDetails={showSelectedMethodFeeDetails}
-          selectedMethodFeeText={selectedMethodFeeText}
-          selectedMethodFeeTooltip={selectedMethodFeeTooltip}
-          onToggle={toggleExpanded}
-        />
-
-        {isExpanded && (
-          <div className='space-y-3 border-t border-border p-4'>
-            {visibleMethodOptions.map(method => {
-              const isSelected = selectedPaymentMethod === method.id;
-
-              return (
-                <PaymentMethodOption
-                  key={method.id}
-                  methodId={method.id}
-                  methodLabel={method.label}
-                  isSelected={isSelected}
-                  showFeeDetails={feeCollectionEnabled}
-                  methodFeeText={method.feeText}
-                  methodFeeTooltip={method.feeTooltip}
-                  onSelect={handleMethodSelect}
-                />
-              );
-            })}
-          </div>
-        )}
+        <div className='space-y-3 p-4'>
+          {visibleMethodOptions.map(method => {
+            const isSelected = selectedPaymentMethod === method.id;
+            return (
+              <PaymentMethodOption
+                key={method.id}
+                methodId={method.id}
+                methodLabel={method.label}
+                methodLogo={method.logo}
+                isSelected={isSelected}
+                showFeeDetails={feeCollectionEnabled}
+                methodFeeText={method.feeText}
+                methodFeeTooltip={method.feeTooltip}
+                onSelect={handleMethodSelect}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}

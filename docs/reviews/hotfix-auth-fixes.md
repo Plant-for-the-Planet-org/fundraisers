@@ -141,9 +141,9 @@ Note: replacing `isProtectedRoute` with `getSafeRedirectPath` alone would break 
 
 ---
 
-### 🟢 LOW — Dead-code ternary inside `if (nonce)` block
+### ~~🟢 LOW — Dead-code ternary inside `if (nonce)` block~~ ✅ Fixed (`4d4e8f4`)
 
-- [ ] **Fix:** Simplify the ternary
+- [x] **Fix:** Simplify the ternary
 
 **File:** `src/app/(standard)/redirecting/page.tsx:36-38`
 
@@ -160,6 +160,8 @@ Simplify:
 if (nonce) {
   const redirectTo = getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH;
 ```
+
+**Applied fix** (`4d4e8f4`): ternary removed; the assignment now reads `const redirectTo = getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH;` inside the `if (nonce)` block.
 
 ---
 
@@ -231,13 +233,13 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 
 ## Summary
 
-| Severity  | Issue                                                                                                          | Status            |
-| --------- | -------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Severity  | Issue                                                                                                          | Status              |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------- |
 | 🔴 High   | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [x] Fixed `f700adc` |
 | 🔴 High   | Logout from authenticated `/fundraisers/*` routes bounces user to `/login`                                     | [x] Fixed `22cae9f` |
 | 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [x] Fixed `ecf892a` |
-| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed         |
-| 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [ ] Open          |
+| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed `cbf116c` |
 | 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [x] Fixed `9eae94d` |
-| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open          |
-| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open          |
+| 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [x] Fixed `4d4e8f4` |
+| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open            |
+| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open            |
