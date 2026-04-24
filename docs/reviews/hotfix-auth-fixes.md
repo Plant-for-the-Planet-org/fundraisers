@@ -187,17 +187,9 @@ The function previously accepted `redirectTo?: string` and also read `window.loc
 
 ---
 
-### 🟢 LOW — `AuthGuard` preserves error query params in `redirectTo`
+### ~~🟢 LOW — `AuthGuard` preserves error query params in `redirectTo`~~ N/A
 
-- [ ] **Fix:** Strip known error/auth params from `search` before building `currentPath`
-
-**File:** `src/components/auth/auth-guard.tsx:28`
-
-```ts
-const currentPath = search ? `${pathname}?${search}` : pathname;
-```
-
-If `search` contains params like `error=auth_failed`, they're carried through the `redirectTo` chain and would be present in the URL after the user logs in. This is a minor UX issue, not a security issue.
+- [x] **Not applicable** — error params (`error=auth_failed`, `reason=...`) are only set by the auth callback route, which redirects to `/?error=...` (the home page). The home page is not wrapped by `AuthGuard`, so these params never appear in a guarded route's URL under normal usage. No fix needed.
 
 ---
 
@@ -242,4 +234,4 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 | 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [x] Fixed `9eae94d` |
 | 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [x] Fixed `4d4e8f4` |
 | 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [x] Fixed `d5dd8c5` |
-| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open            |
+| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | N/A                 |
