@@ -1,18 +1,20 @@
 /**
- * Gets the sign in page URL with redirect parameter
- * Prevents redirect loops by detecting if already on login page
+ * Builds the `/login?redirectTo=...` URL for the given current path.
+ *
+ * If `currentPath` is already `/login?redirectTo=X`, the inner `X` is reused
+ * (falling back to `/explore`) so re-entry doesn't produce nested redirects.
+ * Otherwise `currentPath` is used verbatim as the redirect target.
+ *
+ * Callers are responsible for supplying `currentPath` — this function does not
+ * read `window.location`, so it is safe in any environment.
  */
-export function getSignInPath(redirectTo?: string): string {
-  if (typeof window === 'undefined') {
-    return `/login?redirectTo=${encodeURIComponent(redirectTo || '/explore')}`;
-  }
-
-  const { pathname, search } = window.location;
+export function getSignInPath(currentPath: string): string {
+  const [pathname, search = ''] = currentPath.split('?');
   const isOnLoginPage = pathname === '/login';
 
   const target = isOnLoginPage
-    ? new URLSearchParams(search).get('redirectTo') || redirectTo || '/explore'
-    : redirectTo || pathname + search;
+    ? new URLSearchParams(search).get('redirectTo') || '/explore'
+    : currentPath;
 
   return `/login?redirectTo=${encodeURIComponent(target)}`;
 }
