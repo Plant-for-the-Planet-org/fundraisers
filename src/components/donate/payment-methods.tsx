@@ -7,11 +7,10 @@ import type {
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Check, ChevronUp } from 'lucide-react';
-import { ChevronDown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -91,7 +90,8 @@ const MethodFeeDetails = memo(function MethodFeeDetails({
   );
 });
 
-type SelectedMethodTriggerProps = {
+// Preserved in case we want to switch back to a dropdown for payment method selection in the future
+/* type SelectedMethodTriggerProps = {
   isExpanded: boolean;
   selectedMethodLabel: string;
   showFeeDetails: boolean;
@@ -144,7 +144,7 @@ const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
       )}
     </button>
   );
-});
+}); */
 
 type PaymentMethodOptionProps = {
   methodId: PaymentMethodId;
@@ -219,7 +219,6 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 });
 
 export function PaymentMethods() {
-  const [isExpanded, setIsExpanded] = useState(true);
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
   const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
@@ -346,27 +345,6 @@ export function PaymentMethods() {
     ]
   );
 
-  const selectedMethodOption = useMemo(
-    () =>
-      visibleMethodOptions.find(method => method.id === selectedPaymentMethod),
-    [selectedPaymentMethod, visibleMethodOptions]
-  );
-
-  const selectedMethodLabel = selectedMethodOption
-    ? selectedMethodOption.label
-    : t('selectMethodPlaceholder');
-
-  const selectedMethodFeeText = selectedMethodOption?.feeText ?? null;
-
-  const selectedMethodFeeTooltip = selectedMethodOption?.feeTooltip ?? null;
-  const showSelectedMethodFeeDetails = Boolean(
-    feeCollectionEnabled && selectedMethodOption && selectedMethodFeeText
-  );
-
-  const toggleExpanded = useCallback(() => {
-    setIsExpanded(prev => !prev);
-  }, []);
-
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
       setValue('selectedPaymentMethod', methodId, {
@@ -402,17 +380,6 @@ export function PaymentMethods() {
       </div>
 
       <div className='border border-border rounded-lg'>
-        {false && (
-          <SelectedMethodTrigger
-            isExpanded={isExpanded}
-            selectedMethodLabel={selectedMethodLabel}
-            showFeeDetails={showSelectedMethodFeeDetails}
-            selectedMethodFeeText={selectedMethodFeeText}
-            selectedMethodFeeTooltip={selectedMethodFeeTooltip}
-            onToggle={toggleExpanded}
-          />
-        )}
-
         <div className='space-y-3 border-t border-border p-4'>
           {visibleMethodOptions.map(method => {
             const isSelected = selectedPaymentMethod === method.id;
