@@ -2,7 +2,8 @@
 
 **Branch:** `hotfix/auth-fixes`  
 **Base:** `develop`  
-**Reviewed:** 2026-04-22
+**Reviewed:** 2026-04-22  
+**Updated:** 2026-04-24 (post-fix re-review)
 
 ---
 
@@ -33,9 +34,9 @@ The security fixes are well-implemented. One regression and several maintenance 
 
 ## Issues & Task Tracker
 
-### 🔴 HIGH — Silent-auth iframe triggers `AuthInitializer` code exchange
+### ~~🔴 HIGH — Silent-auth iframe triggers `AuthInitializer` code exchange~~ ✅ Fixed (`f700adc`)
 
-- [ ] **Fix:** Guard `AuthInitializer` against iframe context
+- [x] **Fix:** Guard `AuthInitializer` against iframe context
 
 **Files:** `src/app/api/auth/callback/route.ts:26-28`, `src/components/auth/auth-initializer.tsx:12-16`, `src/lib/auth/auth0-config.ts:136-196`
 
@@ -67,11 +68,15 @@ if (typeof window !== 'undefined' && window.self !== window.top) return;
 
 Alternative: have the callback route detect a silent-auth context and avoid redirecting to `/redirecting` in that path.
 
+**Applied fix** (`f700adc`): added `if (typeof window !== 'undefined' && window.self !== window.top) return;` at the top of the init `useEffect`, exactly as recommended. The guard is correctly placed before the `logoutSuccess` and `didStartInit` checks.
+
+Note: the second `useEffect` (`if (logoutSuccess === 'true') clearAuth()`) does not have the iframe guard, but logouts never run through an iframe, so this is safe.
+
 ---
 
-### 🟡 MEDIUM — `AuthInitializer` fires a second `init()` after post-login navigation
+### ~~🟡 MEDIUM — `AuthInitializer` fires a second `init()` after post-login navigation~~ ✅ Fixed (`ecf892a`)
 
-- [ ] **Fix:** Prevent double-invocation of `init()` after redirect
+- [x] **Fix:** Prevent double-invocation of `init()` after redirect
 
 **File:** `src/components/auth/auth-initializer.tsx:30-83`
 
@@ -82,11 +87,13 @@ When `RedirectingPage` calls `router.replace('/dashboard')`, `useSearchParams()`
 
 **Recommended fix:** use a `useRef` run-once flag inside the effect, or check that the effect hasn't already been settled before calling `init()` again.
 
+**Applied fix** (`ecf892a`): added `const didStartInit = useRef(false)` and a `if (didStartInit.current) return; didStartInit.current = true;` guard at the top of the effect, exactly as recommended.
+
 ---
 
-### 🔴 HIGH — Logout from authenticated `/fundraisers/*` routes lands on `/login`
+### ~~🔴 HIGH — Logout from authenticated `/fundraisers/*` routes lands on `/login`~~ ✅ Fixed (`22cae9f`)
 
-- [ ] **Fix:** Extend `PROTECTED_PATH` to cover all auth-required routes, or invert the logic to a public-path allowlist
+- [x] **Fix:** Extend `PROTECTED_PATH` to cover all auth-required routes, or invert the logic to a public-path allowlist
 
 **File:** `src/lib/constants/auth.ts`, `src/stores/auth-store.ts:106-112`
 
@@ -101,11 +108,13 @@ The `isAllowedRedirect` fix suggested for the medium issue below would not catch
 - Extend `PROTECTED_PATH` to include `/fundraisers/create` (and any other auth-only sub-paths)
 - Invert the model: maintain an explicit public-path allowlist for post-logout redirects and default everything else to `DEFAULT_REDIRECT_PATH`
 
+**Applied fix** (`22cae9f`): added `/fundraisers/create` and `/dashboard/fundraisers/edit` to `PROTECTED_PATH`. `/fundraisers/create` is the only currently auth-required route under `/fundraisers/`, so this fix is complete for the present app. `/dashboard/fundraisers/edit` is already covered by the existing `/dashboard` prefix (since `isProtectedRoute` uses `startsWith`), so that entry is redundant but harmless. The architectural misalignment between `PROTECTED_PATH` and `ALLOWED_REDIRECT_ROOTS` remains; any new auth-required route added under `/fundraisers/` will need a manual `PROTECTED_PATH` entry to avoid the same bug.
+
 ---
 
-### 🟡 MEDIUM — `logout()` embeds unvalidated paths in the Auth0 `returnTo` URL
+### ~~🟡 MEDIUM — `logout()` embeds unvalidated paths in the Auth0 `returnTo` URL~~ ✅ Fixed
 
-- [ ] **Fix:** Apply `getSafeRedirectPath` to `redirectAfterLogout` in `authStore.logout()`
+- [x] **Fix:** Apply `getSafeRedirectPath` to `redirectAfterLogout` in `authStore.logout()`
 
 **File:** `src/stores/auth-store.ts:106-127`
 
@@ -117,11 +126,18 @@ const safeRedirect = isProtectedRoute(redirectAfterLogout)
 
 Any non-protected path the user is on gets embedded in the Auth0 `returnTo` URL without being checked against the allowlist. It's validated at receipt by `getSafeRedirectPath()` in `/redirecting`, so there is no open-redirect risk — but it's inconsistent with the validation posture applied everywhere else and could mislead future maintainers.
 
-**Recommended fix:**
+**Recommended fix:** chain both checks — `isProtectedRoute` first (to avoid sending the user back to an auth-required page), then `getSafeRedirectPath` (to reject paths outside the allowlist):
 
 ```ts
-const safeRedirect = getSafeRedirectPath(redirectAfterLogout);
+const uncheckedRedirect = isProtectedRoute(redirectAfterLogout)
+  ? DEFAULT_REDIRECT_PATH
+  : redirectAfterLogout;
+const safeRedirect = getSafeRedirectPath(uncheckedRedirect);
 ```
+
+Note: replacing `isProtectedRoute` with `getSafeRedirectPath` alone would break `/fundraisers/create` — `isAllowedRedirect` passes it through because `/fundraisers` is an allowed root, so the user would be sent back to an auth-required page after logout, re-introducing the two-step redirect bug fixed in `22cae9f`.
+
+**Applied fix:** chained both checks as above. `getSafeRedirectPath` is imported alongside `isProtectedRoute` in `auth-store.ts`. `/redirecting` retains its own `getSafeRedirectPath` call independently — it is a public page that can receive arbitrary query params directly.
 
 ---
 
@@ -213,13 +229,13 @@ If `search` contains params like `error=auth_failed`, they're carried through th
 
 ## Summary
 
-| Severity  | Issue                                                                                                          | Status   |
-| --------- | -------------------------------------------------------------------------------------------------------------- | -------- |
-| 🔴 High   | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [ ] Open |
-| 🔴 High   | Logout from authenticated `/fundraisers/*` routes bounces user to `/login`                                     | [ ] Open |
-| 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [ ] Open |
-| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [ ] Open |
-| 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [ ] Open |
-| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [ ] Open |
-| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open |
-| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open |
+| Severity  | Issue                                                                                                          | Status            |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 🔴 High   | Silent-auth iframe `AuthInitializer` races to exchange the code; `clearAuth()` can wipe the localStorage token | [x] Fixed `f700adc` |
+| 🔴 High   | Logout from authenticated `/fundraisers/*` routes bounces user to `/login`                                     | [x] Fixed `22cae9f` |
+| 🟡 Medium | `AuthInitializer` double-fires `init()` after `router.replace()` changes `searchParams`                        | [x] Fixed `ecf892a` |
+| 🟡 Medium | `logout()` embeds non-allowlist-validated paths in the Auth0 returnTo URL                                      | [x] Fixed         |
+| 🟢 Low    | Dead-code ternary in `redirecting/page.tsx`                                                                    | [ ] Open          |
+| 🟢 Low    | `getValidStoredToken` / `cleanUrl` lack SSR guards                                                             | [ ] Open          |
+| 🟢 Low    | `getSignInPath` redundant `window.location` read                                                               | [ ] Open          |
+| 🟢 Low    | `AuthGuard` carries error query params through `redirectTo`                                                    | [ ] Open          |
