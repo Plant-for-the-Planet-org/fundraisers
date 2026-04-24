@@ -7,7 +7,7 @@ import type {
   ThemeMode,
 } from './types';
 
-import { DEFAULT_THEME,THEMES } from './themes';
+import { DEFAULT_THEME, THEMES } from './themes';
 
 const VALID_ACCENTS = new Set<string>([
   'blue',

@@ -68,7 +68,7 @@ export const AddressCountrySelector = ({
       `#${CSS.escape(activeOptionId)}`
     );
     activeOption?.scrollIntoView({ block: 'nearest' });
-  }, [isOpen, activeIndex, filteredCountries]);
+  }, [isOpen, activeIndex, filteredCountries, uid]);
 
   const handleSelectCountry = (code: string) => {
     const countryOption = allCountries.find(c => c.code === code);

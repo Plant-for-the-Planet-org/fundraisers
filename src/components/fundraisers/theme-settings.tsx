@@ -48,11 +48,9 @@ export function ThemeSettings() {
   const pathname = usePathname();
   const tTheme = useTranslations('Fundraisers.form.theme');
   const { selectedTheme, setSelectedTheme } = useThemeStore();
-  const { field } = useController<FundraiserFormValues, 'settings.theme'>(
-    {
-      name: 'settings.theme',
-    }
-  );
+  const { field } = useController<FundraiserFormValues, 'settings.theme'>({
+    name: 'settings.theme',
+  });
 
   const activeTheme = selectedTheme ?? getThemeForPath(pathname);
 

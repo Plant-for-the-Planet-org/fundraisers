@@ -11,9 +11,7 @@ export function MyFundraisersCard({ count }: MyFundraisersCardProps) {
   const tMyFundraisers = useTranslations('Dashboard.cards.myFundraisers');
 
   const helper =
-    count === 0
-      ? tMyFundraisers('empty')
-      : tMyFundraisers('activeFundraisers');
+    count === 0 ? tMyFundraisers('empty') : tMyFundraisers('activeFundraisers');
 
   return (
     <CardBase

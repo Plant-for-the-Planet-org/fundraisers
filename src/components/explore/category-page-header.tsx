@@ -1,6 +1,6 @@
 import type { Category } from '@/lib/types/category';
 
-import { useLocale,useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { CategoryIcon } from './category-icon';
 
