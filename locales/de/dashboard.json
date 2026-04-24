@@ -21,11 +21,11 @@
       },
       "totalRaised": {
         "title": "Insgesamt gesammelt",
-        "description": "Gesamtbetrag, der über alle Aufrufe gesammelt wurde",
-        "value": "Zusammengefasst nach Währung",
-        "summaryLine": "{amount} von {count, plural, one {# Spendenaufruf} other {# Spendenaufrufen}}",
+        "description": "Gesamtbetrag, der durch alle Aufrufe gesammelt wurde",
+        "value": "Nach Währung zusammengefasst",
+        "summaryLine": "{amount} durch {count, plural, one {# Spendenaufruf} other {# Spendenaufrufe}}",
         "empty": "Keine Spenden gesammelt",
-        "aggregatedByCurrency": "Zusammengefasst nach Währung"
+        "aggregatedByCurrency": "Nach Währung zusammengefasst"
       },
       "donations": {
         "title": "Spenden",

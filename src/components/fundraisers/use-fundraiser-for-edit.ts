@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 export type FundraiserEditStatus =
   | 'idle'
