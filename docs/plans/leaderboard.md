@@ -51,29 +51,39 @@ Then, add `settings.modules.leaderboard` to the Zod schema in `src/components/fu
 
 ### Step 2 - LeaderboardSettings UI component (toggles, no preview)
 
-**What:** Create `src/components/fundraisers/leaderboard-settings.tsx`. Enable/disable toggle in the header row. Gear icon opens a settings overlay with individual option switches for: show_recent_list, show_top_list, show_amount, view_all, anonymize, show_avatar. Uses shadcn `Switch` component. Controlled by `react-hook-form` via `Controller` or `useFormContext`.
+**What:** Create a `leaderboard/` folder under `src/components/fundraisers/` with three files:
 
-No `Popover` component exists in this project — use the `Card` overlay pattern from the prototype (absolutely positioned `Card` toggled via local `useState`, closed via an `X` icon).
+- `leaderboard-settings.tsx` — the section row: `SectionHeader` (with `className='flex-row items-center justify-between'` following the `project-selection.tsx` pattern) containing the enable/disable `Switch` and the settings dropdown trigger. Owned RHF controller via `useController`. Also renders `DisabledView` when disabled.
+- `leaderboard-settings-dropdown.tsx` — the gear/X icon button with a `DropdownMenu` overlay containing 6 option `Switch` items: show_recent_list, show_top_list, show_amount, view_all, anonymize, show_avatar. Receives `settings` and `onChange` as props. Uses `DropdownMenu` (not a Card overlay) for consistent border styling, outside-click close, and Escape key support.
+- `disabled-view.tsx` — dashed placeholder shown when leaderboard is disabled.
 
-Add it to the sidebar section of `src/components/fundraisers/fundraiser-form-body.tsx`.
+Add new translation files (`locales/en/leaderboard.json`, `locales/de/leaderboard.json`) under the `Leaderboard.form` namespace. Register in `src/i18n/request.ts` and `src/i18n/types.ts`.
+
+Add `LeaderboardSettings` to `MainPanel` in `src/components/fundraisers/fundraiser-form-body.tsx`, below `<Title />`.
 
 **Files:**
 
-- `src/components/fundraisers/leaderboard-settings.tsx` (new)
+- `src/components/fundraisers/leaderboard/leaderboard-settings.tsx` (new)
+- `src/components/fundraisers/leaderboard/leaderboard-settings-dropdown.tsx` (new)
+- `src/components/fundraisers/leaderboard/disabled-view.tsx` (new)
+- `locales/en/leaderboard.json` (new)
+- `locales/de/leaderboard.json` (new)
+- `src/i18n/request.ts`
+- `src/i18n/types.ts`
 - `src/components/fundraisers/fundraiser-form-body.tsx`
 
-**Visual test:** Create/edit form shows a "Leaderboard" row in the sidebar. Toggle on/off. Open gear icon — all 6 options appear with working toggles. React DevTools confirms form state updates on each toggle.
+**Visual test:** Create/edit form shows a "Leaderboard" row in the main panel below the title. Toggle on/off. Open gear icon — all 6 options appear with working toggles. React DevTools confirms form state updates on each toggle.
 
 ---
 
 ### Step 3 - Leaderboard preview inside settings
 
-**What:** Port `leaderboard.tsx` from the prototype into `src/components/fundraisers/leaderboard.tsx` (adapting imports to the fundraisers project's `formatCurrency` and shadcn paths). Render it inside `LeaderboardSettings` with mock donations — live-updating as settings change. Currency comes from `useFormContext`. Keep horizontal auto-scroll behavior from the prototype.
+**What:** Port `leaderboard.tsx` from the prototype into `src/components/fundraisers/leaderboard/leaderboard.tsx` (adapting imports to the fundraisers project's `formatCurrency` and shadcn paths). Render it inside `LeaderboardSettings` with mock donations — live-updating as settings change. Currency comes from `useFormContext`. Keep horizontal auto-scroll behavior from the prototype.
 
 **Files:**
 
-- `src/components/fundraisers/leaderboard.tsx` (new, ported from prototype)
-- `src/components/fundraisers/leaderboard-settings.tsx` (add preview section)
+- `src/components/fundraisers/leaderboard/leaderboard.tsx` (new, ported from prototype)
+- `src/components/fundraisers/leaderboard/leaderboard-settings.tsx` (add preview below the enable toggle)
 
 **Visual test:** With leaderboard enabled, a horizontal scrolling preview appears in the sidebar. Toggle "Show Amounts" — amounts appear/disappear. Toggle tabs — Newest/Top tabs appear/disappear. Toggle "Anonymize" — names become "Anonymous". Toggle avatars on/off.
 
@@ -111,7 +121,7 @@ The type changes needed here were done in Step 1.
 
 ### Step 6 - Leaderboard display component + fundraiser detail page
 
-**What:** Port `leaderboard-container.tsx` from the prototype as `src/components/fundraisers/leaderboard-container.tsx`. It handles: loading state, error state, `enabled` flag (renders null if disabled), tab state, data processing with `formatTimeAgo`.
+**What:** Port `leaderboard-container.tsx` from the prototype as `src/components/fundraisers/leaderboard/leaderboard-container.tsx`. It handles: loading state, error state, `enabled` flag (renders null if disabled), tab state, data processing with `formatTimeAgo`.
 
 Port `formatTimeAgo()` from `gofundnature/src/lib/utils.ts` into `src/lib/utils/time.ts` and import it from there.
 
@@ -120,7 +130,7 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 **Files:**
 
 - `src/lib/utils/time.ts` (new — port `formatTimeAgo` from prototype)
-- `src/components/fundraisers/leaderboard-container.tsx` (new, ported from prototype)
+- `src/components/fundraisers/leaderboard/leaderboard-container.tsx` (new, ported from prototype)
 - `src/app/(fundraiser)/fundraisers/[slug]/page.tsx`
 - `src/components/fundraisers/fundraiser-view.tsx`
 
@@ -139,7 +149,7 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 | Step | Builds                      | Testable on                    | Status |
 | ---- | --------------------------- | ------------------------------ | ------ |
 | 1    | Form schema + defaults      | DevTools form state            | [x]    |
-| 2    | Settings toggles UI         | Create/edit form sidebar       | [ ]    |
+| 2    | Settings toggles UI         | Create/edit form sidebar       | [x]    |
 | 3    | Live settings preview       | Sidebar preview with mock data | [ ]    |
 | 4    | API request includes config | Network tab on create/edit     | [ ]    |
 | 5    | Leaderboard data service    | Console / Network tab          | [ ]    |
