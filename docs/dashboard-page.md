@@ -62,9 +62,8 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 - New components in `src/components/dashboard/`:
   - `fundraiser-list.tsx` — handles the loading / empty / populated states.
-  - `fundraiser-list-item.tsx` — image, title, host, `amount of goal`, donations, days‑left.
+  - `fundraiser-list-item.tsx` — image, title, host, `amount of goal`, donations, days‑left. **No status badge yet — that lands in PR 3.**
   - `fundraiser-list-item-skeleton.tsx` — shown 3–5× while loading.
-  - `fundraiser-status-badge.tsx` — variants `active` / `paused` / `draft` / `ended` / `ending-soon`.
   - `fundraiser-list-empty.tsx` — zero‑fundraisers CTA → `/fundraisers/create`.
 - New utility `src/lib/utils/fundraiser-list.ts` with **only** what the list needs at this stage:
   - `DisplayStatus` type, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
@@ -74,7 +73,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 - Page composition: render the list directly under `DashboardSummary`. Default order: `startDate` desc.
 - Locale keys added: `statusBadge.*`, `listItem.*`, `empty.*`.
 
-**Out of scope (deferred to PR 3 / 4):** search box, status‑filter pills, sort menu, result‑count line, `noResults` empty state, all per‑row actions (kebab menu).
+**Out of scope (deferred to PR 3 / 4):** status badge component (`fundraiser-status-badge.tsx`) and `statusBadge.*` locale keys, search box, status‑filter pills, sort menu, result‑count line, `noResults` empty state, all per‑row actions (kebab menu).
 
 **Dependencies / risks**
 
@@ -83,7 +82,6 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 **Acceptance**
 
 - All of the user's fundraisers render in a single list, newest first.
-- Status badges render correct colors for the four real statuses available pre‑backend.
 - Long titles truncate; missing image shows the placeholder; missing host shows the fallback string.
 - Skeleton renders during `isLoading`; empty state renders when the user has zero fundraisers.
 
@@ -96,6 +94,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 **In scope**
 
 - New components:
+  - `fundraiser-status-badge.tsx` — variants `active` / `paused` / `ended` / `ending-soon`. Wired into `fundraiser-list-item.tsx` next to the title.
   - `fundraiser-list-section.tsx` — wraps toolbar + result count + list, owns filter state.
   - `fundraiser-list-toolbar.tsx`.
   - `fundraiser-search-input.tsx` (250 ms debounce, syncs from parent for "Clear filters").
@@ -105,7 +104,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 - Extend `src/lib/utils/fundraiser-list.ts` with: `FundraiserListSort`, `FundraiserListStatusFilter`, `FundraiserListFilters`, `FundraiserStatusCounts`, `DEFAULT_FUNDRAISER_LIST_FILTERS`, `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
 - New `useFundraiserListFilters` hook in `src/components/dashboard/use-fundraiser-list-filters.ts`.
 - Wire `FundraiserListSection` into the page in place of the bare list from PR 2.
-- Locale keys added: `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
+- Locale keys added: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
 
 **Out of scope (deferred to PR 4):** any per‑row actions; URL‑sync for filter state (still a doc open question).
 
@@ -210,7 +209,7 @@ src/components/dashboard/
 ├── fundraiser-list.tsx                 # Renders rows or empty/no-results state
 ├── fundraiser-list-item.tsx            # One row (image + meta + status + ⋮)
 ├── fundraiser-list-item-skeleton.tsx
-├── fundraiser-status-badge.tsx         # Active / Paused / Ended / Ending soon
+├── fundraiser-status-badge.tsx         # Active / Paused / Ended / Ending soon (drafts → Paused)
 ├── fundraiser-action-menu.tsx          # ⋮ menu (Edit / Copy link / Pause | Resume)
 ├── fundraiser-list-empty.tsx           # User has zero fundraisers
 ├── fundraiser-list-no-results.tsx      # Filters/search produced zero rows
@@ -307,15 +306,15 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 - Props: `{ fundraiser: Fundraiser; onMutate: () => void; }`
 - Layout (left → right):
   - 80×80 image (or placeholder if `fundraiser.image` is null) — uses `next/image` with `fill` and `sizes`.
-  - Block: title + `FundraiserStatusBadge`; "by {hostName}" line; metric row (`amountRaised of goal · N donations · timeLeft`).
+  - Block: title (PR 3 also renders `FundraiserStatusBadge` next to the title); "by {hostName}" line — formatted from `fundraiser.hosts` as `X` (1), `X and Y` (2), or `X, Y and N other(s)` (3+) via `listItem.hostsTwo` / `listItem.hostsMany`; metric row (`amountRaised of goal · N donations · timeLeft`).
   - Right: `FundraiserActionMenu`.
 - Title is a `<Link>` to the public fundraiser page (or to edit if you prefer; **call out** as an open question).
 
 ### `FundraiserStatusBadge`
 
 - Props: `{ status: DisplayStatus; }`
-- Variants: `active` (green), `paused` (muted), `draft` (muted, distinct label), `ended` (gray), `ending-soon` (amber). Pure presentational; no logic. The display status is derived upstream (see `deriveDisplayStatus`).
-- Drafts share the **Paused** filter bucket (per API rule below) but render with a distinct "Draft" label so the user can tell them apart at a glance.
+- Variants: `active` (green), `paused` (muted), `ended` (gray), `ending-soon` (amber). Pure presentational; no logic. The display status is derived upstream (see `deriveDisplayStatus`).
+- Drafts collapse into the **Paused** badge (and Paused filter bucket) — no separate "Draft" label.
 
 ### `FundraiserActionMenu`
 
@@ -397,12 +396,7 @@ Drop `getDashboardFundraiserStats` (and its callers in tests, if any).
 ### New: `lib/utils/fundraiser-list.ts` (pure functions, fully unit‑testable)
 
 ```ts
-export type DisplayStatus =
-  | 'active'
-  | 'paused'
-  | 'draft'
-  | 'ended'
-  | 'ending-soon';
+export type DisplayStatus = 'active' | 'paused' | 'ended' | 'ending-soon';
 export type FundraiserListSort =
   | 'newest'
   | 'oldest'
@@ -445,12 +439,12 @@ export function getStatusCounts(list: Fundraiser[]): FundraiserStatusCounts;
 | ------------------------ | ------------- | --------------------------------------------------- |
 | `active`                 | **Active**    | `active`, or `ending-soon` if `0 < getDaysLeft ≤ 7` |
 | `paused`                 | **Paused**    | `paused`                                            |
-| `draft`                  | **Paused**    | `draft` (distinct label)                            |
+| `draft`                  | **Paused**    | `paused` (drafts collapse into the Paused badge)    |
 | `completed`, `cancelled` | **Ended**     | `ended`                                             |
 
 Rules:
 
-- `deriveDisplayStatus`: switch on API `status`. `'completed' | 'cancelled'` → `ended`. `'paused'` → `paused`. `'draft'` → `draft`. `'active'` → `ending-soon` if `0 < getDaysLeft ≤ ENDING_SOON_THRESHOLD_DAYS`, else `active`. `endDate` is **not** consulted for non‑active statuses — the API status wins.
+- `deriveDisplayStatus`: switch on API `status`. `'completed' | 'cancelled'` → `ended`. `'paused' | 'draft'` → `paused`. `'active'` → `ending-soon` if `0 < getDaysLeft ≤ ENDING_SOON_THRESHOLD_DAYS`, else `active`. `endDate` is **not** consulted for non‑active statuses — the API status wins.
 - `filterFundraisers`:
   - `all` → everything (no exclusions; drafts included).
   - `active` → API `status === 'active'` (covers both `active` and `ending-soon` badges).
@@ -542,12 +536,13 @@ Proposed key shape (English; German mirrors structure):
     "statusBadge": {
       "active": "Active",
       "paused": "Paused",
-      "draft": "Draft",
       "ended": "Ended",
       "ending-soon": "Ending soon"
     },
     "listItem": {
       "byHost": "by {host}",
+      "hostsTwo": "{first} and {second}",
+      "hostsMany": "{first}, {second} and {count, plural, one {# other} other {# others}}",
       "amountOfGoal": "{raised} of {goal}",
       "donations": "{count, plural, one {# donation} other {# donations}}",
       "daysLeft": "{count, plural, one {# day left} other {# days left}}",
@@ -596,10 +591,10 @@ Proposed key shape (English; German mirrors structure):
 | `endDate` ≤ 7 days away and API `status === 'active'`          | `ending-soon` badge (amber). Counted under **Active** filter (`ending-soon` is a visual subset of active, not a separate bucket).                                                                                                                                |
 | `status === 'completed'` or `'cancelled'`                      | **Ended** filter. Read‑only — action menu shows **Copy link only** (no Edit, no Pause/Resume).                                                                                                                                                                   |
 | `status === 'paused'`                                          | **Paused** filter. Action menu shows Resume.                                                                                                                                                                                                                     |
-| `status === 'draft'`                                           | **Paused** filter, badge label "Draft". Action menu shows Edit + Copy link, **no** Pause/Resume (drafts are published, not resumed). Counted under `pausedCount`.                                                                                                |
+| `status === 'draft'`                                           | **Paused** filter, **Paused** badge (drafts collapse into Paused — no separate "Draft" label). Action menu shows Edit + Copy link, **no** Pause/Resume (drafts are published, not resumed). Counted under `pausedCount`.                                         |
 | Long titles / host names                                       | Truncate with ellipsis (`line-clamp-1` for title, `truncate` for host). Full text in `title=""` attr for tooltip.                                                                                                                                                |
 | Missing `fundraiser.image`                                     | Render solid placeholder with first letter of title; same dimensions.                                                                                                                                                                                            |
-| Missing host display name                                      | Fall back to `host.user?.name`, then `t('listItem.unknownHost')`.                                                                                                                                                                                                |
+| Missing host display name                                      | Per host, fall back to `host.user?.name`; if no host has any name, render `tFundraisers('unknownHost')`. Multiple hosts compose as `X` / `X and Y` / `X, Y and N other(s)` (`listItem.hostsTwo` / `hostsMany`).                                                  |
 | `navigator.clipboard` unavailable (HTTP, old browser)          | Fall back to a hidden `<input>` + `document.execCommand('copy')`; if both fail show error toast.                                                                                                                                                                 |
 | Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
 | Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
@@ -657,7 +652,8 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 - Ended fundraisers (`completed` / `cancelled`) are read‑only — no Edit, only Copy link.
 - Filter buckets are driven by API `status` only (not `endDate`).
-- Drafts share the **Paused** filter bucket but render with a distinct "Draft" badge.
+- Drafts collapse into **Paused** — same filter bucket and same "Paused" badge (no separate "Draft" label).
+- Only four badges exist: Active, Paused, Ended, Ending soon.
 - Toast feedback uses `sonner` (already a dependency, used elsewhere in the app).
 
 ---
@@ -678,18 +674,18 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Add `status: FundraiserStatus` to the `Fundraiser` interface (required — backend ships it on `GET /fundraisers`).
 - [ ] Switch `getDashboardSummary`'s `activeCount` to `status === 'active'` (drop the `canDonate` proxy).
 - [ ] Add `src/lib/utils/fundraiser-list.ts` with **only** `DisplayStatus`, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
-- [ ] Add components: `fundraiser-status-badge.tsx`, `fundraiser-list-item.tsx`, `fundraiser-list-item-skeleton.tsx`, `fundraiser-list.tsx`, `fundraiser-list-empty.tsx`; export from `index.ts`.
+- [ ] Add components: `fundraiser-list-item.tsx`, `fundraiser-list-item-skeleton.tsx`, `fundraiser-list.tsx`, `fundraiser-list-empty.tsx`; export from `index.ts`. **Status badge component is deferred to PR 3.**
 - [ ] Page: render the list directly under `DashboardSummary`, sorted newest‑first by `startDate`.
-- [ ] Locale keys: `statusBadge.*`, `listItem.*`, `empty.*`.
+- [ ] Locale keys: `listItem.*`, `empty.*`. (`statusBadge.*` is added in PR 3.)
 - [ ] Unit tests for `deriveDisplayStatus`.
 
 ### PR 3 — Toolbar (search + filter + sort)
 
 - [ ] Extend `src/lib/utils/fundraiser-list.ts` with filter/sort/counts types + functions.
 - [ ] Add `useFundraiserListFilters` hook in `src/components/dashboard/`.
-- [ ] Add components: `fundraiser-search-input.tsx`, `fundraiser-status-filter.tsx`, `fundraiser-sort-menu.tsx`, `fundraiser-list-toolbar.tsx`, `fundraiser-list-no-results.tsx`, `fundraiser-list-section.tsx`; export from `index.ts`.
+- [ ] Add components: `fundraiser-status-badge.tsx` (variants `active` / `paused` / `ended` / `ending-soon`; wired into `fundraiser-list-item.tsx`), `fundraiser-search-input.tsx`, `fundraiser-status-filter.tsx`, `fundraiser-sort-menu.tsx`, `fundraiser-list-toolbar.tsx`, `fundraiser-list-no-results.tsx`, `fundraiser-list-section.tsx`; export from `index.ts`.
 - [ ] Replace the bare list in the page with `FundraiserListSection`.
-- [ ] Locale keys: `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
+- [ ] Locale keys: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
 - [ ] Unit tests for `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
 
 ### PR 4 — Per‑row actions
