@@ -54,10 +54,10 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
     daysLeft <= 0;
 
   return (
-    <li className='fundraiser-list-item flex items-start gap-4 py-4'>
+    <li className='fundraiser-list-item group flex items-start gap-4 py-4'>
       <Link
         href={getFundraiserUrl(fundraiser)}
-        className='shrink-0 h-20 w-20 overflow-hidden rounded-lg bg-muted'
+        className='shrink-0 h-20 w-20 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-110'
         aria-label={fundraiser.title}
       >
         <FundraiserCardImage
