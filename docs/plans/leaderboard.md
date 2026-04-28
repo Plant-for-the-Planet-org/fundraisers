@@ -151,6 +151,6 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 | 1    | Form schema + defaults      | DevTools form state            | [x]    |
 | 2    | Settings toggles UI         | Create/edit form sidebar       | [x]    |
 | 3    | Live settings preview       | Sidebar preview with mock data | [ ]    |
-| 4    | API request includes config | Network tab on create/edit     | [ ]    |
+| 4    | API request includes config | Network tab on create/edit     | [x]    |
 | 5    | Leaderboard data service    | Console / Network tab          | [ ]    |
 | 6    | Leaderboard on detail page  | Fundraiser detail page         | [ ]    |
