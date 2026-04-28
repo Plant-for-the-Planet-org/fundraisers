@@ -11,7 +11,8 @@
     "summary": {
       "fundraisers": {
         "label": "Spendenaufrufe",
-        "activeHelper": "{count, plural, =0 {Keine aktiv} one {# aktiv} other {# aktiv}}"
+        "activeSuffix": "aktiv",
+        "noActive": "Keine aktiven Spendenaufrufe"
       },
       "totalRaised": {
         "label": "Insgesamt gesammelt",

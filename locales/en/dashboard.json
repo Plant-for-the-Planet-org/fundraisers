@@ -11,7 +11,8 @@
     "summary": {
       "fundraisers": {
         "label": "Fundraisers",
-        "activeHelper": "{count, plural, =0 {No active} one {# active} other {# active}}"
+        "activeSuffix": "active",
+        "noActive": "No active fundraisers"
       },
       "totalRaised": {
         "label": "Total Raised",
