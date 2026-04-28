@@ -8,8 +8,10 @@ interface FundraisersApiEnvelope {
   items?: unknown;
 }
 
-export interface DashboardFundraiserStats {
-  activeFundraisersCount: number;
+export interface DashboardSummaryStats {
+  totalCount: number;
+  activeCount: number;
+  donationsCount: number;
   totalRaisedByCurrency: DashboardRaisedSummary[];
 }
 
@@ -49,16 +51,23 @@ export async function getFundraisers(token: string): Promise<Fundraiser[]> {
   return normalizeFundraisersResponse(payload);
 }
 
-export function getDashboardFundraiserStats(
+export function getDashboardSummary(
   fundraisers: Fundraiser[]
-): DashboardFundraiserStats {
-  const activeFundraisersCount = fundraisers.filter(
-    fundraiser => fundraiser.canDonate === true
-  ).length;
+): DashboardSummaryStats {
+  let activeCount = 0;
+  let donationsCount = 0;
 
   const byCurrency = new Map<string, DashboardRaisedSummary>();
 
   for (const fundraiser of fundraisers) {
+    if (fundraiser.canDonate === true) {
+      activeCount += 1;
+    }
+
+    if (Number.isFinite(fundraiser.donationCount)) {
+      donationsCount += fundraiser.donationCount;
+    }
+
     if (typeof fundraiser.currency !== 'string' || fundraiser.currency === '') {
       continue;
     }
@@ -89,7 +98,9 @@ export function getDashboardFundraiserStats(
   });
 
   return {
-    activeFundraisersCount,
+    totalCount: fundraisers.length,
+    activeCount,
+    donationsCount,
     totalRaisedByCurrency,
   };
 }

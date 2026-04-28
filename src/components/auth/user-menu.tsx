@@ -94,7 +94,7 @@ export function UserMenu() {
         <DropdownMenuItem asChild className='cursor-pointer'>
           <Link href='/dashboard' className='flex items-center'>
             <CreditCard className='mr-2 h-4 w-4' />
-            <span>{tDashboard('dashboard')}</span>
+            <span>{tDashboard('breadcrumb.dashboard')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='cursor-pointer'>
