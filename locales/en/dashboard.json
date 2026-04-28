@@ -31,9 +31,6 @@
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
     },
-    "toolbar": {
-      "resultCount": "Showing <b>{visible}</b> of {total}"
-    },
     "listItem": {
       "byHost": "by {host}",
       "hostsTwo": "{first} and {second}",

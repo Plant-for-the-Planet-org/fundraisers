@@ -31,9 +31,6 @@
       "retry": "Erneut versuchen",
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
-    "toolbar": {
-      "resultCount": "<b>{visible}</b> von {total} werden angezeigt"
-    },
     "listItem": {
       "byHost": "von {host}",
       "hostsTwo": "{first} und {second}",
