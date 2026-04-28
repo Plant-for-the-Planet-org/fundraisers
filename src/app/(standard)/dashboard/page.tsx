@@ -30,38 +30,30 @@ export default function DashboardPage() {
   const [hasError, setHasError] = useState(false);
 
   const fetchFundraisers = useCallback(
-    async (abort?: { cancelled: boolean }) => {
-      if (!accessToken) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setHasError(false);
+    async (isIgnored?: () => boolean) => {
+      if (!accessToken) return;
 
       try {
         const data = await getFundraisers(accessToken);
-        if (abort?.cancelled) return;
+        if (isIgnored?.()) return;
         setFundraisers(data);
+        setHasError(false);
       } catch (error) {
-        if (!abort?.cancelled) {
-          console.error('[Dashboard] Failed to fetch fundraisers:', error);
-          setHasError(true);
-        }
+        if (isIgnored?.()) return;
+        console.error('[Dashboard] Failed to fetch fundraisers:', error);
+        setHasError(true);
       } finally {
-        if (!abort?.cancelled) {
-          setIsLoading(false);
-        }
+        if (!isIgnored?.()) setIsLoading(false);
       }
     },
     [accessToken]
   );
 
   useEffect(() => {
-    const abort = { cancelled: false };
-    void fetchFundraisers(abort);
+    let shouldIgnore = false;
+    void fetchFundraisers(() => shouldIgnore);
     return () => {
-      abort.cancelled = true;
+      shouldIgnore = true;
     };
   }, [fetchFundraisers]);
 
@@ -72,6 +64,8 @@ export default function DashboardPage() {
   );
 
   const refetch = useCallback(() => {
+    setIsLoading(true);
+    setHasError(false);
     void fetchFundraisers();
   }, [fetchFundraisers]);
 
