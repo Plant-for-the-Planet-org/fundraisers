@@ -11,7 +11,11 @@ import {
 } from '@/lib/api/fundraisers-service';
 import { useAuthStore } from '@/stores/auth-store';
 import { AuthGuard } from '@/components/auth/auth-guard';
-import { DashboardHeader, DashboardSummary } from '@/components/dashboard';
+import {
+  DashboardHeader,
+  DashboardSummary,
+  FundraiserList,
+} from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
 const EMPTY_SUMMARY: DashboardSummaryStats = {
@@ -93,6 +97,10 @@ export default function DashboardPage() {
           hasError={hasError}
           onRetry={refetch}
         />
+
+        {!hasError && (
+          <FundraiserList fundraisers={fundraisers} isLoading={isLoading} />
+        )}
       </section>
     </AuthGuard>
   );

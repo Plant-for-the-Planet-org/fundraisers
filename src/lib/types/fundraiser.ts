@@ -131,6 +131,7 @@ export interface Fundraiser {
   hosts: FundraiserHost[];
   visibility: FundraiserVisibility;
   canDonate: boolean;
+  status: FundraiserStatus;
   projectAllocations: ProjectAllocation[];
   startDate: string;
   endDate: string;

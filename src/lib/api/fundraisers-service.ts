@@ -60,7 +60,7 @@ export function getDashboardSummary(
   const byCurrency = new Map<string, DashboardRaisedSummary>();
 
   for (const fundraiser of fundraisers) {
-    if (fundraiser.canDonate === true) {
+    if (fundraiser.status === 'active') {
       activeCount += 1;
     }
 
