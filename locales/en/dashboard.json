@@ -1,37 +1,34 @@
 {
   "Dashboard": {
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard"
+    },
+    "manageFundraisers": {
+      "title": "Manage fundraisers",
+      "subtitle": "View, edit, and track your fundraisers. Pause collection or share the ones that need a boost."
+    },
+    "summary": {
+      "fundraisers": {
+        "label": "Fundraisers",
+        "activeHelper": "{count, plural, =0 {No active} one {# active} other {# active}}"
+      },
+      "totalRaised": {
+        "label": "Total Raised",
+        "helper": "across all time",
+        "moreCurrencies": "+{count, plural, one {# more currency} other {# more currencies}}",
+        "empty": "No funds raised yet"
+      },
+      "donations": {
+        "label": "Donations",
+        "helper": "from supporters"
+      }
+    },
     "statsError": {
       "title": "Couldn't load dashboard stats",
       "description": "Something went wrong while loading your fundraiser data.",
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
-    },
-    "breadcrumb": {
-      "home": "Home"
-    },
-    "dashboard": "Dashboard",
-    "welcome": "Welcome back, {displayName}!",
-    "fallbackName": "there",
-    "cards": {
-      "myFundraisers": {
-        "title": "My Fundraisers",
-        "description": "Manage your active fundraising campaigns",
-        "empty": "No active fundraisers",
-        "activeFundraisers": "Active fundraisers"
-      },
-      "totalRaised": {
-        "title": "Total Raised",
-        "description": "Amount raised across all campaigns",
-        "value": "Aggregated by currency",
-        "summaryLine": "{amount} from {count, plural, one {# fundraiser} other {# fundraisers}}",
-        "empty": "No funds raised.",
-        "aggregatedByCurrency": "Aggregated by currency"
-      },
-      "donations": {
-        "title": "Donations",
-        "description": "Your contribution history",
-        "empty": "No donations yet"
-      }
     }
   }
 }

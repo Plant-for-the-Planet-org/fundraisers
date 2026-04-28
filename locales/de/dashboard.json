@@ -1,37 +1,34 @@
 {
   "Dashboard": {
-    "statsError": {
-      "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
-      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schief gelaufen.",
-      "retry": "Erneut versuchen",
-      "exploreLinkText": "Spendenaufrufe entdecken"
-    },
     "breadcrumb": {
-      "home": "Startseite"
+      "home": "Startseite",
+      "dashboard": "Dashboard"
     },
-    "dashboard": "Dashboard",
-    "welcome": "Willkommen zurück, {displayName}!",
-    "fallbackName": "dort",
-    "cards": {
-      "myFundraisers": {
-        "title": "Meine Spendenaufrufe",
-        "description": "Verwalte deine aktiven Spendenaufrufe",
-        "empty": "Keine aktiven Spendenaufrufe",
-        "activeFundraisers": "Aktive Spendenaufrufe"
+    "manageFundraisers": {
+      "title": "Spendenaufrufe verwalten",
+      "subtitle": "Verwalte, bearbeite und verfolge deine Fundraiser. Pausiere die Sammlung oder teile die, die einen zusätzlichen Schub brauchen."
+    },
+    "summary": {
+      "fundraisers": {
+        "label": "Spendenaufrufe",
+        "activeHelper": "{count, plural, =0 {Keine aktiv} one {# aktiv} other {# aktiv}}"
       },
       "totalRaised": {
-        "title": "Insgesamt gesammelt",
-        "description": "Gesamtbetrag, der durch alle Aufrufe gesammelt wurde",
-        "value": "Nach Währung zusammengefasst",
-        "summaryLine": "{amount} durch {count, plural, one {# Spendenaufruf} other {# Spendenaufrufe}}",
-        "empty": "Keine Spenden gesammelt",
-        "aggregatedByCurrency": "Nach Währung zusammengefasst"
+        "label": "Insgesamt gesammelt",
+        "helper": "über alle Zeit",
+        "moreCurrencies": "+{count, plural, one {# weitere Währung} other {# weitere Währungen}}",
+        "empty": "Noch keine Spenden gesammelt"
       },
       "donations": {
-        "title": "Spenden",
-        "description": "Dein Spendenverlauf",
-        "empty": "Noch keine Spenden"
+        "label": "Spenden",
+        "helper": "von Unterstützer:innen"
       }
+    },
+    "statsError": {
+      "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
+      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schiefgelaufen.",
+      "retry": "Erneut versuchen",
+      "exploreLinkText": "Spendenaufrufe entdecken"
     }
   }
 }
