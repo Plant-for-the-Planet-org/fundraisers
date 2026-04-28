@@ -154,6 +154,7 @@ type PaymentMethodOptionProps = {
   showFeeDetails: boolean;
   methodFeeText: string | null;
   methodFeeTooltip: string | null;
+  lastUsedLabel?: string;
   onSelect: (methodId: PaymentMethodId) => void;
 };
 
@@ -165,6 +166,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   showFeeDetails,
   methodFeeText,
   methodFeeTooltip,
+  lastUsedLabel,
   onSelect,
 }: PaymentMethodOptionProps) {
   const MethodLogo = methodLogo;
@@ -201,8 +203,13 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
             </div>
           )}
 
-          <div className='flex-1'>
+          <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
             <span className='text-sm font-medium'>{methodLabel}</span>
+            {lastUsedLabel && (
+              <span className='px-2 py-0.5 text-xs bg-gray-100 text-muted-foreground rounded-full'>
+                {lastUsedLabel}
+              </span>
+            )}
           </div>
         </div>
 
@@ -221,8 +228,14 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
-  const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
-    useDonationForm();
+  const {
+    fundraiser,
+    donationData,
+    paymentOptions,
+    authenticatedPaymentOptions,
+    sepaFormRef,
+    cardFormRef,
+  } = useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
     control,
@@ -230,6 +243,13 @@ export function PaymentMethods() {
   });
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+
+  const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
+    const raw = authenticatedPaymentOptions?.lastPaymentMethod;
+    if (!raw) return null;
+    const methodPart = raw.split(':')[1] as PaymentMethodId;
+    return SUPPORTED_METHOD_IDS.has(methodPart) ? methodPart : null;
+  }, [authenticatedPaymentOptions?.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
     (methodId: PaymentMethodId) =>
@@ -334,6 +354,8 @@ export function PaymentMethods() {
         feeTooltip: feeCollectionEnabled
           ? getFeeTooltip(method, donationData.currency)
           : null,
+        lastUsedLabel:
+          method.id === lastUsedMethodId ? t('lastUsed') : undefined,
       })),
     [
       donationData.currency,
@@ -341,6 +363,8 @@ export function PaymentMethods() {
       getFeeText,
       getFeeTooltip,
       getMethodLabel,
+      lastUsedMethodId,
+      t,
       visibleMethods,
     ]
   );
@@ -393,6 +417,7 @@ export function PaymentMethods() {
                 showFeeDetails={feeCollectionEnabled}
                 methodFeeText={method.feeText}
                 methodFeeTooltip={method.feeTooltip}
+                lastUsedLabel={method.lastUsedLabel}
                 onSelect={handleMethodSelect}
               />
             );

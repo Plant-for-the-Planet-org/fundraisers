@@ -3,9 +3,13 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import { platformAPIClient } from './external-client';
 
 export async function getPaymentOptions(
-  fundraiserId: string
+  fundraiserId: string,
+  token?: string
 ): Promise<PaymentOptions> {
-  return platformAPIClient.get<PaymentOptions>(
-    `/paymentOptions/${fundraiserId}`
-  );
+  return token
+    ? platformAPIClient.getAuthenticated<PaymentOptions>(
+        `/paymentOptions/${fundraiserId}`,
+        token
+      )
+    : platformAPIClient.get<PaymentOptions>(`/paymentOptions/${fundraiserId}`);
 }

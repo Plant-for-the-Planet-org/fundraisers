@@ -42,6 +42,7 @@
         "description": "Helfe mit, dass deine Spende ankommt. Einige Zahlungsanbieter berechnen uns Gebühren. Mit gebührenfreien Methoden kannst du sicherstellen, dass deine Spende in vollem Umfang bei den Projekten ankommt.",
         "selectMethodPlaceholder": "Zahlungsmethode auswählen",
         "empty": "Es sind derzeit keine Zahlungsmöglichkeiten verfügbar.",
+        "lastUsed": "Zuletzt verwendet",
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
           "bankTransfer": "Banküberweisung",

@@ -42,6 +42,7 @@
         "description": "Help your donation go further. Some payment providers charge us fees. Fee-free methods ensure your full donation supports your cause.",
         "selectMethodPlaceholder": "Select payment method",
         "empty": "No payment methods are currently available.",
+        "lastUsed": "Last used",
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",

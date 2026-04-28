@@ -35,7 +35,7 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
         let options: PaymentOptions | undefined;
         if (data.canDonate) {
           try {
-            options = await getPaymentOptions(data.id);
+            options = await getPaymentOptions(data.id, accessToken ?? undefined);
           } catch {
             // payment options unavailable; donation form won't render
           }

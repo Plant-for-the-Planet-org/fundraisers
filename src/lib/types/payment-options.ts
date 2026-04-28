@@ -15,6 +15,7 @@ export interface PaymentFrequency {
 export interface PaymentOptions {
   id: string;
   name: string;
+  lastPaymentMethod?: string | null;
   currency: string;
   requestedCountry: string;
   effectiveCountry: string;
