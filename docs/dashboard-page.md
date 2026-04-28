@@ -39,7 +39,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 - `DashboardHeader` (title + subtitle).
 - `DashboardSummary` + `SummaryStatCard` + `SummaryStatCardSkeleton`.
 - `DashboardStatsError` (retained from legacy, generic retry block spanning the grid).
-- Slim `getDashboardSummary` returning only `{ totalCount, activeCount, donationsCount, totalRaisedByCurrency }` — `activeCount` derived from `canDonate` for now (no dependency on the unshipped API `status` field).
+- Slim `getDashboardSummary` returning only `{ totalCount, activeCount, donationsCount, totalRaisedByCurrency }`. `activeCount` is currently derived from `canDonate`; switch to `status === 'active'` in PR 2 once the field is wired into the `Fundraiser` type.
 - Locale keys: `breadcrumb.*`, `manageFundraisers.*`, `summary.*`, `statsError.*` only.
 - Page composition: `AuthGuard` → breadcrumb → header → summary.
 - Removed legacy components: `card-base`, `my-fundraisers-card`, `total-raised-card`, `donations-card`, `dashboard-stat-card-skeleton`.
@@ -69,7 +69,8 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 - New utility `src/lib/utils/fundraiser-list.ts` with **only** what the list needs at this stage:
   - `DisplayStatus` type, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
   - **Not** the filter/sort/counts functions — those land in PR 3.
-- Add `status?: FundraiserStatus` to the `Fundraiser` interface (optional, with `canDonate` fallback inside `deriveDisplayStatus`) so derivation works before and after the backend ships the field.
+- Add `status: FundraiserStatus` to the `Fundraiser` interface (required — backend now returns it on `GET /fundraisers`). Drive `deriveDisplayStatus` from `status` directly.
+- Update `getDashboardSummary` so `activeCount` is `status === 'active'` (no longer the `canDonate` proxy).
 - Page composition: render the list directly under `DashboardSummary`. Default order: `startDate` desc.
 - Locale keys added: `statusBadge.*`, `listItem.*`, `empty.*`.
 
@@ -77,7 +78,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 **Dependencies / risks**
 
-- Backend `status` field. **Not strictly blocking** — the `canDonate` fallback covers the active vs paused split for badges. Drafts and cancelled rows will render as `paused` / `ended` once the backend ships `status`; until then they collapse into `active` / `paused`. Note this in PR description.
+- Backend `status` field has shipped on `GET /fundraisers` — no fallback required.
 
 **Acceptance**
 
@@ -110,7 +111,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 **Dependencies / risks**
 
-- **Hard dependency on backend `status` field** — the Paused filter must distinguish `paused` + `draft` from `active`, which `canDonate` cannot. Do not start this PR until the backend ships `status` on `GET /fundraisers`. If it's not ready, the Paused/Ended pills will mis‑bucket rows.
+- Backend `status` field has shipped on `GET /fundraisers` (added to `Fundraiser` in PR 2), so the Paused/Ended buckets can be driven directly off it.
 
 **Acceptance**
 
@@ -674,7 +675,8 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 ### PR 2 — Fundraiser list (read‑only)
 
-- [ ] Add `status?: FundraiserStatus` to the `Fundraiser` interface (optional, `canDonate` fallback).
+- [ ] Add `status: FundraiserStatus` to the `Fundraiser` interface (required — backend ships it on `GET /fundraisers`).
+- [ ] Switch `getDashboardSummary`'s `activeCount` to `status === 'active'` (drop the `canDonate` proxy).
 - [ ] Add `src/lib/utils/fundraiser-list.ts` with **only** `DisplayStatus`, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
 - [ ] Add components: `fundraiser-status-badge.tsx`, `fundraiser-list-item.tsx`, `fundraiser-list-item-skeleton.tsx`, `fundraiser-list.tsx`, `fundraiser-list-empty.tsx`; export from `index.ts`.
 - [ ] Page: render the list directly under `DashboardSummary`, sorted newest‑first by `startDate`.
@@ -689,7 +691,6 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Replace the bare list in the page with `FundraiserListSection`.
 - [ ] Locale keys: `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
 - [ ] Unit tests for `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
-- [ ] Confirm backend has shipped `status` on `GET /fundraisers` before merging.
 
 ### PR 4 — Per‑row actions
 
