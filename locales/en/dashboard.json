@@ -30,6 +30,21 @@
       "description": "Something went wrong while loading your fundraiser data.",
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
+    },
+    "toolbar": {
+      "resultCount": "Showing <b>{visible}</b> of {total}"
+    },
+    "listItem": {
+      "byHost": "by {host}",
+      "ofGoal": "of {goal}",
+      "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
+      "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
+      "ended": "Ended"
+    },
+    "empty": {
+      "title": "You haven't created a fundraiser yet",
+      "description": "Start a campaign to begin collecting donations.",
+      "cta": "Create your first fundraiser"
     }
   }
 }
