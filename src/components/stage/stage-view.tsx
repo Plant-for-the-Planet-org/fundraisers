@@ -19,9 +19,10 @@ interface StageViewProps {
   fundraiser: Fundraiser;
   theme: Theme;
   stageSettings: Record<string, unknown> | undefined;
+  locale: string;
 }
 
-export function StageView({ fundraiser, theme, stageSettings }: StageViewProps) {
+export function StageView({ fundraiser, theme, stageSettings, locale }: StageViewProps) {
   const { containerRef, scale, canvas } = useStageScale();
   const slug = fundraiser.slug ?? fundraiser.id;
   const { data: leaderboardData, offline } = useLeaderboard(slug);
@@ -78,18 +79,19 @@ export function StageView({ fundraiser, theme, stageSettings }: StageViewProps) 
           fundraiser={fundraiser}
           showImpact={showImpact}
           showProgressBar={showProgressBar}
+          locale={locale}
         />
 
         {/* Leaderboard — below counter, optional */}
         {showLeaderboard && (
-          <StageLeaderboard top={leaderboardData?.top ?? []} />
+          <StageLeaderboard top={leaderboardData?.top ?? []} locale={locale} />
         )}
 
         {/* QR panel — bottom left */}
         <StageQRPanel fundraiserId={fundraiser.id} />
 
         {/* Ticker — bottom bar */}
-        <StageTicker recent={leaderboardData?.recent ?? []} offline={offline} />
+        <StageTicker recent={leaderboardData?.recent ?? []} offline={offline} locale={locale} />
 
         {/* Toast stack */}
         <StageToastStack />

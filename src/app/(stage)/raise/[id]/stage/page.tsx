@@ -71,6 +71,7 @@ export default async function StagePage({
         fundraiser={fundraiser}
         theme={theme}
         stageSettings={stageSettings}
+        locale={stageLocale}
       />
     </NextIntlClientProvider>
   );

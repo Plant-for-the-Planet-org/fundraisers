@@ -6,6 +6,7 @@ import type { DonationEntry } from './hooks/use-leaderboard';
 
 interface StageLeaderboardProps {
   top: DonationEntry[];
+  locale: string;
 }
 
 const RANK_STYLE: Record<number, string> = {
@@ -14,7 +15,7 @@ const RANK_STYLE: Record<number, string> = {
   3: 'bg-gradient-to-br from-[#F6C89C] to-[#B76E41] text-[#3C1F0A]',
 };
 
-export function StageLeaderboard({ top }: StageLeaderboardProps) {
+export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
   const t = useTranslations('Stage');
 
   if (top.length === 0) return null;
@@ -70,7 +71,7 @@ export function StageLeaderboard({ top }: StageLeaderboardProps) {
                 className="text-[17px] font-bold"
                 style={{ color: 'var(--accent-color)', fontVariantNumeric: 'tabular-nums' }}
               >
-                {formatCurrencyFromDecimal(entry.amount, entry.currency)}
+                {formatCurrencyFromDecimal(entry.amount, entry.currency, locale)}
               </div>
             </div>
           );

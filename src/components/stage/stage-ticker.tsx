@@ -66,9 +66,10 @@ function timeAgo(created: string): string {
 interface StageTickerProps {
   recent: DonationEntry[];
   offline: boolean;
+  locale: string;
 }
 
-export function StageTicker({ recent, offline }: StageTickerProps) {
+export function StageTicker({ recent, offline, locale }: StageTickerProps) {
   const t = useTranslations('Stage');
   const remaining = useCountdown();
   const items = recent.length > 0 ? [...recent, ...recent] : [];
@@ -124,7 +125,7 @@ export function StageTicker({ recent, offline }: StageTickerProps) {
                 <span className="font-bold">{d.isAnonymous ? 'Anonymous' : d.donorName}</span>
                 <span className="h-1 w-1 rounded-full" style={{ background: 'rgba(11,18,32,.20)' }} />
                 <span className="font-bold" style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--accent-color)' }}>
-                  {formatCurrencyFromDecimal(d.amount, d.currency)}
+                  {formatCurrencyFromDecimal(d.amount, d.currency, locale)}
                 </span>
                 <span className="text-[14px] opacity-50">{timeAgo(d.created)}</span>
               </span>

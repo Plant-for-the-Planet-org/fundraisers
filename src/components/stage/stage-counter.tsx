@@ -9,12 +9,14 @@ interface StageCounterProps {
   fundraiser: Fundraiser;
   showImpact: boolean;
   showProgressBar: boolean;
+  locale: string;
 }
 
 export function StageCounter({
   fundraiser,
   showImpact,
   showProgressBar,
+  locale,
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
@@ -31,6 +33,16 @@ export function StageCounter({
 
   const pct = goal ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
   const t = useTranslations('Stage');
+
+  function formatDonorCount(n: number): string {
+    if (n < 1000) return n.toLocaleString(locale);
+    const formatted = new Intl.NumberFormat(locale, {
+      notation: 'compact',
+      compactDisplay: 'short',
+      maximumFractionDigits: 1,
+    }).format(n);
+    return `${formatted}+`;
+  }
 
   return (
     <div
@@ -52,12 +64,12 @@ export function StageCounter({
         className="mt-0.5 text-[76px] font-bold leading-[1.02] tracking-[-0.03em]"
         style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--accent-color)' }}
       >
-        {formatCurrencyFromDecimal(raised, currency)}
+        {formatCurrencyFromDecimal(raised, currency, locale)}
       </div>
 
       <div className="mt-2 flex items-baseline justify-between text-sm opacity-70">
         <span>
-          {t('ofGoal', { goal: formatCurrencyFromDecimal(goal, currency) })}
+          {t('ofGoal', { goal: formatCurrencyFromDecimal(goal, currency, locale) })}
         </span>
         <span>{pct}%</span>
       </div>
@@ -95,7 +107,7 @@ export function StageCounter({
             className="text-[22px] font-bold"
             style={{ fontVariantNumeric: 'tabular-nums' }}
           >
-            {donationCount}
+            {formatDonorCount(donationCount)}
           </span>
           <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
             {t('donors')}
@@ -108,7 +120,7 @@ export function StageCounter({
               className="text-[22px] font-bold"
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              {trees.toLocaleString()}
+              {trees.toLocaleString(locale)}
             </span>
             <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
               {t('trees')}
