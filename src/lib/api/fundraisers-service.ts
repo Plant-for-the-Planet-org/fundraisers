@@ -9,8 +9,8 @@ interface FundraisersApiEnvelope {
 }
 
 export interface DashboardSummaryStats {
-  totalCount: number;
-  activeCount: number;
+  totalFundraiserCount: number;
+  activeFundraiserCount: number;
   donationsCount: number;
   totalRaisedByCurrency: DashboardRaisedSummary[];
 }
@@ -54,14 +54,14 @@ export async function getFundraisers(token: string): Promise<Fundraiser[]> {
 export function getDashboardSummary(
   fundraisers: Fundraiser[]
 ): DashboardSummaryStats {
-  let activeCount = 0;
+  let activeFundraiserCount = 0;
   let donationsCount = 0;
 
   const byCurrency = new Map<string, DashboardRaisedSummary>();
 
   for (const fundraiser of fundraisers) {
     if (fundraiser.status === 'active') {
-      activeCount += 1;
+      activeFundraiserCount += 1;
     }
 
     if (Number.isFinite(fundraiser.donationCount)) {
@@ -98,8 +98,8 @@ export function getDashboardSummary(
   });
 
   return {
-    totalCount: fundraisers.length,
-    activeCount,
+    totalFundraiserCount: fundraisers.length,
+    activeFundraiserCount,
     donationsCount,
     totalRaisedByCurrency,
   };

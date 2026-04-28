@@ -56,10 +56,10 @@ export function DashboardSummary({
       : t('totalRaised.helper');
 
   const fundraisersHelper =
-    summary.activeCount > 0 ? (
+    summary.activeFundraiserCount > 0 ? (
       <>
         <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
-          {summary.activeCount.toLocaleString(locale)}
+          {summary.activeFundraiserCount.toLocaleString(locale)}
         </span>{' '}
         {t('fundraisers.activeSuffix')}
       </>
@@ -71,7 +71,7 @@ export function DashboardSummary({
     <div className='grid gap-4 md:grid-cols-3'>
       <SummaryStatCard
         label={t('fundraisers.label')}
-        value={summary.totalCount.toLocaleString(locale)}
+        value={summary.totalFundraiserCount.toLocaleString(locale)}
         helper={fundraisersHelper}
       />
       <SummaryStatCard
