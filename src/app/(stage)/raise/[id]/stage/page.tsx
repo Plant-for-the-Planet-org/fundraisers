@@ -1,8 +1,23 @@
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { NextIntlClientProvider } from 'next-intl';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { StageView } from '@/components/stage/stage-view';
+import { routing } from '@/i18n/routing';
+
+type SupportedLocale = (typeof routing.locales)[number];
+
+function resolveStageLocale(raw: unknown): SupportedLocale {
+  return (routing.locales as readonly string[]).includes(raw as string)
+    ? (raw as SupportedLocale)
+    : routing.defaultLocale;
+}
+
+async function loadStageMessages(locale: SupportedLocale) {
+  const mod = await import(`../../../../../../locales/${locale}/stage.json`);
+  return mod.default;
+}
 
 export default async function StagePage({
   params,
@@ -10,19 +25,20 @@ export default async function StagePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const locale = await getLocale();
+  const browserLocale = await getLocale();
 
   let fundraiser;
   let theme;
 
   try {
-    fundraiser = await getCachedFundraiser(id, locale);
+    fundraiser = await getCachedFundraiser(id, browserLocale);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
     if (e instanceof PlatformAPIError && e.status && [404].includes(e.status)) {
+      const t = await getTranslations('Stage');
       return (
         <div className="flex h-full items-center justify-center text-white/60">
-          Fundraiser not found.
+          {t('fundraiserNotFound')}
         </div>
       );
     }
@@ -33,20 +49,29 @@ export default async function StagePage({
     fundraiser.settings?.modules as Record<string, unknown> | undefined
   )?.stage as Record<string, unknown> | undefined;
 
+  const stageLocale = resolveStageLocale(stageSettings?.locale ?? browserLocale);
+
+  const [t, stageMessages] = await Promise.all([
+    getTranslations({ locale: stageLocale, namespace: 'Stage' }),
+    loadStageMessages(stageLocale),
+  ]);
+
   if (!stageSettings?.enabled) {
     return (
       <div className="flex h-dvh w-screen flex-col items-center justify-center gap-3 bg-[#0b1220] text-center">
-        <p className="text-lg font-semibold text-white">Stage Mode is not enabled for this fundraiser.</p>
-        <p className="text-sm text-white/50">Update it on fundraiser settings or ask the Host.</p>
+        <p className="text-lg font-semibold text-white">{t('notEnabled')}</p>
+        <p className="text-sm text-white/50">{t('notEnabledHint')}</p>
       </div>
     );
   }
 
   return (
-    <StageView
-      fundraiser={fundraiser}
-      theme={theme}
-      stageSettings={stageSettings}
-    />
+    <NextIntlClientProvider locale={stageLocale} messages={stageMessages}>
+      <StageView
+        fundraiser={fundraiser}
+        theme={theme}
+        stageSettings={stageSettings}
+      />
+    </NextIntlClientProvider>
   );
 }

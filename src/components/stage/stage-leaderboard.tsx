@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import type { DonationEntry } from './hooks/use-leaderboard';
 
@@ -14,9 +15,9 @@ const RANK_STYLE: Record<number, string> = {
 };
 
 export function StageLeaderboard({ top }: StageLeaderboardProps) {
-  const rows = top;
+  const t = useTranslations('Stage');
 
-  if (rows.length === 0) return null;
+  if (top.length === 0) return null;
 
   return (
     <div
@@ -32,15 +33,15 @@ export function StageLeaderboard({ top }: StageLeaderboardProps) {
     >
       {/* Header */}
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="text-[18px] font-bold">Top donors</span>
+        <span className="text-[18px] font-bold">{t('topDonors')}</span>
         <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
-          contribution
+          {t('contribution')}
         </span>
       </div>
 
       {/* Rows */}
       <div className="flex flex-col">
-        {rows.map((entry, i) => {
+        {top.map((entry, i) => {
           const rank = i + 1;
           const name = entry.isAnonymous ? 'Anonymous' : entry.donorName;
           return (

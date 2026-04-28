@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import type { DonationEntry } from './hooks/use-leaderboard';
 
@@ -68,6 +69,7 @@ interface StageTickerProps {
 }
 
 export function StageTicker({ recent, offline }: StageTickerProps) {
+  const t = useTranslations('Stage');
   const remaining = useCountdown();
   const items = recent.length > 0 ? [...recent, ...recent] : [];
 
@@ -96,10 +98,10 @@ export function StageTicker({ recent, offline }: StageTickerProps) {
             style={{ background: offline ? 'rgba(11,18,32,.25)' : 'rgba(220,38,38,.92)', lineHeight: 1, transition: 'background 0.4s' }}
           >
             <span className={`block h-[7px] w-[7px] rounded-full bg-white ${offline ? '' : 'animate-pulse'}`} />
-            {offline ? 'Offline' : 'Live'}
+            {offline ? t('offline') : t('live')}
           </span>
           <span className="text-[16px] font-bold leading-none" style={{ color: '#0B1220' }}>
-            Recent gifts
+            {t('recentGifts')}
           </span>
         </div>
       </div>
@@ -130,7 +132,7 @@ export function StageTicker({ recent, offline }: StageTickerProps) {
           </div>
         ) : (
           <div className="flex h-full items-center px-6 text-[15px] opacity-40">
-            Waiting for donations...
+            {t('waitingForDonations')}
           </div>
         )}
       </div>

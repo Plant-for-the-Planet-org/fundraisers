@@ -1,6 +1,7 @@
 'use client';
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { useAlltimeStats } from './hooks/use-alltime-stats';
 
@@ -29,6 +30,7 @@ export function StageCounter({
   const showTrees = showImpactStat && trees > 0;
 
   const pct = goal ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+  const t = useTranslations('Stage');
 
   return (
     <div
@@ -43,7 +45,7 @@ export function StageCounter({
       }}
     >
       <div className="text-[11px] font-bold uppercase tracking-[.18em] opacity-60">
-        Raised so far
+        {t('raisedSoFar')}
       </div>
 
       <div
@@ -55,11 +57,7 @@ export function StageCounter({
 
       <div className="mt-2 flex items-baseline justify-between text-sm opacity-70">
         <span>
-          of{' '}
-          <strong className="opacity-100">
-            {formatCurrencyFromDecimal(goal, currency)}
-          </strong>{' '}
-          goal
+          {t('ofGoal', { goal: formatCurrencyFromDecimal(goal, currency) })}
         </span>
         <span>{pct}%</span>
       </div>
@@ -100,7 +98,7 @@ export function StageCounter({
             {donationCount}
           </span>
           <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
-            donors
+            {t('donors')}
           </span>
         </div>
 
@@ -113,7 +111,7 @@ export function StageCounter({
               {trees.toLocaleString()}
             </span>
             <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
-              trees
+              {t('trees')}
             </span>
           </div>
         )}
@@ -127,7 +125,7 @@ export function StageCounter({
               {daysLeft}
             </span>
             <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
-              days left
+              {t('daysLeft')}
             </span>
           </div>
         )}

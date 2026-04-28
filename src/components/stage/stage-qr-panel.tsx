@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
 
 interface StageQRPanelProps {
@@ -8,6 +9,7 @@ interface StageQRPanelProps {
 }
 
 export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
+  const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
   const [donateUrl, setDonateUrl] = useState('');
 
@@ -37,7 +39,7 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
     >
       <div className="flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5">
         {qrSrc ? (
-          <img src={qrSrc} alt="Scan to donate" className="h-full w-full" />
+          <img src={qrSrc} alt={t('scanToDonate')} className="h-full w-full" />
         ) : (
           <div className="h-full w-full rounded-xl bg-[#0B1220]/5" />
         )}
@@ -45,7 +47,7 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
 
       <div className="mt-3 flex flex-col items-center gap-0.5 text-center">
         <div className="text-[11px] font-bold uppercase tracking-[.18em]" style={{ color: 'var(--accent-color)' }}>
-          Scan to donate
+          {t('scanToDonate')}
         </div>
         <div className="flex items-center gap-1.5 text-[13px] font-bold tracking-tight opacity-70" style={{ color: '#0B1220' }}>
           <Globe size={13} />

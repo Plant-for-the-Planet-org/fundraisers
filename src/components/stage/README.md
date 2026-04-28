@@ -30,6 +30,8 @@ interface StageModuleSettings {
   description?: string;         // Falls back to fundraiser.description (first paragraph)
   partner_logo_url?: string;    // PNG, 56×56, optional — shown in top bar
 
+  locale?: string;               // Fixed display locale ("en" | "de"). Overrides viewer's browser locale
+
   slides: {
     position: number;           // Display order (1-based)
     title: string;
