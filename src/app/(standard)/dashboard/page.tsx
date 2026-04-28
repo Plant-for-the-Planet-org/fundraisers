@@ -15,8 +15,8 @@ import { DashboardHeader, DashboardSummary } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
 const EMPTY_SUMMARY: DashboardSummaryStats = {
-  totalCount: 0,
-  activeCount: 0,
+  totalFundraiserCount: 0,
+  activeFundraiserCount: 0,
   donationsCount: 0,
   totalRaisedByCurrency: [],
 };
