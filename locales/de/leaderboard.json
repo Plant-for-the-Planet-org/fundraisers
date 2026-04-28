@@ -16,6 +16,14 @@
         "title": "Rangliste deaktiviert",
         "description": "Rangliste aktivieren um Spender-Rankings und aktuelle Spenden anzuzeigen"
       }
+    },
+    "view": {
+      "tabs": {
+        "newest": "Neueste",
+        "topDonations": "Top-Spenden"
+      },
+      "viewAll": "Alle anzeigen",
+      "emptyState": "Keine Spenden vorhanden"
     }
   }
 }

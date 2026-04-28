@@ -3,12 +3,14 @@
 import type { FundraiserFormValues } from '../fundraiser-form-schema';
 import type { BooleanLeaderboardKey } from './leaderboard-settings-dropdown';
 
-import { useController } from 'react-hook-form';
+import { useController, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from '../typography';
 import { DisabledView } from './disabled-view';
 import { LeaderboardSettingsDropdown } from './leaderboard-settings-dropdown';
+import { LeaderboardView } from './leaderboard-view';
+import { getMockLeaderboardDonations } from './mock-data';
 
 export function LeaderboardSettings() {
   const t = useTranslations('Leaderboard.form');
@@ -20,6 +22,10 @@ export function LeaderboardSettings() {
     name: 'settings.modules.leaderboard',
   });
 
+  const currency = useWatch<FundraiserFormValues, 'currency'>({
+    name: 'currency',
+  });
+
   const settings = field.value;
 
   const handleChange = (
@@ -28,6 +34,9 @@ export function LeaderboardSettings() {
   ) => {
     field.onChange({ ...settings, [key]: checked });
   };
+
+  const { recent: mockRecent, top: mockTop } =
+    getMockLeaderboardDonations(currency);
 
   return (
     <div className='flex flex-col gap-3'>
@@ -50,7 +59,15 @@ export function LeaderboardSettings() {
         {t('sectionHeading')}
       </SectionHeader>
 
-      {!settings.enabled && <DisabledView />}
+      {settings.enabled ? (
+        <LeaderboardView
+          recentDonations={mockRecent}
+          topDonations={mockTop}
+          settings={settings}
+        />
+      ) : (
+        <DisabledView />
+      )}
     </div>
   );
 }
