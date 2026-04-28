@@ -132,7 +132,6 @@ export interface Fundraiser {
   visibility: FundraiserVisibility;
   status: FundraiserStatus;
   canDonate: boolean;
-  status: FundraiserStatus;
   projectAllocations: ProjectAllocation[];
   startDate: string;
   endDate: string;
