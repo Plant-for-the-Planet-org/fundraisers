@@ -38,8 +38,7 @@ export function LeaderboardSettings() {
 
   const { recent: mockRecent, top: mockTop } =
     getMockLeaderboardDonations(currency);
-  const hasActiveTabs =
-    settings.show_recent_list || settings.show_top_list;
+  const hasActiveTabs = settings.show_recent_list || settings.show_top_list;
 
   return (
     <div className='flex flex-col gap-3'>

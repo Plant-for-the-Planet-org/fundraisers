@@ -162,12 +162,11 @@ Settings come from the fundraiser object (not the leaderboard API response) — 
 
 **Files:**
 
-- `src/components/fundraisers/fundraiser-form-schema.ts`
 - `src/components/fundraisers/leaderboard/no-tabs-warning.tsx` (new)
 - `src/components/fundraisers/leaderboard/leaderboard-settings.tsx`
 - `locales/en/leaderboard.json`, `locales/de/leaderboard.json`
 
-**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears. Try to submit — form is blocked. Re-enable either tab — warning disappears and submission succeeds.
+**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears in place of the preview. Re-enable either tab — preview returns.
 
 ---
 
