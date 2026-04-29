@@ -1,3 +1,5 @@
+import type { LeaderboardModuleSettings } from './fundraiser';
+
 export interface LeaderboardDonation {
   id: string;
   amount: number;
@@ -7,4 +9,12 @@ export interface LeaderboardDonation {
   created: string;
   avatarUrl?: string | null;
   isAnonymous?: boolean;
+}
+
+export interface LeaderboardApiResponse {
+  recent: LeaderboardDonation[];
+  top: LeaderboardDonation[];
+  donorCount: number;
+  donationCount: number;
+  settings: LeaderboardModuleSettings;
 }

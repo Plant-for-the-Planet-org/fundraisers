@@ -124,41 +124,38 @@ The type changes needed here were done in Step 1.
 
 ### Step 5 - Leaderboard API service
 
-**What:** Create `src/lib/api/leaderboard-service.ts`. Port `getLeaderboard` and `getLeaderboardWithRetry` from the prototype, adapted to use the fundraisers project's `platformAPIClient` pattern. Endpoint: `GET /fundraisers/{hid}/leaderboard` (public, no auth). Add a `LeaderboardResponse` type to `src/lib/types/leaderboard.ts` (matching the API shape: `{ recent, top, donorCount, donationCount, settings }`).
-
-Note: `src/lib/types/leaderboard.ts` already exists (created in Step 3 with `LeaderboardDonation`). This step adds `LeaderboardResponse` to it.
+**What:** Created `src/lib/api/leaderboard-service.ts` with `getLeaderboard(idOrSlug)` and `getLeaderboardWithRetry(idOrSlug, maxRetries=2)` using `platformAPIClient` (public, no auth). Retry uses exponential backoff (1s, 2s). Added `LeaderboardApiResponse` to `src/lib/types/leaderboard.ts`.
 
 **Files:**
 
 - `src/lib/api/leaderboard-service.ts` (new)
-- `src/lib/types/leaderboard.ts` (add `LeaderboardResponse`)
+- `src/lib/types/leaderboard.ts` (added `LeaderboardApiResponse`)
 
-**Visual test:** No visual change yet — verify in isolation via a quick console log or Network tab call.
+**Note:** No independently testable state — verified via Step 6.
 
 ---
 
-### Step 6 - Leaderboard display component + fundraiser detail page
+### Step 6 - Leaderboard display on fundraiser detail page
 
-**What:** Port `leaderboard-container.tsx` from the prototype as `src/components/fundraisers/leaderboard/leaderboard-container.tsx`. It handles: loading state, error state, `enabled` flag (renders null if disabled), tab state, data processing with `formatTimeAgo`. Renders `LeaderboardView` with real data.
+**What:** Create `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` as a `'use client'` component. It fetches leaderboard data client-side on mount (one-shot, no polling), shows a skeleton while loading, renders null on error or if `settings.enabled` is false, and renders `LeaderboardView` with real data otherwise.
 
 `formatTimeAgo()` is already in `src/lib/utils/time.ts` (done in Step 3).
 
-Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fundraisers/[slug]/page.tsx`). The URL param is `slug`, but the leaderboard API requires `hid` — read `fundraiser.hid` from the already-fetched fundraiser object returned by `getCachedFundraiser(slug)`. Pass the leaderboard data to `LeaderboardContainer`. Add `LeaderboardContainer` to `src/components/fundraisers/fundraiser-view.tsx`.
+Data is fetched inside `LeaderboardLoader` itself — no changes to `page.tsx`. `FundraiserView` receives `fundraiser.hid` and passes it to `LeaderboardLoader`. Add `LeaderboardLoader` to `FundraiserView` in `fundraiser-view.tsx`.
 
 **Files:**
 
-- `src/components/fundraisers/leaderboard/leaderboard-container.tsx` (new, ported from prototype)
-- `src/app/(fundraiser)/fundraisers/[slug]/page.tsx`
-- `src/components/fundraisers/fundraiser-view.tsx`
+- `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` (new)
+- `src/components/fundraisers/fundraiser-view.tsx` (add `LeaderboardLoader`)
 
-**Visual test:** Open a fundraiser detail page. Leaderboard renders with real donor data. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
+**Visual test:** Open a fundraiser detail page. A skeleton briefly appears, then real donor data loads. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
 
 ---
 
 ## Implementation Notes
 
 - **Circular dependency (Step 1):** `fundraiser-data-builder.ts` imports `FundraiserFormValues` from `fundraiser-form-schema.ts`. The schema file cannot import `DEFAULT_MODULES` back from the data builder. Resolved by defining `DEFAULT_LEADERBOARD: LeaderboardModuleSettings` directly in `fundraiser-form-schema.ts`.
-- **`FundraiserView` prop gap (Step 6):** The plan says to add `LeaderboardContainer` to `fundraiser-view.tsx` but doesn't mention widening the props. `FundraiserView` needs a new `leaderboardData?: LeaderboardResponse | null` prop, passed down from `page.tsx`.
+- **`LeaderboardLoader` is self-contained (Step 6):** Data is fetched inside the component — no prop drilling from `page.tsx`. `FundraiserView` only needs to pass `fundraiser.hid` down.
 - **Step 5 — no leaderboard service in prototype:** The prototype has no dedicated leaderboard API service file. The service in this project will be written fresh (not ported), following the `platformAPIClient` pattern from `fundraiser-service.ts`.
 
 ## Summary
@@ -169,5 +166,5 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 | 2    | Settings toggles UI         | Create/edit form sidebar       | [x]    |
 | 3    | Live settings preview       | Sidebar preview with mock data | [x]    |
 | 4    | API request includes config | Network tab on create/edit     | [x]    |
-| 5    | Leaderboard data service    | Console / Network tab          | [ ]    |
+| 5    | Leaderboard data service    | Network tab (via Step 6)       | [ ]    |
 | 6    | Leaderboard on detail page  | Fundraiser detail page         | [ ]    |
