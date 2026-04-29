@@ -13,6 +13,7 @@ import { GoalInput } from './goal-input';
 import { GoalPreview } from './goal-preview';
 import { Hosts } from './hosts';
 import { ImageSelector } from './image-selector';
+import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
 import { ProjectSelection } from './project-selection';
 import { ThemeSettings } from './theme-settings';
@@ -54,6 +55,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
+        <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
