@@ -12,7 +12,7 @@ export function DashboardStatsError({ onRetry }: DashboardStatsErrorProps) {
 
   return (
     <div
-      className='dashboard-stats-error md:col-span-2 lg:col-span-3 bg-transparent px-6 py-10 text-center'
+      className='dashboard-stats-error md:col-span-3 bg-transparent px-6 py-10 text-center'
       role='alert'
     >
       <h2 className='text-lg font-semibold text-foreground mb-2'>

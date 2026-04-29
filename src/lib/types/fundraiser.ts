@@ -132,6 +132,7 @@ export interface Fundraiser {
   workspace: Nullable<FundraiserWorkspace>;
   hosts: FundraiserHost[];
   visibility: FundraiserVisibility;
+  status: FundraiserStatus;
   canDonate: boolean;
   projectAllocations: ProjectAllocation[];
   startDate: string;

@@ -1,66 +1,56 @@
 'use client';
 
-import type { DashboardFundraiserStats } from '@/lib/api/fundraisers-service';
+import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  getDashboardFundraiserStats,
+  getDashboardSummary,
   getFundraisers,
 } from '@/lib/api/fundraisers-service';
 import { useAuthStore } from '@/stores/auth-store';
 import { AuthGuard } from '@/components/auth/auth-guard';
-import {
-  DashboardStatCardSkeleton,
-  DashboardStatsError,
-  MyFundraisersCard,
-  TotalRaisedCard,
-} from '@/components/dashboard';
+import { DashboardHeader, DashboardSummary } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
-const INITIAL_FUNDRAISER_STATS: DashboardFundraiserStats = {
-  activeFundraisersCount: 0,
+const EMPTY_SUMMARY: DashboardSummaryStats = {
+  totalFundraiserCount: 0,
+  activeFundraiserCount: 0,
+  donationsCount: 0,
   totalRaisedByCurrency: [],
 };
 
 export default function DashboardPage() {
   const t = useTranslations('Dashboard');
-  const [fundraiserStats, setFundraiserStats] =
-    useState<DashboardFundraiserStats>(INITIAL_FUNDRAISER_STATS);
-  const [isStatsLoading, setIsStatsLoading] = useState(true);
-  const [statsError, setStatsError] = useState(false);
-
-  const user = useAuthStore(state => state.user);
   const accessToken = useAuthStore(state => state.accessToken);
-  const profile = user?.profile;
 
-  const displayName =
-    profile?.displayName || user?.name || user?.email || t('fallbackName');
+  const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-  const fetchDashboardStats = useCallback(
-    async (abort?: { cancelled: boolean }) => {
+  const fetchFundraisers = useCallback(
+    async (signal?: { aborted: boolean }) => {
       if (!accessToken) {
-        setIsStatsLoading(false);
+        setIsLoading(false);
         return;
       }
 
-      setIsStatsLoading(true);
-      setStatsError(false);
+      setIsLoading(true);
+      setHasError(false);
 
       try {
-        const fundraisers = await getFundraisers(accessToken);
-        if (abort?.cancelled) {
-          return;
-        }
-        setFundraiserStats(getDashboardFundraiserStats(fundraisers));
+        const data = await getFundraisers(accessToken);
+        if (signal?.aborted) return;
+        setFundraisers(data);
       } catch (error) {
-        if (!abort?.cancelled) {
-          console.error('[Dashboard] Failed to fetch fundraiser stats:', error);
-          setStatsError(true);
+        if (!signal?.aborted) {
+          console.error('[Dashboard] Failed to fetch fundraisers:', error);
+          setHasError(true);
         }
       } finally {
-        if (!abort?.cancelled) {
-          setIsStatsLoading(false);
+        if (!signal?.aborted) {
+          setIsLoading(false);
         }
       }
     },
@@ -68,12 +58,24 @@ export default function DashboardPage() {
   );
 
   useEffect(() => {
-    const abort = { cancelled: false };
-    void fetchDashboardStats(abort);
+    // Mocks AbortSignal (AbortController) so stale responses are ignored if the effect re-runs before a fetch completes. This can happen if the user quickly navigates away and back to the dashboard, or if the access token changes.
+    const signal = { aborted: false };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchFundraisers(signal);
     return () => {
-      abort.cancelled = true;
+      signal.aborted = true;
     };
-  }, [fetchDashboardStats]);
+  }, [fetchFundraisers]);
+
+  const summary = useMemo(
+    () =>
+      fundraisers.length > 0 ? getDashboardSummary(fundraisers) : EMPTY_SUMMARY,
+    [fundraisers]
+  );
+
+  const refetch = useCallback(() => {
+    void fetchFundraisers();
+  }, [fetchFundraisers]);
 
   return (
     <AuthGuard>
@@ -81,38 +83,18 @@ export default function DashboardPage() {
         <BreadcrumbTrail
           items={[
             { label: t('breadcrumb.home'), href: '/' },
-            { label: t('dashboard') },
+            { label: t('breadcrumb.dashboard') },
           ]}
         />
 
-        <div>
-          <h1 className='text-3xl font-bold text-foreground'>
-            {t('dashboard')}
-          </h1>
-          <p className='text-muted-foreground'>
-            {t('welcome', { displayName })}
-          </p>
-        </div>
+        <DashboardHeader />
 
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {statsError ? (
-            <DashboardStatsError onRetry={() => void fetchDashboardStats()} />
-          ) : isStatsLoading ? (
-            <>
-              <DashboardStatCardSkeleton />
-              <DashboardStatCardSkeleton />
-            </>
-          ) : (
-            <>
-              <MyFundraisersCard
-                count={fundraiserStats.activeFundraisersCount}
-              />
-              <TotalRaisedCard
-                summaries={fundraiserStats.totalRaisedByCurrency}
-              />
-            </>
-          )}
-        </div>
+        <DashboardSummary
+          summary={summary}
+          isLoading={isLoading}
+          hasError={hasError}
+          onRetry={refetch}
+        />
       </section>
     </AuthGuard>
   );
