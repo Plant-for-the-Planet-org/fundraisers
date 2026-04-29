@@ -37,6 +37,7 @@ export function LeaderboardSettings() {
         actionSlot={
           <div className='flex items-center gap-2'>
             <Switch
+              size='compact'
               checked={settings.enabled}
               onCheckedChange={checked => handleChange('enabled', checked)}
               aria-label={t('labels.enableLeaderboard')}

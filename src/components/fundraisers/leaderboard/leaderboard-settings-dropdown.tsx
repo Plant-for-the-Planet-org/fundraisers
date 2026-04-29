@@ -49,7 +49,7 @@ export function LeaderboardSettingsDropdown({
           type='button'
           variant='ghost'
           size='sm'
-          className='p-1 h-auto'
+          className='p-px h-auto'
           aria-label={t('labels.openSettings')}
         >
           {isOpen ? (
@@ -70,6 +70,7 @@ export function LeaderboardSettingsDropdown({
                 {label}
               </label>
               <Switch
+                size='compact'
                 id={`leaderboard-${key}`}
                 checked={settings[key]}
                 onCheckedChange={checked => onChange(key, checked)}
