@@ -1,6 +1,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
+import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { getDaysLeft } from '@/lib/utils/fundraiser';
@@ -17,6 +18,10 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
+import {
+  LeaderboardLoader,
+  LeaderboardSkeleton,
+} from './leaderboard/leaderboard-loader';
 
 export function FundraiserView({
   fundraiser,
@@ -72,6 +77,16 @@ export function FundraiserView({
       <MainPanel>
         {/* Title */}
         <TitleDisplay value={fundraiser.title} />
+
+        {/* Leaderboard */}
+        {fundraiser.settings?.modules?.leaderboard?.enabled && (
+          <Suspense fallback={<LeaderboardSkeleton />}>
+            <LeaderboardLoader
+              idOrSlug={fundraiser.slug}
+              settings={fundraiser.settings.modules.leaderboard}
+            />
+          </Suspense>
+        )}
 
         {/* Donation form + overlay */}
         {fundraiser.canDonate && paymentOptions ? (

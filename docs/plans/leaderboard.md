@@ -137,25 +137,25 @@ The type changes needed here were done in Step 1.
 
 ### Step 6 - Leaderboard display on fundraiser detail page
 
-**What:** Create `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` as a `'use client'` component. It fetches leaderboard data client-side on mount (one-shot, no polling), shows a skeleton while loading, renders null on error or if `settings.enabled` is false, and renders `LeaderboardView` with real data otherwise.
+**What:** Create `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` as an async server component. It calls `getLeaderboardWithRetry` directly, returns null on error, and renders `LeaderboardView` with real data on success. Also exports `LeaderboardSkeleton` used as the `<Suspense>` fallback.
+
+Settings come from the fundraiser object (not the leaderboard API response) — solves the `show_avatar` gap where the leaderboard API omits that field. `FundraiserView` gates on `fundraiser.settings?.modules?.leaderboard?.enabled` before mounting, and passes `fundraiser.slug` and the full settings object down. The `<Suspense>` boundary streams the skeleton while the server fetch resolves — no client-side state or effects needed.
 
 `formatTimeAgo()` is already in `src/lib/utils/time.ts` (done in Step 3).
-
-Data is fetched inside `LeaderboardLoader` itself — no changes to `page.tsx`. `FundraiserView` receives `fundraiser.hid` and passes it to `LeaderboardLoader`. Add `LeaderboardLoader` to `FundraiserView` in `fundraiser-view.tsx`.
 
 **Files:**
 
 - `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` (new)
-- `src/components/fundraisers/fundraiser-view.tsx` (add `LeaderboardLoader`)
+- `src/components/fundraisers/fundraiser-view.tsx` (add `<Suspense>` + `LeaderboardLoader`)
 
-**Visual test:** Open a fundraiser detail page. A skeleton briefly appears, then real donor data loads. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
+**Visual test:** Open a fundraiser detail page. Skeleton streams in, then real donor data appears. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
 
 ---
 
 ## Implementation Notes
 
 - **Circular dependency (Step 1):** `fundraiser-data-builder.ts` imports `FundraiserFormValues` from `fundraiser-form-schema.ts`. The schema file cannot import `DEFAULT_MODULES` back from the data builder. Resolved by defining `DEFAULT_LEADERBOARD: LeaderboardModuleSettings` directly in `fundraiser-form-schema.ts`.
-- **`LeaderboardLoader` is self-contained (Step 6):** Data is fetched inside the component — no prop drilling from `page.tsx`. `FundraiserView` only needs to pass `fundraiser.hid` down.
+- **`LeaderboardLoader` is a server component (Step 6):** Async server component with `<Suspense>` streaming — no client-side state or effects. Settings come from the fundraiser object to cover the `show_avatar` gap in the leaderboard API response. `page.tsx` needs no changes.
 - **Step 5 — no leaderboard service in prototype:** The prototype has no dedicated leaderboard API service file. The service in this project will be written fresh (not ported), following the `platformAPIClient` pattern from `fundraiser-service.ts`.
 
 ## Summary
