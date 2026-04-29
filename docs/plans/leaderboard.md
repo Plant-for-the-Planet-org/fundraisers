@@ -139,7 +139,7 @@ The type changes needed here were done in Step 1.
 
 **What:** Create `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` as an async server component. It calls `getLeaderboardWithRetry` directly, returns null on error, and renders `LeaderboardView` with real data on success. Also exports `LeaderboardSkeleton` used as the `<Suspense>` fallback.
 
-Settings come from the fundraiser object (not the leaderboard API response) — solves the `show_avatar` gap where the leaderboard API omits that field. `FundraiserView` gates on `fundraiser.settings?.modules?.leaderboard?.enabled` before mounting, and passes `fundraiser.slug` and the full settings object down. The `<Suspense>` boundary streams the skeleton while the server fetch resolves — no client-side state or effects needed.
+Settings come from the fundraiser object (not the leaderboard API response) — solves the `show_avatar` gap where the leaderboard API omits that field. `FundraiserView` gates on `canShowLeaderboard` (`enabled` and at least one of `show_recent_list` / `show_top_list` is true) before mounting, and passes `fundraiser.slug` and the full settings object down. The `<Suspense>` boundary streams the skeleton while the server fetch resolves — no client-side state or effects needed.
 
 `formatTimeAgo()` is already in `src/lib/utils/time.ts` (done in Step 3).
 
@@ -148,7 +148,7 @@ Settings come from the fundraiser object (not the leaderboard API response) — 
 - `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` (new)
 - `src/components/fundraisers/fundraiser-view.tsx` (add `<Suspense>` + `LeaderboardLoader`)
 
-**Visual test:** Open a fundraiser detail page. Skeleton streams in, then real donor data appears. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
+**Visual test:** Open a fundraiser detail page. Skeleton streams in, then real donor data appears. Tabs switch Newest/Top. Auto-scroll runs. If `enabled: false`, nothing renders. If both `show_recent_list` and `show_top_list` are false, nothing renders. If `show_amount: false`, amounts are hidden.
 
 ---
 

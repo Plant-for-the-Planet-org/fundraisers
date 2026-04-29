@@ -41,6 +41,10 @@ export function FundraiserView({
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
+  const leaderboardSettings = fundraiser.settings?.modules?.leaderboard;
+  const canShowLeaderboard =
+    leaderboardSettings?.enabled &&
+    (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
 
   return (
     <FundraiserLayout>
@@ -79,11 +83,11 @@ export function FundraiserView({
         <TitleDisplay value={fundraiser.title} />
 
         {/* Leaderboard */}
-        {fundraiser.settings?.modules?.leaderboard?.enabled && (
+        {canShowLeaderboard && (
           <Suspense fallback={<LeaderboardSkeleton />}>
             <LeaderboardLoader
               idOrSlug={fundraiser.slug}
-              settings={fundraiser.settings.modules.leaderboard}
+              settings={leaderboardSettings}
             />
           </Suspense>
         )}
