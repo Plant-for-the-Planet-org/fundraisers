@@ -130,6 +130,11 @@ export function sortFundraisers(
         return a.currency.localeCompare(b.currency);
       });
     case 'ending-soonest':
+      // Active rows first, then non-active by endDate. Within active, rows
+      // with positive daysLeft sort ahead; an active fundraiser past its
+      // endDate (daysLeft === 0) is treated as non-positive and pushed
+      // below still-running ones — the backend is expected to transition
+      // it to `completed`, so this is a transient state.
       return copy.sort((a, b) => {
         const aActive = a.status === 'active';
         const bActive = b.status === 'active';
