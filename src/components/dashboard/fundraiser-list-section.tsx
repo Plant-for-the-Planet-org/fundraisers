@@ -2,7 +2,7 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   filterFundraisers,
@@ -41,11 +41,6 @@ export function FundraiserListSection({
     [fundraisers, filters.search, filters.status, filters.sort, locale]
   );
 
-  const handleChange = useCallback(
-    (next: Parameters<typeof setFilters>[0]) => setFilters(next),
-    [setFilters]
-  );
-
   const isFiltered = filters.search.trim() !== '' || filters.status !== 'all';
 
   const showToolbar = isLoading || fundraisers.length > 0;
@@ -57,7 +52,7 @@ export function FundraiserListSection({
         <FundraiserListToolbar
           filters={filters}
           counts={counts}
-          onChange={handleChange}
+          onChange={setFilters}
         />
       )}
 

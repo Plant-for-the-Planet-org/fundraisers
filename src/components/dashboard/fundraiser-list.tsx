@@ -10,8 +10,8 @@ import { FundraiserListNoResults } from './fundraiser-list-no-results';
 interface FundraiserListProps {
   fundraisers: Fundraiser[];
   isLoading: boolean;
-  isFiltered?: boolean;
-  onClearFilters?: () => void;
+  isFiltered: boolean;
+  onClearFilters: () => void;
 }
 
 const SKELETON_ROWS = 4;
@@ -19,7 +19,7 @@ const SKELETON_ROWS = 4;
 export function FundraiserList({
   fundraisers,
   isLoading,
-  isFiltered = false,
+  isFiltered,
   onClearFilters,
 }: FundraiserListProps) {
   if (isLoading) {
@@ -34,7 +34,7 @@ export function FundraiserList({
 
   if (fundraisers.length === 0) {
     if (isFiltered) {
-      return <FundraiserListNoResults onClear={onClearFilters ?? (() => {})} />;
+      return <FundraiserListNoResults onClear={onClearFilters} />;
     }
     return <FundraiserListEmpty />;
   }
