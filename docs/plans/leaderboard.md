@@ -138,6 +138,25 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 
 ---
 
+### Fix - Validate that at least one tab is enabled
+
+**What:** Warn the user when the leaderboard is enabled but both `show_recent_list` and `show_top_list` are disabled — a config that renders nothing on the detail page. Submission is still allowed; the detail page already handles this case via `canShowLeaderboard`.
+
+- `leaderboard/no-tabs-warning.tsx` — new component styled like `DisabledView` but amber, shown in the settings section whenever the invalid state is active.
+- `leaderboard-settings.tsx` — render `NoTabsWarning` when `settings.enabled && !(settings.show_recent_list || settings.show_top_list)`.
+- Translation keys added under `Leaderboard.form.noTabsWarning` in both locale files.
+
+**Files:**
+
+- `src/components/fundraisers/fundraiser-form-schema.ts`
+- `src/components/fundraisers/leaderboard/no-tabs-warning.tsx` (new)
+- `src/components/fundraisers/leaderboard/leaderboard-settings.tsx`
+- `locales/en/leaderboard.json`, `locales/de/leaderboard.json`
+
+**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears. Try to submit — form is blocked. Re-enable either tab — warning disappears and submission succeeds.
+
+---
+
 ## Implementation Notes
 
 - **Circular dependency (Step 1):** `fundraiser-data-builder.ts` imports `FundraiserFormValues` from `fundraiser-form-schema.ts`. The schema file cannot import `DEFAULT_MODULES` back from the data builder. Resolved by defining `DEFAULT_LEADERBOARD: LeaderboardModuleSettings` directly in `fundraiser-form-schema.ts`.
@@ -154,3 +173,4 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 | 4    | API request includes config | Network tab on create/edit     | [x]    |
 | 5    | Leaderboard data service    | Console / Network tab          | [ ]    |
 | 6    | Leaderboard on detail page  | Fundraiser detail page         | [ ]    |
+| Fix  | No-tabs warning (informational) | Create/edit form           | [x]    |

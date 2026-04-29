@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from '../typography';
 import { DisabledView } from './disabled-view';
 import { LeaderboardSettingsDropdown } from './leaderboard-settings-dropdown';
+import { NoTabsWarning } from './no-tabs-warning';
 
 export function LeaderboardSettings() {
   const t = useTranslations('Leaderboard.form');
@@ -36,6 +37,7 @@ export function LeaderboardSettings() {
         actionSlot={
           <div className='flex items-center gap-2'>
             <Switch
+              size='compact'
               checked={settings.enabled}
               onCheckedChange={checked => handleChange('enabled', checked)}
               aria-label={t('labels.enableLeaderboard')}
@@ -51,6 +53,10 @@ export function LeaderboardSettings() {
       </SectionHeader>
 
       {!settings.enabled && <DisabledView />}
+      {settings.enabled &&
+        !(settings.show_recent_list || settings.show_top_list) && (
+          <NoTabsWarning />
+        )}
     </div>
   );
 }
