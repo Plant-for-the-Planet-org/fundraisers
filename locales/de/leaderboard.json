@@ -20,6 +20,14 @@
         "title": "Keine Tabs ausgewählt",
         "description": "Aktiviere mindestens eine der Listen (Neueste oder Top), um die Rangliste anzuzeigen"
       }
+    },
+    "view": {
+      "tabs": {
+        "newest": "Neueste",
+        "topDonations": "Top-Spenden"
+      },
+      "viewAll": "Alle anzeigen",
+      "emptyState": "Keine Spenden vorhanden"
     }
   }
 }

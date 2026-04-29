@@ -3,12 +3,14 @@
 import type { FundraiserFormValues } from '../fundraiser-form-schema';
 import type { BooleanLeaderboardKey } from './leaderboard-settings-dropdown';
 
-import { useController } from 'react-hook-form';
+import { useController, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from '../typography';
 import { DisabledView } from './disabled-view';
 import { LeaderboardSettingsDropdown } from './leaderboard-settings-dropdown';
+import { LeaderboardView } from './leaderboard-view';
+import { getMockLeaderboardDonations } from './mock-data';
 import { NoTabsWarning } from './no-tabs-warning';
 
 export function LeaderboardSettings() {
@@ -21,6 +23,10 @@ export function LeaderboardSettings() {
     name: 'settings.modules.leaderboard',
   });
 
+  const currency = useWatch<FundraiserFormValues, 'currency'>({
+    name: 'currency',
+  });
+
   const settings = field.value;
 
   const handleChange = (
@@ -29,6 +35,10 @@ export function LeaderboardSettings() {
   ) => {
     field.onChange({ ...settings, [key]: checked });
   };
+
+  const { recent: mockRecent, top: mockTop } =
+    getMockLeaderboardDonations(currency);
+  const hasActiveTabs = settings.show_recent_list || settings.show_top_list;
 
   return (
     <div className='flex flex-col gap-3'>
@@ -54,9 +64,15 @@ export function LeaderboardSettings() {
 
       {!settings.enabled && <DisabledView />}
       {settings.enabled &&
-        !(settings.show_recent_list || settings.show_top_list) && (
+        (hasActiveTabs ? (
+          <LeaderboardView
+            recentDonations={mockRecent}
+            topDonations={mockTop}
+            settings={settings}
+          />
+        ) : (
           <NoTabsWarning />
-        )}
+        ))}
     </div>
   );
 }

@@ -17,9 +17,9 @@
 
 ## What Must Be Ported from Prototype
 
-- `leaderboard.tsx` — horizontal scrolling display component with auto-scroll logic
+- `leaderboard.tsx` → `leaderboard-view.tsx` (`LeaderboardView`) — horizontal scrolling display component with auto-scroll logic; renamed to avoid collision with the `leaderboard/` folder name — **done (Step 3)**
 - `leaderboard-container.tsx` — handles loading/error/enabled states, tab state, data processing
-- `formatTimeAgo()` — does not exist in this project; port from `gofundnature/src/lib/utils.ts` into `src/lib/utils/time.ts`
+- `formatTimeAgo()` — pulled forward into `src/lib/utils/time.ts` during Step 3; **done**
 
 ## Steps
 
@@ -76,14 +76,30 @@ Add `LeaderboardSettings` to `MainPanel` in `src/components/fundraisers/fundrais
 
 ---
 
-### Step 3 - Leaderboard preview inside settings
+### Step 3 - Leaderboard preview inside settings ✓
 
-**What:** Port `leaderboard.tsx` from the prototype into `src/components/fundraisers/leaderboard/leaderboard.tsx` (adapting imports to the fundraisers project's `formatCurrency` and shadcn paths). Render it inside `LeaderboardSettings` with mock donations — live-updating as settings change. Currency comes from `useFormContext`. Keep horizontal auto-scroll behavior from the prototype.
+**What:** Ported `leaderboard.tsx` from the prototype into `leaderboard-view.tsx` as `LeaderboardView`. Refactored into sub-components. Added mock data and translations. Wired live preview into `LeaderboardSettings`.
+
+**Actual implementation:**
+
+- `LeaderboardView` accepts `recentDonations`, `topDonations`, and `settings` as props (shaped to match the real API so Step 6 fits without rework). Tab state and `effectiveTab` fallback logic are internalized.
+- Extracted `DonationItem` (avatar, name, amount, time) and `ScrollingDonationList` (owns scroll ref and auto-scroll interval). `isActive` prop controls scroll lifecycle — avoids `setState` in `useEffect`.
+- Avatar fallback color is stable: hashed from `donation.id` charCodes, not array index.
+- `formatTimeAgo` and `parseUTCDate` pulled forward into `src/lib/utils/time.ts` (originally planned for Step 6).
+- Domain type `LeaderboardDonation` in `src/lib/types/leaderboard.ts` (originally planned for Step 5); `created` field is a UTC ISO 8601 string without timezone suffix.
+- Mock data co-located in `src/components/fundraisers/leaderboard/mock-data.ts`; generates fresh timestamps on each call.
+- Translations added under `Leaderboard.view` namespace in `locales/en/leaderboard.json` and `locales/de/leaderboard.json`.
 
 **Files:**
 
-- `src/components/fundraisers/leaderboard/leaderboard.tsx` (new, ported from prototype)
-- `src/components/fundraisers/leaderboard/leaderboard-settings.tsx` (add preview below the enable toggle)
+- `src/components/fundraisers/leaderboard/leaderboard-view.tsx` (new)
+- `src/components/fundraisers/leaderboard/donation-item.tsx` (new)
+- `src/components/fundraisers/leaderboard/scrolling-donation-list.tsx` (new)
+- `src/components/fundraisers/leaderboard/mock-data.ts` (new)
+- `src/components/fundraisers/leaderboard/leaderboard-settings.tsx` (updated — passes `settings` object, uses mock data for preview)
+- `src/lib/types/leaderboard.ts` (new — pulled forward from Step 5)
+- `src/lib/utils/time.ts` (new — pulled forward from Step 6)
+- `locales/en/leaderboard.json`, `locales/de/leaderboard.json` (updated — added `Leaderboard.view` namespace)
 
 **Visual test:** With leaderboard enabled, a horizontal scrolling preview appears in the sidebar. Toggle "Show Amounts" — amounts appear/disappear. Toggle tabs — Newest/Top tabs appear/disappear. Toggle "Anonymize" — names become "Anonymous". Toggle avatars on/off.
 
@@ -108,33 +124,31 @@ The type changes needed here were done in Step 1.
 
 ### Step 5 - Leaderboard API service
 
-**What:** Create `src/lib/api/leaderboard-service.ts`. Port `getLeaderboard` and `getLeaderboardWithRetry` from the prototype, adapted to use the fundraisers project's `platformAPIClient` pattern. Endpoint: `GET /fundraisers/{hid}/leaderboard` (public, no auth). Add a `LeaderboardResponse` type to `src/lib/types/leaderboard.ts` (matching the API shape: `{ recent, top, donorCount, donationCount, settings }`).
+**What:** Created `src/lib/api/leaderboard-service.ts` with `getLeaderboard(idOrSlug)` and `getLeaderboardWithRetry(idOrSlug, maxRetries=2)` using `platformAPIClient` (public, no auth). Retry uses exponential backoff (1s, 2s). Added `LeaderboardApiResponse` to `src/lib/types/leaderboard.ts`.
 
 **Files:**
 
 - `src/lib/api/leaderboard-service.ts` (new)
-- `src/lib/types/leaderboard.ts` (new)
+- `src/lib/types/leaderboard.ts` (added `LeaderboardApiResponse`)
 
-**Visual test:** No visual change yet — verify in isolation via a quick console log or Network tab call.
+**Note:** No independently testable state — verified via Step 6.
 
 ---
 
-### Step 6 - Leaderboard display component + fundraiser detail page
+### Step 6 - Leaderboard display on fundraiser detail page
 
-**What:** Port `leaderboard-container.tsx` from the prototype as `src/components/fundraisers/leaderboard/leaderboard-container.tsx`. It handles: loading state, error state, `enabled` flag (renders null if disabled), tab state, data processing with `formatTimeAgo`.
+**What:** Create `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` as an async server component. It calls `getLeaderboardWithRetry` directly, returns null on error, and renders `LeaderboardView` with real data on success. Also exports `LeaderboardSkeleton` used as the `<Suspense>` fallback.
 
-Port `formatTimeAgo()` from `gofundnature/src/lib/utils.ts` into `src/lib/utils/time.ts` and import it from there.
+Settings come from the fundraiser object (not the leaderboard API response) — solves the `show_avatar` gap where the leaderboard API omits that field. `FundraiserView` gates on `canShowLeaderboard` (`enabled` and at least one of `show_recent_list` / `show_top_list` is true) before mounting, and passes `fundraiser.slug` and the full settings object down. The `<Suspense>` boundary streams the skeleton while the server fetch resolves — no client-side state or effects needed.
 
-Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fundraisers/[slug]/page.tsx`). The URL param is `slug`, but the leaderboard API requires `hid` — read `fundraiser.hid` from the already-fetched fundraiser object returned by `getCachedFundraiser(slug)`. Pass the leaderboard data to `LeaderboardContainer`. Add `LeaderboardContainer` to `src/components/fundraisers/fundraiser-view.tsx`.
+`formatTimeAgo()` is already in `src/lib/utils/time.ts` (done in Step 3).
 
 **Files:**
 
-- `src/lib/utils/time.ts` (new — port `formatTimeAgo` from prototype)
-- `src/components/fundraisers/leaderboard/leaderboard-container.tsx` (new, ported from prototype)
-- `src/app/(fundraiser)/fundraisers/[slug]/page.tsx`
-- `src/components/fundraisers/fundraiser-view.tsx`
+- `src/components/fundraisers/leaderboard/leaderboard-loader.tsx` (new)
+- `src/components/fundraisers/fundraiser-view.tsx` (add `<Suspense>` + `LeaderboardLoader`)
 
-**Visual test:** Open a fundraiser detail page. Leaderboard renders with real donor data. Tabs switch Newest/Top. Auto-scroll runs. If a fundraiser has `enabled: false`, nothing renders. If `show_amount: false`, amounts are hidden.
+**Visual test:** Open a fundraiser detail page. Skeleton streams in, then real donor data appears. Tabs switch Newest/Top. Auto-scroll runs. If `enabled: false`, nothing renders. If both `show_recent_list` and `show_top_list` are false, nothing renders. If `show_amount: false`, amounts are hidden.
 
 ---
 
@@ -148,19 +162,18 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 
 **Files:**
 
-- `src/components/fundraisers/fundraiser-form-schema.ts`
 - `src/components/fundraisers/leaderboard/no-tabs-warning.tsx` (new)
 - `src/components/fundraisers/leaderboard/leaderboard-settings.tsx`
 - `locales/en/leaderboard.json`, `locales/de/leaderboard.json`
 
-**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears. Try to submit — form is blocked. Re-enable either tab — warning disappears and submission succeeds.
+**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears in place of the preview. Re-enable either tab — preview returns.
 
 ---
 
 ## Implementation Notes
 
 - **Circular dependency (Step 1):** `fundraiser-data-builder.ts` imports `FundraiserFormValues` from `fundraiser-form-schema.ts`. The schema file cannot import `DEFAULT_MODULES` back from the data builder. Resolved by defining `DEFAULT_LEADERBOARD: LeaderboardModuleSettings` directly in `fundraiser-form-schema.ts`.
-- **`FundraiserView` prop gap (Step 6):** The plan says to add `LeaderboardContainer` to `fundraiser-view.tsx` but doesn't mention widening the props. `FundraiserView` needs a new `leaderboardData?: LeaderboardResponse | null` prop, passed down from `page.tsx`.
+- **`LeaderboardLoader` is a server component (Step 6):** Async server component with `<Suspense>` streaming — no client-side state or effects. Settings come from the fundraiser object to cover the `show_avatar` gap in the leaderboard API response. `page.tsx` needs no changes.
 - **Step 5 — no leaderboard service in prototype:** The prototype has no dedicated leaderboard API service file. The service in this project will be written fresh (not ported), following the `platformAPIClient` pattern from `fundraiser-service.ts`.
 
 ## Summary
@@ -169,8 +182,8 @@ Fetch leaderboard data in the fundraiser detail page (`src/app/(fundraiser)/fund
 | ---- | --------------------------- | ------------------------------ | ------ |
 | 1    | Form schema + defaults      | DevTools form state            | [x]    |
 | 2    | Settings toggles UI         | Create/edit form sidebar       | [x]    |
-| 3    | Live settings preview       | Sidebar preview with mock data | [ ]    |
+| 3    | Live settings preview       | Sidebar preview with mock data | [x]    |
 | 4    | API request includes config | Network tab on create/edit     | [x]    |
-| 5    | Leaderboard data service    | Console / Network tab          | [ ]    |
+| 5    | Leaderboard data service    | Network tab (via Step 6)       | [ ]    |
 | 6    | Leaderboard on detail page  | Fundraiser detail page         | [ ]    |
 | Fix  | No-tabs warning (informational) | Create/edit form           | [x]    |
