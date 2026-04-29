@@ -31,6 +31,32 @@
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
     },
+    "toolbar": {
+      "searchPlaceholder": "Search by name or host...",
+      "resultCount": "Showing <bold>{visible}</bold> of {total}"
+    },
+    "statusFilter": {
+      "all": "All",
+      "active": "Active",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "sort": {
+      "triggerLabel": "Sort: ",
+      "options": {
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "most-raised": "Most raised",
+        "ending-soonest": "Ending soonest",
+        "name-asc": "Name A-Z"
+      }
+    },
+    "statusBadge": {
+      "active": "Active",
+      "paused": "Paused",
+      "ended": "Ended",
+      "ending-soon": "Ending soon"
+    },
     "listItem": {
       "byHost": "by {host}",
       "hostsTwo": "{first} and {second}",
@@ -44,6 +70,11 @@
       "title": "You haven't created a fundraiser yet",
       "description": "Start a campaign to begin collecting donations.",
       "cta": "Create your first fundraiser"
+    },
+    "noResults": {
+      "title": "No fundraisers match these filters.",
+      "description": "Try adjusting your search or filters.",
+      "cta": "Clear filters"
     }
   }
 }
