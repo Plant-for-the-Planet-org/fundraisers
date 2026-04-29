@@ -3,12 +3,12 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 type MockBase = Omit<LeaderboardDonation, 'currency' | 'created'>;
 
 const MOCK_RECENT_BASE: MockBase[] = [
-  { id: '1', amount: 5000, donorName: 'Maria Schmidt' },
-  { id: '2', amount: 2000, donorName: 'James Kim' },
-  { id: '3', amount: 10000, donorName: 'Sarah Lindqvist' },
-  { id: '4', amount: 3500, donorName: 'Ahmed Al-Rashid' },
-  { id: '5', amount: 8000, donorName: 'Liu Wei' },
-  { id: '6', amount: 2500, donorName: 'Anna Bergström' },
+  { id: '1', amount: 50, donorName: 'Maria Schmidt' },
+  { id: '2', amount: 20, donorName: 'James Kim' },
+  { id: '3', amount: 100, donorName: 'Sarah Lindqvist' },
+  { id: '4', amount: 35, donorName: 'Ahmed Al-Rashid' },
+  { id: '5', amount: 80, donorName: 'Liu Wei' },
+  { id: '6', amount: 25, donorName: 'Anna Bergström' },
 ];
 
 const MOCK_TOP_BASE: MockBase[] = [...MOCK_RECENT_BASE].sort(

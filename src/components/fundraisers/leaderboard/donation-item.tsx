@@ -1,7 +1,7 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils/currency';
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -72,7 +72,7 @@ export function DonationItem({
         </div>
         <div className='text-zinc-600 dark:text-gray-300 text-xs font-medium leading-tight whitespace-nowrap'>
           {showAmount
-            ? `${formatCurrency(donation.amount, donation.currency)} • `
+            ? `${formatCurrencyFromDecimal(donation.amount, donation.currency)} • `
             : ''}
           {formatTimeAgo(donation.created)}
         </div>
