@@ -15,7 +15,7 @@ interface FundraiserStatusFilterProps {
   className?: string;
 }
 
-const FILTER_OPTIONS: FundraiserListStatusFilter[] = [
+const STATUS_FILTER_OPTIONS: FundraiserListStatusFilter[] = [
   'all',
   'active',
   'paused',
@@ -40,18 +40,18 @@ export function FundraiserStatusFilter({
         className
       )}
     >
-      {FILTER_OPTIONS.map(option => {
-        const isActive = option === value;
+      {STATUS_FILTER_OPTIONS.map(option => {
+        const isSelected = option === value;
         return (
           <button
             key={option}
             type='button'
             role='radio'
-            aria-checked={isActive}
+            aria-checked={isSelected}
             onClick={() => onChange(option)}
             className={cn(
               'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors',
-              isActive
+              isSelected
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             )}
@@ -60,7 +60,7 @@ export function FundraiserStatusFilter({
             <span
               className={cn(
                 'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
-                isActive
+                isSelected
                   ? 'bg-muted text-foreground'
                   : 'bg-background/70 text-muted-foreground'
               )}

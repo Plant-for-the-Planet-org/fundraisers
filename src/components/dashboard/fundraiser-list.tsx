@@ -34,7 +34,7 @@ export function FundraiserList({
 
   if (fundraisers.length === 0) {
     if (isFiltered) {
-      return <FundraiserListNoResults onClear={onClearFilters} />;
+      return <FundraiserListNoResults onClearFilters={onClearFilters} />;
     }
     return <FundraiserListEmpty />;
   }

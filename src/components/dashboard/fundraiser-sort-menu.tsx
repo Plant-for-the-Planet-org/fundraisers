@@ -34,7 +34,7 @@ export function FundraiserSortMenu({
 }: FundraiserSortMenuProps) {
   const t = useTranslations('Dashboard.sort');
 
-  const currentLabel = t(`options.${value}`);
+  const selectedSortLabel = t(`options.${value}`);
 
   return (
     <DropdownMenu modal={false}>
@@ -50,7 +50,7 @@ export function FundraiserSortMenu({
           <span className='inline-flex min-w-0 items-center gap-1 truncate'>
             <span className='text-muted-foreground'>{t('triggerLabel')}</span>
             <span className='truncate font-medium text-foreground'>
-              {currentLabel}
+              {selectedSortLabel}
             </span>
           </span>
           <ChevronDown className='ml-2 h-4 w-4 shrink-0' aria-hidden='true' />

@@ -24,7 +24,7 @@ export function FundraiserListSection({
 }: FundraiserListSectionProps) {
   const t = useTranslations('Dashboard.toolbar');
   const locale = useLocale();
-  const { filters, setFilters, reset } = useFundraiserListFilters();
+  const { filters, updateFilters, resetFilters } = useFundraiserListFilters();
 
   const counts = useMemo(() => getStatusCounts(fundraisers), [fundraisers]);
 
@@ -52,7 +52,7 @@ export function FundraiserListSection({
         <FundraiserListToolbar
           filters={filters}
           counts={counts}
-          onChange={setFilters}
+          onFiltersChange={updateFilters}
         />
       )}
 
@@ -74,7 +74,7 @@ export function FundraiserListSection({
         fundraisers={visibleFundraisers}
         isLoading={isLoading}
         isFiltered={isFiltered}
-        onClearFilters={reset}
+        onClearFilters={resetFilters}
       />
     </div>
   );

@@ -90,11 +90,11 @@ function matchesStatus(
 }
 
 export function filterFundraisers(
-  list: Fundraiser[],
+  fundraisers: Fundraiser[],
   filters: Pick<FundraiserListFilters, 'search' | 'status'>
 ): Fundraiser[] {
   const query = filters.search.trim().toLowerCase();
-  return list.filter(
+  return fundraisers.filter(
     f => matchesStatus(f, filters.status) && matchesSearch(f, query)
   );
 }
@@ -112,19 +112,19 @@ function compareDatesAsc(a: string, b: string): number {
 }
 
 export function sortFundraisers(
-  list: Fundraiser[],
+  fundraisers: Fundraiser[],
   sort: FundraiserListSort,
   locale?: string
 ): Fundraiser[] {
-  const copy = [...list];
+  const sorted = [...fundraisers];
 
   switch (sort) {
     case 'newest':
-      return copy.sort((a, b) => compareDatesDesc(a.startDate, b.startDate));
+      return sorted.sort((a, b) => compareDatesDesc(a.startDate, b.startDate));
     case 'oldest':
-      return copy.sort((a, b) => compareDatesAsc(a.startDate, b.startDate));
+      return sorted.sort((a, b) => compareDatesAsc(a.startDate, b.startDate));
     case 'most-raised':
-      return copy.sort((a, b) => {
+      return sorted.sort((a, b) => {
         const diff = compareNumbersDesc(a.totalRaised, b.totalRaised);
         if (diff !== 0) return diff;
         return a.currency.localeCompare(b.currency);
@@ -135,7 +135,7 @@ export function sortFundraisers(
       // endDate (daysLeft === 0) is treated as non-positive and pushed
       // below still-running ones — the backend is expected to transition
       // it to `completed`, so this is a transient state.
-      return copy.sort((a, b) => {
+      return sorted.sort((a, b) => {
         const aActive = a.status === 'active';
         const bActive = b.status === 'active';
         if (aActive && !bActive) return -1;
@@ -152,23 +152,25 @@ export function sortFundraisers(
         return aDaysLeft - bDaysLeft;
       });
     case 'name-asc':
-      return copy.sort((a, b) =>
+      return sorted.sort((a, b) =>
         a.title.localeCompare(b.title, locale, { sensitivity: 'base' })
       );
     default:
-      return copy;
+      return sorted;
   }
 }
 
-export function getStatusCounts(list: Fundraiser[]): FundraiserStatusCounts {
+export function getStatusCounts(
+  fundraisers: Fundraiser[]
+): FundraiserStatusCounts {
   const counts: FundraiserStatusCounts = {
-    all: list.length,
+    all: fundraisers.length,
     active: 0,
     paused: 0,
     ended: 0,
   };
 
-  for (const fundraiser of list) {
+  for (const fundraiser of fundraisers) {
     switch (fundraiser.status) {
       case 'active':
         counts.active += 1;

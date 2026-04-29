@@ -5,11 +5,11 @@ import { SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FundraiserListNoResultsProps {
-  onClear: () => void;
+  onClearFilters: () => void;
 }
 
 export function FundraiserListNoResults({
-  onClear,
+  onClearFilters,
 }: FundraiserListNoResultsProps) {
   const t = useTranslations('Dashboard.noResults');
 
@@ -22,7 +22,7 @@ export function FundraiserListNoResults({
       <p className='mt-1 max-w-sm text-sm text-muted-foreground'>
         {t('description')}
       </p>
-      <Button variant='outline' className='mt-4' onClick={onClear}>
+      <Button variant='outline' className='mt-4' onClick={onClearFilters}>
         {t('cta')}
       </Button>
     </div>

@@ -425,14 +425,16 @@ export const ENDING_SOON_THRESHOLD_DAYS = 7;
 export function deriveDisplayStatus(f: Fundraiser, now?: Date): DisplayStatus;
 export function getDaysLeft(endDate: string, now?: Date): number; // negative if past
 export function filterFundraisers(
-  list: Fundraiser[],
+  fundraisers: Fundraiser[],
   f: FundraiserListFilters
 ): Fundraiser[];
 export function sortFundraisers(
-  list: Fundraiser[],
+  fundraisers: Fundraiser[],
   sort: FundraiserListSort
 ): Fundraiser[];
-export function getStatusCounts(list: Fundraiser[]): FundraiserStatusCounts;
+export function getStatusCounts(
+  fundraisers: Fundraiser[]
+): FundraiserStatusCounts;
 ```
 
 **Filter buckets — driven by API `status` only:**
@@ -468,8 +470,8 @@ const DEFAULT_FILTERS: FundraiserListFilters = {
 };
 export function useFundraiserListFilters(): {
   filters: FundraiserListFilters;
-  setFilters: (next: Partial<FundraiserListFilters>) => void;
-  reset: () => void;
+  updateFilters: (next: Partial<FundraiserListFilters>) => void;
+  resetFilters: () => void;
 };
 ```
 
