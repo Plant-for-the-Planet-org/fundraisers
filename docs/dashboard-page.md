@@ -87,7 +87,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 ---
 
-### PR 3 — Search + filter + sort toolbar
+### PR 3 — Search + filter + sort toolbar ✅ shipped
 
 **Goal:** add the toolbar above the list. Users can search by name/host, filter by status, and pick a sort order. The list re‑renders accordingly.
 
@@ -265,17 +265,17 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserListSection`
 
-- Props: `{ fundraisers: Fundraiser[]; onMutate: () => void; }`
+- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; }` (PR 4 will add `onMutate` once Pause/Resume is wired).
 - Owns local state via `useFundraiserListFilters` (see Hooks).
 - Computes `visibleFundraisers = sortFundraisers(filterFundraisers(fundraisers, { search, status }), sort)`.
-- Renders: `FundraiserListToolbar` → result count line (`Showing {visible} of {total}`) → `FundraiserList`.
-- Passes `onMutate` down so action menu can refresh after Pause/Resume.
+- Renders: `FundraiserListToolbar` → result count line (`Showing <bold>{visible}</bold> of {total}`, rendered via `t.rich` so the visible count is bolded) → `FundraiserList`.
+- Passes `onMutate` down so action menu can refresh after Pause/Resume (PR 4 — not wired in PR 3).
 
 ### `FundraiserListToolbar`
 
 - Props: `{ filters: FundraiserListFilters; counts: FundraiserStatusCounts; onChange: (next: FundraiserListFilters) => void; }`
 - Pure presentational; composes `FundraiserSearchInput`, `FundraiserStatusFilter`, `FundraiserSortMenu`.
-- Mobile: stacks vertically (`flex-col md:flex-row`); status filter scrolls horizontally if it overflows.
+- Mobile: stacks vertically (`flex-col md:flex-row`); status filter pills spread evenly via `justify-between` so all four fit on one row at narrow widths (no horizontal scroll).
 
 ### `FundraiserSearchInput`
 
@@ -291,14 +291,16 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserSortMenu`
 
-- Props: `{ value: FundraiserListSort; onChange: (next: FundraiserListSort) => void; }`
-- Dropdown built on [src/components/ui/dropdown-menu.tsx](src/components/ui/dropdown-menu.tsx).
-- Options: `newest` (default), `oldest`, `most-raised`, `ending-soonest`, `name-asc`. Trigger label: `t('sort.label', { value: t('sort.options.<id>') })`.
+- Props: `{ value: FundraiserListSort; onChange: (next: FundraiserListSort) => void; className?: string; }`
+- Dropdown built on [src/components/ui/dropdown-menu.tsx](src/components/ui/dropdown-menu.tsx). Mounted with `modal={false}` to disable Radix's scroll-lock side effects (which would otherwise shift the page when opening/closing the menu).
+- Options: `newest` (default), `oldest`, `most-raised`, `ending-soonest`, `name-asc`. Trigger renders `t('sort.triggerLabel')` (literal "Sort: ") followed by the selected option label inline so the option can be styled distinctly. The selected option in the menu shows a green `Check` on the left.
+- Trigger has a fixed `md:w-52` so its width does not change with the selected option (prevents toolbar layout shifts).
 
 ### `FundraiserList`
 
-- Props: `{ fundraisers: Fundraiser[]; isFiltered: boolean; onMutate: () => void; }`
-- If `fundraisers.length === 0`: render `FundraiserListNoResults` when `isFiltered`, otherwise `FundraiserListEmpty`.
+- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered?: boolean; onClearFilters?: () => void; }` (PR 4 will add `onMutate` for per‑row actions).
+- If `isLoading`: renders 4 `FundraiserListItemSkeleton` rows.
+- If `fundraisers.length === 0`: render `FundraiserListNoResults` (with `onClearFilters`) when `isFiltered`, otherwise `FundraiserListEmpty`.
 - Otherwise maps to `FundraiserListItem`.
 
 ### `FundraiserListItem`
@@ -471,7 +473,7 @@ export function useFundraiserListFilters(): {
 };
 ```
 
-**URL sync (recommended, flag as decision):** persist filters in the query string via Next.js `useSearchParams` so a refresh keeps the user's view. Skip if it adds noise to analytics; document the choice either way.
+**URL sync (still open as of PR 3):** the hook currently keeps filters in local component state only — refreshing the page resets to defaults. Persisting filters in the query string via Next.js `useSearchParams` is a future‑polish item; revisit alongside any analytics work.
 
 ---
 
@@ -514,8 +516,8 @@ Proposed key shape (English; German mirrors structure):
       }
     },
     "toolbar": {
-      "searchPlaceholder": "Search by name or host…",
-      "resultCount": "Showing {visible} of {total}"
+      "searchPlaceholder": "Search by name or host...",
+      "resultCount": "Showing <bold>{visible}</bold> of {total}"
     },
     "statusFilter": {
       "all": "All",
@@ -524,13 +526,13 @@ Proposed key shape (English; German mirrors structure):
       "ended": "Ended"
     },
     "sort": {
-      "label": "Sort: {value}",
+      "triggerLabel": "Sort: ",
       "options": {
         "newest": "Newest first",
         "oldest": "Oldest first",
         "most-raised": "Most raised",
         "ending-soonest": "Ending soonest",
-        "name-asc": "Name A–Z"
+        "name-asc": "Name A-Z"
       }
     },
     "statusBadge": {
@@ -644,7 +646,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 1. **Pause/Resume endpoint** — confirm `PATCH /fundraisers/{id}` accepts `{ status }`. If not, backend work needed first.
 2. **Copy link on drafts** — drafts may not have a publicly resolvable URL. If not, hide Copy link for drafts (leaving Edit only).
-3. **URL‑sync filters?** Persist `?status=active&sort=most-raised&q=plan` in the query string?
+3. **URL‑sync filters?** Persist `?status=active&sort=most-raised&q=plan` in the query string? _Still open after PR 3 — implementation keeps filters in local component state only._
 4. **Pagination** — list is unpaginated for v1. Confirm this is acceptable for users with > 50 fundraisers.
 5. **Multi‑currency tile** — single dominant total + "+N more" vs. always show all currencies stacked (current legacy behavior). Picking dominant keeps the tile height stable.
 
@@ -679,13 +681,14 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Locale keys: `listItem.*`, `empty.*`. (`statusBadge.*` is added in PR 3.)
 - [ ] Unit tests for `deriveDisplayStatus`.
 
-### PR 3 — Toolbar (search + filter + sort)
+### PR 3 — Toolbar (search + filter + sort) ✅
 
-- [ ] Extend `src/lib/utils/fundraiser-list.ts` with filter/sort/counts types + functions.
-- [ ] Add `useFundraiserListFilters` hook in `src/components/dashboard/`.
-- [ ] Add components: `fundraiser-status-badge.tsx` (variants `active` / `paused` / `ended` / `ending-soon`; wired into `fundraiser-list-item.tsx`), `fundraiser-search-input.tsx`, `fundraiser-status-filter.tsx`, `fundraiser-sort-menu.tsx`, `fundraiser-list-toolbar.tsx`, `fundraiser-list-no-results.tsx`, `fundraiser-list-section.tsx`; export from `index.ts`.
-- [ ] Replace the bare list in the page with `FundraiserListSection`.
-- [ ] Locale keys: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
+- [x] Extend `src/lib/utils/fundraiser-list.ts` with filter/sort/counts types + functions.
+- [x] Add `useFundraiserListFilters` hook in `src/components/dashboard/`.
+- [x] Add components: `fundraiser-status-badge.tsx` (variants `active` / `paused` / `ended` / `ending-soon`; wired into `fundraiser-list-item.tsx`), `fundraiser-search-input.tsx`, `fundraiser-status-filter.tsx`, `fundraiser-sort-menu.tsx`, `fundraiser-list-toolbar.tsx`, `fundraiser-list-no-results.tsx`, `fundraiser-list-section.tsx`; export from `index.ts`.
+- [x] Replace the bare list in the page with `FundraiserListSection`.
+- [x] Locale keys: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
+- [x] Layout stability: `scrollbar-gutter: stable` on `html` (in `src/app/globals.css`) so list height changes between filters don't shift the page; `modal={false}` on the sort `DropdownMenu` to disable Radix's scroll-lock side effects.
 - [ ] Unit tests for `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
 
 ### PR 4 — Per‑row actions

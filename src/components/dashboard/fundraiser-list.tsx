@@ -2,14 +2,16 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useMemo } from 'react';
 import { FundraiserListEmpty } from './fundraiser-list-empty';
 import { FundraiserListItem } from './fundraiser-list-item';
 import { FundraiserListItemSkeleton } from './fundraiser-list-item-skeleton';
+import { FundraiserListNoResults } from './fundraiser-list-no-results';
 
 interface FundraiserListProps {
   fundraisers: Fundraiser[];
   isLoading: boolean;
+  isFiltered?: boolean;
+  onClearFilters?: () => void;
 }
 
 const SKELETON_ROWS = 4;
@@ -17,13 +19,9 @@ const SKELETON_ROWS = 4;
 export function FundraiserList({
   fundraisers,
   isLoading,
+  isFiltered = false,
+  onClearFilters,
 }: FundraiserListProps) {
-  const sorted = useMemo(
-    () =>
-      [...fundraisers].sort((a, b) => b.startDate.localeCompare(a.startDate)),
-    [fundraisers]
-  );
-
   if (isLoading) {
     return (
       <ul className='fundraiser-list divide-y divide-border/60'>
@@ -34,13 +32,16 @@ export function FundraiserList({
     );
   }
 
-  if (sorted.length === 0) {
+  if (fundraisers.length === 0) {
+    if (isFiltered) {
+      return <FundraiserListNoResults onClear={onClearFilters ?? (() => {})} />;
+    }
     return <FundraiserListEmpty />;
   }
 
   return (
     <ul className='fundraiser-list divide-y divide-border/60'>
-      {sorted.map(fundraiser => (
+      {fundraisers.map(fundraiser => (
         <FundraiserListItem key={fundraiser.id} fundraiser={fundraiser} />
       ))}
     </ul>

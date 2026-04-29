@@ -14,7 +14,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import {
   DashboardHeader,
   DashboardSummary,
-  FundraiserList,
+  FundraiserListSection,
 } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
@@ -93,7 +93,10 @@ export default function DashboardPage() {
         />
 
         {!hasError && (
-          <FundraiserList fundraisers={fundraisers} isLoading={isLoading} />
+          <FundraiserListSection
+            fundraisers={fundraisers}
+            isLoading={isLoading}
+          />
         )}
       </section>
     </AuthGuard>
