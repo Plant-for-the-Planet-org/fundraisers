@@ -11,6 +11,7 @@ import { DisabledView } from './disabled-view';
 import { LeaderboardSettingsDropdown } from './leaderboard-settings-dropdown';
 import { LeaderboardView } from './leaderboard-view';
 import { getMockLeaderboardDonations } from './mock-data';
+import { NoTabsWarning } from './no-tabs-warning';
 
 export function LeaderboardSettings() {
   const t = useTranslations('Leaderboard.form');
@@ -37,6 +38,8 @@ export function LeaderboardSettings() {
 
   const { recent: mockRecent, top: mockTop } =
     getMockLeaderboardDonations(currency);
+  const hasActiveTabs =
+    settings.show_recent_list || settings.show_top_list;
 
   return (
     <div className='flex flex-col gap-3'>
@@ -45,6 +48,7 @@ export function LeaderboardSettings() {
         actionSlot={
           <div className='flex items-center gap-2'>
             <Switch
+              size='compact'
               checked={settings.enabled}
               onCheckedChange={checked => handleChange('enabled', checked)}
               aria-label={t('labels.enableLeaderboard')}
@@ -59,15 +63,17 @@ export function LeaderboardSettings() {
         {t('sectionHeading')}
       </SectionHeader>
 
-      {settings.enabled ? (
-        <LeaderboardView
-          recentDonations={mockRecent}
-          topDonations={mockTop}
-          settings={settings}
-        />
-      ) : (
-        <DisabledView />
-      )}
+      {!settings.enabled && <DisabledView />}
+      {settings.enabled &&
+        (hasActiveTabs ? (
+          <LeaderboardView
+            recentDonations={mockRecent}
+            topDonations={mockTop}
+            settings={settings}
+          />
+        ) : (
+          <NoTabsWarning />
+        ))}
     </div>
   );
 }

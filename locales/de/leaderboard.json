@@ -15,6 +15,10 @@
       "disabledView": {
         "title": "Rangliste deaktiviert",
         "description": "Rangliste aktivieren um Spender-Rankings und aktuelle Spenden anzuzeigen"
+      },
+      "noTabsWarning": {
+        "title": "Keine Tabs ausgewählt",
+        "description": "Aktiviere mindestens eine der Listen (Neueste oder Top), um die Rangliste anzuzeigen"
       }
     },
     "view": {

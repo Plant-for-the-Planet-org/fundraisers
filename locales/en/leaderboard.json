@@ -15,6 +15,10 @@
       "disabledView": {
         "title": "Leaderboard Disabled",
         "description": "Enable the leaderboard to show donor rankings and recent donations"
+      },
+      "noTabsWarning": {
+        "title": "No Tabs Selected",
+        "description": "Enable at least one of Recent List or Top List to display the leaderboard"
       }
     },
     "view": {
