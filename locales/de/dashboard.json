@@ -36,6 +36,7 @@
       "resultCount": "<bold>{visible}</bold> von {total} werden angezeigt"
     },
     "statusFilter": {
+      "groupLabel": "Nach Status filtern",
       "all": "Alle",
       "active": "Aktiv",
       "paused": "Pausiert",

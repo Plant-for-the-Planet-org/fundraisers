@@ -34,7 +34,7 @@ export function FundraiserStatusFilter({
   return (
     <div
       role='radiogroup'
-      aria-label={t('all')}
+      aria-label={t('groupLabel')}
       className={cn(
         'fundraiser-status-filter flex h-11 shrink-0 items-center justify-between rounded-xl border border-border/60 bg-muted px-1 md:inline-flex md:justify-start',
         className
