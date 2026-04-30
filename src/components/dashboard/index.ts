@@ -1,6 +1,7 @@
 export { DashboardHeader } from './dashboard-header';
 export { DashboardStatsError } from './dashboard-stats-error';
 export { DashboardSummary } from './dashboard-summary';
+export { FundraiserActionMenu } from './fundraiser-action-menu';
 export { FundraiserList } from './fundraiser-list';
 export { FundraiserListNoResults } from './fundraiser-list-no-results';
 export { FundraiserListSection } from './fundraiser-list-section';

@@ -96,6 +96,7 @@ export default function DashboardPage() {
           <FundraiserListSection
             fundraisers={fundraisers}
             isLoading={isLoading}
+            onMutate={refetch}
           />
         )}
       </section>

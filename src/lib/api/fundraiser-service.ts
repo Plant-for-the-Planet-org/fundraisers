@@ -49,3 +49,17 @@ export async function updateFundraiser(
     token
   );
 }
+
+export function pauseFundraiser(
+  id: string,
+  token: string
+): Promise<Fundraiser> {
+  return updateFundraiser(id, { status: 'paused' }, token);
+}
+
+export function resumeFundraiser(
+  id: string,
+  token: string
+): Promise<Fundraiser> {
+  return updateFundraiser(id, { status: 'active' }, token);
+}

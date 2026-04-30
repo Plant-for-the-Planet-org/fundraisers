@@ -12,6 +12,7 @@ interface FundraiserListProps {
   isLoading: boolean;
   isFiltered: boolean;
   onClearFilters: () => void;
+  onMutate: () => void;
 }
 
 const SKELETON_ROWS = 4;
@@ -21,6 +22,7 @@ export function FundraiserList({
   isLoading,
   isFiltered,
   onClearFilters,
+  onMutate,
 }: FundraiserListProps) {
   if (isLoading) {
     return (
@@ -42,7 +44,11 @@ export function FundraiserList({
   return (
     <ul className='fundraiser-list divide-y divide-border/60'>
       {fundraisers.map(fundraiser => (
-        <FundraiserListItem key={fundraiser.id} fundraiser={fundraiser} />
+        <FundraiserListItem
+          key={fundraiser.id}
+          fundraiser={fundraiser}
+          onMutate={onMutate}
+        />
       ))}
     </ul>
   );
