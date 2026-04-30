@@ -57,7 +57,7 @@ locales/
 3. EditFundraiserBody calls useFundraiserForEdit(slug):
      - status = 'loading'
      - getFundraiserAuthenticated(slug, token) → Fundraiser
-     - isUserAuthorized(fundraiser, userId) checks hosts for { role: 'owner', user.id === userId }
+     - isFundraiserOwner(fundraiser, userId) checks hosts for { role: 'owner', user.id === userId }
      - status = 'ready'
 4. EditFundraiserContent mounts:
      - extractInitialExtraProjects(fundraiser) — strips the workspace's default cause from
@@ -129,7 +129,7 @@ return () => {
 
 Every state update checks `shouldIgnore` first so a resolved fetch for a stale slug cannot overwrite the current state.
 
-**Authorization rule:** `isUserAuthorized` requires a host entry where `host.user?.id === userId` **and** `host.role === 'owner'`. Admin hosts are not allowed to edit — this mirrors the platform contract and is the reason an extra `unauthorized` status exists alongside the HTTP `401`/`403` branch.
+**Authorization rule:** `isFundraiserOwner` (shared helper in [src/lib/utils/fundraiser.ts](src/lib/utils/fundraiser.ts)) requires a host entry where `host.user?.id === userId` **and** `host.role === 'owner'`. Admin hosts are not allowed to edit — this mirrors the platform contract and is the reason an extra `unauthorized` status exists alongside the HTTP `401`/`403` branch. The same helper is reused by `FundraiserActionMenu` on the dashboard to gate per-row actions.
 
 **Error mapping:** `PlatformAPIError` statuses are folded into `not-found` / `unauthorized`; everything else becomes `error`. The error's `message` is surfaced to the UI when the thrown value is an `Error`; anything else falls back to the `Fundraisers.edit.loadError` translation so users never see an empty or hard-coded English string.
 
@@ -261,7 +261,7 @@ An earlier sketch had two sibling components (`CreateFundraiserFormBody`, `EditF
 
 ## Why owner-only authorization
 
-Platform policy restricts editing to users with an `owner` host role. The client performs the check defensively in `isUserAuthorized` so admins and other non-owner viewers get the unauthorized screen before they can type into the form, instead of seeing a cryptic `403` at submit time. The server remains authoritative — this is UX, not security.
+Platform policy restricts editing to users with an `owner` host role. The client performs the check defensively in `isFundraiserOwner` so admins and other non-owner viewers get the unauthorized screen before they can type into the form, instead of seeing a cryptic `403` at submit time. The server remains authoritative — this is UX, not security.
 
 ---
 

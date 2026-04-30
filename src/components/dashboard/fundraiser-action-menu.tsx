@@ -18,7 +18,7 @@ import {
   pauseFundraiser,
   resumeFundraiser,
 } from '@/lib/api/fundraiser-service';
-import { getFundraiserUrl } from '@/lib/utils/fundraiser';
+import { getFundraiserUrl, isFundraiserOwner } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,21 +41,11 @@ interface ActionVisibility {
   resume: boolean;
 }
 
-function isOwnerHost(
-  fundraiser: Fundraiser,
-  currentUserId: string | null
-): boolean {
-  if (!currentUserId) return false;
-  return fundraiser.hosts.some(
-    host => host.user?.id === currentUserId && host.role === 'owner'
-  );
-}
-
 function getAvailableActions(
   fundraiser: Fundraiser,
   currentUserId: string | null
 ): ActionVisibility {
-  if (!isOwnerHost(fundraiser, currentUserId)) {
+  if (!isFundraiserOwner(fundraiser, currentUserId)) {
     return { edit: false, copyLink: true, pause: false, resume: false };
   }
 
