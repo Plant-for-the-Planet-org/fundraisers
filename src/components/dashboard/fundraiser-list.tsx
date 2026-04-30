@@ -12,7 +12,7 @@ interface FundraiserListProps {
   isLoading: boolean;
   isFiltered: boolean;
   onClearFilters: () => void;
-  onMutate: () => void;
+  onActionComplete: () => void;
 }
 
 const SKELETON_ROWS = 4;
@@ -22,7 +22,7 @@ export function FundraiserList({
   isLoading,
   isFiltered,
   onClearFilters,
-  onMutate,
+  onActionComplete,
 }: FundraiserListProps) {
   if (isLoading) {
     return (
@@ -47,7 +47,7 @@ export function FundraiserList({
         <FundraiserListItem
           key={fundraiser.id}
           fundraiser={fundraiser}
-          onMutate={onMutate}
+          onActionComplete={onActionComplete}
         />
       ))}
     </ul>

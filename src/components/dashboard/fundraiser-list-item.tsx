@@ -15,12 +15,12 @@ import { FundraiserStatusBadge } from './fundraiser-status-badge';
 
 interface FundraiserListItemProps {
   fundraiser: Fundraiser;
-  onMutate: () => void;
+  onActionComplete: () => void;
 }
 
 export function FundraiserListItem({
   fundraiser,
-  onMutate,
+  onActionComplete,
 }: FundraiserListItemProps) {
   const t = useTranslations('Dashboard.listItem');
   const tFundraisers = useTranslations('Fundraisers');
@@ -113,7 +113,10 @@ export function FundraiserListItem({
         </div>
       </div>
 
-      <FundraiserActionMenu fundraiser={fundraiser} onMutate={onMutate} />
+      <FundraiserActionMenu
+        fundraiser={fundraiser}
+        onActionComplete={onActionComplete}
+      />
     </li>
   );
 }

@@ -140,7 +140,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
   - `modal={false}` on the `DropdownMenu` to disable Radix's scroll‑lock side effects (prevents horizontal layout shift on open/close), matching `FundraiserSortMenu`.
 - API layer:
   - Reuse the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts) (which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`). Pause = `updateFundraiser(id, { status: 'paused' }, token)`; Resume = `updateFundraiser(id, { status: 'active' }, token)`. `UpdateFundraiserRequest` already accepts `status?: FundraiserStatus` — no type, client, or service changes required.
-- Page composition: thread `onMutate = refetch` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`.
+- Page composition: thread `onActionComplete = refetch` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`.
 - Locale keys added: `actions.*`.
 
 **Out of scope:** optimistic updates (record as a future polish item), share‑sheet beyond Copy link.
@@ -268,11 +268,11 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserListSection`
 
-- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; onMutate: () => void; }`
+- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; onActionComplete: () => void; }`
 - Owns local state via `useFundraiserListFilters` (see Hooks).
 - Computes `visibleFundraisers = sortFundraisers(filterFundraisers(fundraisers, { search, status }), sort)`.
 - Renders: `FundraiserListToolbar` → result count line (`Showing <bold>{visible}</bold> of {total}`, rendered via `t.rich` so the visible count is bolded) → `FundraiserList`.
-- Threads `onMutate` (= page‑level `refetch`) down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu` so Pause/Resume can refresh the list after a successful mutation.
+- Threads `onActionComplete` (= page‑level `refetch`) down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu` so Pause/Resume can refresh the list after a successful mutation.
 
 ### `FundraiserListToolbar`
 
@@ -301,14 +301,14 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserList`
 
-- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered?: boolean; onClearFilters?: () => void; }` (PR 4 will add `onMutate` for per‑row actions).
+- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered?: boolean; onClearFilters?: () => void; }` (PR 4 will add `onActionComplete` for per‑row actions).
 - If `isLoading`: renders 4 `FundraiserListItemSkeleton` rows.
 - If `fundraisers.length === 0`: render `FundraiserListNoResults` (with `onClearFilters`) when `isFiltered`, otherwise `FundraiserListEmpty`.
 - Otherwise maps to `FundraiserListItem`.
 
 ### `FundraiserListItem`
 
-- Props: `{ fundraiser: Fundraiser; onMutate: () => void; }`
+- Props: `{ fundraiser: Fundraiser; onActionComplete: () => void; }`
 - Layout (left → right):
   - 80×80 image (or placeholder if `fundraiser.image` is null) — uses `next/image` with `fill` and `sizes`.
   - Block: title (PR 3 also renders `FundraiserStatusBadge` next to the title); "by {hostName}" line — formatted from `fundraiser.hosts` as `X` (1), `X and Y` (2), or `X, Y and N other(s)` (3+) via `listItem.hostsTwo` / `listItem.hostsMany`; metric row (`amountRaised of goal · N donations · timeLeft`).
@@ -323,7 +323,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserActionMenu`
 
-- Props: `{ fundraiser: Fundraiser; onMutate: () => void; }`
+- Props: `{ fundraiser: Fundraiser; onActionComplete: () => void; }`
 - Items are gated in two layers — first by the **viewer's host role**, then by **API `status`**.
 
 **1. Owner gating.** The dashboard list contains every fundraiser the current user co‑hosts. The menu first checks whether the current user's host record on this fundraiser has `role === 'owner'`. The current user ID comes from `useAuthStore(state => state.user?.sub)` (the auth store maps `sub` to `profile.id`, which matches `host.user.id`).
@@ -345,7 +345,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 - **Edit** → navigates to `/dashboard/fundraisers/edit/[slug]` (existing route). Hidden for ended (`completed` / `cancelled`) fundraisers and for non‑owner viewers.
 - **Copy link** → writes `${window.location.origin}${getFundraiserUrl(fundraiser)}` (resolves to `/fundraisers/{slug-or-id}` — see [src/lib/utils/fundraiser.ts](src/lib/utils/fundraiser.ts)) to clipboard via `navigator.clipboard.writeText`. Surfaces success/error via `sonner` toast. No `execCommand` fallback — modern browsers only.
-- **Pause** (when API `status === 'active'`) / **Resume** (when API `status === 'paused'` or `'draft'`). Both call `updateFundraiser(fundraiser.id, { status: 'paused' | 'active' }, token)`, then `onMutate()` to refetch. The same `Resume` action publishes a draft (transitions `draft → active`); the badge for drafts collapses into "Paused" so the user sees a single, consistent verb across both states. Disabled while in‑flight; show spinner inside the menu item; menu stays open until the request resolves (`onSelect` calls `event.preventDefault()` on Pause/Resume only).
+- **Pause** (when API `status === 'active'`) / **Resume** (when API `status === 'paused'` or `'draft'`). Both call `updateFundraiser(fundraiser.id, { status: 'paused' | 'active' }, token)`, then `onActionComplete()` to refetch. The same `Resume` action publishes a draft (transitions `draft → active`); the badge for drafts collapses into "Paused" so the user sees a single, consistent verb across both states. Disabled while in‑flight; show spinner inside the menu item; menu stays open until the request resolves (`onSelect` calls `event.preventDefault()` on Pause/Resume only).
 - **Visual styling:** Pause uses the destructive variant (red); Resume uses an emerald accent (`text-emerald-600` icon, `text-emerald-700` label, `bg-emerald-50` focus) to mirror Pause as a positive counterpart. A `DropdownMenuSeparator` divides the safe actions (Edit / Copy link) from the status‑change action (Pause / Resume).
 - **Layout stability:** the `DropdownMenu` is mounted with `modal={false}` to disable Radix's scroll‑lock side effects, which would otherwise add body padding on open and shift the page horizontally. Matches `FundraiserSortMenu`.
 - **Empty menu:** if the row resolves to zero items (defensive — every status currently has at least Copy link), the component returns `null` so no kebab trigger renders.
@@ -493,7 +493,7 @@ export function useFundraiserListFilters(): {
 
 The page stays thin: `AuthGuard` → single `getFundraisers(accessToken)` fetch → memoized `getDashboardSummary` → composes feature components. Per‑PR composition (what's wired up at each step) lives in the **Delivery Plan** section above.
 
-After PR 4, mutation refresh strategy: a successful Pause/Resume calls `onMutate()` which re‑runs `fetchFundraisers`. Optimistic update is a polish item, not v1.
+After PR 4, mutation refresh strategy: a successful Pause/Resume calls `onActionComplete()` which re‑runs `fetchFundraisers`. Optimistic update is a polish item, not v1.
 
 ---
 
@@ -715,7 +715,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Add `fundraiser-action-menu.tsx` — calls existing `updateFundraiser` for Pause/Resume; uses `getFundraiserUrl` for Copy link; mounted with `modal={false}` for layout stability. Export from `index.ts`.
 - [ ] Owner gating: read current user from `useAuthStore` and compare against `fundraiser.hosts[].user.id` + `role === 'owner'`. Non‑owners see Copy link only.
 - [ ] Drafts include Resume (publishes via `{ status: 'active' }`) — same case as `paused` in `getAvailableActions`.
-- [ ] Thread `onMutate = refetch` from the page → section → list → item → menu.
+- [ ] Thread `onActionComplete = refetch` from the page → section → list → item → menu.
 - [ ] Locale keys: `actions.*`.
 
 ### Cross‑PR housekeeping

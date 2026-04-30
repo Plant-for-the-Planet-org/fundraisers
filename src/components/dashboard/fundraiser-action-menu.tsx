@@ -31,7 +31,7 @@ import {
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
-  onMutate: () => void;
+  onActionComplete: () => void;
 }
 
 interface ActionVisibility {
@@ -63,11 +63,12 @@ function getAvailableActions(
   }
 }
 
-type PendingAction = 'pause' | 'resume' | null;
+type StatusActionKind = 'pause' | 'resume';
+type PendingAction = StatusActionKind | null;
 
 export function FundraiserActionMenu({
   fundraiser,
-  onMutate,
+  onActionComplete,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
   const accessToken = useAuthStore(state => state.accessToken);
@@ -97,7 +98,7 @@ export function FundraiserActionMenu({
     }
   };
 
-  const handleStatusChange = async (next: 'pause' | 'resume') => {
+  const handleStatusChange = async (next: StatusActionKind) => {
     if (pending || !accessToken) return;
 
     setPending(next);
@@ -109,7 +110,7 @@ export function FundraiserActionMenu({
         await resumeFundraiser(fundraiser.id, accessToken);
         toast.success(t('resumeSuccess'));
       }
-      onMutate();
+      onActionComplete();
       setOpen(false);
     } catch (error) {
       console.error('[FundraiserActionMenu] status change failed:', error);
