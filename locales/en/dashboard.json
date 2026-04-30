@@ -76,6 +76,18 @@
       "title": "No fundraisers match these filters.",
       "description": "Try adjusting your search or filters.",
       "cta": "Clear filters"
+    },
+    "actions": {
+      "menuLabel": "Open actions",
+      "edit": "Edit",
+      "copyLink": "Copy link",
+      "pause": "Pause",
+      "resume": "Resume",
+      "copyLinkSuccess": "Link copied",
+      "copyLinkError": "Could not copy link",
+      "pauseSuccess": "Fundraiser paused",
+      "resumeSuccess": "Fundraiser resumed",
+      "mutationError": "Something went wrong. Try again."
     }
   }
 }
