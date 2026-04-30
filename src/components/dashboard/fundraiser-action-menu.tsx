@@ -1,6 +1,6 @@
 'use client';
 
-import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { Fundraiser, FundraiserStatus } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -41,26 +41,29 @@ interface ActionVisibility {
   resume: boolean;
 }
 
+const NON_OWNER_ACTIONS: ActionVisibility = {
+  edit: false,
+  copyLink: true,
+  pause: false,
+  resume: false,
+};
+
+const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
+  active: { edit: true, copyLink: true, pause: true, resume: false },
+  paused: { edit: true, copyLink: true, pause: false, resume: true },
+  draft: { edit: true, copyLink: true, pause: false, resume: true },
+  completed: { edit: false, copyLink: true, pause: false, resume: false },
+  cancelled: { edit: false, copyLink: true, pause: false, resume: false },
+};
+
 function getAvailableActions(
   fundraiser: Fundraiser,
   currentUserId: string | null
 ): ActionVisibility {
   if (!isFundraiserOwner(fundraiser, currentUserId)) {
-    return { edit: false, copyLink: true, pause: false, resume: false };
+    return NON_OWNER_ACTIONS;
   }
-
-  switch (fundraiser.status) {
-    case 'active':
-      return { edit: true, copyLink: true, pause: true, resume: false };
-    case 'paused':
-    case 'draft':
-      return { edit: true, copyLink: true, pause: false, resume: true };
-    case 'completed':
-    case 'cancelled':
-      return { edit: false, copyLink: true, pause: false, resume: false };
-    default:
-      return { edit: false, copyLink: false, pause: false, resume: false };
-  }
+  return OWNER_ACTIONS_BY_STATUS[fundraiser.status];
 }
 
 type StatusActionKind = 'pause' | 'resume';
