@@ -7,22 +7,31 @@ import type { DonationData } from '../donate/donate-overlay';
 import { useState } from 'react';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
 import { DonateOverlay } from '../donate/donate-overlay';
+import { usePaymentOptions } from '../donate/use-payment-options';
 import { DonationForm } from './donation-form';
 
 interface DonationSectionProps {
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
+  paymentOptionsAreAuthenticated?: boolean;
 }
 
 export function DonationSection({
   fundraiser,
   paymentOptions,
+  paymentOptionsAreAuthenticated = false,
 }: DonationSectionProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [donationData, setDonationData] = useState<DonationData | null>(null);
+  const resolvedPaymentOptions = usePaymentOptions(fundraiser.id, {
+    initialPaymentOptions: paymentOptions,
+    enabled: isOverlayOpen,
+    includeAuthenticatedData: true,
+    initialPaymentOptionsAreAuthenticated: paymentOptionsAreAuthenticated,
+  });
 
   const contributionSettings = mapPaymentOptionsToContributionSettings(
-    paymentOptions,
+    resolvedPaymentOptions,
     fundraiser.settings?.modules?.contribution
   );
 
@@ -50,7 +59,7 @@ export function DonationSection({
         }}
         donationData={donationData}
         fundraiser={fundraiser}
-        paymentOptions={paymentOptions}
+        paymentOptions={resolvedPaymentOptions}
       />
     </>
   );

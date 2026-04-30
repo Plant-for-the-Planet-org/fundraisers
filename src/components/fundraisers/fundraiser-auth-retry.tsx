@@ -35,7 +35,9 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
         let options: PaymentOptions | undefined;
         if (data.canDonate) {
           try {
-            options = await getPaymentOptions(data.id, accessToken ?? undefined);
+            options = await getPaymentOptions(data.id, {
+              token: accessToken ?? undefined,
+            });
           } catch {
             // payment options unavailable; donation form won't render
           }
@@ -50,6 +52,10 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
   if (!fundraiser) return null;
 
   return (
-    <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+    <FundraiserView
+      fundraiser={fundraiser}
+      paymentOptions={paymentOptions}
+      paymentOptionsAreAuthenticated={!!accessToken}
+    />
   );
 }

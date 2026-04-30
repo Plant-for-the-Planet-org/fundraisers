@@ -228,14 +228,8 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
-  const {
-    fundraiser,
-    donationData,
-    paymentOptions,
-    authenticatedPaymentOptions,
-    sepaFormRef,
-    cardFormRef,
-  } = useDonationForm();
+  const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
+    useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
     control,
@@ -245,11 +239,11 @@ export function PaymentMethods() {
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
-    const raw = authenticatedPaymentOptions?.lastPaymentMethod;
+    const raw = paymentOptions.lastPaymentMethod;
     if (!raw) return null;
     const methodPart = raw.split(':')[1] as PaymentMethodId;
     return SUPPORTED_METHOD_IDS.has(methodPart) ? methodPart : null;
-  }, [authenticatedPaymentOptions?.lastPaymentMethod]);
+  }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
     (methodId: PaymentMethodId) =>

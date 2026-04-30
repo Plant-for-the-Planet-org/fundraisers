@@ -140,7 +140,6 @@ interface DonationFormContextValue {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
-  authenticatedPaymentOptions: PaymentOptions | null;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -154,7 +153,6 @@ interface DonationFormProviderProps {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
-  authenticatedPaymentOptions: PaymentOptions | null;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -171,7 +169,6 @@ export function DonationFormProvider({
   fundraiser,
   donationData,
   paymentOptions,
-  authenticatedPaymentOptions,
   onSubmit,
   sepaFormRef,
   cardFormRef,
@@ -223,7 +220,6 @@ export function DonationFormProvider({
         fundraiser,
         donationData,
         paymentOptions,
-        authenticatedPaymentOptions,
         onSubmit,
         sepaFormRef,
         cardFormRef,

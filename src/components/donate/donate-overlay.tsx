@@ -23,7 +23,6 @@ import { DonationThankYou } from './donation-thank-you';
 import { DonorInfo } from './donor-info';
 import { GiftSummary } from './gift-summary';
 import { PaymentMethods } from './payment-methods';
-import { useAuthenticatedPaymentOptions } from './use-authenticated-payment-options';
 import { useDonationSubmit } from './use-donation-submit';
 
 export interface DonationData {
@@ -91,9 +90,6 @@ function DonateOverlayInner({
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
   const cardFormRef = useRef<StripeCardFormHandle>(null);
-  const authenticatedPaymentOptions = useAuthenticatedPaymentOptions(
-    fundraiser.id
-  );
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = stripeConfig
@@ -168,7 +164,6 @@ function DonateOverlayInner({
         fundraiser={fundraiser}
         donationData={donationData}
         paymentOptions={paymentOptions}
-        authenticatedPaymentOptions={authenticatedPaymentOptions}
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
