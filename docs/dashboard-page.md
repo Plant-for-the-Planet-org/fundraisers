@@ -140,7 +140,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
   - `modal={false}` on the `DropdownMenu` to disable Radix's scroll‑lock side effects (prevents horizontal layout shift on open/close), matching `FundraiserSortMenu`.
 - API layer:
   - Reuse the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts) (which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`). Pause = `updateFundraiser(id, { status: 'paused' }, token)`; Resume = `updateFundraiser(id, { status: 'active' }, token)`. `UpdateFundraiserRequest` already accepts `status?: FundraiserStatus` — no type, client, or service changes required.
-- Page composition: thread `onActionComplete = refetch` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`.
+- Page composition: thread `onActionComplete` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. The page exposes two refetch callbacks: `retryAfterError` (loud — sets `isLoading=true`, used by `DashboardSummary onRetry`) and `refetchSilently` (no `isLoading` toggle, used as `onActionComplete`). Silent refetch prevents unrelated rows from flashing skeletons on Pause/Resume.
 - Locale keys added: `actions.*`.
 
 **Out of scope:** optimistic updates (record as a future polish item), share‑sheet beyond Copy link.
@@ -272,7 +272,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 - Owns local state via `useFundraiserListFilters` (see Hooks).
 - Computes `visibleFundraisers = sortFundraisers(filterFundraisers(fundraisers, { search, status }), sort)`.
 - Renders: `FundraiserListToolbar` → result count line (`Showing <bold>{visible}</bold> of {total}`, rendered via `t.rich` so the visible count is bolded) → `FundraiserList`.
-- Threads `onActionComplete` (= page‑level `refetch`) down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu` so Pause/Resume can refresh the list after a successful mutation.
+- Threads `onActionComplete` (= page‑level `refetchSilently`) down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu` so Pause/Resume can refresh the list after a successful mutation **without** toggling `isLoading` (other rows do not flash skeletons).
 
 ### `FundraiserListToolbar`
 
@@ -301,7 +301,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 ### `FundraiserList`
 
-- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered?: boolean; onClearFilters?: () => void; }` (PR 4 will add `onActionComplete` for per‑row actions).
+- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered: boolean; onClearFilters: () => void; onActionComplete: () => void; }`.
 - If `isLoading`: renders 4 `FundraiserListItemSkeleton` rows.
 - If `fundraisers.length === 0`: render `FundraiserListNoResults` (with `onClearFilters`) when `isFiltered`, otherwise `FundraiserListEmpty`.
 - Otherwise maps to `FundraiserListItem`.
@@ -493,7 +493,7 @@ export function useFundraiserListFilters(): {
 
 The page stays thin: `AuthGuard` → single `getFundraisers(accessToken)` fetch → memoized `getDashboardSummary` → composes feature components. Per‑PR composition (what's wired up at each step) lives in the **Delivery Plan** section above.
 
-After PR 4, mutation refresh strategy: a successful Pause/Resume calls `onActionComplete()` which re‑runs `fetchFundraisers`. Optimistic update is a polish item, not v1.
+After PR 4, mutation refresh strategy: a successful Pause/Resume calls `onActionComplete()` which re‑runs `fetchFundraisers` **silently** (no `setIsLoading(true)`), so only the toggled row's badge updates while the rest of the list stays put. The error retry path on `DashboardSummary` uses a separate `retryAfterError` callback that does toggle `isLoading=true`. Optimistic update is a polish item, not v1.
 
 ---
 
@@ -613,6 +613,7 @@ Proposed key shape (English; German mirrors structure):
 | `navigator.clipboard` unavailable (HTTP, old browser)          | Show error toast. No `execCommand` fallback for v1 — the app is HTTPS‑only in supported browsers.                                                                                                                                                                 |
 | Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
 | Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
+| Pause/Resume API succeeds                                      | Refetch is **silent** — `isLoading` is not toggled, so only the toggled row's badge updates after the response. Other rows stay rendered. The toast confirms success.                                                                                            |
 | Search typed quickly                                           | Debounce 250 ms before filtering; filtering itself is sync and cheap.                                                                                                                                                                                            |
 | List > ~50 items                                               | Acceptable for v1 (no virtualization). Flag as a future concern if perf testing shows scroll stutter.                                                                                                                                                            |
 | User on small screen                                           | Toolbar stacks; status filter scrolls horizontally; action menu remains a `Dropdown` (not a sheet) for v1.                                                                                                                                                       |
@@ -715,7 +716,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Add `fundraiser-action-menu.tsx` — calls existing `updateFundraiser` for Pause/Resume; uses `getFundraiserUrl` for Copy link; mounted with `modal={false}` for layout stability. Export from `index.ts`.
 - [ ] Owner gating: read current user from `useAuthStore` and compare against `fundraiser.hosts[].user.id` + `role === 'owner'`. Non‑owners see Copy link only.
 - [ ] Drafts include Resume (publishes via `{ status: 'active' }`) — same case as `paused` in `getAvailableActions`.
-- [ ] Thread `onActionComplete = refetch` from the page → section → list → item → menu.
+- [ ] Thread `onActionComplete = refetchSilently` from the page → section → list → item → menu. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button.
 - [ ] Locale keys: `actions.*`.
 
 ### Cross‑PR housekeeping

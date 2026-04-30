@@ -67,9 +67,13 @@ export default function DashboardPage() {
     [fundraisers]
   );
 
-  const refetch = useCallback(() => {
+  const retryAfterError = useCallback(() => {
     setIsLoading(true);
     setHasError(false);
+    void fetchFundraisers();
+  }, [fetchFundraisers]);
+
+  const refetchSilently = useCallback(() => {
     void fetchFundraisers();
   }, [fetchFundraisers]);
 
@@ -89,14 +93,14 @@ export default function DashboardPage() {
           summary={summary}
           isLoading={isLoading}
           hasError={hasError}
-          onRetry={refetch}
+          onRetry={retryAfterError}
         />
 
         {!hasError && (
           <FundraiserListSection
             fundraisers={fundraisers}
             isLoading={isLoading}
-            onActionComplete={refetch}
+            onActionComplete={refetchSilently}
           />
         )}
       </section>
