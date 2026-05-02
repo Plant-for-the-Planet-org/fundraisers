@@ -199,8 +199,9 @@ export function DonationFormProvider({
       tin: '',
       makeMonthly: false,
       coverFees: false,
-      // TODO: change default once other payment methods are implemented
-      selectedPaymentMethod: 'bank-transfer',
+      // No default — PaymentMethods sets the initial selection on mount:
+      // last-used method (if available) → top of PAYMENT_METHOD_ORDER fallback.
+      selectedPaymentMethod: '' as DonationFormValues['selectedPaymentMethod'],
       addressType: 'primary',
     },
     mode: 'onBlur',

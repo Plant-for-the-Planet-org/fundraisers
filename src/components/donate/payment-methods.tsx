@@ -328,13 +328,21 @@ export function PaymentMethods() {
     );
 
     if (!isSelectedMethodAvailable) {
-      setValue('selectedPaymentMethod', visibleMethods[0].id, {
+      const isLastUsedAvailable =
+        lastUsedMethodId !== null &&
+        visibleMethods.some(method => method.id === lastUsedMethodId);
+
+      const initialMethodId = isLastUsedAvailable
+        ? lastUsedMethodId
+        : visibleMethods[0].id;
+
+      setValue('selectedPaymentMethod', initialMethodId, {
         shouldDirty: false,
         shouldTouch: false,
         shouldValidate: false,
       });
     }
-  }, [visibleMethods, selectedPaymentMethod, setValue]);
+  }, [visibleMethods, selectedPaymentMethod, setValue, lastUsedMethodId]);
 
   const visibleMethodOptions = useMemo(
     () =>
