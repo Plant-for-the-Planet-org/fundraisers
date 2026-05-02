@@ -53,10 +53,10 @@ type PaymentLogoProps = {
 };
 
 const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
-  'bank-transfer': BankIcon,
   paypal: PaypalIcon,
-  card: CreditCard,
   'sepa-debit': SepaIcon,
+  card: CreditCard,
+  'bank-transfer': BankIcon,
   'apple-pay': ApplePayIcon,
   'google-pay': GooglePayIcon,
 };

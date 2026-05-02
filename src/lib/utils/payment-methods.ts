@@ -18,10 +18,10 @@ interface PaymentMethodContext {
 }
 
 const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
-  'bank-transfer',
   'paypal',
-  'card',
   'sepa-debit',
+  'card',
+  'bank-transfer',
   'apple-pay',
   'google-pay',
 ];
