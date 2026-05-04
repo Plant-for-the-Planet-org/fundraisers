@@ -1,9 +1,10 @@
 'use client';
 
+import type { DonationEntry } from './hooks/use-leaderboard';
+
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import type { DonationEntry } from './hooks/use-leaderboard';
 
 const POLL_SECONDS = 15;
 
@@ -34,17 +35,21 @@ function CountdownRing({ remaining }: { remaining: number }) {
   return (
     <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
       <circle
-        cx={size / 2} cy={size / 2} r={r}
-        fill="none"
-        stroke="rgba(11,18,32,.10)"
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill='none'
+        stroke='rgba(11,18,32,.10)'
         strokeWidth={stroke}
       />
       <circle
-        cx={size / 2} cy={size / 2} r={r}
-        fill="none"
-        stroke="rgba(11,18,32,.35)"
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill='none'
+        stroke='rgba(11,18,32,.35)'
         strokeWidth={stroke}
-        strokeLinecap="round"
+        strokeLinecap='round'
         strokeDasharray={circumference}
         strokeDashoffset={dashoffset}
         style={{ transition: 'stroke-dashoffset 0.9s linear' }}
@@ -76,7 +81,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
 
   return (
     <div
-      className="absolute bottom-12 left-12 right-12 z-[19] grid h-[88px] overflow-hidden rounded-[18px] border"
+      className='absolute bottom-12 left-12 right-12 z-[19] grid h-[88px] overflow-hidden rounded-[18px] border'
       style={{
         gridTemplateColumns: 'auto 1fr auto',
         background: 'rgba(255,255,255,0.92)',
@@ -90,18 +95,33 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
     >
       {/* Head */}
       <div
-        className="flex items-center gap-3 px-5"
-        style={{ borderRight: '1px solid rgba(11,18,32,.08)', background: 'linear-gradient(90deg, rgba(46,123,255,.10), rgba(46,123,255,0))' }}
+        className='flex items-center gap-3 px-5'
+        style={{
+          borderRight: '1px solid rgba(11,18,32,.08)',
+          background:
+            'linear-gradient(90deg, rgba(46,123,255,.10), rgba(46,123,255,0))',
+        }}
       >
-        <div className="flex flex-col items-start gap-2">
+        <div className='flex flex-col items-start gap-2'>
           <span
-            className="inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-white"
-            style={{ background: offline ? 'rgba(11,18,32,.25)' : 'rgba(220,38,38,.92)', lineHeight: 1, transition: 'background 0.4s' }}
+            className='inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-white'
+            style={{
+              background: offline
+                ? 'rgba(11,18,32,.25)'
+                : 'rgba(220,38,38,.92)',
+              lineHeight: 1,
+              transition: 'background 0.4s',
+            }}
           >
-            <span className={`block h-[7px] w-[7px] rounded-full bg-white ${offline ? '' : 'animate-pulse'}`} />
+            <span
+              className={`block h-[7px] w-[7px] rounded-full bg-white ${offline ? '' : 'animate-pulse'}`}
+            />
             {offline ? t('offline') : t('live')}
           </span>
-          <span className="text-[16px] font-bold leading-none" style={{ color: '#0B1220' }}>
+          <span
+            className='text-[16px] font-bold leading-none'
+            style={{ color: '#0B1220' }}
+          >
             {t('recentGifts')}
           </span>
         </div>
@@ -109,30 +129,49 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
 
       {/* Scrolling track */}
       <div
-        className="relative overflow-hidden"
+        className='relative overflow-hidden'
         style={{
-          maskImage: 'linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)',
+          maskImage:
+            'linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)',
+          WebkitMaskImage:
+            'linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)',
         }}
       >
         {items.length > 0 ? (
           <div
-            className="flex h-full items-center gap-12 whitespace-nowrap px-6"
+            className='flex h-full items-center gap-12 whitespace-nowrap px-6'
             style={{ animation: 'stage-tickscroll 60s linear infinite' }}
           >
             {items.map((d, i) => (
-              <span key={`${d.id}-${i}`} className="inline-flex items-center gap-3 text-[17px]" style={{ color: '#0B1220' }}>
-                <span className="font-bold">{d.isAnonymous ? 'Anonymous' : d.donorName}</span>
-                <span className="h-1 w-1 rounded-full" style={{ background: 'rgba(11,18,32,.20)' }} />
-                <span className="font-bold" style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--accent-color)' }}>
+              <span
+                key={`${d.id}-${i}`}
+                className='inline-flex items-center gap-3 text-[17px]'
+                style={{ color: '#0B1220' }}
+              >
+                <span className='font-bold'>
+                  {d.isAnonymous ? 'Anonymous' : d.donorName}
+                </span>
+                <span
+                  className='h-1 w-1 rounded-full'
+                  style={{ background: 'rgba(11,18,32,.20)' }}
+                />
+                <span
+                  className='font-bold'
+                  style={{
+                    fontVariantNumeric: 'tabular-nums',
+                    color: 'var(--accent-color)',
+                  }}
+                >
                   {formatCurrencyFromDecimal(d.amount, d.currency, locale)}
                 </span>
-                <span className="text-[14px] opacity-50">{timeAgo(d.created)}</span>
+                <span className='text-[14px] opacity-50'>
+                  {timeAgo(d.created)}
+                </span>
               </span>
             ))}
           </div>
         ) : (
-          <div className="flex h-full items-center px-6 text-[15px] opacity-40">
+          <div className='flex h-full items-center px-6 text-[15px] opacity-40'>
             {t('waitingForDonations')}
           </div>
         )}
@@ -140,13 +179,17 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
 
       {/* Refresh indicator */}
       <div
-        className="flex items-center gap-2.5 px-5"
-        style={{ borderLeft: '1px solid rgba(11,18,32,.08)', background: 'linear-gradient(270deg, rgba(52,211,153,.12), rgba(52,211,153,0))' }}
+        className='flex items-center gap-2.5 px-5'
+        style={{
+          borderLeft: '1px solid rgba(11,18,32,.08)',
+          background:
+            'linear-gradient(270deg, rgba(52,211,153,.12), rgba(52,211,153,0))',
+        }}
       >
-        <div className="relative flex items-center justify-center">
+        <div className='relative flex items-center justify-center'>
           <CountdownRing remaining={remaining} />
           <span
-            className="absolute text-[11px] font-bold tabular-nums"
+            className='absolute text-[11px] font-bold tabular-nums'
             style={{ color: 'rgba(11,18,32,.5)' }}
           >
             {remaining}

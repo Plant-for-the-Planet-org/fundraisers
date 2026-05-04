@@ -26,23 +26,24 @@ Stored under `fundraiser.settings.modules.stage`.
 interface StageModuleSettings {
   enabled: boolean;
 
-  title?: string;               // Falls back to fundraiser.title
-  description?: string;         // Falls back to fundraiser.description (first paragraph)
-  partner_logo_url?: string;    // PNG, 56×56, optional — shown in top bar
+  title?: string; // Falls back to fundraiser.title
+  description?: string; // Falls back to fundraiser.description (first paragraph)
+  partner_logo_url?: string; // PNG, 56×56, optional — shown in top bar
 
-  locale?: string;               // Fixed display locale ("en" | "de"). Overrides viewer's browser locale
+  locale?: string; // Fixed display locale ("en" | "de"). Overrides viewer's browser locale
 
   slides: {
-    position: number;           // Display order (1-based)
+    position: number; // Display order (1-based)
     title: string;
     description?: string;
-    image?: string;             // JPG or PNG URL
-    duration: number;           // Seconds per slide. Default: 8
-  }[]
+    image?: string; // JPG or PNG URL
+    duration: number; // Seconds per slide. Default: 8
+  }[];
 }
 ```
 
 **Driven by other modules — no Stage override:**
+
 - Leaderboard visibility — `modules.leaderboard.enabled`
 - Leaderboard display options (tab, anonymize, show_amount) — `modules.leaderboard`
 - `show_days_left` — from alltime-stats settings
@@ -50,6 +51,7 @@ interface StageModuleSettings {
 - Font and accent colors — `fundraiser.settings.theme`
 
 **Always visible — no controls:**
+
 - Goal + raised
 - QR panel (`stage.pp.eco/:id` with UTM params)
 - Ticker — horizontal scrolling recent donations
@@ -87,17 +89,17 @@ Toast notifications overlay top-right when a new donation lands.
 
 ## Data Sources
 
-| Data | Source | Used for |
-|---|---|---|
-| Event name | `fundraiser.title` or `modules.stage.title` | Top bar |
-| Planet logo | `https://cdn.plant-for-the-planet.org/logo/svg/planet.svg` | Top bar |
-| Partner logo | `modules.stage.partner_logo_url` | Top bar |
-| Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=` | Counter |
-| Donation feed + leaderboard | Leaderboard module endpoint (polled every 15s) | Ticker, toasts, leaderboard |
-| QR code | `https://qr.pp.eco/?url={origin}/raise/{id}?utm_*` | QR panel |
-| Short URL display | `stage.pp.eco/{id}` | QR panel label |
-| Slide content | `modules.stage.slides` | Story panel |
-| Theme, fonts, accent | `fundraiser.settings.theme` | All styling |
+| Data                                           | Source                                                     | Used for                    |
+| ---------------------------------------------- | ---------------------------------------------------------- | --------------------------- |
+| Event name                                     | `fundraiser.title` or `modules.stage.title`                | Top bar                     |
+| Planet logo                                    | `https://cdn.plant-for-the-planet.org/logo/svg/planet.svg` | Top bar                     |
+| Partner logo                                   | `modules.stage.partner_logo_url`                           | Top bar                     |
+| Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=`         | Counter                     |
+| Donation feed + leaderboard                    | Leaderboard module endpoint (polled every 15s)             | Ticker, toasts, leaderboard |
+| QR code                                        | `https://qr.pp.eco/?url={origin}/raise/{id}?utm_*`         | QR panel                    |
+| Short URL display                              | `stage.pp.eco/{id}`                                        | QR panel label              |
+| Slide content                                  | `modules.stage.slides`                                     | Story panel                 |
+| Theme, fonts, accent                           | `fundraiser.settings.theme`                                | All styling                 |
 
 ---
 
@@ -105,10 +107,10 @@ Toast notifications overlay top-right when a new donation lands.
 
 `?stagehash=Math.floor(Date.now()/15000)` appended to all poll requests to bust backend cache.
 
-| Endpoint | Interval | Status |
-|---|---|---|
-| `GET /fundraisers/{slug}/alltime-stats` | 15s | Wired |
-| `GET /fundraisers/{slug}/leaderboard` | 15s | Wired |
+| Endpoint                                | Interval | Status |
+| --------------------------------------- | -------- | ------ |
+| `GET /fundraisers/{slug}/alltime-stats` | 15s      | Wired  |
+| `GET /fundraisers/{slug}/leaderboard`   | 15s      | Wired  |
 
 ---
 
@@ -125,21 +127,21 @@ Toast notifications overlay top-right when a new donation lands.
 
 ## Components
 
-| Component | File | Status |
-|---|---|---|
-| `StageLayout` | `app/(stage)/raise/[id]/stage/layout.tsx` | Done |
-| `StagePage` | `app/(stage)/raise/[id]/stage/page.tsx` | Done |
-| `StageView` | `components/stage/stage-view.tsx` | Done |
-| `StageTopBar` | `components/stage/stage-top-bar.tsx` | Done |
-| `StageSlidePanel` | `components/stage/stage-slide-panel.tsx` | Done — Ken Burns, crossfade, pager |
-| `StageCounter` | `components/stage/stage-counter.tsx` | Done — live via alltime-stats |
-| `StageQRPanel` | `components/stage/stage-qr-panel.tsx` | Done |
-| `StageTicker` | `components/stage/stage-ticker.tsx` | Done — live via leaderboard feed, countdown ring |
-| `StageToastStack` | `components/stage/stage-toast-stack.tsx` | Mount point only — toast injection not yet wired |
-| `StageLeaderboard` | `components/stage/stage-leaderboard.tsx` | Done — live via leaderboard feed |
-| `useStageScale` | `components/stage/hooks/use-stage-scale.ts` | Done |
-| `useAlltimeStats` | `components/stage/hooks/use-alltime-stats.ts` | Done |
-| `useLeaderboard` | `components/stage/hooks/use-leaderboard.ts` | Done — polls every 15s, feeds ticker + leaderboard |
+| Component          | File                                          | Status                                             |
+| ------------------ | --------------------------------------------- | -------------------------------------------------- |
+| `StageLayout`      | `app/(stage)/raise/[id]/stage/layout.tsx`     | Done                                               |
+| `StagePage`        | `app/(stage)/raise/[id]/stage/page.tsx`       | Done                                               |
+| `StageView`        | `components/stage/stage-view.tsx`             | Done                                               |
+| `StageTopBar`      | `components/stage/stage-top-bar.tsx`          | Done                                               |
+| `StageSlidePanel`  | `components/stage/stage-slide-panel.tsx`      | Done — Ken Burns, crossfade, pager                 |
+| `StageCounter`     | `components/stage/stage-counter.tsx`          | Done — live via alltime-stats                      |
+| `StageQRPanel`     | `components/stage/stage-qr-panel.tsx`         | Done                                               |
+| `StageTicker`      | `components/stage/stage-ticker.tsx`           | Done — live via leaderboard feed, countdown ring   |
+| `StageToastStack`  | `components/stage/stage-toast-stack.tsx`      | Mount point only — toast injection not yet wired   |
+| `StageLeaderboard` | `components/stage/stage-leaderboard.tsx`      | Done — live via leaderboard feed                   |
+| `useStageScale`    | `components/stage/hooks/use-stage-scale.ts`   | Done                                               |
+| `useAlltimeStats`  | `components/stage/hooks/use-alltime-stats.ts` | Done                                               |
+| `useLeaderboard`   | `components/stage/hooks/use-leaderboard.ts`   | Done — polls every 15s, feeds ticker + leaderboard |
 
 ---
 

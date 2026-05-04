@@ -27,7 +27,7 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
 
   return (
     <div
-      className="absolute bottom-[170px] left-12 z-[18] w-[300px] rounded-3xl border p-[18px]"
+      className='absolute bottom-[170px] left-12 z-[18] w-[300px] rounded-3xl border p-[18px]'
       style={{
         background: 'rgba(255,255,255,0.78)',
         borderColor: 'rgba(255,255,255,0.55)',
@@ -37,19 +37,25 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
         color: '#0B1220',
       }}
     >
-      <div className="flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5">
+      <div className='flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5'>
         {qrSrc ? (
-          <img src={qrSrc} alt={t('scanToDonate')} className="h-full w-full" />
+          <img src={qrSrc} alt={t('scanToDonate')} className='h-full w-full' />
         ) : (
-          <div className="h-full w-full rounded-xl bg-[#0B1220]/5" />
+          <div className='h-full w-full rounded-xl bg-[#0B1220]/5' />
         )}
       </div>
 
-      <div className="mt-3 flex flex-col items-center gap-0.5 text-center">
-        <div className="text-[11px] font-bold uppercase tracking-[.18em]" style={{ color: 'var(--accent-color)' }}>
+      <div className='mt-3 flex flex-col items-center gap-0.5 text-center'>
+        <div
+          className='text-[11px] font-bold uppercase tracking-[.18em]'
+          style={{ color: 'var(--accent-color)' }}
+        >
           {t('scanToDonate')}
         </div>
-        <div className="flex items-center gap-1.5 text-[13px] font-bold tracking-tight opacity-70" style={{ color: '#0B1220' }}>
+        <div
+          className='flex items-center gap-1.5 text-[13px] font-bold tracking-tight opacity-70'
+          style={{ color: '#0B1220' }}
+        >
           <Globe size={13} />
           {donateUrl}
         </div>

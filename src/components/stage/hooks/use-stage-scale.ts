@@ -15,7 +15,9 @@ export function useStageScale() {
   const [{ scale }, setState] = useState({ scale: 1 });
 
   useLayoutEffect(() => {
-    function fit() { setState(measure()); }
+    function fit() {
+      setState(measure());
+    }
     fit();
     window.addEventListener('resize', fit);
     return () => window.removeEventListener('resize', fit);

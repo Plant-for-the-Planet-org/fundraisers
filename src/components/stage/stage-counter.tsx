@@ -1,6 +1,7 @@
 'use client';
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
+
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { useAlltimeStats } from './hooks/use-alltime-stats';
@@ -46,7 +47,7 @@ export function StageCounter({
 
   return (
     <div
-      className="absolute right-12 top-12 z-[18] w-[440px] rounded-3xl border p-6"
+      className='absolute right-12 top-12 z-[18] w-[440px] rounded-3xl border p-6'
       style={{
         background: 'rgba(255,255,255,0.78)',
         borderColor: 'rgba(255,255,255,0.55)',
@@ -56,38 +57,53 @@ export function StageCounter({
         color: '#0B1220',
       }}
     >
-      <div className="text-[11px] font-bold uppercase tracking-[.18em] opacity-60">
+      <div className='text-[11px] font-bold uppercase tracking-[.18em] opacity-60'>
         {t('raisedSoFar')}
       </div>
 
       <div
-        className="mt-0.5 text-[76px] font-bold leading-[1.02] tracking-[-0.03em]"
-        style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--accent-color)' }}
+        className='mt-0.5 text-[76px] font-bold leading-[1.02] tracking-[-0.03em]'
+        style={{
+          fontVariantNumeric: 'tabular-nums',
+          color: 'var(--accent-color)',
+        }}
       >
         {formatCurrencyFromDecimal(raised, currency, locale)}
       </div>
 
-      <div className="mt-2 flex items-baseline justify-between text-sm opacity-70">
+      <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
         <span>
-          {t('ofGoal', { goal: formatCurrencyFromDecimal(goal, currency, locale) })}
+          {t('ofGoal', {
+            goal: formatCurrencyFromDecimal(goal, currency, locale),
+          })}
         </span>
         <span>{pct}%</span>
       </div>
 
       {showProgressBar && (
         <div
-          className="mt-2.5 h-2 overflow-hidden rounded-full"
+          className='mt-2.5 h-2 overflow-hidden rounded-full'
           style={{ background: 'rgba(11,18,32,.08)' }}
         >
           <div
-            className="h-full rounded-full transition-[width] duration-700 overflow-hidden relative"
+            className='h-full rounded-full transition-[width] duration-700 overflow-hidden relative'
             style={{
               width: `${pct}%`,
               background: 'var(--accent-color)',
-              boxShadow: '0 0 12px color-mix(in srgb, var(--accent-color) 50%, transparent)',
+              boxShadow:
+                '0 0 12px color-mix(in srgb, var(--accent-color) 50%, transparent)',
             }}
           >
-            <div className="absolute inset-0" style={{ animation: 'stage-shimmer 2s linear infinite', background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)', transform: 'skewX(-20deg)', width: '60%' }} />
+            <div
+              className='absolute inset-0'
+              style={{
+                animation: 'stage-shimmer 2s linear infinite',
+                background:
+                  'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                transform: 'skewX(-20deg)',
+                width: '60%',
+              }}
+            />
           </div>
           <style>{`
             @keyframes stage-shimmer {
@@ -99,44 +115,44 @@ export function StageCounter({
       )}
 
       <div
-        className="mt-3.5 flex gap-5 border-t pt-3.5"
+        className='mt-3.5 flex gap-5 border-t pt-3.5'
         style={{ borderColor: 'rgba(11,18,32,.12)' }}
       >
-        <div className="flex flex-col gap-0.5">
+        <div className='flex flex-col gap-0.5'>
           <span
-            className="text-[22px] font-bold"
+            className='text-[22px] font-bold'
             style={{ fontVariantNumeric: 'tabular-nums' }}
           >
             {formatDonorCount(donationCount)}
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
+          <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
             {t('donors')}
           </span>
         </div>
 
         {showTrees && (
-          <div className="flex flex-col gap-0.5">
+          <div className='flex flex-col gap-0.5'>
             <span
-              className="text-[22px] font-bold"
+              className='text-[22px] font-bold'
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {trees.toLocaleString(locale)}
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
+            <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
               {t('trees')}
             </span>
           </div>
         )}
 
         {showDaysLeft && daysLeft !== undefined && daysLeft > 0 && (
-          <div className="flex flex-col gap-0.5">
+          <div className='flex flex-col gap-0.5'>
             <span
-              className="text-[22px] font-bold"
+              className='text-[22px] font-bold'
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {daysLeft}
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-[.14em] opacity-60">
+            <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
               {t('daysLeft')}
             </span>
           </div>
