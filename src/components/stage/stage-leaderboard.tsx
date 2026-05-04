@@ -45,7 +45,7 @@ export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
       <div className='flex flex-col'>
         {top.map((entry, i) => {
           const rank = i + 1;
-          const name = entry.isAnonymous ? 'Anonymous' : entry.donorName;
+          const name = entry.isAnonymous ? t('anonymous') : entry.donorName;
           return (
             <div
               key={entry.id}

@@ -14,6 +14,7 @@
     "daysLeft": "days left",
     "notEnabled": "Stage Mode is not enabled for this fundraiser.",
     "notEnabledHint": "Update it on fundraiser settings or ask the Host.",
-    "fundraiserNotFound": "Fundraiser not found."
+    "fundraiserNotFound": "Fundraiser not found.",
+    "anonymous": "Anonymous"
   }
 }

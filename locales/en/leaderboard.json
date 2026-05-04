@@ -27,7 +27,8 @@
         "topDonations": "Top Donations"
       },
       "viewAll": "View all",
-      "emptyState": "No donations to display"
+      "emptyState": "No donations to display",
+      "anonymous": "Anonymous"
     }
   }
 }

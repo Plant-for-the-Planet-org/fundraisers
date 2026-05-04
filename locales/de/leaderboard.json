@@ -27,7 +27,8 @@
         "topDonations": "Top-Spenden"
       },
       "viewAll": "Alle anzeigen",
-      "emptyState": "Keine Spenden vorhanden"
+      "emptyState": "Keine Spenden vorhanden",
+      "anonymous": "Anonym"
     }
   }
 }

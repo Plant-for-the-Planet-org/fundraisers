@@ -59,7 +59,6 @@ function CountdownRing({ remaining }: { remaining: number }) {
   );
 }
 
-
 interface StageTickerProps {
   recent: DonationEntry[];
   offline: boolean;
@@ -141,7 +140,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
                 style={{ color: '#0B1220' }}
               >
                 <span className='font-bold'>
-                  {d.isAnonymous ? 'Anonymous' : d.donorName}
+                  {d.isAnonymous ? t('anonymous') : d.donorName}
                 </span>
                 <span
                   className='h-1 w-1 rounded-full'
