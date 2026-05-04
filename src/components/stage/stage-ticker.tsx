@@ -5,6 +5,7 @@ import type { DonationEntry } from './hooks/use-leaderboard';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { formatTimeAgo } from '@/lib/utils/time';
 
 const POLL_SECONDS = 15;
 
@@ -58,15 +59,6 @@ function CountdownRing({ remaining }: { remaining: number }) {
   );
 }
 
-function timeAgo(created: string): string {
-  const secs = Math.floor((Date.now() - new Date(created).getTime()) / 1000);
-  if (secs < 60) return `${secs}s ago`;
-  const mins = Math.floor(secs / 60);
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 18) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
-}
 
 interface StageTickerProps {
   recent: DonationEntry[];
@@ -165,7 +157,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
                   {formatCurrencyFromDecimal(d.amount, d.currency, locale)}
                 </span>
                 <span className='text-[14px] opacity-50'>
-                  {timeAgo(d.created)}
+                  {formatTimeAgo(d.created)}
                 </span>
               </span>
             ))}
