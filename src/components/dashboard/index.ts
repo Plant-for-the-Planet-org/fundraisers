@@ -1,6 +1,5 @@
-export { CardBase } from './card-base';
-export { DashboardStatCardSkeleton } from './dashboard-stat-card-skeleton';
+export { DashboardHeader } from './dashboard-header';
 export { DashboardStatsError } from './dashboard-stats-error';
-export { DonationsCard } from './donations-card';
-export { MyFundraisersCard } from './my-fundraisers-card';
-export { TotalRaisedCard } from './total-raised-card';
+export { DashboardSummary } from './dashboard-summary';
+export { SummaryStatCard } from './summary-stat-card';
+export { SummaryStatCardSkeleton } from './summary-stat-card-skeleton';
