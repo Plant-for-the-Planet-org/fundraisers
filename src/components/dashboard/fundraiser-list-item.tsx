@@ -50,12 +50,10 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
       <Link
         href={getFundraiserUrl(fundraiser)}
         className='shrink-0 h-20 w-20 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-110'
-        aria-label={fundraiser.title}
+        aria-hidden
+        tabIndex={-1}
       >
-        <FundraiserCardImage
-          imageUrl={imageUrl}
-          alt={tFundraisers('coverImageAlt', { title: fundraiser.title })}
-        />
+        <FundraiserCardImage imageUrl={imageUrl} alt='' />
       </Link>
 
       <div className='min-w-0 flex-1'>
