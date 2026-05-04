@@ -9,6 +9,7 @@
       "subtitle": "Verwalte, bearbeite und verfolge deine Fundraiser. Pausiere die Sammlung oder teile die, die einen zusätzlichen Schub brauchen."
     },
     "summary": {
+      "loading": "Statistik wird geladen...",
       "fundraisers": {
         "label": "Spendenaufrufe",
         "activeSuffix": "aktiv",
@@ -32,6 +33,7 @@
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
     "list": {
+      "loading": "Spendenaufruf wird geladen...",
       "item": {
         "byHost": "von {host}",
         "hostsTwo": "{first} und {second}",

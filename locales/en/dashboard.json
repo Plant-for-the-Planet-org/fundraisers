@@ -9,6 +9,7 @@
       "subtitle": "View, edit, and track your fundraisers. Pause collection or share the ones that need a boost."
     },
     "summary": {
+      "loading": "Loading summary stat...",
       "fundraisers": {
         "label": "Fundraisers",
         "activeSuffix": "active",
@@ -32,6 +33,7 @@
       "exploreLinkText": "Discover Fundraisers"
     },
     "list": {
+      "loading": "Loading fundraiser item...",
       "item": {
         "byHost": "by {host}",
         "hostsTwo": "{first} and {second}",
