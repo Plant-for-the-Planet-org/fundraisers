@@ -1,12 +1,15 @@
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function SummaryStatCardSkeleton() {
+  const t = useTranslations('Dashboard.summary');
+
   return (
     <Card
       className='gap-3 border-border/60 px-6 py-5 shadow-xs'
       role='status'
-      aria-label='Loading'
+      aria-label={t('loading')}
     >
       <Skeleton className='h-3 w-24' />
       <Skeleton className='h-10 w-32' />
