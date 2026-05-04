@@ -6,7 +6,7 @@
     },
     "manageFundraisers": {
       "title": "Spendenaufrufe verwalten",
-      "subtitle": "Zeige an, bearbeite und verfolge deine Spendenaufrufe. Pausiere den Aufruf oder teile die, die mehr Sichtbarkeit brauchen."
+      "subtitle": "Verwalte, bearbeite und verfolge deine Spendenaufrufe. Pausiere den Aufruf oder teile die, die mehr Sichtbarkeit brauchen."
     },
     "summary": {
       "fundraisers": {
@@ -18,11 +18,11 @@
         "label": "Insgesamt gesammelt",
         "helper": "über die ganze Zeit",
         "moreCurrencies": "+{count, plural, one {# weitere Währung} other {# weitere Währungen}}",
-        "empty": "Noch nichts gesammelt"
+        "empty": "Noch keine Spenden gesammelt"
       },
       "donations": {
         "label": "Spenden",
-        "helper": "von Unterstützern"
+        "helper": "von Unterstützer:innen"
       }
     },
     "statsError": {
