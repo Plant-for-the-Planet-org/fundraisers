@@ -2,7 +2,12 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { getDaysLeft } from './fundraiser';
 
-export type DisplayStatus = 'active' | 'paused' | 'ended' | 'ending-soon';
+export type DisplayStatus =
+  | 'active'
+  | 'draft'
+  | 'paused'
+  | 'ended'
+  | 'ending-soon';
 
 export type FundraiserListSort =
   | 'newest'
@@ -11,7 +16,12 @@ export type FundraiserListSort =
   | 'ending-soonest'
   | 'name-asc';
 
-export type FundraiserListStatusFilter = 'all' | 'active' | 'paused' | 'ended';
+export type FundraiserListStatusFilter =
+  | 'all'
+  | 'active'
+  | 'draft'
+  | 'paused'
+  | 'ended';
 
 export interface FundraiserListFilters {
   search: string;
@@ -22,6 +32,7 @@ export interface FundraiserListFilters {
 export interface FundraiserStatusCounts {
   all: number;
   active: number;
+  draft: number;
   paused: number;
   ended: number;
 }
@@ -41,8 +52,9 @@ export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
     case 'cancelled':
       return 'ended';
     case 'paused':
-    case 'draft':
       return 'paused';
+    case 'draft':
+      return 'draft';
     case 'active': {
       const daysLeft = getDaysLeft(fundraiser.endDate);
       if (daysLeft > 0 && daysLeft <= ENDING_SOON_THRESHOLD_DAYS) {
@@ -78,8 +90,10 @@ function matchesStatus(
       return true;
     case 'active':
       return fundraiser.status === 'active';
+    case 'draft':
+      return fundraiser.status === 'draft';
     case 'paused':
-      return fundraiser.status === 'paused' || fundraiser.status === 'draft';
+      return fundraiser.status === 'paused';
     case 'ended':
       return (
         fundraiser.status === 'completed' || fundraiser.status === 'cancelled'
@@ -166,6 +180,7 @@ export function getStatusCounts(
   const counts: FundraiserStatusCounts = {
     all: fundraisers.length,
     active: 0,
+    draft: 0,
     paused: 0,
     ended: 0,
   };
@@ -175,8 +190,10 @@ export function getStatusCounts(
       case 'active':
         counts.active += 1;
         break;
-      case 'paused':
       case 'draft':
+        counts.draft += 1;
+        break;
+      case 'paused':
         counts.paused += 1;
         break;
       case 'completed':

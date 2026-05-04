@@ -12,6 +12,7 @@ interface FundraiserStatusBadgeProps {
 
 const STATUS_DOT_CLASS: Record<DisplayStatus, string> = {
   active: 'bg-success',
+  draft: 'bg-muted-foreground/60',
   paused: 'bg-muted-foreground/60',
   ended: 'bg-muted-foreground/40',
   'ending-soon': 'bg-warning',
@@ -19,6 +20,7 @@ const STATUS_DOT_CLASS: Record<DisplayStatus, string> = {
 
 const STATUS_BADGE_CLASS: Record<DisplayStatus, string> = {
   active: 'bg-success/15 text-success',
+  draft: 'border border-border bg-muted text-muted-foreground',
   paused: 'border border-border bg-muted text-muted-foreground',
   ended: 'border border-border bg-muted text-muted-foreground',
   'ending-soon': 'bg-warning/15 text-warning',

@@ -40,6 +40,7 @@
       "groupLabel": "Nach Status filtern",
       "all": "Alle",
       "active": "Aktiv",
+      "draft": "Entwurf",
       "paused": "Pausiert",
       "ended": "Beendet"
     },
@@ -55,6 +56,7 @@
     },
     "statusBadge": {
       "active": "Aktiv",
+      "draft": "Entwurf",
       "paused": "Pausiert",
       "ended": "Beendet",
       "ending-soon": "Endet bald"

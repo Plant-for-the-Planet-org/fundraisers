@@ -18,6 +18,7 @@ interface FundraiserStatusFilterProps {
 const STATUS_FILTER_OPTIONS: FundraiserListStatusFilter[] = [
   'all',
   'active',
+  'draft',
   'paused',
   'ended',
 ];
