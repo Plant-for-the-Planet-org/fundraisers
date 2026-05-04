@@ -36,7 +36,7 @@ export function FundraiserStatusFilter({
       role='radiogroup'
       aria-label={t('groupLabel')}
       className={cn(
-        'fundraiser-status-filter flex h-11 shrink-0 items-center justify-between rounded-xl border border-border/60 bg-muted px-1 md:inline-flex md:justify-start',
+        'fundraiser-status-filter flex h-11 shrink-0 items-center justify-between rounded-xl border border-border/60 bg-muted px-1 shadow-xs md:inline-flex md:justify-start',
         className
       )}
     >
@@ -50,7 +50,7 @@ export function FundraiserStatusFilter({
             aria-checked={isSelected}
             onClick={() => onChange(option)}
             className={cn(
-              'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors',
+              'inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
               isSelected
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'

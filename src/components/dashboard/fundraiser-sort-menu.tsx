@@ -43,7 +43,7 @@ export function FundraiserSortMenu({
           variant='outline'
           size='sm'
           className={cn(
-            'h-11 w-full justify-between rounded-xl border-border/60 bg-background px-4 md:w-52',
+            'h-11 w-full justify-between rounded-xl border-border/60 bg-background px-4 has-[>svg]:px-4 md:w-52',
             className
           )}
         >
@@ -58,7 +58,7 @@ export function FundraiserSortMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='end'
-        className='w-52 border-border/60 shadow-lg'
+        className='w-52 rounded-xl border-border/60 shadow-lg'
       >
         {SORT_OPTIONS.map(option => {
           const isSelected = option === value;
