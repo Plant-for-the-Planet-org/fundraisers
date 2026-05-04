@@ -72,6 +72,7 @@
       "copyLink": "Link kopieren",
       "pause": "Pausieren",
       "resume": "Fortsetzen",
+      "activate": "Aktivieren",
       "copyLinkSuccess": "Link kopiert",
       "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",

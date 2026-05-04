@@ -133,7 +133,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
   - Items gated per API `status` for owners:
     - `active` → Edit, Copy link, Pause.
     - `paused` → Edit, Copy link, Resume.
-    - `draft` → Edit, Copy link, Resume (Resume publishes the draft via `{ status: 'active' }`).
+    - `draft` → Edit, Copy link, Activate (Activate publishes the draft via `{ status: 'active' }` — same handler as Resume, only the label differs).
     - `completed` / `cancelled` → Copy link only (read‑only).
   - Clipboard via `navigator.clipboard.writeText`; on failure show error toast (no `execCommand` fallback — modern browsers only).
   - `sonner` toasts for success / error.
@@ -162,7 +162,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 - Pause on an Active row → row badge flips to Paused, Active count drops by 1, Paused count rises by 1.
 - Resume on a Paused row → reverse.
-- Resume on a Draft row → row transitions to Active (badge flips, Paused count drops, Active count rises).
+- Activate on a Draft row → row transitions to Active (badge flips, Draft count drops, Active count rises).
 - Admin co‑host viewing a fundraiser they do not own → menu shows **Copy link only** for any status.
 - Copy link → clipboard contains `${origin}${getFundraiserUrl(fundraiser)}` (i.e. `${origin}/fundraisers/{slug-or-id}`); toast shows.
 - Network failure on Pause → row stays Active, error toast shows, no local state corruption.
@@ -591,6 +591,7 @@ Proposed key shape (English; German mirrors structure):
       "copyLink": "Copy link",
       "pause": "Pause",
       "resume": "Resume",
+      "activate": "Activate",
       "copyLinkSuccess": "Link copied",
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
@@ -664,7 +665,7 @@ Manual:
 - Toggle status filter; toggle again to "All". Verify counts in pills don't change as you toggle.
 - Cycle every sort option; verify ordering matches spec (especially `ending-soonest` placing past‑end at the bottom).
 - Open action menu on Active row → Pause → row badge flips to Paused, "Active" filter loses one, "Paused" gains one. Resume reverses it.
-- Open action menu on a Draft row → Resume publishes it (row moves out of "Paused" filter, into "Active").
+- Open action menu on a Draft row → Activate publishes it (row moves out of "Draft" filter, into "Active").
 - Sign in as an admin co‑host of a fundraiser → action menu on that row shows Copy link only.
 - Open and close the action menu repeatedly → page should not shift horizontally.
 - Copy link on a row → paste elsewhere matches the public URL.
@@ -692,7 +693,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 - Pause/Resume uses the existing `updateFundraiser` (`PUT /fundraisers/{id}` with `{ status }`) — no new endpoint needed.
 - Copy link uses `getFundraiserUrl(fundraiser)` (resolves to `/fundraisers/{slug-or-id}`) prefixed with `window.location.origin`. Shown for all statuses including drafts (the URL is generated client‑side; whether it publicly resolves is the backend's concern).
-- Drafts get the **Resume** action (which publishes them via `{ status: 'active' }`) so users with two "Paused"‑badged rows (one truly paused, one draft) see a consistent verb. Decided over the alternatives of (a) leaving drafts action‑less or (b) adding a separate "Publish" label.
+- Drafts get an **Activate** action (label only — same handler as Resume, publishes via `{ status: 'active' }`). The split between Draft and Paused buckets means users no longer see two "Paused"‑badged rows, so a single shared verb is no longer necessary; "Activate" reads more naturally for a draft that has never been live than "Resume" does. Chosen over (a) leaving drafts action‑less or (b) "Publish".
 - **Owner gating** on Edit / Pause / Resume: only host records with `role === 'owner'` see them; admin co‑hosts see Copy link only. Resolves the UX inconsistency where two "Paused"‑badged rows showed different menus to non‑owners.
 - Ended fundraisers (`completed` / `cancelled`) are read‑only — no Edit, only Copy link.
 - Filter buckets are driven by API `status` only (not `endDate`).
@@ -738,7 +739,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 - [ ] Add `fundraiser-action-menu.tsx` — calls existing `updateFundraiser` for Pause/Resume; uses `getFundraiserUrl` for Copy link; mounted with `modal={false}` for layout stability. Export from `index.ts`.
 - [ ] Owner gating: read current user from `useAuthStore` and compare against `fundraiser.hosts[].user.id` + `role === 'owner'`. Non‑owners see Copy link only.
-- [ ] Drafts include Resume (publishes via `{ status: 'active' }`) — same case as `paused` in `getAvailableActions`.
+- [ ] Drafts include the same Resume case as `paused` in `getAvailableActions` (publishes via `{ status: 'active' }`), but the menu item label is **Activate** when `fundraiser.status === 'draft'`.
 - [ ] Thread `onActionComplete = refetchSilently` from the page → section → list → item → menu. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button.
 - [ ] Locale keys: `actions.*`.
 - [ ] Verify Pause/Resume endpoint contract with backend before merging.

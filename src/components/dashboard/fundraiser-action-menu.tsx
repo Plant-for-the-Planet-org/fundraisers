@@ -141,7 +141,7 @@ export function FundraiserActionMenu({
 
       <DropdownMenuContent
         align='end'
-        className='w-52 border-border/60 shadow-lg'
+        className='w-52 rounded-xl border-border/60 shadow-lg'
       >
         {actions.edit && (
           <DropdownMenuItem asChild className='cursor-pointer py-2'>
@@ -203,7 +203,7 @@ export function FundraiserActionMenu({
                 aria-hidden='true'
               />
             )}
-            {t('resume')}
+            {fundraiser.status === 'draft' ? t('activate') : t('resume')}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
