@@ -23,16 +23,16 @@ async function loadStageMessages(locale: SupportedLocale) {
 export default async function StagePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
+  const { slug } = await params;
   const browserLocale = await getLocale();
 
   let fundraiser;
   let theme;
 
   try {
-    fundraiser = await getCachedFundraiser(id, browserLocale);
+    fundraiser = await getCachedFundraiser(slug, browserLocale);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
     if (e instanceof PlatformAPIError && e.status && [404].includes(e.status)) {
