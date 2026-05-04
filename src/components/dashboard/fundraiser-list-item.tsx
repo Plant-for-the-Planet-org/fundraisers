@@ -15,7 +15,7 @@ interface FundraiserListItemProps {
 }
 
 export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
-  const t = useTranslations('Dashboard.listItem');
+  const t = useTranslations('Dashboard.list.item');
   const tFundraisers = useTranslations('Fundraisers');
 
   const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
@@ -82,8 +82,13 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
 
         <div className='mt-2 flex flex-wrap items-center gap-x-7 gap-y-1 text-sm text-muted-foreground'>
           <span>
-            <span className='font-semibold text-foreground'>{raised}</span>{' '}
-            {t('ofGoal', { goal })}
+            {t.rich('goalProgress', {
+              achievedAmount: raised,
+              goal,
+              b: chunks => (
+                <span className='font-semibold text-foreground'>{chunks}</span>
+              ),
+            })}
           </span>
           <span className='inline-flex items-center gap-1'>
             <Users className='h-3.5 w-3.5' aria-hidden='true' />

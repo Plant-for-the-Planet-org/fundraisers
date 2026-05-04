@@ -31,19 +31,21 @@
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
     },
-    "listItem": {
-      "byHost": "by {host}",
-      "hostsTwo": "{first} and {second}",
-      "hostsMany": "{first}, {second} and {count, plural, one {# other} other {# others}}",
-      "ofGoal": "of {goal}",
-      "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
-      "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
-      "ended": "Ended"
-    },
-    "empty": {
-      "title": "You haven't created a fundraiser yet",
-      "description": "Start a campaign to begin collecting donations.",
-      "cta": "Create your first fundraiser"
+    "list": {
+      "item": {
+        "byHost": "by {host}",
+        "hostsTwo": "{first} and {second}",
+        "hostsMany": "{first}, {second} and {count, plural, one {# other} other {# others}}",
+        "goalProgress": "<b>{achievedAmount}</b> of {goal}",
+        "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
+        "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
+        "ended": "Ended"
+      },
+      "empty": {
+        "title": "You haven't created a fundraiser yet",
+        "description": "Start a campaign to begin collecting donations.",
+        "cta": "Create your first fundraiser"
+      }
     }
   }
 }
