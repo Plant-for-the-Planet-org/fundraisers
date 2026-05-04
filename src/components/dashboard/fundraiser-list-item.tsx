@@ -3,7 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
@@ -22,8 +22,9 @@ export function FundraiserListItem({
   fundraiser,
   onActionComplete,
 }: FundraiserListItemProps) {
-  const t = useTranslations('Dashboard.listItem');
+  const t = useTranslations('Dashboard.list.item');
   const tFundraisers = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
   const daysLeft = getDaysLeft(fundraiser.endDate);
@@ -32,20 +33,13 @@ export function FundraiserListItem({
   const hostNames = fundraiser.hosts
     .map(host => host.displayName ?? host.user?.name)
     .filter((name): name is string => Boolean(name));
-  let hostName: string;
-  if (hostNames.length === 0) {
-    hostName = tFundraisers('unknownHost');
-  } else if (hostNames.length === 1) {
-    hostName = hostNames[0];
-  } else if (hostNames.length === 2) {
-    hostName = t('hostsTwo', { first: hostNames[0], second: hostNames[1] });
-  } else {
-    hostName = t('hostsMany', {
-      first: hostNames[0],
-      second: hostNames[1],
-      count: hostNames.length - 2,
-    });
-  }
+  const hostName =
+    hostNames.length === 0
+      ? tFundraisers('unknownHost')
+      : new Intl.ListFormat(locale, {
+          style: 'long',
+          type: 'conjunction',
+        }).format(hostNames);
 
   const raised = formatCurrencyFromDecimal(
     fundraiser.totalRaised,
@@ -57,21 +51,17 @@ export function FundraiserListItem({
   );
 
   const showEnded =
-    fundraiser.status === 'completed' ||
-    fundraiser.status === 'cancelled' ||
-    daysLeft <= 0;
+    fundraiser.status === 'completed' || fundraiser.status === 'cancelled';
 
   return (
     <li className='fundraiser-list-item group flex items-start gap-4 py-4'>
       <Link
         href={getFundraiserUrl(fundraiser)}
         className='shrink-0 h-20 w-20 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-110'
-        aria-label={fundraiser.title}
+        aria-hidden
+        tabIndex={-1}
       >
-        <FundraiserCardImage
-          imageUrl={imageUrl}
-          alt={tFundraisers('coverImageAlt', { title: fundraiser.title })}
-        />
+        <FundraiserCardImage imageUrl={imageUrl} alt='' />
       </Link>
 
       <div className='min-w-0 flex-1'>
@@ -93,8 +83,13 @@ export function FundraiserListItem({
 
         <div className='mt-2 flex flex-wrap items-center gap-x-7 gap-y-1 text-sm text-muted-foreground'>
           <span>
-            <span className='font-semibold text-foreground'>{raised}</span>{' '}
-            {t('ofGoal', { goal })}
+            {t.rich('goalProgress', {
+              achievedAmount: raised,
+              goal,
+              b: chunks => (
+                <span className='font-semibold text-foreground'>{chunks}</span>
+              ),
+            })}
           </span>
           <span className='inline-flex items-center gap-1'>
             <Users className='h-3.5 w-3.5' aria-hidden='true' />
@@ -103,7 +98,7 @@ export function FundraiserListItem({
           <span
             className={
               displayStatus === 'ending-soon'
-                ? 'inline-flex items-center gap-1 text-amber-700 dark:text-amber-400'
+                ? 'inline-flex items-center gap-1 text-warning'
                 : 'inline-flex items-center gap-1'
             }
           >

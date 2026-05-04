@@ -115,7 +115,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 **Acceptance**
 
 - Typing in search filters the list with no perceptible lag; debounce ≈ 250 ms.
-- Each pill (All / Active / Paused / Ended) shows its count from the **unfiltered** list and stays stable as the user toggles between pills.
+- Each pill (All / Active / Draft / Paused / Ended) shows its count from the **search‑filtered** list (counts update as the user types) and stays stable as the user toggles between pills.
 - All five sort options behave per the rules in `sortFundraisers`.
 - "No fundraisers match these filters." renders with a working "Clear filters" button.
 - DE locale renders pluralized strings correctly.
@@ -142,6 +142,14 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
   - Reuse the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts) (which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`). Pause = `updateFundraiser(id, { status: 'paused' }, token)`; Resume = `updateFundraiser(id, { status: 'active' }, token)`. `UpdateFundraiserRequest` already accepts `status?: FundraiserStatus` — no type, client, or service changes required.
 - Page composition: thread `onActionComplete` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. The page exposes two refetch callbacks: `retryAfterError` (loud — sets `isLoading=true`, used by `DashboardSummary onRetry`) and `refetchSilently` (no `isLoading` toggle, used as `onActionComplete`). Silent refetch prevents unrelated rows from flashing skeletons on Pause/Resume.
 - Locale keys added: `actions.*`.
+- **Split Draft out of Paused** (carry‑over from PR 3, where drafts collapsed into Paused):
+  - Extend `DisplayStatus`, `FundraiserListStatusFilter`, and `FundraiserStatusCounts` with a `'draft'` member.
+  - `deriveDisplayStatus`: API `status === 'draft'` → `'draft'` (no longer `'paused'`).
+  - `filterFundraisers`: `'draft'` filter → API `status === 'draft'`; `'paused'` filter → API `status === 'paused'` only.
+  - `getStatusCounts`: track `draft` independently from `paused`.
+  - `FundraiserStatusFilter`: add a `Draft` pill between `Active` and `Paused`.
+  - `FundraiserStatusBadge`: add a `draft` variant (blue accent).
+  - Locale keys added: `statusFilter.draft`, `statusBadge.draft`.
 
 **Out of scope:** optimistic updates (record as a future polish item), share‑sheet beyond Copy link.
 
@@ -174,7 +182,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 │ │  6 active   │ │  across all… │ │  from supp│             │
 │ └─────────────┘ └──────────────┘ └───────────┘             │
 ├────────────────────────────────────────────────────────────┤
-│ [🔍 Search…]   [All 8 | Active 6 | Paused 1 | Ended 1]     │  ← FundraiserListToolbar
+│ [🔍 Search…]   [All 8 | Active 6 | Draft 1 | Paused 0 | Ended 1] │  ← FundraiserListToolbar
 │                                       Sort: Newest first ▼ │
 │ Showing 8 of 8                                              │  ← result count
 ├────────────────────────────────────────────────────────────┤
@@ -212,7 +220,7 @@ src/components/dashboard/
 ├── fundraiser-list.tsx                 # Renders rows or empty/no-results state
 ├── fundraiser-list-item.tsx            # One row (image + meta + status + ⋮)
 ├── fundraiser-list-item-skeleton.tsx
-├── fundraiser-status-badge.tsx         # Active / Paused / Ended / Ending soon (drafts → Paused)
+├── fundraiser-status-badge.tsx         # Active / Draft / Paused / Ended / Ending soon
 ├── fundraiser-action-menu.tsx          # ⋮ menu (Edit / Copy link / Pause | Resume)
 ├── fundraiser-list-empty.tsx           # User has zero fundraisers
 ├── fundraiser-list-no-results.tsx      # Filters/search produced zero rows
@@ -289,8 +297,8 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 ### `FundraiserStatusFilter`
 
 - Props: `{ value: FundraiserListStatusFilter; counts: FundraiserStatusCounts; onChange: (next: FundraiserListStatusFilter) => void; }`
-- Segmented pills: `All` | `Active` | `Paused` | `Ended`. Each shows its count badge.
-- Counts are computed from the **unfiltered** list (so toggling between filters never changes the badge numbers).
+- Segmented pills: `All` | `Active` | `Draft` | `Paused` | `Ended`. Each shows its count badge.
+- Counts are computed from the **search‑filtered** list (so typing in search updates the pill numbers to reflect what currently matches), but **not** from the status‑filtered list — toggling between pills never changes the badge numbers, only typing in search does.
 
 ### `FundraiserSortMenu`
 
@@ -318,8 +326,8 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 ### `FundraiserStatusBadge`
 
 - Props: `{ status: DisplayStatus; }`
-- Variants: `active` (green), `paused` (muted), `ended` (gray), `ending-soon` (amber). Pure presentational; no logic. The display status is derived upstream (see `deriveDisplayStatus`).
-- Drafts collapse into the **Paused** badge (and Paused filter bucket) — no separate "Draft" label.
+- Variants: `active` (green), `draft` (muted — same treatment as paused), `paused` (muted), `ended` (gray), `ending-soon` (amber). Pure presentational; no logic. The display status is derived upstream (see `deriveDisplayStatus`).
+- Drafts get their own **Draft** badge and filter bucket — they do not collapse into Paused.
 
 ### `FundraiserActionMenu`
 
@@ -374,7 +382,8 @@ Replace `DashboardFundraiserStats` with a richer summary. **Status buckets are d
 | API `status`             | Filter bucket | Counted in    |
 | ------------------------ | ------------- | ------------- |
 | `active`                 | **Active**    | `activeCount` |
-| `draft`, `paused`        | **Paused**    | `pausedCount` |
+| `draft`                  | **Draft**     | `draftCount`  |
+| `paused`                 | **Paused**    | `pausedCount` |
 | `completed`, `cancelled` | **Ended**     | `endedCount`  |
 
 ```ts
@@ -390,7 +399,7 @@ export function getDashboardSummary(fundraisers: Fundraiser[]): DashboardSummary
 
 > Note: `donationsCount` is summed client‑side from `Fundraiser.donationCount`. If the API later exposes a single endpoint returning the full summary, swap implementation; the page just consumes the shape.
 
-> The status‑filter pill counts (Paused/Ended) are computed by `getStatusCounts(fundraisers)` in the list utility — they do not live on `DashboardSummaryStats`, since the tiles only surface `totalCount` / `activeCount` / `donationsCount`.
+> The status‑filter pill counts (Draft/Paused/Ended) are computed by `getStatusCounts(fundraisers)` in the list utility — they do not live on `DashboardSummaryStats`, since the tiles only surface `totalCount` / `activeCount` / `donationsCount`.
 
 Pause/Resume reuses the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts), which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`. `UpdateFundraiserRequest.status` is already typed as `FundraiserStatus`, so:
 
@@ -408,14 +417,24 @@ Drop `getDashboardFundraiserStats` (and its callers in tests, if any).
 ### New: `lib/utils/fundraiser-list.ts` (pure functions, fully unit‑testable)
 
 ```ts
-export type DisplayStatus = 'active' | 'paused' | 'ended' | 'ending-soon';
+export type DisplayStatus =
+  | 'active'
+  | 'draft'
+  | 'paused'
+  | 'ended'
+  | 'ending-soon';
 export type FundraiserListSort =
   | 'newest'
   | 'oldest'
   | 'most-raised'
   | 'ending-soonest'
   | 'name-asc';
-export type FundraiserListStatusFilter = 'all' | 'active' | 'paused' | 'ended';
+export type FundraiserListStatusFilter =
+  | 'all'
+  | 'active'
+  | 'draft'
+  | 'paused'
+  | 'ended';
 
 export interface FundraiserListFilters {
   search: string;
@@ -426,6 +445,7 @@ export interface FundraiserListFilters {
 export interface FundraiserStatusCounts {
   all: number;
   active: number;
+  draft: number;
   paused: number;
   ended: number;
 }
@@ -452,21 +472,22 @@ export function getStatusCounts(
 | API `status`             | Filter bucket | `DisplayStatus` (badge)                             |
 | ------------------------ | ------------- | --------------------------------------------------- |
 | `active`                 | **Active**    | `active`, or `ending-soon` if `0 < getDaysLeft ≤ 7` |
+| `draft`                  | **Draft**     | `draft`                                             |
 | `paused`                 | **Paused**    | `paused`                                            |
-| `draft`                  | **Paused**    | `paused` (drafts collapse into the Paused badge)    |
 | `completed`, `cancelled` | **Ended**     | `ended`                                             |
 
 Rules:
 
-- `deriveDisplayStatus`: switch on API `status`. `'completed' | 'cancelled'` → `ended`. `'paused' | 'draft'` → `paused`. `'active'` → `ending-soon` if `0 < getDaysLeft ≤ ENDING_SOON_THRESHOLD_DAYS`, else `active`. `endDate` is **not** consulted for non‑active statuses — the API status wins.
+- `deriveDisplayStatus`: switch on API `status`. `'completed' | 'cancelled'` → `ended`. `'paused'` → `paused`. `'draft'` → `draft`. `'active'` → `ending-soon` if `0 < getDaysLeft ≤ ENDING_SOON_THRESHOLD_DAYS`, else `active`. `endDate` is **not** consulted for non‑active statuses — the API status wins.
 - `filterFundraisers`:
   - `all` → everything (no exclusions; drafts included).
   - `active` → API `status === 'active'` (covers both `active` and `ending-soon` badges).
-  - `paused` → API `status` in `{'paused','draft'}`.
+  - `draft` → API `status === 'draft'`.
+  - `paused` → API `status === 'paused'`.
   - `ended` → API `status` in `{'completed','cancelled'}`.
   - Search matches title and host display name (lowercased, trimmed).
 - `sortFundraisers`: stable sort. `newest`/`oldest` use `startDate`; `ending-soonest` puts ended/paused/draft last and orders active rows by smallest positive `daysLeft`; `most-raised` uses `totalRaised` desc with currency tiebreak via `currency.localeCompare`; `name-asc` uses `title.localeCompare(other, locale, { sensitivity: 'base' })` — locale must be passed in.
-- `getStatusCounts`: returns `{ all, active, paused, ended }` using the same buckets above. `paused` includes drafts.
+- `getStatusCounts`: returns `{ all, active, draft, paused, ended }` using the same buckets above. `draft` and `paused` are tracked independently.
 
 ### Hook: `useFundraiserListFilters`
 
@@ -534,6 +555,7 @@ Proposed key shape (English; German mirrors structure):
     "statusFilter": {
       "all": "All",
       "active": "Active",
+      "draft": "Draft",
       "paused": "Paused",
       "ended": "Ended"
     },
@@ -549,6 +571,7 @@ Proposed key shape (English; German mirrors structure):
     },
     "statusBadge": {
       "active": "Active",
+      "draft": "Draft",
       "paused": "Paused",
       "ended": "Ended",
       "ending-soon": "Ending soon"
@@ -605,12 +628,12 @@ Proposed key shape (English; German mirrors structure):
 | `endDate` ≤ 7 days away and API `status === 'active'`          | `ending-soon` badge (amber). Counted under **Active** filter (`ending-soon` is a visual subset of active, not a separate bucket).                                                                                                                                |
 | `status === 'completed'` or `'cancelled'`                      | **Ended** filter. Read‑only — action menu shows **Copy link only** (no Edit, no Pause/Resume).                                                                                                                                                                   |
 | `status === 'paused'`                                          | **Paused** filter. Action menu shows Resume.                                                                                                                                                                                                                     |
-| `status === 'draft'`                                           | **Paused** filter, **Paused** badge (drafts collapse into Paused — no separate "Draft" label). Action menu shows Edit + Copy link + Resume; clicking Resume publishes the draft (`status → 'active'`). Counted under `pausedCount`.                              |
 | Current user is an **admin** co‑host (not owner)               | Action menu shows **Copy link only**. Edit, Pause, Resume are hidden regardless of fundraiser status. Determined by checking `fundraiser.hosts[].user.id === auth.user.sub && role === 'owner'`.                                                                 |
+| `status === 'draft'`                                           | **Draft** filter, **Draft** badge. Action menu shows Edit + Copy link, **no** Pause/Resume (drafts are published, not resumed). Counted under `draftCount`.                                                                                                      |
 | Long titles / host names                                       | Truncate with ellipsis (`line-clamp-1` for title, `truncate` for host). Full text in `title=""` attr for tooltip.                                                                                                                                                |
 | Missing `fundraiser.image`                                     | Render solid placeholder with first letter of title; same dimensions.                                                                                                                                                                                            |
 | Missing host display name                                      | Per host, fall back to `host.user?.name`; if no host has any name, render `tFundraisers('unknownHost')`. Multiple hosts compose as `X` / `X and Y` / `X, Y and N other(s)` (`listItem.hostsTwo` / `hostsMany`).                                                  |
-| `navigator.clipboard` unavailable (HTTP, old browser)          | Show error toast. No `execCommand` fallback for v1 — the app is HTTPS‑only in supported browsers.                                                                                                                                                                 |
+| `navigator.clipboard` unavailable (HTTP, old browser)          | Show error toast. No `execCommand` fallback for v1 — the app is HTTPS‑only in supported browsers.                                                                                                                                                                |
 | Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
 | Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
 | Pause/Resume API succeeds                                      | Refetch is **silent** — `isLoading` is not toggled, so only the toggled row's badge updates after the response. Other rows stay rendered. The toast confirms success.                                                                                            |
@@ -673,8 +696,8 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - **Owner gating** on Edit / Pause / Resume: only host records with `role === 'owner'` see them; admin co‑hosts see Copy link only. Resolves the UX inconsistency where two "Paused"‑badged rows showed different menus to non‑owners.
 - Ended fundraisers (`completed` / `cancelled`) are read‑only — no Edit, only Copy link.
 - Filter buckets are driven by API `status` only (not `endDate`).
-- Drafts collapse into **Paused** — same filter bucket and same "Paused" badge (no separate "Draft" label).
-- Only four badges exist: Active, Paused, Ended, Ending soon.
+- Drafts have their own **Draft** filter bucket and **Draft** badge — they do **not** collapse into Paused (the API ships `status: 'draft'` on `GET /fundraisers`, so the UI surfaces it directly).
+- Five badges exist: Active, Draft, Paused, Ended, Ending soon.
 - Toast feedback uses `sonner` (already a dependency, used elsewhere in the app).
 - No `execCommand('copy')` fallback for the clipboard — modern browsers + HTTPS only.
 
@@ -718,6 +741,14 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [ ] Drafts include Resume (publishes via `{ status: 'active' }`) — same case as `paused` in `getAvailableActions`.
 - [ ] Thread `onActionComplete = refetchSilently` from the page → section → list → item → menu. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button.
 - [ ] Locale keys: `actions.*`.
+- [ ] Verify Pause/Resume endpoint contract with backend before merging.
+- [ ] Split Draft out of Paused:
+  - [ ] Extend `DisplayStatus`, `FundraiserListStatusFilter`, `FundraiserStatusCounts` with `'draft'`.
+  - [ ] Update `deriveDisplayStatus`, `filterFundraisers`, `getStatusCounts` so `draft` is its own bucket (no longer aliased to `paused`).
+  - [ ] Add `Draft` pill to `fundraiser-status-filter.tsx` (between `Active` and `Paused`).
+  - [ ] Add `draft` variant (reuses the muted Paused treatment) to `fundraiser-status-badge.tsx`.
+  - [ ] Locale keys: `statusFilter.draft`, `statusBadge.draft` (en + de).
+  - [ ] Update `deriveDisplayStatus` / `filterFundraisers` / `getStatusCounts` unit tests.
 
 ### Cross‑PR housekeeping
 

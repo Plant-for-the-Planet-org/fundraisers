@@ -1,12 +1,10 @@
-'use client';
-
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { HeartHandshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function FundraiserListEmpty() {
-  const t = useTranslations('Dashboard.empty');
+  const t = useTranslations('Dashboard.list.empty');
 
   return (
     <div className='fundraiser-list-empty flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-card/40 px-6 py-12 text-center'>

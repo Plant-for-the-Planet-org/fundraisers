@@ -29,22 +29,22 @@ export function FundraiserListToolbar({
     onFiltersChange({ sort });
 
   return (
-    <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 md:flex-row md:flex-wrap md:items-center'>
+    <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 md:flex-row md:items-center'>
       <FundraiserSearchInput
         value={filters.search}
         onChange={handleSearchChange}
-        className='w-full md:min-w-[16rem] md:flex-1'
+        className='w-full md:min-w-0 md:flex-1'
       />
       <FundraiserStatusFilter
         value={filters.status}
         counts={counts}
         onChange={handleStatusChange}
-        className='w-full md:w-auto'
+        className='w-full md:w-auto md:shrink-0'
       />
       <FundraiserSortMenu
         value={filters.sort}
         onChange={handleSortChange}
-        className='w-full md:w-52'
+        className='w-full md:w-52 md:shrink-0'
       />
     </div>
   );
