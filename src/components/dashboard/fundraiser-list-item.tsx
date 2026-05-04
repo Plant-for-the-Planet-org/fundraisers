@@ -10,13 +10,18 @@ import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
 import { FundraiserCardImage } from '@/components/explore/fundraiser-card-image';
+import { FundraiserActionMenu } from './fundraiser-action-menu';
 import { FundraiserStatusBadge } from './fundraiser-status-badge';
 
 interface FundraiserListItemProps {
   fundraiser: Fundraiser;
+  onActionComplete: () => void;
 }
 
-export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
+export function FundraiserListItem({
+  fundraiser,
+  onActionComplete,
+}: FundraiserListItemProps) {
   const t = useTranslations('Dashboard.list.item');
   const tFundraisers = useTranslations('Fundraisers');
   const locale = useLocale();
@@ -102,6 +107,11 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
           </span>
         </div>
       </div>
+
+      <FundraiserActionMenu
+        fundraiser={fundraiser}
+        onActionComplete={onActionComplete}
+      />
     </li>
   );
 }

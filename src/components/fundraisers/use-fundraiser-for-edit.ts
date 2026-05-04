@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
+import { isFundraiserOwner } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 
 export type FundraiserEditStatus =
@@ -20,18 +21,6 @@ export interface FundraiserEditState {
   status: FundraiserEditStatus;
   fundraiser: Fundraiser | null;
   errorMessage: string | null;
-}
-
-function isUserAuthorized(
-  fundraiser: Fundraiser,
-  userId: string | undefined
-): boolean {
-  if (!userId) {
-    return false;
-  }
-  return fundraiser.hosts.some(
-    host => host.user?.id === userId && host.role === 'owner'
-  );
 }
 
 export function useFundraiserForEdit(slug: string): FundraiserEditState {
@@ -60,7 +49,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
 
         if (shouldIgnore) return;
 
-        if (!isUserAuthorized(fundraiser, userId)) {
+        if (!isFundraiserOwner(fundraiser, userId)) {
           setState({
             status: 'unauthorized',
             fundraiser: null,

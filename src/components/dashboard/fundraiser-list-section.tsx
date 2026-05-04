@@ -16,11 +16,13 @@ import { useFundraiserListFilters } from './use-fundraiser-list-filters';
 interface FundraiserListSectionProps {
   fundraisers: Fundraiser[];
   isLoading: boolean;
+  onActionComplete: () => void;
 }
 
 export function FundraiserListSection({
   fundraisers,
   isLoading,
+  onActionComplete,
 }: FundraiserListSectionProps) {
   const t = useTranslations('Dashboard.toolbar');
   const locale = useLocale();
@@ -90,6 +92,7 @@ export function FundraiserListSection({
         isLoading={isLoading}
         isFiltered={isFiltered}
         onClearFilters={resetFilters}
+        onActionComplete={onActionComplete}
       />
     </div>
   );

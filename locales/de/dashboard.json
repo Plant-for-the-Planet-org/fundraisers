@@ -66,6 +66,19 @@
       "description": "Versuche, deine Suche oder Filter anzupassen.",
       "cta": "Filter zurücksetzen"
     },
+    "actions": {
+      "menuLabel": "Aktionen öffnen",
+      "edit": "Bearbeiten",
+      "copyLink": "Link kopieren",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "activate": "Aktivieren",
+      "copyLinkSuccess": "Link kopiert",
+      "copyLinkError": "Link konnte nicht kopiert werden",
+      "pauseSuccess": "Spendenaufruf pausiert",
+      "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "mutationError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+    },
     "list": {
       "loading": "Spendenaufruf wird geladen...",
       "item": {

@@ -66,6 +66,19 @@
       "description": "Try adjusting your search or filters.",
       "cta": "Clear filters"
     },
+    "actions": {
+      "menuLabel": "Open actions",
+      "edit": "Edit",
+      "copyLink": "Copy link",
+      "pause": "Pause",
+      "resume": "Resume",
+      "activate": "Activate",
+      "copyLinkSuccess": "Link copied",
+      "copyLinkError": "Could not copy link",
+      "pauseSuccess": "Fundraiser paused",
+      "resumeSuccess": "Fundraiser resumed",
+      "mutationError": "Something went wrong. Try again."
+    },
     "list": {
       "loading": "Loading fundraiser item...",
       "item": {
