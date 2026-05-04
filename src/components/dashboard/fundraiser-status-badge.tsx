@@ -11,21 +11,17 @@ interface FundraiserStatusBadgeProps {
 }
 
 const STATUS_DOT_CLASS: Record<DisplayStatus, string> = {
-  active: 'bg-emerald-500',
+  active: 'bg-success',
   paused: 'bg-muted-foreground/60',
   ended: 'bg-muted-foreground/40',
-  'ending-soon': 'bg-amber-500',
+  'ending-soon': 'bg-warning',
 };
 
 const STATUS_BADGE_CLASS: Record<DisplayStatus, string> = {
-  active:
-    'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
-  paused:
-    'border border-border bg-zinc-100 text-muted-foreground dark:bg-zinc-800/60',
-  ended:
-    'border border-border bg-zinc-100 text-muted-foreground dark:bg-zinc-800/60',
-  'ending-soon':
-    'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
+  active: 'bg-success/15 text-success',
+  paused: 'border border-border bg-muted text-muted-foreground',
+  ended: 'border border-border bg-muted text-muted-foreground',
+  'ending-soon': 'bg-warning/15 text-warning',
 };
 
 export function FundraiserStatusBadge({

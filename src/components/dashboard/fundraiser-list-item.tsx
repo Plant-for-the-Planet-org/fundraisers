@@ -93,7 +93,7 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
           <span
             className={
               displayStatus === 'ending-soon'
-                ? 'inline-flex items-center gap-1 text-amber-700 dark:text-amber-400'
+                ? 'inline-flex items-center gap-1 text-warning'
                 : 'inline-flex items-center gap-1'
             }
           >
