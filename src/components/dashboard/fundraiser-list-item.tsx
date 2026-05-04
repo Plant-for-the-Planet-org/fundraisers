@@ -43,9 +43,7 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
   );
 
   const showEnded =
-    fundraiser.status === 'completed' ||
-    fundraiser.status === 'cancelled' ||
-    daysLeft <= 0;
+    fundraiser.status === 'completed' || fundraiser.status === 'cancelled';
 
   return (
     <li className='fundraiser-list-item group flex items-start gap-4 py-4'>
