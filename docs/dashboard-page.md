@@ -115,7 +115,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 **Acceptance**
 
 - Typing in search filters the list with no perceptible lag; debounce ≈ 250 ms.
-- Each pill (All / Active / Paused / Ended) shows its count from the **unfiltered** list and stays stable as the user toggles between pills.
+- Each pill (All / Active / Draft / Paused / Ended) shows its count from the **search‑filtered** list (counts update as the user types) and stays stable as the user toggles between pills.
 - All five sort options behave per the rules in `sortFundraisers`.
 - "No fundraisers match these filters." renders with a working "Clear filters" button.
 - DE locale renders pluralized strings correctly.
@@ -295,7 +295,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 - Props: `{ value: FundraiserListStatusFilter; counts: FundraiserStatusCounts; onChange: (next: FundraiserListStatusFilter) => void; }`
 - Segmented pills: `All` | `Active` | `Draft` | `Paused` | `Ended`. Each shows its count badge.
-- Counts are computed from the **unfiltered** list (so toggling between filters never changes the badge numbers).
+- Counts are computed from the **search‑filtered** list (so typing in search updates the pill numbers to reflect what currently matches), but **not** from the status‑filtered list — toggling between pills never changes the badge numbers, only typing in search does.
 
 ### `FundraiserSortMenu`
 

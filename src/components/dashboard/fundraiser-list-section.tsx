@@ -26,19 +26,34 @@ export function FundraiserListSection({
   const locale = useLocale();
   const { filters, updateFilters, resetFilters } = useFundraiserListFilters();
 
-  const counts = useMemo(() => getStatusCounts(fundraisers), [fundraisers]);
+  // Apply search first so the status-pill counts reflect the active query.
+  // Status is intentionally excluded so toggling between pills doesn't
+  // change the counts — only typing in search does.
+  const searchedFundraisers = useMemo(
+    () =>
+      filterFundraisers(fundraisers, {
+        search: filters.search,
+        status: 'all',
+      }),
+    [fundraisers, filters.search]
+  );
+
+  const counts = useMemo(
+    () => getStatusCounts(searchedFundraisers),
+    [searchedFundraisers]
+  );
 
   const visibleFundraisers = useMemo(
     () =>
       sortFundraisers(
-        filterFundraisers(fundraisers, {
-          search: filters.search,
+        filterFundraisers(searchedFundraisers, {
+          search: '',
           status: filters.status,
         }),
         filters.sort,
         locale
       ),
-    [fundraisers, filters.search, filters.status, filters.sort, locale]
+    [searchedFundraisers, filters.status, filters.sort, locale]
   );
 
   const isFiltered = filters.search.trim() !== '' || filters.status !== 'all';
