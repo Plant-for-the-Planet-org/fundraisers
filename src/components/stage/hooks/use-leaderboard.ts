@@ -1,22 +1,14 @@
 'use client';
 
+import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+
 import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '@/lib/constants/app-config';
 import { stageHash } from './use-alltime-stats';
 
-export interface DonationEntry {
-  id: string;
-  amount: number;
-  currency: string;
-  donorName: string;
-  created: string;
-  avatarUrl: string | null;
-  isAnonymous: boolean;
-}
-
 interface LeaderboardData {
-  recent: DonationEntry[];
-  top: DonationEntry[];
+  recent: LeaderboardDonation[];
+  top: LeaderboardDonation[];
 }
 
 const POLL_INTERVAL = 15_000;

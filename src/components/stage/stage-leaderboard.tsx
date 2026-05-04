@@ -1,12 +1,12 @@
 'use client';
 
-import type { DonationEntry } from './hooks/use-leaderboard';
+import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 interface StageLeaderboardProps {
-  top: DonationEntry[];
+  top: LeaderboardDonation[];
   locale: string;
 }
 

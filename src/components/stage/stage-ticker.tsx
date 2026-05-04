@@ -1,6 +1,6 @@
 'use client';
 
-import type { DonationEntry } from './hooks/use-leaderboard';
+import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -60,7 +60,7 @@ function CountdownRing({ remaining }: { remaining: number }) {
 }
 
 interface StageTickerProps {
-  recent: DonationEntry[];
+  recent: LeaderboardDonation[];
   offline: boolean;
   locale: string;
 }
