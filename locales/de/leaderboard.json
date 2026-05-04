@@ -1,24 +1,24 @@
 {
   "Leaderboard": {
     "form": {
-      "sectionHeading": "Rangliste",
+      "sectionHeading": "Bestenliste",
       "labels": {
-        "enableLeaderboard": "Rangliste aktivieren",
-        "openSettings": "Ranglisten-Einstellungen",
-        "showRecentList": "Neueste Liste anzeigen",
-        "showTopList": "Top-Liste anzeigen",
+        "enableLeaderboard": "Bestenliste aktivieren",
+        "openSettings": "Einstellungen für die Bestenliste",
+        "showRecentList": "Liste mit letzten Spenden anzeigen",
+        "showTopList": "List mit Top-Spenden anzeigen",
         "showAmounts": "Beträge anzeigen",
-        "viewAllButton": "Alle anzeigen-Schaltfläche",
+        "viewAllButton": "\"Alle anzeigen\"-Knopf",
         "anonymizeDonors": "Spender anonymisieren",
         "showAvatars": "Avatare anzeigen"
       },
       "disabledView": {
-        "title": "Rangliste deaktiviert",
-        "description": "Rangliste aktivieren um Spender-Rankings und aktuelle Spenden anzuzeigen"
+        "title": "Bestenliste deaktiviert",
+        "description": "Aktiviere die Bestenliste, um die Bestenliste der Spender und die letzten Spenden anzuzeigen"
       },
       "noTabsWarning": {
         "title": "Keine Tabs ausgewählt",
-        "description": "Aktiviere mindestens eine der Listen (Neueste oder Top), um die Rangliste anzuzeigen"
+        "description": "Aktiviere mindestens eine der Optionen \"Liste mit letzten Spenden anzeigen\" oder \"Liste mit Top-Spenden anzeigen\", um die Bestenliste anzuzeigen"
       }
     },
     "view": {
@@ -27,7 +27,7 @@
         "topDonations": "Top-Spenden"
       },
       "viewAll": "Alle anzeigen",
-      "emptyState": "Keine Spenden vorhanden"
+      "emptyState": "Keine Spenden zum anzeigen"
     }
   }
 }
