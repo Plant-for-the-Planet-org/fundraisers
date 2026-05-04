@@ -3,7 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
@@ -17,6 +17,7 @@ interface FundraiserListItemProps {
 export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
   const t = useTranslations('Dashboard.list.item');
   const tFundraisers = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
   const daysLeft = getDaysLeft(fundraiser.endDate);
@@ -24,20 +25,13 @@ export function FundraiserListItem({ fundraiser }: FundraiserListItemProps) {
   const hostNames = fundraiser.hosts
     .map(host => host.displayName ?? host.user?.name)
     .filter((name): name is string => Boolean(name));
-  let hostName: string;
-  if (hostNames.length === 0) {
-    hostName = tFundraisers('unknownHost');
-  } else if (hostNames.length === 1) {
-    hostName = hostNames[0];
-  } else if (hostNames.length === 2) {
-    hostName = t('hostsTwo', { first: hostNames[0], second: hostNames[1] });
-  } else {
-    hostName = t('hostsMany', {
-      first: hostNames[0],
-      second: hostNames[1],
-      count: hostNames.length - 2,
-    });
-  }
+  const hostName =
+    hostNames.length === 0
+      ? tFundraisers('unknownHost')
+      : new Intl.ListFormat(locale, {
+          style: 'long',
+          type: 'conjunction',
+        }).format(hostNames);
 
   const raised = formatCurrencyFromDecimal(
     fundraiser.totalRaised,

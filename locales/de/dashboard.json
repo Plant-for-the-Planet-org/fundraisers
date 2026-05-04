@@ -36,8 +36,6 @@
       "loading": "Spendenaufruf wird geladen...",
       "item": {
         "byHost": "von {host}",
-        "hostsTwo": "{first} und {second}",
-        "hostsMany": "{first}, {second} und {count, plural, one {# weiterer} other {# weitere}}",
         "goalProgress": "<b>{achievedAmount}</b> von {goal}",
         "donations": "{count, plural, =0 {0 Spenden} one {1 Spende} other {# Spenden}}",
         "daysLeft": "{count, plural, one {Noch 1 Tag} other {Noch # Tage}}",

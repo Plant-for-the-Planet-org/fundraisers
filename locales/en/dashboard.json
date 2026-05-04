@@ -36,8 +36,6 @@
       "loading": "Loading fundraiser item...",
       "item": {
         "byHost": "by {host}",
-        "hostsTwo": "{first} and {second}",
-        "hostsMany": "{first}, {second} and {count, plural, one {# other} other {# others}}",
         "goalProgress": "<b>{achievedAmount}</b> of {goal}",
         "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
         "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
