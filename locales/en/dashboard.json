@@ -32,6 +32,54 @@
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
     },
+    "toolbar": {
+      "searchPlaceholder": "Name or Host...",
+      "resultCount": "Showing <bold>{visible}</bold> of {total}"
+    },
+    "statusFilter": {
+      "groupLabel": "Filter by status",
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "sort": {
+      "triggerLabel": "Sort: ",
+      "options": {
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "most-raised": "Most raised",
+        "ending-soonest": "Ending soonest",
+        "name-asc": "Name A-Z"
+      }
+    },
+    "statusBadge": {
+      "active": "Active",
+      "draft": "Draft",
+      "paused": "Paused",
+      "ended": "Ended",
+      "ending-soon": "Ending soon"
+    },
+    "noResults": {
+      "title": "No fundraisers match these filters.",
+      "description": "Try adjusting your search or filters.",
+      "cta": "Clear filters"
+    },
+    "actions": {
+      "menuLabel": "Open actions",
+      "edit": "Edit",
+      "copyLink": "Copy link",
+      "pause": "Pause",
+      "resume": "Resume",
+      "activate": "Activate",
+      "copyLinkSuccess": "Link copied",
+      "copyLinkError": "Could not copy link",
+      "pauseSuccess": "Fundraiser paused",
+      "resumeSuccess": "Fundraiser resumed",
+      "activateSuccess": "Fundraiser activated",
+      "mutationError": "Something went wrong. Try again."
+    },
     "list": {
       "loading": "Loading fundraiser item...",
       "item": {

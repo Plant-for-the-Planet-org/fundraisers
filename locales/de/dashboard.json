@@ -32,6 +32,54 @@
       "retry": "Erneut versuchen",
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
+    "toolbar": {
+      "searchPlaceholder": "Name oder Host...",
+      "resultCount": "<bold>{visible}</bold> von {total} werden angezeigt"
+    },
+    "statusFilter": {
+      "groupLabel": "Nach Status filtern",
+      "all": "Alle",
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "paused": "Pausiert",
+      "ended": "Beendet"
+    },
+    "sort": {
+      "triggerLabel": "Sortieren: ",
+      "options": {
+        "newest": "Neueste zuerst",
+        "oldest": "Älteste zuerst",
+        "most-raised": "Am meisten gesammelt",
+        "ending-soonest": "Endet am ehesten",
+        "name-asc": "Name A-Z"
+      }
+    },
+    "statusBadge": {
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "paused": "Pausiert",
+      "ended": "Beendet",
+      "ending-soon": "Endet bald"
+    },
+    "noResults": {
+      "title": "Keine Spendenaufrufe entsprechen diesen Filtern.",
+      "description": "Versuche, deine Suche oder Filter anzupassen.",
+      "cta": "Filter zurücksetzen"
+    },
+    "actions": {
+      "menuLabel": "Aktionen öffnen",
+      "edit": "Bearbeiten",
+      "copyLink": "Link kopieren",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "activate": "Aktivieren",
+      "copyLinkSuccess": "Link kopiert",
+      "copyLinkError": "Link konnte nicht kopiert werden",
+      "pauseSuccess": "Spendenaufruf pausiert",
+      "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "activateSuccess": "Spendenaufruf aktiviert",
+      "mutationError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+    },
     "list": {
       "loading": "Spendenaufruf wird geladen",
       "item": {
