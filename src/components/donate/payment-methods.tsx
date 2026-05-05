@@ -15,6 +15,7 @@ import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
+import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
@@ -249,12 +250,16 @@ export function PaymentMethods() {
     //   const raw = 'stripe:card';
     //   const raw = 'stripe:sepa_debit';
     //   const raw = 'paypal:paypal';
-    //   const raw = 'offline:bank_transfer';
+    //   const raw = 'offline:offline';
     const raw = paymentOptions.lastPaymentMethod;
     if (!raw) return null;
-    // API format is "<gateway>:<method>" — both sides snake_case.
-    const methodPart = raw.split(':')[1] as PaymentMethodId;
-    return SUPPORTED_METHOD_IDS.has(methodPart) ? methodPart : null;
+    // API format is "<gateway>:<method>". For the offline gateway the
+    // method side comes back as "offline" (the gateway name) — run the
+    // method through the normalizer so it maps to "bank_transfer".
+    const methodPart = normalizePaymentMethodId(raw.split(':')[1]);
+    return methodPart && SUPPORTED_METHOD_IDS.has(methodPart)
+      ? methodPart
+      : null;
   }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
