@@ -34,7 +34,7 @@ export function FundraiserStatusFilter({
 
   return (
     <div
-      role='radiogroup'
+      role='toolbar'
       aria-label={t('groupLabel')}
       className={cn(
         'fundraiser-status-filter flex h-11 shrink-0 items-center justify-between gap-1 overflow-x-auto rounded-xl border border-border/60 bg-muted px-1 shadow-xs md:inline-flex md:justify-start md:overflow-x-visible',
@@ -47,8 +47,7 @@ export function FundraiserStatusFilter({
           <button
             key={option}
             type='button'
-            role='radio'
-            aria-checked={isSelected}
+            aria-pressed={isSelected}
             onClick={() => onChange(option)}
             className={cn(
               'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
