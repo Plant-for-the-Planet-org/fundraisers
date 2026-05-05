@@ -9,6 +9,7 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus, getHostNames } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
+import { cn } from '@/lib/utils/index';
 import { FundraiserCardImage } from '@/components/explore/fundraiser-card-image';
 import { FundraiserActionMenu } from './fundraiser-action-menu';
 import { FundraiserStatusBadge } from './fundraiser-status-badge';
@@ -94,11 +95,10 @@ export function FundraiserListItem({
             {t('donations', { count: fundraiser.donationCount })}
           </span>
           <span
-            className={
-              displayStatus === 'ending-soon'
-                ? 'inline-flex items-center gap-1 text-warning'
-                : 'inline-flex items-center gap-1'
-            }
+            className={cn(
+              'inline-flex items-center gap-1',
+              displayStatus === 'ending-soon' && 'text-warning'
+            )}
           >
             <Clock className='h-3.5 w-3.5' aria-hidden='true' />
             {showEnded ? t('ended') : t('daysLeft', { count: daysLeft })}
