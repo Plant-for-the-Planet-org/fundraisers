@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
-import { deriveDisplayStatus } from '@/lib/utils/fundraiser-list';
+import { deriveDisplayStatus, getHostNames } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
 import { FundraiserCardImage } from '@/components/explore/fundraiser-card-image';
 import { FundraiserActionMenu } from './fundraiser-action-menu';
@@ -30,9 +30,7 @@ export function FundraiserListItem({
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const displayStatus = deriveDisplayStatus(fundraiser);
 
-  const hostNames = fundraiser.hosts
-    .map(host => host.displayName ?? host.user?.name)
-    .filter((name): name is string => Boolean(name));
+  const hostNames = getHostNames(fundraiser);
   const hostName =
     hostNames.length === 0
       ? tFundraisers('unknownHost')

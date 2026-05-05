@@ -67,7 +67,7 @@ export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   }
 }
 
-function getHostNames(fundraiser: Fundraiser): string[] {
+export function getHostNames(fundraiser: Fundraiser): string[] {
   return fundraiser.hosts
     .map(host => host.displayName ?? host.user?.name)
     .filter((name): name is string => Boolean(name));
