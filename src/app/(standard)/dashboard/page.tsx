@@ -3,7 +3,7 @@
 import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   getDashboardSummary,
@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const accessToken = useAuthStore(state => state.accessToken);
 
   const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
+  const [summary, setSummary] = useState<DashboardSummaryStats>(EMPTY_SUMMARY);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
@@ -47,6 +48,7 @@ export default function DashboardPage() {
         const data = await getFundraisers(accessToken);
         if (signal?.aborted) return;
         setFundraisers(data);
+        setSummary(data.length > 0 ? getDashboardSummary(data) : EMPTY_SUMMARY);
       } catch (error) {
         if (!signal?.aborted) {
           console.error('[Dashboard] Failed to fetch fundraisers:', error);
@@ -71,21 +73,24 @@ export default function DashboardPage() {
     };
   }, [fetchFundraisers]);
 
-  const summary = useMemo(
-    () =>
-      fundraisers.length > 0 ? getDashboardSummary(fundraisers) : EMPTY_SUMMARY,
-    [fundraisers]
-  );
-
   const retryAfterError = useCallback(() => {
-    setIsLoading(true);
-    setHasError(false);
     void fetchFundraisers();
   }, [fetchFundraisers]);
 
-  const refetchSilently = useCallback(() => {
-    void fetchFundraisers();
-  }, [fetchFundraisers]);
+  // Merge locally so only the affected row re-renders; summary stays at its
+  // last full-load snapshot (deliberately not derived from this list).
+  const handleFundraiserUpdated = useCallback(
+    (updatedFundraiser: Fundraiser) => {
+      setFundraisers(prev =>
+        prev.map(fundraiser =>
+          fundraiser.id === updatedFundraiser.id
+            ? { ...fundraiser, ...updatedFundraiser }
+            : fundraiser
+        )
+      );
+    },
+    []
+  );
 
   return (
     <AuthGuard>
@@ -110,7 +115,7 @@ export default function DashboardPage() {
           <FundraiserListSection
             fundraisers={fundraisers}
             isLoading={isLoading}
-            onActionComplete={refetchSilently}
+            onFundraiserUpdated={handleFundraiserUpdated}
           />
         )}
       </section>

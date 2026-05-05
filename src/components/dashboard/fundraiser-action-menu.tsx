@@ -31,7 +31,7 @@ import {
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
-  onActionComplete: () => void;
+  onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
 }
 
 interface ActionVisibility {
@@ -71,7 +71,7 @@ type PendingAction = StatusActionKind | null;
 
 export function FundraiserActionMenu({
   fundraiser,
-  onActionComplete,
+  onFundraiserUpdated,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
   const accessToken = useAuthStore(state => state.accessToken);
@@ -106,14 +106,12 @@ export function FundraiserActionMenu({
 
     setPending(next);
     try {
-      if (next === 'pause') {
-        await pauseFundraiser(fundraiser.id, accessToken);
-        toast.success(t('pauseSuccess'));
-      } else {
-        await resumeFundraiser(fundraiser.id, accessToken);
-        toast.success(t('resumeSuccess'));
-      }
-      onActionComplete();
+      const updatedFundraiser =
+        next === 'pause'
+          ? await pauseFundraiser(fundraiser.id, accessToken)
+          : await resumeFundraiser(fundraiser.id, accessToken);
+      toast.success(t(next === 'pause' ? 'pauseSuccess' : 'resumeSuccess'));
+      onFundraiserUpdated(updatedFundraiser);
       setOpen(false);
     } catch (error) {
       console.error('[FundraiserActionMenu] status change failed:', error);
