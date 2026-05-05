@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollingDonationList } from './scrolling-donation-list';
+import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
   recentDonations: LeaderboardDonation[];
@@ -42,6 +43,7 @@ export function LeaderboardView({
 
   const t = useTranslations('Leaderboard.view');
   const [activeTab, setActiveTab] = useState<'recent' | 'top'>(default_tab);
+  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
   const effectiveTab =
     activeTab === 'recent' && !show_recent_list
@@ -76,6 +78,7 @@ export function LeaderboardView({
             <Button
               variant='ghost'
               className='text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight p-0 h-auto hover:opacity-70 transition-opacity'
+              onClick={() => setIsViewAllOpen(true)}
             >
               {t('viewAll')}
             </Button>
@@ -105,6 +108,15 @@ export function LeaderboardView({
           </TabsContent>
         )}
       </Tabs>
+
+      <ViewAllOverlay
+        isOpen={isViewAllOpen}
+        onClose={() => setIsViewAllOpen(false)}
+        donations={effectiveTab === 'recent' ? recentDonations : topDonations}
+        anonymize={anonymize}
+        showAmount={show_amount}
+        showAvatar={show_avatar}
+      />
     </div>
   );
 }

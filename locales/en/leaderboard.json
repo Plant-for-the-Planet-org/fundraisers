@@ -27,7 +27,12 @@
         "topDonations": "Top Donations"
       },
       "viewAll": "View all",
-      "emptyState": "No donations to display"
+      "emptyState": "No donations to display",
+      "viewAllOverlay": {
+        "title": "All Donations",
+        "emptyState": "No donations yet",
+        "closeAria": "Close donations list"
+      }
     }
   }
 }

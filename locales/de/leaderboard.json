@@ -27,7 +27,12 @@
         "topDonations": "Top-Spenden"
       },
       "viewAll": "Alle anzeigen",
-      "emptyState": "Keine Spenden zum anzeigen"
+      "emptyState": "Keine Spenden zum anzeigen",
+      "viewAllOverlay": {
+        "title": "Alle Spenden",
+        "emptyState": "Noch keine Spenden",
+        "closeAria": "Spendenliste schliessen"
+      }
     }
   }
 }
