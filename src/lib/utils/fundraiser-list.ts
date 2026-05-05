@@ -98,8 +98,10 @@ function matchesStatus(
       return (
         fundraiser.status === 'completed' || fundraiser.status === 'cancelled'
       );
-    default:
+    default: {
+      filter satisfies never;
       return true;
+    }
   }
 }
 
