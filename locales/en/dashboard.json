@@ -33,7 +33,7 @@
       "exploreLinkText": "Discover Fundraisers"
     },
     "toolbar": {
-      "searchPlaceholder": "Search by name or host...",
+      "searchPlaceholder": "Name or Host...",
       "resultCount": "Showing <bold>{visible}</bold> of {total}"
     },
     "statusFilter": {

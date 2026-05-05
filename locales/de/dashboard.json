@@ -33,7 +33,7 @@
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
     "toolbar": {
-      "searchPlaceholder": "Nach Name oder Host suchen...",
+      "searchPlaceholder": "Name oder Host...",
       "resultCount": "<bold>{visible}</bold> von {total} werden angezeigt"
     },
     "statusFilter": {
