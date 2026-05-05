@@ -286,7 +286,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 
 - Props: `{ filters: FundraiserListFilters; counts: FundraiserStatusCounts; onChange: (next: FundraiserListFilters) => void; }`
 - Pure presentational; composes `FundraiserSearchInput`, `FundraiserStatusFilter`, `FundraiserSortMenu`.
-- Mobile: stacks vertically (`flex-col md:flex-row`); status filter pills spread evenly via `justify-between` so all four fit on one row at narrow widths (no horizontal scroll).
+- Mobile: stacks vertically (`flex-col md:flex-row`). The five status‑filter pills (`All`/`Active`/`Draft`/`Paused`/`Ended`) spread via `justify-between` when they fit; if not, the row scrolls horizontally (`overflow-x-auto`, pills are `shrink-0`). On `md+` the filter becomes `inline-flex` and overflow is disabled.
 
 ### `FundraiserSearchInput`
 

@@ -26,7 +26,7 @@ export function FundraiserList({
 }: FundraiserListProps) {
   if (isLoading) {
     return (
-      <ul className='fundraiser-list divide-y divide-border/60'>
+      <ul className='fundraiser-list grid grid-cols-1 gap-x-8 md:grid-cols-2'>
         {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
           <FundraiserListItemSkeleton key={index} />
         ))}
@@ -42,7 +42,7 @@ export function FundraiserList({
   }
 
   return (
-    <ul className='fundraiser-list divide-y divide-border/60'>
+    <ul className='fundraiser-list grid grid-cols-1 gap-x-8 md:grid-cols-2'>
       {fundraisers.map(fundraiser => (
         <FundraiserListItem
           key={fundraiser.id}
