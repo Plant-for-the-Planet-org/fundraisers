@@ -77,6 +77,7 @@
       "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "activateSuccess": "Spendenaufruf aktiviert",
       "mutationError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     },
     "list": {

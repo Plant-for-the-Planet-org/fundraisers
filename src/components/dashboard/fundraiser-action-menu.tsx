@@ -101,16 +101,20 @@ export function FundraiserActionMenu({
     }
   };
 
-  const handleStatusChange = async (next: StatusActionKind) => {
+  const handleStatusChange = async (action: StatusActionKind) => {
     if (pending || !accessToken) return;
 
-    setPending(next);
+    setPending(action);
     try {
-      const updatedFundraiser =
-        next === 'pause'
-          ? await pauseFundraiser(fundraiser.id, accessToken)
-          : await resumeFundraiser(fundraiser.id, accessToken);
-      toast.success(t(next === 'pause' ? 'pauseSuccess' : 'resumeSuccess'));
+      let updatedFundraiser: Fundraiser;
+      if (action === 'pause') {
+        updatedFundraiser = await pauseFundraiser(fundraiser.id, accessToken);
+        toast.success(t('pauseSuccess'));
+      } else {
+        const isDraft = fundraiser.status === 'draft';
+        updatedFundraiser = await resumeFundraiser(fundraiser.id, accessToken);
+        toast.success(t(isDraft ? 'activateSuccess' : 'resumeSuccess'));
+      }
       onFundraiserUpdated(updatedFundraiser);
       setOpen(false);
     } catch (error) {
