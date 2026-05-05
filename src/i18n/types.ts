@@ -5,13 +5,15 @@ import type MessageDashboard from '../../locales/en/dashboard.json';
 import type MessageDonate from '../../locales/en/donate.json';
 import type MessagesExplore from '../../locales/en/explore.json';
 import type MessagesFundraisers from '../../locales/en/fundraisers.json';
+import type MessagesLeaderboard from '../../locales/en/leaderboard.json';
 
 type Messages = typeof MessagesCommon &
   typeof MessagesExplore &
   typeof MessagesFundraisers &
   typeof MessageAuth &
   typeof MessageDashboard &
-  typeof MessageDonate;
+  typeof MessageDonate &
+  typeof MessagesLeaderboard;
 
 declare module 'next-intl' {
   interface AppConfig {

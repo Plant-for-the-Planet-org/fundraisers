@@ -34,30 +34,40 @@ export default function DashboardPage() {
   const [hasError, setHasError] = useState(false);
 
   const fetchFundraisers = useCallback(
-    async (isIgnored?: () => boolean) => {
-      if (!accessToken) return;
+    async (signal?: { aborted: boolean }) => {
+      if (!accessToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setHasError(false);
 
       try {
         const data = await getFundraisers(accessToken);
-        if (isIgnored?.()) return;
+        if (signal?.aborted) return;
         setFundraisers(data);
-        setHasError(false);
       } catch (error) {
-        if (isIgnored?.()) return;
-        console.error('[Dashboard] Failed to fetch fundraisers:', error);
-        setHasError(true);
+        if (!signal?.aborted) {
+          console.error('[Dashboard] Failed to fetch fundraisers:', error);
+          setHasError(true);
+        }
       } finally {
-        if (!isIgnored?.()) setIsLoading(false);
+        if (!signal?.aborted) {
+          setIsLoading(false);
+        }
       }
     },
     [accessToken]
   );
 
   useEffect(() => {
-    let shouldIgnore = false;
-    void fetchFundraisers(() => shouldIgnore);
+    // Mocks AbortSignal (AbortController) so stale responses are ignored if the effect re-runs before a fetch completes. This can happen if the user quickly navigates away and back to the dashboard, or if the access token changes.
+    const signal = { aborted: false };
+
+    void fetchFundraisers(signal);
     return () => {
-      shouldIgnore = true;
+      signal.aborted = true;
     };
   }, [fetchFundraisers]);
 

@@ -1,0 +1,33 @@
+{
+  "Leaderboard": {
+    "form": {
+      "sectionHeading": "Leaderboard",
+      "labels": {
+        "enableLeaderboard": "Enable leaderboard",
+        "openSettings": "Leaderboard settings",
+        "showRecentList": "Show Recent List",
+        "showTopList": "Show Top List",
+        "showAmounts": "Show Amounts",
+        "viewAllButton": "View All Button",
+        "anonymizeDonors": "Anonymize Donors",
+        "showAvatars": "Show Avatars"
+      },
+      "disabledView": {
+        "title": "Leaderboard Disabled",
+        "description": "Enable the leaderboard to show donor rankings and recent donations"
+      },
+      "noTabsWarning": {
+        "title": "No Tabs Selected",
+        "description": "Enable at least one of Recent List or Top List to display the leaderboard"
+      }
+    },
+    "view": {
+      "tabs": {
+        "newest": "Newest",
+        "topDonations": "Top Donations"
+      },
+      "viewAll": "View all",
+      "emptyState": "No donations to display"
+    }
+  }
+}

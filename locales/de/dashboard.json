@@ -6,10 +6,10 @@
     },
     "manageFundraisers": {
       "title": "Spendenaufrufe verwalten",
-      "subtitle": "Verwalte, bearbeite und verfolge deine Fundraiser. Pausiere die Sammlung oder teile die, die einen zusätzlichen Schub brauchen."
+      "subtitle": "Verwalte, bearbeite und verfolge deine Spendenaufrufe. Pausiere den Aufruf oder teile die, die mehr Sichtbarkeit brauchen."
     },
     "summary": {
-      "loading": "Statistik wird geladen...",
+      "loading": "Übersicht wird geladen...",
       "fundraisers": {
         "label": "Spendenaufrufe",
         "activeSuffix": "aktiv",
@@ -17,7 +17,7 @@
       },
       "totalRaised": {
         "label": "Insgesamt gesammelt",
-        "helper": "über alle Zeit",
+        "helper": "über die ganze Zeit",
         "moreCurrencies": "+{count, plural, one {# weitere Währung} other {# weitere Währungen}}",
         "empty": "Noch keine Spenden gesammelt"
       },
@@ -28,7 +28,7 @@
     },
     "statsError": {
       "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
-      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schiefgelaufen.",
+      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schief gelaufen.",
       "retry": "Erneut versuchen",
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
@@ -80,18 +80,18 @@
       "mutationError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     },
     "list": {
-      "loading": "Spendenaufruf wird geladen...",
+      "loading": "Spendenaufruf wird geladen",
       "item": {
         "byHost": "von {host}",
         "goalProgress": "<b>{achievedAmount}</b> von {goal}",
         "donations": "{count, plural, =0 {0 Spenden} one {1 Spende} other {# Spenden}}",
-        "daysLeft": "{count, plural, one {Noch 1 Tag} other {Noch # Tage}}",
+        "daysLeft": "{count, plural, one {1 Tag übrig} other {# Tage übrig}}",
         "ended": "Beendet"
       },
       "empty": {
-        "title": "Du hast noch keinen Spendenaufruf erstellt",
-        "description": "Starte eine Kampagne, um Spenden zu sammeln.",
-        "cta": "Ersten Spendenaufruf erstellen"
+        "title": "Du hast noch keine Spendenaufruf erstellt",
+        "description": "Starte einen Aufruf, um mit dem Sammeln von Spenden zu beginnen.",
+        "cta": "Erstelle deinen ersten Spendenaufruf"
       }
     }
   }

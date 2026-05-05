@@ -19,6 +19,13 @@ function isThemeDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(theme).some(Boolean);
 }
 
+function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
+  const leaderboard = dirty.settings?.modules?.leaderboard;
+  if (!leaderboard) return false;
+  if (typeof leaderboard === 'boolean') return leaderboard;
+  return Object.values(leaderboard).some(Boolean);
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -81,7 +88,13 @@ export function buildUpdateFundraiserRequest(
     request.projectAllocations = values.projectAllocations;
   }
   if (isThemeDirty(dirtyFields)) {
-    request.settings = { theme: values.settings.theme };
+    request.settings = { ...request.settings, theme: values.settings.theme };
+  }
+  if (isLeaderboardDirty(dirtyFields)) {
+    request.settings = {
+      ...request.settings,
+      modules: { leaderboard: values.settings.modules.leaderboard },
+    };
   }
   if (imageFile) request.imageFile = imageFile;
 
@@ -103,7 +116,10 @@ export function buildCreateFundraiserRequest(
     projectAllocations: values.projectAllocations,
     settings: {
       theme: values.settings.theme,
-      modules: DEFAULT_MODULES,
+      modules: {
+        ...DEFAULT_MODULES,
+        leaderboard: values.settings.modules.leaderboard,
+      },
     },
     startDate: getTodayString(),
     endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),

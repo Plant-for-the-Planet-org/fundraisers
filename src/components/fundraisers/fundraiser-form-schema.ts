@@ -1,4 +1,7 @@
-import type { Fundraiser } from '@/lib/types/fundraiser';
+import type {
+  Fundraiser,
+  LeaderboardModuleSettings,
+} from '@/lib/types/fundraiser';
 import type { SelectedImage } from '@/lib/types/image-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
@@ -13,6 +16,17 @@ import {
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+
+const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
+  enabled: true,
+  view_all: false,
+  anonymize: false,
+  default_tab: 'recent',
+  show_amount: true,
+  show_top_list: true,
+  show_recent_list: true,
+  show_avatar: true,
+};
 
 const unsplashAttributionSchema = z.object({
   photographer: z.string(),
@@ -61,6 +75,18 @@ export const fundraiserFormSchema = z.object({
       title_font: z.string(),
       animation: z.string(),
     }),
+    modules: z.object({
+      leaderboard: z.object({
+        enabled: z.boolean(),
+        view_all: z.boolean(),
+        anonymize: z.boolean(),
+        default_tab: z.enum(['recent', 'top']),
+        show_amount: z.boolean(),
+        show_top_list: z.boolean(),
+        show_recent_list: z.boolean(),
+        show_avatar: z.boolean(),
+      }),
+    }),
   }),
 });
 
@@ -100,6 +126,9 @@ export function buildDefaultCreateValues(
         body_font: initialTheme.bodyFont,
         title_font: initialTheme.titleFont,
         animation: initialTheme.animation ?? 'none',
+      },
+      modules: {
+        leaderboard: { ...DEFAULT_LEADERBOARD },
       },
     },
   };
@@ -163,6 +192,12 @@ export function fundraiserToFormValues(
         body_font: theme.body_font ?? fallbackTheme.bodyFont,
         title_font: theme.title_font ?? fallbackTheme.titleFont,
         animation: theme.animation ?? fallbackTheme.animation ?? 'none',
+      },
+      modules: {
+        leaderboard: {
+          ...DEFAULT_LEADERBOARD,
+          ...fundraiser.settings?.modules?.leaderboard,
+        },
       },
     },
   };
