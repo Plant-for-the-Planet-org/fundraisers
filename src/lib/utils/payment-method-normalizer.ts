@@ -37,19 +37,35 @@ export function normalizePaymentMethodId(
   ) {
     return 'card';
   }
-  if (normalized === 'sepa' || normalized === 'sepa_debit') {
+  if (
+    normalized === 'sepa' ||
+    normalized === 'sepa_debit' ||
+    normalized === 'sepa-debit'
+  ) {
     return 'sepa_debit';
   }
   if (normalized === 'paypal') {
     return 'paypal';
   }
-  if (normalized === 'bank_transfer' || normalized === 'offline') {
+  if (
+    normalized === 'bank_transfer' ||
+    normalized === 'bank-transfer' ||
+    normalized === 'offline'
+  ) {
     return 'bank_transfer';
   }
-  if (normalized === 'apple_pay' || normalized === 'applepay') {
+  if (
+    normalized === 'apple_pay' ||
+    normalized === 'applepay' ||
+    normalized === 'apple-pay'
+  ) {
     return 'apple_pay';
   }
-  if (normalized === 'google_pay' || normalized === 'googlepay') {
+  if (
+    normalized === 'google_pay' ||
+    normalized === 'googlepay' ||
+    normalized === 'google-pay'
+  ) {
     return 'google_pay';
   }
 
