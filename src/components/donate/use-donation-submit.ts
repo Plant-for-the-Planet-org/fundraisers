@@ -103,7 +103,7 @@ export function useDonationSubmit(
         if (isPlanetCash) {
           // TODO: Implement PlanetCash donation flow
         } else {
-          if (values.selectedPaymentMethod === 'sepa-debit') {
+          if (values.selectedPaymentMethod === 'sepa_debit') {
             const donor = formData.type === 'guest' ? formData.donor : null;
             const sepaResult = await sepaFormRef.current?.createPaymentMethod({
               email: donor?.email ?? donorProfile?.email ?? '',
@@ -296,7 +296,7 @@ export function useDonationSubmit(
               return;
             }
 
-            if (values.selectedPaymentMethod === 'sepa-debit') {
+            if (values.selectedPaymentMethod === 'sepa_debit') {
               const sepaResult =
                 (await sepaFormRef.current?.confirmSepaDebitPayment(
                   paymentResponse.response.payment_intent_client_secret

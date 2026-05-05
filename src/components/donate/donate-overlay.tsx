@@ -39,6 +39,8 @@ interface DonateOverlayProps {
   donationData: DonationData | null;
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
+  /** `true` once `paymentOptions` reflects the user's auth state — see `usePaymentOptions`. */
+  paymentOptionsReady: boolean;
 }
 
 export function DonateOverlay({
@@ -47,6 +49,7 @@ export function DonateOverlay({
   donationData,
   fundraiser,
   paymentOptions,
+  paymentOptionsReady,
 }: DonateOverlayProps) {
   const isClient = typeof window !== 'undefined';
 
@@ -67,6 +70,7 @@ export function DonateOverlay({
       donationData={donationData}
       fundraiser={fundraiser}
       paymentOptions={paymentOptions}
+      paymentOptionsReady={paymentOptionsReady}
       onClose={onClose}
       isOpen={isOpen}
     />
@@ -78,12 +82,14 @@ function DonateOverlayInner({
   donationData,
   fundraiser,
   paymentOptions,
+  paymentOptionsReady,
   onClose,
   isOpen,
 }: {
   donationData: DonationData;
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
+  paymentOptionsReady: boolean;
   onClose: () => void;
   isOpen: boolean;
 }) {
@@ -164,6 +170,7 @@ function DonateOverlayInner({
         fundraiser={fundraiser}
         donationData={donationData}
         paymentOptions={paymentOptions}
+        paymentOptionsReady={paymentOptionsReady}
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}

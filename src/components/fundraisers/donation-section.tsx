@@ -23,12 +23,13 @@ export function DonationSection({
 }: DonationSectionProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [donationData, setDonationData] = useState<DonationData | null>(null);
-  const resolvedPaymentOptions = usePaymentOptions(fundraiser.id, {
-    initialPaymentOptions: paymentOptions,
-    enabled: isOverlayOpen,
-    includeAuthenticatedData: true,
-    initialPaymentOptionsAreAuthenticated: paymentOptionsAreAuthenticated,
-  });
+  const { paymentOptions: resolvedPaymentOptions, isReady: paymentOptionsReady } =
+    usePaymentOptions(fundraiser.id, {
+      initialPaymentOptions: paymentOptions,
+      enabled: isOverlayOpen,
+      includeAuthenticatedData: true,
+      initialPaymentOptionsAreAuthenticated: paymentOptionsAreAuthenticated,
+    });
 
   const contributionSettings = mapPaymentOptionsToContributionSettings(
     resolvedPaymentOptions,
@@ -60,6 +61,7 @@ export function DonationSection({
         donationData={donationData}
         fundraiser={fundraiser}
         paymentOptions={resolvedPaymentOptions}
+        paymentOptionsReady={paymentOptionsReady}
       />
     </>
   );

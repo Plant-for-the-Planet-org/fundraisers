@@ -41,11 +41,11 @@ const donationFormFields = z.object({
   coverFees: z.boolean(),
   selectedPaymentMethod: z.enum([
     'card',
-    'sepa-debit',
-    'apple-pay',
-    'google-pay',
+    'sepa_debit',
+    'apple_pay',
+    'google_pay',
     'paypal',
-    'bank-transfer',
+    'bank_transfer',
   ]),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
@@ -140,6 +140,12 @@ interface DonationFormContextValue {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
+  /**
+   * `true` once `paymentOptions` reflects the user's auth state — see
+   * `usePaymentOptions`. Components that key off auth-protected fields
+   * (e.g. `lastPaymentMethod`) should defer reads until this is `true`.
+   */
+  paymentOptionsReady: boolean;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -153,6 +159,7 @@ interface DonationFormProviderProps {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
+  paymentOptionsReady: boolean;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -169,6 +176,7 @@ export function DonationFormProvider({
   fundraiser,
   donationData,
   paymentOptions,
+  paymentOptionsReady,
   onSubmit,
   sepaFormRef,
   cardFormRef,
@@ -221,6 +229,7 @@ export function DonationFormProvider({
         fundraiser,
         donationData,
         paymentOptions,
+        paymentOptionsReady,
         onSubmit,
         sepaFormRef,
         cardFormRef,

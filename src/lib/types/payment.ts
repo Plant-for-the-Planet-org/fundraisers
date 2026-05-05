@@ -1,11 +1,11 @@
-// Payment methods available
+// Payment methods available — snake_case to match the platform API and Stripe SDK
 export type PaymentMethod =
   | 'card'
-  | 'sepa-debit'
-  | 'apple-pay'
-  | 'google-pay'
+  | 'sepa_debit'
+  | 'apple_pay'
+  | 'google_pay'
   | 'paypal'
-  | 'bank-transfer';
+  | 'bank_transfer';
 
 // Payment providers supported by the platform
 export type PaymentProvider = 'stripe' | 'paypal' | 'offline' | 'planet-cash';
@@ -16,13 +16,13 @@ interface PaymentDataBase {
 }
 
 export interface OfflinePaymentData extends PaymentDataBase {
-  paymentMethod: 'bank-transfer';
+  paymentMethod: 'bank_transfer';
   paymentDetails: Record<string, never>;
 }
 
 // TODO: discriminate Stripe and PayPal variants when implementing those payment flows
 export interface StripeOrPaypalPaymentData extends PaymentDataBase {
-  paymentMethod: Exclude<PaymentMethod, 'bank-transfer'>;
+  paymentMethod: Exclude<PaymentMethod, 'bank_transfer'>;
   paymentDetails: {
     savedMethodId?: string;
     paymentMethodId?: string;

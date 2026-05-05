@@ -30,12 +30,12 @@ import {
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
-  'bank-transfer': 'methods.bankTransfer',
+  bank_transfer: 'methods.bankTransfer',
   paypal: 'methods.paypal',
   card: 'methods.card',
-  'sepa-debit': 'methods.sepa',
-  'apple-pay': 'methods.applePay',
-  'google-pay': 'methods.googlePay',
+  sepa_debit: 'methods.sepa',
+  apple_pay: 'methods.applePay',
+  google_pay: 'methods.googlePay',
 };
 
 const PROVIDER_TRANSLATION_KEYS: Record<
@@ -54,11 +54,11 @@ type PaymentLogoProps = {
 
 const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
   paypal: PaypalIcon,
-  'sepa-debit': SepaIcon,
+  sepa_debit: SepaIcon,
   card: CreditCard,
-  'bank-transfer': BankIcon,
-  'apple-pay': ApplePayIcon,
-  'google-pay': GooglePayIcon,
+  bank_transfer: BankIcon,
+  apple_pay: ApplePayIcon,
+  google_pay: GooglePayIcon,
 };
 
 type MethodFeeDetailsProps = {
@@ -228,8 +228,14 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
-  const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
-    useDonationForm();
+  const {
+    fundraiser,
+    donationData,
+    paymentOptions,
+    paymentOptionsReady,
+    sepaFormRef,
+    cardFormRef,
+  } = useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
     control,
@@ -239,8 +245,14 @@ export function PaymentMethods() {
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
+    // To test pre-selection without hitting the API, replace the next line:
+    //   const raw = 'stripe:card';
+    //   const raw = 'stripe:sepa_debit';
+    //   const raw = 'paypal:paypal';
+    //   const raw = 'offline:bank_transfer';
     const raw = paymentOptions.lastPaymentMethod;
     if (!raw) return null;
+    // API format is "<gateway>:<method>" — both sides snake_case.
     const methodPart = raw.split(':')[1] as PaymentMethodId;
     return SUPPORTED_METHOD_IDS.has(methodPart) ? methodPart : null;
   }, [paymentOptions.lastPaymentMethod]);
@@ -323,26 +335,41 @@ export function PaymentMethods() {
   useEffect(() => {
     if (visibleMethods.length === 0) return;
 
+    // Wait for the auth-protected fetch to resolve before pre-selecting.
+    // This prevents the visible "shift" where the first method is picked
+    // initially and then replaced once `lastPaymentMethod` arrives. While
+    // not ready, no method shows as selected — the user simply sees the
+    // list with no radio filled in for a brief moment.
+    if (!paymentOptionsReady) return;
+
     const isSelectedMethodAvailable = visibleMethods.some(
       method => method.id === selectedPaymentMethod
     );
 
-    if (!isSelectedMethodAvailable) {
-      const isLastUsedAvailable =
-        lastUsedMethodId !== null &&
-        visibleMethods.some(method => method.id === lastUsedMethodId);
+    // Only auto-pick when there's no valid selection. Once the user (or
+    // this effect) has picked something available, leave it alone.
+    if (isSelectedMethodAvailable) return;
 
-      const initialMethodId = isLastUsedAvailable
-        ? lastUsedMethodId
-        : visibleMethods[0].id;
+    const isLastUsedAvailable =
+      lastUsedMethodId !== null &&
+      visibleMethods.some(method => method.id === lastUsedMethodId);
 
-      setValue('selectedPaymentMethod', initialMethodId, {
-        shouldDirty: false,
-        shouldTouch: false,
-        shouldValidate: false,
-      });
-    }
-  }, [visibleMethods, selectedPaymentMethod, setValue, lastUsedMethodId]);
+    const initialMethodId = isLastUsedAvailable
+      ? lastUsedMethodId
+      : visibleMethods[0].id;
+
+    setValue('selectedPaymentMethod', initialMethodId, {
+      shouldDirty: false,
+      shouldTouch: false,
+      shouldValidate: false,
+    });
+  }, [
+    visibleMethods,
+    selectedPaymentMethod,
+    setValue,
+    lastUsedMethodId,
+    paymentOptionsReady,
+  ]);
 
   const visibleMethodOptions = useMemo(
     () =>
@@ -428,7 +455,7 @@ export function PaymentMethods() {
       </div>
 
       {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}
-      {selectedPaymentMethod === 'sepa-debit' && (
+      {selectedPaymentMethod === 'sepa_debit' && (
         <StripeSepaForm ref={sepaFormRef} />
       )}
     </div>

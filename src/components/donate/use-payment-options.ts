@@ -13,6 +13,21 @@ interface UsePaymentOptionsOptions {
   initialPaymentOptionsAreAuthenticated?: boolean;
 }
 
+interface UsePaymentOptionsResult {
+  paymentOptions: PaymentOptions;
+  /**
+   * `true` once `paymentOptions` reflects the user's auth state:
+   * - anonymous user → ready immediately (no fetch coming).
+   * - authenticated, server-side data already authenticated → ready immediately.
+   * - authenticated, client-side fetch resolved (success or error) → ready.
+   *
+   * Consumers that read auth-protected fields like `lastPaymentMethod`
+   * should defer the read until `isReady` is `true` to avoid showing the
+   * pre-auth value and then shifting once the fetch resolves.
+   */
+  isReady: boolean;
+}
+
 interface AuthenticatedPaymentOptionsState {
   fundraiserId: string;
   paymentOptions: PaymentOptions;
@@ -27,11 +42,13 @@ export function usePaymentOptions(
     includeAuthenticatedData = false,
     initialPaymentOptionsAreAuthenticated = false,
   }: UsePaymentOptionsOptions
-): PaymentOptions {
+): UsePaymentOptionsResult {
   const accessToken = useAuthStore(state => state.accessToken);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const [authenticatedState, setAuthenticatedState] =
     useState<AuthenticatedPaymentOptionsState | null>(null);
+  const [authFetchSettled, setAuthFetchSettled] = useState(false);
+
   const isAuthenticatedStateCurrent =
     !!accessToken &&
     authenticatedState?.fundraiserId === fundraiserId &&
@@ -42,6 +59,11 @@ export function usePaymentOptions(
   const paymentOptions = isAuthenticatedStateCurrent
     ? authenticatedState.paymentOptions
     : initialPaymentOptions;
+
+  // Reset the settled flag when the inputs that drive the fetch change.
+  useEffect(() => {
+    setAuthFetchSettled(false);
+  }, [fundraiserId, accessToken]);
 
   useEffect(() => {
     if (!enabled || !includeAuthenticatedData) return;
@@ -59,11 +81,13 @@ export function usePaymentOptions(
           paymentOptions: nextPaymentOptions,
           token: accessToken,
         });
+        setAuthFetchSettled(true);
       })
       .catch(error => {
-        if (!cancelled) {
-          console.error('[payment-options] auth fetch', error);
-        }
+        if (cancelled) return;
+        console.error('[payment-options] auth fetch', error);
+        // Mark settled even on failure so consumers don't wait forever.
+        setAuthFetchSettled(true);
       });
 
     return () => {
@@ -79,5 +103,12 @@ export function usePaymentOptions(
     isAuthInitializing,
   ]);
 
-  return paymentOptions;
+  const isReady =
+    !isAuthInitializing &&
+    (!includeAuthenticatedData ||
+      !accessToken ||
+      hasAuthenticatedData ||
+      authFetchSettled);
+
+  return { paymentOptions, isReady };
 }
