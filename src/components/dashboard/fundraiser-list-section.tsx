@@ -40,7 +40,7 @@ export function FundraiserListSection({
     [fundraisers, filters.search]
   );
 
-  const counts = useMemo(
+  const statusCounts = useMemo(
     () => getStatusCounts(searchedFundraisers),
     [searchedFundraisers]
   );
@@ -68,7 +68,7 @@ export function FundraiserListSection({
       {showToolbar && (
         <FundraiserListToolbar
           filters={filters}
-          counts={counts}
+          statusCounts={statusCounts}
           onFiltersChange={updateFilters}
         />
       )}

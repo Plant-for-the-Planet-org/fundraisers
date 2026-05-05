@@ -13,13 +13,13 @@ import { FundraiserStatusFilter } from './fundraiser-status-filter';
 
 interface FundraiserListToolbarProps {
   filters: FundraiserListFilters;
-  counts: FundraiserStatusCounts;
+  statusCounts: FundraiserStatusCounts;
   onFiltersChange: (next: Partial<FundraiserListFilters>) => void;
 }
 
 export function FundraiserListToolbar({
   filters,
-  counts,
+  statusCounts,
   onFiltersChange,
 }: FundraiserListToolbarProps) {
   const handleSearchChange = (search: string) => onFiltersChange({ search });
@@ -37,7 +37,7 @@ export function FundraiserListToolbar({
       />
       <FundraiserStatusFilter
         value={filters.status}
-        counts={counts}
+        statusCounts={statusCounts}
         onChange={handleStatusChange}
         className='w-full md:w-auto md:shrink-0'
       />

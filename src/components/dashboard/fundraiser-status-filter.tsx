@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils/index';
 
 interface FundraiserStatusFilterProps {
   value: FundraiserListStatusFilter;
-  counts: FundraiserStatusCounts;
+  statusCounts: FundraiserStatusCounts;
   onChange: (next: FundraiserListStatusFilter) => void;
   className?: string;
 }
@@ -25,7 +25,7 @@ const STATUS_FILTER_OPTIONS: FundraiserListStatusFilter[] = [
 
 export function FundraiserStatusFilter({
   value,
-  counts,
+  statusCounts,
   onChange,
   className,
 }: FundraiserStatusFilterProps) {
@@ -65,7 +65,7 @@ export function FundraiserStatusFilter({
                   : 'bg-background/70 text-muted-foreground'
               )}
             >
-              {counts[option].toLocaleString(locale)}
+              {statusCounts[option].toLocaleString(locale)}
             </span>
           </button>
         );
