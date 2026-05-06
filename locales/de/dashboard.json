@@ -6,9 +6,10 @@
     },
     "manageFundraisers": {
       "title": "Spendenaufrufe verwalten",
-      "subtitle": "Verwalte, bearbeite und verfolge deine Fundraiser. Pausiere die Sammlung oder teile die, die einen zusätzlichen Schub brauchen."
+      "subtitle": "Verwalte, bearbeite und verfolge deine Spendenaufrufe. Pausiere den Aufruf oder teile die, die mehr Sichtbarkeit brauchen."
     },
     "summary": {
+      "loading": "Übersicht wird geladen...",
       "fundraisers": {
         "label": "Spendenaufrufe",
         "activeSuffix": "aktiv",
@@ -16,7 +17,7 @@
       },
       "totalRaised": {
         "label": "Insgesamt gesammelt",
-        "helper": "über alle Zeit",
+        "helper": "über die ganze Zeit",
         "moreCurrencies": "+{count, plural, one {# weitere Währung} other {# weitere Währungen}}",
         "empty": "Noch keine Spenden gesammelt"
       },
@@ -27,9 +28,72 @@
     },
     "statsError": {
       "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
-      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schiefgelaufen.",
+      "description": "Beim Laden der Daten zu deinem Spendenaufruf ist etwas schief gelaufen.",
       "retry": "Erneut versuchen",
       "exploreLinkText": "Spendenaufrufe entdecken"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Name oder Ersteller",
+      "resultCount": "<bold>{visible}</bold> von {total} angezeigt"
+    },
+    "statusFilter": {
+      "groupLabel": "Nach Status filtern",
+      "all": "Alle",
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "paused": "Pausiert",
+      "ended": "Beendet"
+    },
+    "sort": {
+      "triggerLabel": "Sortieren:",
+      "options": {
+        "newest": "Neueste zuerst",
+        "oldest": "Älteste zuerst",
+        "most-raised": "Höchstes Spendenergebnis",
+        "ending-soonest": "Endet als nächstes",
+        "name-asc": "Name A-Z"
+      }
+    },
+    "statusBadge": {
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "paused": "Pausiert",
+      "ended": "Beendet",
+      "ending-soon": "Endet bald"
+    },
+    "noResults": {
+      "title": "Keiner der Spendenaufrufe entspricht diesem Filter.",
+      "description": "Versuche, deine Suche oder Filter anzupassen.",
+      "cta": "Filter löschen"
+    },
+    "actions": {
+      "menuLabel": "Aktionen öffnen",
+      "edit": "Bearbeiten",
+      "copyLink": "Link kopieren",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "activate": "Aktivieren",
+      "copyLinkSuccess": "Link kopiert",
+      "copyLinkError": "Link konnte nicht kopiert werden",
+      "pauseSuccess": "Spendenaufruf pausiert",
+      "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "activateSuccess": "Spendenaufruf aktiviert",
+      "mutationError": "Etwas ist schief gelaufen. Versuche es noch einmal."
+    },
+    "list": {
+      "loading": "Spendenaufruf wird geladen",
+      "item": {
+        "byHost": "von {host}",
+        "goalProgress": "<b>{achievedAmount}</b> von {goal}",
+        "donations": "{count, plural, =0 {0 Spenden} one {1 Spende} other {# Spenden}}",
+        "daysLeft": "{count, plural, one {1 Tag übrig} other {# Tage übrig}}",
+        "ended": "Beendet"
+      },
+      "empty": {
+        "title": "Du hast noch keine Spendenaufruf erstellt",
+        "description": "Starte einen Aufruf, um mit dem Sammeln von Spenden zu beginnen.",
+        "cta": "Erstelle deinen ersten Spendenaufruf"
+      }
     }
   }
 }
