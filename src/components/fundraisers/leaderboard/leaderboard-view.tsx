@@ -65,7 +65,7 @@ export function LeaderboardView({
           >
             {show_recent_list && (
               <TabsTrigger value='recent' className={TAB_TRIGGER_CLASS}>
-                {t('tabs.newest')}
+                {t('tabs.latest')}
               </TabsTrigger>
             )}
             {show_top_list && (

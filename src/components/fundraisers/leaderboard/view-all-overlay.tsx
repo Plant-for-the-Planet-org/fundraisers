@@ -5,32 +5,13 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { CalendarDays, Check, ChevronDown, Search, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAvatarColor } from './donation-item';
-
-type TimeFilter = 'all' | 'today' | 'week' | 'month';
-
-const TIME_FILTERS: TimeFilter[] = ['all', 'today', 'week', 'month'];
-
-const TIME_FILTER_LABEL_KEYS = {
-  all: 'viewAllOverlay.filterAll',
-  today: 'viewAllOverlay.filterToday',
-  week: 'viewAllOverlay.filterWeek',
-  month: 'viewAllOverlay.filterMonth',
-} as const;
 
 const TAB_TRIGGER_CLASS = cn(
   'h-auto flex-none text-foreground after:hidden',
@@ -68,8 +49,6 @@ export function ViewAllOverlay({
 }: ViewAllOverlayProps) {
   const t = useTranslations('Leaderboard.view');
   const [tab, setTab] = useState<'recent' | 'top'>(activeTab);
-  const [search, setSearch] = useState('');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [lastIsOpen, setLastIsOpen] = useState(false);
 
   // Sync tab from parent when overlay opens
@@ -117,52 +96,10 @@ export function ViewAllOverlay({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleClose, isOpen]);
 
-  const filteredDonations = useMemo(() => {
-    const source = effectiveTab === 'recent' ? recentDonations : topDonations;
-    let result = source;
-
-    // Time-range filter
-    if (timeFilter !== 'all') {
-      const now = new Date();
-      let threshold: Date;
-
-      switch (timeFilter) {
-        case 'today':
-          threshold = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate()
-          );
-          break;
-        case 'week': {
-          const day = now.getDay();
-          const sinceMon = day === 0 ? 6 : day - 1;
-          threshold = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate() - sinceMon
-          );
-          break;
-        }
-        case 'month':
-          threshold = new Date(now.getFullYear(), now.getMonth(), 1);
-          break;
-      }
-
-      const cutoff = threshold.getTime();
-      result = result.filter(d => new Date(d.created).getTime() >= cutoff);
-    }
-
-    // Search filter
-    if (search) {
-      const query = search.toLowerCase();
-      result = result.filter(d => d.donorName.toLowerCase().includes(query));
-    }
-
-    return result;
-  }, [effectiveTab, recentDonations, topDonations, search, timeFilter]);
-
-  const filterLabel = t(TIME_FILTER_LABEL_KEYS[timeFilter]);
+  const donations = useMemo(
+    () => (effectiveTab === 'recent' ? recentDonations : topDonations),
+    [effectiveTab, recentDonations, topDonations]
+  );
 
   if (!isOpen || !hasEnabledList) return null;
 
@@ -177,7 +114,7 @@ export function ViewAllOverlay({
     >
       <div className='w-full max-w-3xl mx-4 bg-background rounded-2xl shadow-2xl border border-border overflow-hidden'>
         {/* Header */}
-        <div className='flex items-start justify-between px-4 pt-4 pb-3 border-b border-border'>
+        <div className='flex items-start justify-between px-4 pt-4 pb-3'>
           <div>
             <h2 className='text-xl font-semibold text-foreground'>
               {t('viewAllOverlay.title')}
@@ -196,98 +133,29 @@ export function ViewAllOverlay({
           </button>
         </div>
 
-        {/* Toolbar + Tabs + List */}
+        {/* Tabs + List */}
         <Tabs
           value={effectiveTab}
           onValueChange={value => setTab(value as 'recent' | 'top')}
         >
-          <div className='flex flex-wrap items-center justify-between gap-3 px-4 py-3'>
-            <div className='flex items-center gap-3 max-w-[50%] min-w-[280px]'>
-              <div className='relative flex-1'>
-                <Search
-                  className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground'
-                  aria-hidden='true'
-                />
-                <Input
-                  type='search'
-                  value={search}
-                  onChange={event => setSearch(event.target.value)}
-                  placeholder={t('viewAllOverlay.searchPlaceholder')}
-                  aria-label={t('viewAllOverlay.searchPlaceholder')}
-                  className='h-11 rounded-xl bg-background pl-9 pr-4 [&::-webkit-search-cancel-button]:cursor-pointer'
-                />
-              </div>
-
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='h-11 shrink-0 justify-between rounded-xl border-border/60 bg-background px-4 has-[>svg]:px-4'
-                  >
-                    <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
-                      <CalendarDays
-                        className='h-4 w-4 shrink-0 text-muted-foreground'
-                        aria-hidden='true'
-                      />
-                      <span className='truncate font-medium text-foreground'>
-                        {filterLabel}
-                      </span>
-                    </span>
-                    <ChevronDown
-                      className='ml-2 h-4 w-4 shrink-0'
-                      aria-hidden='true'
-                    />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align='end'
-                  className='w-48 rounded-xl border-border/60 shadow-lg'
-                >
-                  {TIME_FILTERS.map(option => {
-                    const isSelected = option === timeFilter;
-                    const label = t(TIME_FILTER_LABEL_KEYS[option]);
-                    return (
-                      <DropdownMenuItem
-                        key={option}
-                        onSelect={() => setTimeFilter(option)}
-                        className='gap-2'
-                      >
-                        <span className='flex h-4 w-4 items-center justify-center'>
-                          {isSelected && (
-                            <Check
-                              className='h-4 w-4 text-emerald-600 dark:text-emerald-400'
-                              aria-hidden='true'
-                            />
-                          )}
-                        </span>
-                        <span>{label}</span>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <TabsList
-              variant='line'
-              className='gap-0 bg-transparent p-0 h-auto relative'
-            >
-              {showRecentList && (
-                <TabsTrigger value='recent' className={TAB_TRIGGER_CLASS}>
-                  {t('tabs.newest')}
-                </TabsTrigger>
-              )}
-              {showTopList && (
-                <TabsTrigger value='top' className={TAB_TRIGGER_CLASS}>
-                  {t('tabs.topDonations')}
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </div>
+          <TabsList
+            variant='line'
+            className='gap-0 bg-transparent p-0 px-4 pt-3 h-auto relative'
+          >
+            {showRecentList && (
+              <TabsTrigger value='recent' className={TAB_TRIGGER_CLASS}>
+                {t('tabs.latest')}
+              </TabsTrigger>
+            )}
+            {showTopList && (
+              <TabsTrigger value='top' className={TAB_TRIGGER_CLASS}>
+                {t('tabs.topDonations')}
+              </TabsTrigger>
+            )}
+          </TabsList>
 
           <div className='max-h-[50vh] overflow-y-auto'>
-            {filteredDonations.length > 0 ? (
+            {donations.length > 0 ? (
               <table className='w-full'>
                 <thead className='sticky top-0 z-10 bg-background'>
                   <tr className='border-b border-border'>
@@ -302,7 +170,7 @@ export function ViewAllOverlay({
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-border'>
-                  {filteredDonations.map(donation => {
+                  {donations.map(donation => {
                     const isAnonymous =
                       anonymize || donation.isAnonymous || false;
                     const displayName = isAnonymous
@@ -357,12 +225,6 @@ export function ViewAllOverlay({
                   })}
                 </tbody>
               </table>
-            ) : search ? (
-              <div className='py-8 text-center'>
-                <p className='text-sm text-muted-foreground'>
-                  {t('viewAllOverlay.noResults')}
-                </p>
-              </div>
             ) : (
               <div className='py-8 text-center'>
                 <p className='text-sm text-muted-foreground'>

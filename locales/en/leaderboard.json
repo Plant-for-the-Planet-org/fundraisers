@@ -26,7 +26,7 @@
         "anonymous": "Anonymous"
       },
       "tabs": {
-        "newest": "Newest",
+        "latest": "Latest",
         "topDonations": "Top Donations"
       },
       "viewAll": "View all",
@@ -35,13 +35,7 @@
         "title": "All Donations",
         "subtitle": "See all the amazing people who've supported this fundraiser",
         "emptyState": "No donations yet",
-        "noResults": "No donations match your search",
         "closeAria": "Close donations list",
-        "searchPlaceholder": "Search donors...",
-        "filterAll": "All Time",
-        "filterToday": "Today",
-        "filterWeek": "This Week",
-        "filterMonth": "This Month",
         "columnDonor": "Donor",
         "columnAmount": "Amount"
       }
