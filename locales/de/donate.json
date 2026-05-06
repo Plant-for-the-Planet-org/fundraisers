@@ -156,6 +156,10 @@
       "countryPlaceholder": "Land auswählen",
       "countryNoResults": "Keine Länder gefunden"
     },
+    "applePay": {
+      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche es mit Safari auf macOS oder iOS, oder scanne den QR-Code mit deinem iPhone.",
+      "processing": "Apple-Pay-Spende wird verarbeitet…"
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
       "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es nochmal.",

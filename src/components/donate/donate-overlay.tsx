@@ -103,6 +103,7 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
+    onApplePayConfirm,
   } = useDonationSubmit(
     donationData,
     fundraiser,
@@ -152,6 +153,7 @@ function DonateOverlayInner({
             onPayPalCreateOrder={onPayPalCreateOrder}
             onPayPalApproved={onPayPalApproved}
             onPayPalError={onPayPalError}
+            onApplePayConfirm={onApplePayConfirm}
           />
         </>
       )}

@@ -3,6 +3,7 @@ import type {
   PaymentMethod,
   PaymentRequest,
   StripePaymentMethod,
+  StripeWallet,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
@@ -45,6 +46,36 @@ function mapPaymentMethodName(paymentMethod: PaymentMethod): string {
     case 'sepa-debit':
       return 'sepa_debit';
     case 'apple-pay':
+    case 'google-pay':
+      return 'card';
+    case 'paypal':
+      return 'paypal';
+    case 'bank-transfer':
+      return 'offline';
+    default:
+      return paymentMethod;
+  }
+}
+
+function getWallet(paymentMethod: PaymentMethod): StripeWallet | undefined {
+  switch (paymentMethod) {
+    case 'apple-pay':
+      return 'apple_pay';
+    case 'google-pay':
+      return 'google_pay';
+    default:
+      return undefined;
+  }
+}
+
+// Key used to gate against gateway.methods allowlist. Keeps wallets
+// independently gateable (e.g. enable Card without enabling Apple Pay) by
+// preserving the per-wallet identifier even when the wire `method` is `card`.
+function getAllowlistKey(paymentMethod: PaymentMethod): string {
+  switch (paymentMethod) {
+    case 'sepa-debit':
+      return 'sepa_debit';
+    case 'apple-pay':
       return 'apple_pay';
     case 'google-pay':
       return 'google_pay';
@@ -78,8 +109,8 @@ export function buildPaymentRequest(
     const account = (paymentDetails.account as string) || gatewayConfig.account;
 
     if ('methods' in gatewayConfig) {
-      const mappedMethod = mapPaymentMethodName(paymentMethod);
-      if (!gatewayConfig.methods.includes(mappedMethod)) {
+      const allowlistKey = getAllowlistKey(paymentMethod);
+      if (!gatewayConfig.methods.includes(allowlistKey)) {
         throw new PaymentOptionsError(
           `Payment method '${paymentMethod}' is not supported for gateway '${gateway}'`,
           'PAYMENT_METHOD_NOT_SUPPORTED',
@@ -106,10 +137,12 @@ export function buildPaymentRequest(
             400
           );
         }
+        const wallet = getWallet(paymentMethod);
         return {
           gateway: 'stripe',
           account,
           method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+          ...(wallet ? { wallet } : {}),
           source: { id: String(id), object: 'payment_method' },
         };
       }

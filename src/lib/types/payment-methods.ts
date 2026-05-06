@@ -17,6 +17,7 @@ export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
   'paypal',
   'card',
   'sepa-debit',
+  'apple-pay',
 ]);
 
 export type FeeRegion = 'US' | 'EU' | 'ROW';

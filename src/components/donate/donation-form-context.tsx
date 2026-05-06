@@ -207,8 +207,12 @@ export function DonationFormProvider({
     reValidateMode: 'onChange',
   });
 
-  methods.register('country');
-  methods.register('selectedPaymentMethod');
+  useEffect(() => {
+    methods.register('country');
+    methods.register('selectedPaymentMethod');
+    methods.register('coverFees');
+    methods.register('makeMonthly');
+  }, [methods]);
 
   useEffect(() => {
     if (!isOpen) methods.reset();

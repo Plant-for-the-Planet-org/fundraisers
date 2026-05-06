@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
+import type { Stripe } from '@stripe/stripe-js';
 import type { DonationFormValues } from './donation-form-context';
 
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -9,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '../ui/button';
 import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
+import { ApplePayButton } from './apple-pay-button';
 import { useDonationForm } from './donation-form-context';
 import { PayPalButton } from './paypal-button';
 
@@ -18,6 +20,11 @@ interface DonateCTAProps {
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
+  onApplePayConfirm?: (
+    values: DonationFormValues,
+    paymentMethodId: string,
+    stripe: Stripe
+  ) => Promise<void>;
 }
 
 export function DonateCTA({
@@ -26,6 +33,7 @@ export function DonateCTA({
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
+  onApplePayConfirm,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
@@ -51,6 +59,10 @@ export function DonateCTA({
         onPayPalError={onPayPalError ?? (() => undefined)}
       />
     );
+  }
+
+  if (selectedPaymentMethod === 'apple-pay' && onApplePayConfirm) {
+    return <ApplePayButton onApplePayConfirm={onApplePayConfirm} />;
   }
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
