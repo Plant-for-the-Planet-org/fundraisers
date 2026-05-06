@@ -15,7 +15,7 @@ import { useFundraiserForEdit } from '@/components/fundraisers/use-fundraiser-fo
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
 
-function extractInitialExtraProjects(
+function extractNonDefaultInitialProjects(
   fundraiser: Fundraiser
 ): SelectedProject[] {
   const workspaceCountry = fundraiser.workspace?.country ?? 'DE';
@@ -32,8 +32,8 @@ function extractInitialExtraProjects(
 }
 
 function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
-  const initialExtraProjects = useMemo(
-    () => extractInitialExtraProjects(fundraiser),
+  const nonDefaultInitialProjects = useMemo(
+    () => extractNonDefaultInitialProjects(fundraiser),
     [fundraiser]
   );
 
@@ -42,7 +42,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
       <FundraiserFormBody
         mode='edit'
         submitButton={<UpdateFundraiserButton fundraiserId={fundraiser.id} />}
-        initialExtraProjects={initialExtraProjects}
+        nonDefaultInitialProjects={nonDefaultInitialProjects}
         totalRaised={fundraiser.totalRaised}
         endDate={fundraiser.endDate}
       />
