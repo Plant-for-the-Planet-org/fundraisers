@@ -22,6 +22,9 @@
       }
     },
     "view": {
+      "donation": {
+        "anonymous": "Anonymous"
+      },
       "tabs": {
         "newest": "Newest",
         "topDonations": "Top Donations"

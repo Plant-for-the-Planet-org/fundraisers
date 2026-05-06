@@ -22,6 +22,9 @@
       }
     },
     "view": {
+      "donation": {
+        "anonymous": "Anonym"
+      },
       "tabs": {
         "newest": "Neueste",
         "topDonations": "Top-Spenden"
@@ -30,7 +33,7 @@
       "emptyState": "Keine Spenden zum anzeigen",
       "viewAllOverlay": {
         "title": "Alle Spenden",
-        "subtitle": "Alle grossartigen Menschen, die diesen Spendenaufruf unterstutzt haben",
+        "subtitle": "Alle großartigen Menschen, die diesen Spendenaufruf unterstützt haben",
         "emptyState": "Noch keine Spenden",
         "noResults": "Keine Spenden zu deiner Suche gefunden",
         "closeAria": "Spendenliste schliessen",

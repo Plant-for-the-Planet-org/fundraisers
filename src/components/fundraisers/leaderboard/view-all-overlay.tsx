@@ -91,6 +91,8 @@ export function ViewAllOverlay({
     };
   }, [isOpen]);
 
+  const hasEnabledList = showRecentList || showTopList;
+
   const effectiveTab =
     tab === 'recent' && !showRecentList
       ? 'top'
@@ -162,7 +164,7 @@ export function ViewAllOverlay({
 
   const filterLabel = t(TIME_FILTER_LABEL_KEYS[timeFilter]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !hasEnabledList) return null;
 
   return createPortal(
     <div
@@ -304,7 +306,7 @@ export function ViewAllOverlay({
                     const isAnonymous =
                       anonymize || donation.isAnonymous || false;
                     const displayName = isAnonymous
-                      ? 'Anonymous'
+                      ? t('donation.anonymous')
                       : donation.donorName;
 
                     return (
