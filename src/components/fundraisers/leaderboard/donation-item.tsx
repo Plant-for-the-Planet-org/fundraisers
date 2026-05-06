@@ -12,7 +12,7 @@ interface DonationItemProps {
   showAvatar: boolean;
 }
 
-const FALLBACK_COLORS = [
+export const FALLBACK_COLORS = [
   'bg-amber-500',
   'bg-blue-500',
   'bg-emerald-500',
@@ -27,7 +27,7 @@ const FALLBACK_COLORS = [
   'bg-rose-500',
 ];
 
-function getAvatarColor(id: string): string {
+export function getAvatarColor(id: string): string {
   const hash = id.split('').reduce((sum, c) => sum + c.charCodeAt(0), 0);
   return FALLBACK_COLORS[hash % FALLBACK_COLORS.length] ?? 'bg-gray-500';
 }

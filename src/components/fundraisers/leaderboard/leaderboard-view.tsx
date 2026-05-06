@@ -111,8 +111,15 @@ export function LeaderboardView({
 
       <ViewAllOverlay
         isOpen={isViewAllOpen}
-        onClose={() => setIsViewAllOpen(false)}
-        donations={effectiveTab === 'recent' ? recentDonations : topDonations}
+        onClose={closedTab => {
+          setIsViewAllOpen(false);
+          setActiveTab(closedTab);
+        }}
+        recentDonations={recentDonations}
+        topDonations={topDonations}
+        activeTab={effectiveTab}
+        showRecentList={show_recent_list}
+        showTopList={show_top_list}
         anonymize={anonymize}
         showAmount={show_amount}
         showAvatar={show_avatar}

@@ -30,8 +30,17 @@
       "emptyState": "Keine Spenden zum anzeigen",
       "viewAllOverlay": {
         "title": "Alle Spenden",
+        "subtitle": "Alle grossartigen Menschen, die diesen Spendenaufruf unterstutzt haben",
         "emptyState": "Noch keine Spenden",
-        "closeAria": "Spendenliste schliessen"
+        "noResults": "Keine Spenden zu deiner Suche gefunden",
+        "closeAria": "Spendenliste schliessen",
+        "searchPlaceholder": "Spender suchen...",
+        "filterAll": "Gesamt",
+        "filterToday": "Heute",
+        "filterWeek": "Diese Woche",
+        "filterMonth": "Diesen Monat",
+        "columnDonor": "Spender",
+        "columnAmount": "Betrag"
       }
     }
   }

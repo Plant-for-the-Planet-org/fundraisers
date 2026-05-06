@@ -30,8 +30,17 @@
       "emptyState": "No donations to display",
       "viewAllOverlay": {
         "title": "All Donations",
+        "subtitle": "See all the amazing people who've supported this fundraiser",
         "emptyState": "No donations yet",
-        "closeAria": "Close donations list"
+        "noResults": "No donations match your search",
+        "closeAria": "Close donations list",
+        "searchPlaceholder": "Search donors...",
+        "filterAll": "All Time",
+        "filterToday": "Today",
+        "filterWeek": "This Week",
+        "filterMonth": "This Month",
+        "columnDonor": "Donor",
+        "columnAmount": "Amount"
       }
     }
   }
