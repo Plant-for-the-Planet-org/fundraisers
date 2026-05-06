@@ -2,7 +2,7 @@
 
 import type { DonationFormValues } from './donation-form-context';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -12,11 +12,12 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useDonationForm } from './donation-form-context';
 
 export function DonateOptions() {
-  const { control } = useFormContext<DonationFormValues>();
+  const { control, setValue } = useFormContext<DonationFormValues>();
   const selectedPaymentMethod = useWatch({
     control,
     name: 'selectedPaymentMethod',
   });
+  const makeMonthly = useWatch({ control, name: 'makeMonthly' });
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
   const t = useTranslations('Fundraisers');
 
@@ -37,9 +38,14 @@ export function DonateOptions() {
       selectedPaymentMethod,
     ]);
 
-  const showCoverFees = feeCollectionEnabled && hasProcessingFee;
+  const isOneTime = donationData.frequency === 'once' && !makeMonthly;
+  const showCoverFees = feeCollectionEnabled && hasProcessingFee && isOneTime;
   const showMakeMonthly =
     paymentOptions.recurrency.supported && donationData.frequency === 'once';
+
+  useEffect(() => {
+    if (!isOneTime) setValue('willAbsorbFee', false);
+  }, [isOneTime, setValue]);
 
   if (!showCoverFees && !showMakeMonthly) return null;
 
