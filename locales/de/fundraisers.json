@@ -236,6 +236,38 @@
         "visibility": {
           "label": "Mache den Spendenaufruf entdeckbar",
           "description": "Ermögliche es anderen, diesen Spendenaufruf über die Suche zu finden und zu entdecken"
+        },
+        "addModule": "Modul hinzufügen",
+        "stage": {
+          "title": "Bühnenmodus",
+          "blurb": "Schreibgeschützte Vollbildanzeige für Live-Events. Spender geben per QR; der Bildschirm aktualisiert sich in Echtzeit.",
+          "subtitle": "Zeige deinen Spendenaufruf in Vollbild bei Konzerten, Galas und Events",
+          "collapse": "Einklappen",
+          "expand": "Ausklappen",
+          "remove": "Bühnenmodus entfernen",
+          "toggleEnabled": "Bühnenmodus umschalten",
+          "slideCountOne": "1 Folie",
+          "slideCountMany": "{count} Folien",
+          "stageTitle": "Bühnentitel",
+          "stageTitlePlaceholder": "Leer lassen, um den Spendenaufruf-Titel zu verwenden",
+          "stageDescription": "Bühnenbeschreibung",
+          "stageDescriptionPlaceholder": "Kurzer Slogan unter dem Titel auf dem Bühnenbildschirm",
+          "locale": "Bühnensprache",
+          "partnerLogo": "Logo-URL",
+          "optional": "optional",
+          "slides": "Folien",
+          "addSlide": "Folie hinzufügen",
+          "noSlides": "Noch keine Folien. Füge eine hinzu, um deine Rotation zu starten.",
+          "slideTitlePlaceholder": "Folientitel",
+          "slideDescriptionPlaceholder": "Folienbeschreibung",
+          "slideImagePlaceholder": "Bild-URL (https://…)",
+          "duration": "Dauer",
+          "seconds": "Sekunden",
+          "moveUp": "Nach oben",
+          "moveDown": "Nach unten",
+          "removeSlide": "Folie entfernen",
+          "imageUrlError": "Nur Bilder von vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org usw.)",
+          "maxSlidesReached": "Maximum von {max} Folien erreicht"
         }
       },
       "contributionSettings": {

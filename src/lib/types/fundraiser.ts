@@ -58,6 +58,23 @@ export interface LeaderboardModuleSettings {
   show_avatar: boolean;
 }
 
+export interface StageSlide {
+  position: number;
+  title: string;
+  description: string;
+  image: string;
+  duration: number;
+}
+
+export interface StageModuleSettings {
+  enabled: boolean;
+  locale: 'en' | 'de' | 'es';
+  title: string;
+  description: string;
+  partner_logo_url: string;
+  slides: StageSlide[];
+}
+
 export interface FundraiserSettings {
   theme: {
     base_id?: string;
@@ -70,6 +87,7 @@ export interface FundraiserSettings {
   };
   modules: {
     leaderboard?: LeaderboardModuleSettings;
+    stage?: StageModuleSettings | null;
     contribution?: {
       options: Array<{
         unit?: number;
@@ -155,8 +173,10 @@ export interface UpdateFundraiserRequest {
   // Expand modules as new module settings are added
   settings?: {
     theme?: FundraiserSettings['theme'];
-    modules?: { leaderboard?: LeaderboardModuleSettings };
-  };
+    modules?: { 
+      leaderboard?: LeaderboardModuleSettings,
+      stage?: StageModuleSettings
+     };
   imageFile?: string; // base64 encoded, only sent when image changed
 }
 

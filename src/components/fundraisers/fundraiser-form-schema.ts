@@ -50,6 +50,59 @@ const projectAllocationSchema = z.object({
   percentage: z.number().int().min(1).max(100),
 });
 
+export const STAGE_LIMITS = {
+  stageTitle: 80,
+  stageDescription: 200,
+  slideTitle: 60,
+  slideDescription: 160,
+  maxSlides: 10,
+} as const;
+
+// Trusted hostnames for stage images. Prevents javascript:/data: injection and SSRF.
+const ALLOWED_IMAGE_HOSTNAME_SUFFIXES = [
+  'plant-for-the-planet.org',
+  'unsplash.com',
+  'cloudinary.com',
+  'amazonaws.com',
+  'imgix.net',
+  'googleusercontent.com',
+] as const;
+
+function isAllowedImageUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:') return false;
+    const host = url.hostname.toLowerCase();
+    return ALLOWED_IMAGE_HOSTNAME_SUFFIXES.some(
+      suffix => host === suffix || host.endsWith(`.${suffix}`)
+    );
+  } catch {
+    return false;
+  }
+}
+
+const stageImageUrlSchema = z
+  .string()
+  .refine(isAllowedImageUrl, { message: 'imageUrlNotAllowed' });
+
+const stageSlideSchema = z.object({
+  position: z.number().int().min(1),
+  title: z.string().max(STAGE_LIMITS.slideTitle),
+  description: z.string().max(STAGE_LIMITS.slideDescription),
+  image: stageImageUrlSchema,
+  duration: z.number().int().min(1).max(60),
+});
+
+export const stageModeSchema = z.object({
+  enabled: z.boolean(),
+  locale: z.enum(['en', 'de', 'es']),
+  title: z.string().max(STAGE_LIMITS.stageTitle),
+  description: z.string().max(STAGE_LIMITS.stageDescription),
+  partner_logo_url: stageImageUrlSchema,
+  slides: z.array(stageSlideSchema).max(STAGE_LIMITS.maxSlides),
+});
+
 export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
@@ -86,6 +139,7 @@ export const fundraiserFormSchema = z.object({
         show_recent_list: z.boolean(),
         show_avatar: z.boolean(),
       }),
+      stage: stageModeSchema.nullable(),
     }),
   }),
 });
@@ -129,6 +183,7 @@ export function buildDefaultCreateValues(
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
+        stage: null,
       },
     },
   };
@@ -198,6 +253,7 @@ export function fundraiserToFormValues(
           ...DEFAULT_LEADERBOARD,
           ...fundraiser.settings?.modules?.leaderboard,
         },
+        stage: fundraiser.settings?.modules?.stage ?? null,
       },
     },
   };
