@@ -4,7 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from './typography';

@@ -7,7 +7,7 @@ import { DonationForm } from './donation-form';
 import { SectionHeader } from './typography';
 
 export function ContributionSettings() {
-  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const t = useTranslations('Fundraisers.form.contributionSettings');
   const currency = useWatch({ name: 'currency' }) as string;
 
   return (

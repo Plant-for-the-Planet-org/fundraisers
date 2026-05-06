@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedImage } from '@/lib/types/image-selection';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,17 +13,17 @@ import { createFundraiser } from '@/lib/api/create-fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
 import { imageToBase64 } from '@/lib/utils/image-processor';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {
   const t = useTranslations('Fundraisers.create.formSubmission');
-  const { handleSubmit } = useFormContext<CreateFundraiserFormValues>();
+  const { handleSubmit } = useFormContext<FundraiserFormValues>();
   const accessToken = useAuthStore(state => state.accessToken);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (values: CreateFundraiserFormValues) => {
+  const onSubmit = async (values: FundraiserFormValues) => {
     if (!accessToken) return;
 
     setIsSubmitting(true);

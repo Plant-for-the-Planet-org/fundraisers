@@ -4,8 +4,8 @@
     "welcome": "Willkommen bei unserer Anwendung.",
     "languageSelectionLabel": "Sprache:",
     "legalLinks": {
-      "privacy": "Datenschutz",
-      "terms": "Allgemeine Geschäftsbedingungen",
+      "privacy": "Datenschutzbestimmungen",
+      "terms": "Nutzungsbedingungen",
       "imprint": "Impressum"
     },
     "cookieSettings": "Cookie-Einstellungen",

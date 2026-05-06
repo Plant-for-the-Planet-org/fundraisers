@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useController, useFormContext } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
@@ -18,12 +18,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export function WorkspaceSelector() {
-  const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.countryEntity');
+interface WorkspaceSelectorProps {
+  disabled?: boolean;
+}
 
-  const { setValue } = useFormContext<CreateFundraiserFormValues>();
-  const { field } = useController<CreateFundraiserFormValues, 'country'>({
+export function WorkspaceSelector({
+  disabled = false,
+}: WorkspaceSelectorProps = {}) {
+  const locale = useLocale();
+  const t = useTranslations('Fundraisers.form.countryEntity');
+
+  const { setValue } = useFormContext<FundraiserFormValues>();
+  const { field } = useController<FundraiserFormValues, 'country'>({
     name: 'country',
   });
 
@@ -44,7 +50,11 @@ export function WorkspaceSelector() {
       <label className='text-sm font-medium' htmlFor='form-country'>
         {t('label')}
       </label>
-      <Select value={field.value} onValueChange={handleCountryChange}>
+      <Select
+        value={field.value}
+        onValueChange={handleCountryChange}
+        disabled={disabled}
+      >
         <SelectTrigger
           className='w-full bg-transparent border-border hover:bg-muted/5'
           id='form-country'

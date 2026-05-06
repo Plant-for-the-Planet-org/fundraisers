@@ -6,19 +6,19 @@
     "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Einstellungen verwalten",
     "closeIconLabel": "Alle ablehnen und schließen",
-    "footer": "<a href=\"https://www.plant-for-the-planet.org/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/privacy/terms\">Datenschutz</a><a href=\"https://www.plant-for-the-planet.org/terms-and-conditions\">Allgemeine Geschäftsbedingungen</a>"
+    "footer": "<a href=\"https://www.plant-for-the-planet.org/de/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/de/privacy-terms/\">Datenschutzerklärung</a><a href=\"https://www.plant-for-the-planet.org/de/terms-and-conditions\">Nutzungsbedingungen</a>"
   },
   "preferencesModal": {
     "title": "Cookie-Einstellungen",
     "acceptAllBtn": "Alle akzeptieren",
-    "acceptNecessaryBtn": "Optionale ablehnen",
+    "acceptNecessaryBtn": "Optionale Cookies ablehnen",
     "savePreferencesBtn": "Einstellungen speichern",
     "closeIconLabel": "Fenster schließen",
     "serviceCounterLabel": "Service|Dienstleistungen",
     "sections": {
       "intro": {
         "title": "Hat jemand Cookies gesagt?",
-        "description": "Unsere Website verwendet essentielle Cookies, um ihren ordnungsgemäßen Betrieb zu gewährleisten, und Tracking-Cookies, um zu verstehen, wie du mit ihr interagierst. Letztere werden nur nach Zustimmung gesetzt."
+        "description": "Unsere Website verwendet notwendige Cookies, um ihren ordnungsgemäßen Betrieb zu gewährleisten, und Tracking-Cookies, um zu verstehen, wie du mit ihr interagierst. Letztere werden nur nach Zustimmung gesetzt."
       },
       "necessary": {
         "title": "Notwendige Cookies <span class=\"pm__badge\">Immer aktiviert</span>",
@@ -27,12 +27,12 @@
       },
       "analytics": {
         "title": "Analyse-Cookies",
-        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.",
+        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher*innen mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.",
         "linkedCategory": "Analyse"
       },
       "moreInfo": {
         "title": "Weitere Informationen",
-        "description": "Wenn du Fragen zu unseren Cookies und deinen Wahlmöglichkeiten hast, wende dich bitte an uns."
+        "description": "Wenn du Fragen zu unseren Cookies und deinen Auswahlmöglichkeiten hast, wende dich bitte an uns."
       }
     }
   }

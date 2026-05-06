@@ -2,17 +2,6 @@ import type { NextRequest } from 'next/server';
 
 import { NextResponse } from 'next/server';
 
-// Whitelist of allowed redirect destinations
-const ALLOWED_REDIRECTS = ['/explore'];
-
-function getSafeRedirectUrl(state: string | null): string {
-  if (!state) return '/explore';
-
-  // Only allow relative paths from whitelist
-  const isAllowed = ALLOWED_REDIRECTS.some(path => state.startsWith(path));
-  return isAllowed ? state : '/explore';
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
@@ -34,10 +23,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/?error=no_code', request.url));
   }
 
-  //Safe redirect — no open redirect vulnerability
-  const redirectUrl = getSafeRedirectUrl(state);
-  const url = new URL(redirectUrl, request.url);
+  const url = new URL('/redirecting', request.url);
   url.searchParams.set('code', code);
+  if (state) url.searchParams.set('state', state);
 
   const response = NextResponse.redirect(url);
 

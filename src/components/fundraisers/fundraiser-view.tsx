@@ -1,8 +1,10 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
+import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
+import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
@@ -16,15 +18,10 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
-
-function getDaysLeft(endDate: string): number {
-  const end = new Date(endDate);
-  const now = new Date();
-  return Math.max(
-    0,
-    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  );
-}
+import {
+  LeaderboardLoader,
+  LeaderboardSkeleton,
+} from './leaderboard/leaderboard-loader';
 
 export function FundraiserView({
   fundraiser,
@@ -44,6 +41,10 @@ export function FundraiserView({
       ? Math.min(100, (fundraiser.totalRaised / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
+  const leaderboardSettings = fundraiser.settings?.modules?.leaderboard;
+  const canShowLeaderboard =
+    leaderboardSettings?.enabled &&
+    (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
 
   return (
     <FundraiserLayout>
@@ -80,6 +81,16 @@ export function FundraiserView({
       <MainPanel>
         {/* Title */}
         <TitleDisplay value={fundraiser.title} />
+
+        {/* Leaderboard */}
+        {canShowLeaderboard && (
+          <Suspense fallback={<LeaderboardSkeleton />}>
+            <LeaderboardLoader
+              idOrSlug={fundraiser.slug}
+              settings={leaderboardSettings}
+            />
+          </Suspense>
+        )}
 
         {/* Donation form + overlay */}
         {fundraiser.canDonate && paymentOptions ? (

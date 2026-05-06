@@ -31,12 +31,13 @@ export function DonationSection({
       <DonationForm
         currency={fundraiser.currency}
         contributionSettings={contributionSettings}
-        onDonate={(amountCents, isDedicated, frequency) => {
+        onDonate={(amountCents, isDedicated, frequency, gift) => {
           setDonationData({
             amountCents,
             currency: fundraiser.currency,
             frequency,
             dedicated: isDedicated,
+            gift,
           });
           setIsOverlayOpen(true);
         }}

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, CreditCard, Plus } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import {
@@ -94,7 +94,7 @@ export function UserMenu() {
         <DropdownMenuItem asChild className='cursor-pointer'>
           <Link href='/dashboard' className='flex items-center'>
             <CreditCard className='mr-2 h-4 w-4' />
-            <span>{tDashboard('dashboard')}</span>
+            <span>{tDashboard('breadcrumb.dashboard')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className='cursor-pointer'>

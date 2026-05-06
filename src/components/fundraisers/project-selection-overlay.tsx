@@ -5,7 +5,7 @@ import type {
   SelectedProject,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
-import type { CreateFundraiserFormValues } from '@/components/fundraisers/create-fundraiser-form-context';
+import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -52,9 +52,9 @@ export function ProjectSelectionOverlay({
   onSelectProject,
   selectedProjectIds,
 }: ProjectSelectionOverlayProps) {
-  const t = useTranslations('Fundraisers.create.projectSelection');
+  const t = useTranslations('Fundraisers.form.projectSelection');
   const locale = useLocale();
-  const country = useWatch<CreateFundraiserFormValues, 'country'>({
+  const country = useWatch<FundraiserFormValues, 'country'>({
     name: 'country',
   });
   const [isMounted, setIsMounted] = useState(false);

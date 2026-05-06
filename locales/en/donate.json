@@ -74,6 +74,11 @@
       "saveAddressError": "Failed to save address",
       "addNewAddress": "+ Add new address"
     },
+    "gift": {
+      "dedicatedTo": "Dedicated to {recipientName}",
+      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to {recipientEmail}",
+      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to {recipientEmail}"
+    },
     "errors": {
       "zipCode": {
         "required": "Zip code is required"
@@ -136,7 +141,7 @@
       },
       "address2": {
         "label": "Address Line 2",
-        "placeholder": "Apartment, suite, unit, etc."
+        "placeholder": "Apartment, suite, etc."
       },
       "cityLabel": "City *",
       "cityPlaceholder": "Enter city",

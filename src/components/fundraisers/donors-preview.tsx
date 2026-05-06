@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { SectionHeader } from './typography';
 
 export function DonorsPreview() {
-  const t = useTranslations('Fundraisers.create.donorsPreview');
+  const t = useTranslations('Fundraisers.form.donorsPreview');
   const donors = [
     { id: '1', name: 'Ava' },
     { id: '2', name: 'Noah' },

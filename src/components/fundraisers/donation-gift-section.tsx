@@ -1,0 +1,137 @@
+'use client';
+
+import type {
+  DonationGiftErrors,
+  DonationGiftValues,
+} from '@/lib/donation/gift-validation';
+
+import { useTranslations } from 'next-intl';
+import { Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+
+interface DonationGiftSectionProps {
+  isDedicated: boolean;
+  values: DonationGiftValues;
+  errors: DonationGiftErrors;
+  onToggleDedicated: () => void;
+  onFieldChange: (field: keyof DonationGiftValues, value: string) => void;
+}
+
+export function DonationGiftSection({
+  isDedicated,
+  values,
+  errors,
+  onToggleDedicated,
+  onFieldChange,
+}: DonationGiftSectionProps) {
+  const t = useTranslations('Fundraisers.form.contributionSettings');
+
+  return (
+    <>
+      <div className='flex items-start gap-2.5'>
+        <div className='w-6 h-6 flex justify-start items-start gap-3'>
+          <button
+            type='button'
+            onClick={onToggleDedicated}
+            aria-label={t('giftTitle')}
+            aria-pressed={isDedicated}
+            className='flex-1 self-stretch relative'
+          >
+            <div
+              className={`w-5 h-5 left-px top-px absolute rounded shadow-sm border flex items-center justify-center transition-all ${
+                isDedicated
+                  ? 'bg-foreground border-foreground'
+                  : 'bg-background border-input'
+              }`}
+            >
+              {isDedicated && <Check className='w-4 h-4 text-background' />}
+            </div>
+          </button>
+        </div>
+        <div className='flex-1 flex flex-col gap-1'>
+          <div className='text-foreground text-sm font-semibold'>
+            {t('giftTitle')}
+          </div>
+          <div className='text-muted-foreground text-sm font-normal'>
+            {t('giftSubtitle')}
+          </div>
+        </div>
+      </div>
+
+      {isDedicated && (
+        <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-1'>
+            <label
+              htmlFor='gift-recipient-name'
+              className='text-sm font-medium text-foreground'
+            >
+              {t('gift.recipientName.label')}
+            </label>
+            <Input
+              id='gift-recipient-name'
+              type='text'
+              placeholder={t('gift.recipientName.placeholder')}
+              value={values.recipientName}
+              onChange={e => onFieldChange('recipientName', e.target.value)}
+              className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
+              aria-invalid={!!errors.recipientName}
+              aria-describedby='gift-recipient-name-error'
+            />
+            {errors.recipientName && (
+              <p
+                id='gift-recipient-name-error'
+                className='text-sm text-destructive'
+              >
+                {errors.recipientName}
+              </p>
+            )}
+          </div>
+
+          <div className='flex flex-col gap-1'>
+            <label
+              htmlFor='gift-recipient-email'
+              className='text-sm font-medium text-foreground'
+            >
+              {t('gift.recipientEmail.label')}
+            </label>
+            <Input
+              id='gift-recipient-email'
+              type='email'
+              placeholder={t('gift.recipientEmail.placeholder')}
+              value={values.recipientEmail}
+              onChange={e => onFieldChange('recipientEmail', e.target.value)}
+              className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
+              aria-invalid={!!errors.recipientEmail}
+              aria-describedby='gift-recipient-email-error'
+            />
+            {errors.recipientEmail && (
+              <p
+                id='gift-recipient-email-error'
+                className='text-sm text-destructive'
+              >
+                {errors.recipientEmail}
+              </p>
+            )}
+          </div>
+
+          <div className='flex flex-col gap-1'>
+            <label
+              htmlFor='gift-message'
+              className='text-sm font-medium text-foreground'
+            >
+              {t('gift.message.label')}
+            </label>
+            <Textarea
+              id='gift-message'
+              rows={2}
+              placeholder={t('gift.message.placeholder')}
+              value={values.message}
+              onChange={e => onFieldChange('message', e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

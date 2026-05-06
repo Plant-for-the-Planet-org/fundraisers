@@ -1,3 +1,4 @@
+import type { SentInvitationGift } from '@planet-sdk/common';
 import type { BankAccountDetails } from './payment';
 
 // TODO: evaluate if the DonationResponse interface is accurate
@@ -95,6 +96,7 @@ interface DonationFormDataBase {
   frequency: DonationFrequency;
   isAnonymous: boolean;
   tin?: string;
+  gift?: SentInvitationGift;
 }
 
 export interface AuthenticatedFormData extends DonationFormDataBase {
@@ -132,4 +134,5 @@ export interface DonationPayload {
   absorbedFee?: number; // processing fee covered by donor, decimal
   prePaid?: boolean;
   donor: DonorInfo;
+  gift?: SentInvitationGift;
 }

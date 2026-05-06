@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getAccessTokenSilently } from '@/lib/auth/auth0-config';
-import { isTokenExpired } from '@/lib/auth/jwt-utils';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
-import { useAuthStore } from '@/stores/authStore';
+import { isTokenExpired } from '@/lib/utils/auth';
+import { useAuthStore } from '@/stores/auth-store';
 import { Loader } from '../ui/loader';
 
 interface AuthGuardProps {
@@ -15,12 +15,17 @@ interface AuthGuardProps {
 }
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const tAuth = useTranslations('Auth');
   const accessToken = useAuthStore(state => state.accessToken);
   const setAccessToken = useAuthStore(state => state.setAccessToken);
   const clearAuth = useAuthStore(state => state.clearAuth);
+
+  const search = searchParams.toString();
+  const currentPath = search ? `${pathname}?${search}` : pathname;
 
   useEffect(() => {
     const checkToken = async () => {
@@ -36,39 +41,34 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
           }
 
           clearAuth();
-          router.replace(getSignInPath());
+          router.replace(getSignInPath(currentPath));
         } catch (err) {
           console.error('Silent auth failed:', err);
           clearAuth();
-          router.replace(getSignInPath());
+          router.replace(getSignInPath(currentPath));
         }
       }
     };
 
     checkToken();
-  }, [accessToken, isAuthInitializing, setAccessToken, clearAuth, router]);
+  }, [
+    accessToken,
+    isAuthInitializing,
+    setAccessToken,
+    clearAuth,
+    router,
+    currentPath,
+  ]);
 
-  /**
-   * Redirect unauthenticated users
-   */
   useEffect(() => {
-    if (!isAuthInitializing && !isAuthenticated) {
-      router.replace(getSignInPath());
+    if (isAuthInitializing) return;
+    if (!isAuthenticated) {
+      router.replace(getSignInPath(currentPath));
     }
-  }, [isAuthenticated, isAuthInitializing, router]);
+  }, [isAuthInitializing, isAuthenticated, router, currentPath]);
 
-  /**
-   * Show loader while auth state is initializing
-   */
-  if (isAuthInitializing) {
+  if (isAuthInitializing || !isAuthenticated) {
     return fallback ?? <Loader text={tAuth('redirecting')} />;
-  }
-
-  /**
-   * Prevent UI flicker before redirect happens
-   */
-  if (!isAuthenticated) {
-    return null;
   }
 
   return <>{children}</>;

@@ -7,7 +7,7 @@ import { useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { isFundraiserSortOption } from '@/lib/api/categories-service';
-import { Tabs, TabsContent,TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FundraiserCard } from './fundraiser-card';
 import { FundraiserCardSkeletonGrid } from './fundraiser-card-skeleton';
 

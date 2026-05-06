@@ -3,31 +3,29 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { getSafeRedirectPath } from '@/lib/utils/auth';
+import { useAuthStore } from '@/stores/auth-store';
 import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
 import { Loader } from '@/components/ui/loader';
 import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 
 export default function LoginPage() {
+  const tAuth = useTranslations('Auth');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tAuth = useTranslations('Auth');
-  const logoutSuccess = searchParams.get('logoutSuccess');
-  const redirectTo = searchParams.get('redirectTo') || '/explore';
+  const safeRedirectPath = getSafeRedirectPath(searchParams.get('redirectTo'));
+  // store: state
+  const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
-  const safeRedirect =
-    redirectTo && redirectTo.startsWith('/') ? redirectTo : '/explore';
   useEffect(() => {
-    if (logoutSuccess !== 'true') return;
+    if (isAuthInitializing) return;
+    if (isAuthenticated) {
+      router.replace(safeRedirectPath);
+    }
+  }, [isAuthInitializing, isAuthenticated, router, safeRedirectPath]);
 
-    // Small delay to ensure logout is processed, then redirect
-    const timer = setTimeout(() => {
-      router.replace(safeRedirect);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [logoutSuccess, safeRedirect, router]);
-
-  if (logoutSuccess === 'true') {
+  if (isAuthInitializing || isAuthenticated) {
     return <Loader text={tAuth('redirecting')} />;
   }
 
@@ -37,7 +35,7 @@ export default function LoginPage() {
       <SignInHeroImage />
 
       {/* Right side - Login (order-1 on mobile, order-2 on desktop) */}
-      <SignInFormPanel redirectTo={safeRedirect} />
+      <SignInFormPanel redirectTo={safeRedirectPath} />
     </div>
   );
 }

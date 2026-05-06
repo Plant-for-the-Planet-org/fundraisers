@@ -1,9 +1,9 @@
 'use client';
 
 import type { SelectedProject } from '@/lib/types/project-selection';
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Target } from 'lucide-react';
@@ -17,6 +17,9 @@ import { Button } from '@/components/ui/button';
 import { ProjectSelectionOverlay } from './project-selection-overlay';
 import { SectionHeader } from './typography';
 
+type ProjectAllocations = FundraiserFormValues['projectAllocations'];
+type ProjectDetailsById = Record<string, SelectedProject>;
+
 function getProjectImageSource(image?: string): string | null {
   if (!image) {
     return null;
@@ -29,20 +32,68 @@ function getProjectImageSource(image?: string): string | null {
   return getImageUrl('project', 'small', image);
 }
 
-export function ProjectSelection() {
-  const t = useTranslations('Fundraisers.create.projectSelection');
-  const { control, getValues, setValue } =
-    useFormContext<CreateFundraiserFormValues>();
+function recalculateAllocations(
+  projectIds: string[],
+  defaultCauseId: string
+): ProjectAllocations {
+  const shell: SelectedProject[] = projectIds.map(id => ({
+    id,
+    name: '',
+    description: '',
+  }));
+  return calculateProjectAllocations(
+    shell,
+    defaultCauseId,
+    MIN_DEFAULT_CAUSE_PERCENT
+  ).map(project => ({
+    project_id: project.id,
+    percentage: project.percentage,
+  }));
+}
+
+interface ProjectSelectionProps {
+  nonDefaultInitialProjects?: SelectedProject[];
+}
+
+export function ProjectSelection({
+  nonDefaultInitialProjects,
+}: ProjectSelectionProps = {}) {
+  const t = useTranslations('Fundraisers.form.projectSelection');
+  const { control, setValue } = useFormContext<FundraiserFormValues>();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  const country = useWatch<CreateFundraiserFormValues, 'country'>({
+  const country = useWatch<FundraiserFormValues, 'country'>({
     control,
     name: 'country',
   });
+  const projectAllocations = useWatch<
+    FundraiserFormValues,
+    'projectAllocations'
+  >({
+    control,
+    name: 'projectAllocations',
+  });
+  const allocations = useMemo(
+    () => projectAllocations ?? [],
+    [projectAllocations]
+  );
 
-  const [extraProjects, setExtraProjects] = useState<SelectedProject[]>([]);
+  // Presentation-only cache of project metadata (name/description/image).
+  // Form state only stores { project_id, percentage }; this fills in the rest for rendering.
+  // Not a parallel source of truth: it is never written back to the form.
+  const [sessionProjectDetails, setSessionProjectDetails] =
+    useState<ProjectDetailsById>({});
 
-  const defaultCause = useMemo(
+  const projectDetailsById = useMemo<ProjectDetailsById>(() => {
+    const fromInitial: ProjectDetailsById = {};
+    for (const project of nonDefaultInitialProjects ?? []) {
+      fromInitial[project.id] = project;
+    }
+    // Session-added details win over initial ones when ids collide.
+    return { ...fromInitial, ...sessionProjectDetails };
+  }, [nonDefaultInitialProjects, sessionProjectDetails]);
+
+  const defaultWorkspaceCause = useMemo(
     () =>
       createDefaultCause(country ?? 'DE', [], {
         name: t('defaultCause.name'),
@@ -50,76 +101,107 @@ export function ProjectSelection() {
       }),
     [country, t]
   );
+  const defaultWorkspaceCauseId = defaultWorkspaceCause.id;
 
-  const selectedProjects = useMemo(
-    () => [defaultCause, ...extraProjects],
-    [defaultCause, extraProjects]
-  );
-
-  const defaultCauseId = defaultCause.id;
-  const projectAllocations = useMemo(
+  const displayedAllocations = useMemo(
     () =>
-      calculateProjectAllocations(
-        selectedProjects,
-        defaultCauseId,
-        MIN_DEFAULT_CAUSE_PERCENT
-      ),
-    [selectedProjects, defaultCauseId]
+      allocations.map(({ project_id, percentage }) => {
+        const isDefault = project_id === defaultWorkspaceCauseId;
+        const details = isDefault
+          ? defaultWorkspaceCause
+          : projectDetailsById[project_id];
+        return {
+          id: project_id,
+          name: details?.name ?? '',
+          description: details?.description ?? '',
+          image: details?.image,
+          country: details?.country,
+          percentage,
+          isDefault,
+        };
+      }),
+    [
+      allocations,
+      defaultWorkspaceCauseId,
+      defaultWorkspaceCause,
+      projectDetailsById,
+    ]
   );
 
-  useEffect(() => {
-    const nextAllocations = projectAllocations.map(project => ({
-      project_id: project.id,
-      percentage: project.percentage,
-    }));
-    const currentAllocations = getValues('projectAllocations') ?? [];
+  const selectedProjectIds = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          defaultWorkspaceCauseId,
+          ...allocations.map(({ project_id }) => project_id),
+        ])
+      ),
+    [defaultWorkspaceCauseId, allocations]
+  );
 
-    const isSame =
-      currentAllocations.length === nextAllocations.length &&
-      currentAllocations.every((allocation, index) => {
-        const next = nextAllocations[index];
-        return (
-          allocation?.project_id === next?.project_id &&
-          allocation?.percentage === next?.percentage
-        );
-      });
+  const updateAllocationsFromProjectIds = useCallback(
+    (projectIds: string[]) => {
+      const nextAllocations = recalculateAllocations(
+        projectIds,
+        defaultWorkspaceCauseId
+      );
 
-    if (!isSame) {
       setValue('projectAllocations', nextAllocations, {
         shouldDirty: true,
         shouldValidate: true,
       });
-    }
-  }, [getValues, projectAllocations, setValue]);
+    },
+    [defaultWorkspaceCauseId, setValue]
+  );
+
+  // When country (workspace) changes, the default workspace cause id changes
+  // too. Swap the stale id in the form for the new one. Short-circuits when
+  // allocations already reference the current defaultWorkspaceCauseId, so mount
+  // never dirties the form.
+  useEffect(() => {
+    const hasWorkspaceDefaultCause = allocations.some(
+      ({ project_id }) => project_id === defaultWorkspaceCauseId
+    );
+
+    if (allocations.length === 0 || hasWorkspaceDefaultCause) return;
+
+    const reconciledProjectIds = Array.from(
+      new Set([
+        defaultWorkspaceCauseId,
+        ...allocations.map(({ project_id }) =>
+          projectDetailsById[project_id] ? project_id : defaultWorkspaceCauseId
+        ),
+      ])
+    );
+
+    updateAllocationsFromProjectIds(reconciledProjectIds);
+  }, [
+    allocations,
+    updateAllocationsFromProjectIds,
+    defaultWorkspaceCauseId,
+    projectDetailsById,
+  ]);
 
   function handleSelectProject(project: SelectedProject) {
-    if (project.id === defaultCauseId) {
+    if (project.id === defaultWorkspaceCauseId) return;
+    if (allocations.some(({ project_id }) => project_id === project.id)) {
       return;
     }
 
-    if (
-      selectedProjects.some(
-        selectedProject => selectedProject.id === project.id
-      )
-    ) {
-      return;
-    }
-
-    setExtraProjects(prev => [
-      ...prev,
-      {
-        ...project,
-        isDefault: false,
-      },
+    setSessionProjectDetails(prev => ({ ...prev, [project.id]: project }));
+    updateAllocationsFromProjectIds([
+      ...allocations.map(({ project_id }) => project_id),
+      project.id,
     ]);
   }
 
   function handleRemoveProject(projectId: string) {
-    if (projectId === defaultCauseId) {
-      return;
-    }
-
-    setExtraProjects(prev => prev.filter(project => project.id !== projectId));
+    if (projectId === defaultWorkspaceCauseId) return;
+    updateAllocationsFromProjectIds(
+      allocations
+        .filter(({ project_id }) => project_id !== projectId)
+        .map(({ project_id }) => project_id)
+    );
   }
 
   return (
@@ -142,9 +224,9 @@ export function ProjectSelection() {
         </SectionHeader>
 
         <div className='space-y-4'>
-          {projectAllocations.map((project, index) => {
+          {displayedAllocations.map((project, index) => {
             const projectImageSource = getProjectImageSource(project.image);
-            const isLastProject = index === projectAllocations.length - 1;
+            const isLastProject = index === displayedAllocations.length - 1;
 
             return (
               <div key={project.id}>
@@ -204,7 +286,7 @@ export function ProjectSelection() {
         isOpen={isOverlayOpen}
         onClose={() => setIsOverlayOpen(false)}
         onSelectProject={handleSelectProject}
-        selectedProjectIds={selectedProjects.map(project => project.id)}
+        selectedProjectIds={selectedProjectIds}
       />
     </>
   );

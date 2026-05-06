@@ -1,5 +1,6 @@
 'use client';
 
+import type { SentInvitationGift } from '@planet-sdk/common';
 import type { DonationFrequency } from '@/lib/types/donation';
 import type {
   ContributionModuleSettings,
@@ -8,7 +9,11 @@ import type {
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check } from 'lucide-react';
+import {
+  type DonationGiftErrors,
+  type DonationGiftValues,
+  validateDonationGift,
+} from '@/lib/donation/gift-validation';
 import {
   getAvailableRecurrencyOptions,
   getContributionSettings,
@@ -21,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DonationAmounts } from './donation-amounts';
 import { DonationFrequencyDropdown } from './donation-frequency-dropdown';
+import { DonationGiftSection } from './donation-gift-section';
 
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
@@ -28,7 +34,8 @@ interface DonationFormProps {
   onDonate: (
     amountCents: number,
     isDedicated: boolean,
-    frequency: DonationFrequency
+    frequency: DonationFrequency,
+    gift?: SentInvitationGift
   ) => void;
 }
 
@@ -51,7 +58,7 @@ export function DonationForm({
   currency = 'EUR',
   onDonate,
 }: DonationFormProps) {
-  const t = useTranslations('Fundraisers.create.contributionSettings');
+  const t = useTranslations('Fundraisers.form.contributionSettings');
 
   const settings = getContributionSettings(contributionSettings);
   const availableRecurrencyOptions =
@@ -88,6 +95,13 @@ export function DonationForm({
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
+  const [giftValues, setGiftValues] = useState<DonationGiftValues>({
+    recipientName: '',
+    recipientEmail: '',
+    message: '',
+  });
+  const [giftErrors, setGiftErrors] = useState<DonationGiftErrors>({});
+
   const getDonateButtonText = () => {
     const amount = customAmount || selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
@@ -103,6 +117,86 @@ export function DonationForm({
       default:
         return `${amountText}${t('donateNow')}`;
     }
+  };
+
+  const handleDedicationToggle = () => {
+    setIsDedicated(!isDedicated);
+    setGiftErrors({});
+  };
+
+  const handleGiftFieldChange = (
+    field: keyof DonationGiftValues,
+    value: string
+  ) => {
+    setGiftValues(prev => ({ ...prev, [field]: value }));
+
+    if (field === 'recipientName' && giftErrors.recipientName) {
+      setGiftErrors(prev => ({ ...prev, recipientName: undefined }));
+      return;
+    }
+
+    if (
+      (field === 'recipientEmail' || field === 'message') &&
+      giftErrors.recipientEmail
+    ) {
+      setGiftErrors(prev => ({ ...prev, recipientEmail: undefined }));
+    }
+  };
+
+  const handleDonate = () => {
+    if (isDedicated) {
+      const validationResult = validateDonationGift(giftValues);
+
+      if (!validationResult.success) {
+        const errors: DonationGiftErrors = {};
+
+        if (validationResult.errorCodes.recipientName) {
+          errors.recipientName = t('gift.errors.recipientName.required');
+        }
+
+        if (validationResult.errorCodes.recipientEmail) {
+          if (
+            validationResult.errorCodes.recipientEmail ===
+            'recipientEmail.requiredWithMessage'
+          ) {
+            errors.recipientEmail = t(
+              'gift.errors.recipientEmail.requiredWithMessage'
+            );
+          } else {
+            errors.recipientEmail = t('gift.errors.recipientEmail.invalid');
+          }
+        }
+
+        setGiftErrors(errors);
+        return;
+      }
+
+      const {
+        recipientName: validatedRecipientName,
+        recipientEmail: validatedRecipientEmail,
+        message: validatedMessage,
+      } = validationResult.data;
+
+      const gift: SentInvitationGift = {
+        type: 'invitation',
+        recipientName: validatedRecipientName,
+        ...(validatedRecipientEmail && {
+          recipientEmail: validatedRecipientEmail,
+        }),
+        ...(validatedMessage && { message: validatedMessage }),
+      };
+
+      setGiftErrors({});
+      onDonate(
+        customAmount || selectedAmount,
+        true,
+        selectedFrequency.value,
+        gift
+      );
+      return;
+    }
+
+    onDonate(customAmount || selectedAmount, false, selectedFrequency.value);
   };
 
   return (
@@ -135,45 +229,19 @@ export function DonationForm({
         />
 
         {settings.allow_dedication && (
-          <div className='flex items-start gap-2.5'>
-            <div className='w-6 h-6 flex justify-start items-start gap-3'>
-              <button
-                type='button'
-                onClick={() => setIsDedicated(!isDedicated)}
-                className='flex-1 self-stretch relative'
-              >
-                <div
-                  className={`w-5 h-5 left-px top-px absolute rounded shadow-sm border flex items-center justify-center transition-all ${
-                    isDedicated
-                      ? 'bg-foreground border-foreground'
-                      : 'bg-background border-input'
-                  }`}
-                >
-                  {isDedicated && <Check className='w-4 h-4 text-background' />}
-                </div>
-              </button>
-            </div>
-            <div className='flex-1 flex flex-col gap-1'>
-              <div className='text-foreground text-sm font-semibold'>
-                {t('giftTitle')}
-              </div>
-              <div className='text-muted-foreground text-sm font-normal'>
-                {t('giftSubtitle')}
-              </div>
-            </div>
-          </div>
+          <DonationGiftSection
+            isDedicated={isDedicated}
+            values={giftValues}
+            errors={giftErrors}
+            onToggleDedicated={handleDedicationToggle}
+            onFieldChange={handleGiftFieldChange}
+          />
         )}
 
         <Button
           className='h-9 w-full font-medium text-base hover:brightness-90'
           style={{ backgroundColor: 'var(--accent-color)' }}
-          onClick={() =>
-            onDonate(
-              customAmount || selectedAmount,
-              isDedicated,
-              selectedFrequency.value
-            )
-          }
+          onClick={handleDonate}
         >
           {getDonateButtonText()}
         </Button>

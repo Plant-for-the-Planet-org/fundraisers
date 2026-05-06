@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { buildTheme } from '@/lib/theme/build-theme';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 import { useThemeStore } from '@/stores/theme-store';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 

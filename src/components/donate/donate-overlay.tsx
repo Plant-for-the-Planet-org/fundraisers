@@ -1,5 +1,6 @@
 'use client';
 
+import type { SentInvitationGift } from '@planet-sdk/common';
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
@@ -20,6 +21,7 @@ import { DonationFormProvider } from './donation-form-context';
 import { DonationSummary } from './donation-summary';
 import { DonationThankYou } from './donation-thank-you';
 import { DonorInfo } from './donor-info';
+import { GiftSummary } from './gift-summary';
 import { PaymentMethods } from './payment-methods';
 import { useDonationSubmit } from './use-donation-submit';
 
@@ -28,6 +30,7 @@ export interface DonationData {
   currency: string;
   frequency: DonationFrequency;
   dedicated: boolean;
+  gift?: SentInvitationGift;
 }
 
 interface DonateOverlayProps {
@@ -138,6 +141,7 @@ function DonateOverlayInner({
 
   const rightColumn = (
     <>
+      <GiftSummary />
       <DonationSummary />
       {thankYouState === null && (
         <>

@@ -2,11 +2,26 @@
  * Utility functions for fundraisers
  */
 
+import type { Fundraiser } from '../types/fundraiser';
 import type { Nullable } from '../types/utility';
 
 export interface FundraiserUrlData {
   id: string;
   slug?: Nullable<string>;
+}
+
+/**
+ * True when `userId` matches a host on `fundraiser` whose role is `owner`.
+ * Returns false when `userId` is missing.
+ */
+export function isFundraiserOwner(
+  fundraiser: Fundraiser,
+  userId: string | null | undefined
+): boolean {
+  if (!userId) return false;
+  return fundraiser.hosts.some(
+    host => host.user?.id === userId && host.role === 'owner'
+  );
 }
 
 /**
@@ -19,4 +34,17 @@ export interface FundraiserUrlData {
 export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   const identifier = fundraiser.slug || fundraiser.id;
   return `/fundraisers/${identifier}`;
+}
+
+/**
+ * Days remaining until `endDate`, rounded up, never negative.
+ */
+export function getDaysLeft(endDate: string): number {
+  const end = new Date(endDate);
+  if (isNaN(end.getTime())) return 0;
+  const now = new Date();
+  return Math.max(
+    0,
+    Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  );
 }

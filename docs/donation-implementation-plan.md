@@ -81,7 +81,7 @@ Actual payment details (card numbers, IBAN, CVV) are **never stored in React sta
 
 ### Auth token
 
-`gofundnature` uses `platformAPIClient.getAuthToken()` — this method does not exist in this project. Use `useAuthStore.getState().accessToken` instead (from `src/stores/authStore.ts`). The token is optional; unauthenticated donations are allowed.
+`gofundnature` uses `platformAPIClient.getAuthToken()` — this method does not exist in this project. Use `useAuthStore.getState().accessToken` instead (from `src/stores/auth-store.ts`). The token is optional; unauthenticated donations are allowed.
 
 ---
 
@@ -92,7 +92,7 @@ Actual payment details (card numbers, IBAN, CVV) are **never stored in React sta
 File: `src/components/donate/donor-info.tsx`
 
 - Guest: full form (email, firstName, lastName, address, zip, city, country)
-- Authenticated: pre-populate from `authStore.user.profile` (`src/stores/authStore.ts`)
+- Authenticated: pre-populate from `authStore.user.profile` (`src/stores/auth-store.ts`)
   - Primary address: `profile.addresses.find(a => a.isPrimary)`
 - Profile type: `UserProfileResponse` from `src/lib/api/user-service.ts`
 
@@ -305,7 +305,7 @@ Remaining for Portion 4:
 | `formatCurrency(amountCents, currency)`                       | `src/lib/utils/currency.ts`                       |
 | `getImageUrl(type, size, filename)`                           | `src/lib/utils/images.ts`                         |
 | `platformAPIClient`                                           | `src/lib/api/external-client.ts`                  |
-| `useAuthStore`                                                | `src/stores/authStore.ts`                         |
+| `useAuthStore`                                                | `src/stores/auth-store.ts`                        |
 | `PaymentOptions` type                                         | `src/lib/types/payment-options.ts`                |
 | `Fundraiser` type                                             | `src/lib/types/fundraiser.ts`                     |
 | `DonationData` type                                           | `src/components/donate/donate-overlay.tsx`        |

@@ -34,7 +34,7 @@ import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore } from '@/stores/auth-store';
 
 /**
  * Encapsulates the full donation submission flow:

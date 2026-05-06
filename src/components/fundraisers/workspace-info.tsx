@@ -1,6 +1,6 @@
 'use client';
 
-import type { CreateFundraiserFormValues } from './create-fundraiser-form-context';
+import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
@@ -9,9 +9,9 @@ import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 
 export function WorkspaceInfo() {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.create.countryEntity.info');
+  const t = useTranslations('Fundraisers.form.countryEntity.info');
 
-  const country = useWatch<CreateFundraiserFormValues, 'country'>({
+  const country = useWatch<FundraiserFormValues, 'country'>({
     name: 'country',
   });
   const { isDeductible, countryName } = getTaxDeductibilityInfo(

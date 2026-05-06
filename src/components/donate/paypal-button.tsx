@@ -9,7 +9,7 @@ import type { DonationFormValues } from './donation-form-context';
 
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { PayPalButtons,PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { useDonationForm } from './donation-form-context';
 
 interface PayPalButtonProps {

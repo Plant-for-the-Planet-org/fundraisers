@@ -1,0 +1,125 @@
+'use client';
+
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { SelectedProject } from '@/lib/types/project-selection';
+
+import { use, useMemo } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { AuthGuard } from '@/components/auth/auth-guard';
+import { EditFundraiserFormProvider } from '@/components/fundraisers/edit-fundraiser-form-context';
+import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
+import { UpdateFundraiserButton } from '@/components/fundraisers/update-fundraiser-button';
+import { useFundraiserForEdit } from '@/components/fundraisers/use-fundraiser-for-edit';
+import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/loader';
+
+function extractNonDefaultInitialProjects(
+  fundraiser: Fundraiser
+): SelectedProject[] {
+  const workspaceCountry = fundraiser.workspace?.country ?? 'DE';
+  const defaultCauseId = getDefaultCauseId(workspaceCountry);
+
+  return fundraiser.projectAllocations
+    .filter(allocation => allocation.project.id !== defaultCauseId)
+    .map(allocation => ({
+      id: allocation.project.id,
+      name: allocation.project.name,
+      description: allocation.project.description,
+      image: allocation.project.image,
+    }));
+}
+
+function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
+  const nonDefaultInitialProjects = useMemo(
+    () => extractNonDefaultInitialProjects(fundraiser),
+    [fundraiser]
+  );
+
+  return (
+    <EditFundraiserFormProvider fundraiser={fundraiser}>
+      <FundraiserFormBody
+        mode='edit'
+        submitButton={<UpdateFundraiserButton fundraiserId={fundraiser.id} />}
+        nonDefaultInitialProjects={nonDefaultInitialProjects}
+        totalRaised={fundraiser.totalRaised}
+        endDate={fundraiser.endDate}
+      />
+    </EditFundraiserFormProvider>
+  );
+}
+
+function StatusMessage({
+  title,
+  description,
+  backLabel,
+}: {
+  title: string;
+  description: string;
+  backLabel: string;
+}) {
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 min-h-[50vh] text-center'>
+      <h1 className='text-2xl font-semibold'>{title}</h1>
+      <p className='text-muted-foreground'>{description}</p>
+      <Button asChild variant='outline'>
+        <Link href='/dashboard'>{backLabel}</Link>
+      </Button>
+    </div>
+  );
+}
+
+function EditFundraiserBody({ slug }: { slug: string }) {
+  const t = useTranslations('Fundraisers.edit');
+  const state = useFundraiserForEdit(slug);
+
+  if (state.status === 'idle' || state.status === 'loading') {
+    return <Loader text={t('loading')} />;
+  }
+
+  if (state.status === 'not-found') {
+    return (
+      <StatusMessage
+        title={t('notFoundTitle')}
+        description={t('notFoundDescription')}
+        backLabel={t('backToDashboard')}
+      />
+    );
+  }
+
+  if (state.status === 'unauthorized') {
+    return (
+      <StatusMessage
+        title={t('unauthorizedTitle')}
+        description={t('unauthorizedDescription')}
+        backLabel={t('backToDashboard')}
+      />
+    );
+  }
+
+  if (state.status === 'error' || !state.fundraiser) {
+    return (
+      <StatusMessage
+        title={t('errorTitle')}
+        description={state.errorMessage ?? t('errorDescription')}
+        backLabel={t('backToDashboard')}
+      />
+    );
+  }
+
+  return <EditFundraiserContent fundraiser={state.fundraiser} />;
+}
+
+export default function EditFundraiserPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params);
+  return (
+    <AuthGuard>
+      <EditFundraiserBody slug={slug} />
+    </AuthGuard>
+  );
+}

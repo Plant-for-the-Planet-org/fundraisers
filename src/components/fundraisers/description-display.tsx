@@ -12,7 +12,7 @@ export default function DescriptionDisplay({
   value,
   className,
 }: DescriptionDisplayProps) {
-  const t = useTranslations('Fundraisers.create.description');
+  const t = useTranslations('Fundraisers.form.description');
 
   if (!value) {
     return null;
