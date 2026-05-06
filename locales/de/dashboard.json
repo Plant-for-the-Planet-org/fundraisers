@@ -33,8 +33,8 @@
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
     "toolbar": {
-      "searchPlaceholder": "Name oder Host...",
-      "resultCount": "<bold>{visible}</bold> von {total} werden angezeigt"
+      "searchPlaceholder": "Name oder Ersteller",
+      "resultCount": "<bold>{visible}</bold> von {total} angezeigt"
     },
     "statusFilter": {
       "groupLabel": "Nach Status filtern",
@@ -45,12 +45,12 @@
       "ended": "Beendet"
     },
     "sort": {
-      "triggerLabel": "Sortieren: ",
+      "triggerLabel": "Sortieren:",
       "options": {
         "newest": "Neueste zuerst",
         "oldest": "Älteste zuerst",
-        "most-raised": "Am meisten gesammelt",
-        "ending-soonest": "Endet am ehesten",
+        "most-raised": "Höchstes Spendenergebnis",
+        "ending-soonest": "Endet als nächstes",
         "name-asc": "Name A-Z"
       }
     },
@@ -62,12 +62,12 @@
       "ending-soon": "Endet bald"
     },
     "noResults": {
-      "title": "Keine Spendenaufrufe entsprechen diesen Filtern.",
+      "title": "Keiner der Spendenaufrufe entspricht diesem Filter.",
       "description": "Versuche, deine Suche oder Filter anzupassen.",
-      "cta": "Filter zurücksetzen"
+      "cta": "Filter löschen"
     },
     "actions": {
-      "menuLabel": "Aktionen öffnen",
+      "menuLabel": "Offene Aktionen",
       "edit": "Bearbeiten",
       "copyLink": "Link kopieren",
       "pause": "Pausieren",
@@ -78,7 +78,7 @@
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
       "activateSuccess": "Spendenaufruf aktiviert",
-      "mutationError": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+      "mutationError": "Etwas ist schief gelaufen. Versuche es noch einmal."
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",
