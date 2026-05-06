@@ -9,7 +9,7 @@ import type {
 import type { DonationFormValues } from './donation-form-context';
 
 import { useCallback, useMemo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   Elements,
@@ -17,6 +17,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDonationForm } from './donation-form-context';
@@ -39,7 +40,11 @@ interface ApplePayButtonProps {
  */
 export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
   const locale = useLocale();
-  const { paymentOptions, donationData } = useDonationForm();
+  const { fundraiser, paymentOptions, donationData } = useDonationForm();
+
+  const coverFees = useWatch<DonationFormValues, 'coverFees'>({
+    name: 'coverFees',
+  });
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = useMemo(
@@ -50,15 +55,36 @@ export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
     [stripeConfig, locale]
   );
 
+  const totalAmount = useMemo(() => {
+    const { hasProcessingFee, processingFeeCents } =
+      getDonationProcessingFeeInfo({
+        paymentOptions,
+        donationAmountCents: donationData.amount,
+        donationCurrency: donationData.currency,
+        workspaceCountry: fundraiser.workspace?.country,
+        selectedPaymentMethod: 'apple-pay',
+      });
+    return (
+      donationData.amount +
+      (coverFees && hasProcessingFee ? processingFeeCents : 0)
+    );
+  }, [
+    coverFees,
+    donationData.amount,
+    donationData.currency,
+    fundraiser.workspace?.country,
+    paymentOptions,
+  ]);
+
   const elementsOptions: StripeElementsOptionsMode = useMemo(
     () => ({
       mode: 'payment',
-      amount: donationData.amount,
+      amount: totalAmount,
       currency: donationData.currency.toLowerCase(),
       paymentMethodCreation: 'manual',
       loader: 'auto',
     }),
-    [donationData.amount, donationData.currency]
+    [totalAmount, donationData.currency]
   );
 
   if (!stripePromise) return null;
@@ -74,7 +100,6 @@ function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
   const stripe = useStripe();
   const elements = useElements();
   const t = useTranslations('Donate.applePay');
-  const { donationData } = useDonationForm();
   const { trigger, getValues } = useFormContext<DonationFormValues>();
 
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
@@ -160,9 +185,6 @@ function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
           {t('processing')}
         </p>
       )}
-      <p className='sr-only'>
-        {donationData.amount} {donationData.currency}
-      </p>
     </div>
   );
 }
