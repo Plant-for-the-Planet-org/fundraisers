@@ -25,6 +25,7 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   if (typeof leaderboard === 'boolean') return leaderboard;
   return Object.values(leaderboard).some(Boolean);
 }
+
 function isStageDirty(dirty: UpdateDirtyFields): boolean {
   const stage = dirty.settings?.modules?.stage;
   if (!stage) return false;
@@ -96,16 +97,13 @@ export function buildUpdateFundraiserRequest(
   if (isThemeDirty(dirtyFields)) {
     request.settings = { ...request.settings, theme: values.settings.theme };
   }
-  if (isLeaderboardDirty(dirtyFields)) {
+  if (isLeaderboardDirty(dirtyFields) || isStageDirty(dirtyFields)) {
     request.settings = {
       ...request.settings,
-      modules: { leaderboard: values.settings.modules.leaderboard },
-    };
-  }
-  if (isStageDirty(dirtyFields)) {
-    request.settings = {
-      ...(request.settings ?? { theme: values.settings.theme }),
-      modules: { stage: values.settings.modules.stage },
+      modules: {
+        leaderboard: values.settings.modules.leaderboard,
+        stage: values.settings.modules.stage,
+      },
     };
   }
   if (imageFile) request.imageFile = imageFile;
