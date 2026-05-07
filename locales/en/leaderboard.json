@@ -36,6 +36,7 @@
         "subtitle": "See all the amazing people who've supported this fundraiser",
         "emptyState": "No donations yet",
         "closeAria": "Close donations list",
+        "loadingMore": "Loading more donations...",
         "columnDonor": "Donor",
         "columnAmount": "Amount"
       }

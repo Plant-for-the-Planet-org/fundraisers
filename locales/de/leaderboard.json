@@ -36,6 +36,7 @@
         "subtitle": "Alle großartigen Menschen, die diesen Spendenaufruf unterstützt haben",
         "emptyState": "Noch keine Spenden",
         "closeAria": "Spendenliste schliessen",
+        "loadingMore": "Weitere Spenden werden geladen...",
         "columnDonor": "Spender",
         "columnAmount": "Betrag"
       }

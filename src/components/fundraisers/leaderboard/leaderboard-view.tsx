@@ -12,6 +12,7 @@ import { ScrollingDonationList } from './scrolling-donation-list';
 import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
+  idOrSlug: string;
   recentDonations: LeaderboardDonation[];
   topDonations: LeaderboardDonation[];
   settings: LeaderboardModuleSettings;
@@ -27,6 +28,7 @@ const TAB_TRIGGER_CLASS = cn(
 );
 
 export function LeaderboardView({
+  idOrSlug,
   recentDonations,
   topDonations,
   settings,
@@ -110,6 +112,7 @@ export function LeaderboardView({
       </Tabs>
 
       <ViewAllOverlay
+        idOrSlug={idOrSlug}
         isOpen={isViewAllOpen}
         onClose={closedTab => {
           setIsViewAllOpen(false);

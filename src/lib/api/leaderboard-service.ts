@@ -30,3 +30,18 @@ export async function getLeaderboardWithRetry(
 
   throw lastError!;
 }
+
+export async function getLeaderboardPage(
+  idOrSlug: string,
+  limit: number = 10,
+  page: number = 1
+): Promise<LeaderboardApiResponse> {
+  const params = new URLSearchParams({
+    limit: limit.toString(),
+    page: page.toString(),
+  });
+
+  return platformAPIClient.get<LeaderboardApiResponse>(
+    `/fundraisers/${idOrSlug}/leaderboard?${params.toString()}`
+  );
+}
