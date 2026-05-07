@@ -18,10 +18,10 @@ interface LeaderboardViewProps {
 
 const TAB_TRIGGER_CLASS = cn(
   'h-auto flex-none text-foreground after:hidden',
-  'px-4 py-2 text-sm font-medium bg-transparent transition-all rounded-t-md rounded-b-none relative -mb-px z-10 shadow-none border-2 border-transparent',
-  'data-[state=active]:bg-white/0 data-[state=active]:border-t-white/50 data-[state=active]:border-l-white/50 data-[state=active]:border-r-white/50 data-[state=active]:border-b-transparent data-[state=active]:shadow-none',
-  'data-[state=inactive]:border-b-white/50 data-[state=inactive]:shadow-none',
-  'dark:data-[state=active]:bg-transparent',
+  'px-4 py-2 text-sm font-medium bg-transparent transition-all rounded-t-md rounded-b-none relative -mb-px z-10 !shadow-none border-2 border-transparent',
+  'data-[state=active]:bg-transparent data-[state=active]:border-t-tab-border data-[state=active]:border-l-tab-border data-[state=active]:border-r-tab-border data-[state=active]:border-b-0 data-[state=active]:shadow-none',
+  'dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent dark:data-[state=active]:border-t-tab-border dark:data-[state=active]:border-l-tab-border dark:data-[state=active]:border-r-tab-border',
+  'data-[state=inactive]:border-t-0 data-[state=inactive]:border-l-0 data-[state=inactive]:border-r-0 data-[state=inactive]:border-b-tab-border data-[state=inactive]:shadow-none',
   'hover:bg-muted/50'
 );
 
@@ -57,10 +57,7 @@ export function LeaderboardView({
         onValueChange={value => setActiveTab(value as 'recent' | 'top')}
       >
         <div className='flex justify-between items-start'>
-          <TabsList
-            variant='line'
-            className='gap-0 bg-transparent p-0 h-auto relative'
-          >
+          <TabsList className='gap-0 bg-transparent p-0 h-auto relative'>
             {show_recent_list && (
               <TabsTrigger value='recent' className={TAB_TRIGGER_CLASS}>
                 {t('tabs.newest')}

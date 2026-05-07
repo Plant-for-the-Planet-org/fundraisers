@@ -55,6 +55,7 @@
   --color-accent-color: var(--accent-color);
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
+  --color-tab-border: var(--tab-border-color);
 
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
@@ -66,6 +67,7 @@
 }
 
 :root {
+  --tab-border-color: rgb(0 0 0 / 0.3);
   --background: 0 0% 100%;
   --foreground: 224 71.4% 4.1%;
   --muted: 220 14.3% 95.9%;
@@ -91,6 +93,7 @@
 }
 
 .dark {
+  --tab-border-color: rgb(255 255 255 / 0.5);
   --background: 224 71.4% 4.1%;
   --foreground: 210 20% 98%;
   --muted: 215 27.9% 16.9%;
