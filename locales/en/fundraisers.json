@@ -50,7 +50,8 @@
           "card": "Credit or Debit Card",
           "sepa": "SEPA Direct Debit",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay"
+          "googlePay": "Google Pay",
+          "bankTransferRemark": "Please set up a standing order with your bank."
         },
         "providers": {
           "stripe": "Stripe",
