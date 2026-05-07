@@ -221,7 +221,7 @@ export function ViewAllOverlay({
 
   return createPortal(
     <div
-      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-start justify-center pt-[10vh]'
+      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center'
       onMouseDown={event => {
         if (event.target === event.currentTarget) {
           handleClose();
@@ -265,7 +265,7 @@ export function ViewAllOverlay({
             </TabsList>
           </div>
 
-          <div ref={scrollRef} className='max-h-[50vh] overflow-y-auto'>
+          <div ref={scrollRef} className='h-[72vh] lg:h-[66vh] overflow-y-auto'>
             {donations.length > 0 ? (
               <>
                 <table className='w-full'>
