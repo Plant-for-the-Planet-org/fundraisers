@@ -175,10 +175,10 @@ export interface UpdateFundraiserRequest {
     theme?: FundraiserSettings['theme'];
     modules?: {
       leaderboard?: LeaderboardModuleSettings;
-      stage?: StageModuleSettings;
+      stage?: Nullable<StageModuleSettings>;
     };
-    imageFile?: string; // base64 encoded, only sent when image changed
   };
+  imageFile?: string; // base64 encoded, only sent when image changed
 }
 
 export interface CreateFundraiserRequest {
