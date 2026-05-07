@@ -173,11 +173,12 @@ export interface UpdateFundraiserRequest {
   // Expand modules as new module settings are added
   settings?: {
     theme?: FundraiserSettings['theme'];
-    modules?: { 
-      leaderboard?: LeaderboardModuleSettings,
-      stage?: StageModuleSettings
-     };
-  imageFile?: string; // base64 encoded, only sent when image changed
+    modules?: {
+      leaderboard?: LeaderboardModuleSettings;
+      stage?: StageModuleSettings;
+    };
+    imageFile?: string; // base64 encoded, only sent when image changed
+  };
 }
 
 export interface CreateFundraiserRequest {
