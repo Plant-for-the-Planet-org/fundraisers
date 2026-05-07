@@ -16,15 +16,6 @@ import { getAvatarColor } from './donation-item';
 
 const PAGE_SIZE = 10;
 
-const TAB_TRIGGER_CLASS = cn(
-  'h-auto flex-none text-foreground after:hidden',
-  'px-4 py-2 text-sm font-medium bg-transparent transition-all rounded-t-md rounded-b-none relative -mb-px z-10 shadow-none border-2 border-transparent',
-  'data-[state=active]:bg-white/0 data-[state=active]:border-t-white/50 data-[state=active]:border-l-white/50 data-[state=active]:border-r-white/50 data-[state=active]:border-b-transparent data-[state=active]:shadow-none',
-  'data-[state=inactive]:border-b-white/50 data-[state=inactive]:shadow-none',
-  'dark:data-[state=active]:bg-transparent',
-  'hover:bg-muted/50'
-);
-
 interface ViewAllOverlayProps {
   idOrSlug: string;
   isOpen: boolean;
@@ -141,6 +132,8 @@ export function ViewAllOverlay({
 
   // Fetch next page - caches BOTH tabs from single API call
   const fetchNextPage = useCallback(async () => {
+    if (isLoadingMore || !hasMore[effectiveTab]) return;
+
     const currentPage = pagePerTab[effectiveTab];
     const nextPage = currentPage + 1;
 
@@ -180,28 +173,49 @@ export function ViewAllOverlay({
     } finally {
       setIsLoadingMore(false);
     }
-  }, [effectiveTab, pagePerTab, recentPageCache, topPageCache, idOrSlug]);
+  }, [
+    effectiveTab,
+    isLoadingMore,
+    hasMore,
+    pagePerTab,
+    recentPageCache,
+    topPageCache,
+    idOrSlug,
+  ]);
 
-  // Scroll listener for infinite scroll
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const isNearBottom =
-      el.scrollHeight - (el.scrollTop + el.clientHeight) < 300;
-
-    if (isNearBottom && !isLoadingMore && hasMore[effectiveTab]) {
-      fetchNextPage();
-    }
-  }, [isLoadingMore, hasMore, effectiveTab, fetchNextPage]);
-
+  // Ref keeps observer callback stable while always calling the latest fetchNextPage
+  const fetchNextPageRef = useRef(fetchNextPage);
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    fetchNextPageRef.current = fetchNextPage;
+  }, [fetchNextPage]);
 
-    el.addEventListener('scroll', handleScroll);
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  // Sentinel element observed for infinite scroll
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // IntersectionObserver triggers fetch when sentinel nears the viewport.
+  // Handles both scroll-near-bottom AND content-shorter-than-container cases.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const sentinel = sentinelRef.current;
+    const scrollContainer = scrollRef.current;
+    if (!sentinel || !scrollContainer) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          fetchNextPageRef.current();
+        }
+      },
+      {
+        root: scrollContainer,
+        rootMargin: '0px 0px 300px 0px',
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [isOpen, effectiveTab, donations.length]);
 
   if (!isOpen || !hasEnabledList) return null;
 
@@ -240,21 +254,16 @@ export function ViewAllOverlay({
           value={effectiveTab}
           onValueChange={value => setTab(value as 'recent' | 'top')}
         >
-          <TabsList
-            variant='line'
-            className='gap-0 bg-transparent p-0 px-4 pt-3 h-auto relative'
-          >
-            {showRecentList && (
-              <TabsTrigger value='recent' className={TAB_TRIGGER_CLASS}>
-                {t('tabs.latest')}
-              </TabsTrigger>
-            )}
-            {showTopList && (
-              <TabsTrigger value='top' className={TAB_TRIGGER_CLASS}>
-                {t('tabs.topDonations')}
-              </TabsTrigger>
-            )}
-          </TabsList>
+          <div className='px-4 pt-3'>
+            <TabsList>
+              {showRecentList && (
+                <TabsTrigger value='recent'>{t('tabs.latest')}</TabsTrigger>
+              )}
+              {showTopList && (
+                <TabsTrigger value='top'>{t('tabs.topDonations')}</TabsTrigger>
+              )}
+            </TabsList>
+          </div>
 
           <div ref={scrollRef} className='max-h-[50vh] overflow-y-auto'>
             {donations.length > 0 ? (
@@ -336,6 +345,8 @@ export function ViewAllOverlay({
                     </span>
                   </div>
                 )}
+                {/* Sentinel observed by IntersectionObserver for infinite scroll */}
+                <div ref={sentinelRef} className='h-1' aria-hidden='true' />
               </>
             ) : (
               <div className='py-8 text-center'>
