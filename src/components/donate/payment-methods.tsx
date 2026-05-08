@@ -256,16 +256,9 @@ export function PaymentMethods() {
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
-    // To test pre-selection without hitting the API, replace the next line:
-    //   const raw = 'stripe:card';
-    //   const raw = 'stripe:sepa_debit';
-    //   const raw = 'paypal:paypal';
-    //   const raw = 'offline:offline';
     const raw = paymentOptions.lastPaymentMethod;
     if (!raw) return null;
-    // API format is "<gateway>:<method>". For the offline gateway the
-    // method side comes back as "offline" (the gateway name) — run the
-    // method through the normalizer so it maps to "bank_transfer".
+    // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
     const methodPart = normalizePaymentMethodId(raw.split(':')[1]);
     return methodPart && SUPPORTED_METHOD_IDS.has(methodPart)
       ? methodPart
