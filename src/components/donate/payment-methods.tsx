@@ -156,7 +156,7 @@ type PaymentMethodOptionProps = {
   methodFeeText: string | null;
   methodFeeTooltip: string | null;
   lastUsedLabel?: string;
-  remark?: string | null;
+  remark?: string;
   onSelect: (methodId: PaymentMethodId) => void;
 };
 
@@ -404,8 +404,8 @@ export function PaymentMethods() {
           method.id === lastUsedMethodId ? t('lastUsed') : undefined,
         remark:
           isSubscription && method.id === 'bank_transfer'
-            ? t('methods.bankTransferRemark' as never)
-            : null,
+            ? t('methods.bankTransferRemark')
+            : undefined,
       })),
     [
       donationData.currency,
