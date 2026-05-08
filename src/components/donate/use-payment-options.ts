@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { useAuthStore } from '@/stores/auth-store';
 
-interface UsePaymentOptionsOptions {
+interface UsePaymentOptionsArgs {
   initialPaymentOptions: PaymentOptions;
   enabled?: boolean;
   includeAuthenticatedData?: boolean;
@@ -41,7 +41,7 @@ export function usePaymentOptions(
     enabled = true,
     includeAuthenticatedData = false,
     initialPaymentOptionsAreAuthenticated = false,
-  }: UsePaymentOptionsOptions
+  }: UsePaymentOptionsArgs
 ): UsePaymentOptionsResult {
   const accessToken = useAuthStore(state => state.accessToken);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);

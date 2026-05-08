@@ -2,13 +2,13 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { platformAPIClient } from './external-client';
 
-interface GetPaymentOptionsOptions {
-  token?: string | null;
+interface GetPaymentOptionsParams {
+  token?: string;
 }
 
 export async function getPaymentOptions(
   fundraiserId: string,
-  options: GetPaymentOptionsOptions = {}
+  options: GetPaymentOptionsParams = {}
 ): Promise<PaymentOptions> {
   return options.token
     ? platformAPIClient.getAuthenticated<PaymentOptions>(
