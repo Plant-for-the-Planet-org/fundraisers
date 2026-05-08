@@ -39,14 +39,17 @@ const donationFormFields = z.object({
   selectedAddressId: z.string().optional(),
   makeMonthly: z.boolean(),
   willAbsorbFee: z.boolean(),
-  selectedPaymentMethod: z.enum([
-    'card',
-    'sepa_debit',
-    'apple_pay',
-    'google_pay',
-    'paypal',
-    'bank_transfer',
-  ]),
+  selectedPaymentMethod: z.enum(
+    [
+      'card',
+      'sepa_debit',
+      'apple_pay',
+      'google_pay',
+      'paypal',
+      'bank_transfer',
+    ],
+    { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
+  ),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
   tin: z.string().trim().optional(),
@@ -207,8 +210,6 @@ export function DonationFormProvider({
       tin: '',
       makeMonthly: false,
       willAbsorbFee: false,
-      // TODO: change default once other payment methods are implemented
-      selectedPaymentMethod: 'bank-transfer',
       addressType: 'primary',
     },
     mode: 'onBlur',

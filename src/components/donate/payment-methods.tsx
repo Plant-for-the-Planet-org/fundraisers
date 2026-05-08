@@ -8,7 +8,7 @@ import type {
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
 import { memo, useCallback, useEffect, useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
@@ -20,6 +20,7 @@ import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import { useFieldError } from '@/components/donate/use-field-error';
 import {
   ApplePayIcon,
   BankIcon,
@@ -235,6 +236,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
+  const translateError = useFieldError();
 
   const {
     fundraiser,
@@ -245,6 +247,10 @@ export function PaymentMethods() {
     cardFormRef,
   } = useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
+  const { errors } = useFormState({ control, name: 'selectedPaymentMethod' });
+  const paymentMethodError = translateError(
+    errors.selectedPaymentMethod?.message
+  );
   const selectedPaymentMethod = useWatch({
     control,
     name: 'selectedPaymentMethod',
@@ -469,6 +475,10 @@ export function PaymentMethods() {
           })}
         </div>
       </div>
+
+      {paymentMethodError && (
+        <p className='text-sm text-destructive'>{paymentMethodError}</p>
+      )}
 
       {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}
       {selectedPaymentMethod === 'sepa_debit' && (
