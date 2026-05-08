@@ -45,10 +45,10 @@ export async function submitStandardDonation({
   // respective payment element refs (e.g. paymentMethodId for Stripe, orderId for PayPal)
   // and extend this branch as needed.
   const paymentData: PaymentData =
-    selectedPaymentMethod === 'bank-transfer'
+    selectedPaymentMethod === 'bank_transfer'
       ? {
           donationId: donationResponse.donationId,
-          paymentMethod: 'bank-transfer',
+          paymentMethod: 'bank_transfer',
           paymentDetails: {},
         }
       : {

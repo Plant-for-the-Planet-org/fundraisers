@@ -65,7 +65,7 @@ src/components/donate/
         calls confirmCardPayment on form ref, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
     — handleSepaAction(sepaFormRef, paymentResponse, donationId, token)
-        Handles action_required → sepa-debit branch:
+        Handles action_required → sepa_debit branch:
         calls confirmSepaDebitPayment on form ref, then resolveThankYouStateFromDonation.
         Returns ThankYouState or error.
 

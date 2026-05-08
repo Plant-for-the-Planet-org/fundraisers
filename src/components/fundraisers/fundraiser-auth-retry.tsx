@@ -23,19 +23,15 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (isAuthInitializing) return;
+    if (isAuthInitializing || !accessToken) return;
 
-    const request = accessToken
-      ? getFundraiserAuthenticated(slug, accessToken)
-      : Promise.reject(new Error('unauthenticated'));
-
-    request
+    getFundraiserAuthenticated(slug, accessToken)
       .then(async data => {
         setSelectedTheme(buildTheme(data.settings?.theme ?? null));
         let options: PaymentOptions | undefined;
         if (data.canDonate) {
           try {
-            options = await getPaymentOptions(data.id);
+            options = await getPaymentOptions(data.id, { token: accessToken });
           } catch {
             // payment options unavailable; donation form won't render
           }
@@ -50,6 +46,10 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
   if (!fundraiser) return null;
 
   return (
-    <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+    <FundraiserView
+      fundraiser={fundraiser}
+      paymentOptions={paymentOptions}
+      paymentOptionsAreAuthenticated={accessToken !== null}
+    />
   );
 }
