@@ -8,15 +8,15 @@ import { useAuthStore } from '@/stores/auth-store';
 
 interface UsePaymentOptionsArgs {
   initialPaymentOptions: PaymentOptions;
-  enabled?: boolean;
-  includeAuthenticatedData?: boolean;
-  initialPaymentOptionsAreAuthenticated?: boolean;
+  fetchEnabled?: boolean;
+  areInitialOptionsAuthenticated?: boolean;
 }
 
 interface UsePaymentOptionsResult {
   paymentOptions: PaymentOptions;
   /**
    * `true` once `paymentOptions` reflects the user's auth state:
+   * - fetch disabled → ready immediately (no fetch coming).
    * - anonymous user → ready immediately (no fetch coming).
    * - authenticated, server-side data already authenticated → ready immediately.
    * - authenticated, client-side fetch resolved (success or error) → ready.
@@ -28,7 +28,7 @@ interface UsePaymentOptionsResult {
   isReady: boolean;
 }
 
-interface AuthenticatedPaymentOptionsState {
+interface PaymentOptionsCache {
   fundraiserId: string;
   paymentOptions: PaymentOptions;
   token: string;
@@ -38,56 +38,53 @@ export function usePaymentOptions(
   fundraiserId: string,
   {
     initialPaymentOptions,
-    enabled = true,
-    includeAuthenticatedData = false,
-    initialPaymentOptionsAreAuthenticated = false,
+    fetchEnabled = true,
+    areInitialOptionsAuthenticated = false,
   }: UsePaymentOptionsArgs
 ): UsePaymentOptionsResult {
   const accessToken = useAuthStore(state => state.accessToken);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
-  const [authenticatedState, setAuthenticatedState] =
-    useState<AuthenticatedPaymentOptionsState | null>(null);
-  const [authFetchSettled, setAuthFetchSettled] = useState(false);
 
-  const isAuthenticatedStateCurrent =
-    !!accessToken &&
-    authenticatedState?.fundraiserId === fundraiserId &&
-    authenticatedState.token === accessToken;
+  const [cache, setCache] = useState<PaymentOptionsCache | null>(null);
+  const [isFetchSettled, setIsFetchSettled] = useState(false);
+
+  const isCacheValid =
+    accessToken !== null &&
+    cache?.fundraiserId === fundraiserId &&
+    cache.token === accessToken;
   const hasAuthenticatedData =
-    (initialPaymentOptionsAreAuthenticated && !!accessToken) ||
-    isAuthenticatedStateCurrent;
-  const paymentOptions = isAuthenticatedStateCurrent
-    ? authenticatedState.paymentOptions
+    (areInitialOptionsAuthenticated && accessToken !== null) || isCacheValid;
+  const paymentOptions = isCacheValid
+    ? cache.paymentOptions
     : initialPaymentOptions;
 
-  // Reset the settled flag when the inputs that drive the fetch change.
   useEffect(() => {
-    setAuthFetchSettled(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsFetchSettled(false);
   }, [fundraiserId, accessToken]);
 
   useEffect(() => {
-    if (!enabled || !includeAuthenticatedData) return;
-    if (isAuthInitializing || !accessToken || hasAuthenticatedData) {
-      return;
-    }
+    if (!fetchEnabled) return;
+    if (isAuthInitializing || !accessToken || hasAuthenticatedData) return;
 
     let cancelled = false;
 
     getPaymentOptions(fundraiserId, { token: accessToken })
       .then(nextPaymentOptions => {
         if (cancelled) return;
-        setAuthenticatedState({
+        setCache({
           fundraiserId,
           paymentOptions: nextPaymentOptions,
           token: accessToken,
         });
-        setAuthFetchSettled(true);
+        setIsFetchSettled(true);
       })
       .catch(error => {
         if (cancelled) return;
         console.error('[payment-options] auth fetch', error);
         // Mark settled even on failure so consumers don't wait forever.
-        setAuthFetchSettled(true);
+        setIsFetchSettled(true);
       });
 
     return () => {
@@ -95,20 +92,19 @@ export function usePaymentOptions(
     };
   }, [
     accessToken,
-    enabled,
+    fetchEnabled,
     fundraiserId,
     hasAuthenticatedData,
-    includeAuthenticatedData,
-    initialPaymentOptionsAreAuthenticated,
+    areInitialOptionsAuthenticated,
     isAuthInitializing,
   ]);
 
   const isReady =
     !isAuthInitializing &&
-    (!includeAuthenticatedData ||
-      !accessToken ||
+    (!fetchEnabled ||
+      !isAuthenticated ||
       hasAuthenticatedData ||
-      authFetchSettled);
+      isFetchSettled);
 
   return { paymentOptions, isReady };
 }

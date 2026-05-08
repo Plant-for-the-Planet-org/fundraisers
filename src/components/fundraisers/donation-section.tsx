@@ -28,9 +28,8 @@ export function DonationSection({
     isReady: paymentOptionsReady,
   } = usePaymentOptions(fundraiser.id, {
     initialPaymentOptions: paymentOptions,
-    enabled: isOverlayOpen,
-    includeAuthenticatedData: true,
-    initialPaymentOptionsAreAuthenticated: paymentOptionsAreAuthenticated,
+    fetchEnabled: isOverlayOpen,
+    areInitialOptionsAuthenticated: paymentOptionsAreAuthenticated,
   });
 
   const contributionSettings = mapPaymentOptionsToContributionSettings(
