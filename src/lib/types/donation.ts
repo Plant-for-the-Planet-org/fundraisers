@@ -125,13 +125,15 @@ export type DonationFormData = AuthenticatedFormData | GuestFormData;
 export type DonationFrequency = 'once' | 'monthly' | 'yearly';
 
 export interface DonationPayload {
-  amount: number; // base donation total excluding fees, decimal
+  /** base donation total excluding fees, decimal */
+  amount: number;
   currency: string;
   frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
-  absorbedFee?: number; // processing fee covered by donor, decimal
+  /** processing fee covered by donor, decimal, only if donor decides to cover feed */
+  absorbedFee?: number;
   prePaid?: boolean;
   donor: DonorInfo;
   gift?: SentInvitationGift;
