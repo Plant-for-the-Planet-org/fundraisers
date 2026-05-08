@@ -156,6 +156,7 @@ type PaymentMethodOptionProps = {
   methodFeeText: string | null;
   methodFeeTooltip: string | null;
   lastUsedLabel?: string;
+  remark?: string;
   onSelect: (methodId: PaymentMethodId) => void;
 };
 
@@ -168,6 +169,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   methodFeeText,
   methodFeeTooltip,
   lastUsedLabel,
+  remark,
   onSelect,
 }: PaymentMethodOptionProps) {
   const MethodLogo = methodLogo;
@@ -211,6 +213,11 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
                 {lastUsedLabel}
               </span>
             )}
+            {remark && (
+              <span className='w-full text-xs text-muted-foreground'>
+                {remark}
+              </span>
+            )}
           </div>
         </div>
 
@@ -242,6 +249,9 @@ export function PaymentMethods() {
     control,
     name: 'selectedPaymentMethod',
   });
+  const makeMonthly = useWatch({ control, name: 'makeMonthly' });
+
+  const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
@@ -332,10 +342,12 @@ export function PaymentMethods() {
   ]);
 
   const visibleMethods = useMemo(() => {
-    return availableMethods.filter(method =>
-      SUPPORTED_METHOD_IDS.has(method.id)
-    );
-  }, [availableMethods]);
+    return availableMethods.filter(method => {
+      if (!SUPPORTED_METHOD_IDS.has(method.id)) return false;
+      if (isSubscription && method.id === 'paypal') return false;
+      return true;
+    });
+  }, [availableMethods, isSubscription]);
 
   useEffect(() => {
     if (visibleMethods.length === 0) return;
@@ -390,6 +402,10 @@ export function PaymentMethods() {
           : null,
         lastUsedLabel:
           method.id === lastUsedMethodId ? t('lastUsed') : undefined,
+        remark:
+          isSubscription && method.id === 'bank_transfer'
+            ? t('methods.bankTransferRemark')
+            : undefined,
       })),
     [
       donationData.currency,
@@ -397,6 +413,7 @@ export function PaymentMethods() {
       getFeeText,
       getFeeTooltip,
       getMethodLabel,
+      isSubscription,
       lastUsedMethodId,
       t,
       visibleMethods,
@@ -452,6 +469,7 @@ export function PaymentMethods() {
                 methodFeeText={method.feeText}
                 methodFeeTooltip={method.feeTooltip}
                 lastUsedLabel={method.lastUsedLabel}
+                remark={method.remark}
                 onSelect={handleMethodSelect}
               />
             );
