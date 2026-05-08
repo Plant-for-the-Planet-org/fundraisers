@@ -15,6 +15,8 @@ interface LeaderboardViewProps {
   idOrSlug: string;
   recentDonations: LeaderboardDonation[];
   topDonations: LeaderboardDonation[];
+  recentTotal: number;
+  topTotal: number;
   settings: LeaderboardModuleSettings;
 }
 
@@ -31,6 +33,8 @@ export function LeaderboardView({
   idOrSlug,
   recentDonations,
   topDonations,
+  recentTotal,
+  topTotal,
   settings,
 }: LeaderboardViewProps) {
   const {
@@ -120,6 +124,8 @@ export function LeaderboardView({
         }}
         recentDonations={recentDonations}
         topDonations={topDonations}
+        recentTotal={recentTotal}
+        topTotal={topTotal}
         activeTab={effectiveTab}
         showRecentList={show_recent_list}
         showTopList={show_top_list}

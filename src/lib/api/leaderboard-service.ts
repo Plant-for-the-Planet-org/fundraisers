@@ -1,12 +1,17 @@
-import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
+import type {
+  LeaderboardApiResponse,
+  LeaderboardPageResponse,
+} from '@/lib/types/leaderboard';
 
 import { platformAPIClient } from './external-client';
 
 export async function getLeaderboard(
-  idOrSlug: string
+  idOrSlug: string,
+  limit: number = 10
 ): Promise<LeaderboardApiResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
   return platformAPIClient.get<LeaderboardApiResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard`
+    `/fundraisers/${idOrSlug}/leaderboard?${params.toString()}`
   );
 }
 
@@ -31,17 +36,30 @@ export async function getLeaderboardWithRetry(
   throw lastError!;
 }
 
-export async function getLeaderboardPage(
+export async function getLeaderboardRecent(
   idOrSlug: string,
-  limit: number = 10,
-  page: number = 1
-): Promise<LeaderboardApiResponse> {
+  page: number = 1,
+  limit: number = 10
+): Promise<LeaderboardPageResponse> {
   const params = new URLSearchParams({
-    limit: limit.toString(),
     page: page.toString(),
+    limit: limit.toString(),
   });
+  return platformAPIClient.get<LeaderboardPageResponse>(
+    `/fundraisers/${idOrSlug}/leaderboard/recent?${params.toString()}`
+  );
+}
 
-  return platformAPIClient.get<LeaderboardApiResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard?${params.toString()}`
+export async function getLeaderboardTop(
+  idOrSlug: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<LeaderboardPageResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  return platformAPIClient.get<LeaderboardPageResponse>(
+    `/fundraisers/${idOrSlug}/leaderboard/top?${params.toString()}`
   );
 }

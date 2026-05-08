@@ -6,7 +6,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { Loader2, X } from 'lucide-react';
-import { getLeaderboardPage } from '@/lib/api/leaderboard-service';
+import {
+  getLeaderboardRecent,
+  getLeaderboardTop,
+} from '@/lib/api/leaderboard-service';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
@@ -22,6 +25,8 @@ interface ViewAllOverlayProps {
   onClose: (activeTab: 'recent' | 'top') => void;
   recentDonations: LeaderboardDonation[];
   topDonations: LeaderboardDonation[];
+  recentTotal: number;
+  topTotal: number;
   activeTab: 'recent' | 'top';
   showRecentList: boolean;
   showTopList: boolean;
@@ -36,6 +41,8 @@ export function ViewAllOverlay({
   onClose,
   recentDonations,
   topDonations,
+  recentTotal,
+  topTotal,
   activeTab,
   showRecentList,
   showTopList,
@@ -67,8 +74,8 @@ export function ViewAllOverlay({
   const [pagePerTab, setPagePerTab] = useState({ recent: 1, top: 1 });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState({
-    recent: recentDonations.length >= PAGE_SIZE,
-    top: topDonations.length >= PAGE_SIZE,
+    recent: recentTotal > recentDonations.length,
+    top: topTotal > topDonations.length,
   });
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -130,7 +137,7 @@ export function ViewAllOverlay({
     return result;
   }, [effectiveTab, pagePerTab, recentPageCache, topPageCache]);
 
-  // Fetch next page - caches BOTH tabs from single API call
+  // Fetch next page for the active tab
   const fetchNextPage = useCallback(async () => {
     if (isLoadingMore || !hasMore[effectiveTab]) return;
 
@@ -146,28 +153,27 @@ export function ViewAllOverlay({
 
     setIsLoadingMore(true);
     try {
-      const response = await getLeaderboardPage(idOrSlug, PAGE_SIZE, nextPage);
+      const response =
+        effectiveTab === 'recent'
+          ? await getLeaderboardRecent(idOrSlug, nextPage, PAGE_SIZE)
+          : await getLeaderboardTop(idOrSlug, nextPage, PAGE_SIZE);
 
-      // Cache BOTH tabs from this single response
-      setRecentPageCache(prev => {
+      // Cache the fetched page for the active tab
+      const setCache =
+        effectiveTab === 'recent' ? setRecentPageCache : setTopPageCache;
+      setCache(prev => {
         const m = new Map(prev);
-        m.set(nextPage, response.recent);
+        m.set(nextPage, response.items);
         return m;
       });
-      setTopPageCache(prev => {
-        const m = new Map(prev);
-        m.set(nextPage, response.top);
-        return m;
-      });
 
-      // Advance page for active tab
       setPagePerTab(prev => ({ ...prev, [effectiveTab]: nextPage }));
 
-      // Update hasMore for BOTH tabs
-      setHasMore({
-        recent: response.recent.length >= PAGE_SIZE,
-        top: response.top.length >= PAGE_SIZE,
-      });
+      // Use _links.next presence to determine hasMore
+      setHasMore(prev => ({
+        ...prev,
+        [effectiveTab]: !!response._links.next,
+      }));
     } catch (error) {
       console.error('Failed to fetch leaderboard page', nextPage, error);
     } finally {

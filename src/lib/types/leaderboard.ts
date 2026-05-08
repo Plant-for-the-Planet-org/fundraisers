@@ -14,7 +14,24 @@ export interface LeaderboardDonation {
 export interface LeaderboardApiResponse {
   recent: LeaderboardDonation[];
   top: LeaderboardDonation[];
+  recentTotal: number;
+  topTotal: number;
   donorCount: number;
   donationCount: number;
   settings: LeaderboardModuleSettings;
+}
+
+export interface LeaderboardPageLinks {
+  self: string;
+  first: string;
+  last: string;
+  next?: string;
+  prev?: string;
+}
+
+export interface LeaderboardPageResponse {
+  items: LeaderboardDonation[];
+  total: number;
+  count: number;
+  _links: LeaderboardPageLinks;
 }

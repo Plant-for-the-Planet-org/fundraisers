@@ -69,6 +69,8 @@ export function LeaderboardSettings() {
             idOrSlug=''
             recentDonations={mockRecent}
             topDonations={mockTop}
+            recentTotal={mockRecent.length}
+            topTotal={mockTop.length}
             settings={settings}
           />
         ) : (

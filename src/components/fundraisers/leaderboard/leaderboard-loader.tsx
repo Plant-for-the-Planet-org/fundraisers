@@ -25,6 +25,8 @@ export async function LeaderboardLoader({
       idOrSlug={idOrSlug}
       recentDonations={data.recent}
       topDonations={data.top}
+      recentTotal={data.recentTotal}
+      topTotal={data.topTotal}
       settings={settings}
     />
   );
