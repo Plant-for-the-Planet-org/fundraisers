@@ -31,6 +31,7 @@ import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donatio
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
+import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
 import { useAuthStore } from '@/stores/auth-store';
@@ -88,11 +89,21 @@ export function useDonationSubmit(
       const isPlanetCash =
         values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
 
+      const { processingFeeCents } = getDonationProcessingFeeInfo({
+        paymentOptions,
+        donationAmountCents: donationData.amountCents,
+        donationCurrency: donationData.currency,
+        workspaceCountry: fundraiser.workspace?.country,
+        selectedPaymentMethod: values.selectedPaymentMethod,
+      });
+
       const payload = buildDonationPayload(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash
+        isPlanetCash,
+        values.willAbsorbFee,
+        processingFeeCents
       );
 
       let paymentDetails: PaymentData['paymentDetails'] = {};
@@ -377,11 +388,22 @@ export function useDonationSubmit(
       const isPlanetCash =
         values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
 
+      const { processingFeeCents: paypalProcessingFeeCents } =
+        getDonationProcessingFeeInfo({
+          paymentOptions,
+          donationAmountCents: donationData.amountCents,
+          donationCurrency: donationData.currency,
+          workspaceCountry: fundraiser.workspace?.country,
+          selectedPaymentMethod: values.selectedPaymentMethod,
+        });
+
       const payload = buildDonationPayload(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash
+        isPlanetCash,
+        values.willAbsorbFee,
+        paypalProcessingFeeCents
       );
 
       try {

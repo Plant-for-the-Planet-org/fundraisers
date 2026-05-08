@@ -291,10 +291,10 @@ export function PaymentMethods() {
         fundraiser.workspace?.country ||
         'DE',
       currency: donationData.currency,
-      donationAmountCents: donationData.amount,
+      donationAmountCents: donationData.amountCents,
     });
   }, [
-    donationData.amount,
+    donationData.amountCents,
     donationData.currency,
     fundraiser.workspace?.country,
     paymentOptions,

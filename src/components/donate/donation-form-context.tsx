@@ -38,7 +38,7 @@ const donationFormFields = z.object({
   isAnonymous: z.boolean(),
   selectedAddressId: z.string().optional(),
   makeMonthly: z.boolean(),
-  coverFees: z.boolean(),
+  willAbsorbFee: z.boolean(),
   selectedPaymentMethod: z.enum([
     'card',
     'sepa-debit',
@@ -198,7 +198,7 @@ export function DonationFormProvider({
       isCompany: false,
       tin: '',
       makeMonthly: false,
-      coverFees: false,
+      willAbsorbFee: false,
       // TODO: change default once other payment methods are implemented
       selectedPaymentMethod: 'bank-transfer',
       addressType: 'primary',

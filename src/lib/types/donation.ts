@@ -83,11 +83,15 @@ export interface DonationMetadata {
     };
     customFields?: CustomFieldValue[];
   };
+  fees?: {
+    is_fee_absorbed: boolean;
+    fee_amount: number; // decimal
+  };
 }
 
 /** Intermediate form data assembled from donation context and user input */
 interface DonationFormDataBase {
-  amount: number;
+  amountCents: number;
   currency: string;
   frequency: DonationFrequency;
   isAnonymous: boolean;
@@ -121,11 +125,15 @@ export type DonationFormData = AuthenticatedFormData | GuestFormData;
 export type DonationFrequency = 'once' | 'monthly' | 'yearly';
 
 export interface DonationPayload {
+  /** base donation total excluding fees, decimal */
+  amount: number;
   currency: string;
   frequency: DonationFrequency;
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
+  /** processing fee covered by donor, decimal, only if donor decides to cover feed */
+  absorbedFee?: number;
   prePaid?: boolean;
   donor: DonorInfo;
   gift?: SentInvitationGift;
