@@ -25,7 +25,7 @@ export function DonationSection({
   const [donationData, setDonationData] = useState<DonationData | null>(null);
   const {
     paymentOptions: resolvedPaymentOptions,
-    isReady: paymentOptionsReady,
+    isReady: paymentOptionsReady, // renamed for clarity when passed as a prop
   } = usePaymentOptions(fundraiser.id, {
     initialPaymentOptions: paymentOptions,
     fetchEnabled: isOverlayOpen,

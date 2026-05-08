@@ -43,6 +43,7 @@
         "selectMethodPlaceholder": "Select payment method",
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
+        "bankTransferRemark": "Please set up a standing order with your bank.",
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
@@ -50,8 +51,7 @@
           "card": "Credit or Debit Card",
           "sepa": "SEPA Direct Debit",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay",
-          "bankTransferRemark": "Please set up a standing order with your bank."
+          "googlePay": "Google Pay"
         },
         "providers": {
           "stripe": "Stripe",

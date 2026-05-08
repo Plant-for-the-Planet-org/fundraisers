@@ -77,6 +77,15 @@ export function DonateOverlay({
   );
 }
 
+interface DonateOverlayInnerProps {
+  donationData: DonationData;
+  fundraiser: Fundraiser;
+  paymentOptions: PaymentOptions;
+  paymentOptionsReady: boolean;
+  onClose: () => void;
+  isOpen: boolean;
+}
+
 /** Inner component rendered only when donationData is available, so hooks can depend on it safely */
 function DonateOverlayInner({
   donationData,
@@ -85,14 +94,7 @@ function DonateOverlayInner({
   paymentOptionsReady,
   onClose,
   isOpen,
-}: {
-  donationData: DonationData;
-  fundraiser: Fundraiser;
-  paymentOptions: PaymentOptions;
-  paymentOptionsReady: boolean;
-  onClose: () => void;
-  isOpen: boolean;
-}) {
+}: DonateOverlayInnerProps) {
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
   const cardFormRef = useRef<StripeCardFormHandle>(null);

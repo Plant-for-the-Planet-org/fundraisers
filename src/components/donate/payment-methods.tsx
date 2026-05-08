@@ -210,7 +210,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
           <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
             <span className='text-sm font-medium'>{methodLabel}</span>
             {lastUsedLabel && (
-              <span className='px-2 py-0.5 text-xs bg-gray-100 text-muted-foreground rounded-full'>
+              <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
                 {lastUsedLabel}
               </span>
             )}
@@ -262,13 +262,11 @@ export function PaymentMethods() {
   const feeCollectionEnabled = isFeeCollectionEnabled();
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
-    const raw = paymentOptions.lastPaymentMethod;
-    if (!raw) return null;
     // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
-    const methodPart = normalizePaymentMethodId(raw.split(':')[1]);
-    return methodPart && SUPPORTED_METHOD_IDS.has(methodPart)
-      ? methodPart
-      : null;
+    const method = normalizePaymentMethodId(
+      paymentOptions.lastPaymentMethod?.split(':')[1]
+    );
+    return method && SUPPORTED_METHOD_IDS.has(method) ? method : null;
   }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
@@ -403,7 +401,7 @@ export function PaymentMethods() {
           method.id === lastUsedMethodId ? t('lastUsed') : undefined,
         remark:
           isSubscription && method.id === 'bank_transfer'
-            ? t('methods.bankTransferRemark')
+            ? t('bankTransferRemark')
             : undefined,
       })),
     [

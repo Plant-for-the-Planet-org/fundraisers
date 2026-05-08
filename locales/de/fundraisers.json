@@ -43,6 +43,7 @@
         "selectMethodPlaceholder": "Zahlungsmethode auswählen",
         "empty": "Es sind derzeit keine Zahlungsmöglichkeiten verfügbar.",
         "lastUsed": "Zuletzt verwendet",
+        "bankTransferRemark": "Bitte richten Sie einen Dauerauftrag bei Ihrer Bank ein.",
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
           "bankTransfer": "Banküberweisung",
@@ -50,8 +51,7 @@
           "card": "Kredit- oder Debitkarte",
           "sepa": "SEPA-Lastschriftverfahren",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay",
-          "bankTransferRemark": "Bitte richten Sie einen Dauerauftrag bei Ihrer Bank ein."
+          "googlePay": "Google Pay"
         },
         "providers": {
           "stripe": "Stripe",
