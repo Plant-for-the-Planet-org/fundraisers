@@ -6,6 +6,7 @@ import type { SelectedProject } from '@/lib/types/project-selection';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import { BundleTabs } from './bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
@@ -63,7 +64,11 @@ export function FundraiserFormBody({
           <GoalInput />
         </div>
         <WorkspaceInfo />
-        <ProjectSelection initialExtraProjects={initialExtraProjects} />
+        {isEditMode ? (
+          <ProjectSelection initialExtraProjects={initialExtraProjects} />
+        ) : (
+          <BundleTabs />
+        )}
         <Options />
         {submitButton}
       </MainPanel>

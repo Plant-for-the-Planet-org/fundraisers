@@ -1,6 +1,7 @@
 import type {
   ProjectData,
   ProjectPurpose,
+  ProjectUnitType,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
@@ -21,6 +22,30 @@ const PROJECT_PURPOSE_SET: ReadonlySet<string> = new Set(PROJECT_PURPOSES);
 
 function isProjectPurpose(value: string): value is ProjectPurpose {
   return PROJECT_PURPOSE_SET.has(value);
+}
+
+const PROJECT_UNIT_TYPES: ReadonlySet<ProjectUnitType> = new Set([
+  'tree',
+  'm2',
+  'currency',
+]);
+
+function normalizeUnitType(value: unknown): ProjectUnitType | undefined {
+  if (typeof value !== 'string') return undefined;
+  return PROJECT_UNIT_TYPES.has(value as ProjectUnitType)
+    ? (value as ProjectUnitType)
+    : undefined;
+}
+
+function normalizeUnitCost(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+  }
+  return undefined;
 }
 
 function normalizePurpose(purpose: unknown): ProjectPurpose | undefined {
@@ -71,6 +96,8 @@ function normalizeProject(project: unknown): ProjectData | null {
     country: typeof rawProject.country === 'string' ? rawProject.country : '',
     purpose: normalizePurpose(rawProject.purpose),
     image: typeof rawProject.image === 'string' ? rawProject.image : undefined,
+    unitCost: normalizeUnitCost(rawProject.unitCost),
+    unitType: normalizeUnitType(rawProject.unitType),
     tpo: normalizeTpo(rawProject.tpo),
   };
 }
