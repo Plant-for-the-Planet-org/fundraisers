@@ -47,27 +47,29 @@ export interface FundraiserWorkspace {
   };
 }
 
+export interface LeaderboardModuleSettings {
+  enabled: boolean;
+  view_all: boolean;
+  anonymize: boolean;
+  default_tab: 'recent' | 'top';
+  show_amount: boolean;
+  show_top_list: boolean;
+  show_recent_list: boolean;
+  show_avatar: boolean;
+}
+
 export interface FundraiserSettings {
   theme: {
-    base_id?: string; // Base theme ID (optional)
-    mode?: 'light' | 'dark'; // Override mode (optional)
-    accent?: string; // Override accent (optional)
-    background?: string; // Override background (optional)
-    body_font?: string; // Override body font (optional)
-    title_font?: string; // Override title font (optional)
-    animation?: string; // Override animation (optional)
+    base_id?: string;
+    mode?: 'light' | 'dark';
+    accent?: string;
+    background?: string;
+    body_font?: string;
+    title_font?: string;
+    animation?: string;
   };
   modules: {
-    leaderboard?: {
-      enabled: boolean;
-      view_all: boolean;
-      anonymize: boolean;
-      default_tab: 'recent' | 'top';
-      show_amount: boolean;
-      show_top_list: boolean;
-      show_recent_list: boolean;
-      show_avatar: boolean;
-    };
+    leaderboard?: LeaderboardModuleSettings;
     contribution?: {
       options: Array<{
         unit?: number;
@@ -130,6 +132,7 @@ export interface Fundraiser {
   workspace: Nullable<FundraiserWorkspace>;
   hosts: FundraiserHost[];
   visibility: FundraiserVisibility;
+  status: FundraiserStatus;
   canDonate: boolean;
   projectAllocations: ProjectAllocation[];
   startDate: string;
@@ -149,7 +152,11 @@ export interface UpdateFundraiserRequest {
     percentage: number;
     project_id: string;
   }>;
-  settings?: Pick<FundraiserSettings, 'theme'>;
+  // Expand modules as new module settings are added
+  settings?: {
+    theme?: FundraiserSettings['theme'];
+    modules?: { leaderboard?: LeaderboardModuleSettings };
+  };
   imageFile?: string; // base64 encoded, only sent when image changed
 }
 

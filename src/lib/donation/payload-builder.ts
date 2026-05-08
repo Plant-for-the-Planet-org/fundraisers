@@ -32,9 +32,13 @@ export function buildDonationMetadata(
   fundraiserData: Fundraiser,
   userProfile?: UserProfileResponse,
   sourceUrl?: string,
-  referrer?: string
+  referrer?: string,
+  willAbsorbFee?: boolean,
+  processingFeeCents?: number
 ): DonationPayload['metadata'] {
   const source = sourceUrl || getSourceUrl(fundraiserData.id);
+  const isAbsorbingFee =
+    willAbsorbFee && processingFeeCents && processingFeeCents > 0;
 
   return {
     utm_campaign: fundraiserData.id,
@@ -47,6 +51,12 @@ export function buildDonationMetadata(
         is_anonymous: formData.isAnonymous,
       },
     },
+    ...(isAbsorbingFee && {
+      fees: {
+        is_fee_absorbed: true,
+        fee_amount: processingFeeCents / 100,
+      },
+    }),
   };
 }
 /**
@@ -138,7 +148,7 @@ export function assembleFormData(
   isAuthenticated: boolean
 ): DonationFormData {
   const base = {
-    amount: donationData.amount || 0,
+    amountCents: donationData.amountCents || 0,
     currency: donationData.currency || fundraiser.currency || 'EUR',
     frequency: calculateFrequency(donationData.frequency, values.makeMonthly),
     isAnonymous: values.isAnonymous,
@@ -195,13 +205,15 @@ export function buildDonationPayload(
   formData: DonationFormData,
   fundraiser: Fundraiser,
   donorProfile: UserProfileResponse | undefined,
-  isPlanetCash: boolean
+  isPlanetCash: boolean,
+  willAbsorbFee: boolean,
+  processingFeeCents: number
 ): DonationPayload {
   const sourceUrl = getSourceUrl(fundraiser.id);
   const referrer = getReferrer();
 
   const lineItems = calculateLineItems(
-    formData.amount,
+    formData.amountCents,
     fundraiser.projectAllocations
   );
   const metadata = buildDonationMetadata(
@@ -209,16 +221,21 @@ export function buildDonationPayload(
     fundraiser,
     donorProfile,
     sourceUrl,
-    referrer
+    referrer,
+    willAbsorbFee,
+    processingFeeCents
   );
   const donorAlias = buildDonorAlias(formData, donorProfile);
+  const isAbsorbingFee = willAbsorbFee && processingFeeCents > 0;
 
   const base = {
+    amount: formData.amountCents / 100,
     currency: formData.currency,
     frequency: formData.frequency,
     lineItems,
     donorAlias,
     metadata,
+    ...(isAbsorbingFee && { absorbedFee: processingFeeCents / 100 }),
     ...(isPlanetCash && { prePaid: true }),
     ...(formData.gift && { gift: formData.gift }),
   };

@@ -1,36 +1,98 @@
 {
   "Dashboard": {
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard"
+    },
+    "manageFundraisers": {
+      "title": "Manage fundraisers",
+      "subtitle": "View, edit, and track your fundraisers. Pause collection or share the ones that need a boost."
+    },
+    "summary": {
+      "loading": "Loading summary stat...",
+      "fundraisers": {
+        "label": "Fundraisers",
+        "activeSuffix": "active",
+        "noActive": "No active fundraisers"
+      },
+      "totalRaised": {
+        "label": "Total Raised",
+        "helper": "across all time",
+        "moreCurrencies": "+{count, plural, one {# more currency} other {# more currencies}}",
+        "empty": "No funds raised yet"
+      },
+      "donations": {
+        "label": "Donations",
+        "helper": "from supporters"
+      }
+    },
     "statsError": {
       "title": "Couldn't load dashboard stats",
       "description": "Something went wrong while loading your fundraiser data.",
       "retry": "Try again",
       "exploreLinkText": "Discover Fundraisers"
     },
-    "breadcrumb": {
-      "home": "Home"
+    "toolbar": {
+      "searchPlaceholder": "Name or Host...",
+      "resultCount": "Showing <bold>{visible}</bold> of {total}"
     },
-    "dashboard": "Dashboard",
-    "welcome": "Welcome back, {displayName}!",
-    "fallbackName": "there",
-    "cards": {
-      "myFundraisers": {
-        "title": "My Fundraisers",
-        "description": "Manage your active fundraising campaigns",
-        "empty": "No active fundraisers",
-        "activeFundraisers": "Active fundraisers"
+    "statusFilter": {
+      "groupLabel": "Filter by status",
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "sort": {
+      "triggerLabel": "Sort: ",
+      "options": {
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "most-raised": "Most raised",
+        "ending-soonest": "Ending soonest",
+        "name-asc": "Name A-Z"
+      }
+    },
+    "statusBadge": {
+      "active": "Active",
+      "draft": "Draft",
+      "paused": "Paused",
+      "ended": "Ended",
+      "ending-soon": "Ending soon"
+    },
+    "noResults": {
+      "title": "No fundraisers match these filters.",
+      "description": "Try adjusting your search or filters.",
+      "cta": "Clear filters"
+    },
+    "actions": {
+      "menuLabel": "Open actions",
+      "edit": "Edit",
+      "copyLink": "Copy link",
+      "pause": "Pause",
+      "resume": "Resume",
+      "activate": "Activate",
+      "copyLinkSuccess": "Link copied",
+      "copyLinkError": "Could not copy link",
+      "pauseSuccess": "Fundraiser paused",
+      "resumeSuccess": "Fundraiser resumed",
+      "activateSuccess": "Fundraiser activated",
+      "mutationError": "Something went wrong. Try again."
+    },
+    "list": {
+      "loading": "Loading fundraiser item...",
+      "item": {
+        "byHost": "by {host}",
+        "goalProgress": "<b>{achievedAmount}</b> of {goal}",
+        "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
+        "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
+        "ended": "Ended"
       },
-      "totalRaised": {
-        "title": "Total Raised",
-        "description": "Amount raised across all campaigns",
-        "value": "Aggregated by currency",
-        "summaryLine": "{amount} from {count, plural, one {# fundraiser} other {# fundraisers}}",
-        "empty": "No funds raised.",
-        "aggregatedByCurrency": "Aggregated by currency"
-      },
-      "donations": {
-        "title": "Donations",
-        "description": "Your contribution history",
-        "empty": "No donations yet"
+      "empty": {
+        "title": "You haven't created a fundraiser yet",
+        "description": "Start a campaign to begin collecting donations.",
+        "cta": "Create your first fundraiser"
       }
     }
   }

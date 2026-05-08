@@ -41,9 +41,9 @@ export function DonationSection({
       <DonationForm
         currency={fundraiser.currency}
         contributionSettings={contributionSettings}
-        onDonate={(amount, isDedicated, frequency, gift) => {
+        onDonate={(amountCents, isDedicated, frequency, gift) => {
           setDonationData({
-            amount,
+            amountCents,
             currency: fundraiser.currency,
             frequency,
             dedicated: isDedicated,

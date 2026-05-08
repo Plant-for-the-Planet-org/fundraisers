@@ -13,6 +13,7 @@ import { GoalInput } from './goal-input';
 import { GoalPreview } from './goal-preview';
 import { Hosts } from './hosts';
 import { ImageSelector } from './image-selector';
+import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
 import { ProjectSelection } from './project-selection';
 import { ThemeSettings } from './theme-settings';
@@ -23,7 +24,7 @@ import { WorkspaceSelector } from './workspace-selector';
 interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
-  initialExtraProjects?: SelectedProject[];
+  nonDefaultInitialProjects?: SelectedProject[];
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
@@ -33,7 +34,7 @@ interface FundraiserFormBodyProps {
 export function FundraiserFormBody({
   mode,
   submitButton,
-  initialExtraProjects,
+  nonDefaultInitialProjects,
   totalRaised,
   endDate,
 }: FundraiserFormBodyProps) {
@@ -54,6 +55,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
+        <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -61,7 +63,9 @@ export function FundraiserFormBody({
           <GoalInput />
         </div>
         <WorkspaceInfo />
-        <ProjectSelection initialExtraProjects={initialExtraProjects} />
+        <ProjectSelection
+          nonDefaultInitialProjects={nonDefaultInitialProjects}
+        />
         <Options />
         {submitButton}
       </MainPanel>

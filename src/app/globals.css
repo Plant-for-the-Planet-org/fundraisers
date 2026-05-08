@@ -50,9 +50,12 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-ring: hsl(var(--ring));
   --color-destructive: hsl(var(--destructive));
+  --color-warning: hsl(var(--warning));
+  --color-success: hsl(var(--success));
   --color-accent-color: var(--accent-color);
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
+  --color-tab-border: var(--tab-border-color);
 
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
@@ -64,6 +67,7 @@
 }
 
 :root {
+  --tab-border-color: rgb(0 0 0 / 0.3);
   --background: 0 0% 100%;
   --foreground: 224 71.4% 4.1%;
   --muted: 220 14.3% 95.9%;
@@ -80,6 +84,8 @@
   --accent-color: #16a34a;
   --ring: 142 76% 36%;
   --destructive: 0 72% 51%;
+  --warning: 21 90% 48%;
+  --success: 160 84% 24%;
   --accent: 220 14.3% 95.9%;
   --accent-foreground: 220.9 39.3% 11%;
   --neutral: 220 13% 84%;
@@ -87,6 +93,7 @@
 }
 
 .dark {
+  --tab-border-color: rgb(255 255 255 / 0.5);
   --background: 224 71.4% 4.1%;
   --foreground: 210 20% 98%;
   --muted: 215 27.9% 16.9%;
@@ -99,10 +106,16 @@
   --input: 215 27.9% 16.9%;
   --ring: 142 71% 45%;
   --destructive: 0 63% 55%;
+  --warning: 27 96% 61%;
+  --success: 159 64% 52%;
   --accent: 215 27.9% 16.9%;
   --accent-foreground: 210 20% 98%;
   --neutral: 220 14% 34%;
   --neutral-foreground: 220 13% 84%;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 body {

@@ -3,7 +3,7 @@
 import type { SelectedProject } from '@/lib/types/project-selection';
 import type { FundraiserFormValues } from './fundraiser-form-schema';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Target } from 'lucide-react';
@@ -52,11 +52,11 @@ function recalculateAllocations(
 }
 
 interface ProjectSelectionProps {
-  initialExtraProjects?: SelectedProject[];
+  nonDefaultInitialProjects?: SelectedProject[];
 }
 
 export function ProjectSelection({
-  initialExtraProjects,
+  nonDefaultInitialProjects,
 }: ProjectSelectionProps = {}) {
   const t = useTranslations('Fundraisers.form.projectSelection');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
@@ -86,14 +86,14 @@ export function ProjectSelection({
 
   const projectDetailsById = useMemo<ProjectDetailsById>(() => {
     const fromInitial: ProjectDetailsById = {};
-    for (const project of initialExtraProjects ?? []) {
+    for (const project of nonDefaultInitialProjects ?? []) {
       fromInitial[project.id] = project;
     }
     // Session-added details win over initial ones when ids collide.
     return { ...fromInitial, ...sessionProjectDetails };
-  }, [initialExtraProjects, sessionProjectDetails]);
+  }, [nonDefaultInitialProjects, sessionProjectDetails]);
 
-  const defaultCause = useMemo(
+  const defaultWorkspaceCause = useMemo(
     () =>
       createDefaultCause(country ?? 'DE', [], {
         name: t('defaultCause.name'),
@@ -101,14 +101,14 @@ export function ProjectSelection({
       }),
     [country, t]
   );
-  const defaultCauseId = defaultCause.id;
+  const defaultWorkspaceCauseId = defaultWorkspaceCause.id;
 
   const displayedAllocations = useMemo(
     () =>
       allocations.map(({ project_id, percentage }) => {
-        const isDefault = project_id === defaultCauseId;
+        const isDefault = project_id === defaultWorkspaceCauseId;
         const details = isDefault
-          ? defaultCause
+          ? defaultWorkspaceCause
           : projectDetailsById[project_id];
         return {
           id: project_id,
@@ -120,62 +120,84 @@ export function ProjectSelection({
           isDefault,
         };
       }),
-    [allocations, defaultCauseId, defaultCause, projectDetailsById]
+    [
+      allocations,
+      defaultWorkspaceCauseId,
+      defaultWorkspaceCause,
+      projectDetailsById,
+    ]
   );
 
   const selectedProjectIds = useMemo(
     () =>
       Array.from(
         new Set([
-          defaultCauseId,
+          defaultWorkspaceCauseId,
           ...allocations.map(({ project_id }) => project_id),
         ])
       ),
-    [defaultCauseId, allocations]
+    [defaultWorkspaceCauseId, allocations]
   );
 
-  function commitAllocations(nextIds: string[]) {
-    setValue(
-      'projectAllocations',
-      recalculateAllocations(nextIds, defaultCauseId),
-      { shouldDirty: true, shouldValidate: true }
-    );
-  }
+  const updateAllocationsFromProjectIds = useCallback(
+    (projectIds: string[]) => {
+      const nextAllocations = recalculateAllocations(
+        projectIds,
+        defaultWorkspaceCauseId
+      );
 
-  // When country changes, the default-cause id changes too. Swap the stale id
-  // in the form for the new one. Short-circuits when allocations already
-  // reference the current defaultCauseId, so mount never dirties the form.
+      setValue('projectAllocations', nextAllocations, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+    [defaultWorkspaceCauseId, setValue]
+  );
+
+  // When country (workspace) changes, the default workspace cause id changes
+  // too. Swap the stale id in the form for the new one. Short-circuits when
+  // allocations already reference the current defaultWorkspaceCauseId, so mount
+  // never dirties the form.
   useEffect(() => {
-    const referencesCurrentDefault = allocations.some(
-      ({ project_id }) => project_id === defaultCauseId
+    const hasWorkspaceDefaultCause = allocations.some(
+      ({ project_id }) => project_id === defaultWorkspaceCauseId
     );
-    if (allocations.length === 0 || referencesCurrentDefault) return;
 
-    commitAllocations(
-      allocations.map(({ project_id }) =>
-        projectDetailsById[project_id] ? project_id : defaultCauseId
-      )
+    if (allocations.length === 0 || hasWorkspaceDefaultCause) return;
+
+    const reconciledProjectIds = Array.from(
+      new Set([
+        defaultWorkspaceCauseId,
+        ...allocations.map(({ project_id }) =>
+          projectDetailsById[project_id] ? project_id : defaultWorkspaceCauseId
+        ),
+      ])
     );
-    // commitAllocations is stable in behavior; excluded to avoid noisy re-runs.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultCauseId, allocations, projectDetailsById]);
+
+    updateAllocationsFromProjectIds(reconciledProjectIds);
+  }, [
+    allocations,
+    updateAllocationsFromProjectIds,
+    defaultWorkspaceCauseId,
+    projectDetailsById,
+  ]);
 
   function handleSelectProject(project: SelectedProject) {
-    if (project.id === defaultCauseId) return;
+    if (project.id === defaultWorkspaceCauseId) return;
     if (allocations.some(({ project_id }) => project_id === project.id)) {
       return;
     }
 
     setSessionProjectDetails(prev => ({ ...prev, [project.id]: project }));
-    commitAllocations([
+    updateAllocationsFromProjectIds([
       ...allocations.map(({ project_id }) => project_id),
       project.id,
     ]);
   }
 
   function handleRemoveProject(projectId: string) {
-    if (projectId === defaultCauseId) return;
-    commitAllocations(
+    if (projectId === defaultWorkspaceCauseId) return;
+    updateAllocationsFromProjectIds(
       allocations
         .filter(({ project_id }) => project_id !== projectId)
         .map(({ project_id }) => project_id)
