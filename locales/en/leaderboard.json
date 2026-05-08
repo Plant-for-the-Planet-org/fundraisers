@@ -10,7 +10,8 @@
         "showAmounts": "Show Amounts",
         "viewAllButton": "View All Button",
         "anonymizeDonors": "Anonymize Donors",
-        "showAvatars": "Show Avatars"
+        "showAvatars": "Show Avatars",
+        "groupTopByDonor": "Group Top by Donor"
       },
       "disabledView": {
         "title": "Leaderboard Disabled",

@@ -10,7 +10,8 @@
         "showAmounts": "Beträge anzeigen",
         "viewAllButton": "\"Alle anzeigen\"-Knopf",
         "anonymizeDonors": "Spender anonymisieren",
-        "showAvatars": "Avatare anzeigen"
+        "showAvatars": "Avatare anzeigen",
+        "groupTopByDonor": "Top-Spenden nach Spender gruppieren"
       },
       "disabledView": {
         "title": "Bestenliste deaktiviert",
