@@ -180,6 +180,65 @@
           "minAmount": "Goal must be at least {formattedAmount}."
         }
       },
+      "bundleSelection": {
+        "sectionHeading": "Pick Causes Supported by your Fundraiser",
+        "tagline": "Choose your feeling.",
+        "subline": "The forests don't care why you give. But you will.",
+        "tabs": {
+          "staffPicks": {
+            "label": "Staff Picks",
+            "description": "Handpicked by the Plant-for-the-Planet team."
+          },
+          "wonder": {
+            "label": "Wonder",
+            "description": "The world is vast and beautiful."
+          },
+          "rage": {
+            "label": "Rage",
+            "description": "This is broken and needs fixing."
+          },
+          "love": {
+            "label": "Love",
+            "description": "For people, places, things I care about."
+          },
+          "custom": {
+            "label": "Custom",
+            "description": "Build your own bundle — pick projects one by one."
+          }
+        },
+        "card": {
+          "projectCount": "{count, plural, one {# PROJECT} other {# PROJECTS}}",
+          "seeInside": "See inside →",
+          "selected": "Selected"
+        },
+        "aria": {
+          "openBundle": "See inside the {name} bundle",
+          "selectBundle": "Select the {name} bundle",
+          "selectedBundle": "{name} bundle is currently selected",
+          "openProject": "Learn more about {name} (opens in a new tab)",
+          "closeModal": "Close bundle preview"
+        },
+        "modal": {
+          "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
+          "useBundle": "Use this bundle",
+          "unitCost": "~{value, number, ::.#}{currencySymbol} per {unitType, select, tree {tree} m2 {m²} other {{unitType}}}",
+          "learnMore": "Learn More",
+          "loading": "Loading projects...",
+          "errorTitle": "Failed to load projects",
+          "errorMessage": "Unable to load this bundle. Please try again.",
+          "retry": "Try Again",
+          "tag": {
+            "rage": "RAGE",
+            "wonder": "WONDER",
+            "love": "LOVE",
+            "staffPicks": "STAFF PICKS"
+          }
+        },
+        "custom": {
+          "comingSoon": "Custom bundle selection — coming soon."
+        },
+        "projectImageAlt": "Image for {name}"
+      },
       "projectSelection": {
         "sectionHeading": "Causes Supported by this Fundraiser",
         "viewModeSectionHeading": "Projects Supported by this Fundraiser",

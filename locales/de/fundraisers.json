@@ -180,6 +180,65 @@
           "minAmount": "Der Betrag für das gesetzte Ziel muss mindestens {formattedAmount} sein."
         }
       },
+      "bundleSelection": {
+        "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
+        "tagline": "Wähle dein Gefühl.",
+        "subline": "Den Wäldern ist es egal, warum du spendest. Dir nicht.",
+        "tabs": {
+          "staffPicks": {
+            "label": "Team-Auswahl",
+            "description": "Handverlesen vom Plant-for-the-Planet-Team."
+          },
+          "wonder": {
+            "label": "Staunen",
+            "description": "Die Welt ist riesig und wunderschön."
+          },
+          "rage": {
+            "label": "Wut",
+            "description": "Hier läuft etwas schief und muss repariert werden."
+          },
+          "love": {
+            "label": "Liebe",
+            "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
+          },
+          "custom": {
+            "label": "Individuell",
+            "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus."
+          }
+        },
+        "card": {
+          "projectCount": "{count, plural, one {# PROJEKT} other {# PROJEKTE}}",
+          "seeInside": "Reinschauen →",
+          "selected": "Ausgewählt"
+        },
+        "aria": {
+          "openBundle": "Schaue in das Paket {name} hinein",
+          "selectBundle": "Das Paket {name} auswählen",
+          "selectedBundle": "Das Paket {name} ist aktuell ausgewählt",
+          "openProject": "Mehr über {name} erfahren (öffnet in einem neuen Tab)",
+          "closeModal": "Paketvorschau schließen"
+        },
+        "modal": {
+          "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
+          "useBundle": "Dieses Paket verwenden",
+          "unitCost": "~{value, number, ::.#}{currencySymbol} pro {unitType, select, tree {Baum} m2 {m²} other {{unitType}}}",
+          "learnMore": "Mehr erfahren",
+          "loading": "Projekte werden geladen...",
+          "errorTitle": "Projekte konnten nicht geladen werden",
+          "errorMessage": "Dieses Paket konnte nicht geladen werden. Bitte versuche es nochmal.",
+          "retry": "Nochmal versuchen",
+          "tag": {
+            "rage": "WUT",
+            "wonder": "STAUNEN",
+            "love": "LIEBE",
+            "staffPicks": "TEAM-AUSWAHL"
+          }
+        },
+        "custom": {
+          "comingSoon": "Individuelle Paketauswahl — folgt in Kürze."
+        },
+        "projectImageAlt": "Bild für {name}"
+      },
       "projectSelection": {
         "sectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
         "viewModeSectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
