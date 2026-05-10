@@ -33,7 +33,11 @@ const TAB_LABEL_KEYS = {
   custom: 'tabs.custom.label',
 } as const satisfies Record<BundleTabId, string>;
 
-export function BundleTabs() {
+interface BundleTabsProps {
+  mode: 'create' | 'edit';
+}
+
+export function BundleTabs({ mode }: BundleTabsProps) {
   const t = useTranslations('Fundraisers.form.bundleSelection');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
 
@@ -53,11 +57,14 @@ export function BundleTabs() {
     return detectBundleFromAllocations(projectAllocations, workspace);
   }, [projectAllocations, workspace]);
 
-  const [activeTab, setActiveTab] = useState<BundleTabId>(
-    selectedBundle
-      ? (selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab)
-      : BUNDLE_CONFIG.meta.defaultTab
-  );
+  const [activeTab, setActiveTab] = useState<BundleTabId>(() => {
+    if (selectedBundle) {
+      return selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab;
+    }
+    // Edit mode with no bundle match → user has a custom selection; land on Custom.
+    if (mode === 'edit') return 'custom';
+    return BUNDLE_CONFIG.meta.defaultTab;
+  });
   const [previewBundle, setPreviewBundle] = useState<Bundle | null>(null);
 
   function handleUseBundle(bundle: Bundle) {
