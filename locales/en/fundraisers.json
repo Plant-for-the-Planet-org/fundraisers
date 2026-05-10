@@ -208,7 +208,7 @@
         },
         "card": {
           "projectCount": "{count, plural, one {# PROJECT} other {# PROJECTS}}",
-          "seeInside": "See inside →",
+          "seeInside": "See inside",
           "selected": "Selected"
         },
         "aria": {
@@ -221,7 +221,7 @@
         "modal": {
           "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
           "useBundle": "Use this bundle",
-          "unitCost": "~{value, number, ::.#}{currencySymbol} per {unitType, select, tree {tree} m2 {m²} other {{unitType}}}",
+          "unitCost": "{currencySymbol}{value, number, ::.#} per {unitType, select, tree {tree} m2 {m²} other {{unitType}}}",
           "learnMore": "Learn More",
           "loading": "Loading projects...",
           "errorTitle": "Failed to load projects",
@@ -235,7 +235,28 @@
           }
         },
         "custom": {
-          "comingSoon": "Custom bundle selection — coming soon."
+          "description": "Build your own bundle — pick projects one by one.",
+          "searchPlaceholder": "Search projects by name or country…",
+          "showingCount": "Showing {shown, number} of {total, number} · Search to find more",
+          "noResultsTitle": "No projects found",
+          "noResults": "No projects match \"{query}\"",
+          "clearSearch": "Clear search",
+          "loading": "Loading projects…",
+          "errorTitle": "Failed to load projects",
+          "errorMessage": "Unable to load projects. Please try again.",
+          "retry": "Try Again",
+          "yourBundle": "Your Custom Bundle",
+          "projectCount": "{count, plural, =0 {No projects} one {# project} other {# projects}}",
+          "emptyState": "Pick at least one project to support.",
+          "allAddedTitle": "All projects added",
+          "allAddedDescription": "You've added all available projects to your fundraiser",
+          "allocationLabel": "{percentage, number}%",
+          "aria": {
+            "search": "Search projects",
+            "addProject": "Add {name}",
+            "removeProject": "Remove {name}",
+            "defaultProjectLocked": "{name} is the default project and cannot be removed"
+          }
         },
         "projectImageAlt": "Image for {name}"
       },
