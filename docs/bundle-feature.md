@@ -15,13 +15,13 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 | 1 — Bundle config + types | ✅ Shipped | |
 | 2 — Bundle helpers | ✅ Shipped | `getEqualSplit` was inlined into `bundleToAllocations` and removed; `getDisplayableUnitCost` added for the per-row unit-cost metric |
 | 3 — Form schema + provider wiring | ✅ Shipped (simpler than spec) | No ephemeral form fields. Active tab is component-local `useState`; selected bundle is derived on each render via `detectBundleFromAllocations`. `buildDefaultCreateValues` left as-is — its existing `getDefaultCauseId(defaultCountry)` happens to return the same support-project ID for DE |
-| 4 — `BundleTabs` shell | ✅ Shipped (create-mode only) | Edit-mode form keeps `<ProjectSelection />` until Custom lands. Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
-| 4a — Country gating | ⚠️ Partial | Tab visibility flips correctly between DE/ROW (all tabs) and ES/CH (custom-only placeholder). Cross-country allocation reconciliation is deferred — switching DE → ES leaves the now-orphaned bundle allocations on the form until the user touches Custom |
+| 4 — `BundleTabs` shell | ✅ Shipped (create-mode only) | Edit-mode form keeps `<ProjectSelection />` until Custom rolls out to edit. Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
+| 4a — Country gating | ✅ Shipped | Tab visibility flips correctly between DE/ROW (all tabs) and ES/CH (Custom-only). Country-change reconciliation handled via `workspace-selector` — switching country wipes allocations and reseeds the new country's default cause at 100% |
 | 5 — Bundle preview modal | ✅ Shipped | UX iterated past spec; see step body for the shipped behaviour |
 | 5a — `projectsService.getProjectById` | 🟡 Deferred | Not needed in practice. Synthetic fallback in `useBundleProjects` covers the support-project miss using `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` |
-| 6 — Custom tab panel | 🟡 Placeholder only | Real implementation pending; UX shared by user but not wired up |
+| 6 — Custom tab panel | ✅ Shipped | Default project is locked (not removable); 8-card paginated grid; image + name in grid links to project page in new tab; selected rows non-interactive |
 | 7 — Public view | ⏸ Pending | |
-| 8 — Cleanup | ⏸ Pending | Blocked on Step 6 |
+| 8 — Cleanup | ⏸ Pending (now unblocked) | |
 
 ## Open Decisions Captured (defaults assumed unless overridden)
 
@@ -152,14 +152,14 @@ Created `src/components/fundraisers/bundle-selection/` with:
 - **Swap is create-mode only.** [`fundraiser-form-body.tsx:67-71`](src/components/fundraisers/fundraiser-form-body.tsx#L67-L71) renders `<BundleTabs />` only when `mode === 'create'`. Edit mode keeps `<ProjectSelection />` until Custom ships and we can verify parity with existing fundraisers.
 - **`useBundleProjects` lifted to `BundleTabs`** rather than created per-modal-instance, so the bundle cards can render real project thumbnails (was a follow-up fix once thumbnails were noticed to be placeholders).
 
-**Step 4a — Country gating behaviour (partial):**
+**Step 4a — Country gating behaviour (shipped):**
 
 What works:
 - DE / ROW → workspace `DE` → all 5 tabs render with the bundle card grid.
-- ES / CH → workspace `null` → tab strip is hidden entirely, body shows the Custom placeholder ("Coming soon").
+- ES / CH → workspace `null` → tab strip is hidden, body renders the live Custom panel for that country.
+- Country-change reconciliation handled in [`workspace-selector.tsx`](src/components/fundraisers/workspace-selector.tsx): on country change the form wipes `projectAllocations` and reseeds with `[{ project_id: getDefaultCauseId(newCountry), percentage: 100 }]`, marked `shouldDirty: true, shouldValidate: true`.
 
-What's deferred:
-- **Cross-country allocation reconciliation** is not implemented. Switching from DE → ES with a bundle selected leaves the now-orphaned bundle allocations on the form. The user has to re-pick allocations once Custom ships. Acceptable today since ES/CH only show the placeholder anyway, but worth fixing as part of Step 6.
+Deliberate trade-off: this is a full reset, not a swap-and-resplit. The original spec implied swapping the support project ID and rebalancing the existing percentages. We chose the blunt reset because (a) projects fetched for country A almost certainly aren't valid for country B's catalogue, so preserving them is unsafe, and (b) the user has no expectation that selections survive a workspace change. Trade-off: a careful custom-bundle build is silently discarded if the user accidentally clicks the country dropdown — a confirmation dialog or "selections were reset" toast would be a worthwhile follow-up.
 
 **Files:**
 
@@ -208,40 +208,59 @@ If support-project metadata becomes important enough to require live data (it cu
 
 ---
 
-### Step 6 — Custom tab panel
+### Step 6 — Custom tab panel (shipped)
 
-**Status:** placeholder shipped (a "Coming soon" box). UX shared by user; real implementation pending.
+**What we shipped:**
 
-**Locked-in decisions for when this lands:**
+- `custom-tab-panel.tsx` — top-level layout with two cards stacked: the search/grid panel, then the "YOUR CUSTOM BUNDLE" selected list.
+- `project-search-card.tsx` — the `+` card used in the grid.
+- `selected-project-row.tsx` — the row used in the selected list (X for removable rows, Lock indicator for the default).
 
-- **Use `getDefaultCauseId(country)` for the support project, not `BUNDLE_CONFIG.supportProjects[workspace]`.** The bundle workspace map is DE-only; the `getDefaultCauseId` helper has support-project IDs for DE / ES / CH / ROW. Custom needs to work for every country, so the country-aware lookup is the right primitive.
-- **Allocation rule should match Decision #10** — the same 25% floor on the support project that `bundleToAllocations` applies. Either reuse the inline logic from `bundleToAllocations` or extract a shared `splitWithDefaultMinimum(ids, defaultIndex)` helper. Don't reintroduce a divergent equal-split rule for Custom.
-- **Country-change reconciliation for Step 4a should land in this step too** — when Custom can actually receive new allocations, switching DE → ES (or vice versa) needs to swap the support project ID from `getDefaultCauseId(oldCountry)` to `getDefaultCauseId(newCountry)` and re-split.
+**Support project preselection.** `useEffect` with a `hasSeededRef` guard runs once on mount: if `projectAllocations` is empty, it seeds `[{ project_id: getDefaultCauseId(country), percentage: 100 }]` with `shouldDirty: false, shouldValidate: false`. The guard means removing-and-re-mounting doesn't re-seed unintentionally; once the form is dirty the user owns the state.
 
-**What:**
+**Search grid (top card):**
+- Reuses the same `useBundleProjects(country)` hook from Step 5 — single fetch shared with the bundle tabs.
+- Filter is `name | description | country | tpo.name` (lowercase contains) for legacy parity.
+- Renders an 8-card 2-column grid by default with `"Showing 8 of N · Search to find more"` footer when results exceed 8. Typing into the search box drops the cap and shows all matches.
+- Already-selected projects (including the preselected default cause) are filtered out of the grid.
+- Each card: gradient placeholder fallback (no Target icon) | name + country + unit cost (`€X per tree` / `Y € pro Baum` per locale) | `+` button.
+- **Image + name region is wrapped in `<a target="_blank">`** that points at the platform project page (same UTM params as the modal's "Learn More" link). Hover reveals an `ExternalLink` icon and shifts the title to the primary accent. The `+` button is a separate click target outside the link.
+- Empty / loading / error / "all added" states are inline (no overlay component).
 
-`custom-tab-panel.tsx` — implements screenshot 1:
+**Selected list (bottom card):**
+- Header: `YOUR CUSTOM BUNDLE` eyebrow + `N project(s)` count.
+- Each row: image | name (line-clamp-2) + country | percentage | action slot. Rows are **non-interactive** (no link, no hover) — explicitly different from the search grid.
+- **Default project is locked, not removable.** Per UX feedback the workspace's default cause must always remain in the bundle. Renders a muted `Lock` icon in the action slot with `aria-label` / `title` `"{name} is the default project and cannot be removed"`.
+- **Lock icon only renders when there are removable siblings.** When the default is the only allocation, the action slot is omitted entirely so the row stretches full width.
+- Removable rows: bordered `X` button styled as a peer to the `+` button (both `h-8 w-8`, `border bg-background`); hover shifts to `destructive` color (vs. `primary` for `+`) to communicate intent.
 
-- **Support-project preselection.** On mount, if the resolved country's `getDefaultCauseId` is not yet in allocations AND `projectAllocations` is empty, seed allocations with `[{ project_id: defaultCauseId, percentage: 100 }]`. This is the "100% allocation initially, then split when causes are added" behaviour. The seeding runs once per mount; it must not re-seed after the user removes the support project.
-- **Top section ("Search 200+ projects by name or country…")** — search input + 2-column project grid.
-  - Source: same `useBundleProjects()` hook from Step 5 (reuses the cached country fetch). When the country is not `DE`, refetch for the user's country.
-  - Filter pipeline: by `name`, `description`, `country`, `tpo.name` (legacy parity, lowercase compare).
-  - Pagination: show **8 cards** when the search query is empty, with `"Showing 8 of N · Search to find more"` footer. When the user types, show all matching results.
-  - Each card has a `+` button. Clicking adds the project to allocations (recompute equal split via `getEqualSplit(allocations.length + 1)`).
-  - Already-selected projects (including the preselected support project) are excluded from the grid.
-- **Bottom section ("YOUR CUSTOM BUNDLE — N projects")** — list of currently-selected projects with image, name, country, percentage, and `×` remove button. Removing recomputes equal split. The support project is removable (parity with adding any other project) — once removed it does not re-seed automatically.
-- Selecting any project clears `selectedBundleSlug` (it is no longer a clean bundle match).
+**Allocation rule:**
 
-`custom-tab-panel.tsx` does **not** use the existing `<ProjectSelectionOverlay />`. The grid is rendered inline.
+Reuses the existing `calculateProjectAllocations` from `@/lib/utils/project-selection` rather than extracting a shared `splitWithDefaultMinimum`. That helper already enforces `MIN_DEFAULT_CAUSE_PERCENT` (25% floor on the default cause) — same rule as Decision #10, no divergent code path. The `applyAllocationsFromIds` callback in `custom-tab-panel.tsx` builds placeholder `SelectedProject[]` objects from the IDs, runs them through `calculateProjectAllocations(placeholderProjects, defaultCauseId, MIN_DEFAULT_CAUSE_PERCENT)`, and writes the resulting `{ project_id, percentage }` array.
+
+**Bundle detection coexistence:**
+
+Adding or removing in Custom mutates `projectAllocations`, which automatically falls out of `detectBundleFromAllocations` on the next render — no explicit `selectedBundleSlug` to clear (Step 3's "derive on render" decision pays off here). Switching back to a bundle tab still shows the previous bundle as unselected unless its exact 5-ID set match is restored.
+
+**Departures from spec:**
+
+- **Default project is not removable** — original spec said "removable (parity with adding any other project)". Changed to locked-and-indicated after UX iteration; preserves the workspace's support project guarantee on every fundraiser. The Lock indicator pattern (with `showLockIndicator` prop reserving a fixed-width slot only when siblings exist) keeps percentages aligned across rows.
+- **Image + name links out** in the search grid (not spec'd) — addresses the "users have no way to learn about a project before adding" gap that Custom had vs. the bundle tabs (which expose Learn More inside the modal). Selected rows are intentionally **not** linked to keep that section purely an editing context.
+- **Allocation rule reuses `calculateProjectAllocations`** (already country-aware via `defaultCauseId` parameter) instead of extracting a new shared helper. The earlier draft of this step proposed `splitWithDefaultMinimum`; deemed unnecessary given the existing helper already does the same job.
+- **Country-change reconciliation moved to `workspace-selector.tsx`** rather than living inside Custom — see Step 4a above for the full reset trade-off.
 
 **Files:**
 
 - `src/components/fundraisers/bundle-selection/custom-tab-panel.tsx` — new
-- `src/components/fundraisers/bundle-selection/project-search-card.tsx` — new (the `+` card)
-- `src/components/fundraisers/bundle-selection/selected-project-row.tsx` — new (the `×` row)
-- `locales/en/fundraisers.json`, `locales/de/fundraisers.json` — add `Fundraisers.form.bundleSelection.custom.{searchPlaceholder,showingCount,yourBundle,projectCount,removeProject,addProject,emptyState}` plus `aria-label`s for `+` / `×`
+- `src/components/fundraisers/bundle-selection/project-search-card.tsx` — new
+- `src/components/fundraisers/bundle-selection/selected-project-row.tsx` — new
+- `src/components/fundraisers/workspace-selector.tsx` — added country-change reset
+- `src/lib/utils/bundle.ts` — added `buildProjectLearnMoreUrl` helper (the existing duplicates in `project-selection-overlay.tsx` and `bundle-preview-modal.tsx` were left in place; cleaning those up belongs in Step 8)
+- `locales/{en,de}/fundraisers.json` — added `Fundraisers.form.bundleSelection.custom.{description,searchPlaceholder,showingCount,noResultsTitle,noResults,clearSearch,loading,errorTitle,errorMessage,retry,yourBundle,projectCount,emptyState,allAddedTitle,allAddedDescription,allocationLabel}` plus the `custom.aria.{search,addProject,removeProject,defaultProjectLocked}` sub-namespace.
 
-**Visual test:** Custom tab → search box filters to typed query; clicking `+` moves a project into the bundle list with re-split percentages; `×` removes it; switching to a bundle tab and back preserves the manual selection (do **not** auto-clear when leaving Custom).
+**i18n note:** aria/screen-reader-only strings were grouped under a `custom.aria.*` sub-namespace (matching the existing `bundleSelection.aria.*` convention) rather than mixed with the visible strings. The `defaultProjectLocked` key is new — it powers the Lock indicator's `aria-label` and `title`.
+
+**Visual test:** Custom tab on `/fundraisers/create` → support project preselected at 100% with Lock icon (no removable siblings → Lock hidden, full-width row). Type into search → grid filters; click `+` → project moves into selected list with split percentages, Lock now visible on default row. Click `×` on a non-default row → removed, percentages re-split. Click image or name on a search-grid card → opens project page in a new tab with UTM params. Switch country in the workspace selector → allocations reset to the new country's default cause at 100%.
 
 ---
 

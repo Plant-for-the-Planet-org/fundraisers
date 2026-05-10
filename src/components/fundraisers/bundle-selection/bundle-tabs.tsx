@@ -1,6 +1,7 @@
 'use client';
 
-import type { Bundle, BundleTabId } from '@/lib/types/bundle';
+import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useMemo, useState } from 'react';
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { BundlePreviewModal } from './bundle-preview-modal';
 import { BundleTabPanel } from './bundle-tab-panel';
+import { CustomTabPanel } from './custom-tab-panel';
 import { useBundleProjects } from './use-bundle-projects';
 
 type BundleSubTab = Exclude<BundleTabId, 'custom'>;
@@ -72,9 +74,7 @@ export function BundleTabs() {
     return (
       <div className='flex flex-col gap-3'>
         <SectionHeader>{t('sectionHeading')}</SectionHeader>
-        <div className='rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground'>
-          {t('custom.comingSoon')}
-        </div>
+        <CustomTabPanel country={country} />
       </div>
     );
   }
@@ -86,6 +86,7 @@ export function BundleTabs() {
       previewBundle={previewBundle}
       setPreviewBundle={setPreviewBundle}
       selectedBundleSlug={selectedBundle?.slug}
+      country={country}
       workspace={workspace}
       onUseBundle={handleUseBundle}
     />
@@ -98,7 +99,8 @@ interface BundleTabsContentProps {
   previewBundle: Bundle | null;
   setPreviewBundle: (bundle: Bundle | null) => void;
   selectedBundleSlug: string | undefined;
-  workspace: 'DE';
+  country: AllowedCountry;
+  workspace: BundleWorkspace;
   onUseBundle: (bundle: Bundle) => void;
 }
 
@@ -112,11 +114,12 @@ function BundleTabsContent({
   previewBundle,
   setPreviewBundle,
   selectedBundleSlug,
+  country,
   workspace,
   onUseBundle,
 }: BundleTabsContentProps) {
   const t = useTranslations('Fundraisers.form.bundleSelection');
-  const { getProject } = useBundleProjects(workspace);
+  const { getProject } = useBundleProjects(country);
 
   return (
     <div className='flex flex-col gap-3'>
@@ -151,9 +154,7 @@ function BundleTabsContent({
 
       <div role='tabpanel'>
         {activeTab === 'custom' ? (
-          <div className='rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground'>
-            {t('custom.comingSoon')}
-          </div>
+          <CustomTabPanel country={country} />
         ) : (
           <BundleTabPanel
             tabId={activeTab}

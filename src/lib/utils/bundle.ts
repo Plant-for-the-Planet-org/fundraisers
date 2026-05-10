@@ -1,7 +1,13 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 
+import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
+
+export function buildProjectLearnMoreUrl(projectId: string): string {
+  const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
+  return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
+}
 
 export function getBundleBySlug(slug: string): Bundle | undefined {
   return BUNDLE_CONFIG.bundles.find(bundle => bundle.slug === slug);
