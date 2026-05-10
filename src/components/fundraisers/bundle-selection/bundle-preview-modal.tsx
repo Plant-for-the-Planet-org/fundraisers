@@ -6,7 +6,7 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
-import { Package, Target, X } from 'lucide-react';
+import { ExternalLink, Package, Target, X } from 'lucide-react';
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import {
   getBundleProjectIds,
@@ -201,8 +201,12 @@ export function BundlePreviewModal({
                       target='_blank'
                       rel='noopener noreferrer'
                       aria-label={t('aria.openProject', { name: project.name })}
-                      className='shrink-0 self-end rounded text-xs font-medium text-orange-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:text-sm dark:text-orange-300 dark:focus-visible:ring-orange-700'
+                      className='inline-flex shrink-0 items-center gap-1.5 self-end rounded-md px-2 py-1 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-700/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:text-sm dark:text-orange-300 dark:hover:bg-orange-300/10 dark:focus-visible:ring-orange-700'
                     >
+                      <ExternalLink
+                        className='h-3.5 w-3.5'
+                        aria-hidden='true'
+                      />
                       {t('modal.learnMore')}
                     </a>
                   )}

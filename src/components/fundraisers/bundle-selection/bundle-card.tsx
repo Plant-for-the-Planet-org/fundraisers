@@ -4,7 +4,7 @@ import type { Bundle, BundleWorkspace } from '@/lib/types/bundle';
 import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
-import { Check, Package } from 'lucide-react';
+import { Check, Eye, Package } from 'lucide-react';
 import { getBundleProjectIds } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { getImageUrl } from '@/lib/utils/images';
@@ -120,9 +120,11 @@ export function BundleCard({
             event.stopPropagation();
             onOpen();
           }}
+          aria-haspopup='dialog'
           aria-label={t('aria.openBundle', { name: bundle.label })}
-          className='rounded font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+          className='inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         >
+          <Eye className='h-4 w-4' aria-hidden='true' />
           {t('card.seeInside')}
         </button>
       </div>
