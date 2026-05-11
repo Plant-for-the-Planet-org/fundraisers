@@ -21,7 +21,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 | 5a — `projectsService.getProjectById` | 🟡 Deferred | Not needed in practice. Synthetic fallback in `useBundleProjects` covers the support-project miss using `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` |
 | 6 — Custom tab panel | ✅ Shipped | Default project is locked (not removable); 8-card paginated grid; image + name in grid links to project page in new tab; selected rows non-interactive |
 | 7 — Public view | ⏸ Pending | |
-| 8 — Cleanup | ⏸ Pending (now unblocked) | |
+| 8 — Cleanup | ✅ Shipped | Deleted `project-selection.tsx`, `project-selection-overlay.tsx`, `docs/project-selection.md`. Dropped `mapProjectToSelectedCause`, `createDefaultCause`, and the exported `resolveCauseCountry` (now internal) from `lib/utils/project-selection.ts`. Trimmed the `Fundraisers.form.projectSelection.*` locale namespace to the 4 keys still consumed by the public-view `ProjectsSupportedDisplay` component |
 
 ## Open Decisions Captured (defaults assumed unless overridden)
 
@@ -288,20 +288,26 @@ Extend [projects-supported-display.tsx](src/components/fundraisers/projects-supp
 
 ---
 
-### Step 8 — Cleanup + remove dead code
+### Step 8 — Cleanup + remove dead code (shipped)
 
-**What:**
+**What we shipped:**
 
-Once Steps 1–7 are merged and the new flow is the only entry point:
+Now that the bundle UI is the only entry point on both create and edit forms (Step 4), the legacy project-selection components and their support code have been removed:
 
-- Delete [project-selection.tsx](src/components/fundraisers/project-selection.tsx) and [project-selection-overlay.tsx](src/components/fundraisers/project-selection-overlay.tsx).
-- Audit `src/lib/utils/project-selection.ts` — keep `mapProjectToSelectedCause` (still used by Step 5/6 hook), drop `createDefaultCause`, `resolveCauseCountry`, `getDefaultCauseId`, `calculateProjectAllocations` if no other caller remains.
-- Drop `MIN_DEFAULT_CAUSE_PERCENT` from [project-selection.ts](src/lib/constants/project-selection.ts) if unused.
-- Remove now-orphaned i18n keys under `Fundraisers.form.projectSelection.modal.*` and `addCause`/`removeCause` if not referenced.
+- **Deleted files:**
+  - `src/components/fundraisers/project-selection.tsx`
+  - `src/components/fundraisers/project-selection-overlay.tsx`
+  - `docs/project-selection.md`
+- **Trimmed `src/lib/utils/project-selection.ts`:** removed `mapProjectToSelectedCause` and `createDefaultCause` (only consumed by the deleted components). `resolveCauseCountry` is now a non-exported internal helper (still used by `getDefaultCauseId`). `getDefaultCauseId` and `calculateProjectAllocations` stay — both are core dependencies of the bundle/custom flows.
+- **Kept `src/lib/constants/project-selection.ts` as-is:** every exported constant is still used (`MIN_DEFAULT_CAUSE_PERCENT` by `bundleToAllocations` and custom tab; `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` by `useBundleProjects`; `DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY` and `DEFAULT_NON_EARMARKED_CAUSE_ID` by `getDefaultCauseId`).
+- **Trimmed `Fundraisers.form.projectSelection.*` locale namespace** in both en and de. The 4 keys still referenced by [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx) were preserved: `viewModeSectionHeading`, `projectImageAlt`, `expandDescription`, `collapseDescription`. Everything else (`addCause`, `removeCause`, `modal.*`, `aria.*`, `defaultCause`, etc.) was dropped.
 
-**Files:** as above.
+**Not touched (intentionally):**
 
-**Visual test:** Full create + edit + public-view smoke run, both `/en` and `/de` locales.
+- The public-view `projects-supported-display.tsx` component itself stays — it's a different component from the form-side `ProjectSelection` and remains the active surface for the fundraiser detail page.
+- Types in `src/lib/types/project-selection.ts` are all still in use (`ProjectData`, `SelectedProject`, `ProjectAllocationPreview`, `ProjectPurpose`, `PROJECT_PURPOSES`, `ProjectUnitType`, `DefaultCauseIdByCountry`) — no trims.
+
+**Visual test:** Full create + edit + public-view smoke run, both `/en` and `/de` locales. Edit form should load existing fundraisers into the bundle UI (matching bundles open on their tab; non-matching land on Custom).
 
 ---
 

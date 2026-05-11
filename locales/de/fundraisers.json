@@ -262,51 +262,10 @@
         "unknownProject": "Unbekanntes Projekt"
       },
       "projectSelection": {
-        "sectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
         "viewModeSectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
-        "addCause": "Projekt hinzufügen",
-        "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}%-Zuweisung",
         "projectImageAlt": "Bild für {name}",
         "expandDescription": "Mehr erfahren",
-        "collapseDescription": "Weniger lesen",
-        "defaultCause": {
-          "name": "Junge Menschen empowern und Wälder zurückbringen",
-          "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen auf der ganzen Welt zu empowern und sich für den Klimaschutz einzusetzen. Wir stellen Wälder wieder her, klären die Öffentlichkeit auf und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
-        },
-        "aria": {
-          "closeModal": "Projektauswahl schließen",
-          "selectCause": "Projekt {name} hinzufügen"
-        },
-        "modal": {
-          "title": "Projekt hinzufügen",
-          "subtitle": "Wähle weitere Projekte zur Unterstützung aus",
-          "searchPlaceholder": "Projekte werden durchsucht...",
-          "searchAriaLabel": "Projekte werden durchsucht",
-          "tabs": {
-            "top": "Top-Projekte",
-            "all": "Alle Projekte"
-          },
-          "resultsCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
-          "loading": "Projekte werden geladen...",
-          "errorTitle": "Projekte konnten nicht geladen werden",
-          "errorMessage": "Es können keine Projekte geladen werden. Bitte versuche es nochmal.",
-          "retry": "Nochmal versuchen",
-          "byOrganization": "von {organization}",
-          "tags": {
-            "topProject": "Top-Projekt",
-            "restoration": "Renaturierung",
-            "conservation": "Waldschutz",
-            "learnMore": "Mehr erfahren",
-            "restOfWorld": "Rest der Welt"
-          },
-          "add": "Hinzufügen",
-          "emptySearchTitle": "Es wurden keine Projekte gefunden",
-          "emptySearchDescription": "Keine Projekt entspricht \"{query}\"",
-          "clearSearch": "Suchbegriff löschen",
-          "emptyAllTitle": "Alle Projekte hinzugefügt",
-          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt"
-        }
+        "collapseDescription": "Weniger lesen"
       },
       "options": {
         "sectionHeading": "Spendenaufruf-Optionen",
