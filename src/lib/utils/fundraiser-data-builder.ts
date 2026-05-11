@@ -45,6 +45,7 @@ export const DEFAULT_MODULES: FundraiserSettings['modules'] = {
     anonymize: false,
     default_tab: 'recent',
     show_avatar: true,
+    aggregate_top_by_donor: true,
   },
   contribution: {
     options: [],
