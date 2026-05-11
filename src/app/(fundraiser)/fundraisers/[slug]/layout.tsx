@@ -29,7 +29,7 @@ export default async function FundraiserLayout({
     if (
       e instanceof PlatformAPIError &&
       e.status &&
-      [401, 403, 404].includes(e.status)
+      [401, 403, 404, 405].includes(e.status)
     ) {
       theme = DEFAULT_THEME;
     } else {

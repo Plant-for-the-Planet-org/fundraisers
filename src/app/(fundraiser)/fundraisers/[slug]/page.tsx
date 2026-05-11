@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { getLocale, getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
@@ -129,12 +130,13 @@ export default async function FundraiserPage({
   try {
     fundraiser = await getCachedFundraiser(slug, locale);
   } catch (e) {
-    if (
-      e instanceof PlatformAPIError &&
-      e.status &&
-      [401, 403, 404].includes(e.status)
-    ) {
-      return <FundraiserAuthRetry slug={slug} />;
+    if (e instanceof PlatformAPIError && e.status) {
+      if ([401, 403, 404].includes(e.status)) {
+        return <FundraiserAuthRetry slug={slug} />;
+      }
+      if (e.status === 405) {
+        notFound();
+      }
     }
     throw e;
   }
