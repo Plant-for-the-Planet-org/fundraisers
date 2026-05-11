@@ -33,7 +33,7 @@ export function isFundraiserOwner(
  */
 export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   const identifier = fundraiser.slug || fundraiser.id;
-  return `/fundraisers/${identifier}`;
+  return `/fundraisers/${encodeURIComponent(identifier)}`;
 }
 
 /**
