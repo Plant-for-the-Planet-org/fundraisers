@@ -258,7 +258,8 @@
             "defaultProjectLocked": "{name} is the default project and cannot be removed"
           }
         },
-        "projectImageAlt": "Image for {name}"
+        "projectImageAlt": "Image for {name}",
+        "unknownProject": "Unknown project"
       },
       "projectSelection": {
         "sectionHeading": "Causes Supported by this Fundraiser",

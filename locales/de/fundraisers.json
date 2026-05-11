@@ -258,7 +258,8 @@
             "defaultProjectLocked": "{name} ist das Standardprojekt und kann nicht entfernt werden"
           }
         },
-        "projectImageAlt": "Bild für {name}"
+        "projectImageAlt": "Bild für {name}",
+        "unknownProject": "Unbekanntes Projekt"
       },
       "projectSelection": {
         "sectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",

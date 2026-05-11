@@ -73,9 +73,7 @@ export function BundlePreviewModal({
 
   if (!isOpen || typeof document === 'undefined') return null;
 
-  const displayTab = getDisplayTabForBundle(bundle);
-  const tabKey =
-    displayTab === 'custom' ? 'staffPicks' : TAB_KEY_BY_ID[displayTab];
+  const tabKey = TAB_KEY_BY_ID[getDisplayTabForBundle(bundle)];
 
   return createPortal(
     <div

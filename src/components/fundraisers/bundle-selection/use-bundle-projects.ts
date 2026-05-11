@@ -80,6 +80,9 @@ export function useBundleProjects(
           name: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.name,
           description: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.description,
           image: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.image,
+          // ROW (Rest of the World) falls back to DE since the workspace's
+          // default cause is physically a German project regardless of the
+          // fundraiser's selected country.
           country: country === 'ROW' ? 'DE' : country,
           allowDonations: true,
           isTopProject: false,
@@ -88,7 +91,7 @@ export function useBundleProjects(
 
       return {
         id,
-        name: t('projectImageAlt', { name: id }),
+        name: t('unknownProject'),
         description: '',
         country: '',
         allowDonations: true,

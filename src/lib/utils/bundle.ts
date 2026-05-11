@@ -6,7 +6,7 @@ import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
 
 export function buildProjectLearnMoreUrl(projectId: string): string {
   const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
-  return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
+  return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
 export function getBundleBySlug(slug: string): Bundle | undefined {
@@ -46,9 +46,10 @@ export function bundleToAllocations(
   bundle: Bundle,
   workspace: BundleWorkspace
 ): Array<{ project_id: string; percentage: number }> {
+  // `getBundleProjectIds` always returns at least the support project,
+  // so `supportId` is guaranteed to be a string.
   const ids = getBundleProjectIds(bundle, workspace);
-  const [supportId, ...otherIds] = ids;
-  if (!supportId) return [];
+  const [supportId, ...otherIds] = ids as [string, ...string[]];
 
   const equalShare = Math.floor(100 / ids.length);
 
@@ -99,11 +100,22 @@ export function detectBundleFromAllocations(
 
 /**
  * Picks the most "specific" tab for displaying a bundle's tag — the first
- * non-`staff-picks` tab. Falls back to `staff-picks` if it's the only one.
+ * non-`staff-picks`, non-`custom` tab. Falls back to `staff-picks` if no
+ * better option exists. `custom` is never a valid display tag (bundles
+ * don't live on the Custom tab).
  */
-export function getDisplayTabForBundle(bundle: Bundle): BundleTabId {
-  const nonStaff = bundle.tabs.find(tab => tab !== 'staff-picks');
-  return nonStaff ?? bundle.tabs[0] ?? 'staff-picks';
+export function getDisplayTabForBundle(
+  bundle: Bundle
+): Exclude<BundleTabId, 'custom'> {
+  const specific = bundle.tabs.find(
+    (tab): tab is Exclude<BundleTabId, 'custom' | 'staff-picks'> =>
+      tab !== 'staff-picks' && tab !== 'custom'
+  );
+  if (specific) return specific;
+  const fallback = bundle.tabs.find(
+    (tab): tab is Exclude<BundleTabId, 'custom'> => tab !== 'custom'
+  );
+  return fallback ?? 'staff-picks';
 }
 
 /**

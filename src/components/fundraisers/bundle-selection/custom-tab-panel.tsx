@@ -68,19 +68,33 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
     [allocations]
   );
 
+  // Pre-lowercase each project's searchable fields once per project list
+  // so keystroke filtering doesn't re-stringify every field every render.
+  const searchableProjects = useMemo(
+    () =>
+      projects.map(project => ({
+        project,
+        haystack: [
+          project.name,
+          project.description,
+          project.country,
+          project.tpo?.name ?? '',
+        ]
+          .join(' ')
+          .toLowerCase(),
+      })),
+    [projects]
+  );
+
   const filteredProjects = useMemo(() => {
-    let list = projects.filter(project => !selectedIdSet.has(project.id));
+    let list = searchableProjects.filter(
+      ({ project }) => !selectedIdSet.has(project.id)
+    );
     if (trimmedQuery) {
-      list = list.filter(
-        project =>
-          project.name.toLowerCase().includes(trimmedQuery) ||
-          project.description.toLowerCase().includes(trimmedQuery) ||
-          project.country.toLowerCase().includes(trimmedQuery) ||
-          (project.tpo?.name?.toLowerCase().includes(trimmedQuery) ?? false)
-      );
+      list = list.filter(({ haystack }) => haystack.includes(trimmedQuery));
     }
-    return list;
-  }, [projects, selectedIdSet, trimmedQuery]);
+    return list.map(({ project }) => project);
+  }, [searchableProjects, selectedIdSet, trimmedQuery]);
 
   const visibleProjects = trimmedQuery
     ? filteredProjects
