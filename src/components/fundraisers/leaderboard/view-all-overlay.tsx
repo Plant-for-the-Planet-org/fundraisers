@@ -172,7 +172,7 @@ export function ViewAllOverlay({
       // Use _links.next presence to determine hasMore
       setHasMore(prev => ({
         ...prev,
-        [effectiveTab]: !!response._links.next,
+        [effectiveTab]: !!response._links?.next,
       }));
     } catch (error) {
       console.error('Failed to fetch leaderboard page', nextPage, error);
