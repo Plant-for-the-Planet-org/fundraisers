@@ -9,7 +9,7 @@ import { projectsService } from '@/lib/api/projects-service';
 import { DEFAULT_NON_EARMARKED_CAUSE_FALLBACK } from '@/lib/constants/project-selection';
 import { getDefaultCauseId } from '@/lib/utils/project-selection';
 
-export type ProjectsById = Record<string, ProjectData>;
+type ProjectsById = Record<string, ProjectData>;
 
 interface UseBundleProjectsResult {
   projects: ProjectData[];

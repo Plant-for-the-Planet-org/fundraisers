@@ -2,25 +2,20 @@
 
 import type { ProjectData } from '@/lib/types/project-selection';
 
-import { useMemo, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ExternalLink, Plus } from 'lucide-react';
 import {
   buildProjectLearnMoreUrl,
   getDisplayableUnitCost,
 } from '@/lib/utils/bundle';
-import { getImageUrl } from '@/lib/utils/images';
+import { resolveProjectImageSource } from '@/lib/utils/images';
+import { useCountryLabel } from './use-country-label';
 
 interface ProjectSearchCardProps {
   project: ProjectData;
   currencySymbol: string;
   onAdd: () => void;
-}
-
-function resolveImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
 }
 
 export function ProjectSearchCard({
@@ -30,21 +25,9 @@ export function ProjectSearchCard({
 }: ProjectSearchCardProps) {
   const t = useTranslations('Fundraisers.form.bundleSelection');
   const tCustom = useTranslations('Fundraisers.form.bundleSelection.custom');
-  const locale = useLocale();
+  const getCountryLabel = useCountryLabel();
 
-  const countryDisplayNames = useMemo(
-    () => new Intl.DisplayNames([locale], { type: 'region' }),
-    [locale]
-  );
-
-  function getCountryLabel(code: string): string {
-    const normalized = code.trim().toUpperCase();
-    if (!normalized) return '';
-    if (!/^[A-Z]{2}$/.test(normalized)) return normalized;
-    return countryDisplayNames.of(normalized) ?? normalized;
-  }
-
-  const imageSource = resolveImageSource(project.image);
+  const imageSource = resolveProjectImageSource(project.image);
   const [imageFailed, setImageFailed] = useState(false);
   const countryLabel = project.country ? getCountryLabel(project.country) : '';
   const unitDisplay = getDisplayableUnitCost(

@@ -5,18 +5,19 @@ import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ExternalLink, Package, Target, X } from 'lucide-react';
-import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import {
+  buildProjectLearnMoreUrl,
   getBundleProjectIds,
   getDisplayableUnitCost,
   getDisplayTabForBundle,
   getSupportProjectId,
 } from '@/lib/utils/bundle';
 import { getCurrencySymbolForCountry } from '@/lib/utils/country-currency';
-import { getImageUrl } from '@/lib/utils/images';
+import { resolveProjectImageSource } from '@/lib/utils/images';
 import { Button } from '@/components/ui/button';
+import { useCountryLabel } from './use-country-label';
 
 interface BundlePreviewModalProps {
   bundle: Bundle;
@@ -34,17 +35,6 @@ const TAB_KEY_BY_ID = {
   love: 'love',
 } as const;
 
-function resolveImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
-}
-
-function buildLearnMoreUrl(projectId: string): string {
-  const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
-  return `${normalizedBaseUrl}/${projectId}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
-}
-
 export function BundlePreviewModal({
   bundle,
   workspace,
@@ -54,18 +44,7 @@ export function BundlePreviewModal({
   onUseBundle,
 }: BundlePreviewModalProps) {
   const t = useTranslations('Fundraisers.form.bundleSelection');
-  const locale = useLocale();
-  const countryDisplayNames = useMemo(
-    () => new Intl.DisplayNames([locale], { type: 'region' }),
-    [locale]
-  );
-
-  function getCountryLabel(code: string): string {
-    const normalized = code.trim().toUpperCase();
-    if (!normalized) return '';
-    if (!/^[A-Z]{2}$/.test(normalized)) return normalized;
-    return countryDisplayNames.of(normalized) ?? normalized;
-  }
+  const getCountryLabel = useCountryLabel();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -147,7 +126,7 @@ export function BundlePreviewModal({
           <ul className='flex flex-col gap-2'>
             {projectIds.map(id => {
               const project = getProject(id);
-              const imageSource = resolveImageSource(project.image);
+              const imageSource = resolveProjectImageSource(project.image);
               const isSupport = id === supportId;
               const countryLabel = project.country
                 ? getCountryLabel(project.country)
@@ -197,7 +176,7 @@ export function BundlePreviewModal({
                   </div>
                   {!isSupport && (
                     <a
-                      href={buildLearnMoreUrl(id)}
+                      href={buildProjectLearnMoreUrl(id)}
                       target='_blank'
                       rel='noopener noreferrer'
                       aria-label={t('aria.openProject', { name: project.name })}

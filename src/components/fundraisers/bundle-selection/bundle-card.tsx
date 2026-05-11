@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Check, Eye, Package } from 'lucide-react';
 import { getBundleProjectIds } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
-import { getImageUrl } from '@/lib/utils/images';
+import { resolveProjectImageSource } from '@/lib/utils/images';
 
 interface BundleCardProps {
   bundle: Bundle;
@@ -16,12 +16,6 @@ interface BundleCardProps {
   getProject: (id: string) => ProjectData;
   onSelect: () => void;
   onOpen: () => void;
-}
-
-function resolveImageSource(image?: string): string | null {
-  if (!image) return null;
-  if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
 }
 
 export function BundleCard({
@@ -92,7 +86,7 @@ export function BundleCard({
       <div className='grid grid-cols-5 gap-1.5' aria-hidden='true'>
         {projectIds.map(id => {
           const project = getProject(id);
-          const imageSource = resolveImageSource(project.image);
+          const imageSource = resolveProjectImageSource(project.image);
           return (
             <div
               key={id}
