@@ -14,15 +14,10 @@ import { useCountryLabel } from './use-country-label';
 
 interface ProjectSearchCardProps {
   project: ProjectData;
-  currencySymbol: string;
   onAdd: () => void;
 }
 
-export function ProjectSearchCard({
-  project,
-  currencySymbol,
-  onAdd,
-}: ProjectSearchCardProps) {
+export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
   const t = useTranslations('Fundraisers.form.bundleSelection');
   const tCustom = useTranslations('Fundraisers.form.bundleSelection.custom');
   const getCountryLabel = useCountryLabel();
@@ -66,13 +61,6 @@ export function ProjectSearchCard({
           {(countryLabel || unitDisplay !== null) && (
             <p className='truncate text-xs text-muted-foreground'>
               {countryLabel}
-              {countryLabel && unitDisplay !== null && ' · '}
-              {unitDisplay !== null &&
-                t('modal.unitCost', {
-                  value: unitDisplay.value,
-                  currencySymbol,
-                  unitType: unitDisplay.unitType,
-                })}
             </p>
           )}
         </div>

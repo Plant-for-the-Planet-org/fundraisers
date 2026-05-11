@@ -9,7 +9,6 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { CircleCheck, Search, SearchX } from 'lucide-react';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
-import { getCurrencySymbolForCountry } from '@/lib/utils/country-currency';
 import {
   calculateProjectAllocations,
   getDefaultCauseId,
@@ -42,7 +41,6 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
     useBundleProjects(country);
 
   const defaultCauseId = useMemo(() => getDefaultCauseId(country), [country]);
-  const currencySymbol = getCurrencySymbolForCountry(country);
 
   // Seed the support project at 100% on first mount when allocations are
   // empty. Runs once per mount so removal is sticky.
@@ -57,7 +55,6 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
         { shouldDirty: false, shouldValidate: false }
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -225,7 +222,6 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                 <ProjectSearchCard
                   key={project.id}
                   project={project}
-                  currencySymbol={currencySymbol}
                   onAdd={() => handleAdd(project.id)}
                 />
               ))}

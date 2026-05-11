@@ -14,7 +14,6 @@ import {
   getDisplayTabForBundle,
   getSupportProjectId,
 } from '@/lib/utils/bundle';
-import { getCurrencySymbolForCountry } from '@/lib/utils/country-currency';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { Button } from '@/components/ui/button';
 import { useCountryLabel } from './use-country-label';
@@ -69,7 +68,6 @@ export function BundlePreviewModal({
     [bundle, workspace]
   );
   const supportId = getSupportProjectId(workspace);
-  const currencySymbol = getCurrencySymbolForCountry(workspace);
 
   if (!isOpen || typeof document === 'undefined') return null;
 
@@ -86,7 +84,7 @@ export function BundlePreviewModal({
       aria-label={bundle.label}
     >
       <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
-        <div className='flex items-start gap-2 bg-orange-100 px-4 py-3 dark:bg-orange-950/30 sm:gap-3 sm:px-5 sm:py-4'>
+        <div className='flex items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
           <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm sm:h-12 sm:w-12'>
             <Package
               className='h-5 w-5 text-foreground sm:h-6 sm:w-6'
@@ -106,17 +104,25 @@ export function BundlePreviewModal({
               &ldquo;{bundle.tagline}&rdquo;
             </p>
           </div>
+
+          <Button
+            onClick={() => onUseBundle(bundle)}
+            className='bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
+          >
+            {t('modal.useBundle')}
+          </Button>
+
           <button
             type='button'
             onClick={onClose}
             aria-label={t('aria.closeModal')}
-            className='shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-background/70'
+            className='flex h-9 min-w-9 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground transition-colors hover:bg-background/80'
           >
             <X className='h-5 w-5' />
           </button>
         </div>
 
-        <div className='max-h-[60vh] overflow-y-auto px-4 py-3 sm:px-5 sm:py-4'>
+        <div className='max-h-[60vh] overflow-y-auto px-4 py-4'>
           <p className='mb-3 text-xs font-bold tracking-wide text-muted-foreground'>
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
@@ -162,13 +168,6 @@ export function BundlePreviewModal({
                     {(countryLabel || unit !== null) && (
                       <p className='truncate text-sm text-muted-foreground'>
                         {countryLabel}
-                        {countryLabel && unit !== null && ' · '}
-                        {unit !== null &&
-                          t('modal.unitCost', {
-                            value: unit.value,
-                            currencySymbol,
-                            unitType: unit.unitType,
-                          })}
                       </p>
                     )}
                   </div>
@@ -191,15 +190,6 @@ export function BundlePreviewModal({
               );
             })}
           </ul>
-        </div>
-
-        <div className='flex items-center justify-center border-t border-border bg-orange-50/50 px-4 py-3 dark:bg-orange-950/20 sm:px-5'>
-          <Button
-            onClick={() => onUseBundle(bundle)}
-            className='bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
-          >
-            {t('modal.useBundle')}
-          </Button>
         </div>
       </div>
     </div>,

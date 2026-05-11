@@ -221,7 +221,6 @@
         "modal": {
           "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
           "useBundle": "Dieses Paket verwenden",
-          "unitCost": "{value, number, ::.#} {currencySymbol} pro {unitType, select, tree {Baum} m2 {m²} other {{unitType}}}",
           "learnMore": "Mehr erfahren",
           "loading": "Projekte werden geladen...",
           "errorTitle": "Projekte konnten nicht geladen werden",

@@ -221,7 +221,6 @@
         "modal": {
           "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
           "useBundle": "Use this bundle",
-          "unitCost": "{currencySymbol}{value, number, ::.#} per {unitType, select, tree {tree} m2 {m²} other {{unitType}}}",
           "learnMore": "Learn More",
           "loading": "Loading projects...",
           "errorTitle": "Failed to load projects",
