@@ -9,7 +9,7 @@ No saved-card/SEPA-account sub-dropdowns or card/IBAN forms in this slice.
 ## Implementation Changes
 
 - Build payment-method derivation in `lib` from `paymentOptions.gateways`:
-  - Normalize method ids (`sepa_debit`/`sepa-debit`, `bank-transfer`/`offline`, etc.).
+  - Normalize method ids to canonical snake_case (e.g. `sepa` → `sepa_debit`, `offline` → `bank_transfer`).
   - Dedupe and enforce stable legacy display order.
   - Filter rules aligned with legacy behavior (SEPA hidden for non-EUR).
   - Include provider mapping needed for fee calculation (`stripe`, `paypal`, `offline`).
@@ -43,7 +43,7 @@ No saved-card/SEPA-account sub-dropdowns or card/IBAN forms in this slice.
    - Stripe (`card`, `sepa_debit`) + PayPal + Offline yields all expected methods in legacy order.
    - Unknown method ids are ignored safely.
 2. Normalization:
-   - Both underscore and hyphen method variants map correctly.
+   - Legacy/variant ids (`sepa`, `offline`, `applepay`, `googlepay`, `credit-card`) map to canonical snake_case.
 3. Filtering:
    - SEPA hidden when currency is not EUR.
 4. RHF integration:

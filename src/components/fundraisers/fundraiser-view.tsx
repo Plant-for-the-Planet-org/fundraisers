@@ -26,9 +26,11 @@ import {
 export function FundraiserView({
   fundraiser,
   paymentOptions,
+  paymentOptionsAreAuthenticated = false,
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
+  paymentOptionsAreAuthenticated?: boolean;
 }) {
   const t = useTranslations('Fundraisers');
 
@@ -98,6 +100,7 @@ export function FundraiserView({
             <DonationSection
               fundraiser={fundraiser}
               paymentOptions={paymentOptions}
+              paymentOptionsAreAuthenticated={paymentOptionsAreAuthenticated}
             />
             <SecurityNotice
               organizationName={workspaceName}

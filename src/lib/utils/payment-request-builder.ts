@@ -23,13 +23,13 @@ function getGatewayForPaymentMethod(
 ): 'stripe' | 'paypal' | 'offline' {
   switch (paymentMethod) {
     case 'card':
-    case 'sepa-debit':
-    case 'apple-pay':
-    case 'google-pay':
+    case 'sepa_debit':
+    case 'apple_pay':
+    case 'google_pay':
       return 'stripe';
     case 'paypal':
       return 'paypal';
-    case 'bank-transfer':
+    case 'bank_transfer':
       return 'offline';
     default:
       throw new PaymentOptionsError(
@@ -37,23 +37,6 @@ function getGatewayForPaymentMethod(
         'UNKNOWN_PAYMENT_METHOD',
         400
       );
-  }
-}
-
-function mapPaymentMethodName(paymentMethod: PaymentMethod): string {
-  switch (paymentMethod) {
-    case 'sepa-debit':
-      return 'sepa_debit';
-    case 'apple-pay':
-      return 'apple_pay';
-    case 'google-pay':
-      return 'google_pay';
-    case 'paypal':
-      return 'paypal';
-    case 'bank-transfer':
-      return 'offline';
-    default:
-      return paymentMethod;
   }
 }
 
@@ -78,8 +61,11 @@ export function buildPaymentRequest(
     const account = (paymentDetails.account as string) || gatewayConfig.account;
 
     if ('methods' in gatewayConfig) {
-      const mappedMethod = mapPaymentMethodName(paymentMethod);
-      if (!gatewayConfig.methods.includes(mappedMethod)) {
+      // The offline gateway exposes its method as 'offline' (the gateway name),
+      // not 'bank_transfer'. Stripe and PayPal use the same id we do.
+      const apiMethodName =
+        paymentMethod === 'bank_transfer' ? 'offline' : paymentMethod;
+      if (!gatewayConfig.methods.includes(apiMethodName)) {
         throw new PaymentOptionsError(
           `Payment method '${paymentMethod}' is not supported for gateway '${gateway}'`,
           'PAYMENT_METHOD_NOT_SUPPORTED',
@@ -109,7 +95,9 @@ export function buildPaymentRequest(
         return {
           gateway: 'stripe',
           account,
-          method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+          // Internal ids align with `StripePaymentMethod` after the snake_case
+          // migration; no remapping needed.
+          method: paymentMethod as StripePaymentMethod,
           source: { id: String(id), object: 'payment_method' },
         };
       }

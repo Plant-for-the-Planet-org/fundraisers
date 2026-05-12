@@ -38,15 +38,18 @@ const donationFormFields = z.object({
   isAnonymous: z.boolean(),
   selectedAddressId: z.string().optional(),
   makeMonthly: z.boolean(),
-  coverFees: z.boolean(),
-  selectedPaymentMethod: z.enum([
-    'card',
-    'sepa-debit',
-    'apple-pay',
-    'google-pay',
-    'paypal',
-    'bank-transfer',
-  ]),
+  willAbsorbFee: z.boolean(),
+  selectedPaymentMethod: z.enum(
+    [
+      'card',
+      'sepa_debit',
+      'apple_pay',
+      'google_pay',
+      'paypal',
+      'bank_transfer',
+    ],
+    { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
+  ),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
   tin: z.string().trim().optional(),
@@ -140,6 +143,12 @@ interface DonationFormContextValue {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
+  /**
+   * `true` once `paymentOptions` reflects the user's auth state — see
+   * `usePaymentOptions`. Components that key off auth-protected fields
+   * (e.g. `lastPaymentMethod`) should defer reads until this is `true`.
+   */
+  paymentOptionsReady: boolean;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -153,6 +162,7 @@ interface DonationFormProviderProps {
   fundraiser: Fundraiser;
   donationData: DonationData;
   paymentOptions: PaymentOptions;
+  paymentOptionsReady: boolean;
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
@@ -169,6 +179,7 @@ export function DonationFormProvider({
   fundraiser,
   donationData,
   paymentOptions,
+  paymentOptionsReady,
   onSubmit,
   sepaFormRef,
   cardFormRef,
@@ -198,9 +209,7 @@ export function DonationFormProvider({
       isCompany: false,
       tin: '',
       makeMonthly: false,
-      coverFees: false,
-      // TODO: change default once other payment methods are implemented
-      selectedPaymentMethod: 'bank-transfer',
+      willAbsorbFee: false,
       addressType: 'primary',
     },
     mode: 'onBlur',
@@ -220,6 +229,7 @@ export function DonationFormProvider({
         fundraiser,
         donationData,
         paymentOptions,
+        paymentOptionsReady,
         onSubmit,
         sepaFormRef,
         cardFormRef,

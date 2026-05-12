@@ -7,22 +7,33 @@ import type { DonationData } from '../donate/donate-overlay';
 import { useState } from 'react';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
 import { DonateOverlay } from '../donate/donate-overlay';
+import { usePaymentOptions } from '../donate/use-payment-options';
 import { DonationForm } from './donation-form';
 
 interface DonationSectionProps {
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
+  paymentOptionsAreAuthenticated?: boolean;
 }
 
 export function DonationSection({
   fundraiser,
   paymentOptions,
+  paymentOptionsAreAuthenticated = false,
 }: DonationSectionProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [donationData, setDonationData] = useState<DonationData | null>(null);
+  const {
+    paymentOptions: resolvedPaymentOptions,
+    isReady: paymentOptionsReady, // renamed for clarity when passed as a prop
+  } = usePaymentOptions(fundraiser.id, {
+    initialPaymentOptions: paymentOptions,
+    fetchEnabled: isOverlayOpen,
+    areInitialOptionsAuthenticated: paymentOptionsAreAuthenticated,
+  });
 
   const contributionSettings = mapPaymentOptionsToContributionSettings(
-    paymentOptions,
+    resolvedPaymentOptions,
     fundraiser.settings?.modules?.contribution
   );
 
@@ -31,9 +42,9 @@ export function DonationSection({
       <DonationForm
         currency={fundraiser.currency}
         contributionSettings={contributionSettings}
-        onDonate={(amount, isDedicated, frequency, gift) => {
+        onDonate={(amountCents, isDedicated, frequency, gift) => {
           setDonationData({
-            amount,
+            amountCents,
             currency: fundraiser.currency,
             frequency,
             dedicated: isDedicated,
@@ -50,7 +61,8 @@ export function DonationSection({
         }}
         donationData={donationData}
         fundraiser={fundraiser}
-        paymentOptions={paymentOptions}
+        paymentOptions={resolvedPaymentOptions}
+        paymentOptionsReady={paymentOptionsReady}
       />
     </>
   );
