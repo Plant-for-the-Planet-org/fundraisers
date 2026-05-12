@@ -300,6 +300,7 @@
       "loadError": "Failed to load fundraiser",
       "errorTitle": "Something went wrong",
       "errorDescription": "An unexpected error occurred. Please try again.",
+      "invalidUrlDescription": "Could not fetch data. The fundraiser url ({slug}) may not be valid. Reach us at support@plant-for-the-planet.org",
       "backToDashboard": "Back to dashboard",
       "formSubmission": {
         "buttonProcessing": "Updating fundraiser...",

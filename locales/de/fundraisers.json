@@ -300,6 +300,7 @@
       "loadError": "Der Spendenaufruf konnte nicht geladen werden",
       "errorTitle": "Etwas ist schief gelaufen",
       "errorDescription": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es nochmal.",
+      "invalidUrlDescription": "Daten konnten nicht geladen werden. Die URL des Spendenaufrufs ({slug}) ist möglicherweise ungültig. Kontaktiere uns unter support@plant-for-the-planet.org",
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Der Spendenaufruf wird aktualisiert...",

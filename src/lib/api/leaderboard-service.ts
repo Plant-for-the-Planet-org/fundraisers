@@ -11,7 +11,7 @@ export async function getLeaderboard(
 ): Promise<LeaderboardApiResponse> {
   const params = new URLSearchParams({ limit: limit.toString() });
   return platformAPIClient.get<LeaderboardApiResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard?${params.toString()}`
+    `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard?${params.toString()}`
   );
 }
 
