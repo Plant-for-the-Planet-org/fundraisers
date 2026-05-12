@@ -39,7 +39,7 @@ export interface BundleTab {
   id: BundleTabId;
   label: string;
   description: string;
-  bundleSlugs: string[];
+  bundleSlugs: BundleSlug[];
 }
 
 export interface BundleConfig {
