@@ -296,6 +296,7 @@ export function ViewAllOverlay({
                   anonymize={anonymize}
                   showAmount={showAmount}
                   showAvatar={showAvatar}
+                  showDate={!(aggregateTopByDonor && effectiveTab === 'top')}
                 />
                 {isLoadingMore && (
                   <div className='flex items-center justify-center gap-2 py-4'>

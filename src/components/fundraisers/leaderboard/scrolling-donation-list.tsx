@@ -12,6 +12,7 @@ interface ScrollingDonationListProps {
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
+  showDate?: boolean;
 }
 
 export function ScrollingDonationList({
@@ -20,6 +21,7 @@ export function ScrollingDonationList({
   anonymize,
   showAmount,
   showAvatar,
+  showDate = true,
 }: ScrollingDonationListProps) {
   const t = useTranslations('Leaderboard.view');
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -88,6 +90,7 @@ export function ScrollingDonationList({
           anonymize={anonymize}
           showAmount={showAmount}
           showAvatar={showAvatar}
+          showDate={showDate}
         />
       ))}
     </div>

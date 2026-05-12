@@ -110,6 +110,7 @@ export function LeaderboardView({
               anonymize={anonymize}
               showAmount={show_amount}
               showAvatar={show_avatar}
+              showDate={!aggregate_top_by_donor}
             />
           </TabsContent>
         )}

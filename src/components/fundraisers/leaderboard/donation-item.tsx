@@ -11,6 +11,7 @@ interface DonationItemProps {
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
+  showDate?: boolean;
 }
 
 export function DonationItem({
@@ -18,6 +19,7 @@ export function DonationItem({
   anonymize,
   showAmount,
   showAvatar,
+  showDate = true,
 }: DonationItemProps) {
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const displayName = isAnonymous
@@ -52,10 +54,10 @@ export function DonationItem({
           {displayName}
         </div>
         <div className='text-zinc-600 dark:text-gray-300 text-xs font-medium leading-tight whitespace-nowrap'>
-          {showAmount
-            ? `${formatCurrencyFromDecimal(donation.amount, donation.currency)} • `
-            : ''}
-          {formatTimeAgo(donation.created)}
+          {showAmount &&
+            formatCurrencyFromDecimal(donation.amount, donation.currency)}
+          {showAmount && showDate && ' • '}
+          {showDate && formatTimeAgo(donation.created)}
         </div>
       </div>
     </div>

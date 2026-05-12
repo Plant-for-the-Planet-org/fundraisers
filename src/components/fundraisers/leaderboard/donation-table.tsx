@@ -12,6 +12,7 @@ interface DonationTableProps {
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
+  showDate?: boolean;
 }
 
 function DonationRow({
@@ -19,11 +20,13 @@ function DonationRow({
   anonymize,
   showAmount,
   showAvatar,
+  showDate = true,
 }: {
   donation: LeaderboardDonation;
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
+  showDate?: boolean;
 }) {
   const t = useTranslations('Leaderboard.view');
   const isAnonymous = anonymize || donation.isAnonymous || false;
@@ -58,9 +61,11 @@ function DonationRow({
             >
               {displayName}
             </span>
-            <span className='text-xs text-muted-foreground leading-tight mt-0.5'>
-              {formatTimeAgo(donation.created)}
-            </span>
+            {showDate && (
+              <span className='text-xs text-muted-foreground leading-tight mt-0.5'>
+                {formatTimeAgo(donation.created)}
+              </span>
+            )}
           </div>
         </div>
       </td>
@@ -78,6 +83,7 @@ export function DonationTable({
   anonymize,
   showAmount,
   showAvatar,
+  showDate = true,
 }: DonationTableProps) {
   const t = useTranslations('Leaderboard.view');
 
@@ -103,6 +109,7 @@ export function DonationTable({
             anonymize={anonymize}
             showAmount={showAmount}
             showAvatar={showAvatar}
+            showDate={showDate}
           />
         ))}
       </tbody>
