@@ -11,7 +11,7 @@
         "viewAllButton": "View All Button",
         "anonymizeDonors": "Anonymize Donors",
         "showAvatars": "Show Avatars",
-        "groupTopByDonor": "Group Top by Donor"
+        "groupTopByDonor": "Group Top Donations by Donor"
       },
       "disabledView": {
         "title": "Leaderboard Disabled",

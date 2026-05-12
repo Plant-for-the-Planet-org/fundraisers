@@ -13,10 +13,10 @@ import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
   idOrSlug: string;
-  initialRecent: LeaderboardDonation[];
-  initialTop: LeaderboardDonation[];
-  recentTotal: number;
-  topTotal: number;
+  recentDonationSlice: LeaderboardDonation[];
+  topDonationSlice: LeaderboardDonation[];
+  totalRecentDonationCount: number;
+  totalTopDonationCount: number;
   settings: LeaderboardModuleSettings;
 }
 
@@ -31,10 +31,10 @@ const TAB_TRIGGER_CLASS = cn(
 
 export function LeaderboardView({
   idOrSlug,
-  initialRecent,
-  initialTop,
-  recentTotal,
-  topTotal,
+  recentDonationSlice,
+  topDonationSlice,
+  totalRecentDonationCount,
+  totalTopDonationCount,
   settings,
 }: LeaderboardViewProps) {
   const {
@@ -94,7 +94,7 @@ export function LeaderboardView({
         {show_recent_list && (
           <TabsContent value='recent' className='mt-0'>
             <ScrollingDonationList
-              donations={initialRecent}
+              donations={recentDonationSlice}
               isActive={effectiveTab === 'recent'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -105,7 +105,7 @@ export function LeaderboardView({
         {show_top_list && (
           <TabsContent value='top' className='mt-0'>
             <ScrollingDonationList
-              donations={initialTop}
+              donations={topDonationSlice}
               isActive={effectiveTab === 'top'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -122,10 +122,10 @@ export function LeaderboardView({
           setIsViewAllOpen(false);
           setActiveTab(closedTab);
         }}
-        initialRecent={initialRecent}
-        initialTop={initialTop}
-        recentTotal={recentTotal}
-        topTotal={topTotal}
+        recentDonationSlice={recentDonationSlice}
+        topDonationSlice={topDonationSlice}
+        totalRecentDonationCount={totalRecentDonationCount}
+        totalTopDonationCount={totalTopDonationCount}
         activeTab={effectiveTab}
         showRecentList={show_recent_list}
         showTopList={show_top_list}
