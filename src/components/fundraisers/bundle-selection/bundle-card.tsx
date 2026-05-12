@@ -4,10 +4,11 @@ import type { Bundle, BundleWorkspace } from '@/lib/types/bundle';
 import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
-import { Check, Eye, Package } from 'lucide-react';
+import { Check, Eye } from 'lucide-react';
 import { getBundleProjectIds } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { resolveProjectImageSource } from '@/lib/utils/images';
+import { BundleIcon } from './bundle-icon';
 
 interface BundleCardProps {
   bundle: Bundle;
@@ -69,10 +70,7 @@ export function BundleCard({
         </div>
         <div className='flex-1 min-w-0'>
           <div className='flex items-center gap-1.5'>
-            <Package
-              className='h-4 w-4 text-muted-foreground'
-              aria-hidden='true'
-            />
+            <BundleIcon slug={bundle.slug} className='h-4 w-4 shrink-0' />
             <p className='font-semibold text-foreground leading-tight'>
               {bundle.label}
             </p>

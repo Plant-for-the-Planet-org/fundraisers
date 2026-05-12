@@ -6,7 +6,7 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { Package, Target, X } from 'lucide-react';
+import { Target, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   buildProjectLearnMoreUrl,
@@ -17,6 +17,7 @@ import {
 } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { Button } from '@/components/ui/button';
+import { BundleIcon } from './bundle-icon';
 import { useCountryLabel } from './use-country-label';
 
 interface BundlePreviewModalProps {
@@ -87,10 +88,7 @@ export function BundlePreviewModal({
       <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
         <div className='flex items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
           <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm sm:h-12 sm:w-12'>
-            <Package
-              className='h-5 w-5 text-foreground sm:h-6 sm:w-6'
-              aria-hidden='true'
-            />
+            <BundleIcon slug={bundle.slug} className='h-8 w-8' />
           </div>
           <div className='min-w-0 flex-1'>
             <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
