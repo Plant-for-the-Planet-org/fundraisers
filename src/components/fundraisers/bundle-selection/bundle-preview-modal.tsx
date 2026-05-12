@@ -68,7 +68,7 @@ export function BundlePreviewModal({
     () => getBundleProjectIds(bundle, workspace),
     [bundle, workspace]
   );
-  const supportId = getSupportProjectId(workspace);
+  const supportProjectId = getSupportProjectId(workspace);
 
   if (!isOpen || typeof document === 'undefined') return null;
 
@@ -136,7 +136,7 @@ export function BundlePreviewModal({
             {projectIds.map(id => {
               const project = getProject(id);
               const imageSource = resolveProjectImageSource(project.image);
-              const isSupportProject = id === supportId;
+              const isSupportProject = id === supportProjectId;
               const countryLabel = project.country
                 ? getCountryLabel(project.country)
                 : '';
