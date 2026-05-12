@@ -51,7 +51,12 @@
           "card": "Kredit- oder Debitkarte",
           "sepa": "SEPA-Lastschriftverfahren",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay"
+          "googlePay": "Google Pay",
+          "planetCash": "PlanetCash"
+        },
+        "planetCash": {
+          "availableBalance": "Verfügbar: {amount}",
+          "insufficientBalance": "Unzureichendes Guthaben"
         },
         "providers": {
           "stripe": "Stripe",
