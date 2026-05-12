@@ -174,9 +174,10 @@ function BundleTabsContent({
         )}
       </div>
 
-      {previewBundle && (
+      {previewBundle && activeTab !== 'custom' && (
         <BundlePreviewModal
           bundle={previewBundle}
+          activeTab={activeTab}
           workspace={workspace}
           isOpen
           getProject={getProject}

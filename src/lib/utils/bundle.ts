@@ -9,10 +9,6 @@ export function buildProjectLearnMoreUrl(projectId: string): string {
   return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
 }
 
-export function getBundleBySlug(slug: string): Bundle | undefined {
-  return BUNDLE_CONFIG.bundles.find(bundle => bundle.slug === slug);
-}
-
 export function getBundlesForTab(tabId: BundleTabId): Bundle[] {
   const tab = BUNDLE_CONFIG.tabs.find(t => t.id === tabId);
   if (!tab) return [];
@@ -96,26 +92,6 @@ export function detectBundleFromAllocations(
     if (bundleIds.length !== allocationIds.size) return false;
     return bundleIds.every(id => allocationIds.has(id));
   });
-}
-
-/**
- * Picks the most "specific" tab for displaying a bundle's tag — the first
- * non-`staff-picks`, non-`custom` tab. Falls back to `staff-picks` if no
- * better option exists. `custom` is never a valid display tag (bundles
- * don't live on the Custom tab).
- */
-export function getDisplayTabForBundle(
-  bundle: Bundle
-): Exclude<BundleTabId, 'custom'> {
-  const specific = bundle.tabs.find(
-    (tab): tab is Exclude<BundleTabId, 'custom' | 'staff-picks'> =>
-      tab !== 'staff-picks' && tab !== 'custom'
-  );
-  if (specific) return specific;
-  const fallback = bundle.tabs.find(
-    (tab): tab is Exclude<BundleTabId, 'custom'> => tab !== 'custom'
-  );
-  return fallback ?? 'staff-picks';
 }
 
 /**

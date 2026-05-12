@@ -1,6 +1,6 @@
 'use client';
 
-import type { Bundle, BundleWorkspace } from '@/lib/types/bundle';
+import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useEffect, useMemo } from 'react';
@@ -12,7 +12,6 @@ import {
   buildProjectLearnMoreUrl,
   getBundleProjectIds,
   getDisplayableUnitCost,
-  getDisplayTabForBundle,
   getSupportProjectId,
 } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
@@ -23,6 +22,7 @@ import { useCountryLabel } from './use-country-label';
 interface BundlePreviewModalProps {
   bundle: Bundle;
   workspace: BundleWorkspace;
+  activeTab: Exclude<BundleTabId, 'custom'>;
   isOpen: boolean;
   getProject: (id: string) => ProjectData;
   onClose: () => void;
@@ -39,6 +39,7 @@ const TAB_KEY_BY_ID = {
 export function BundlePreviewModal({
   bundle,
   workspace,
+  activeTab,
   isOpen,
   getProject,
   onClose,
@@ -72,8 +73,7 @@ export function BundlePreviewModal({
   const supportProjectId = getSupportProjectId(workspace);
 
   if (!isOpen || typeof document === 'undefined') return null;
-
-  const tabKey = TAB_KEY_BY_ID[getDisplayTabForBundle(bundle)];
+  const tabKey = TAB_KEY_BY_ID[activeTab];
 
   return createPortal(
     <div
