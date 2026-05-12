@@ -61,7 +61,7 @@ export function BundleCard({
             'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border',
             isSelected
               ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-border'
+              : 'border-zinc-400'
           )}
           aria-hidden='true'
         >
@@ -90,7 +90,7 @@ export function BundleCard({
           return (
             <div
               key={id}
-              className='h-10 overflow-hidden rounded-md bg-linear-to-br from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'
+              className='h-10 overflow-hidden rounded-md bg-linear-to-br  transition-transform duration-300 hover:scale-110 from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'
             >
               {imageSource && (
                 <img
