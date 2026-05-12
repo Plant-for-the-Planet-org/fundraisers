@@ -220,6 +220,7 @@
         },
         "modal": {
           "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
+          "clickProjectHint": "Click a project to learn more.",
           "useBundle": "Use this bundle",
           "learnMore": "Learn More",
           "loading": "Loading projects...",

@@ -220,6 +220,7 @@
         },
         "modal": {
           "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
+          "clickProjectHint": "Klicken Sie auf ein Projekt, um mehr zu erfahren.",
           "useBundle": "Dieses Paket verwenden",
           "learnMore": "Mehr erfahren",
           "loading": "Projekte werden geladen...",

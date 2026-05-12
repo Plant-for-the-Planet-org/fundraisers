@@ -6,7 +6,8 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { ExternalLink, Package, Target, X } from 'lucide-react';
+import { Package, Target, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   buildProjectLearnMoreUrl,
   getBundleProjectIds,
@@ -127,11 +128,15 @@ export function BundlePreviewModal({
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
 
+          <p className='mb-3 text-xs text-muted-foreground'>
+            {t('modal.clickProjectHint')}
+          </p>
+
           <ul className='flex flex-col gap-2'>
             {projectIds.map(id => {
               const project = getProject(id);
               const imageSource = resolveProjectImageSource(project.image);
-              const isSupport = id === supportId;
+              const isSupportProject = id === supportId;
               const countryLabel = project.country
                 ? getCountryLabel(project.country)
                 : '';
@@ -140,11 +145,9 @@ export function BundlePreviewModal({
                 project.unitType
               );
 
-              return (
-                <li
-                  key={id}
-                  className='flex min-w-0 items-center gap-2 rounded-lg border border-border px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5'
-                >
+              const content = (
+                <>
+                  {' '}
                   <div className='h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted sm:h-12 sm:w-12'>
                     {imageSource ? (
                       <img
@@ -171,19 +174,30 @@ export function BundlePreviewModal({
                       </p>
                     )}
                   </div>
-                  {!isSupport && (
+                </>
+              );
+
+              const baseClassName =
+                'flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 border border-border';
+
+              return (
+                <li key={id}>
+                  {isSupportProject ? (
+                    <div className={cn(baseClassName)}>{content}</div>
+                  ) : (
                     <a
                       href={buildProjectLearnMoreUrl(id)}
                       target='_blank'
                       rel='noopener noreferrer'
-                      aria-label={t('aria.openProject', { name: project.name })}
-                      className='inline-flex shrink-0 items-center gap-1.5 self-end rounded-md px-2 py-1 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-700/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:text-sm dark:text-orange-300 dark:hover:bg-orange-300/10 dark:focus-visible:ring-orange-700'
+                      aria-label={t('aria.openProject', {
+                        name: project.name,
+                      })}
+                      className={cn(
+                        baseClassName,
+                        'cursor-pointer transition-colors hover:bg-orange-50 dark:border-orange-800/60 dark:hover:bg-orange-950/20'
+                      )}
                     >
-                      <ExternalLink
-                        className='h-3.5 w-3.5'
-                        aria-hidden='true'
-                      />
-                      {t('modal.learnMore')}
+                      {content}
                     </a>
                   )}
                 </li>
