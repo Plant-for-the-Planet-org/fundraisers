@@ -7,7 +7,7 @@ import { cache } from 'react';
 import { platformAPIClient } from './external-client';
 
 function fundraiserPath(slug: string, locale?: string): string {
-  const path = `/fundraisers/${slug}`;
+  const path = `/fundraisers/${encodeURIComponent(slug)}`;
   if (!locale) {
     return path;
   }
@@ -27,7 +27,7 @@ export async function getFundraiserAuthenticated(
   token: string
 ): Promise<Fundraiser> {
   return platformAPIClient.getAuthenticated<Fundraiser>(
-    `/fundraisers/${slug}`,
+    `/fundraisers/${encodeURIComponent(slug)}`,
     token
   );
 }

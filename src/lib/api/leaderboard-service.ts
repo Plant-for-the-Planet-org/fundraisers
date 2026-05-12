@@ -6,7 +6,7 @@ export async function getLeaderboard(
   idOrSlug: string
 ): Promise<LeaderboardApiResponse> {
   return platformAPIClient.get<LeaderboardApiResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard`
+    `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard`
   );
 }
 
