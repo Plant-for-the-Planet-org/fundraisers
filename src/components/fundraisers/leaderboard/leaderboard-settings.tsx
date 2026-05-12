@@ -67,8 +67,8 @@ export function LeaderboardSettings() {
         (hasActiveTabs ? (
           <LeaderboardView
             idOrSlug=''
-            recentDonations={mockRecent}
-            topDonations={mockTop}
+            initialRecent={mockRecent}
+            initialTop={mockTop}
             recentTotal={mockRecent.length}
             topTotal={mockTop.length}
             settings={settings}

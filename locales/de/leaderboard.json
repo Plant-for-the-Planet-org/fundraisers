@@ -28,7 +28,8 @@
       },
       "tabs": {
         "latest": "Neueste",
-        "topDonations": "Top-Spenden"
+        "topDonations": "Top-Spenden",
+        "topDonors": "Top-Spender"
       },
       "viewAll": "Alle anzeigen",
       "emptyState": "Keine Spenden zum anzeigen",
@@ -39,7 +40,9 @@
         "closeAria": "Spendenliste schliessen",
         "loadingMore": "Weitere Spenden werden geladen...",
         "columnDonor": "Spender",
-        "columnAmount": "Betrag"
+        "columnAmount": "Betrag",
+        "loadError": "Weitere Spenden konnten nicht geladen werden",
+        "retry": "Erneut versuchen"
       }
     }
   }

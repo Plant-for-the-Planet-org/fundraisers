@@ -5,17 +5,11 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { Loader2, X } from 'lucide-react';
-import {
-  getLeaderboardRecent,
-  getLeaderboardTop,
-} from '@/lib/api/leaderboard-service';
-import { cn } from '@/lib/utils';
-import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { formatTimeAgo } from '@/lib/utils/time';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { getLeaderboardByTab } from '@/lib/api/leaderboard-service';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getAvatarColor } from './donation-item';
+import { DonationTable } from './donation-table';
+import { OverlayHeader } from './overlay-header';
 
 const PAGE_SIZE = 10;
 
@@ -23,8 +17,8 @@ interface ViewAllOverlayProps {
   idOrSlug: string;
   isOpen: boolean;
   onClose: (activeTab: 'recent' | 'top') => void;
-  recentDonations: LeaderboardDonation[];
-  topDonations: LeaderboardDonation[];
+  initialRecent: LeaderboardDonation[];
+  initialTop: LeaderboardDonation[];
   recentTotal: number;
   topTotal: number;
   activeTab: 'recent' | 'top';
@@ -33,14 +27,15 @@ interface ViewAllOverlayProps {
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
+  aggregateTopByDonor: boolean;
 }
 
 export function ViewAllOverlay({
   idOrSlug,
   isOpen,
   onClose,
-  recentDonations,
-  topDonations,
+  initialRecent,
+  initialTop,
   recentTotal,
   topTotal,
   activeTab,
@@ -49,6 +44,7 @@ export function ViewAllOverlay({
   anonymize,
   showAmount,
   showAvatar,
+  aggregateTopByDonor,
 }: ViewAllOverlayProps) {
   const t = useTranslations('Leaderboard.view');
   const [tab, setTab] = useState<'recent' | 'top'>(activeTab);
@@ -59,7 +55,7 @@ export function ViewAllOverlay({
     Map<number, LeaderboardDonation[]>
   >(() => {
     const m = new Map<number, LeaderboardDonation[]>();
-    m.set(1, recentDonations);
+    m.set(1, initialRecent);
     return m;
   });
 
@@ -67,20 +63,24 @@ export function ViewAllOverlay({
     Map<number, LeaderboardDonation[]>
   >(() => {
     const m = new Map<number, LeaderboardDonation[]>();
-    m.set(1, topDonations);
+    m.set(1, initialTop);
     return m;
   });
 
   const [pagePerTab, setPagePerTab] = useState({ recent: 1, top: 1 });
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [hasMore, setHasMore] = useState({
-    recent: recentTotal > recentDonations.length,
-    top: topTotal > topDonations.length,
+    recent: recentTotal > initialRecent.length,
+    top: topTotal > initialTop.length,
   });
 
+  const dialogRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Sync tab from parent when overlay opens
+  // Render-time state sync (React 19 pattern). We sync `tab` from the parent's
+  // `activeTab` the moment the overlay opens. A useEffect would defer this by
+  // one tick, causing a visible flash of the wrong tab on open.
   if (isOpen !== lastIsOpen) {
     setLastIsOpen(isOpen);
     if (isOpen) {
@@ -118,6 +118,29 @@ export function ViewAllOverlay({
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         handleClose();
+        return;
+      }
+
+      // Focus trap: cycle Tab/Shift+Tab within the dialog
+      if (event.key === 'Tab') {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        const focusable = dialog.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     }
 
@@ -152,11 +175,14 @@ export function ViewAllOverlay({
     }
 
     setIsLoadingMore(true);
+    setFetchError(false);
     try {
-      const response =
-        effectiveTab === 'recent'
-          ? await getLeaderboardRecent(idOrSlug, nextPage, PAGE_SIZE)
-          : await getLeaderboardTop(idOrSlug, nextPage, PAGE_SIZE);
+      const response = await getLeaderboardByTab(
+        idOrSlug,
+        effectiveTab,
+        nextPage,
+        PAGE_SIZE
+      );
 
       // Cache the fetched page for the active tab
       const setCache =
@@ -176,6 +202,7 @@ export function ViewAllOverlay({
       }));
     } catch (error) {
       console.error('Failed to fetch leaderboard page', nextPage, error);
+      setFetchError(true);
     } finally {
       setIsLoadingMore(false);
     }
@@ -227,6 +254,10 @@ export function ViewAllOverlay({
 
   return createPortal(
     <div
+      ref={dialogRef}
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='leaderboard-overlay-title'
       className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center'
       onMouseDown={event => {
         if (event.target === event.currentTarget) {
@@ -235,25 +266,7 @@ export function ViewAllOverlay({
       }}
     >
       <div className='w-full max-w-3xl mx-4 bg-background rounded-2xl shadow-2xl border border-border overflow-hidden'>
-        {/* Header */}
-        <div className='flex items-start justify-between px-4 pt-4 pb-3'>
-          <div>
-            <h2 className='text-xl font-semibold text-foreground'>
-              {t('viewAllOverlay.title')}
-            </h2>
-            <p className='text-sm text-muted-foreground mt-1'>
-              {t('viewAllOverlay.subtitle')}
-            </p>
-          </div>
-          <button
-            type='button'
-            onClick={handleClose}
-            className='p-2 hover:bg-muted rounded-full transition-colors'
-            aria-label={t('viewAllOverlay.closeAria')}
-          >
-            <X className='w-5 h-5 text-muted-foreground' />
-          </button>
-        </div>
+        <OverlayHeader onClose={handleClose} />
 
         {/* Tabs + List */}
         <Tabs
@@ -266,7 +279,11 @@ export function ViewAllOverlay({
                 <TabsTrigger value='recent'>{t('tabs.latest')}</TabsTrigger>
               )}
               {showTopList && (
-                <TabsTrigger value='top'>{t('tabs.topDonations')}</TabsTrigger>
+                <TabsTrigger value='top'>
+                  {aggregateTopByDonor
+                    ? t('tabs.topDonors')
+                    : t('tabs.topDonations')}
+                </TabsTrigger>
               )}
             </TabsList>
           </div>
@@ -274,81 +291,36 @@ export function ViewAllOverlay({
           <div ref={scrollRef} className='h-[72vh] lg:h-[66vh] overflow-y-auto'>
             {donations.length > 0 ? (
               <>
-                <table className='w-full'>
-                  <thead className='sticky top-0 z-10 bg-background'>
-                    <tr className='border-b border-border'>
-                      <th className='w-full py-2 px-4 text-left text-xs font-medium text-muted-foreground'>
-                        {t('viewAllOverlay.columnDonor')}
-                      </th>
-                      {showAmount && (
-                        <th className='py-2 px-4 text-right text-xs font-medium text-muted-foreground whitespace-nowrap'>
-                          {t('viewAllOverlay.columnAmount')}
-                        </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody className='divide-y divide-border'>
-                    {donations.map(donation => {
-                      const isAnonymous =
-                        anonymize || donation.isAnonymous || false;
-                      const displayName = isAnonymous
-                        ? t('donation.anonymous')
-                        : donation.donorName;
-
-                      return (
-                        <tr key={donation.id}>
-                          <td className='py-3 px-4'>
-                            <div className='flex items-center gap-3 min-w-0'>
-                              {showAvatar && (
-                                <Avatar className='h-8 w-8 shrink-0 ring-2 ring-white/20 dark:ring-gray-500/20'>
-                                  {!isAnonymous && donation.avatarUrl && (
-                                    <AvatarImage
-                                      src={donation.avatarUrl}
-                                      alt={donation.donorName}
-                                      loading='lazy'
-                                    />
-                                  )}
-                                  <AvatarFallback
-                                    className={getAvatarColor(donation.id)}
-                                  />
-                                </Avatar>
-                              )}
-                              <div className='flex flex-col min-w-0'>
-                                <span
-                                  className={cn(
-                                    'truncate text-sm font-semibold leading-tight',
-                                    isAnonymous
-                                      ? 'text-zinc-500 dark:text-gray-400 italic'
-                                      : 'text-zinc-800 dark:text-gray-100'
-                                  )}
-                                >
-                                  {displayName}
-                                </span>
-                                <span className='text-xs text-muted-foreground leading-tight mt-0.5'>
-                                  {formatTimeAgo(donation.created)}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-                          {showAmount && (
-                            <td className='py-3 px-4 text-right text-sm font-semibold text-foreground whitespace-nowrap'>
-                              {formatCurrencyFromDecimal(
-                                donation.amount,
-                                donation.currency
-                              )}
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <DonationTable
+                  donations={donations}
+                  anonymize={anonymize}
+                  showAmount={showAmount}
+                  showAvatar={showAvatar}
+                />
                 {isLoadingMore && (
                   <div className='flex items-center justify-center gap-2 py-4'>
                     <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
                     <span className='text-sm text-muted-foreground'>
                       {t('viewAllOverlay.loadingMore')}
                     </span>
+                  </div>
+                )}
+                {fetchError && (
+                  <div className='flex items-center justify-center gap-2 py-4'>
+                    <span className='text-sm text-destructive'>
+                      {t('viewAllOverlay.loadError')}
+                    </span>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setFetchError(false);
+                        fetchNextPageRef.current();
+                      }}
+                      className='inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
+                    >
+                      <RefreshCw className='h-3.5 w-3.5' />
+                      {t('viewAllOverlay.retry')}
+                    </button>
                   </div>
                 )}
                 {/* Sentinel observed by IntersectionObserver for infinite scroll */}

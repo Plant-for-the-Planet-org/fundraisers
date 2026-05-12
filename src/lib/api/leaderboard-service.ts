@@ -36,8 +36,9 @@ export async function getLeaderboardWithRetry(
   throw lastError!;
 }
 
-export async function getLeaderboardRecent(
+export async function getLeaderboardByTab(
   idOrSlug: string,
+  tab: 'recent' | 'top',
   page: number = 1,
   limit: number = 10
 ): Promise<LeaderboardPageResponse> {
@@ -46,20 +47,6 @@ export async function getLeaderboardRecent(
     limit: limit.toString(),
   });
   return platformAPIClient.get<LeaderboardPageResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard/recent?${params.toString()}`
-  );
-}
-
-export async function getLeaderboardTop(
-  idOrSlug: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<LeaderboardPageResponse> {
-  const params = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
-  return platformAPIClient.get<LeaderboardPageResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard/top?${params.toString()}`
+    `/fundraisers/${idOrSlug}/leaderboard/${tab}?${params.toString()}`
   );
 }

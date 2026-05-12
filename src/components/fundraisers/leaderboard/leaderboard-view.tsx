@@ -13,8 +13,8 @@ import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
   idOrSlug: string;
-  recentDonations: LeaderboardDonation[];
-  topDonations: LeaderboardDonation[];
+  initialRecent: LeaderboardDonation[];
+  initialTop: LeaderboardDonation[];
   recentTotal: number;
   topTotal: number;
   settings: LeaderboardModuleSettings;
@@ -31,8 +31,8 @@ const TAB_TRIGGER_CLASS = cn(
 
 export function LeaderboardView({
   idOrSlug,
-  recentDonations,
-  topDonations,
+  initialRecent,
+  initialTop,
   recentTotal,
   topTotal,
   settings,
@@ -45,6 +45,7 @@ export function LeaderboardView({
     show_amount,
     show_avatar,
     default_tab,
+    aggregate_top_by_donor,
   } = settings;
 
   const t = useTranslations('Leaderboard.view');
@@ -73,7 +74,9 @@ export function LeaderboardView({
             )}
             {show_top_list && (
               <TabsTrigger value='top' className={TAB_TRIGGER_CLASS}>
-                {t('tabs.topDonations')}
+                {aggregate_top_by_donor
+                  ? t('tabs.topDonors')
+                  : t('tabs.topDonations')}
               </TabsTrigger>
             )}
           </TabsList>
@@ -91,7 +94,7 @@ export function LeaderboardView({
         {show_recent_list && (
           <TabsContent value='recent' className='mt-0'>
             <ScrollingDonationList
-              donations={recentDonations}
+              donations={initialRecent}
               isActive={effectiveTab === 'recent'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -102,7 +105,7 @@ export function LeaderboardView({
         {show_top_list && (
           <TabsContent value='top' className='mt-0'>
             <ScrollingDonationList
-              donations={topDonations}
+              donations={initialTop}
               isActive={effectiveTab === 'top'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -119,8 +122,8 @@ export function LeaderboardView({
           setIsViewAllOpen(false);
           setActiveTab(closedTab);
         }}
-        recentDonations={recentDonations}
-        topDonations={topDonations}
+        initialRecent={initialRecent}
+        initialTop={initialTop}
         recentTotal={recentTotal}
         topTotal={topTotal}
         activeTab={effectiveTab}
@@ -129,6 +132,7 @@ export function LeaderboardView({
         anonymize={anonymize}
         showAmount={show_amount}
         showAvatar={show_avatar}
+        aggregateTopByDonor={aggregate_top_by_donor}
       />
     </div>
   );

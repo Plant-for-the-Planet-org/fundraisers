@@ -28,7 +28,8 @@
       },
       "tabs": {
         "latest": "Latest",
-        "topDonations": "Top Donations"
+        "topDonations": "Top Donations",
+        "topDonors": "Top Donors"
       },
       "viewAll": "View all",
       "emptyState": "No donations to display",
@@ -39,7 +40,9 @@
         "closeAria": "Close donations list",
         "loadingMore": "Loading more donations...",
         "columnDonor": "Donor",
-        "columnAmount": "Amount"
+        "columnAmount": "Amount",
+        "loadError": "Failed to load more donations",
+        "retry": "Retry"
       }
     }
   }
