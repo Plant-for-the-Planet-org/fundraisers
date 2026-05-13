@@ -80,27 +80,29 @@ export function BundlePreviewModal({
       aria-label={label}
     >
       <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
-        <div className='flex items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
-          <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm sm:h-12 sm:w-12'>
-            <BundleIcon slug={bundle.slug} className='h-8 w-8' />
-          </div>
-          <div className='min-w-0 flex-1'>
-            <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
-              <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
-                {label}
-              </h2>
-              <span className='rounded-md bg-orange-200 px-2 py-0.5 text-xs font-bold tracking-wide text-orange-900 dark:bg-orange-800/60 dark:text-orange-100'>
-                {t(`modal.tag.${activeTab}`)}
-              </span>
+        <div className='flex flex-wrap items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
+          <div className='flex min-w-0 flex-1 items-start gap-2'>
+            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm sm:h-12 sm:w-12'>
+              <BundleIcon slug={bundle.slug} className='h-8 w-8' />
             </div>
-            <p className='mt-1 text-sm italic text-muted-foreground'>
-              &ldquo;{tagline}&rdquo;
-            </p>
+            <div className='min-w-0 flex-1'>
+              <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
+                <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
+                  {label}
+                </h2>
+                <span className='rounded-md bg-orange-200 px-2 py-0.5 text-xs font-bold tracking-wide text-orange-900 dark:bg-orange-800/60 dark:text-orange-100'>
+                  {t(`modal.tag.${activeTab}`)}
+                </span>
+              </div>
+              <p className='mt-1 text-sm italic text-muted-foreground'>
+                &ldquo;{tagline}&rdquo;
+              </p>
+            </div>
           </div>
 
           <Button
             onClick={() => onUseBundle(bundle)}
-            className='bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
+            className='order-last w-full bg-zinc-900 text-white hover:bg-zinc-800 sm:order-0 sm:w-auto dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
           >
             {t('modal.useBundle')}
           </Button>
