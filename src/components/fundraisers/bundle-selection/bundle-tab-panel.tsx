@@ -17,13 +17,6 @@ interface BundleTabPanelProps {
   onOpenBundle: (bundle: Bundle) => void;
 }
 
-const TAB_DESCRIPTION_KEYS = {
-  'staff-picks': 'tabs.staffPicks.description',
-  wonder: 'tabs.wonder.description',
-  rage: 'tabs.rage.description',
-  love: 'tabs.love.description',
-} as const;
-
 export function BundleTabPanel({
   tabId,
   workspace,
@@ -38,7 +31,7 @@ export function BundleTabPanel({
   return (
     <div className='flex flex-col gap-4'>
       <p className='text-sm italic text-muted-foreground'>
-        {t(TAB_DESCRIPTION_KEYS[tabId])}
+        {t(`tabs.${tabId}.description`)}
       </p>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {bundles.map(bundle => (

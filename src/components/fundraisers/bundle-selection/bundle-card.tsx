@@ -28,6 +28,8 @@ export function BundleCard({
   onOpen,
 }: BundleCardProps) {
   const t = useTranslations('Bundles');
+  const label = t(`entries.${bundle.slug}.label`);
+  const tagline = t(`entries.${bundle.slug}.tagline`);
   const projectIds = getBundleProjectIds(bundle, workspace);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -45,8 +47,8 @@ export function BundleCard({
       aria-pressed={isSelected}
       aria-label={
         isSelected
-          ? t('aria.selectedBundle', { name: bundle.label })
-          : t('aria.selectBundle', { name: bundle.label })
+          ? t('aria.selectedBundle', { name: label })
+          : t('aria.selectBundle', { name: label })
       }
       onClick={onSelect}
       onKeyDown={handleKeyDown}
@@ -72,11 +74,11 @@ export function BundleCard({
           <div className='flex items-center gap-1.5'>
             <BundleIcon slug={bundle.slug} className='h-4 w-4 shrink-0' />
             <p className='font-semibold text-foreground leading-tight'>
-              {bundle.label}
+              {label}
             </p>
           </div>
           <p className='mt-1 text-sm text-muted-foreground line-clamp-2'>
-            {bundle.tagline}
+            {tagline}
           </p>
         </div>
       </div>
@@ -113,7 +115,7 @@ export function BundleCard({
             onOpen();
           }}
           aria-haspopup='dialog'
-          aria-label={t('aria.openBundle', { name: bundle.label })}
+          aria-label={t('aria.openBundle', { name: label })}
           className='inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
         >
           <Eye className='h-4 w-4' aria-hidden='true' />

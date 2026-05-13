@@ -1,10 +1,8 @@
 {
   "Bundles": {
     "sectionHeading": "Pick Causes Supported by your Fundraiser",
-    "tagline": "Choose your feeling.",
-    "subline": "The forests don't care why you give. But you will.",
     "tabs": {
-      "staffPicks": {
+      "staff-picks": {
         "label": "Staff Picks",
         "description": "Handpicked by the Plant-for-the-Planet team."
       },
@@ -50,7 +48,7 @@
         "rage": "RAGE",
         "wonder": "WONDER",
         "love": "LOVE",
-        "staffPicks": "STAFF PICKS"
+        "staff-picks": "STAFF PICKS"
       }
     },
     "custom": {
@@ -78,6 +76,48 @@
       }
     },
     "projectImageAlt": "Image for {name}",
-    "unknownProject": "Unknown project"
+    "unknownProject": "Unknown project",
+    "entries": {
+      "ancestral-lands": {
+        "label": "Ancestral Lands",
+        "tagline": "Rooted in Community. Led by the people that never left."
+      },
+      "fix-what-we-broke": {
+        "label": "Fix What We Broke",
+        "tagline": "Not guilt. Just responsibility. Just a shovel."
+      },
+      "for-your-children": {
+        "label": "For My Kids",
+        "tagline": "A forest that will still be growing strong when they are."
+      },
+      "roof-of-the-world": {
+        "label": "Roof of the World",
+        "tagline": "High up where the air is thin and the stakes are high."
+      },
+      "supply-chain-guilt-trip": {
+        "label": "Supply Chain Guilt Trip",
+        "tagline": "Everything you buy has a forest behind it. Meet it."
+      },
+      "amazon-route": {
+        "label": "The Amazon Route",
+        "tagline": "Somewhere in this river basin, a tree is waiting for you."
+      },
+      "underdog-bundle": {
+        "label": "The Underdog Bundle",
+        "tagline": "Small projects. Quiet work. Enormous hearts."
+      },
+      "undo-your-amazon-order": {
+        "label": "Undo Your Amazon Order",
+        "tagline": "You clicked buy. Now click restore."
+      },
+      "where-your-coffee-grows": {
+        "label": "Where Your Coffee Grows",
+        "tagline": "Every morning cup starts somewhere beautiful. Keep it that way."
+      },
+      "worst-of-the-worst": {
+        "label": "Worst of the Worst",
+        "tagline": "The hardest hit places. The ones that need you most."
+      }
+    }
   }
 }

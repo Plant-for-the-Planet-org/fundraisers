@@ -29,13 +29,6 @@ interface BundlePreviewModalProps {
   onUseBundle: (bundle: Bundle) => void;
 }
 
-const TAB_KEY_BY_ID = {
-  'staff-picks': 'staffPicks',
-  wonder: 'wonder',
-  rage: 'rage',
-  love: 'love',
-} as const;
-
 export function BundlePreviewModal({
   bundle,
   workspace,
@@ -46,6 +39,8 @@ export function BundlePreviewModal({
   onUseBundle,
 }: BundlePreviewModalProps) {
   const t = useTranslations('Bundles');
+  const label = t(`entries.${bundle.slug}.label`);
+  const tagline = t(`entries.${bundle.slug}.tagline`);
   const getCountryLabel = useCountryLabel();
 
   useEffect(() => {
@@ -73,7 +68,6 @@ export function BundlePreviewModal({
   const supportProjectId = getSupportProjectId(workspace);
 
   if (!isOpen || typeof document === 'undefined') return null;
-  const tabKey = TAB_KEY_BY_ID[activeTab];
 
   return createPortal(
     <div
@@ -83,7 +77,7 @@ export function BundlePreviewModal({
       }}
       role='dialog'
       aria-modal='true'
-      aria-label={bundle.label}
+      aria-label={label}
     >
       <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
         <div className='flex items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
@@ -93,14 +87,14 @@ export function BundlePreviewModal({
           <div className='min-w-0 flex-1'>
             <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
               <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
-                {bundle.label}
+                {label}
               </h2>
               <span className='rounded-md bg-orange-200 px-2 py-0.5 text-xs font-bold tracking-wide text-orange-900 dark:bg-orange-800/60 dark:text-orange-100'>
-                {t(`modal.tag.${tabKey}` as const)}
+                {t(`modal.tag.${activeTab}`)}
               </span>
             </div>
             <p className='mt-1 text-sm italic text-muted-foreground'>
-              &ldquo;{bundle.tagline}&rdquo;
+              &ldquo;{tagline}&rdquo;
             </p>
           </div>
 

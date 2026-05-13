@@ -1,10 +1,8 @@
 {
   "Bundles": {
     "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
-    "tagline": "Wähle dein Gefühl.",
-    "subline": "Den Wäldern ist es egal, warum du spendest. Dir nicht.",
     "tabs": {
-      "staffPicks": {
+      "staff-picks": {
         "label": "Team-Auswahl",
         "description": "Handverlesen vom Plant-for-the-Planet-Team."
       },
@@ -50,7 +48,7 @@
         "rage": "WUT",
         "wonder": "STAUNEN",
         "love": "LIEBE",
-        "staffPicks": "TEAM-AUSWAHL"
+        "staff-picks": "TEAM-AUSWAHL"
       }
     },
     "custom": {
@@ -78,6 +76,48 @@
       }
     },
     "projectImageAlt": "Bild für {name}",
-    "unknownProject": "Unbekanntes Projekt"
+    "unknownProject": "Unbekanntes Projekt",
+    "entries": {
+      "ancestral-lands": {
+        "label": "Land der Vorfahren",
+        "tagline": "Verwurzelt in der Gemeinschaft. Geführt von den Menschen, die nie gegangen sind."
+      },
+      "fix-what-we-broke": {
+        "label": "Reparieren, was wir zerstört haben",
+        "tagline": "Keine Schuld. Nur Verantwortung. Nur eine Schaufel."
+      },
+      "for-your-children": {
+        "label": "Für meine Kinder",
+        "tagline": "Ein Wald, der noch immer kraftvoll wächst, wenn sie groß sind."
+      },
+      "roof-of-the-world": {
+        "label": "Dach der Welt",
+        "tagline": "Hoch oben, wo die Luft dünn und der Einsatz hoch ist."
+      },
+      "supply-chain-guilt-trip": {
+        "label": "Lieferketten-Gewissensbisse",
+        "tagline": "Hinter allem, was du kaufst, steht ein Wald. Lerne ihn kennen."
+      },
+      "amazon-route": {
+        "label": "Die Amazonas-Route",
+        "tagline": "Irgendwo in diesem Flussbecken wartet ein Baum auf dich."
+      },
+      "underdog-bundle": {
+        "label": "Das Underdog-Paket",
+        "tagline": "Kleine Projekte. Stille Arbeit. Riesige Herzen."
+      },
+      "undo-your-amazon-order": {
+        "label": "Mach deine Amazon-Bestellung rückgängig",
+        "tagline": "Du hast „Kaufen“ geklickt. Jetzt klicke „Wiederherstellen“."
+      },
+      "where-your-coffee-grows": {
+        "label": "Wo dein Kaffee wächst",
+        "tagline": "Jede Tasse am Morgen beginnt an einem schönen Ort. Halte es so."
+      },
+      "worst-of-the-worst": {
+        "label": "Die schlimmsten Orte",
+        "tagline": "Die am stärksten betroffenen Orte. Die, die dich am dringendsten brauchen."
+      }
+    }
   }
 }

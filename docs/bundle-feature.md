@@ -33,7 +33,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 | 4 | Project metadata source | `/countryProjects/<country>?locale=<l>` once on mount, plus per-ID fallback fetch for bundle / support projects missing from the list |
 | 5 | Tab → bundle mapping | Driven by `tabs[].bundleSlugs` in config; `bundles[].tab` is informational only |
 | 6 | Public-view bundle tag | When a bundle has multiple tabs, prefer the first non-`staff-picks` tab |
-| 7 | Bundle labels / taglines | Raw strings from config for now; i18n added in a follow-up once translations land |
+| 7 | Bundle labels / taglines | Translated via `Bundles.entries.<slug>.{label,tagline}` in `locales/{en,de}/bundles.json`. Components look up by slug; the raw strings in `BUNDLE_CONFIG` are no longer rendered. German copy is a draft — flag for native-speaker review. |
 | 8 | Old `project-selection*.tsx` files | Kept as dead code until Step 8, then removed |
 | 9 | Country-based gating | Bundle tabs (Staff Picks / Wonder / Rage / Love) only shown when the form's country resolves to the config's `meta.workspace` (currently `DE`). For other supported countries (ES, CH) only the **Custom** tab is shown. "Rest of the World" maps to the default workspace (`DE`) and gets all tabs |
 | 10 | Allocation split | **25% floor preserved on the support project** — same rule as the legacy `calculateProjectAllocations` (`MIN_DEFAULT_CAUSE_PERCENT`). For a 5-project bundle (1 support + 4 curated): support 28%, others 18% each (vs. a flat 20% × 5 if we'd dropped the floor). Earlier iterations of this doc proposed dropping the rule; we kept it for parity with the existing project-selection behaviour |
@@ -315,7 +315,7 @@ Now that the bundle UI is the only entry point on both create and edit forms (St
 
 ### i18n
 
-Every user-facing string — including `aria-label`, `title`, `alt`, `placeholder` — must use `next-intl` with both `en` and `de` entries. Namespace: `Bundles.*` (extracted into `locales/{en,de}/bundles.json`) and `Fundraisers.publicView.bundle.*`. The bundle `label` and `tagline` from the config remain raw strings for now; once translations are provided, swap them to `useTranslations('Bundles.<slug>.label')` etc.
+Every user-facing string — including `aria-label`, `title`, `alt`, `placeholder` — must use `next-intl` with both `en` and `de` entries. Namespace: `Bundles.*` (extracted into `locales/{en,de}/bundles.json`) and `Fundraisers.publicView.bundle.*`. Bundle `label` and `tagline` are looked up by slug from `Bundles.entries.<slug>.{label,tagline}` — `BUNDLE_CONFIG.bundles[].label` / `.tagline` exist only as authoring metadata and are not rendered.
 
 ### Accessibility
 
@@ -351,7 +351,6 @@ Every user-facing string — including `aria-label`, `title`, `alt`, `placeholde
 
 ## Out of Scope (for this plan)
 
-- Translating bundle labels / taglines (handled in a follow-up once strings are localised).
 - Persisting `selectedBundleSlug` on the API (current detection-by-match approach is simpler and covers the requirement).
 - Editing bundle config from a CMS — config is hard-coded for now.
 - Analytics events on bundle selection (deferred).

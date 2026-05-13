@@ -25,14 +25,6 @@ type BundleSubTab = Exclude<BundleTabId, 'custom'>;
 const BUNDLE_TABS: BundleSubTab[] = ['staff-picks', 'wonder', 'rage', 'love'];
 const ALL_TABS: BundleTabId[] = [...BUNDLE_TABS, 'custom'];
 
-const TAB_LABEL_KEYS = {
-  'staff-picks': 'tabs.staffPicks.label',
-  wonder: 'tabs.wonder.label',
-  rage: 'tabs.rage.label',
-  love: 'tabs.love.label',
-  custom: 'tabs.custom.label',
-} as const satisfies Record<BundleTabId, string>;
-
 interface BundleTabsProps {
   mode: 'create' | 'edit';
 }
@@ -153,7 +145,7 @@ function BundleTabsContent({
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {t(TAB_LABEL_KEYS[tabId])}
+              {t(`tabs.${tabId}.label`)}
             </button>
           );
         })}

@@ -6,6 +6,8 @@ export const BUNDLE_TAB_IDS = [
   'custom',
 ] as const;
 
+// When adding a slug, also add `Bundles.entries.<slug>.{label,tagline}` to
+// locales/{en,de}/bundles.json — otherwise the UI renders the raw key.
 export const BUNDLE_SLUGS = [
   'ancestral-lands',
   'fix-what-we-broke',
@@ -28,17 +30,13 @@ export type BundleWorkspace = (typeof BUNDLE_WORKSPACES)[number];
 
 export interface Bundle {
   slug: BundleSlug;
-  label: string;
   tabs: BundleTabId[];
-  tagline: string;
   /** 4 curated project IDs. The workspace's support project is added at runtime. */
   projectIds: string[];
 }
 
 export interface BundleTab {
   id: BundleTabId;
-  label: string;
-  description: string;
   bundleSlugs: BundleSlug[];
 }
 
@@ -47,8 +45,6 @@ export interface BundleConfig {
     version: string;
     workspace: BundleWorkspace;
     defaultTab: Exclude<BundleTabId, 'custom'>;
-    tagline: string;
-    subline: string;
   };
   tabs: BundleTab[];
   bundles: Bundle[];
