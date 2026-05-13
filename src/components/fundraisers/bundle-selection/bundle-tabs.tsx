@@ -156,7 +156,7 @@ function BundleTabsContent({
           <CustomTabPanel country={country} />
         ) : (
           <BundleTabPanel
-            tabId={activeTab}
+            activeTab={activeTab}
             workspace={workspace}
             selectedBundleSlug={selectedBundleSlug}
             getProject={getProject}

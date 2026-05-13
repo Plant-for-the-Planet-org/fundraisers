@@ -9,7 +9,7 @@ import { getBundlesForTab } from '@/lib/utils/bundle';
 import { BundleCard } from './bundle-card';
 
 interface BundleTabPanelProps {
-  tabId: Exclude<BundleTabId, 'custom'>;
+  activeTab: BundleTabId;
   workspace: BundleWorkspace;
   selectedBundleSlug: string | undefined;
   getProject: (id: string) => ProjectData;
@@ -18,7 +18,7 @@ interface BundleTabPanelProps {
 }
 
 export function BundleTabPanel({
-  tabId,
+  activeTab,
   workspace,
   selectedBundleSlug,
   getProject,
@@ -26,12 +26,12 @@ export function BundleTabPanel({
   onOpenBundle,
 }: BundleTabPanelProps) {
   const t = useTranslations('Bundles');
-  const bundles = useMemo(() => getBundlesForTab(tabId), [tabId]);
+  const bundles = useMemo(() => getBundlesForTab(activeTab), [activeTab]);
 
   return (
     <div className='flex flex-col gap-4'>
       <p className='text-sm italic text-muted-foreground'>
-        {t(`tabs.${tabId}.description`)}
+        {t(`tabs.${activeTab}.description`)}
       </p>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {bundles.map(bundle => (
