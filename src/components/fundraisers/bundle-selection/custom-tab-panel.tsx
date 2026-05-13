@@ -124,12 +124,12 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
     });
   }
 
-  function handleAdd(projectId: string) {
+  function handleProjectAdd(projectId: string) {
     if (selectedIdSet.has(projectId)) return;
     applyAllocationsFromIds([...allocations.map(a => a.project_id), projectId]);
   }
 
-  function handleRemove(projectId: string) {
+  function handleProjectRemove(projectId: string) {
     if (projectId === defaultCauseId) return;
     applyAllocationsFromIds(
       allocations
@@ -222,7 +222,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                 <ProjectSearchCard
                   key={project.id}
                   project={project}
-                  onAdd={() => handleAdd(project.id)}
+                  onAdd={() => handleProjectAdd(project.id)}
                 />
               ))}
             </div>
@@ -260,7 +260,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                 percentage={percentage}
                 isDefaultCause={project_id === defaultCauseId}
                 showLockIndicator={allocations.length > 1}
-                onRemove={() => handleRemove(project_id)}
+                onRemove={() => handleProjectRemove(project_id)}
               />
             ))}
           </ul>
