@@ -86,9 +86,6 @@ export function useDonationSubmit(
         isAuthenticated
       );
 
-      const isPlanetCash =
-        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
-
       const { processingFeeCents } = getDonationProcessingFeeInfo({
         paymentOptions,
         donationAmountCents: donationData.amountCents,
@@ -101,7 +98,7 @@ export function useDonationSubmit(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash,
+        values.selectedPaymentMethod,
         values.willAbsorbFee,
         processingFeeCents
       );
@@ -111,8 +108,31 @@ export function useDonationSubmit(
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
-        if (isPlanetCash) {
-          // TODO: Implement PlanetCash donation flow
+        // PlanetCash: single POST, balance deducted immediately — no PUT step needed.
+        if (values.selectedPaymentMethod === 'planet_cash') {
+          if (!token) {
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: { code: 'unexpected' },
+            }));
+            return;
+          }
+          const donationResponse = await donationService.submitDonation(
+            payload,
+            token,
+            donationAttemptKey
+          );
+          const thankYouState = await resolveThankYouStateFromDonation(
+            donationResponse.donationId,
+            token
+          );
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            thankYouState,
+          }));
+          return;
         } else {
           if (values.selectedPaymentMethod === 'sepa_debit') {
             const donor = formData.type === 'guest' ? formData.donor : null;
@@ -385,9 +405,6 @@ export function useDonationSubmit(
         isAuthenticated
       );
 
-      const isPlanetCash =
-        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
-
       const { processingFeeCents: paypalProcessingFeeCents } =
         getDonationProcessingFeeInfo({
           paymentOptions,
@@ -401,7 +418,7 @@ export function useDonationSubmit(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash,
+        values.selectedPaymentMethod,
         values.willAbsorbFee,
         paypalProcessingFeeCents
       );

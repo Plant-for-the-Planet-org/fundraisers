@@ -124,7 +124,7 @@ export type DonationFormData = AuthenticatedFormData | GuestFormData;
 
 export type DonationFrequency = 'once' | 'monthly' | 'yearly';
 
-export interface DonationPayload {
+export interface DonationPayloadBase {
   /** base donation total excluding fees, decimal */
   amount: number;
   currency: string;
@@ -132,9 +132,19 @@ export interface DonationPayload {
   lineItems: LineItem[];
   donorAlias?: string;
   metadata: DonationMetadata;
-  /** processing fee covered by donor, decimal, only if donor decides to cover feed */
-  absorbedFee?: number;
-  prePaid?: boolean;
-  donor: DonorInfo;
   gift?: SentInvitationGift;
 }
+
+/** For PlanetCash only */
+export interface PrepaidDonationPayload extends DonationPayloadBase {
+  prePaid: true;
+}
+
+/** For all payment methods besides PlanetCash */
+export interface PostpaidDonationPayload extends DonationPayloadBase {
+  donor: DonorInfo;
+  /** processing fee covered by donor, decimal, only if donor decides to cover fee */
+  absorbedFee?: number;
+}
+
+export type DonationPayload = PrepaidDonationPayload | PostpaidDonationPayload;
