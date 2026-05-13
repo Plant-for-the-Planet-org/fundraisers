@@ -121,25 +121,34 @@ export function ViewAllOverlay({
         return;
       }
 
-      // Focus trap: cycle Tab/Shift+Tab within the dialog
+      // Focus trap: always intercept Tab/Shift+Tab and cycle within the dialog
       if (event.key === 'Tab') {
         const dialog = dialogRef.current;
         if (!dialog) return;
 
-        const focusable = dialog.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        const focusable = Array.from(
+          dialog.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter(el => el.tabIndex !== -1);
         if (focusable.length === 0) return;
 
-        const first = focusable[0]!;
-        const last = focusable[focusable.length - 1]!;
+        event.preventDefault();
 
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
+        const currentIndex = focusable.indexOf(
+          document.activeElement as HTMLElement
+        );
+
+        if (event.shiftKey) {
+          focusable[
+            currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1
+          ]!.focus();
+        } else {
+          focusable[
+            currentIndex === -1 || currentIndex >= focusable.length - 1
+              ? 0
+              : currentIndex + 1
+          ]!.focus();
         }
       }
     }
@@ -288,7 +297,11 @@ export function ViewAllOverlay({
             </TabsList>
           </div>
 
-          <div ref={scrollRef} className='h-[72vh] lg:h-[66vh] overflow-y-auto'>
+          <div
+            ref={scrollRef}
+            tabIndex={0}
+            className='h-[72vh] lg:h-[66vh] overflow-y-auto'
+          >
             {donations.length > 0 ? (
               <>
                 <DonationTable
