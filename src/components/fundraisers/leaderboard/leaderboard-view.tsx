@@ -13,8 +13,8 @@ import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
   idOrSlug: string;
-  recentDonationSlice: LeaderboardDonation[];
-  topDonationSlice: LeaderboardDonation[];
+  initialRecentDonations: LeaderboardDonation[];
+  initialTopDonations: LeaderboardDonation[];
   totalRecentDonationCount: number;
   totalTopDonationCount: number;
   settings: LeaderboardModuleSettings;
@@ -31,8 +31,8 @@ const TAB_TRIGGER_CLASS = cn(
 
 export function LeaderboardView({
   idOrSlug,
-  recentDonationSlice,
-  topDonationSlice,
+  initialRecentDonations,
+  initialTopDonations,
   totalRecentDonationCount,
   totalTopDonationCount,
   settings,
@@ -94,7 +94,7 @@ export function LeaderboardView({
         {show_recent_list && (
           <TabsContent value='recent' className='mt-0'>
             <ScrollingDonationList
-              donations={recentDonationSlice}
+              donations={initialRecentDonations}
               isActive={effectiveTab === 'recent'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -105,7 +105,7 @@ export function LeaderboardView({
         {show_top_list && (
           <TabsContent value='top' className='mt-0'>
             <ScrollingDonationList
-              donations={topDonationSlice}
+              donations={initialTopDonations}
               isActive={effectiveTab === 'top'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -123,8 +123,8 @@ export function LeaderboardView({
           setIsViewAllOpen(false);
           setActiveTab(closedTab);
         }}
-        recentDonationSlice={recentDonationSlice}
-        topDonationSlice={topDonationSlice}
+        initialRecentDonations={initialRecentDonations}
+        initialTopDonations={initialTopDonations}
         totalRecentDonationCount={totalRecentDonationCount}
         totalTopDonationCount={totalTopDonationCount}
         activeTab={effectiveTab}

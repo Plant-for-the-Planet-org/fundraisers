@@ -17,8 +17,8 @@ interface ViewAllOverlayProps {
   idOrSlug: string;
   isOpen: boolean;
   onClose: (activeTab: 'recent' | 'top') => void;
-  recentDonationSlice: LeaderboardDonation[];
-  topDonationSlice: LeaderboardDonation[];
+  initialRecentDonations: LeaderboardDonation[];
+  initialTopDonations: LeaderboardDonation[];
   totalRecentDonationCount: number;
   totalTopDonationCount: number;
   activeTab: 'recent' | 'top';
@@ -34,8 +34,8 @@ export function ViewAllOverlay({
   idOrSlug,
   isOpen,
   onClose,
-  recentDonationSlice,
-  topDonationSlice,
+  initialRecentDonations,
+  initialTopDonations,
   totalRecentDonationCount,
   totalTopDonationCount,
   activeTab,
@@ -55,7 +55,7 @@ export function ViewAllOverlay({
     Map<number, LeaderboardDonation[]>
   >(() => {
     const m = new Map<number, LeaderboardDonation[]>();
-    m.set(1, recentDonationSlice);
+    m.set(1, initialRecentDonations);
     return m;
   });
 
@@ -63,7 +63,7 @@ export function ViewAllOverlay({
     Map<number, LeaderboardDonation[]>
   >(() => {
     const m = new Map<number, LeaderboardDonation[]>();
-    m.set(1, topDonationSlice);
+    m.set(1, initialTopDonations);
     return m;
   });
 
@@ -71,8 +71,8 @@ export function ViewAllOverlay({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [hasMore, setHasMore] = useState({
-    recent: totalRecentDonationCount > recentDonationSlice.length,
-    top: totalTopDonationCount > topDonationSlice.length,
+    recent: totalRecentDonationCount > initialRecentDonations.length,
+    top: totalTopDonationCount > initialTopDonations.length,
   });
 
   const dialogRef = useRef<HTMLDivElement>(null);
