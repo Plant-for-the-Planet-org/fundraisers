@@ -1,0 +1,83 @@
+{
+  "Bundles": {
+    "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
+    "tagline": "Wähle dein Gefühl.",
+    "subline": "Den Wäldern ist es egal, warum du spendest. Dir nicht.",
+    "tabs": {
+      "staffPicks": {
+        "label": "Team-Auswahl",
+        "description": "Handverlesen vom Plant-for-the-Planet-Team."
+      },
+      "wonder": {
+        "label": "Staunen",
+        "description": "Die Welt ist riesig und wunderschön."
+      },
+      "rage": {
+        "label": "Wut",
+        "description": "Hier läuft etwas schief und muss repariert werden."
+      },
+      "love": {
+        "label": "Liebe",
+        "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
+      },
+      "custom": {
+        "label": "Individuell",
+        "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus."
+      }
+    },
+    "card": {
+      "projectCount": "{count, plural, one {# PROJEKT} other {# PROJEKTE}}",
+      "seeInside": "Reinschauen",
+      "selected": "Ausgewählt"
+    },
+    "aria": {
+      "openBundle": "Schaue in das Paket {name} hinein",
+      "selectBundle": "Das Paket {name} auswählen",
+      "selectedBundle": "Das Paket {name} ist aktuell ausgewählt",
+      "openProject": "Mehr über {name} erfahren (öffnet in einem neuen Tab)",
+      "closeModal": "Paketvorschau schließen"
+    },
+    "modal": {
+      "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
+      "clickProjectHint": "Klicken Sie auf ein Projekt, um mehr zu erfahren.",
+      "useBundle": "Dieses Paket verwenden",
+      "learnMore": "Mehr erfahren",
+      "loading": "Projekte werden geladen...",
+      "errorTitle": "Projekte konnten nicht geladen werden",
+      "errorMessage": "Dieses Paket konnte nicht geladen werden. Bitte versuche es nochmal.",
+      "retry": "Nochmal versuchen",
+      "tag": {
+        "rage": "WUT",
+        "wonder": "STAUNEN",
+        "love": "LIEBE",
+        "staffPicks": "TEAM-AUSWAHL"
+      }
+    },
+    "custom": {
+      "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus.",
+      "searchPlaceholder": "Projekte nach Name oder Land durchsuchen…",
+      "showingCount": "{shown, number} von {total, number} angezeigt · Suche, um mehr zu finden",
+      "noResultsTitle": "Keine Projekte gefunden",
+      "noResults": "Kein Projekt entspricht „{query}“",
+      "clearSearch": "Suche zurücksetzen",
+      "loading": "Projekte werden geladen…",
+      "errorTitle": "Projekte konnten nicht geladen werden",
+      "errorMessage": "Projekte konnten nicht geladen werden. Bitte versuche es nochmal.",
+      "retry": "Nochmal versuchen",
+      "yourBundle": "Dein eigenes Paket",
+      "projectCount": "{count, plural, =0 {Keine Projekte} one {# Projekt} other {# Projekte}}",
+      "emptyState": "Wähle mindestens ein Projekt aus, das du unterstützen möchtest.",
+      "allAddedTitle": "Alle Projekte hinzugefügt",
+      "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Fundraiser hinzugefügt",
+      "allocationLabel": "{percentage, number}%",
+      "aria": {
+        "search": "Projekte durchsuchen",
+        "addProject": "{name} hinzufügen",
+        "removeProject": "{name} entfernen",
+        "defaultProjectLocked": "{name} ist das Standardprojekt und kann nicht entfernt werden"
+      }
+    },
+    "projectImageAlt": "Bild für {name}",
+    "unknownProject": "Unbekanntes Projekt"
+  }
+}

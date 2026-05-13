@@ -26,7 +26,7 @@ interface CustomTabPanelProps {
 }
 
 export function CustomTabPanel({ country }: CustomTabPanelProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection.custom');
+  const t = useTranslations('Bundles.custom');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
   const projectAllocations = useWatch<
     FundraiserFormValues,

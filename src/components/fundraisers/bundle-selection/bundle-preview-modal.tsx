@@ -45,7 +45,7 @@ export function BundlePreviewModal({
   onClose,
   onUseBundle,
 }: BundlePreviewModalProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const getCountryLabel = useCountryLabel();
 
   useEffect(() => {

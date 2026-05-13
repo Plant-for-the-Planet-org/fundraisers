@@ -38,7 +38,7 @@ interface BundleTabsProps {
 }
 
 export function BundleTabs({ mode }: BundleTabsProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
 
   const country = useWatch<FundraiserFormValues, 'country'>({
@@ -125,7 +125,7 @@ function BundleTabsContent({
   workspace,
   onUseBundle,
 }: BundleTabsContentProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const { getProject } = useBundleProjects(country);
 
   return (

@@ -32,7 +32,7 @@ export function BundleTabPanel({
   onSelectBundle,
   onOpenBundle,
 }: BundleTabPanelProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const bundles = useMemo(() => getBundlesForTab(tabId), [tabId]);
 
   return (

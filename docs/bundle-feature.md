@@ -165,7 +165,7 @@ Deliberate trade-off: this is a full reset, not a swap-and-resplit. The original
 
 - `src/components/fundraisers/bundle-selection/{bundle-tabs,bundle-tab-panel,bundle-card,use-bundle-projects,index}.{ts,tsx}` — new
 - `src/components/fundraisers/fundraiser-form-body.tsx` — `mode === 'create'` branch
-- `locales/{en,de}/fundraisers.json` — `Fundraisers.form.bundleSelection.tabs.*` plus `card.{seeInside,projectCount}` and `aria.{openBundle,selectedBundle}`
+- `locales/{en,de}/bundles.json` — `Bundles.tabs.*` plus `card.{seeInside,projectCount}` and `aria.{openBundle,selectedBundle}`
 
 **Visual test:** DE / ROW → 5 tabs render with cards; ES / CH → only Custom placeholder is shown; switching country between DE and ES flips visibility correctly (allocations stay as-is — see "deferred" above).
 
@@ -202,7 +202,7 @@ If support-project metadata becomes important enough to require live data (it cu
 - `src/lib/types/project-selection.ts` — added `unitCost`, `unitType`, `ProjectUnitType`
 - `src/lib/api/projects-service.ts` — added `normalizeUnitCost` / `normalizeUnitType` to `normalizeProject`
 - `src/lib/utils/bundle.ts` — added `getDisplayableUnitCost`
-- `locales/{en,de}/fundraisers.json` — `Fundraisers.form.bundleSelection.modal.{projectsInside,useBundle,unitCost,learnMore,tag.{rage,wonder,love,staffPicks},errorTitle,errorMessage,retry,loading}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
+- `locales/{en,de}/bundles.json` — `Bundles.modal.{projectsInside,useBundle,unitCost,learnMore,tag.{rage,wonder,love,staffPicks},errorTitle,errorMessage,retry,loading}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
 
 **Visual test:** open `/fundraisers/create`, click any bundle card on the page background → modal opens with 5 rows and full metadata. Click "Use this bundle" → modal closes, the bundle's card on the page now shows the selected check; `projectAllocations` reflects the 28%/18×4 split. Try a card click directly (without opening modal) → also selects.
 
@@ -256,7 +256,7 @@ Adding or removing in Custom mutates `projectAllocations`, which automatically f
 - `src/components/fundraisers/bundle-selection/selected-project-row.tsx` — new
 - `src/components/fundraisers/workspace-selector.tsx` — added country-change reset
 - `src/lib/utils/bundle.ts` — added `buildProjectLearnMoreUrl` helper (the existing duplicates in `project-selection-overlay.tsx` and `bundle-preview-modal.tsx` were left in place; cleaning those up belongs in Step 8)
-- `locales/{en,de}/fundraisers.json` — added `Fundraisers.form.bundleSelection.custom.{description,searchPlaceholder,showingCount,noResultsTitle,noResults,clearSearch,loading,errorTitle,errorMessage,retry,yourBundle,projectCount,emptyState,allAddedTitle,allAddedDescription,allocationLabel}` plus the `custom.aria.{search,addProject,removeProject,defaultProjectLocked}` sub-namespace.
+- `locales/{en,de}/bundles.json` — added `Bundles.custom.{description,searchPlaceholder,showingCount,noResultsTitle,noResults,clearSearch,loading,errorTitle,errorMessage,retry,yourBundle,projectCount,emptyState,allAddedTitle,allAddedDescription,allocationLabel}` plus the `custom.aria.{search,addProject,removeProject,defaultProjectLocked}` sub-namespace.
 
 **i18n note:** aria/screen-reader-only strings were grouped under a `custom.aria.*` sub-namespace (matching the existing `bundleSelection.aria.*` convention) rather than mixed with the visible strings. The `defaultProjectLocked` key is new — it powers the Lock indicator's `aria-label` and `title`.
 
@@ -315,7 +315,7 @@ Now that the bundle UI is the only entry point on both create and edit forms (St
 
 ### i18n
 
-Every user-facing string — including `aria-label`, `title`, `alt`, `placeholder` — must use `next-intl` with both `en` and `de` entries. New namespace: `Fundraisers.form.bundleSelection.*` and `Fundraisers.publicView.bundle.*`. The bundle `label` and `tagline` from the config remain raw strings for now; once translations are provided, swap them to `useTranslations('Bundles.<slug>.label')` etc.
+Every user-facing string — including `aria-label`, `title`, `alt`, `placeholder` — must use `next-intl` with both `en` and `de` entries. Namespace: `Bundles.*` (extracted into `locales/{en,de}/bundles.json`) and `Fundraisers.publicView.bundle.*`. The bundle `label` and `tagline` from the config remain raw strings for now; once translations are provided, swap them to `useTranslations('Bundles.<slug>.label')` etc.
 
 ### Accessibility
 

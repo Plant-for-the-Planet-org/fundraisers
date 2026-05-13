@@ -23,8 +23,8 @@ export function SelectedProjectRow({
   showLockIndicator = false,
   onRemove,
 }: SelectedProjectRowProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
-  const tCustom = useTranslations('Fundraisers.form.bundleSelection.custom');
+  const t = useTranslations('Bundles');
+  const tCustom = useTranslations('Bundles.custom');
   const getCountryLabel = useCountryLabel();
 
   const imageSource = resolveProjectImageSource(project.image);

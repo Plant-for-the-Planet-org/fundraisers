@@ -18,8 +18,8 @@ interface ProjectSearchCardProps {
 }
 
 export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
-  const tCustom = useTranslations('Fundraisers.form.bundleSelection.custom');
+  const t = useTranslations('Bundles');
+  const tCustom = useTranslations('Bundles.custom');
   const getCountryLabel = useCountryLabel();
 
   const imageSource = resolveProjectImageSource(project.image);

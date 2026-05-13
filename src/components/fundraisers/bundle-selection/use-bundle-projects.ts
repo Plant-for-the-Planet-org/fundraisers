@@ -34,7 +34,7 @@ export function useBundleProjects(
   country: AllowedCountry
 ): UseBundleProjectsResult {
   const locale = useLocale();
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);

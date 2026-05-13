@@ -27,7 +27,7 @@ export function BundleCard({
   onSelect,
   onOpen,
 }: BundleCardProps) {
-  const t = useTranslations('Fundraisers.form.bundleSelection');
+  const t = useTranslations('Bundles');
   const projectIds = getBundleProjectIds(bundle, workspace);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
