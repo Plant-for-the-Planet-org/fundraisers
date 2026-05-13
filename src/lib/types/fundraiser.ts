@@ -56,6 +56,7 @@ export interface LeaderboardModuleSettings {
   show_top_list: boolean;
   show_recent_list: boolean;
   show_avatar: boolean;
+  aggregate_top_by_donor: boolean;
 }
 
 export interface FundraiserSettings {

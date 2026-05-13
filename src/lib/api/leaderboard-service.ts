@@ -1,12 +1,17 @@
-import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
+import type {
+  LeaderboardApiResponse,
+  LeaderboardPageResponse,
+} from '@/lib/types/leaderboard';
 
 import { platformAPIClient } from './external-client';
 
 export async function getLeaderboard(
-  idOrSlug: string
+  idOrSlug: string,
+  limit: number = 10
 ): Promise<LeaderboardApiResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
   return platformAPIClient.get<LeaderboardApiResponse>(
-    `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard`
+    `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard?${params.toString()}`
   );
 }
 
@@ -29,4 +34,19 @@ export async function getLeaderboardWithRetry(
   }
 
   throw lastError!;
+}
+
+export async function getLeaderboardByTab(
+  idOrSlug: string,
+  tab: 'recent' | 'top',
+  page: number = 1,
+  limit: number = 10
+): Promise<LeaderboardPageResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  return platformAPIClient.get<LeaderboardPageResponse>(
+    `/fundraisers/${idOrSlug}/leaderboard/${tab}?${params.toString()}`
+  );
 }

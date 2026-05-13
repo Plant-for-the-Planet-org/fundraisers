@@ -5,32 +5,14 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getAvatarColor } from './avatar-utils';
 
 interface DonationItemProps {
   donation: LeaderboardDonation;
   anonymize: boolean;
   showAmount: boolean;
   showAvatar: boolean;
-}
-
-const FALLBACK_COLORS = [
-  'bg-amber-500',
-  'bg-blue-500',
-  'bg-emerald-500',
-  'bg-purple-500',
-  'bg-red-500',
-  'bg-orange-500',
-  'bg-teal-500',
-  'bg-pink-500',
-  'bg-indigo-500',
-  'bg-lime-500',
-  'bg-cyan-500',
-  'bg-rose-500',
-];
-
-function getAvatarColor(id: string): string {
-  const hash = id.split('').reduce((sum, c) => sum + c.charCodeAt(0), 0);
-  return FALLBACK_COLORS[hash % FALLBACK_COLORS.length] ?? 'bg-gray-500';
+  showDate?: boolean;
 }
 
 export function DonationItem({
@@ -38,6 +20,7 @@ export function DonationItem({
   anonymize,
   showAmount,
   showAvatar,
+  showDate = true,
 }: DonationItemProps) {
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const avatarSrc =
@@ -76,10 +59,10 @@ export function DonationItem({
           {displayName}
         </div>
         <div className='text-zinc-600 dark:text-gray-300 text-xs font-medium leading-tight whitespace-nowrap'>
-          {showAmount
-            ? `${formatCurrencyFromDecimal(donation.amount, donation.currency)} • `
-            : ''}
-          {formatTimeAgo(donation.created)}
+          {showAmount &&
+            formatCurrencyFromDecimal(donation.amount, donation.currency)}
+          {showAmount && showDate && ' • '}
+          {showDate && formatTimeAgo(donation.created)}
         </div>
       </div>
     </div>

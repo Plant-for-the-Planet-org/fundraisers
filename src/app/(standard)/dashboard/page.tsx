@@ -46,6 +46,7 @@ export default function DashboardPage() {
 
       try {
         const data = await getFundraisers(accessToken);
+
         if (signal?.aborted) return;
         setFundraisers(data);
         setSummary(data.length > 0 ? getDashboardSummary(data) : EMPTY_SUMMARY);
