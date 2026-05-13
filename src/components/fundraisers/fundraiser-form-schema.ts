@@ -6,8 +6,11 @@ import type { SelectedImage } from '@/lib/types/image-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { z } from 'zod';
+import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
+import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
   ALLOWED_COUNTRIES,
   getCurrencyForCountry,
@@ -102,6 +105,15 @@ export function buildDefaultCreateValues(
   const initialTheme = getThemeForPath(pathname);
   const defaultCountry: AllowedCountry = 'DE';
 
+  const workspace = getWorkspaceForCountry(defaultCountry);
+  const defaultBundle = workspace
+    ? getBundlesForTab(BUNDLE_CONFIG.meta.defaultTab)[0]
+    : undefined;
+  const projectAllocations =
+    workspace && defaultBundle
+      ? bundleToAllocations(defaultBundle, workspace)
+      : [{ project_id: getDefaultCauseId(defaultCountry), percentage: 100 }];
+
   return {
     title: '',
     description: '',
@@ -111,12 +123,7 @@ export function buildDefaultCreateValues(
     goalAmount: undefined as unknown as number,
     visibility: 'public',
     status: 'draft',
-    projectAllocations: [
-      {
-        project_id: getDefaultCauseId(defaultCountry),
-        percentage: 100,
-      },
-    ],
+    projectAllocations,
     settings: {
       theme: {
         base_id: initialTheme.id,

@@ -14,7 +14,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 |---|---|---|
 | 1 — Bundle config + types | ✅ Shipped | |
 | 2 — Bundle helpers | ✅ Shipped | `getEqualSplit` was inlined into `bundleToAllocations` and removed; `getDisplayableUnitCost` added for the per-row unit-cost metric |
-| 3 — Form schema + provider wiring | ✅ Shipped (simpler than spec) | No ephemeral form fields. Active tab is component-local `useState`; selected bundle is derived on each render via `detectBundleFromAllocations`. `buildDefaultCreateValues` left as-is — its existing `getDefaultCauseId(defaultCountry)` happens to return the same support-project ID for DE |
+| 3 — Form schema + provider wiring | ✅ Shipped (simpler than spec) | No ephemeral form fields. Active tab is component-local `useState`; selected bundle is derived on each render via `detectBundleFromAllocations`. `buildDefaultCreateValues` now seeds the default bundle (first slug of `meta.defaultTab`) via `bundleToAllocations`, so a fresh form mounts with that bundle pre-selected on its tab |
 | 4 — `BundleTabs` shell | ✅ Shipped (create + edit) | Both create and edit forms render `<BundleTabs />`. Edit-mode initial-tab logic: bundle match → bundle's first tab; no match → `custom` (so existing custom selections land where they can be edited). Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
 | 4a — Country gating | ✅ Shipped | Tab visibility flips correctly between DE/ROW (all tabs) and ES/CH (Custom-only). Country-change reconciliation handled via `workspace-selector` — switching country wipes allocations and reseeds the new country's default cause at 100% |
 | 5 — Bundle preview modal | ✅ Shipped | UX iterated past spec; see step body for the shipped behaviour |
@@ -121,7 +121,7 @@ The Zod schema is **unchanged**. `projectAllocations` is still the only persiste
 - **Active tab** — component-local `useState<BundleTabId>` inside `BundleTabs`. Defaults to `selectedBundle?.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab` so an existing bundle is shown on its tab when the form mounts.
 - **Selected bundle** — derived per render via `detectBundleFromAllocations(allocations, workspace)`. No state to keep in sync, no stripping before submit.
 
-`buildDefaultCreateValues` is **also unchanged**. It still calls `getDefaultCauseId(defaultCountry)` which returns the same DE support-project ID (`proj_bFH...`) at 100% — so a fresh DE/ROW form already starts in the right state. No bundle is selected on first mount; the user picks one (or stays in Custom).
+`buildDefaultCreateValues` seeds `projectAllocations` from the default bundle (first slug of `BUNDLE_CONFIG.meta.defaultTab`) via `bundleToAllocations`, resolved against the default country's workspace. A fresh DE/ROW form mounts with that bundle's allocations, so `detectBundleFromAllocations` matches on first render and `BundleTabs` lands on the bundle's tab with the bundle card shown selected. If the default country has no workspace (shouldn't happen for `DE`), it falls back to the legacy single-support-project allocation at 100%.
 
 `fundraiserToFormValues` is **unchanged**. Edit-mode bundle detection is not needed because the edit form doesn't use `<BundleTabs />` yet (see Step 4) — it still renders `<ProjectSelection />`.
 
