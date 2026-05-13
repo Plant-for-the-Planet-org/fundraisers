@@ -15,6 +15,8 @@ export interface PaymentFrequency {
 export interface PaymentOptions {
   id: string;
   name: string;
+  /** Format: `gateway:method`. e.g. "stripe:card", "paypal:paypal", "offline:offline" */
+  lastPaymentMethod?: string | null;
   currency: string;
   requestedCountry: string;
   effectiveCountry: string;

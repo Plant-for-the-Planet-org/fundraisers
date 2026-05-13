@@ -79,27 +79,13 @@ case 'stripe': {
   return {
     gateway: 'stripe',
     account,
-    method: mapStripeMethodName(paymentMethod),
+    method: paymentMethod as StripePaymentMethod,
     source: { kind: 'stripe', id: String(id), object: 'payment_method' },
   };
 }
 ```
 
-Add `mapStripeMethodName` (maps `PaymentMethod` → `StripePaymentMethod`). Also consider tightening `mapPaymentMethodName`'s return type from `string` to a full method name union — once all three gateway cases are implemented, this allows the switch branches to use the mapper rather than hardcoding method literals:
-
-
-```ts
-function mapStripeMethodName(paymentMethod: PaymentMethod): StripePaymentMethod {
-  switch (paymentMethod) {
-    case 'sepa-debit': return 'sepa_debit';
-    case 'apple-pay':  return 'apple_pay';
-    case 'google-pay': return 'google_pay';
-    default:           return 'card';
-  }
-}
-```
-
-`StripePaymentMethod` is already exported from [`payment.ts`](../src/lib/types/payment.ts).
+Internal `PaymentMethod` ids are snake_case (`'card'`, `'sepa_debit'`, `'apple_pay'`, `'google_pay'`), so they line up with `StripePaymentMethod` directly — no mapping function needed. `StripePaymentMethod` is exported from [`payment.ts`](../src/lib/types/payment.ts).
 
 ### Note: `kind` field on `StripePaymentSource`
 

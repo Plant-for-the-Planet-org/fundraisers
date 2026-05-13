@@ -8,17 +8,19 @@ import type {
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
 import { memo, useCallback, useEffect, useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
+import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
+import { useFieldError } from '@/components/donate/use-field-error';
 import {
   ApplePayIcon,
   BankIcon,
@@ -30,12 +32,12 @@ import {
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
-  'bank-transfer': 'methods.bankTransfer',
+  bank_transfer: 'methods.bankTransfer',
   paypal: 'methods.paypal',
   card: 'methods.card',
-  'sepa-debit': 'methods.sepa',
-  'apple-pay': 'methods.applePay',
-  'google-pay': 'methods.googlePay',
+  sepa_debit: 'methods.sepa',
+  apple_pay: 'methods.applePay',
+  google_pay: 'methods.googlePay',
 };
 
 const PROVIDER_TRANSLATION_KEYS: Record<
@@ -53,12 +55,12 @@ type PaymentLogoProps = {
 };
 
 const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
-  'bank-transfer': BankIcon,
   paypal: PaypalIcon,
+  sepa_debit: SepaIcon,
   card: CreditCard,
-  'sepa-debit': SepaIcon,
-  'apple-pay': ApplePayIcon,
-  'google-pay': GooglePayIcon,
+  bank_transfer: BankIcon,
+  apple_pay: ApplePayIcon,
+  google_pay: GooglePayIcon,
 };
 
 type MethodFeeDetailsProps = {
@@ -154,6 +156,8 @@ type PaymentMethodOptionProps = {
   showFeeDetails: boolean;
   methodFeeText: string | null;
   methodFeeTooltip: string | null;
+  lastUsedLabel?: string;
+  remark?: string;
   onSelect: (methodId: PaymentMethodId) => void;
 };
 
@@ -165,6 +169,8 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   showFeeDetails,
   methodFeeText,
   methodFeeTooltip,
+  lastUsedLabel,
+  remark,
   onSelect,
 }: PaymentMethodOptionProps) {
   const MethodLogo = methodLogo;
@@ -201,8 +207,18 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
             </div>
           )}
 
-          <div className='flex-1'>
+          <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
             <span className='text-sm font-medium'>{methodLabel}</span>
+            {lastUsedLabel && (
+              <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
+                {lastUsedLabel}
+              </span>
+            )}
+            {remark && (
+              <span className='w-full text-xs text-muted-foreground'>
+                {remark}
+              </span>
+            )}
           </div>
         </div>
 
@@ -220,16 +236,38 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
+  const translateError = useFieldError();
 
-  const { fundraiser, donationData, paymentOptions, sepaFormRef, cardFormRef } =
-    useDonationForm();
+  const {
+    fundraiser,
+    donationData,
+    paymentOptions,
+    paymentOptionsReady,
+    sepaFormRef,
+    cardFormRef,
+  } = useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
+  const { errors } = useFormState({ control, name: 'selectedPaymentMethod' });
+  const paymentMethodError = translateError(
+    errors.selectedPaymentMethod?.message
+  );
   const selectedPaymentMethod = useWatch({
     control,
     name: 'selectedPaymentMethod',
   });
+  const makeMonthly = useWatch({ control, name: 'makeMonthly' });
+
+  const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+
+  const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
+    // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
+    const method = normalizePaymentMethodId(
+      paymentOptions.lastPaymentMethod?.split(':')[1]
+    );
+    return method && SUPPORTED_METHOD_IDS.has(method) ? method : null;
+  }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
     (methodId: PaymentMethodId) =>
@@ -291,36 +329,61 @@ export function PaymentMethods() {
         fundraiser.workspace?.country ||
         'DE',
       currency: donationData.currency,
-      donationAmountCents: donationData.amount,
+      donationAmountCents: donationData.amountCents,
     });
   }, [
-    donationData.amount,
+    donationData.amountCents,
     donationData.currency,
     fundraiser.workspace?.country,
     paymentOptions,
   ]);
 
   const visibleMethods = useMemo(() => {
-    return availableMethods.filter(method =>
-      SUPPORTED_METHOD_IDS.has(method.id)
-    );
-  }, [availableMethods]);
+    return availableMethods.filter(method => {
+      if (!SUPPORTED_METHOD_IDS.has(method.id)) return false;
+      if (isSubscription && method.id === 'paypal') return false;
+      return true;
+    });
+  }, [availableMethods, isSubscription]);
 
   useEffect(() => {
     if (visibleMethods.length === 0) return;
+
+    // Wait for the auth-protected fetch to resolve before pre-selecting.
+    // This prevents the visible "shift" where the first method is picked
+    // initially and then replaced once `lastPaymentMethod` arrives. While
+    // not ready, no method shows as selected — the user simply sees the
+    // list with no radio filled in for a brief moment.
+    if (!paymentOptionsReady) return;
 
     const isSelectedMethodAvailable = visibleMethods.some(
       method => method.id === selectedPaymentMethod
     );
 
-    if (!isSelectedMethodAvailable) {
-      setValue('selectedPaymentMethod', visibleMethods[0].id, {
-        shouldDirty: false,
-        shouldTouch: false,
-        shouldValidate: false,
-      });
-    }
-  }, [visibleMethods, selectedPaymentMethod, setValue]);
+    // Only auto-pick when there's no valid selection. Once the user (or
+    // this effect) has picked something available, leave it alone.
+    if (isSelectedMethodAvailable) return;
+
+    const isLastUsedAvailable =
+      lastUsedMethodId !== null &&
+      visibleMethods.some(method => method.id === lastUsedMethodId);
+
+    const initialMethodId = isLastUsedAvailable
+      ? lastUsedMethodId
+      : visibleMethods[0].id;
+
+    setValue('selectedPaymentMethod', initialMethodId, {
+      shouldDirty: false,
+      shouldTouch: false,
+      shouldValidate: false,
+    });
+  }, [
+    visibleMethods,
+    selectedPaymentMethod,
+    setValue,
+    lastUsedMethodId,
+    paymentOptionsReady,
+  ]);
 
   const visibleMethodOptions = useMemo(
     () =>
@@ -334,6 +397,12 @@ export function PaymentMethods() {
         feeTooltip: feeCollectionEnabled
           ? getFeeTooltip(method, donationData.currency)
           : null,
+        lastUsedLabel:
+          method.id === lastUsedMethodId ? t('lastUsed') : undefined,
+        remark:
+          isSubscription && method.id === 'bank_transfer'
+            ? t('bankTransferRemark')
+            : undefined,
       })),
     [
       donationData.currency,
@@ -341,6 +410,9 @@ export function PaymentMethods() {
       getFeeText,
       getFeeTooltip,
       getMethodLabel,
+      isSubscription,
+      lastUsedMethodId,
+      t,
       visibleMethods,
     ]
   );
@@ -393,6 +465,8 @@ export function PaymentMethods() {
                 showFeeDetails={feeCollectionEnabled}
                 methodFeeText={method.feeText}
                 methodFeeTooltip={method.feeTooltip}
+                lastUsedLabel={method.lastUsedLabel}
+                remark={method.remark}
                 onSelect={handleMethodSelect}
               />
             );
@@ -400,8 +474,12 @@ export function PaymentMethods() {
         </div>
       </div>
 
+      {paymentMethodError && (
+        <p className='text-sm text-destructive'>{paymentMethodError}</p>
+      )}
+
       {selectedPaymentMethod === 'card' && <StripeCardForm ref={cardFormRef} />}
-      {selectedPaymentMethod === 'sepa-debit' && (
+      {selectedPaymentMethod === 'sepa_debit' && (
         <StripeSepaForm ref={sepaFormRef} />
       )}
     </div>

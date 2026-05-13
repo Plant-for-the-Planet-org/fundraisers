@@ -1,10 +1,14 @@
+// Internal payment method ids — kept in snake_case to match the
+// platform API (`gateways.<g>.methods[]`, `lastPaymentMethod`) and the
+// Stripe SDK (`PaymentMethodCreateParams.type`). Avoids round-tripping
+// through case conversion at the boundary.
 export type PaymentMethodId =
-  | 'bank-transfer'
+  | 'bank_transfer'
   | 'paypal'
   | 'card'
-  | 'sepa-debit'
-  | 'apple-pay'
-  | 'google-pay';
+  | 'sepa_debit'
+  | 'apple_pay'
+  | 'google_pay';
 
 export type PaymentMethodProvider =
   | 'stripe'
@@ -13,10 +17,10 @@ export type PaymentMethodProvider =
   | 'planetcash';
 
 export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
-  'bank-transfer',
+  'bank_transfer',
   'paypal',
   'card',
-  'sepa-debit',
+  'sepa_debit',
 ]);
 
 export type FeeRegion = 'US' | 'EU' | 'ROW';

@@ -10,11 +10,21 @@ import {
   storeCodeVerifier,
 } from './pkce';
 
+const AUTH0_DOMAIN = 'accounts.plant-for-the-planet.org';
+const AUTH0_AUDIENCE = 'urn:plant-for-the-planet';
+
+if (!process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID) {
+  throw new Error(
+    'Missing required environment variable: NEXT_PUBLIC_AUTH0_CLIENT_ID. ' +
+      'Please add it to your .env file.'
+  );
+}
+
 export const AUTH0_CONFIG = {
-  domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN!,
-  clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!,
-  audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE!,
-  issuerBaseURL: `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN!}`,
+  domain: AUTH0_DOMAIN,
+  clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID,
+  audience: AUTH0_AUDIENCE,
+  issuerBaseURL: `https://${AUTH0_DOMAIN}`,
   scope: 'openid profile email',
 };
 

@@ -18,21 +18,21 @@ interface PaymentMethodContext {
 }
 
 const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
-  'bank-transfer',
   'paypal',
+  'sepa_debit',
   'card',
-  'sepa-debit',
-  'apple-pay',
-  'google-pay',
+  'bank_transfer',
+  'apple_pay',
+  'google_pay',
 ];
 
 // const METHOD_LABEL_KEYS: Record<PaymentMethodId, string> = {
-//   'bank-transfer': 'methods.bankTransfer',
+//   bank_transfer: 'methods.bankTransfer',
 //   paypal: 'methods.paypal',
 //   card: 'methods.card',
-//   'sepa-debit': 'methods.sepa',
-//   'apple-pay': 'methods.applePay',
-//   'google-pay': 'methods.googlePay',
+//   sepa_debit: 'methods.sepa',
+//   apple_pay: 'methods.applePay',
+//   google_pay: 'methods.googlePay',
 // };
 
 type RawMethodEntry = {
@@ -68,7 +68,7 @@ function resolveMethod(
     if (normalizedGateway === 'paypal') {
       resolvedMethodId = 'paypal';
     } else if (normalizedGateway === 'offline') {
-      resolvedMethodId = 'bank-transfer';
+      resolvedMethodId = 'bank_transfer';
     }
   }
 
@@ -79,7 +79,7 @@ function resolveMethod(
   if (resolvedMethodId === 'paypal') {
     return { methodId: resolvedMethodId, provider: 'paypal' };
   }
-  if (resolvedMethodId === 'bank-transfer') {
+  if (resolvedMethodId === 'bank_transfer') {
     return { methodId: resolvedMethodId, provider: 'offline' };
   }
   if (normalizedGateway === 'planetcash') {
@@ -98,7 +98,7 @@ function isMethodAllowedForCurrency(
   methodId: PaymentMethodId,
   currency: string
 ) {
-  if (methodId === 'sepa-debit' && currency.toUpperCase() !== 'EUR') {
+  if (methodId === 'sepa_debit' && currency.toUpperCase() !== 'EUR') {
     return false;
   }
   return true;
@@ -123,7 +123,7 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
     if (normalizedGateway === 'paypal') {
       entries.push({ methodId: 'paypal', gateway });
     } else if (normalizedGateway === 'offline') {
-      entries.push({ methodId: 'bank-transfer', gateway });
+      entries.push({ methodId: 'bank_transfer', gateway });
     }
   }
 

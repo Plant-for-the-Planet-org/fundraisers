@@ -107,6 +107,9 @@
       },
       "tin": {
         "required": "Die TIN ist erforderlich"
+      },
+      "paymentMethod": {
+        "required": "Bitte wähle eine Zahlungsmethode aus"
       }
     },
     "sepa": {

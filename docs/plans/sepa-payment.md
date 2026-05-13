@@ -301,7 +301,7 @@ After the existing payment method selector, add a conditional that renders the S
 const { sepaFormRef } = useDonationForm();
 
 {
-  selectedPaymentMethod === 'sepa-debit' && (
+  selectedPaymentMethod === 'sepa_debit' && (
     <StripeSepaForm ref={sepaFormRef} />
   );
 }
@@ -332,13 +332,13 @@ case 'stripe': {
   return {
     gateway: 'stripe',
     account,
-    method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+    method: paymentMethod as StripePaymentMethod,
     source: { id: String(id), object: 'payment_method' },
   };
 }
 ```
 
-Note: a separate `mapStripeMethodName` was considered but rejected — `mapPaymentMethodName` already handles all Stripe method names correctly; the cast to `StripePaymentMethod` is sufficient.
+Note: internal `PaymentMethod` ids are snake_case and align with `StripePaymentMethod`, so no remapping is needed — only a cast.
 
 **Testable:** Call `buildPaymentRequest` with mock `PaymentData` for `sepa-debit` and a `paymentMethodId` — assert the returned object matches the expected `StripePaymentRequest` shape.
 
@@ -354,7 +354,7 @@ In `onSubmit`, before calling `submitStandardDonation`, add SEPA-specific paymen
 // After assembleFormData / buildDonationPayload, before submitStandardDonation:
 let paymentDetails: PaymentData['paymentDetails'] = {};
 
-if (values.selectedPaymentMethod === 'sepa-debit') {
+if (values.selectedPaymentMethod === 'sepa_debit') {
   const result = await sepaFormRef.current?.createPaymentMethod({
     name: `${formData.firstname} ${formData.lastname}`,
     email: formData.email,
@@ -384,7 +384,7 @@ Handle `action_required` for SEPA (after `submitStandardDonation`, in the existi
 
 ```typescript
 if (paymentResponse.status === 'action_required') {
-  if (values.selectedPaymentMethod === 'sepa-debit') {
+  if (values.selectedPaymentMethod === 'sepa_debit') {
     const sepaResult = (await sepaFormRef.current?.confirmSepaDebitPayment(
       paymentResponse.response.payment_intent_client_secret
     )) ?? { error: 'No SEPA form available' };

@@ -32,7 +32,7 @@ interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
   currency?: string;
   onDonate: (
-    amount: number,
+    amountCents: number,
     isDedicated: boolean,
     frequency: DonationFrequency,
     gift?: SentInvitationGift
