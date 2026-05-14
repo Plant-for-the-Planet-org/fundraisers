@@ -47,8 +47,8 @@ export function LeaderboardClientLoader({
   return (
     <LeaderboardView
       idOrSlug={idOrSlug}
-      recentDonationSlice={data.recent}
-      topDonationSlice={data.top}
+      initialRecentDonations={data.recent}
+      initialTopDonations={data.top}
       totalRecentDonationCount={data.recentTotal}
       totalTopDonationCount={data.topTotal}
       settings={settings}
