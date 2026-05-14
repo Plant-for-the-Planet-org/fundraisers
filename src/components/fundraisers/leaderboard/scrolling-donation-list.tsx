@@ -60,7 +60,7 @@ export function ScrollingDonationList({
       setTimeout(() => startAutoScroll(el), 100);
     }
     return () => stopAutoScroll();
-  }, [isActive, donations, startAutoScroll, stopAutoScroll]);
+  }, [isActive, donations.length, startAutoScroll, stopAutoScroll]);
 
   useEffect(() => () => stopAutoScroll(), [stopAutoScroll]);
 
