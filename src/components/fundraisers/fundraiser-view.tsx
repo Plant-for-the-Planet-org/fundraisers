@@ -18,6 +18,7 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
+import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
 import {
   LeaderboardLoader,
   LeaderboardSkeleton,
@@ -27,10 +28,12 @@ export function FundraiserView({
   fundraiser,
   paymentOptions,
   paymentOptionsAreAuthenticated = false,
+  leaderboardLoader = 'server',
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
   paymentOptionsAreAuthenticated?: boolean;
+  leaderboardLoader?: 'server' | 'client';
 }) {
   const t = useTranslations('Fundraisers');
 
@@ -85,14 +88,20 @@ export function FundraiserView({
         <TitleDisplay value={fundraiser.title} />
 
         {/* Leaderboard */}
-        {canShowLeaderboard && (
-          <Suspense fallback={<LeaderboardSkeleton />}>
-            <LeaderboardLoader
+        {canShowLeaderboard &&
+          (leaderboardLoader === 'client' ? (
+            <LeaderboardClientLoader
               idOrSlug={fundraiser.slug}
               settings={leaderboardSettings}
             />
-          </Suspense>
-        )}
+          ) : (
+            <Suspense fallback={<LeaderboardSkeleton />}>
+              <LeaderboardLoader
+                idOrSlug={fundraiser.slug}
+                settings={leaderboardSettings}
+              />
+            </Suspense>
+          ))}
 
         {/* Donation form + overlay */}
         {fundraiser.canDonate && paymentOptions ? (
