@@ -43,7 +43,7 @@ export function FundraiserSortMenu({
           variant='outline'
           size='sm'
           className={cn(
-            'h-11 w-full justify-between rounded-xl border-border/60 bg-background px-4 has-[>svg]:px-4 md:w-52',
+            'h-9 w-full justify-between border-border/60 bg-background px-4 has-[>svg]:px-4 md:w-52',
             className
           )}
         >
