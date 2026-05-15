@@ -23,6 +23,8 @@ interface FundraiserStatusFilterProps {
   statusCounts: FundraiserStatusCounts;
   onChange: (next: FundraiserListStatusFilter) => void;
   className?: string;
+  tabsClassName?: string;
+  dropdownClassName?: string;
 }
 
 const STATUS_FILTER_OPTIONS: FundraiserListStatusFilter[] = [
@@ -37,7 +39,8 @@ export function FundraiserStatusFilter({
   value,
   statusCounts,
   onChange,
-  className,
+  tabsClassName,
+  dropdownClassName,
 }: FundraiserStatusFilterProps) {
   const t = useTranslations('Dashboard.statusFilter');
   const locale = useLocale();
@@ -47,7 +50,7 @@ export function FundraiserStatusFilter({
       <Tabs
         value={value}
         onValueChange={v => onChange(v as FundraiserListStatusFilter)}
-        className={cn('hidden mb-block fundraiser-status-filter', className)}
+        className={cn('fundraiser-status-filter', tabsClassName)}
       >
         <TabsList className='w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible'>
           {STATUS_FILTER_OPTIONS.map(option => (
@@ -74,8 +77,8 @@ export function FundraiserStatusFilter({
             size='sm'
             aria-label={t('groupLabel')}
             className={cn(
-              'h-9 w-full justify-between border-border/60 bg-background px-4 has-[>svg]:px-4 md:hidden',
-              className
+              'h-9 w-full justify-between border-border/60 bg-background px-4 has-[>svg]:px-4',
+              dropdownClassName
             )}
           >
             <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
