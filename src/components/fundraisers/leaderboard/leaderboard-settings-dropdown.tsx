@@ -16,6 +16,7 @@ import { Switch } from '@/components/ui/switch';
 export type BooleanLeaderboardKey =
   | 'show_recent_list'
   | 'show_top_list'
+  | 'aggregate_top_by_donor'
   | 'show_amount'
   | 'view_all'
   | 'anonymize'
@@ -36,6 +37,7 @@ export function LeaderboardSettingsDropdown({
   const options: { key: BooleanLeaderboardKey; label: string }[] = [
     { key: 'show_recent_list', label: t('labels.showRecentList') },
     { key: 'show_top_list', label: t('labels.showTopList') },
+    { key: 'aggregate_top_by_donor', label: t('labels.groupTopByDonor') },
     { key: 'show_amount', label: t('labels.showAmounts') },
     { key: 'view_all', label: t('labels.viewAllButton') },
     { key: 'anonymize', label: t('labels.anonymizeDonors') },

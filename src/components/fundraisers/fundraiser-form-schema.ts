@@ -29,6 +29,7 @@ const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   show_top_list: true,
   show_recent_list: true,
   show_avatar: true,
+  aggregate_top_by_donor: true,
 };
 
 const unsplashAttributionSchema = z.object({
@@ -88,6 +89,7 @@ export const fundraiserFormSchema = z.object({
         show_top_list: z.boolean(),
         show_recent_list: z.boolean(),
         show_avatar: z.boolean(),
+        aggregate_top_by_donor: z.boolean(),
       }),
     }),
   }),
