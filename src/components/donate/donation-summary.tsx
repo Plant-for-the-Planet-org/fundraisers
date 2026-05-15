@@ -125,23 +125,28 @@ export function DonationSummary() {
   const renderBreakdown = () => (
     <dl
       aria-label={t('donate.summary.breakdown')}
-      className='space-y-1 border-t border-border pt-4'
+      className='border-t border-border'
     >
-      {fundraiser.projectAllocations.map((allocation, index) => (
-        <div key={index} className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {allocation.project.name}
-          </dt>
-          <dd className='text-foreground text-sm'>
-            {formatCurrency(
-              Math.round(
-                (allocation.percentage / 100) * donationData.amountCents
-              ),
-              donationData.currency
-            )}
-          </dd>
-        </div>
-      ))}
+      <div className='py-4'>
+        {fundraiser.projectAllocations.map((allocation, index) => (
+          <div
+            key={index}
+            className='flex justify-between items-baseline gap-2'
+          >
+            <dt className='text-muted-foreground text-sm'>
+              {allocation.project.name}
+            </dt>
+            <dd className='text-foreground text-sm'>
+              {formatCurrency(
+                Math.round(
+                  (allocation.percentage / 100) * donationData.amountCents
+                ),
+                donationData.currency
+              )}
+            </dd>
+          </div>
+        ))}
+      </div>
 
       {willAbsorbFee && hasProcessingFee && (
         <div className='flex justify-between items-baseline gap-2'>
@@ -154,7 +159,7 @@ export function DonationSummary() {
         </div>
       )}
 
-      <div className='flex justify-between items-center gap-2 pt-3 border-t border-border'>
+      <div className='flex justify-between items-center gap-2 pt-4 border-t border-border'>
         <dt className='font-semibold text-foreground'>{totalLabel}</dt>
         <dd className='font-semibold text-lg text-foreground'>
           {formatCurrency(totalCents, donationData.currency)}
