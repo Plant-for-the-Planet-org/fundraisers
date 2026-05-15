@@ -11,63 +11,32 @@ export function normalizePaymentToken(value: string): string {
   return value.toLowerCase().trim();
 }
 
+const METHOD_ID_ALIASES: Record<PaymentMethodId, readonly string[]> = {
+  card: ['card', 'credit-card', 'debit-card'],
+  sepa_debit: ['sepa', 'sepa_debit', 'sepa-debit'],
+  paypal: ['paypal'],
+  bank_transfer: ['bank_transfer', 'bank-transfer', 'offline'],
+  apple_pay: ['apple_pay', 'applepay', 'apple-pay'],
+  google_pay: ['google_pay', 'googlepay', 'google-pay'],
+  planet_cash: ['planet_cash', 'planet-cash', 'planetcash'],
+};
+
+const ALIAS_LOOKUP: Readonly<Record<string, PaymentMethodId>> = Object.entries(
+  METHOD_ID_ALIASES
+).reduce<Record<string, PaymentMethodId>>((lookup, [id, aliasArray]) => {
+  for (const alias of aliasArray) {
+    lookup[alias] = id as PaymentMethodId;
+  }
+  return lookup;
+}, {});
+
 /**
  * Map a method id from any source (API, legacy data, gateway fallback) to
  * the canonical snake_case `PaymentMethodId`. Returns `null` for unknown ids.
- *
- * Aliases handled:
- * - `'sepa'` → `'sepa_debit'`
- * - `'credit-card'` / `'debit-card'` → `'card'`
- * - `'offline'` → `'bank_transfer'` (gateway name vs. method name)
- * - `'applepay'` / `'googlepay'` → `'apple_pay'` / `'google_pay'`
  */
 export function normalizePaymentMethodId(
   methodId: string | null | undefined
 ): PaymentMethodId | null {
-  if (!methodId) {
-    return null;
-  }
-
-  const normalized = normalizePaymentToken(methodId);
-
-  if (
-    normalized === 'card' ||
-    normalized === 'credit-card' ||
-    normalized === 'debit-card'
-  ) {
-    return 'card';
-  }
-  if (
-    normalized === 'sepa' ||
-    normalized === 'sepa_debit' ||
-    normalized === 'sepa-debit'
-  ) {
-    return 'sepa_debit';
-  }
-  if (normalized === 'paypal') {
-    return 'paypal';
-  }
-  if (
-    normalized === 'bank_transfer' ||
-    normalized === 'bank-transfer' ||
-    normalized === 'offline'
-  ) {
-    return 'bank_transfer';
-  }
-  if (
-    normalized === 'apple_pay' ||
-    normalized === 'applepay' ||
-    normalized === 'apple-pay'
-  ) {
-    return 'apple_pay';
-  }
-  if (
-    normalized === 'google_pay' ||
-    normalized === 'googlepay' ||
-    normalized === 'google-pay'
-  ) {
-    return 'google_pay';
-  }
-
-  return null;
+  if (!methodId) return null;
+  return ALIAS_LOOKUP[normalizePaymentToken(methodId)] ?? null;
 }

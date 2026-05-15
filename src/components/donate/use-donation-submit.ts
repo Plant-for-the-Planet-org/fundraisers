@@ -21,7 +21,10 @@ import {
   PaypalOrderError,
 } from '@/lib/api/paypal-order-service';
 import { buildDonorBillingAddress } from '@/lib/donation/donation-address';
-import { submitStandardDonation } from '@/lib/donation/donation-submission';
+import {
+  submitPrepaidDonation,
+  submitStandardPostpaidDonation,
+} from '@/lib/donation/donation-submission';
 import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   assembleFormData,
@@ -86,9 +89,6 @@ export function useDonationSubmit(
         isAuthenticated
       );
 
-      const isPlanetCash =
-        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
-
       const { processingFeeCents } = getDonationProcessingFeeInfo({
         paymentOptions,
         donationAmountCents: donationData.amountCents,
@@ -101,7 +101,7 @@ export function useDonationSubmit(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash,
+        values.selectedPaymentMethod,
         values.willAbsorbFee,
         processingFeeCents
       );
@@ -111,8 +111,30 @@ export function useDonationSubmit(
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
-        if (isPlanetCash) {
-          // TODO: Implement PlanetCash donation flow
+        // PlanetCash: single POST, balance deducted immediately — no PUT step needed.
+        if (values.selectedPaymentMethod === 'planet_cash') {
+          if (!token) {
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: { code: 'unexpected' },
+            }));
+            return;
+          }
+          const donationResponse = await submitPrepaidDonation(
+            payload,
+            token,
+            donationAttemptKey
+          );
+          const thankYouState = await resolveThankYouStateFromDonation(
+            donationResponse.donationId,
+            token
+          );
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            thankYouState,
+          }));
         } else {
           if (values.selectedPaymentMethod === 'sepa_debit') {
             const donor = formData.type === 'guest' ? formData.donor : null;
@@ -161,7 +183,7 @@ export function useDonationSubmit(
           }
 
           const { donationResponse, paymentResponse } =
-            await submitStandardDonation({
+            await submitStandardPostpaidDonation({
               payload,
               token: token || undefined,
               donationIdempotencyKey: donationAttemptKey,
@@ -385,9 +407,6 @@ export function useDonationSubmit(
         isAuthenticated
       );
 
-      const isPlanetCash =
-        values.selectedPaymentMethod?.startsWith('pcash_') ?? false;
-
       const { processingFeeCents: paypalProcessingFeeCents } =
         getDonationProcessingFeeInfo({
           paymentOptions,
@@ -401,13 +420,13 @@ export function useDonationSubmit(
         formData,
         fundraiser,
         donorProfile,
-        isPlanetCash,
+        values.selectedPaymentMethod,
         values.willAbsorbFee,
         paypalProcessingFeeCents
       );
 
       try {
-        const donationResponse = await donationService.submitDonation(
+        const donationResponse = await donationService.createDonation(
           payload,
           token || undefined,
           donationKeyRef.current

@@ -71,7 +71,7 @@ src/
 ```
 User clicks "Donate Now"
   → useDonationSubmit.onSubmit()
-    → donationService.submitDonation(payload, authToken?, idempotencyKey)
+    → donationService.createDonation(payload, authToken?, idempotencyKey)
       ← DonationResponse { donationId, uid }
     → paymentService.processPayment(donationId, paymentRequest, authToken?, idempotencyKey)
       ← PaymentResponse (discriminated union)

@@ -1,4 +1,5 @@
 import type { UserType } from '@planet-sdk/common';
+import type { Nullable } from '../types/utility';
 
 import { platformAPIClient, PlatformAPIError } from './external-client';
 
@@ -53,14 +54,14 @@ export interface UserProfileResponse {
   isMember: boolean;
   treemapperMigrationState: any | null;
   legacyPriceTill: string | null;
-  planetCash: {
+  planetCash: Nullable<{
     account: string;
     country: string;
     currency: string;
     balance: number;
     creditLimit: number;
     giftFunds: any[];
-  };
+  }>;
   scores: {
     treesDonated: {
       personal: number;
