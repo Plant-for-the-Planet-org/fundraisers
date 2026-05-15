@@ -46,11 +46,27 @@ const roboto = Roboto({
   weight: ['400', '500', '700'],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.BASE_URL || 'http://localhost:3000'),
-  title: 'Fundraisers',
-  description: 'Fundraising platform',
-};
+async function getMetadataBase(): Promise<URL> {
+  const headersList = await headers();
+  const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
+  const protocol =
+    headersList.get('x-forwarded-proto') ??
+    (host?.includes('localhost') ? 'http' : 'https');
+
+  if (host) {
+    return new URL(`${protocol}://${host}`);
+  }
+
+  return new URL('http://localhost:3000');
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    metadataBase: await getMetadataBase(),
+    title: 'Fundraisers',
+    description: 'Fundraising platform',
+  };
+}
 
 export default async function RootLayout({
   children,
