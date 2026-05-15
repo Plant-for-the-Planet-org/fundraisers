@@ -7,6 +7,7 @@ import type {
 
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils/index';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface FundraiserStatusFilterProps {
   value: FundraiserListStatusFilter;
@@ -33,43 +34,28 @@ export function FundraiserStatusFilter({
   const locale = useLocale();
 
   return (
-    <div
-      role='toolbar'
-      aria-label={t('groupLabel')}
-      className={cn(
-        'fundraiser-status-filter flex h-11 shrink-0 items-center justify-between gap-1 overflow-x-auto rounded-xl border border-border/60 bg-muted px-1 shadow-xs md:inline-flex md:justify-start md:overflow-x-visible',
-        className
-      )}
+    <Tabs
+      value={value}
+      onValueChange={v => onChange(v as FundraiserListStatusFilter)}
+      className={cn('fundraiser-status-filter', className)}
     >
-      {STATUS_FILTER_OPTIONS.map(option => {
-        const isSelected = option === value;
-        return (
-          <button
-            key={option}
-            type='button'
-            aria-pressed={isSelected}
-            onClick={() => onChange(option)}
-            className={cn(
-              'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
-              isSelected
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
+      <TabsList className='w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible'>
+        {STATUS_FILTER_OPTIONS.map(option => (
+          <TabsTrigger key={option} value={option} className='gap-1.5 px-4'>
             <span>{t(option)}</span>
             <span
               className={cn(
                 'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
-                isSelected
+                value === option
                   ? 'bg-muted text-foreground'
                   : 'bg-background/70 text-muted-foreground'
               )}
             >
               {statusCounts[option].toLocaleString(locale)}
             </span>
-          </button>
-        );
-      })}
-    </div>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
