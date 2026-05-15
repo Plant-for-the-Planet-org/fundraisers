@@ -189,6 +189,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
       role='radio'
       aria-checked={isSelected}
       aria-disabled={disabled}
+      disabled={disabled}
       className={cn(
         'w-full rounded-lg border p-3 text-left transition-all',
         disabled
@@ -389,7 +390,7 @@ export function PaymentMethods() {
             return (
               !isSubscription &&
               isAuthenticated &&
-              donorProfile?.planetCash !== undefined &&
+              donorProfile?.planetCash != null &&
               donorProfile.planetCash.country === fundraiser.workspace?.country
             );
           }
@@ -412,7 +413,7 @@ export function PaymentMethods() {
               feeTooltip: null,
               lastUsedLabel: undefined,
               remark: isDisabled
-                ? `${balanceText} — ${t('planetCash.insufficientBalance')}`
+                ? `${balanceText} - ${t('planetCash.insufficientBalance')}`
                 : balanceText,
               disabled: isDisabled,
             };
