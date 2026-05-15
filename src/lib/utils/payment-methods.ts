@@ -18,6 +18,7 @@ interface PaymentMethodContext {
 }
 
 const PAYMENT_METHOD_ORDER: PaymentMethodId[] = [
+  'planet_cash',
   'paypal',
   'sepa_debit',
   'card',
@@ -69,6 +70,8 @@ function resolveMethod(
       resolvedMethodId = 'paypal';
     } else if (normalizedGateway === 'offline') {
       resolvedMethodId = 'bank_transfer';
+    } else if (normalizedGateway === 'planet-cash') {
+      resolvedMethodId = 'planet_cash';
     }
   }
 
@@ -81,6 +84,9 @@ function resolveMethod(
   }
   if (resolvedMethodId === 'bank_transfer') {
     return { methodId: resolvedMethodId, provider: 'offline' };
+  }
+  if (resolvedMethodId === 'planet_cash') {
+    return { methodId: resolvedMethodId, provider: 'planetcash' };
   }
   if (normalizedGateway === 'planetcash') {
     return { methodId: resolvedMethodId, provider: 'planetcash' };
@@ -124,6 +130,8 @@ function getRawMethodEntries(paymentOptions: PaymentOptions): RawMethodEntry[] {
       entries.push({ methodId: 'paypal', gateway });
     } else if (normalizedGateway === 'offline') {
       entries.push({ methodId: 'bank_transfer', gateway });
+    } else if (normalizedGateway === 'planet-cash') {
+      entries.push({ methodId: 'planet_cash', gateway });
     }
   }
 

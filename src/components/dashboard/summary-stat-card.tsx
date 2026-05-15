@@ -14,7 +14,7 @@ export function SummaryStatCard({
   helper,
 }: SummaryStatCardProps) {
   return (
-    <Card className='gap-3 border-border/60 px-6 py-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:shadow-md'>
+    <Card className='gap-3 border-border/60 px-6 py-5 shadow-xs'>
       <p className='text-xs font-medium text-muted-foreground uppercase'>
         {label}
       </p>

@@ -51,7 +51,12 @@
           "card": "Credit or Debit Card",
           "sepa": "SEPA Direct Debit",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay"
+          "googlePay": "Google Pay",
+          "planetCash": "PlanetCash"
+        },
+        "planetCash": {
+          "availableBalance": "Available: {amount}",
+          "insufficientBalance": "Insufficient balance"
         },
         "providers": {
           "stripe": "Stripe",

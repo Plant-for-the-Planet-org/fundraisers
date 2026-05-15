@@ -6,9 +6,11 @@ import type {
   DonationFormData,
   DonationFrequency,
   DonationPayload,
+  DonationPayloadBase,
   DonorInfo,
   GuestFormData,
 } from '../types/donation';
+import type { PaymentMethodId } from '../types/payment-methods';
 import type { Fundraiser } from '../types/fundraiser';
 
 import { getPrimaryAddress } from '../utils/profile';
@@ -205,7 +207,7 @@ export function buildDonationPayload(
   formData: DonationFormData,
   fundraiser: Fundraiser,
   donorProfile: UserProfileResponse | undefined,
-  isPlanetCash: boolean,
+  selectedPaymentMethod: PaymentMethodId,
   willAbsorbFee: boolean,
   processingFeeCents: number
 ): DonationPayload {
@@ -226,26 +228,29 @@ export function buildDonationPayload(
     processingFeeCents
   );
   const donorAlias = buildDonorAlias(formData, donorProfile);
-  const isAbsorbingFee = willAbsorbFee && processingFeeCents > 0;
-
-  const base = {
+  const baseDonationPayload: DonationPayloadBase = {
     amount: formData.amountCents / 100,
     currency: formData.currency,
     frequency: formData.frequency,
     lineItems,
     donorAlias,
     metadata,
-    ...(isAbsorbingFee && { absorbedFee: processingFeeCents / 100 }),
-    ...(isPlanetCash && { prePaid: true }),
     ...(formData.gift && { gift: formData.gift }),
   };
 
-  if (formData.type === 'authenticated') {
-    return {
-      ...base,
-      donor: buildAuthenticatedDonorInfo(formData, donorProfile),
-    };
+  if (selectedPaymentMethod === 'planet_cash') {
+    return { ...baseDonationPayload, prePaid: true };
   }
 
-  return { ...base, donor: buildGuestDonorInfo(formData, donorProfile) };
+  const absorbedFee =
+    willAbsorbFee && processingFeeCents > 0
+      ? { absorbedFee: processingFeeCents / 100 }
+      : undefined;
+
+  const donor =
+    formData.type === 'authenticated'
+      ? buildAuthenticatedDonorInfo(formData, donorProfile)
+      : buildGuestDonorInfo(formData, donorProfile);
+
+  return { ...baseDonationPayload, ...absorbedFee, donor };
 }

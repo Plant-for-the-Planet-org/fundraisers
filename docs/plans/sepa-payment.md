@@ -348,10 +348,10 @@ Note: internal `PaymentMethod` ids are snake_case and align with `StripePaymentM
 
 Add `sepaFormRef: React.RefObject<StripeSepaFormHandle | null>` as a fourth parameter to `useDonationSubmit`.
 
-In `onSubmit`, before calling `submitStandardDonation`, add SEPA-specific payment method creation:
+In `onSubmit`, before calling `submitStandardPostpaidDonation`, add SEPA-specific payment method creation:
 
 ```typescript
-// After assembleFormData / buildDonationPayload, before submitStandardDonation:
+// After assembleFormData / buildDonationPayload, before submitStandardPostpaidDonation:
 let paymentDetails: PaymentData['paymentDetails'] = {};
 
 if (values.selectedPaymentMethod === 'sepa_debit') {
@@ -380,7 +380,7 @@ if (values.selectedPaymentMethod === 'sepa_debit') {
 }
 ```
 
-Handle `action_required` for SEPA (after `submitStandardDonation`, in the existing `action_required` placeholder):
+Handle `action_required` for SEPA (after `submitStandardPostpaidDonation`, in the existing `action_required` placeholder):
 
 ```typescript
 if (paymentResponse.status === 'action_required') {

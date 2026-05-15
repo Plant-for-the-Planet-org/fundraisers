@@ -3,6 +3,7 @@ import type { UserProfile } from '@/lib/api/user-service';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
+import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
 
@@ -114,8 +115,8 @@ export const useAuthStore = create<AuthStore>()(
         // Ensure the redirect path is safe to prevent open redirect vulnerabilities
         const safeRedirect = getSafeRedirectPath(uncheckedRedirect);
 
-        const auth0Domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN;
-        const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID;
+        const auth0Domain = AUTH0_CONFIG.domain;
+        const clientId = AUTH0_CONFIG.clientId;
         const baseUrl = window.location.origin;
 
         const logoutSuccessUrl = `${baseUrl}/redirecting?logoutSuccess=true&redirectTo=${encodeURIComponent(
