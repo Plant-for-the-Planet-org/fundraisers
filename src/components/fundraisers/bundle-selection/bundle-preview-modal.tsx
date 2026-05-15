@@ -6,18 +6,11 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { Target, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import {
-  buildProjectLearnMoreUrl,
-  getBundleProjectIds,
-  getDisplayableUnitCost,
-  getSupportProjectId,
-} from '@/lib/utils/bundle';
-import { resolveProjectImageSource } from '@/lib/utils/images';
+import { X } from 'lucide-react';
+import { getBundleProjectIds, getSupportProjectId } from '@/lib/utils/bundle';
+import { calculateProjectAllocations } from '@/lib/utils/project-selection';
 import { Button } from '@/components/ui/button';
-import { BundleIcon } from './bundle-icon';
-import { useCountryLabel } from './use-country-label';
+import { SelectedProjectRow } from './selected-project-row';
 
 interface BundlePreviewModalProps {
   bundle: Bundle;
@@ -41,7 +34,6 @@ export function BundlePreviewModal({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-  const getCountryLabel = useCountryLabel();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,6 +59,11 @@ export function BundlePreviewModal({
   );
   const supportProjectId = getSupportProjectId(workspace);
 
+  const allocations = useMemo(() => {
+    const projects = projectIds.map(id => ({ id, ...getProject(id) }));
+    return calculateProjectAllocations(projects, supportProjectId);
+  }, [projectIds, supportProjectId, getProject]);
+
   if (!isOpen || typeof document === 'undefined') return null;
 
   return createPortal(
@@ -80,24 +77,19 @@ export function BundlePreviewModal({
       aria-label={label}
     >
       <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
-        <div className='flex flex-wrap items-start gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
-          <div className='flex min-w-0 flex-1 items-start gap-2'>
-            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background shadow-sm sm:h-12 sm:w-12'>
-              <BundleIcon slug={bundle.slug} className='h-8 w-8' />
+        <div className='flex flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
+          <div className='min-w-0 flex-1'>
+            <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
+              <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
+                {label}
+              </h2>
+              <span className='rounded-md bg-orange-200 px-2 py-0.5 text-xs font-bold tracking-wide text-orange-900 dark:bg-orange-800/60 dark:text-orange-100'>
+                {t(`modal.tag.${activeTab}`)}
+              </span>
             </div>
-            <div className='min-w-0 flex-1'>
-              <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
-                <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
-                  {label}
-                </h2>
-                <span className='rounded-md bg-orange-200 px-2 py-0.5 text-xs font-bold tracking-wide text-orange-900 dark:bg-orange-800/60 dark:text-orange-100'>
-                  {t(`modal.tag.${activeTab}`)}
-                </span>
-              </div>
-              <p className='mt-1 text-sm italic text-muted-foreground'>
-                &ldquo;{tagline}&rdquo;
-              </p>
-            </div>
+            <p className='mt-1 text-sm italic text-muted-foreground'>
+              &ldquo;{tagline}&rdquo;
+            </p>
           </div>
 
           <Button
@@ -122,81 +114,17 @@ export function BundlePreviewModal({
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
 
-          <p className='mb-3 text-xs text-muted-foreground'>
-            {t('modal.clickProjectHint')}
-          </p>
-
-          <ul className='flex flex-col gap-2'>
-            {projectIds.map(id => {
-              const project = getProject(id);
-              const imageSource = resolveProjectImageSource(project.image);
-              const isSupportProject = id === supportProjectId;
-              const countryLabel = project.country
-                ? getCountryLabel(project.country)
-                : '';
-              const unit = getDisplayableUnitCost(
-                project.unitCost,
-                project.unitType
-              );
-
-              const content = (
-                <>
-                  {' '}
-                  <div className='h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted sm:h-12 sm:w-12'>
-                    {imageSource ? (
-                      <img
-                        src={imageSource}
-                        alt={t('projectImageAlt', { name: project.name })}
-                        className='h-full w-full object-cover'
-                      />
-                    ) : (
-                      <div className='flex h-full w-full items-center justify-center'>
-                        <Target
-                          className='h-5 w-5 text-muted-foreground'
-                          aria-hidden='true'
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className='min-w-0 flex-1 overflow-hidden'>
-                    <p className='line-clamp-2 wrap-break-word font-medium text-foreground sm:truncate'>
-                      {project.name}
-                    </p>
-                    {(countryLabel || unit !== null) && (
-                      <p className='truncate text-sm text-muted-foreground'>
-                        {countryLabel}
-                      </p>
-                    )}
-                  </div>
-                </>
-              );
-
-              const baseClassName =
-                'flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 border border-border';
-
-              return (
-                <li key={id}>
-                  {isSupportProject ? (
-                    <div className={cn(baseClassName)}>{content}</div>
-                  ) : (
-                    <a
-                      href={buildProjectLearnMoreUrl(id)}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      aria-label={t('aria.openProject', {
-                        name: project.name,
-                      })}
-                      className={cn(
-                        baseClassName,
-                        'cursor-pointer transition-colors hover:bg-orange-50 dark:border-orange-800/60 dark:hover:bg-orange-950/20'
-                      )}
-                    >
-                      {content}
-                    </a>
-                  )}
-                </li>
-              );
-            })}
+          <ul className='columns-1 gap-2 min-[600px]:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
+            {allocations.map(({ id, percentage }) => (
+              <SelectedProjectRow
+                key={id}
+                project={getProject(id)}
+                percentage={percentage}
+                isDefaultCause={id === supportProjectId}
+                readOnly={true}
+                onRemove={() => {}}
+              />
+            ))}
           </ul>
         </div>
       </div>

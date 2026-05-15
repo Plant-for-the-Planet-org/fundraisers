@@ -8,7 +8,6 @@ import { Check, Eye } from 'lucide-react';
 import { getBundleProjectIds } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { resolveProjectImageSource } from '@/lib/utils/images';
-import { BundleIcon } from './bundle-icon';
 
 interface BundleCardProps {
   bundle: Bundle;
@@ -53,7 +52,7 @@ export function BundleCard({
       onClick={onSelect}
       onKeyDown={handleKeyDown}
       className={cn(
-        'flex cursor-pointer flex-col gap-3 rounded-xl border bg-background p-4 transition-colors',
+        'flex cursor-pointer flex-col gap-2 rounded-xl border bg-background p-4 transition-colors',
         'hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         isSelected ? 'border-primary ring-1 ring-primary/40' : 'border-border'
       )}
@@ -71,13 +70,10 @@ export function BundleCard({
           {isSelected && <Check className='h-3.5 w-3.5' />}
         </div>
         <div className='flex-1 min-w-0'>
-          <div className='flex items-center gap-1.5'>
-            <BundleIcon slug={bundle.slug} className='h-4 w-4 shrink-0' />
-            <p className='font-semibold text-foreground leading-tight'>
-              {label}
-            </p>
-          </div>
-          <p className='mt-1 text-sm text-muted-foreground line-clamp-2'>
+          <p className='text-sm font-semibold text-foreground leading-tight'>
+            {label}
+          </p>
+          <p className='mt-1 text-xs text-muted-foreground line-clamp-2'>
             {tagline}
           </p>
         </div>
@@ -90,7 +86,7 @@ export function BundleCard({
           return (
             <div
               key={id}
-              className='h-10 overflow-hidden rounded-md bg-linear-to-br  transition-transform duration-300 hover:scale-110 from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'
+              className='h-10 overflow-hidden rounded-md bg-linear-to-br from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'
             >
               {imageSource && (
                 <img

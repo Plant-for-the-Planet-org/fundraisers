@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import {
-  buildProjectLearnMoreUrl,
+  buildProjectUrl,
   getDisplayableUnitCost,
 } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
@@ -15,9 +15,10 @@ import { useCountryLabel } from './use-country-label';
 interface ProjectSearchCardProps {
   project: ProjectData;
   onAdd: () => void;
+  disabled?: boolean;
 }
 
-export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
+export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCardProps) {
   const t = useTranslations('Bundles');
   const tCustom = useTranslations('Bundles.custom');
   const getCountryLabel = useCountryLabel();
@@ -33,7 +34,7 @@ export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
   return (
     <div className='flex min-w-0 items-start gap-2 rounded-xl border border-border bg-background p-2  hover:border-primary'>
       <a
-        href={buildProjectLearnMoreUrl(project.id)}
+        href={buildProjectUrl(project.id)}
         target='_blank'
         rel='noopener noreferrer'
         aria-label={t('aria.openProject', { name: project.name })}
@@ -51,8 +52,8 @@ export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
         </div>
 
         <div className='min-w-0 flex-1'>
-          <p className='flex items-center gap-1 text-sm font-semibold text-foreground transition-colors'>
-            <span>{project.name}</span>
+          <p className='text-sm font-semibold text-foreground transition-colors'>
+            {project.isTopProject ? `${project.name} ✨` : project.name}
           </p>
           {(countryLabel || unitDisplay !== null) && (
             <p className='text-xs text-muted-foreground'>
@@ -65,8 +66,9 @@ export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
       <button
         type='button'
         onClick={onAdd}
+        disabled={disabled}
         aria-label={tCustom('aria.addProject', { name: project.name })}
-        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-foreground transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-foreground transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground'
       >
         <Plus className='h-4 w-4' aria-hidden='true' />
       </button>

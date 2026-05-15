@@ -4,7 +4,8 @@ import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Lock, Target, X } from 'lucide-react';
+import { Target, X } from 'lucide-react';
+import { buildProjectUrl } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { useCountryLabel } from './use-country-label';
 
@@ -12,7 +13,7 @@ interface SelectedProjectRowProps {
   project: ProjectData;
   percentage: number;
   isDefaultCause?: boolean;
-  showLockIndicator?: boolean;
+  readOnly?: boolean;
   onRemove: () => void;
 }
 
@@ -20,7 +21,7 @@ export function SelectedProjectRow({
   project,
   percentage,
   isDefaultCause = false,
-  showLockIndicator = false,
+  readOnly = false,
   onRemove,
 }: SelectedProjectRowProps) {
   const t = useTranslations('Bundles');
@@ -31,10 +32,10 @@ export function SelectedProjectRow({
   const [imageFailed, setImageFailed] = useState(false);
   const countryLabel = project.country ? getCountryLabel(project.country) : '';
 
-  const showTrailingIcon = !isDefaultCause || showLockIndicator;
+  const showTrailingIcon = !isDefaultCause && !readOnly;
 
   return (
-    <li className='flex min-w-0 items-center gap-3 rounded-lg border border-border bg-background p-3'>
+    <li className='flex min-w-0 items-start gap-3 rounded-lg border border-border bg-background p-3'>
       <div className='h-10 w-10 shrink-0 overflow-hidden rounded-md bg-linear-to-br from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'>
         {imageSource && !imageFailed ? (
           <img
@@ -57,40 +58,57 @@ export function SelectedProjectRow({
         <p className='line-clamp-2 text-sm font-semibold text-foreground'>
           {project.name}
         </p>
-        {countryLabel && (
-          <p className='truncate text-xs text-muted-foreground'>
-            {countryLabel}
+        {!isDefaultCause && (
+          <>
+
+            <p className='truncate text-xs text-muted-foreground'>
+              {[countryLabel, tCustom('allocationLabel', { percentage })].filter(Boolean).join(' · ')}
+            </p>
+          </>
+        )}
+        {isDefaultCause ? (
+          <>
+            <p className='mt-0.5 line-clamp-2 text-xs text-muted-foreground'>
+              {tCustom('defaultCauseTooltip')}
+            </p>
+            <a
+              href='https://www.plant-for-the-planet.org/youth-empowerment/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='mt-1 inline-block text-xs text-primary underline-offset-2 hover:underline'
+              onClick={e => e.stopPropagation()}
+            >
+              {tCustom('viewTransparency')}
+            </a>
+          </>
+        ) : project.description ? (
+          <p className='mt-0.5 line-clamp-3 text-xs text-muted-foreground'>
+            {project.description}
           </p>
+        ) : null}
+        {(project.purpose === 'trees' || project.purpose === 'conservation') && (
+          <a
+            href={buildProjectUrl(project.id)}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='mt-1 inline-block text-xs text-primary underline-offset-2 hover:underline'
+            onClick={e => e.stopPropagation()}
+          >
+            {tCustom('viewTransparency')}
+          </a>
         )}
       </div>
 
-      <span className='ml-2 shrink-0 text-sm font-semibold text-foreground tabular-nums'>
-        {tCustom('allocationLabel', { percentage })}
-      </span>
-
-      {showTrailingIcon &&
-        (isDefaultCause ? (
-          <span
-            className='flex h-8 w-8 shrink-0 items-center justify-center text-muted-foreground/60'
-            aria-label={tCustom('aria.defaultProjectLocked', {
-              name: project.name,
-            })}
-            title={tCustom('aria.defaultProjectLocked', {
-              name: project.name,
-            })}
-          >
-            <Lock className='h-3.5 w-3.5' aria-hidden='true' />
-          </span>
-        ) : (
-          <button
-            type='button'
-            onClick={onRemove}
-            aria-label={tCustom('aria.removeProject', { name: project.name })}
-            className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-destructive hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-          >
-            <X className='h-4 w-4' aria-hidden='true' />
-          </button>
-        ))}
+      {showTrailingIcon && (
+        <button
+          type='button'
+          onClick={onRemove}
+          aria-label={tCustom('aria.removeProject', { name: project.name })}
+          className='flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:border-destructive hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+        >
+          <X className='h-4 w-4' aria-hidden='true' />
+        </button>
+      )}
     </li>
   );
 }

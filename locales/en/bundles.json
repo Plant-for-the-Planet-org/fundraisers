@@ -37,9 +37,7 @@
     },
     "modal": {
       "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
-      "clickProjectHint": "Click a project to learn more.",
       "useBundle": "Use this bundle",
-      "learnMore": "Learn More",
       "loading": "Loading projects...",
       "errorTitle": "Failed to load projects",
       "errorMessage": "Unable to load this bundle. Please try again.",
@@ -53,8 +51,9 @@
     },
     "custom": {
       "description": "Build your own bundle — pick projects one by one.",
-      "searchPlaceholder": "Search projects by name or country…",
-      "showingCount": "Showing {shown, number} of {total, number} · Search to find more",
+      "searchPlaceholder": "Search and pick projects to create your bundle",
+      "maxReached": "6 projects selected. Remove one to add another.",
+      "showingCount": "Top {shown, number} of {total, number} · Search to find more · ✨ top projects",
       "noResults": "No projects match \"{query}\"",
       "youMightLike": "You might like these",
       "clearSearch": "Clear search",
@@ -67,7 +66,9 @@
       "emptyState": "Pick at least one project to support.",
       "allAddedTitle": "All projects added",
       "allAddedDescription": "You've added all available projects to your fundraiser",
-      "allocationLabel": "{percentage, number}%",
+      "allocationLabel": "{percentage, number}% of fundraiser",
+      "viewTransparency": "View Transparency →",
+      "defaultCauseTooltip": "Your fundraiser supports our work to empower young people as ambassadors for climate justice, restoring forests and advocating for a sustainable future.",
       "aria": {
         "search": "Search projects",
         "addProject": "Add {name}",

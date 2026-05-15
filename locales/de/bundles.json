@@ -37,9 +37,7 @@
     },
     "modal": {
       "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
-      "clickProjectHint": "Klicken Sie auf ein Projekt, um mehr zu erfahren.",
       "useBundle": "Dieses Paket verwenden",
-      "learnMore": "Mehr erfahren",
       "loading": "Projekte werden geladen...",
       "errorTitle": "Projekte konnten nicht geladen werden",
       "errorMessage": "Dieses Paket konnte nicht geladen werden. Bitte versuche es nochmal.",
@@ -53,8 +51,9 @@
     },
     "custom": {
       "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus.",
-      "searchPlaceholder": "Projekte nach Name oder Land durchsuchen…",
-      "showingCount": "{shown, number} von {total, number} angezeigt · Suche, um mehr zu finden",
+      "searchPlaceholder": "Projekte suchen und auswählen, um dein Paket zu erstellen",
+      "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
+      "showingCount": "Top {shown, number} von {total, number} · Suche, um mehr zu finden · ✨ Top-Projekte",
       "noResults": "Kein Projekt entspricht „{query}“",
       "youMightLike": "Das könnte dir gefallen",
       "clearSearch": "Suche zurücksetzen",
@@ -67,7 +66,9 @@
       "emptyState": "Wähle mindestens ein Projekt aus, das du unterstützen möchtest.",
       "allAddedTitle": "Alle Projekte hinzugefügt",
       "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Fundraiser hinzugefügt",
-      "allocationLabel": "{percentage, number}%",
+      "allocationLabel": "{percentage, number}% des Spendenaufrufs",
+      "viewTransparency": "Transparenz ansehen →",
+      "defaultCauseTooltip": "Dein Spendenaufruf unterstützt unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu stärken, Wälder wiederherzustellen und eine nachhaltige Zukunft zu fördern.",
       "aria": {
         "search": "Projekte durchsuchen",
         "addProject": "{name} hinzufügen",

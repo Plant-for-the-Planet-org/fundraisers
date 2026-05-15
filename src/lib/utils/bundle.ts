@@ -4,9 +4,9 @@ import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
 
-export function buildProjectLearnMoreUrl(projectId: string): string {
+export function buildProjectUrl(projectId: string): string {
   const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
-  return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}?utm_source=fundraiser&utm_medium=cause_selection&utm_campaign=project_link`;
+  return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}`;
 }
 
 export function getBundlesForTab(tabId: BundleTabId): Bundle[] {

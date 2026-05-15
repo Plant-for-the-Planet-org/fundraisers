@@ -7,7 +7,7 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { CircleCheck, Search, SearchX } from 'lucide-react';
+import { CircleCheck, Lock, Search, SearchX } from 'lucide-react';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
 import {
   calculateProjectAllocations,
@@ -19,7 +19,8 @@ import { ProjectSearchCard } from './project-search-card';
 import { SelectedProjectRow } from './selected-project-row';
 import { useBundleProjects } from './use-bundle-projects';
 
-const INITIAL_VISIBLE_COUNT = 8;
+const INITIAL_VISIBLE_COUNT = 6;
+const MAX_PROJECTS = 6;
 
 interface CustomTabPanelProps {
   country: AllowedCountry;
@@ -89,15 +90,28 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
     [searchableProjects, selectedIdSet]
   );
 
+  const topProjects = useMemo(
+    () => unselectedProjects.filter(({ project }) => project.isTopProject).map(({ project }) => project),
+    [unselectedProjects]
+  );
+
   const filteredProjects = useMemo(() => {
-    const list = trimmedQuery
-      ? unselectedProjects.filter(({ haystack }) => haystack.includes(trimmedQuery))
-      : unselectedProjects;
-    return list.map(({ project }) => project);
-  }, [unselectedProjects, trimmedQuery]);
+    if (trimmedQuery) {
+      return unselectedProjects
+        .filter(({ haystack }) => haystack.includes(trimmedQuery))
+        .map(({ project }) => project)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+    const shuffled = topProjects.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, [unselectedProjects, topProjects, trimmedQuery]);
 
   const visibleProjects = filteredProjects.slice(0, INITIAL_VISIBLE_COUNT);
-  const suggestedProjects = unselectedProjects.slice(0, 6).map(({ project }) => project);
+  const suggestedProjects = topProjects.slice(0, 6);
 
   function applyAllocationsFromIds(nextIds: string[]) {
     if (nextIds.length === 0) {
@@ -128,6 +142,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
 
   function handleProjectAdd(projectId: string) {
     if (selectedIdSet.has(projectId)) return;
+    if (allocations.length >= MAX_PROJECTS) return;
     applyAllocationsFromIds([...allocations.map(a => a.project_id), projectId]);
   }
 
@@ -142,20 +157,26 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
 
   return (
     <div className='flex flex-col gap-4'>
-      <p className='text-sm italic text-muted-foreground'>{t('description')}</p>
-
       <div className='rounded-xl border border-border/60 bg-muted p-3 shadow-xs sm:p-4'>
         <div className='relative mb-3'>
-          <Search
-            className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground'
-            aria-hidden='true'
-          />
+          {allocations.length >= MAX_PROJECTS ? (
+            <Lock
+              className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground'
+              aria-hidden='true'
+            />
+          ) : (
+            <Search
+              className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground'
+              aria-hidden='true'
+            />
+          )}
           <Input
             value={searchQuery}
             onChange={event => setSearchQuery(event.target.value)}
-            placeholder={t('searchPlaceholder')}
+            placeholder={allocations.length >= MAX_PROJECTS ? t('maxReached') : t('searchPlaceholder')}
             className='bg-background pl-10'
             aria-label={t('aria.search')}
+            disabled={allocations.length >= MAX_PROJECTS}
           />
         </div>
 
@@ -199,6 +220,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                         key={project.id}
                         project={project}
                         onAdd={() => handleProjectAdd(project.id)}
+                        disabled={allocations.length >= MAX_PROJECTS}
                       />
                     ))}
                   </div>
@@ -268,7 +290,6 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                 project={getProject(project_id)}
                 percentage={percentage}
                 isDefaultCause={project_id === defaultCauseId}
-                showLockIndicator={allocations.length > 1}
                 onRemove={() => handleProjectRemove(project_id)}
               />
             ))}
