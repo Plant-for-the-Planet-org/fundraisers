@@ -40,7 +40,8 @@ export function FundraiserListToolbar({
           value={filters.status}
           statusCounts={statusCounts}
           onChange={handleStatusChange}
-          className='w-40 shrink-0 md:w-auto'
+          tabsClassName='hidden lg:block'
+          dropdownClassName='w-40 sm:w-52 lg:hidden'
         />
       </div>
       <FundraiserSortMenu
