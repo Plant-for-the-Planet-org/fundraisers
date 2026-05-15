@@ -4,6 +4,7 @@ import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
 
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { DashboardStatsError } from './dashboard-stats-error';
 import { SummaryStatCard } from './summary-stat-card';
 import { SummaryStatCardSkeleton } from './summary-stat-card-skeleton';
@@ -59,7 +60,7 @@ export function DashboardSummary({
     summary.activeFundraiserCount > 0 ? (
       <>
         <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
-          {summary.activeFundraiserCount.toLocaleString(locale)}
+          {getLocalizedAbbreviatedCount(summary.activeFundraiserCount, locale)}
         </span>{' '}
         {t('fundraisers.activeSuffix')}
       </>
@@ -71,7 +72,7 @@ export function DashboardSummary({
     <div className='grid gap-4 md:grid-cols-3'>
       <SummaryStatCard
         label={t('fundraisers.label')}
-        value={summary.totalFundraiserCount.toLocaleString(locale)}
+        value={getLocalizedAbbreviatedCount(summary.totalFundraiserCount, locale)}
         helper={fundraisersHelper}
       />
       <SummaryStatCard
@@ -81,7 +82,7 @@ export function DashboardSummary({
       />
       <SummaryStatCard
         label={t('donations.label')}
-        value={summary.donationsCount.toLocaleString(locale)}
+        value={getLocalizedAbbreviatedCount(summary.donationsCount, locale)}
         helper={t('donations.helper')}
       />
     </div>

@@ -7,7 +7,7 @@ import type {
 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils/index';
+import { cn, getLocalizedAbbreviatedCount } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -126,7 +126,7 @@ export function FundraiserStatusFilter({
                     : 'bg-background/70 text-muted-foreground'
                 )}
               >
-                {statusCounts[option].toLocaleString(locale)}
+                {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
               </span>
             </button>
           );

@@ -44,22 +44,23 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 export function formatCurrency(
   amountInCents: number,
   currency: string,
-  locale: string = 'en-US'
+  locale: string = 'en-US',
+  compact: boolean = true
 ): string {
   const currencyUpper = currency.toUpperCase();
 
   // Convert cents to major currency unit (divide by 100)
   const amount = amountInCents / 100;
 
-  // Show 2 decimal places only when the amount has a cent portion (e.g. €0.70),
-  // so round amounts stay clean (e.g. €20, not €20.00).
-  const minimumFractionDigits = amount % 1 !== 0 ? 2 : 0;
-
-  // Format the number with locale-specific decimal and thousands separators.
-  const formattedAmount = new Intl.NumberFormat(locale, {
-    minimumFractionDigits,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  const formattedAmount = compact
+    ? new Intl.NumberFormat(locale, {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(amount)
+    : new Intl.NumberFormat(locale, {
+        minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+        maximumFractionDigits: 2,
+      }).format(amount);
 
   // Use symbol if available, otherwise use currency code
   const symbol = CURRENCY_SYMBOLS[currencyUpper];
@@ -94,19 +95,20 @@ export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
   locale: string = 'en-US',
-  currencyDisplay: 'symbol' | 'code' = 'symbol'
+  currencyDisplay: 'symbol' | 'code' = 'symbol',
+  compact: boolean = true
 ): string {
   const currencyUpper = currency.toUpperCase();
 
-  // Show 2 decimal places only when the amount has a cent portion (e.g. €0.70),
-  // so round amounts stay clean (e.g. €20, not €20.00).
-  const minimumFractionDigits = amount % 1 !== 0 ? 2 : 0;
-
-  // Format the number with locale-specific decimal and thousands separators.
-  const formattedAmount = new Intl.NumberFormat(locale, {
-    minimumFractionDigits,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  const formattedAmount = compact
+    ? new Intl.NumberFormat(locale, {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+      }).format(amount)
+    : new Intl.NumberFormat(locale, {
+        minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+        maximumFractionDigits: 2,
+      }).format(amount);
 
   if (currencyDisplay === 'code') {
     return `${currencyUpper} ${formattedAmount}`;

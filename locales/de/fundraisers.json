@@ -87,7 +87,7 @@
       "goalPreview": {
         "raised": "{amount} gesammelt",
         "goalLine": "{amount} vom gesetzten Ziel",
-        "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
+        "daysLeft": "{days, plural, one {#T übrig} other {#T übrig}}"
       },
       "donorsPreview": {
         "donorCount": "{count, plural, one {# Spender*in} other {# Spender*innen}}",
