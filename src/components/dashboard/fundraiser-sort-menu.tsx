@@ -58,7 +58,7 @@ export function FundraiserSortMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='end'
-        className='w-52 rounded-xl border-border/60 shadow-lg'
+        className='w-(--radix-dropdown-menu-trigger-width) rounded-xl border-border/60 shadow-lg'
       >
         {SORT_OPTIONS.map(option => {
           const isSelected = option === value;
