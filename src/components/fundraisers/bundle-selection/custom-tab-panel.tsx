@@ -83,19 +83,21 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
     [projects]
   );
 
-  const filteredProjects = useMemo(() => {
-    let list = searchableProjects.filter(
-      ({ project }) => !selectedIdSet.has(project.id)
-    );
-    if (trimmedQuery) {
-      list = list.filter(({ haystack }) => haystack.includes(trimmedQuery));
-    }
-    return list.map(({ project }) => project);
-  }, [searchableProjects, selectedIdSet, trimmedQuery]);
+  const unselectedProjects = useMemo(
+    () =>
+      searchableProjects.filter(({ project }) => !selectedIdSet.has(project.id)),
+    [searchableProjects, selectedIdSet]
+  );
 
-  const visibleProjects = trimmedQuery
-    ? filteredProjects
-    : filteredProjects.slice(0, INITIAL_VISIBLE_COUNT);
+  const filteredProjects = useMemo(() => {
+    const list = trimmedQuery
+      ? unselectedProjects.filter(({ haystack }) => haystack.includes(trimmedQuery))
+      : unselectedProjects;
+    return list.map(({ project }) => project);
+  }, [unselectedProjects, trimmedQuery]);
+
+  const visibleProjects = filteredProjects.slice(0, INITIAL_VISIBLE_COUNT);
+  const suggestedProjects = unselectedProjects.slice(0, 6).map(({ project }) => project);
 
   function applyAllocationsFromIds(nextIds: string[]) {
     if (nextIds.length === 0) {
@@ -174,26 +176,34 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
           </div>
         ) : visibleProjects.length === 0 ? (
           trimmedQuery ? (
-            <div className='py-8 text-center'>
-              <div className='mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted-foreground/10'>
-                <SearchX
-                  className='h-6 w-6 text-muted-foreground'
-                  aria-hidden='true'
-                />
+            <div className='flex flex-col gap-3'>
+              <div className='flex items-center justify-between rounded-lg border border-border bg-muted/50 px-3 py-2'>
+                <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  <SearchX className='h-4 w-4 shrink-0' aria-hidden='true' />
+                  <span>{t('noResults', { query: searchQuery })}</span>
+                </div>
+                <button
+                  type='button'
+                  onClick={() => setSearchQuery('')}
+                  className='text-xs font-medium text-foreground underline-offset-2 hover:underline'
+                >
+                  {t('clearSearch')}
+                </button>
               </div>
-              <p className='font-semibold text-foreground'>
-                {t('noResultsTitle')}
-              </p>
-              <p className='mt-1 text-sm text-muted-foreground'>
-                {t('noResults', { query: searchQuery })}
-              </p>
-              <button
-                type='button'
-                onClick={() => setSearchQuery('')}
-                className='mt-3 inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-              >
-                {t('clearSearch')}
-              </button>
+              {suggestedProjects.length > 0 && (
+                <div className='flex flex-col gap-2'>
+                  <p className='text-xs text-muted-foreground'>{t('youMightLike')}</p>
+                  <div className='columns-1 gap-2 sm:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
+                    {suggestedProjects.map(project => (
+                      <ProjectSearchCard
+                        key={project.id}
+                        project={project}
+                        onAdd={() => handleProjectAdd(project.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : projects.length > 0 ? (
             <div className='py-8 text-center'>
@@ -217,7 +227,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
           )
         ) : (
           <>
-            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+            <div className='columns-1 gap-2 sm:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
               {visibleProjects.map(project => (
                 <ProjectSearchCard
                   key={project.id}
@@ -226,8 +236,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
                 />
               ))}
             </div>
-            {!trimmedQuery &&
-              filteredProjects.length > INITIAL_VISIBLE_COUNT && (
+            {filteredProjects.length > INITIAL_VISIBLE_COUNT && (
                 <p className='mt-3 text-center text-xs italic text-muted-foreground'>
                   {t('showingCount', {
                     shown: visibleProjects.length,

@@ -31,13 +31,13 @@ export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
   );
 
   return (
-    <div className='flex min-w-0 items-center gap-2 rounded-xl border border-border bg-background p-2  hover:border-primary'>
+    <div className='flex min-w-0 items-start gap-2 rounded-xl border border-border bg-background p-2  hover:border-primary'>
       <a
         href={buildProjectLearnMoreUrl(project.id)}
         target='_blank'
         rel='noopener noreferrer'
         aria-label={t('aria.openProject', { name: project.name })}
-        className='flex min-w-0 flex-1 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+        className='flex min-w-0 flex-1 items-start gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
       >
         <div className='h-10 w-10 shrink-0 overflow-hidden rounded-md bg-linear-to-br from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'>
           {imageSource && !imageFailed && (
@@ -50,12 +50,12 @@ export function ProjectSearchCard({ project, onAdd }: ProjectSearchCardProps) {
           )}
         </div>
 
-        <div className='min-w-0 flex-1 overflow-hidden'>
-          <p className='flex items-center gap-1 truncate text-sm font-semibold text-foreground transition-colors'>
-            <span className='truncate'>{project.name}</span>
+        <div className='min-w-0 flex-1'>
+          <p className='flex items-center gap-1 text-sm font-semibold text-foreground transition-colors'>
+            <span>{project.name}</span>
           </p>
           {(countryLabel || unitDisplay !== null) && (
-            <p className='truncate text-xs text-muted-foreground'>
+            <p className='text-xs text-muted-foreground'>
               {countryLabel}
             </p>
           )}
