@@ -46,3 +46,7 @@ locales/**/*.d.json.ts
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Claude Code
+.claude/settings.local.json
+.claude/worktrees/
