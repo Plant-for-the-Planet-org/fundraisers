@@ -21,7 +21,10 @@ import {
   PaypalOrderError,
 } from '@/lib/api/paypal-order-service';
 import { buildDonorBillingAddress } from '@/lib/donation/donation-address';
-import { submitStandardDonation } from '@/lib/donation/donation-submission';
+import {
+  submitPrepaidDonation,
+  submitStandardPostpaidDonation,
+} from '@/lib/donation/donation-submission';
 import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   assembleFormData,
@@ -118,7 +121,7 @@ export function useDonationSubmit(
             }));
             return;
           }
-          const donationResponse = await donationService.submitDonation(
+          const donationResponse = await submitPrepaidDonation(
             payload,
             token,
             donationAttemptKey
@@ -132,7 +135,6 @@ export function useDonationSubmit(
             isLoading: false,
             thankYouState,
           }));
-          return;
         } else {
           if (values.selectedPaymentMethod === 'sepa_debit') {
             const donor = formData.type === 'guest' ? formData.donor : null;
@@ -181,7 +183,7 @@ export function useDonationSubmit(
           }
 
           const { donationResponse, paymentResponse } =
-            await submitStandardDonation({
+            await submitStandardPostpaidDonation({
               payload,
               token: token || undefined,
               donationIdempotencyKey: donationAttemptKey,
@@ -424,7 +426,7 @@ export function useDonationSubmit(
       );
 
       try {
-        const donationResponse = await donationService.submitDonation(
+        const donationResponse = await donationService.createDonation(
           payload,
           token || undefined,
           donationKeyRef.current

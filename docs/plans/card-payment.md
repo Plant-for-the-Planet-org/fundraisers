@@ -13,7 +13,7 @@ What's missing is the card form component, its context wiring, the type extensio
 
 Reference implementations:
 
-- `planet-donations/src/Donations/PaymentMethods/PaymentFunctions.ts` — working backend integration; same two-step flow (POST donation, PUT payment). Note: in planet-donations the donation is already created as a draft before the payment form is shown (two-screen flow); in fundraisers both steps happen on the same screen via `submitStandardDonation`.
+- `planet-donations/src/Donations/PaymentMethods/PaymentFunctions.ts` — working backend integration; same two-step flow (POST donation, PUT payment). Note: in planet-donations the donation is already created as a draft before the payment form is shown (two-screen flow); in fundraisers both steps happen on the same screen via `submitStandardPostpaidDonation`.
 - `planet-donations/src/Donations/PaymentMethods/CardPayments.tsx` — UI reference: split Stripe elements (CardNumberElement, CardExpiryElement, CardCvcElement).
 - `gofundnature/src/...` — UI only reference (5 fields); flow not implemented.
 - `src/components/donate/stripe-sepa-form.tsx` — pattern to follow for the ref handle, state, validation, and element styling.

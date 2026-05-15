@@ -171,7 +171,7 @@ Deviations from plan:
   These are pure functions with no React/DOM dependencies — `lib/` is the correct layer.
 
 - **`cleanPaymentDetails`**: Made private inside `donation-submission.ts` rather than its own file.
-  It has a single consumer (`submitStandardDonation`) and no reason to be exported.
+  It has a single consumer (`submitStandardPostpaidDonation`) and no reason to be exported.
 
 - **`resolveDonationContact` and `resolveSelectedAddress` not extracted**: The planned grouping
   of `donor` + `selectedAddress` into `resolveDonationContact` turned out to be an artificial

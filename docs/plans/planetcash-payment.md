@@ -34,7 +34,7 @@ PlanetCash is shown but disabled when `pcGateway.available < donationData.amount
 
 1. User selects PlanetCash and submits.
 2. **Token guard** — if `token` is null, set `error: { code: 'unexpected' }` and return. PlanetCash is only reachable for authenticated users; a missing token is an unexpected state.
-3. **Single POST** — `submitDonation(payload, token, donationAttemptKey)`. Payload has `prePaid: true` and no `donor` field. The backend deducts from the PlanetCash balance immediately.
+3. **Single POST** — `submitPrepaidDonation(payload, token, donationAttemptKey)` → `donationService.createDonation(...)`. Payload has `prePaid: true` and no `donor` field. The backend deducts from the PlanetCash balance immediately.
 4. **Resolve state** — `resolveThankYouStateFromDonation(donationId, token)` fetches the donation status until it is final.
 5. **Done** — `thankYouState` is set and the thank-you UI is shown.
 
@@ -199,7 +199,7 @@ if (values.selectedPaymentMethod === 'planet_cash') {
     return;
   }
   // PlanetCash: single POST, balance deducted immediately — no PUT step needed.
-  const donationResponse = await donationService.submitDonation(payload, token, donationAttemptKey);
+  const donationResponse = await submitPrepaidDonation(payload, token, donationAttemptKey);
   const thankYouState = await resolveThankYouStateFromDonation(donationResponse.donationId, token);
   setDonationState(prev => ({ ...prev, isLoading: false, thankYouState }));
   return;
