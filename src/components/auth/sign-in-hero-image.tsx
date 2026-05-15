@@ -4,8 +4,8 @@ export function SignInHeroImage() {
   return (
     <section className='hidden lg:flex flex-1 relative'>
       <Image
-        src='/bird_on_a_tree.jpg'
-        alt='Bird on a tree'
+        src='/your-fundraiser-plants-trees-academy-2025.jpg'
+        alt='A child proudly shows muddy hands after planting trees at a Plant-for-the-Planet Academy, a reminder of what every fundraiser makes possible.'
         fill
         className='object-cover object-center rounded-none lg:rounded-3xl'
         priority
