@@ -30,17 +30,19 @@ export function FundraiserListToolbar({
 
   return (
     <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 md:flex-row md:items-center'>
-      <FundraiserSearchInput
-        value={filters.search}
-        onChange={handleSearchChange}
-        className='w-full md:min-w-0 md:flex-1'
-      />
-      <FundraiserStatusFilter
-        value={filters.status}
-        statusCounts={statusCounts}
-        onChange={handleStatusChange}
-        className='w-full md:w-auto md:shrink-0'
-      />
+      <div className='flex items-center gap-3 md:contents'>
+        <FundraiserSearchInput
+          value={filters.search}
+          onChange={handleSearchChange}
+          className='min-w-0 flex-1'
+        />
+        <FundraiserStatusFilter
+          value={filters.status}
+          statusCounts={statusCounts}
+          onChange={handleStatusChange}
+          className='w-40 shrink-0 md:w-auto'
+        />
+      </div>
       <FundraiserSortMenu
         value={filters.sort}
         onChange={handleSortChange}
