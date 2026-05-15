@@ -47,6 +47,7 @@ const donationFormFields = z.object({
       'google_pay',
       'paypal',
       'bank_transfer',
+      'planet_cash',
     ],
     { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
   ),

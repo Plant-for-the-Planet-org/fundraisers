@@ -6,8 +6,10 @@
   "language": "en",
   // words - list of words to be always considered correct
   "words": [
+    "applepay",
     "bic",
     "firstname",
+    "googlepay",
     "iban",
     "lastname",
     "noopener",

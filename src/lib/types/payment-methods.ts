@@ -8,7 +8,8 @@ export type PaymentMethodId =
   | 'card'
   | 'sepa_debit'
   | 'apple_pay'
-  | 'google_pay';
+  | 'google_pay'
+  | 'planet_cash';
 
 export type PaymentMethodProvider =
   | 'stripe'
@@ -21,6 +22,7 @@ export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
   'paypal',
   'card',
   'sepa_debit',
+  'planet_cash',
 ]);
 
 export type FeeRegion = 'US' | 'EU' | 'ROW';

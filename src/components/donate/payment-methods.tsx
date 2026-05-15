@@ -17,6 +17,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
 import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer';
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
+import { useAuthStore } from '@/stores/auth-store';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { StripeCardForm } from '@/components/donate/stripe-card-form';
 import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
@@ -27,9 +28,11 @@ import {
   CreditCard,
   GooglePayIcon,
   PaypalIcon,
+  PlanetCashIcon,
   SepaIcon,
 } from '@/components/icons/donation';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   bank_transfer: 'methods.bankTransfer',
@@ -38,6 +41,7 @@ const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   sepa_debit: 'methods.sepa',
   apple_pay: 'methods.applePay',
   google_pay: 'methods.googlePay',
+  planet_cash: 'methods.planetCash',
 };
 
 const PROVIDER_TRANSLATION_KEYS: Record<
@@ -61,6 +65,7 @@ const METHOD_LOGOS: Record<PaymentMethodId, ComponentType<PaymentLogoProps>> = {
   bank_transfer: BankIcon,
   apple_pay: ApplePayIcon,
   google_pay: GooglePayIcon,
+  planet_cash: PlanetCashIcon,
 };
 
 type MethodFeeDetailsProps = {
@@ -158,6 +163,7 @@ type PaymentMethodOptionProps = {
   methodFeeTooltip: string | null;
   lastUsedLabel?: string;
   remark?: string;
+  disabled?: boolean;
   onSelect: (methodId: PaymentMethodId) => void;
 };
 
@@ -171,6 +177,7 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   methodFeeTooltip,
   lastUsedLabel,
   remark,
+  disabled,
   onSelect,
 }: PaymentMethodOptionProps) {
   const MethodLogo = methodLogo;
@@ -178,12 +185,18 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   return (
     <button
       type='button'
-      onClick={() => onSelect(methodId)}
+      onClick={() => !disabled && onSelect(methodId)}
       role='radio'
       aria-checked={isSelected}
+      aria-disabled={disabled}
+      disabled={disabled}
       className={cn(
-        'w-full rounded-lg border p-3 text-left transition-all hover:border-gray-400',
-        isSelected ? 'border-foreground bg-muted' : 'border-border bg-white'
+        'w-full rounded-lg border p-3 text-left transition-all',
+        disabled
+          ? 'cursor-not-allowed border-border bg-muted opacity-70'
+          : 'hover:border-gray-400',
+        !disabled &&
+          (isSelected ? 'border-foreground bg-muted' : 'border-border bg-white')
       )}
     >
       <div className='flex items-center justify-between'>
@@ -234,6 +247,31 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
   );
 });
 
+function PaymentMethodsSkeleton() {
+  const t = useTranslations('Fundraisers.donate.paymentMethods');
+  return (
+    <div className='space-y-3'>
+      <div className='space-y-2'>
+        <h2 className='text-foreground font-medium'>{t('title')}</h2>
+        <p className='text-muted-foreground text-sm'>{t('description')}</p>
+      </div>
+      <div className='border border-border rounded-lg'>
+        <div className='space-y-3 p-4'>
+          {[0, 1, 2].map(i => (
+            <div key={i} className='rounded-lg border border-border p-3'>
+              <div className='flex items-center gap-3'>
+                <Skeleton className='h-4 w-4 shrink-0 rounded-full' />
+                <Skeleton className='h-5 w-12 shrink-0' />
+                <Skeleton className='h-4 w-28' />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const translateError = useFieldError();
@@ -256,6 +294,9 @@ export function PaymentMethods() {
     name: 'selectedPaymentMethod',
   });
   const makeMonthly = useWatch({ control, name: 'makeMonthly' });
+
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const donorProfile = useAuthStore(state => state.user?.profile);
 
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
@@ -338,16 +379,85 @@ export function PaymentMethods() {
     paymentOptions,
   ]);
 
-  const visibleMethods = useMemo(() => {
-    return availableMethods.filter(method => {
-      if (!SUPPORTED_METHOD_IDS.has(method.id)) return false;
-      if (isSubscription && method.id === 'paypal') return false;
-      return true;
-    });
-  }, [availableMethods, isSubscription]);
+  const visibleMethodOptions = useMemo(
+    () =>
+      availableMethods
+        .filter(method => {
+          // Identify available methods
+          if (!SUPPORTED_METHOD_IDS.has(method.id)) return false;
+          if (isSubscription && method.id === 'paypal') return false;
+          if (method.id === 'planet_cash') {
+            return (
+              !isSubscription &&
+              isAuthenticated &&
+              donorProfile?.planetCash != null &&
+              donorProfile.planetCash.country === fundraiser.workspace?.country
+            );
+          }
+          return true;
+        })
+        .map(method => {
+          // Configure options for available methods
+          if (method.id === 'planet_cash') {
+            const pcGateway = paymentOptions.gateways['planet-cash'];
+            const available = pcGateway?.available ?? 0;
+            const isDisabled = available < donationData.amountCents;
+            const balanceText = t('planetCash.availableBalance', {
+              amount: formatCurrency(available, donationData.currency),
+            });
+            return {
+              id: method.id,
+              label: getMethodLabel(method.id),
+              logo: METHOD_LOGOS[method.id],
+              feeText: null,
+              feeTooltip: null,
+              lastUsedLabel: undefined,
+              remark: isDisabled
+                ? `${balanceText} - ${t('planetCash.insufficientBalance')}`
+                : balanceText,
+              disabled: isDisabled,
+            };
+          }
+
+          return {
+            id: method.id,
+            label: getMethodLabel(method.id),
+            logo: METHOD_LOGOS[method.id],
+            feeText: feeCollectionEnabled
+              ? getFeeText(method, donationData.currency)
+              : null,
+            feeTooltip: feeCollectionEnabled
+              ? getFeeTooltip(method, donationData.currency)
+              : null,
+            lastUsedLabel:
+              method.id === lastUsedMethodId ? t('lastUsed') : undefined,
+            remark:
+              isSubscription && method.id === 'bank_transfer'
+                ? t('bankTransferRemark')
+                : undefined,
+            disabled: false,
+          };
+        }),
+    [
+      availableMethods,
+      donationData.amountCents,
+      donationData.currency,
+      donorProfile,
+      feeCollectionEnabled,
+      fundraiser.workspace?.country,
+      getFeeText,
+      getFeeTooltip,
+      getMethodLabel,
+      isAuthenticated,
+      isSubscription,
+      lastUsedMethodId,
+      paymentOptions.gateways,
+      t,
+    ]
+  );
 
   useEffect(() => {
-    if (visibleMethods.length === 0) return;
+    if (visibleMethodOptions.length === 0) return;
 
     // Wait for the auth-protected fetch to resolve before pre-selecting.
     // This prevents the visible "shift" where the first method is picked
@@ -356,21 +466,25 @@ export function PaymentMethods() {
     // list with no radio filled in for a brief moment.
     if (!paymentOptionsReady) return;
 
-    const isSelectedMethodAvailable = visibleMethods.some(
-      method => method.id === selectedPaymentMethod
+    const selectedOption = visibleMethodOptions.find(
+      m => m.id === selectedPaymentMethod
     );
+    const isSelectedMethodEnabled =
+      selectedOption !== undefined && !selectedOption.disabled;
 
-    // Only auto-pick when there's no valid selection. Once the user (or
-    // this effect) has picked something available, leave it alone.
-    if (isSelectedMethodAvailable) return;
+    if (isSelectedMethodEnabled) return;
+
+    const enabledOptions = visibleMethodOptions.filter(m => !m.disabled);
+    const candidates =
+      enabledOptions.length > 0 ? enabledOptions : visibleMethodOptions;
 
     const isLastUsedAvailable =
       lastUsedMethodId !== null &&
-      visibleMethods.some(method => method.id === lastUsedMethodId);
+      candidates.some(m => m.id === lastUsedMethodId);
 
     const initialMethodId = isLastUsedAvailable
       ? lastUsedMethodId
-      : visibleMethods[0].id;
+      : candidates[0].id;
 
     setValue('selectedPaymentMethod', initialMethodId, {
       shouldDirty: false,
@@ -378,44 +492,12 @@ export function PaymentMethods() {
       shouldValidate: false,
     });
   }, [
-    visibleMethods,
+    visibleMethodOptions,
     selectedPaymentMethod,
     setValue,
     lastUsedMethodId,
     paymentOptionsReady,
   ]);
-
-  const visibleMethodOptions = useMemo(
-    () =>
-      visibleMethods.map(method => ({
-        id: method.id,
-        label: getMethodLabel(method.id),
-        logo: METHOD_LOGOS[method.id],
-        feeText: feeCollectionEnabled
-          ? getFeeText(method, donationData.currency)
-          : null,
-        feeTooltip: feeCollectionEnabled
-          ? getFeeTooltip(method, donationData.currency)
-          : null,
-        lastUsedLabel:
-          method.id === lastUsedMethodId ? t('lastUsed') : undefined,
-        remark:
-          isSubscription && method.id === 'bank_transfer'
-            ? t('bankTransferRemark')
-            : undefined,
-      })),
-    [
-      donationData.currency,
-      feeCollectionEnabled,
-      getFeeText,
-      getFeeTooltip,
-      getMethodLabel,
-      isSubscription,
-      lastUsedMethodId,
-      t,
-      visibleMethods,
-    ]
-  );
 
   const handleMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
@@ -428,7 +510,9 @@ export function PaymentMethods() {
     [setValue]
   );
 
-  if (visibleMethods.length === 0) {
+  if (!paymentOptionsReady) return <PaymentMethodsSkeleton />;
+
+  if (visibleMethodOptions.length === 0) {
     return (
       <div className='space-y-3'>
         <div className='space-y-2'>
@@ -467,6 +551,7 @@ export function PaymentMethods() {
                 methodFeeTooltip={method.feeTooltip}
                 lastUsedLabel={method.lastUsedLabel}
                 remark={method.remark}
+                disabled={method.disabled}
                 onSelect={handleMethodSelect}
               />
             );

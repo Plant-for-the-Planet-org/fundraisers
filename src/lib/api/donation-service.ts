@@ -173,7 +173,7 @@ export class DonationService {
     }
   }
 
-  async submitDonation(
+  async createDonation(
     payload: DonationPayload,
     authToken?: string,
     idempotencyKey?: string

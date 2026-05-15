@@ -171,7 +171,7 @@ Add `paypalDonationIdRef` to share `donationId` between the two PayPal callbacks
 - Guards against concurrent calls via `submittingRef`
 - Sets `isLoading: true`
 - `assembleFormData` + `buildDonationPayload` (same as `onSubmit`)
-- `donationService.submitDonation(...)` → stores `donationId` in `paypalDonationIdRef`
+- `donationService.createDonation(...)` → stores `donationId` in `paypalDonationIdRef`
 - `createPaypalOrder(donationId, paypalAccount, token)` → returns `orderId`
 - On error: sets `error` state, clears `isLoading`, rethrows so PayPal SDK blocks the popup
 
