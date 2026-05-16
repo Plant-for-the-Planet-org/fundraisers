@@ -68,7 +68,7 @@ export function BundlePreviewModal({
 
   return createPortal(
     <div
-      className='fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-black/30 px-3 pt-[6vh] pb-3 backdrop-blur-sm sm:px-4 sm:pt-[8vh] sm:pb-4'
+      className='fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-black/30 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-6'
       onMouseDown={event => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -76,8 +76,8 @@ export function BundlePreviewModal({
       aria-modal='true'
       aria-label={label}
     >
-      <div className='mx-auto w-full max-w-[min(56rem,100dvw-1.5rem)] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
-        <div className='flex flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
+      <div className='mx-auto flex w-full max-w-[56rem] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
+        <div className='flex shrink-0 flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
           <div className='min-w-0 flex-1'>
             <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
               <h2 className='wrap-break-word text-base font-semibold text-foreground sm:text-lg'>
@@ -109,7 +109,7 @@ export function BundlePreviewModal({
           </button>
         </div>
 
-        <div className='max-h-[60vh] overflow-y-auto px-4 py-4'>
+        <div className='px-4 py-4'>
           <p className='mb-3 text-xs font-bold tracking-wide text-muted-foreground'>
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>

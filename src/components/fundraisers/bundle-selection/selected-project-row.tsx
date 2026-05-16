@@ -58,14 +58,14 @@ export function SelectedProjectRow({
         <p className='line-clamp-2 text-sm font-semibold text-foreground'>
           {project.name}
         </p>
-        {!isDefaultCause && (
-          <>
-
-            <p className='truncate text-xs text-muted-foreground'>
-              {[countryLabel, tCustom('allocationLabel', { percentage })].filter(Boolean).join(' · ')}
-            </p>
-          </>
-        )}
+        <p className='truncate text-xs text-muted-foreground'>
+          {[
+            isDefaultCause ? tCustom('globalLabel') : countryLabel,
+            tCustom('allocationLabel', { percentage }),
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
         {isDefaultCause ? (
           <>
             <p className='mt-0.5 line-clamp-2 text-xs text-muted-foreground'>

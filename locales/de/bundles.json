@@ -24,7 +24,7 @@
       }
     },
     "card": {
-      "projectCount": "{count, plural, one {# PROJEKT} other {# PROJEKTE}}",
+      "projectCount": "{count, plural, one {# Projekt} other {# Projekte}}",
       "seeInside": "Reinschauen",
       "selected": "Ausgewählt"
     },
@@ -36,7 +36,7 @@
       "closeModal": "Paketvorschau schließen"
     },
     "modal": {
-      "projectsInside": "{count, plural, one {# PROJEKT ENTHALTEN} other {# PROJEKTE ENTHALTEN}}",
+      "projectsInside": "{count, plural, one {# Projekt enthalten} other {# Projekte enthalten}}",
       "useBundle": "Dieses Paket verwenden",
       "loading": "Projekte werden geladen...",
       "errorTitle": "Projekte konnten nicht geladen werden",
@@ -67,6 +67,7 @@
       "allAddedTitle": "Alle Projekte hinzugefügt",
       "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Fundraiser hinzugefügt",
       "allocationLabel": "{percentage, number}% des Spendenaufrufs",
+      "globalLabel": "Global",
       "viewTransparency": "Transparenz ansehen →",
       "defaultCauseTooltip": "Dein Spendenaufruf unterstützt unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu stärken, Wälder wiederherzustellen und eine nachhaltige Zukunft zu fördern.",
       "aria": {

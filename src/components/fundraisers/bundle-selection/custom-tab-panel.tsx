@@ -157,7 +157,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='rounded-xl border border-border/60 bg-muted p-3 shadow-xs sm:p-4'>
+      <div className='rounded-xl border border-border/60 bg-muted/50 p-3 shadow-xs sm:p-4'>
         <div className='relative mb-3'>
           {allocations.length >= MAX_PROJECTS ? (
             <Lock
@@ -270,7 +270,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
         )}
       </div>
 
-      <div className='rounded-xl border border-border/60 bg-muted p-3 shadow-xs sm:p-4'>
+      <div className='rounded-xl border border-border/60 bg-muted/50 p-3 shadow-xs sm:p-4'>
         <p className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
           {t('yourBundle')}
         </p>

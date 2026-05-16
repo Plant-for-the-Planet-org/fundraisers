@@ -24,7 +24,7 @@
       }
     },
     "card": {
-      "projectCount": "{count, plural, one {# PROJECT} other {# PROJECTS}}",
+      "projectCount": "{count, plural, one {# project} other {# projects}}",
       "seeInside": "See inside",
       "selected": "Selected"
     },
@@ -36,7 +36,7 @@
       "closeModal": "Close bundle preview"
     },
     "modal": {
-      "projectsInside": "{count, plural, one {# PROJECT INSIDE} other {# PROJECTS INSIDE}}",
+      "projectsInside": "{count, plural, one {# project inside} other {# projects inside}}",
       "useBundle": "Use this bundle",
       "loading": "Loading projects...",
       "errorTitle": "Failed to load projects",
@@ -67,6 +67,7 @@
       "allAddedTitle": "All projects added",
       "allAddedDescription": "You've added all available projects to your fundraiser",
       "allocationLabel": "{percentage, number}% of fundraiser",
+      "globalLabel": "Global",
       "viewTransparency": "View Transparency →",
       "defaultCauseTooltip": "Your fundraiser supports our work to empower young people as ambassadors for climate justice, restoring forests and advocating for a sustainable future.",
       "aria": {

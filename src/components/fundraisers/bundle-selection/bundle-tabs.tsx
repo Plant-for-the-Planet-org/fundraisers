@@ -4,7 +4,7 @@ import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
@@ -14,6 +14,7 @@ import {
   bundleToAllocations,
   detectBundleFromAllocations,
 } from '@/lib/utils/bundle';
+import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { BundlePreviewModal } from './bundle-preview-modal';
@@ -71,6 +72,23 @@ export function BundleTabs({ mode }: BundleTabsProps) {
     setPreviewBundle(null);
   }
 
+  const handleTabChange = useCallback(
+    (nextTab: BundleTabId) => {
+      // When switching INTO Custom from a bundle tab, drop the prefilled bundle
+      // selection so the user starts fresh with only the support project.
+      if (nextTab === 'custom' && activeTab !== 'custom' && selectedBundle) {
+        const supportId = getDefaultCauseId(country);
+        setValue(
+          'projectAllocations',
+          [{ project_id: supportId, percentage: 100 }],
+          { shouldDirty: true, shouldValidate: true }
+        );
+      }
+      setActiveTab(nextTab);
+    },
+    [activeTab, selectedBundle, country, setValue]
+  );
+
   // Country has no bundle workspace (ES, CH) — Custom only.
   if (!workspace) {
     return (
@@ -84,7 +102,7 @@ export function BundleTabs({ mode }: BundleTabsProps) {
   return (
     <BundleTabsContent
       activeTab={activeTab}
-      setActiveTab={setActiveTab}
+      setActiveTab={handleTabChange}
       previewBundle={previewBundle}
       setPreviewBundle={setPreviewBundle}
       selectedBundleSlug={selectedBundle?.slug}
@@ -167,7 +185,7 @@ function BundleTabsContent({
       <div
         role='tablist'
         aria-label={t('sectionHeading')}
-        className='hidden md:flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted py-1 pl-1 pr-1 shadow-xs'
+        className='hidden md:flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted/50 py-1 pl-1 pr-1 shadow-xs'
       >
         {ALL_TABS.map(tabId => renderTab(tabId))}
       </div>
@@ -177,7 +195,7 @@ function BundleTabsContent({
         <div
           role='tablist'
           aria-label={t('sectionHeading')}
-          className='flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted py-1 pl-1 pr-1 shadow-xs'
+          className='flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted/50 py-1 pl-1 pr-1 shadow-xs'
         >
           {MOBILE_VISIBLE.map(tabId => renderTab(tabId))}
 

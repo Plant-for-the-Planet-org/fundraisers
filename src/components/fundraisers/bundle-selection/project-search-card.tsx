@@ -5,10 +5,7 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
-import {
-  buildProjectUrl,
-  getDisplayableUnitCost,
-} from '@/lib/utils/bundle';
+import { getDisplayableUnitCost } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { useCountryLabel } from './use-country-label';
 
@@ -32,14 +29,8 @@ export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCar
   );
 
   return (
-    <div className='flex min-w-0 items-start gap-2 rounded-xl border border-border bg-background p-2  hover:border-primary'>
-      <a
-        href={buildProjectUrl(project.id)}
-        target='_blank'
-        rel='noopener noreferrer'
-        aria-label={t('aria.openProject', { name: project.name })}
-        className='flex min-w-0 flex-1 items-start gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
-      >
+    <div className='flex min-w-0 cursor-default items-start gap-2 rounded-xl border border-border bg-background p-2 hover:border-primary'>
+      <div className='flex min-w-0 flex-1 items-start gap-2'>
         <div className='h-10 w-10 shrink-0 overflow-hidden rounded-md bg-linear-to-br from-emerald-200 via-purple-300 to-rose-300 dark:from-emerald-900 dark:via-purple-800 dark:to-rose-800'>
           {imageSource && !imageFailed && (
             <img
@@ -52,7 +43,7 @@ export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCar
         </div>
 
         <div className='min-w-0 flex-1'>
-          <p className='text-sm font-semibold text-foreground transition-colors'>
+          <p className='text-sm font-semibold text-foreground'>
             {project.isTopProject ? `${project.name} ✨` : project.name}
           </p>
           {(countryLabel || unitDisplay !== null) && (
@@ -61,7 +52,7 @@ export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCar
             </p>
           )}
         </div>
-      </a>
+      </div>
 
       <button
         type='button'
