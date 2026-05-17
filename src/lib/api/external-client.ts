@@ -4,6 +4,7 @@
  */
 
 import { API_BASE_URL } from '../constants/app-config';
+import { getSessionId } from '../utils/session-id';
 
 export class PlatformAPIError extends Error {
   constructor(
@@ -32,7 +33,7 @@ class PlatformAPIClient {
     const url = `${this.baseURL}${endpoint}`;
 
     const headers: Record<string, string> = {
-      'X-SESSION-ID': 'web-client',
+      'X-SESSION-ID': getSessionId(),
       ...(options.headers as Record<string, string>),
     };
 

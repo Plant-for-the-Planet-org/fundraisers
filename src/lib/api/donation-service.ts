@@ -6,6 +6,7 @@ import type {
 import type { ErrorType } from './http-error-classifier';
 
 import { API_BASE_URL } from '../constants/app-config';
+import { getSessionId } from '../utils/session-id';
 import { classifyHttpError } from './http-error-classifier';
 
 export class DonationError extends Error {
@@ -36,7 +37,7 @@ export class DonationService {
   ): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'X-SESSION-ID': 'web-client',
+      'X-SESSION-ID': getSessionId(),
     };
 
     if (authToken) {
