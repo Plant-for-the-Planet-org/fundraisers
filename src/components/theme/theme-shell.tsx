@@ -81,7 +81,11 @@ export function ThemeShell({
         <PatternLayer patternId={bg.pattern_id} opacity={bg.opacity} />
       )}
       {bg.decoration === 'logo' && bg.logo_id && (
-        <LogoLayer logoId={bg.logo_id} opacity={bg.opacity} />
+        <LogoLayer
+          logoId={bg.logo_id}
+          opacity={bg.opacity}
+          mode={activeTheme.mode}
+        />
       )}
       <div className='relative z-10 flex flex-col min-h-screen'>{children}</div>
     </div>
@@ -176,7 +180,15 @@ function useLogoTile(src: string): string | null {
   return tile;
 }
 
-function LogoLayer({ logoId, opacity }: { logoId: string; opacity: number }) {
+function LogoLayer({
+  logoId,
+  opacity,
+  mode,
+}: {
+  logoId: string;
+  opacity: number;
+  mode: 'light' | 'dark';
+}) {
   const logo = LOGO_LIBRARY.find(l => l.id === logoId);
   const tile = useLogoTile(logo?.src ?? '');
   if (!logo || !tile) return null;
@@ -187,6 +199,7 @@ function LogoLayer({ logoId, opacity }: { logoId: string; opacity: number }) {
         backgroundImage: `url("${tile}")`,
         backgroundSize: '100px 100px',
         opacity,
+        filter: mode === 'dark' ? 'invert(1)' : undefined,
       }}
       aria-hidden
     />
