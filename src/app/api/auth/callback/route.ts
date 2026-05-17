@@ -2,32 +2,43 @@ import type { NextRequest } from 'next/server';
 
 import { NextResponse } from 'next/server';
 
+function getPublicBaseUrl(request: NextRequest): URL {
+  const forwardedHost = request.headers.get('x-forwarded-host');
+  const host = forwardedHost ?? request.headers.get('host');
+  if (!host) return new URL(request.url);
+
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  const protocol =
+    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https');
+  return new URL(`${protocol}://${host}`);
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const error = searchParams.get('error');
 
+  const base = getPublicBaseUrl(request);
+
   if (error) {
     const errorDesc = searchParams.get('error_description') ?? error;
     console.error('Auth0 callback error:', errorDesc);
-    return NextResponse.redirect(
-      new URL(
-        `/?error=auth_failed&reason=${encodeURIComponent(errorDesc)}`,
-        request.url
-      )
-    );
+    const errUrl = new URL('/', base);
+    errUrl.searchParams.set('error', 'auth_failed');
+    errUrl.searchParams.set('reason', errorDesc);
+    return NextResponse.redirect(errUrl);
   }
 
   if (!code) {
-    return NextResponse.redirect(new URL('/?error=no_code', request.url));
+    const noCodeUrl = new URL('/', base);
+    noCodeUrl.searchParams.set('error', 'no_code');
+    return NextResponse.redirect(noCodeUrl);
   }
 
-  const url = new URL('/redirecting', request.url);
+  const url = new URL('/redirecting', base);
   url.searchParams.set('code', code);
   if (state) url.searchParams.set('state', state);
 
-  const response = NextResponse.redirect(url);
-
-  return response;
+  return NextResponse.redirect(url);
 }
