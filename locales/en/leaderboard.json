@@ -10,7 +10,8 @@
         "showAmounts": "Show Amounts",
         "viewAllButton": "View All Button",
         "anonymizeDonors": "Anonymize Donors",
-        "showAvatars": "Show Avatars"
+        "showAvatars": "Show Avatars",
+        "groupTopByDonor": "Group Top Donations by Donor"
       },
       "disabledView": {
         "title": "Leaderboard Disabled",
@@ -22,13 +23,27 @@
       }
     },
     "view": {
+      "donation": {
+        "anonymous": "Anonymous"
+      },
       "tabs": {
-        "newest": "Newest",
-        "topDonations": "Top Donations"
+        "latest": "Latest",
+        "topDonations": "Top Donations",
+        "topDonors": "Top Donors"
       },
       "viewAll": "View all",
       "emptyState": "No donations to display",
-      "anonymous": "Anonymous"
+      "viewAllOverlay": {
+        "title": "All Donations",
+        "subtitle": "See all the amazing people who've supported this fundraiser",
+        "emptyState": "No donations yet",
+        "closeAria": "Close donations list",
+        "loadingMore": "Loading more donations...",
+        "columnDonor": "Donor",
+        "columnAmount": "Amount",
+        "loadError": "Failed to load more donations",
+        "retry": "Retry"
+      }
     }
   }
 }

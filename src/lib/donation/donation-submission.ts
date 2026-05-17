@@ -14,7 +14,16 @@ function cleanPaymentDetails(
   ) as Record<string, string | number | boolean>;
 }
 
-interface SubmitStandardDonationOptions {
+/** PlanetCash: single POST, balance deducted immediately — no payment step needed */
+export async function submitPrepaidDonation(
+  payload: DonationPayload,
+  token: string,
+  donationIdempotencyKey: string
+) {
+  return donationService.createDonation(payload, token, donationIdempotencyKey);
+}
+
+interface SubmitStandardPostpaidDonationOptions {
   payload: DonationPayload;
   token: string | undefined;
   donationIdempotencyKey: string;
@@ -24,8 +33,8 @@ interface SubmitStandardDonationOptions {
   paymentDetails: Record<string, string | number | boolean | undefined>;
 }
 
-/** Standard payment: Two-step flow — create donation, then process payment */
-export async function submitStandardDonation({
+/** Standard postpaid: two-step flow — create donation, then process payment */
+export async function submitStandardPostpaidDonation({
   payload,
   token,
   donationIdempotencyKey,
@@ -33,9 +42,9 @@ export async function submitStandardDonation({
   selectedPaymentMethod,
   paymentOptions,
   paymentDetails,
-}: SubmitStandardDonationOptions) {
+}: SubmitStandardPostpaidDonationOptions) {
   // Step 1: Create donation
-  const donationResponse = await donationService.submitDonation(
+  const donationResponse = await donationService.createDonation(
     payload,
     token,
     donationIdempotencyKey
@@ -45,10 +54,10 @@ export async function submitStandardDonation({
   // respective payment element refs (e.g. paymentMethodId for Stripe, orderId for PayPal)
   // and extend this branch as needed.
   const paymentData: PaymentData =
-    selectedPaymentMethod === 'bank-transfer'
+    selectedPaymentMethod === 'bank_transfer'
       ? {
           donationId: donationResponse.donationId,
-          paymentMethod: 'bank-transfer',
+          paymentMethod: 'bank_transfer',
           paymentDetails: {},
         }
       : {

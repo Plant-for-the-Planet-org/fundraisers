@@ -10,7 +10,8 @@
         "showAmounts": "Beträge anzeigen",
         "viewAllButton": "\"Alle anzeigen\"-Knopf",
         "anonymizeDonors": "Spender anonymisieren",
-        "showAvatars": "Avatare anzeigen"
+        "showAvatars": "Avatare anzeigen",
+        "groupTopByDonor": "Top-Spenden gruppiert nach Spender"
       },
       "disabledView": {
         "title": "Bestenliste deaktiviert",
@@ -22,13 +23,27 @@
       }
     },
     "view": {
+      "donation": {
+        "anonymous": "Anonym"
+      },
       "tabs": {
-        "newest": "Neueste",
-        "topDonations": "Top-Spenden"
+        "latest": "Neueste",
+        "topDonations": "Top-Spenden",
+        "topDonors": "Top-Spender"
       },
       "viewAll": "Alle anzeigen",
-      "emptyState": "Keine Spenden vorhanden",
-      "anonymous": "Anonym"
+      "emptyState": "Keine Spenden zum anzeigen",
+      "viewAllOverlay": {
+        "title": "Alle Spenden",
+        "subtitle": "Schaue dir alle tollen Menschen an, die diese Spendenaktion unterstützt haben",
+        "emptyState": "Noch keine Spenden",
+        "closeAria": "Spendenliste schließen",
+        "loadingMore": "Weitere Spenden laden...",
+        "columnDonor": "Spender",
+        "columnAmount": "Betrag",
+        "loadError": "Es konnte keine weitere Spenden geladen werden",
+        "retry": "Erneut versuchen"
+      }
     }
   }
 }

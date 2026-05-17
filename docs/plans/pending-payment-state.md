@@ -13,9 +13,9 @@ However, the payment PUT only confirms that no further client-side action is req
 
 The same problem applies to PayPal: `onPayPalApproved` goes directly to `thankYouState: { status: 'completed' }` as soon as `processPayment` resolves.
 
-**Note:** `bankTransferPending` is unaffected. This state is only reached when the PUT response contains `type: 'transfer_required'`, which is specific to the offline `bank-transfer` payment method. Those donations are _designed_ to be in a pending state and already show a distinct "transfer pending" thank-you view. No change needed there.
+**Note:** `bankTransferPending` is unaffected. This state is only reached when the PUT response contains `type: 'transfer_required'`, which is specific to the offline `bank_transfer` payment method. Those donations are _designed_ to be in a pending state and already show a distinct "transfer pending" thank-you view. No change needed there.
 
-SEPA Direct Debit (`sepa-debit`) is a separate Stripe payment method that resolves directly to `{ status: 'completed' }` after `confirmSepaDebitPayment` — it has the same problem as card and PayPal and is equally in scope for this fix.
+SEPA Direct Debit (`sepa_debit`) is a separate Stripe payment method that resolves directly to `{ status: 'completed' }` after `confirmSepaDebitPayment` — it has the same problem as card and PayPal and is equally in scope for this fix.
 
 ---
 

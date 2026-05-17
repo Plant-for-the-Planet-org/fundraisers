@@ -12,7 +12,7 @@ The two-step submission flow is complete for offline:
 
 ```
 useDonationSubmit.onSubmit()
-  → submitStandardDonation()         builds PaymentData, calls both steps
+  → submitStandardPostpaidDonation()         builds PaymentData, calls both steps
       → donationService               POST /donations
       → buildPaymentRequest()         builds PUT body — offline case done
       → paymentService                PUT /donations/{id}
@@ -25,7 +25,7 @@ The places where Stripe and PayPal need to plug in are marked with `TODO` commen
 |---|---|---|
 | [`payment-request-builder.ts`](../src/lib/utils/payment-request-builder.ts) | `case 'stripe'` | Build `StripePaymentRequest` from `paymentMethodId` |
 | [`payment-request-builder.ts`](../src/lib/utils/payment-request-builder.ts) | `case 'paypal'` | Build `PayPalPaymentRequest` from SDK callback data |
-| [`use-donation-submit.ts`](../src/components/donate/use-donation-submit.ts) | after `submitStandardDonation` | Handle `action_required` (3DS) response |
+| [`use-donation-submit.ts`](../src/components/donate/use-donation-submit.ts) | after `submitStandardPostpaidDonation` | Handle `action_required` (3DS) response |
 
 ---
 
@@ -33,10 +33,10 @@ The places where Stripe and PayPal need to plug in are marked with `TODO` commen
 
 ### How the source is obtained
 
-Stripe card details **never pass through React state**. They live inside a Stripe Elements hosted iframe. At submit time, call `stripe.createPaymentMethod()` to get a `pm_xxx` ID, then pass it into `submitStandardDonation` as `paymentDetails.paymentMethodId`.
+Stripe card details **never pass through React state**. They live inside a Stripe Elements hosted iframe. At submit time, call `stripe.createPaymentMethod()` to get a `pm_xxx` ID, then pass it into `submitStandardPostpaidDonation` as `paymentDetails.paymentMethodId`.
 
 ```ts
-// In use-donation-submit.ts, before calling submitStandardDonation:
+// In use-donation-submit.ts, before calling submitStandardPostpaidDonation:
 const { paymentMethod: stripePaymentMethod, error } =
   await stripe.createPaymentMethod({ type: 'card', card: cardElement });
 
@@ -79,27 +79,13 @@ case 'stripe': {
   return {
     gateway: 'stripe',
     account,
-    method: mapStripeMethodName(paymentMethod),
+    method: paymentMethod as StripePaymentMethod,
     source: { kind: 'stripe', id: String(id), object: 'payment_method' },
   };
 }
 ```
 
-Add `mapStripeMethodName` (maps `PaymentMethod` → `StripePaymentMethod`). Also consider tightening `mapPaymentMethodName`'s return type from `string` to a full method name union — once all three gateway cases are implemented, this allows the switch branches to use the mapper rather than hardcoding method literals:
-
-
-```ts
-function mapStripeMethodName(paymentMethod: PaymentMethod): StripePaymentMethod {
-  switch (paymentMethod) {
-    case 'sepa-debit': return 'sepa_debit';
-    case 'apple-pay':  return 'apple_pay';
-    case 'google-pay': return 'google_pay';
-    default:           return 'card';
-  }
-}
-```
-
-`StripePaymentMethod` is already exported from [`payment.ts`](../src/lib/types/payment.ts).
+Internal `PaymentMethod` ids are snake_case (`'card'`, `'sepa_debit'`, `'apple_pay'`, `'google_pay'`), so they line up with `StripePaymentMethod` directly — no mapping function needed. `StripePaymentMethod` is exported from [`payment.ts`](../src/lib/types/payment.ts).
 
 ### Note: `kind` field on `StripePaymentSource`
 
@@ -107,7 +93,7 @@ function mapStripeMethodName(paymentMethod: PaymentMethod): StripePaymentMethod 
 
 ### Handling 3DS (`action_required` response)
 
-When the API returns `status: 'action_required'`, the user must complete 3DS authentication via Stripe.js. In `use-donation-submit.ts`, after `submitStandardDonation` returns:
+When the API returns `status: 'action_required'`, the user must complete 3DS authentication via Stripe.js. In `use-donation-submit.ts`, after `submitStandardPostpaidDonation` returns:
 
 ```ts
 if (paymentResponse.status === 'action_required') {
@@ -148,7 +134,7 @@ PayPal is fundamentally different from Stripe — the `orderId` comes from the P
 </PayPalScriptProvider>
 ```
 
-The full `data` object from `onApprove` is the `PayPalPaymentSource`. It must be passed into `submitStandardDonation` as `paymentDetails` so `buildPaymentRequest` can construct the source.
+The full `data` object from `onApprove` is the `PayPalPaymentSource`. It must be passed into `submitStandardPostpaidDonation` as `paymentDetails` so `buildPaymentRequest` can construct the source.
 
 ### `buildPaymentRequest` — PayPal case
 
@@ -190,7 +176,7 @@ const onPayPalApproved = useCallback(async (paypalData: OnApproveData) => {
     payerID: paypalData.payerID,
     // ... rest of fields
   };
-  await submitStandardDonation({
+  await submitStandardPostpaidDonation({
     payload,
     token: token || undefined,
     donationIdempotencyKey: donationKeyRef.current,
@@ -202,7 +188,7 @@ const onPayPalApproved = useCallback(async (paypalData: OnApproveData) => {
 }, [...]);
 ```
 
-PayPal does not produce a 3DS `action_required` response — the SDK handles its own auth. After `submitStandardDonation` resolves, treat any `status: 'success'` as a normal success.
+PayPal does not produce a 3DS `action_required` response — the SDK handles its own auth. After `submitStandardPostpaidDonation` resolves, treat any `status: 'success'` as a normal success.
 
 ---
 
@@ -231,7 +217,7 @@ npm install @stripe/stripe-js @stripe/react-stripe-js @paypal/react-paypal-js
 **Stripe:**
 - [ ] `stripe-card-form.tsx` — `<CardElement>`, exposes `createPaymentMethod()` via ref
 - [ ] `stripe-sepa-form.tsx` — `<IbanElement>`, mandate checkbox, exposes `createPaymentMethod()` via ref
-- [ ] `use-donation-submit.ts` — call `stripe.createPaymentMethod()` before `submitStandardDonation` when Stripe method is selected
+- [ ] `use-donation-submit.ts` — call `stripe.createPaymentMethod()` before `submitStandardPostpaidDonation` when Stripe method is selected
 - [ ] `payment-request-builder.ts` — implement `case 'stripe'`
 - [ ] `use-donation-submit.ts` — handle `action_required` (3DS) response
 - [ ] Confirm `kind` field on `StripePaymentSource` with backend — remove or strip before send

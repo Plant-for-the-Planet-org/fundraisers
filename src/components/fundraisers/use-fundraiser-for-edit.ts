@@ -79,6 +79,14 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
             });
             return;
           }
+          if (error.status === 405) {
+            setState({
+              status: 'error',
+              fundraiser: null,
+              errorMessage: t('invalidUrlDescription', { slug }),
+            });
+            return;
+          }
         }
 
         const message = error instanceof Error ? error.message : t('loadError');

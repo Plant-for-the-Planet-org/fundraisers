@@ -6,6 +6,8 @@ import { isFundraiserSortOption } from '@/lib/api/categories-service';
 import { CategoryPageLoader } from '@/components/explore/category-page-loader';
 import { CategoryPageSkeleton } from '@/components/explore/category-page-skeleton';
 
+const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
+
 interface Props {
   params: Promise<{ category: string }>;
   searchParams: Promise<{ sort?: string }>;
@@ -40,11 +42,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: 'website',
+      images: [
+        {
+          url: META_IMAGE_URL,
+          width: 600,
+          height: 314,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [META_IMAGE_URL],
     },
   };
 }

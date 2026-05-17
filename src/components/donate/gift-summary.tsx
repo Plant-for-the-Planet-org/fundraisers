@@ -3,7 +3,7 @@
 import type { SentInvitationGift } from '@planet-sdk/common';
 
 import { useTranslations } from 'next-intl';
-import { Heart } from 'lucide-react';
+import { Gift } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDonationForm } from './donation-form-context';
 
@@ -24,7 +24,7 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
     <Card className='gift-summary border border-card'>
       <CardContent>
         <div className='relative space-y-3'>
-          <Heart
+          <Gift
             className='absolute right-0 top-0 h-5 w-5 text-red-500 shrink-0'
             aria-hidden='true'
           />

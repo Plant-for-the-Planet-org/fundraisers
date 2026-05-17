@@ -24,7 +24,7 @@ import { WorkspaceSelector } from './workspace-selector';
 interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
-  initialExtraProjects?: SelectedProject[];
+  nonDefaultInitialProjects?: SelectedProject[];
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
@@ -34,7 +34,7 @@ interface FundraiserFormBodyProps {
 export function FundraiserFormBody({
   mode,
   submitButton,
-  initialExtraProjects,
+  nonDefaultInitialProjects,
   totalRaised,
   endDate,
 }: FundraiserFormBodyProps) {
@@ -63,7 +63,9 @@ export function FundraiserFormBody({
           <GoalInput />
         </div>
         <WorkspaceInfo />
-        <ProjectSelection initialExtraProjects={initialExtraProjects} />
+        <ProjectSelection
+          nonDefaultInitialProjects={nonDefaultInitialProjects}
+        />
         <Options />
         {submitButton}
       </MainPanel>

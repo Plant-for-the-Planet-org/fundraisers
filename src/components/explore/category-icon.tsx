@@ -3,12 +3,16 @@ import type { Category } from '@/lib/types/category';
 import {
   Circle,
   Droplets,
+  Gamepad2,
+  Gift,
   Globe,
   Heart,
   Leaf,
+  Medal,
   Thermometer,
   TreePine,
   Users,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -33,6 +37,10 @@ export function CategoryIcon({
     treepine: TreePine,
     droplets: Droplets,
     circle: Circle,
+    zap: Zap,
+    gamepad2: Gamepad2,
+    medal: Medal,
+    gift: Gift,
   };
 
   const IconComponent = iconMap[iconName.toLowerCase()] || Circle;
