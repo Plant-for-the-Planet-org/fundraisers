@@ -20,7 +20,7 @@ export function CategoryPageHeader({ category }: CategoryPageHeaderProps) {
       <div className='space-y-4'>
         <CategoryIcon category={category} size='compact' />
         <div>
-          <h1 className='text-2xl font-semibold text-foreground'>
+          <h1 className='text-2xl font-bold text-foreground'>
             {category.name}
           </h1>
           <p className='text-sm text-muted-foreground'>
