@@ -1,8 +1,7 @@
 import type { ErrorType } from './http-error-classifier';
 
-import { API_BASE_URL } from '../constants/app-config';
-import { getSessionId } from '../utils/session-id';
-import { classifyHttpError } from './http-error-classifier';
+import { classifyPlatformError } from './http-error-classifier';
+import { PlatformAPIError, platformFetch } from './platform-fetch';
 
 export class PaypalOrderError extends Error {
   constructor(
@@ -17,45 +16,54 @@ export class PaypalOrderError extends Error {
   }
 }
 
+function toPaypalOrderError(err: unknown): PaypalOrderError {
+  if (err instanceof PaypalOrderError) return err;
+
+  if (err instanceof PlatformAPIError) {
+    if (err.kind === 'timeout') {
+      return new PaypalOrderError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+    }
+    if (err.kind === 'network') {
+      return new PaypalOrderError(err.message, 'api', 'NETWORK_ERROR', 0, {
+        originalError: err.message,
+      });
+    }
+    const { type, code } = classifyPlatformError(err.status);
+    return new PaypalOrderError(err.message, type, code, err.status, {
+      details: err.body,
+    });
+  }
+
+  return new PaypalOrderError(
+    err instanceof Error ? err.message : 'Failed to create PayPal order',
+    'api',
+    'NETWORK_ERROR',
+    0,
+    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+  );
+}
+
 export async function createPaypalOrder(
   donationId: string,
   paypalAccount: string,
   authToken?: string
 ): Promise<string> {
-  const url = `${API_BASE_URL}/donations/${donationId}/paypal/orders`;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'X-SESSION-ID': getSessionId(),
-  };
-
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
-
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        paymentRequest: {
-          account: paypalAccount,
-          gateway: 'paypal',
-          method: 'paypal',
-          savePaymentMethod: true,
+    const data = await platformFetch<{ orderId?: string }>(
+      `/donations/${donationId}/paypal/orders`,
+      {
+        method: 'POST',
+        token: authToken,
+        body: {
+          paymentRequest: {
+            account: paypalAccount,
+            gateway: 'paypal',
+            method: 'paypal',
+            savePaymentMethod: true,
+          },
         },
-      }),
-    });
-
-    if (!response.ok) {
-      const { type, code, debugMessage, status, errorData } =
-        await classifyHttpError(response);
-      throw new PaypalOrderError(debugMessage, type, code, status, {
-        details: errorData,
-      });
-    }
-
-    const data = await response.json();
+      }
+    );
 
     if (!data?.orderId) {
       throw new PaypalOrderError(
@@ -67,20 +75,8 @@ export async function createPaypalOrder(
       );
     }
 
-    return data.orderId as string;
-  } catch (error) {
-    if (error instanceof PaypalOrderError) {
-      throw error;
-    }
-
-    throw new PaypalOrderError(
-      error instanceof Error ? error.message : 'Failed to create PayPal order',
-      'api',
-      'NETWORK_ERROR',
-      0,
-      {
-        originalError: error instanceof Error ? error.message : 'Unknown error',
-      }
-    );
+    return data.orderId;
+  } catch (err) {
+    throw toPaypalOrderError(err);
   }
 }

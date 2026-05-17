@@ -39,6 +39,18 @@ const STATUS_MAP: Record<number, { type: ErrorType; code: string }> = {
 };
 
 /**
+ * Map an already-parsed PlatformAPIError to a type/code classification.
+ * Used by services that call platformFetch — platformFetch has already parsed
+ * the body and thrown, so we only need to map status → (type, code).
+ */
+export function classifyPlatformError(status: number): {
+  type: ErrorType;
+  code: string;
+} {
+  return STATUS_MAP[status] ?? { type: 'api', code: 'HTTP_ERROR' };
+}
+
+/**
  * Parse the response body and classify an HTTP error by status code.
  * Each service layer can use the returned classification to construct
  * its own domain-specific error (DonationError, PaymentError, etc.).
