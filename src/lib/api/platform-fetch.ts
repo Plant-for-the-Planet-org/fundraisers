@@ -53,8 +53,9 @@ export async function platformFetch<T>(
     ...opts.extraHeaders,
   };
 
-  const hasBody = opts.body !== undefined && !(opts.body instanceof FormData);
-  if (hasBody) {
+  const hasJsonBody =
+    opts.body !== undefined && !(opts.body instanceof FormData);
+  if (hasJsonBody) {
     headers['Content-Type'] = 'application/json';
   }
 
@@ -75,12 +76,13 @@ export async function platformFetch<T>(
     }
   }
 
-  if (opts.idempotencyKey && opts.idempotencyKey.trim()) {
-    headers['Idempotency-Key'] = opts.idempotencyKey;
+  const idempotencyKey = opts.idempotencyKey?.trim();
+  if (idempotencyKey) {
+    headers['Idempotency-Key'] = idempotencyKey;
   }
 
   let requestBody: BodyInit | undefined;
-  if (hasBody) {
+  if (opts.body !== undefined) {
     requestBody =
       opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body);
   }
