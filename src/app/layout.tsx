@@ -12,6 +12,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
+import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
 import { CookieConsentProvider } from '@/components/cookie/cookie-consent-provider';
 import { LocaleInitializer } from '@/components/locale-initializer';
 
@@ -91,6 +92,7 @@ export default async function RootLayout({
           <LocaleInitializer initialLocale={locale} />
           <AuthInitializer />
           <CookieConsentProvider />
+          <ImpersonationBanner />
           {children}
         </NextIntlClientProvider>
       </body>
