@@ -58,6 +58,11 @@ export async function platformFetch<T>(
     headers['Content-Type'] = 'application/json';
   }
 
+  // Impersonation is only injected on authenticated requests by design — pin
+  // must never be sent without a bearer token. Side effect: if a caller forgets
+  // `token` while the user is impersonating, the call runs as the staffer, not
+  // the impersonated user. Pass `token` for any endpoint that should respect
+  // impersonation.
   if (opts.token) {
     headers['Authorization'] = `Bearer ${opts.token}`;
 
@@ -120,12 +125,21 @@ export async function platformFetch<T>(
     return undefined as T;
   }
 
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json')) {
-    return response.json();
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
   }
 
-  return (await response.text()) as unknown as T;
+  const contentType = response.headers.get('content-type');
+  if (contentType?.includes('application/json')) {
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      // Server claimed JSON but body is not parseable. Fall through to text.
+    }
+  }
+
+  return text as unknown as T;
 }
 
 async function safeParseBody(response: Response): Promise<unknown> {
