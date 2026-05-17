@@ -99,8 +99,9 @@
         "selectAccent": "Select {accent} accent color"
       },
       "title": {
-        "label": "Fundraiser name",
-        "placeholder": "Fundraiser Name",
+        "label": "Fundraiser title",
+        "placeholder": "Turn my birthday into a forest",
+        "helper": "This appears on share previews, emails, and the top of your page. Keep it specific.",
         "errors": {
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max, number} characters."

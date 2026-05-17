@@ -99,8 +99,9 @@
         "selectAccent": "Wähle {accent} als Akzentfarbe"
       },
       "title": {
-        "label": "Name des Spendenaufrufs",
-        "placeholder": "Name des Spendenaufrufs",
+        "label": "Titel des Spendenaufrufs",
+        "placeholder": "Mach meinen Geburtstag zu einem Wald",
+        "helper": "Erscheint in Share-Vorschauen, E-Mails und oben auf deiner Seite. Sei konkret.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
