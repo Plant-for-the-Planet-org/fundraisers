@@ -3,14 +3,14 @@ import type {
   LeaderboardPageResponse,
 } from '@/lib/types/leaderboard';
 
-import { platformAPIClient } from './external-client';
+import { platformFetch } from './platform-fetch';
 
 export async function getLeaderboard(
   idOrSlug: string,
   limit: number = 10
 ): Promise<LeaderboardApiResponse> {
   const params = new URLSearchParams({ limit: limit.toString() });
-  return platformAPIClient.get<LeaderboardApiResponse>(
+  return platformFetch<LeaderboardApiResponse>(
     `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard?${params.toString()}`
   );
 }
@@ -46,7 +46,7 @@ export async function getLeaderboardByTab(
     page: page.toString(),
     limit: limit.toString(),
   });
-  return platformAPIClient.get<LeaderboardPageResponse>(
+  return platformFetch<LeaderboardPageResponse>(
     `/fundraisers/${idOrSlug}/leaderboard/${tab}?${params.toString()}`
   );
 }
