@@ -64,10 +64,18 @@ export interface FundraiserSettings {
     base_id?: string;
     mode?: 'light' | 'dark';
     accent?: string;
-    background?: string;
     body_font?: string;
     title_font?: string;
-    animation?: string;
+    bg?: {
+      gradient?: string;
+      decoration?: string;
+      pattern_id?: string | null;
+      image_url?: string | null;
+      image_mode?: string;
+      logo_id?: string | null;
+      opacity?: number;
+      animation?: string;
+    };
   };
   modules: {
     leaderboard?: LeaderboardModuleSettings;

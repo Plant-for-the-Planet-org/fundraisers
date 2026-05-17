@@ -1,13 +1,23 @@
 import type {
   AccentColor,
-  AnimationType,
+  BgSettings,
   FontId,
   FundraiserThemeSettings,
   Theme,
   ThemeMode,
 } from './types';
 
+import {
+  isValidAnimation,
+  isValidDecoration,
+  isValidImageMode,
+} from './backgrounds';
 import { DEFAULT_THEME, THEMES } from './themes';
+
+function clampOpacity(value: unknown, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.min(1, Math.max(0.05, value));
+}
 
 const VALID_ACCENTS = new Set<string>([
   'blue',
@@ -40,13 +50,29 @@ const VALID_FONTS = new Set([
   'roboto',
 ]);
 const VALID_MODES = new Set(['light', 'dark']);
-const VALID_ANIMS = new Set([
-  'none',
-  'snow',
-  'confetti',
-  'hearts',
-  'particles',
-]);
+
+function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
+  const raw = settings.bg ?? {};
+  return {
+    gradient:
+      typeof raw.gradient === 'string' ? raw.gradient : base.bg.gradient,
+    decoration: isValidDecoration(raw.decoration)
+      ? raw.decoration
+      : base.bg.decoration,
+    pattern_id:
+      typeof raw.pattern_id === 'string' ? raw.pattern_id : base.bg.pattern_id,
+    image_url:
+      typeof raw.image_url === 'string' ? raw.image_url : base.bg.image_url,
+    image_mode: isValidImageMode(raw.image_mode)
+      ? raw.image_mode
+      : base.bg.image_mode,
+    logo_id: typeof raw.logo_id === 'string' ? raw.logo_id : base.bg.logo_id,
+    opacity: clampOpacity(raw.opacity, base.bg.opacity),
+    animation: isValidAnimation(raw.animation)
+      ? raw.animation
+      : base.bg.animation,
+  };
+}
 
 export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
   if (!settings) return DEFAULT_THEME;
@@ -58,7 +84,6 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
     ...base,
     id: 'fundraiser-custom',
     name: 'Custom',
-    background: settings.background ?? base.background,
     accent: VALID_ACCENTS.has(settings.accent ?? '')
       ? (settings.accent as AccentColor)
       : base.accent,
@@ -71,8 +96,6 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
     titleFont: VALID_FONTS.has(settings.title_font ?? '')
       ? (settings.title_font as FontId)
       : base.titleFont,
-    animation: VALID_ANIMS.has(settings.animation ?? '')
-      ? (settings.animation as AnimationType)
-      : base.animation,
+    bg: buildBg(settings, base),
   };
 }

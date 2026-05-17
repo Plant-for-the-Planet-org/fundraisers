@@ -7,6 +7,11 @@ import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { z } from 'zod';
 import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
+import {
+  isValidAnimation,
+  isValidDecoration,
+  isValidImageMode,
+} from '@/lib/theme/backgrounds';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import {
   ALLOWED_COUNTRIES,
@@ -71,10 +76,18 @@ export const fundraiserFormSchema = z.object({
       base_id: z.string(),
       mode: z.enum(['light', 'dark']),
       accent: z.string(),
-      background: z.string(),
       body_font: z.string(),
       title_font: z.string(),
-      animation: z.string(),
+      bg: z.object({
+        gradient: z.string(),
+        decoration: z.enum(['none', 'pattern', 'image', 'logo']),
+        pattern_id: z.string().nullable(),
+        image_url: z.string().nullable(),
+        image_mode: z.enum(['cover', 'repeat']),
+        logo_id: z.string().nullable(),
+        opacity: z.number().min(0.05).max(1),
+        animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'particles']),
+      }),
     }),
     modules: z.object({
       leaderboard: z.object({
@@ -124,10 +137,9 @@ export function buildDefaultCreateValues(
         base_id: initialTheme.id,
         mode: initialTheme.mode,
         accent: initialTheme.accent,
-        background: initialTheme.background,
         body_font: initialTheme.bodyFont,
         title_font: initialTheme.titleFont,
-        animation: initialTheme.animation ?? 'none',
+        bg: initialTheme.bg,
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
@@ -190,10 +202,27 @@ export function fundraiserToFormValues(
         base_id: theme.base_id ?? fallbackTheme.id,
         mode: theme.mode ?? fallbackTheme.mode,
         accent: theme.accent ?? fallbackTheme.accent,
-        background: theme.background ?? fallbackTheme.background,
         body_font: theme.body_font ?? fallbackTheme.bodyFont,
         title_font: theme.title_font ?? fallbackTheme.titleFont,
-        animation: theme.animation ?? fallbackTheme.animation ?? 'none',
+        bg: {
+          gradient: theme.bg?.gradient ?? fallbackTheme.bg.gradient,
+          decoration: isValidDecoration(theme.bg?.decoration)
+            ? theme.bg.decoration
+            : fallbackTheme.bg.decoration,
+          pattern_id: theme.bg?.pattern_id ?? fallbackTheme.bg.pattern_id,
+          image_url: theme.bg?.image_url ?? fallbackTheme.bg.image_url,
+          image_mode: isValidImageMode(theme.bg?.image_mode)
+            ? theme.bg.image_mode
+            : fallbackTheme.bg.image_mode,
+          logo_id: theme.bg?.logo_id ?? fallbackTheme.bg.logo_id,
+          opacity:
+            typeof theme.bg?.opacity === 'number'
+              ? Math.min(1, Math.max(0.05, theme.bg.opacity))
+              : fallbackTheme.bg.opacity,
+          animation: isValidAnimation(theme.bg?.animation)
+            ? theme.bg.animation
+            : fallbackTheme.bg.animation,
+        },
       },
       modules: {
         leaderboard: {

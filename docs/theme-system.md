@@ -7,7 +7,7 @@ Documents the current implementation, architectural decisions, and plans for the
 ## Goals
 
 - Each page renders with its correct theme from the first paint — no flash
-- Per-fundraiser themes (background, accent, fonts, mode, animation) stored in the DB, applied server-side
+- Per-fundraiser themes (gradient, decoration layer, accent, fonts, mode, animation) stored in the DB, applied server-side
 - Client components can read the current theme without a separate fetch
 - Interactive theme selector in the create/edit fundraiser flow
 - Tailwind v4 CSS-first config — no `tailwind.config.js`
@@ -18,7 +18,7 @@ Documents the current implementation, architectural decisions, and plans for the
 
 **Phase 1 is complete.** Delivered:
 
-- **All theme types and utilities** — `types.ts`, `themes.ts` (14 predefined themes), `font-utils.ts`, `accent-utils.ts`, `build-theme.ts`, `route-themes.ts` — the full theme library with no external dependencies
+- **All theme types and utilities** — `types.ts`, `themes.ts` (11 predefined themes), `font-utils.ts`, `accent-utils.ts`, `build-theme.ts`, `route-themes.ts` — the full theme library with no external dependencies
 - **Flash-free theme rendering on static routes** — the server root layout resolves the theme from the route map and applies the mode class to `<html>` before the HTML leaves the server; no client-side effect fires on initial load
 - **Class-based dark mode** — replaced `@media (prefers-color-scheme: dark)` with `@variant dark (&:is(.dark *))` in `globals.css`; mode is controlled by the theme system, not the OS
 - **5 fonts loaded** — Open Sans, Inter, Poppins, Playfair Display, and Roboto are loaded in the root layout and available document-wide via CSS variables
@@ -50,7 +50,8 @@ src/
   lib/
     theme/
       types.ts                      ← all theme TypeScript types
-      themes.ts                     ← 14 predefined themes registry + DEFAULT_THEME
+      themes.ts                     ← 11 predefined themes registry + DEFAULT_THEME
+      backgrounds.ts                ← BG_LIBRARY (patterns + image illustrations + video placeholders), resolveBgImage, validators
       font-utils.ts                 ← FontId → CSS variable font-family string
       accent-utils.ts               ← AccentColor → Tailwind class sets + hex value
       build-theme.ts                ← FundraiserThemeSettings (DB) → validated Theme
@@ -64,7 +65,12 @@ src/
     theme/
       theme-shell.tsx               ← 'use client'; owns theme div + mode sync; reads store + pathname
     fundraisers/
-      theme-settings.tsx            ← 'use client'; theme dropdown + accent picker for create sidebar
+      theme-settings/               ← 'use client'; sidebar picker (theme + background tabs)
+        index.tsx                   ← ThemeSettings: header, tabs, customize panels
+        background-tab.tsx          ← gradient + decoration rows, pattern/image panels
+        theme-browse-grid.tsx       ← theme list grid
+        primitives.tsx              ← ThemeChipRow, FontChipRow, OpacitySlider, AssetGrid
+        constants.ts                ← static maps, GRADIENT_OPTIONS, PATTERNS/IMAGES, pickRandom
 ```
 
 ---
@@ -170,34 +176,32 @@ Defines all TypeScript types. Nothing imported from outside the `theme/` directo
 - `FontId` — 5 supported font identifiers
 - `AnimationType` — `none | snow | confetti | hearts | particles`
 - `ThemeMode` — `light | dark`
-- `ThemeCategory` — `atmospheric | celebration | nature | minimal | business | system | seasonal | corporate | simple | dark`
+- `ThemeCategory` — `atmospheric | celebration | nature | minimal | business | system | seasonal | simple | dark`
 - `Theme` — the complete theme object used throughout the app
-- `FundraiserThemeSettings` — shape stored in `fundraiser.settings.theme` in the DB; uses snake_case and looser string types to match the DB record format; `base_id` references a predefined theme as the base for field-level overrides
+- `FundraiserThemeSettings` — shape stored in `fundraiser.settings.theme` in the DB; uses snake_case and looser string types to match the DB record format; `base_id` references a predefined theme as the base for field-level overrides; background customization is nested under `bg: { gradient, decoration, pattern_id, image_url, image_mode, opacity }`
+- `BgSettings`, `BgDecoration`, `BgImageMode` — the validated runtime shape and its enums, produced by `buildTheme`
 
 ---
 
 ### `src/lib/theme/themes.ts`
 
-The registry of all 14 predefined themes, exported as `THEMES: Record<string, Theme>`. Also exports `DEFAULT_THEME = THEMES.spring`.
+The registry of all 11 predefined themes, exported as `THEMES: Record<string, Theme>`. Also exports `DEFAULT_THEME = THEMES.spring`.
 
 Because this file lives inside `src/`, Tailwind's scanner reads it at build time and includes every gradient class string it finds. No safelist entries are needed for predefined themes.
 
 | ID            | Name                       | Category    | Mode  | Animation | Featured |
 | ------------- | -------------------------- | ----------- | ----- | --------- | -------- |
 | spring        | Spring Vibes               | nature      | light | none      | ✓        |
-| clean         | Clean White                | minimal     | light | none      | ✓        |
-| dashboard     | Dashboard                  | business    | light | none      | ✓        |
 | birthday      | Birthday Party             | celebration | light | confetti  |          |
-| wedding       | Wedding Elegance           | celebration | light | hearts    |          |
-| corporate     | Corporate                  | business    | light | none      |          |
+| wedding       | Wedding Elegance           | celebration | light | hearts    | ✓        |
 | stratospheric | Polar Stratospheric Clouds | atmospheric | light | none      | ✓        |
 | sunset        | Sunset                     | nature      | light | none      | ✓        |
-| dark-ocean    | Dark Ocean                 | nature      | dark  | none      |          |
-| lush-forest   | Lush Forest                | nature      | dark  | snow      |          |
-| volcanic      | Volcanic                   | nature      | dark  | none      |          |
-| midnight      | Midnight                   | minimal     | dark  | none      |          |
-| dark          | Professional Dark          | business    | dark  | none      |          |
-| minimal       | Minimal                    | minimal     | light | none      |          |
+| minimal       | Minimal                    | minimal     | light | none      | ✓        |
+| dark-ocean    | Dark Ocean                 | nature      | dark  | none      | ✓        |
+| lush-forest   | Lush Forest                | nature      | dark  | snow      | ✓        |
+| volcanic      | Volcanic                   | nature      | dark  | none      | ✓        |
+| midnight      | Midnight                   | minimal     | dark  | none      | ✓        |
+| dark          | Professional Dark          | business    | dark  | none      | ✓        |
 
 ---
 
@@ -224,7 +228,8 @@ Converts a raw DB settings record into a validated `Theme`. Used in Phase 2 by t
 
 - If `settings` is null/undefined, returns `DEFAULT_THEME`
 - `base_id` selects a predefined theme as the base; falls back to `DEFAULT_THEME` if unknown
-- Each field (`accent`, `mode`, `body_font`, etc.) is validated against a whitelist Set; invalid values fall back to the base theme's value
+- Each scalar field (`accent`, `mode`, `body_font`, etc.) is validated against a whitelist Set; invalid values fall back to the base theme's value
+- Nested `bg` block is validated by `buildBg`: enum fields (`decoration`, `image_mode`) go through `isValidDecoration`/`isValidImageMode`; `opacity` is clamped to `[0.05, 1]`
 - Spreads `...base` first, then overrides — ensures `category`, `colorOptions`, and other required fields are always present
 - Returns `id: 'fundraiser-custom'` so callers can distinguish from predefined themes
 
@@ -302,23 +307,35 @@ All theme rendering is delegated to `ThemeShell`. `Header`, `MainContent`, and `
 
 `'use client'` component that owns all theme rendering. Runs on both server (SSR pass) and client.
 
+The background renders as a **fixed stack** of up to three layers (bottom → top), each conditional:
+
 ```
-<div class="theme-{activeTheme.id} {activeTheme.mode} relative min-h-screen flex flex-col"
-     data-theme="{activeTheme.id}"
-     style="font-family: ...; --theme-title-font: ...; --accent-color: ...">
-  <div class="fixed inset-0 {activeTheme.background} transition-colors duration-300" />
-  <div class="relative z-10 flex flex-col min-h-screen">
-    {children}
-  </div>
-</div>
+1. Image layer       (decoration === 'image' && image_url)   ← cover or repeat
+2. Gradient layer    (theme.bg.gradient or theme.background) ← tailwind alpha-gradient class
+3. Pattern layer     (decoration === 'pattern' && pattern_id)← tiled, uses bg.opacity
+4. Content           (children, z-10)                        ← opaque
 ```
+
+Only one **decoration** is active at a time (`none | pattern | image`), but the gradient is always present (unless the user picks the "None" gradient swatch). Image and gradient stack so a translucent gradient can tint a hero photo. Pattern sits over the gradient with its own opacity.
 
 - `theme-{id}` class and `data-theme="{id}"` attribute identify the active theme for CSS/JS targeting.
 - `font-family` inline style overrides the `body` font for the entire themed subtree.
 - `--theme-title-font` cascades to all `h1–h6` descendants.
 - `--accent-color` is a CSS variable for non-Tailwind contexts (SVG, canvas).
-- The fixed background layer covers the viewport behind all content.
 - Three `useEffect`s: one clears `selectedTheme` when the pathname changes (same-instance navigation); one clears `selectedTheme` on unmount (prevents bleed when navigating between route groups, each of which has its own `ThemeShell` instance); one syncs `activeTheme.mode` to `document.documentElement`.
+
+#### `bg` settings shape
+
+Per-fundraiser background customization lives under `settings.theme.bg`:
+
+| Field         | Type                                  | Notes                                                          |
+| ------------- | ------------------------------------- | -------------------------------------------------------------- |
+| `gradient`    | `string`                              | Tailwind class string; `''` means no gradient layer.           |
+| `decoration`  | `'none' \| 'pattern' \| 'image'`      | Which decoration sits above the gradient.                      |
+| `pattern_id`  | `string \| null`                       | Library key (e.g. `bg-dots-warm`) when `decoration='pattern'`. |
+| `image_url`   | `string \| null`                       | Library key OR external `https://…` URL.                        |
+| `image_mode`  | `'cover' \| 'repeat'`                  | How the image sits — full-bleed or tiled.                      |
+| `opacity`     | `number` (0.05–1)                     | Applies to pattern + image decorations. Gradient alpha is baked into its class. |
 
 ---
 
@@ -337,13 +354,22 @@ interface ThemeOverrideState {
 
 ---
 
-### `src/components/fundraisers/theme-settings.tsx`
+### `src/components/fundraisers/theme-settings/`
 
-`'use client'` component rendered in the create fundraiser sidebar. Gives the user a live theme preview while building their fundraiser:
+`'use client'` component rendered in the create / edit fundraiser sidebar. Two tabs:
 
-- **Theme dropdown** — lists only `featured` themes (filtered via `theme.featured`). Selecting one calls `setSelectedTheme(theme)`.
-- **Accent color picker** — renders the active theme's `colorOptions` as coloured dots. Clicking one calls `setSelectedTheme({ ...activeTheme, accent })`, preserving all other theme properties.
-- Reads `useThemeStore()` + `usePathname()` to compute `activeTheme = selectedTheme ?? getThemeForPath(pathname)`, mirroring the same logic as `ThemeShell` so the displayed selection always matches what the user sees.
+**Header** — three controls always present: a Sun/Moon button that toggles `mode` between light and dark, a Shuffle button that randomizes among featured themes, and a Browse/Customize button that flips between the theme list and the customize view.
+
+**Theme tab** — opens on a 2-column **Browse** grid of every theme. Picking one applies its preset (gradient, accent, fonts, animation, mode). *Customize* flips to a configuration view: accent color swatches, title/body font chips, and animation chips.
+
+**Background tab** — two always-visible rows:
+
+1. **Gradient** — 8 swatches in a 2×4 grid (1 "None" + 7 curated gradients). Each swatch carries its own mode (light/dark), so picking a dark swatch flips the theme to dark.
+2. **Decoration** — segmented control with three options: None / Pattern / Image. Picking one reveals a panel specific to that decoration:
+   - **Pattern**: opacity slider + 4-column tile grid of patterns.
+   - **Image**: cover/repeat toggle + opacity slider + 3-column tile grid of images.
+
+Every change writes to the react-hook-form value *and* mirrors into `useThemeStore.setSelectedTheme(…)` so `ThemeShell` updates the live preview in the same React render.
 
 ---
 
