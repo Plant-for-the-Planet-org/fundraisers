@@ -2,6 +2,7 @@ import type { PaymentRequest, PaymentResponse } from '../types/payment';
 import type { ErrorType } from './http-error-classifier';
 
 import { API_BASE_URL } from '../constants/app-config';
+import { getSessionId } from '../utils/session-id';
 import { classifyHttpError } from './http-error-classifier';
 
 export class PaymentError extends Error {
@@ -37,8 +38,7 @@ export class PaymentService {
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      // TODO: update session id logic to generate a unique session ID per user session, rather than hardcoding 'web-client'
-      'X-SESSION-ID': 'web-client',
+      'X-SESSION-ID': getSessionId(),
     };
 
     if (authToken) {
