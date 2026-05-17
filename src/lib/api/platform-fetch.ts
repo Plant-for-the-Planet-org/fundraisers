@@ -75,8 +75,14 @@ export async function platformFetch<T>(
     }
   }
 
-  if (opts.idempotencyKey) {
+  if (opts.idempotencyKey && opts.idempotencyKey.trim()) {
     headers['Idempotency-Key'] = opts.idempotencyKey;
+  }
+
+  let requestBody: BodyInit | undefined;
+  if (hasBody) {
+    requestBody =
+      opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body);
   }
 
   let response: Response;
@@ -84,11 +90,7 @@ export async function platformFetch<T>(
     response = await fetch(`${API_BASE_URL}${path}`, {
       method: opts.method ?? 'GET',
       headers,
-      body: hasBody
-        ? opts.body instanceof FormData
-          ? opts.body
-          : JSON.stringify(opts.body)
-        : undefined,
+      body: requestBody,
       signal: opts.timeoutMs ? AbortSignal.timeout(opts.timeoutMs) : undefined,
     });
   } catch (err) {

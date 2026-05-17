@@ -31,7 +31,7 @@ function toPaymentError(err: unknown): PaymentError {
     }
     const { type, code } = classifyPlatformError(err.status);
     return new PaymentError(err.message, type, code, err.status, {
-      details: err.body,
+      body: err.body,
     });
   }
 

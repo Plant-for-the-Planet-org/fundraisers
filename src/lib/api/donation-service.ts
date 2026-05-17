@@ -38,7 +38,7 @@ function toDonationError(err: unknown, timeoutMessage: string): DonationError {
       });
     }
     const { type, code } = classifyPlatformError(err.status);
-    const details: Record<string, unknown> = { details: err.body };
+    const details: Record<string, unknown> = { body: err.body };
     // Preserve field-level errors for validation/business statuses
     if (
       (err.status === 400 || err.status === 422) &&

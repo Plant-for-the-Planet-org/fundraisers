@@ -30,7 +30,7 @@ function toPaypalOrderError(err: unknown): PaypalOrderError {
     }
     const { type, code } = classifyPlatformError(err.status);
     return new PaypalOrderError(err.message, type, code, err.status, {
-      details: err.body,
+      body: err.body,
     });
   }
 
