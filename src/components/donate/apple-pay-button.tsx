@@ -158,6 +158,16 @@ function ApplePayButtonInner({
     []
   );
 
+  // Stripe treats wallet dismissal as a non-error (no onConfirm fires), but
+  // donors expect the same visible feedback as a server-side decline so they
+  // know the donation didn't go through. Route cancel through the shared
+  // error path and bump the attempt counter so the next try gets a fresh
+  // Elements instance.
+  const handleCancel = useCallback(() => {
+    onApplePayError();
+    onAttemptComplete();
+  }, [onApplePayError, onAttemptComplete]);
+
   const handleConfirm = useCallback(async () => {
     if (!stripe || !elements) return;
 
@@ -232,6 +242,7 @@ function ApplePayButtonInner({
             }}
             onReady={handleReady}
             onClick={handleClick}
+            onCancel={handleCancel}
             onConfirm={handleConfirm}
           />
         </div>
