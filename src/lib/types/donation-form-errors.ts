@@ -9,6 +9,7 @@ export const DONATION_FORM_ERRORS = {
   'email.invalid': 'email.invalid',
   'companyName.required': 'companyName.required',
   'tin.required': 'tin.required',
+  'paymentMethod.required': 'paymentMethod.required',
 } as const;
 
 export type DonationFormErrorKey = keyof typeof DONATION_FORM_ERRORS;

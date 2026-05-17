@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { getLocale, getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
@@ -11,6 +12,7 @@ import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-re
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
 const MAX_METADATA_DESCRIPTION_LENGTH = 200;
+const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
 
 function getMetadataDescription(
   description: string | null | undefined
@@ -42,16 +44,16 @@ function getMetadataDescription(
 
 function getFundraiserMetadataImage(
   image: string | null | undefined
-): string | undefined {
+): string {
   if (!image) {
-    return undefined;
+    return META_IMAGE_URL;
   }
 
   if (/^https?:\/\//i.test(image)) {
     return image;
   }
 
-  return getImageUrl('fundraiser', 'large', image) ?? undefined;
+  return getImageUrl('fundraiser', 'large', image) ?? META_IMAGE_URL;
 }
 
 export async function generateMetadata({
@@ -94,22 +96,20 @@ export async function generateMetadata({
         description,
         type: 'website',
         url: canonicalUrl,
-        images: imageUrl
-          ? [
-              {
-                url: imageUrl,
-                width: 1200,
-                height: 630,
-                alt: fundraiser.title,
-              },
-            ]
-          : undefined,
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: fundraiser.title,
+          },
+        ],
       },
       twitter: {
         card: 'summary_large_image',
         title: fundraiser.title,
         description,
-        images: imageUrl ? [imageUrl] : undefined,
+        images: [imageUrl],
       },
     };
   } catch {
@@ -129,12 +129,13 @@ export default async function FundraiserPage({
   try {
     fundraiser = await getCachedFundraiser(slug, locale);
   } catch (e) {
-    if (
-      e instanceof PlatformAPIError &&
-      e.status &&
-      [401, 403, 404].includes(e.status)
-    ) {
-      return <FundraiserAuthRetry slug={slug} />;
+    if (e instanceof PlatformAPIError && e.status) {
+      if ([401, 403, 404].includes(e.status)) {
+        return <FundraiserAuthRetry slug={slug} />;
+      }
+      if (e.status === 405) {
+        notFound();
+      }
     }
     throw e;
   }

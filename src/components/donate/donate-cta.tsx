@@ -61,7 +61,7 @@ export function DonateCTA({
     );
   }
 
-  if (selectedPaymentMethod === 'apple-pay' && onApplePayConfirm) {
+  if (selectedPaymentMethod === 'apple_pay' && onApplePayConfirm) {
     return <ApplePayButton onApplePayConfirm={onApplePayConfirm} />;
   }
 

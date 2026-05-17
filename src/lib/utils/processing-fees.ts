@@ -82,7 +82,7 @@ export function getProcessingFee(
     return { feeAmountCents: 0, hasFee: false, region };
   }
 
-  if (provider === 'stripe' && paymentMethod === 'sepa-debit') {
+  if (provider === 'stripe' && paymentMethod === 'sepa_debit') {
     if (region === 'EU') {
       return { feeAmountCents: 35, hasFee: true, region };
     }
@@ -92,8 +92,8 @@ export function getProcessingFee(
   if (
     provider === 'stripe' &&
     (paymentMethod === 'card' ||
-      paymentMethod === 'apple-pay' ||
-      paymentMethod === 'google-pay')
+      paymentMethod === 'apple_pay' ||
+      paymentMethod === 'google_pay')
   ) {
     const fee = STRIPE_FEES[region];
     const feeAmountCents =

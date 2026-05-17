@@ -42,6 +42,8 @@
         "description": "Helfe mit, dass deine Spende ankommt. Einige Zahlungsanbieter berechnen uns Gebühren. Mit gebührenfreien Methoden kannst du sicherstellen, dass deine Spende in vollem Umfang bei den Projekten ankommt.",
         "selectMethodPlaceholder": "Zahlungsmethode auswählen",
         "empty": "Es sind derzeit keine Zahlungsmöglichkeiten verfügbar.",
+        "lastUsed": "Zuletzt verwendet",
+        "bankTransferRemark": "Bitte richte einen Dauerauftrag bei deiner Bank ein.",
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
           "bankTransfer": "Banküberweisung",
@@ -49,7 +51,12 @@
           "card": "Kredit- oder Debitkarte",
           "sepa": "SEPA-Lastschriftverfahren",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay"
+          "googlePay": "Google Pay",
+          "planetCash": "PlanetCash"
+        },
+        "planetCash": {
+          "availableBalance": "Verfügbar: {amount}",
+          "insufficientBalance": "Unzureichendes Guthaben"
         },
         "providers": {
           "stripe": "Stripe",
@@ -298,6 +305,7 @@
       "loadError": "Der Spendenaufruf konnte nicht geladen werden",
       "errorTitle": "Etwas ist schief gelaufen",
       "errorDescription": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es nochmal.",
+      "invalidUrlDescription": "Die Daten konnten nicht abgerufen werden. Die Fundraiser-URL ({slug}) ist möglicherweise nicht gültig. Du kannst uns unter support@plant-for-the-planet.org erreichen",
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Der Spendenaufruf wird aktualisiert...",

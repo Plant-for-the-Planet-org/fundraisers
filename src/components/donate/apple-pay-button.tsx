@@ -62,7 +62,7 @@ export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
         donationAmountCents: donationData.amount,
         donationCurrency: donationData.currency,
         workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod: 'apple-pay',
+        selectedPaymentMethod: 'apple_pay',
       });
     return (
       donationData.amount +

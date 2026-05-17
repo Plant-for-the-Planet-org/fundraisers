@@ -3,7 +3,9 @@
  * Handles HTTP requests to external platform APIs
  */
 
+import { useImpersonationStore } from '@/stores/impersonation-store';
 import { API_BASE_URL } from '../constants/app-config';
+import { getSessionId } from '../utils/session-id';
 
 export class PlatformAPIError extends Error {
   constructor(
@@ -27,12 +29,13 @@ class PlatformAPIClient {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestInit = {},
-    token?: string
+    token?: string,
+    skipImpersonationFromStore = false
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
     const headers: Record<string, string> = {
-      'X-SESSION-ID': 'web-client',
+      'X-SESSION-ID': getSessionId(),
       ...(options.headers as Record<string, string>),
     };
 
@@ -42,6 +45,18 @@ class PlatformAPIClient {
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+
+      if (!skipImpersonationFromStore) {
+        const impersonation = useImpersonationStore.getState();
+        if (
+          impersonation.isActive &&
+          impersonation.email &&
+          impersonation.pin
+        ) {
+          headers['x-switch-user'] = impersonation.email;
+          headers['x-user-support-pin'] = impersonation.pin;
+        }
+      }
     }
 
     const response = await fetch(url, {
@@ -93,6 +108,26 @@ class PlatformAPIClient {
       );
     }
     return this.get<T>(endpoint, token);
+  }
+
+  async getAuthenticatedWithHeaders<T>(
+    endpoint: string,
+    token: string,
+    extraHeaders: Record<string, string>
+  ): Promise<T> {
+    if (!token) {
+      throw new PlatformAPIError(
+        'Authentication token required',
+        'AUTH_TOKEN_MISSING',
+        401
+      );
+    }
+    return this.makeRequest<T>(
+      endpoint,
+      { method: 'GET', headers: extraHeaders },
+      token,
+      true
+    );
   }
 
   async post<T>(endpoint: string, body: unknown, token?: string): Promise<T> {

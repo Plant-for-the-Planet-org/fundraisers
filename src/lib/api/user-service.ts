@@ -1,4 +1,5 @@
 import type { UserType } from '@planet-sdk/common';
+import type { Nullable } from '../types/utility';
 
 import { platformAPIClient, PlatformAPIError } from './external-client';
 
@@ -53,14 +54,14 @@ export interface UserProfileResponse {
   isMember: boolean;
   treemapperMigrationState: any | null;
   legacyPriceTill: string | null;
-  planetCash: {
+  planetCash: Nullable<{
     account: string;
     country: string;
     currency: string;
     balance: number;
     creditLimit: number;
     giftFunds: any[];
-  };
+  }>;
   scores: {
     treesDonated: {
       personal: number;
@@ -107,6 +108,39 @@ export class UserService {
       throw new PlatformAPIError(
         error instanceof Error ? error.message : 'Failed to fetch user profile',
         'PROFILE_FETCH_ERROR',
+        0
+      );
+    }
+  }
+
+  /**
+   * Validate impersonation credentials by fetching /profile with the
+   * impersonation headers. Returns the impersonated user's profile on success,
+   * throws PlatformAPIError on failure (e.g. 401/403 from a bad pin or email).
+   */
+  async validateImpersonation(
+    token: string,
+    email: string,
+    pin: string
+  ): Promise<UserProfileResponse> {
+    try {
+      return await platformAPIClient.getAuthenticatedWithHeaders<UserProfileResponse>(
+        '/profile',
+        token,
+        {
+          'x-switch-user': email,
+          'x-user-support-pin': pin,
+        }
+      );
+    } catch (error) {
+      if (error instanceof PlatformAPIError) {
+        throw error;
+      }
+      throw new PlatformAPIError(
+        error instanceof Error
+          ? error.message
+          : 'Impersonation validation failed',
+        'IMPERSONATION_VALIDATION_ERROR',
         0
       );
     }

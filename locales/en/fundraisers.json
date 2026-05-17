@@ -42,6 +42,8 @@
         "description": "Help your donation go further. Some payment providers charge us fees. Fee-free methods ensure your full donation supports your cause.",
         "selectMethodPlaceholder": "Select payment method",
         "empty": "No payment methods are currently available.",
+        "lastUsed": "Last used",
+        "bankTransferRemark": "Please set up a standing order with your bank.",
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
@@ -49,7 +51,12 @@
           "card": "Credit or Debit Card",
           "sepa": "SEPA Direct Debit",
           "applePay": "Apple Pay",
-          "googlePay": "Google Pay"
+          "googlePay": "Google Pay",
+          "planetCash": "PlanetCash"
+        },
+        "planetCash": {
+          "availableBalance": "Available: {amount}",
+          "insufficientBalance": "Insufficient balance"
         },
         "providers": {
           "stripe": "Stripe",
@@ -298,6 +305,7 @@
       "loadError": "Failed to load fundraiser",
       "errorTitle": "Something went wrong",
       "errorDescription": "An unexpected error occurred. Please try again.",
+      "invalidUrlDescription": "Could not fetch data. The fundraiser url ({slug}) may not be valid. Reach us at support@plant-for-the-planet.org",
       "backToDashboard": "Back to dashboard",
       "formSubmission": {
         "buttonProcessing": "Updating fundraiser...",

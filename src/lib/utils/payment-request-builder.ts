@@ -2,7 +2,6 @@ import type {
   PaymentData,
   PaymentMethod,
   PaymentRequest,
-  StripePaymentMethod,
   StripeWallet,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
@@ -24,13 +23,13 @@ function getGatewayForPaymentMethod(
 ): 'stripe' | 'paypal' | 'offline' {
   switch (paymentMethod) {
     case 'card':
-    case 'sepa-debit':
-    case 'apple-pay':
-    case 'google-pay':
+    case 'sepa_debit':
+    case 'apple_pay':
+    case 'google_pay':
       return 'stripe';
     case 'paypal':
       return 'paypal';
-    case 'bank-transfer':
+    case 'bank_transfer':
       return 'offline';
     default:
       throw new PaymentOptionsError(
@@ -41,50 +40,26 @@ function getGatewayForPaymentMethod(
   }
 }
 
-function mapPaymentMethodName(paymentMethod: PaymentMethod): string {
-  switch (paymentMethod) {
-    case 'sepa-debit':
-      return 'sepa_debit';
-    case 'apple-pay':
-    case 'google-pay':
-      return 'card';
-    case 'paypal':
-      return 'paypal';
-    case 'bank-transfer':
-      return 'offline';
-    default:
-      return paymentMethod;
+// Wallets ride on top of `card` over the wire (Stripe SDK requirement), but we
+// keep the per-wallet id for the allowlist check so card can be enabled without
+// also enabling Apple Pay / Google Pay.
+function getStripeMethodName(
+  paymentMethod: PaymentMethod
+): 'card' | 'sepa_debit' {
+  if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
+    return 'card';
   }
+  return paymentMethod as 'card' | 'sepa_debit';
 }
 
 function getWallet(paymentMethod: PaymentMethod): StripeWallet | undefined {
   switch (paymentMethod) {
-    case 'apple-pay':
+    case 'apple_pay':
       return 'apple_pay';
-    case 'google-pay':
+    case 'google_pay':
       return 'google_pay';
     default:
       return undefined;
-  }
-}
-
-// Key used to gate against gateway.methods allowlist. Keeps wallets
-// independently gateable (e.g. enable Card without enabling Apple Pay) by
-// preserving the per-wallet identifier even when the wire `method` is `card`.
-function getAllowlistKey(paymentMethod: PaymentMethod): string {
-  switch (paymentMethod) {
-    case 'sepa-debit':
-      return 'sepa_debit';
-    case 'apple-pay':
-      return 'apple_pay';
-    case 'google-pay':
-      return 'google_pay';
-    case 'paypal':
-      return 'paypal';
-    case 'bank-transfer':
-      return 'offline';
-    default:
-      return paymentMethod;
   }
 }
 
@@ -109,8 +84,12 @@ export function buildPaymentRequest(
     const account = (paymentDetails.account as string) || gatewayConfig.account;
 
     if ('methods' in gatewayConfig) {
-      const allowlistKey = getAllowlistKey(paymentMethod);
-      if (!gatewayConfig.methods.includes(allowlistKey)) {
+      // The offline gateway exposes its method as 'offline' (the gateway name),
+      // not 'bank_transfer'. Stripe and PayPal use the same id we do — including
+      // 'apple_pay' / 'google_pay', which are gated independently of 'card'.
+      const apiMethodName =
+        paymentMethod === 'bank_transfer' ? 'offline' : paymentMethod;
+      if (!gatewayConfig.methods.includes(apiMethodName)) {
         throw new PaymentOptionsError(
           `Payment method '${paymentMethod}' is not supported for gateway '${gateway}'`,
           'PAYMENT_METHOD_NOT_SUPPORTED',
@@ -141,7 +120,7 @@ export function buildPaymentRequest(
         return {
           gateway: 'stripe',
           account,
-          method: mapPaymentMethodName(paymentMethod) as StripePaymentMethod,
+          method: getStripeMethodName(paymentMethod),
           ...(wallet ? { wallet } : {}),
           source: { id: String(id), object: 'payment_method' },
         };

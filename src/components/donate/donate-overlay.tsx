@@ -26,7 +26,7 @@ import { PaymentMethods } from './payment-methods';
 import { useDonationSubmit } from './use-donation-submit';
 
 export interface DonationData {
-  amount: number;
+  amountCents: number;
   currency: string;
   frequency: DonationFrequency;
   dedicated: boolean;
@@ -39,6 +39,8 @@ interface DonateOverlayProps {
   donationData: DonationData | null;
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
+  /** `true` once `paymentOptions` reflects the user's auth state — see `usePaymentOptions`. */
+  paymentOptionsReady: boolean;
 }
 
 export function DonateOverlay({
@@ -47,6 +49,7 @@ export function DonateOverlay({
   donationData,
   fundraiser,
   paymentOptions,
+  paymentOptionsReady,
 }: DonateOverlayProps) {
   const isClient = typeof window !== 'undefined';
 
@@ -67,10 +70,20 @@ export function DonateOverlay({
       donationData={donationData}
       fundraiser={fundraiser}
       paymentOptions={paymentOptions}
+      paymentOptionsReady={paymentOptionsReady}
       onClose={onClose}
       isOpen={isOpen}
     />
   );
+}
+
+interface DonateOverlayInnerProps {
+  donationData: DonationData;
+  fundraiser: Fundraiser;
+  paymentOptions: PaymentOptions;
+  paymentOptionsReady: boolean;
+  onClose: () => void;
+  isOpen: boolean;
 }
 
 /** Inner component rendered only when donationData is available, so hooks can depend on it safely */
@@ -78,15 +91,10 @@ function DonateOverlayInner({
   donationData,
   fundraiser,
   paymentOptions,
+  paymentOptionsReady,
   onClose,
   isOpen,
-}: {
-  donationData: DonationData;
-  fundraiser: Fundraiser;
-  paymentOptions: PaymentOptions;
-  onClose: () => void;
-  isOpen: boolean;
-}) {
+}: DonateOverlayInnerProps) {
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
   const cardFormRef = useRef<StripeCardFormHandle>(null);
@@ -166,6 +174,7 @@ function DonateOverlayInner({
         fundraiser={fundraiser}
         donationData={donationData}
         paymentOptions={paymentOptions}
+        paymentOptionsReady={paymentOptionsReady}
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
