@@ -95,7 +95,7 @@ export function FundraiserView({
         )}
 
         {/* Donation form + overlay */}
-        {fundraiser.canDonate && paymentOptions ? (
+        {fundraiser.canDonate && paymentOptions && fundraiser.workspace ? (
           <>
             <DonationSection
               fundraiser={fundraiser}

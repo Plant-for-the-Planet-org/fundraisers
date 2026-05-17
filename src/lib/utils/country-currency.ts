@@ -132,11 +132,16 @@ export function getTaxDeductibilityInfo(
   isDeductible: boolean;
   countryName: string;
 } {
-  const code = countryCode.toUpperCase() as AllowedCountry;
+  const code = (countryCode || 'ROW').toUpperCase() as AllowedCountry;
   const resolvedCode = code === 'ROW' ? 'DE' : code; // ROW uses DE as the default workspace country
-  const countryName =
-    new Intl.DisplayNames([locale], { type: 'region' }).of(resolvedCode) ??
-    resolvedCode;
+  let countryName = resolvedCode;
+  try {
+    countryName =
+      new Intl.DisplayNames([locale], { type: 'region' }).of(resolvedCode) ??
+      resolvedCode;
+  } catch {
+    // Intl.DisplayNames.of throws RangeError on invalid region codes — fall back to the raw code
+  }
   return {
     isDeductible: TAX_DEDUCTIBLE_COUNTRIES.has(resolvedCode),
     countryName,
