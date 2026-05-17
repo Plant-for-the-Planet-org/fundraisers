@@ -220,7 +220,7 @@ export function DonationFormProvider({
   useEffect(() => {
     methods.register('country');
     methods.register('selectedPaymentMethod');
-    methods.register('coverFees');
+    methods.register('willAbsorbFee');
     methods.register('makeMonthly');
   }, [methods]);
 

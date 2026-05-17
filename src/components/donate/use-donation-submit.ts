@@ -544,6 +544,10 @@ export function useDonationSubmit(
     [paymentOptions, token]
   );
 
+  // TODO: API fetch is being refactored in a separate PR. When that lands,
+  // adapt the donation/payment service calls below (submitStandardPostpaidDonation,
+  // paymentService.processPayment) to the new client. Same applies to the card
+  // and PayPal flows above.
   const onApplePayConfirm = useCallback(
     async (
       values: DonationFormValues,
@@ -566,11 +570,23 @@ export function useDonationSubmit(
         values,
         isAuthenticated
       );
+
+      const { processingFeeCents: applePayProcessingFeeCents } =
+        getDonationProcessingFeeInfo({
+          paymentOptions,
+          donationAmountCents: donationData.amountCents,
+          donationCurrency: donationData.currency,
+          workspaceCountry: fundraiser.workspace?.country,
+          selectedPaymentMethod: 'apple_pay',
+        });
+
       const payload = buildDonationPayload(
         formData,
         fundraiser,
         donorProfile,
-        false
+        'apple_pay',
+        values.willAbsorbFee,
+        applePayProcessingFeeCents
       );
 
       const donationAttemptKey = donationKeyRef.current;
@@ -578,7 +594,7 @@ export function useDonationSubmit(
 
       try {
         const { donationResponse, paymentResponse } =
-          await submitStandardDonation({
+          await submitStandardPostpaidDonation({
             payload,
             token: token || undefined,
             donationIdempotencyKey: donationAttemptKey,
@@ -705,6 +721,18 @@ export function useDonationSubmit(
     submittingRef.current = false;
   }, []);
 
+  // Surfaces client-side Stripe.js failures from the Apple Pay flow
+  // (elements.submit or createPaymentMethod). Server-side failures in the
+  // donation/payment APIs are already handled inside onApplePayConfirm.
+  const onApplePayError = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paymentFailed' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
@@ -718,6 +746,7 @@ export function useDonationSubmit(
     onPayPalApproved,
     onPayPalError,
     onApplePayConfirm,
+    onApplePayError,
     reset,
   };
 }

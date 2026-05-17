@@ -25,6 +25,7 @@ interface DonateCTAProps {
     paymentMethodId: string,
     stripe: Stripe
   ) => Promise<void>;
+  onApplePayError?: () => void;
 }
 
 export function DonateCTA({
@@ -34,6 +35,7 @@ export function DonateCTA({
   onPayPalApproved,
   onPayPalError,
   onApplePayConfirm,
+  onApplePayError,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
@@ -62,7 +64,12 @@ export function DonateCTA({
   }
 
   if (selectedPaymentMethod === 'apple_pay' && onApplePayConfirm) {
-    return <ApplePayButton onApplePayConfirm={onApplePayConfirm} />;
+    return (
+      <ApplePayButton
+        onApplePayConfirm={onApplePayConfirm}
+        onApplePayError={onApplePayError ?? (() => undefined)}
+      />
+    );
   }
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;

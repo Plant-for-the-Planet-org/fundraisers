@@ -28,6 +28,11 @@ interface ApplePayButtonProps {
     paymentMethodId: string,
     stripe: Stripe
   ) => Promise<void>;
+  onApplePayError: () => void;
+}
+
+interface ApplePayButtonInnerProps extends ApplePayButtonProps {
+  onAttemptComplete: () => void;
 }
 
 /**
@@ -38,13 +43,25 @@ interface ApplePayButtonProps {
  * The outer Elements provider in donate-overlay (no `mode`) keeps card/SEPA
  * flows on their existing token-first path.
  */
-export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
+export function ApplePayButton({
+  onApplePayConfirm,
+  onApplePayError,
+}: ApplePayButtonProps) {
   const locale = useLocale();
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
 
-  const coverFees = useWatch<DonationFormValues, 'coverFees'>({
-    name: 'coverFees',
+  const willAbsorbFee = useWatch<DonationFormValues, 'willAbsorbFee'>({
+    name: 'willAbsorbFee',
   });
+
+  // Stripe locks an Elements instance after the first `elements.submit()` +
+  // `createPaymentMethod` cycle. Retrying on the same instance is undefined
+  // behavior — including the side effect that the wallet sheet won't reopen,
+  // so a second failure never fires `onConfirm` and the error banner can't
+  // re-show. Bumping this counter in the inner component's confirm `finally`
+  // re-keys <Elements> and gives every attempt a fresh instance.
+  const [attemptKey, setAttemptKey] = useState(0);
+  const bumpAttempt = useCallback(() => setAttemptKey(k => k + 1), []);
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = useMemo(
@@ -59,18 +76,18 @@ export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
     const { hasProcessingFee, processingFeeCents } =
       getDonationProcessingFeeInfo({
         paymentOptions,
-        donationAmountCents: donationData.amount,
+        donationAmountCents: donationData.amountCents,
         donationCurrency: donationData.currency,
         workspaceCountry: fundraiser.workspace?.country,
         selectedPaymentMethod: 'apple_pay',
       });
     return (
-      donationData.amount +
-      (coverFees && hasProcessingFee ? processingFeeCents : 0)
+      donationData.amountCents +
+      (willAbsorbFee && hasProcessingFee ? processingFeeCents : 0)
     );
   }, [
-    coverFees,
-    donationData.amount,
+    willAbsorbFee,
+    donationData.amountCents,
     donationData.currency,
     fundraiser.workspace?.country,
     paymentOptions,
@@ -90,17 +107,32 @@ export function ApplePayButton({ onApplePayConfirm }: ApplePayButtonProps) {
   if (!stripePromise) return null;
 
   return (
-    <Elements stripe={stripePromise} options={elementsOptions}>
-      <ApplePayButtonInner onApplePayConfirm={onApplePayConfirm} />
+    <Elements
+      key={attemptKey}
+      stripe={stripePromise}
+      options={elementsOptions}
+    >
+      <ApplePayButtonInner
+        onApplePayConfirm={onApplePayConfirm}
+        onApplePayError={onApplePayError}
+        onAttemptComplete={bumpAttempt}
+      />
     </Elements>
   );
 }
 
-function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
+function ApplePayButtonInner({
+  onApplePayConfirm,
+  onApplePayError,
+  onAttemptComplete,
+}: ApplePayButtonInnerProps) {
   const stripe = useStripe();
   const elements = useElements();
   const t = useTranslations('Donate.applePay');
-  const { trigger, getValues } = useFormContext<DonationFormValues>();
+  const {
+    getValues,
+    formState: { isValid },
+  } = useFormContext<DonationFormValues>();
 
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -113,16 +145,17 @@ function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
   );
 
   const handleClick = useCallback(
-    async (event: StripeExpressCheckoutElementClickEvent) => {
-      const isValid = await trigger();
-      if (!isValid) return; // not calling resolve() halts the sheet
+    (event: StripeExpressCheckoutElementClickEvent) => {
+      // Donor identity (name, email, address, TIN) is collected by our form
+      // — it's required for the donation record and receipts regardless of
+      // payment method — so Apple Pay doesn't need to collect any of it.
       event.resolve({
         emailRequired: false,
         phoneNumberRequired: false,
         shippingAddressRequired: false,
       });
     },
-    [trigger]
+    []
   );
 
   const handleConfirm = useCallback(async () => {
@@ -131,18 +164,34 @@ function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
     setIsProcessing(true);
     try {
       const { error: submitError } = await elements.submit();
-      if (submitError) return;
+      if (submitError) {
+        onApplePayError();
+        return;
+      }
 
       const { paymentMethod, error } = await stripe.createPaymentMethod({
         elements,
       });
-      if (error || !paymentMethod) return;
+      if (error || !paymentMethod) {
+        onApplePayError();
+        return;
+      }
 
       await onApplePayConfirm(getValues(), paymentMethod.id, stripe);
     } finally {
       setIsProcessing(false);
+      // Signal the parent to remount <Elements> so a retry uses a fresh
+      // instance — see the comment on `attemptKey` in ApplePayButton.
+      onAttemptComplete();
     }
-  }, [stripe, elements, getValues, onApplePayConfirm]);
+  }, [
+    stripe,
+    elements,
+    getValues,
+    onApplePayConfirm,
+    onApplePayError,
+    onAttemptComplete,
+  ]);
 
   if (isAvailable === false) {
     return (
@@ -160,7 +209,14 @@ function ApplePayButtonInner({ onApplePayConfirm }: ApplePayButtonProps) {
         {isLoading && (
           <Skeleton className='absolute inset-0 h-12 w-full rounded-md' />
         )}
-        <div style={isLoading ? { visibility: 'hidden' } : undefined}>
+        <div
+          className={
+            !isValid
+              ? 'opacity-50 pointer-events-none transition-opacity'
+              : 'transition-opacity'
+          }
+          style={isLoading ? { visibility: 'hidden' } : undefined}
+        >
           <ExpressCheckoutElement
             options={{
               paymentMethods: {
