@@ -4,8 +4,8 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { PlatformAPIError } from '@/lib/api/external-client';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { isFundraiserOwner } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 
