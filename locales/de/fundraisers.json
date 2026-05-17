@@ -83,6 +83,10 @@
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
     },
+    "createPage": {
+      "title": "Erstelle deinen Spendenaufruf",
+      "subtitle": "Gib Menschen etwas zu fühlen. Dann gib ihnen einen Weg zu spenden."
+    },
     "form": {
       "goalPreview": {
         "raised": "{amount} gesammelt",

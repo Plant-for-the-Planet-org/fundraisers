@@ -83,6 +83,10 @@
         "makeMonthly": "Make my donation monthly"
       }
     },
+    "createPage": {
+      "title": "Create your fundraiser",
+      "subtitle": "Give people something to feel. Then give them a way to give."
+    },
     "form": {
       "goalPreview": {
         "raised": "{amount} raised",
