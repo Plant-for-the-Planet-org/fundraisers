@@ -3,7 +3,7 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/lib/constants/app-config';
+import { platformFetch } from '@/lib/api/platform-fetch';
 import { stageHash } from './use-alltime-stats';
 
 interface LeaderboardData {
@@ -14,12 +14,9 @@ interface LeaderboardData {
 const POLL_INTERVAL = 15_000;
 
 async function fetchLeaderboard(slug: string): Promise<LeaderboardData> {
-  const res = await fetch(
-    `${API_BASE_URL}/fundraisers/${slug}/leaderboard?stagehash=${stageHash()}`,
-    { headers: { 'X-SESSION-ID': 'web-client' } }
+  return platformFetch<LeaderboardData>(
+    `/fundraisers/${slug}/leaderboard?stagehash=${stageHash()}`
   );
-  if (!res.ok) throw new Error(`leaderboard ${res.status}`);
-  return res.json() as Promise<LeaderboardData>;
 }
 
 export function useLeaderboard(slug: string) {

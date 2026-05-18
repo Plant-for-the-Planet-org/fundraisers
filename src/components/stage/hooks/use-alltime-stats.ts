@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '@/lib/constants/app-config';
+import { platformFetch } from '@/lib/api/platform-fetch';
 
 const POLL_INTERVAL = 15_000;
 
@@ -32,12 +32,9 @@ export function stageHash() {
 }
 
 async function fetchAlltimeStats(slug: string): Promise<AlltimeStats> {
-  const res = await fetch(
-    `${API_BASE_URL}/fundraisers/${slug}/alltime-stats?stagehash=${stageHash()}`,
-    { headers: { 'X-SESSION-ID': 'web-client' } }
+  return platformFetch<AlltimeStats>(
+    `/fundraisers/${slug}/alltime-stats?stagehash=${stageHash()}`
   );
-  if (!res.ok) throw new Error(`alltime-stats ${res.status}`);
-  return res.json() as Promise<AlltimeStats>;
 }
 
 export function useAlltimeStats(slug: string) {
