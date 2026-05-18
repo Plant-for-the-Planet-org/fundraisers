@@ -77,22 +77,6 @@ export function bundleToAllocations(
 }
 
 /**
- * Returns the bundle whose full project ID set (support + curated) exactly
- * matches the given allocations. Order-independent.
- */
-export function detectBundleFromAllocations(
-  allocations: ReadonlyArray<{ project_id: string }>,
-  workspace: BundleWorkspace
-): Bundle | undefined {
-  const allocationIds = new Set(allocations.map(a => a.project_id));
-  return BUNDLE_CONFIG.bundles.find(bundle => {
-    const bundleIds = getBundleProjectIds(bundle, workspace);
-    if (bundleIds.length !== allocationIds.size) return false;
-    return bundleIds.every(id => allocationIds.has(id));
-  });
-}
-
-/**
  * Returns a project's display-ready unit cost when it is a measurable physical
  * unit (`tree` or `m2`). Returns `null` for `currency`-typed or missing data so
  * the caller can hide the metric.

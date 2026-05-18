@@ -6,7 +6,7 @@ Introduce a "Bundle" UX in the fundraiser create / edit / public-view flows. Bun
 
 The feature **fully replaces** the current `<ProjectSelection />` slot in [fundraiser-form-body.tsx:66](src/components/fundraisers/fundraiser-form-body.tsx#L66). The existing [project-selection.tsx](src/components/fundraisers/project-selection.tsx) and [project-selection-overlay.tsx](src/components/fundraisers/project-selection-overlay.tsx) are not reused inside the form (kept temporarily as dead code; deletion in a follow-up step once parity is verified).
 
-The API layer is **unchanged**: bundle identity is not persisted. Selecting a bundle simply writes its 5 project IDs to `projectAllocations` (with the support project floored at 25% per the legacy rule — see Decision #10). On edit, the originally-selected bundle (if any) is reverse-detected by exact project-ID set match.
+Bundle identity is **persisted** on the fundraiser as `settings.modules.bundle.slug` (nullable). Selecting a bundle writes both the 5 project IDs to `projectAllocations` (with the support project floored at 25% per the legacy rule — see Decision #10) *and* the bundle slug to settings. On edit, the form reads the stored slug and shows that bundle as selected; switching into the Custom tab clears the slug. Earlier iterations reverse-detected the bundle from the project-ID set; that approach was replaced with explicit persistence so the selection survives changes to curated project IDs and avoids slug/allocations divergence at the source.
 
 ## Implementation Status
 
@@ -14,7 +14,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 |---|---|---|
 | 1 — Bundle config + types | ✅ Shipped | |
 | 2 — Bundle helpers | ✅ Shipped | `getEqualSplit` was inlined into `bundleToAllocations` and removed; `getDisplayableUnitCost` added for the per-row unit-cost metric |
-| 3 — Form schema + provider wiring | ✅ Shipped (simpler than spec) | No ephemeral form fields. Active tab is component-local `useState`; selected bundle is derived on each render via `detectBundleFromAllocations`. `buildDefaultCreateValues` now seeds the default bundle (first slug of `meta.defaultTab`) via `bundleToAllocations`, so a fresh form mounts with that bundle pre-selected on its tab |
+| 3 — Form schema + provider wiring | ✅ Shipped | Schema adds `settings.modules.bundle.slug` (nullable enum). Active tab stays component-local `useState`. Selected bundle is read via `useWatch` + `getBundleBySlug`. `buildDefaultCreateValues` seeds both `projectAllocations` and `bundle.slug` from the default bundle. `fundraiserToFormValues` validates the stored slug against `BUNDLE_SLUGS` (legacy / unknown → `null`) |
 | 4 — `BundleSelection` shell | ✅ Shipped (create + edit) | Both create and edit forms render `<BundleSelection />`. Edit-mode initial-tab logic: bundle match → bundle's first tab; no match → `custom` (so existing custom selections land where they can be edited). Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
 | 4a — Country gating | ✅ Shipped | Tab visibility flips correctly between DE/ROW (all tabs) and ES/CH (Custom-only). Country-change reconciliation handled via `workspace-selector` — switching country wipes allocations and reseeds the new country's default cause at 100% |
 | 5 — Bundle preview modal | ✅ Shipped | UX iterated past spec; see step body for the shipped behaviour |
@@ -27,8 +27,8 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 
 | # | Decision | Default taken |
 |---|----------|---------------|
-| 1 | Bundle identity persistence | Not stored on API; reverse-detected on edit by ID-set match |
-| 2 | Manual edit to bundle's project list | Falls back to `Custom` tab on next edit |
+| 1 | Bundle identity persistence | Persisted on the fundraiser as `settings.modules.bundle.slug` (nullable). Reverse-detection was the original approach and was replaced — see Context |
+| 2 | Manual edit to bundle's project list | UI prevents this: switching to the Custom tab explicitly clears `bundle.slug`. Slug/allocations divergence is only possible via direct API edits |
 | 3 | Support project handling | **Workspace-level** default project (not embedded in bundle config). Stored in a separate `supportProjects` map keyed by workspace. Component prepends it to bundle projects at render/allocation time and preselects it in Custom |
 | 4 | Project metadata source | `/countryProjects/<country>?locale=<l>` once on mount, plus per-ID fallback fetch for bundle / support projects missing from the list |
 | 5 | Tab → bundle mapping | Driven by `tabs[].bundleSlugs` in config; `bundles[].tab` is informational only |
@@ -93,43 +93,48 @@ Define types:
 
 Create pure helpers used by both the form and the public view:
 
-- `getBundleBySlug(slug): Bundle | undefined`
+- `getBundleBySlug(slug): Bundle | undefined` — currently lives as a local helper inside `bundle-selection.tsx`; move into `bundle.ts` when the public view (Step 7) needs the same lookup, to avoid duplication
 - `getBundlesForTab(tabId): Bundle[]` — uses `tabs[].bundleSlugs` ordering
 - `getSupportProjectId(workspace: BundleWorkspace): string` — reads from `supportProjects` map
 - `getWorkspaceForCountry(country: string | undefined): BundleWorkspace | null` — wraps `bundle-country-mapping.ts`. Returns `null` when only Custom should be exposed
 - `getBundleProjectIds(bundle: Bundle, workspace: BundleWorkspace): string[]` — returns `[supportId, ...bundle.projectIds]` (length 5). Single place that combines the two sources
-- `detectBundleFromAllocations(allocations: { project_id: string }[], workspace: BundleWorkspace): Bundle | undefined` — exact set match against `getBundleProjectIds(bundle, workspace)` (same size, same IDs, order-independent)
 - `bundleToAllocations(bundle, workspace): Array<{ project_id; percentage }>` — applies the legacy 25% floor on the support project (see Decision #10). For 5-project bundles → `[28, 18, 18, 18, 18]`. The arithmetic is inlined; an earlier draft of this step pointed at a separate `getEqualSplit` helper which was removed during implementation since it had no other callers
+
+`detectBundleFromAllocations` was part of the original Step 2 set but was removed when bundle identity moved to a persisted slug — see Context and Decision #1.
 - `getDisplayTabForBundle(bundle): BundleTabId` — picks the first non-`staff-picks` tab; falls back to `staff-picks` if it is the only one
 - `getDisplayableUnitCost(unitCost, unitType): { value, unitType } | null` — gates the per-row "~8 €/tree" / "~12 €/m²" metric in the modal. Returns `null` for `currency`-typed projects or missing data so the caller hides the line
 
 **Files:**
 
 - `src/lib/utils/bundle.ts` — new
-- `src/lib/utils/__tests__/bundle.test.ts` — new (unit tests for each helper, especially `detectBundleFromAllocations` order-independence, support-project inclusion, and `getEqualSplit` rounding)
+- `src/lib/utils/__tests__/bundle.test.ts` — new (unit tests for each helper, especially `bundleToAllocations` rounding + 25% floor and `getBundleProjectIds` support-project inclusion)
 
 **Visual test:** None. Run unit tests.
 
 ---
 
-### Step 3 — Form schema + provider wiring (shipped: no schema changes)
+### Step 3 — Form schema + provider wiring (shipped)
 
 **What we shipped:**
 
-The Zod schema is **unchanged**. `projectAllocations` is still the only persisted field, and there are no ephemeral form additions. UX state lives outside the form:
+The Zod schema gains a single new field: `settings.modules.bundle.slug: z.enum(BUNDLE_SLUGS).nullable()`. There are no ephemeral form additions and no active-tab field. UX state split:
 
-- **Active tab** — component-local `useState<BundleTabId>` inside `BundleSelection`. Defaults to `selectedBundle?.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab` so an existing bundle is shown on its tab when the form mounts.
-- **Selected bundle** — derived per render via `detectBundleFromAllocations(allocations, workspace)`. No state to keep in sync, no stripping before submit.
+- **Active tab** — component-local `useState<BundleTabId>` inside `BundleSelection`. Defaults to `selectedBundle?.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab` so a fundraiser with a stored slug opens on that bundle's tab.
+- **Selected bundle** — `useWatch('settings.modules.bundle.slug')` + `getBundleBySlug(slug)`. Resolves to `undefined` when the country has no workspace or the slug doesn't match any configured bundle.
 
-`buildDefaultCreateValues` seeds `projectAllocations` from the default bundle (first slug of `BUNDLE_CONFIG.meta.defaultTab`) via `bundleToAllocations`, resolved against the default country's workspace. A fresh DE/ROW form mounts with that bundle's allocations, so `detectBundleFromAllocations` matches on first render and `BundleSelection` lands on the bundle's tab with the bundle card shown selected. If the default country has no workspace (shouldn't happen for `DE`), it falls back to the legacy single-support-project allocation at 100%.
+`buildDefaultCreateValues` seeds both `projectAllocations` (via `bundleToAllocations` for the default bundle, the first slug of `BUNDLE_CONFIG.meta.defaultTab`) **and** `settings.modules.bundle.slug` from that same default bundle. A fresh DE/ROW form mounts with both fields aligned and `BundleSelection` lands on the bundle's tab with the card shown selected. If the default country has no workspace (shouldn't happen for `DE`), allocations fall back to the legacy single-support-project allocation at 100% and `bundle.slug` is `null`.
 
-`fundraiserToFormValues` is **unchanged**. Edit-mode bundle detection is not needed because the edit form doesn't use `<BundleSelection />` yet (see Step 4) — it still renders `<ProjectSelection />`.
+`fundraiserToFormValues` reads `fundraiser.settings?.modules?.bundle?.slug` and **validates it against `BUNDLE_SLUGS`** before assigning — unknown or absent values become `null`, so legacy fundraisers (created before this field was persisted) land on the Custom tab in edit mode.
 
-**Why simpler than spec:** the original spec proposed `selectedBundleSlug` + `activeBundleTab` form fields with strip-before-send plumbing. Deriving the selection on every render eliminated that whole layer and removed any drift risk between form state and UI state. The active-tab `useState` is acceptable: tabs reset on form remount, but that's not a real UX concern for a single-page form.
+**Why this shape:** earlier iterations of this doc described deriving the bundle from `projectAllocations` per render via `detectBundleFromAllocations`. That worked but coupled bundle identity to the curated project-ID list — any future change to a bundle's projects would silently "lose" the bundle from existing fundraisers. Persisting the slug as a nullable enum field is a one-write commitment that decouples identity from contents and removes the only consumer of `detectBundleFromAllocations`.
 
-**Files actually touched:** none in this step.
+**Files touched:**
 
-**Visual test:** load `/fundraisers/create` → form mounts with `projectAllocations: [{ supportId, 100 }]` and Staff Picks tab open. Pick a bundle → `projectAllocations` becomes the 5-row split (Decision #10) and the bundle's card shows the selected check.
+- `src/components/fundraisers/fundraiser-form-schema.ts` — schema field, default-value seeding, `fundraiserToFormValues` mapping
+- `src/lib/types/fundraiser.ts` — `FundraiserSettings.modules.bundle` + `UpdateFundraiserRequest.settings.modules.bundle`
+- `src/lib/utils/fundraiser-data-builder.ts` — `isBundleDirty`, create-path bundle write, update-path bundle write (with `...request.settings?.modules` spread so leaderboard and bundle dirty writes compose)
+
+**Visual test:** load `/fundraisers/create` → form mounts with `projectAllocations: [5-row split]`, `bundle.slug: <default>`, and Staff Picks tab open with the default bundle card selected. Pick a different bundle → both `projectAllocations` and `bundle.slug` update; the new bundle's card shows the selected check. Switch into Custom → `bundle.slug` becomes `null` and (if a bundle was previously selected) allocations reset to support-project-only.
 
 ---
 
@@ -139,7 +144,7 @@ The Zod schema is **unchanged**. `projectAllocations` is still the only persiste
 
 Created `src/components/fundraisers/bundle-selection/` with:
 
-- `bundle-selection.tsx` — top-level container (exports `BundleSelection`). Reads `country` and `projectAllocations` via `useWatch`, resolves workspace via `getWorkspaceForCountry`, computes `selectedBundle` via `detectBundleFromAllocations`. Renders all 5 tab triggers + the matching panel when a workspace exists; renders the Custom-only placeholder when the country has no workspace (ES, CH).
+- `bundle-selection.tsx` — top-level container (exports `BundleSelection`). Reads `country` and `settings.modules.bundle.slug` via `useWatch`, resolves workspace via `getWorkspaceForCountry`, resolves `selectedBundle` via a local `getBundleBySlug` (gated on workspace presence). Renders all 5 tab triggers + the matching panel when a workspace exists; renders the Custom-only placeholder when the country has no workspace (ES, CH). The Custom tab change handler clears `bundle.slug` and (if a bundle was selected) resets allocations to the workspace's support project at 100%.
 - `bundle-tab-panel.tsx` — bundle list view (used for the 4 bundle tabs). Renders cards via `getBundlesForTab(tabId)`. Each card opens the preview modal.
 - `bundle-card.tsx` — single bundle tile with icon, label, tagline, the 5 project image thumbnails (real images via shared `useBundleProjects`, gradient placeholder fallback), project count, and a "See inside" link.
 - `use-bundle-projects.ts` — shared hook **lifted from the modal up to `BundleSelection`** so cards and modal use the same fetched project data (single fetch per workspace; service-level cache).
@@ -238,9 +243,9 @@ If support-project metadata becomes important enough to require live data (it cu
 
 Reuses the existing `calculateProjectAllocations` from `@/lib/utils/project-allocation` rather than extracting a shared `splitWithDefaultMinimum`. That helper already enforces `MIN_DEFAULT_CAUSE_PERCENT` (25% floor on the default cause) — same rule as Decision #10, no divergent code path. The `applyAllocationsFromIds` callback in `custom-tab-panel.tsx` builds placeholder `SelectedProject[]` objects from the IDs, runs them through `calculateProjectAllocations(placeholderProjects, defaultCauseId, MIN_DEFAULT_CAUSE_PERCENT)`, and writes the resulting `{ project_id, percentage }` array.
 
-**Bundle detection coexistence:**
+**Bundle slug coexistence:**
 
-Adding or removing in Custom mutates `projectAllocations`, which automatically falls out of `detectBundleFromAllocations` on the next render — no explicit `selectedBundleSlug` to clear (Step 3's "derive on render" decision pays off here). Switching back to a bundle tab still shows the previous bundle as unselected unless its exact 5-ID set match is restored.
+Entering the Custom tab explicitly clears `settings.modules.bundle.slug` (handled in `BundleSelection.handleTabChange`), so any mutations the user makes inside Custom never compete with a stored bundle identity. Switching back to a bundle tab shows no bundle as selected until the user picks one — there is no implicit re-detection from allocations.
 
 **Departures from spec:**
 
@@ -270,9 +275,9 @@ Adding or removing in Custom mutates `projectAllocations`, which automatically f
 
 Extend [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx):
 
-- On render, resolve `workspace = getWorkspaceForCountry(fundraiser.country)`. If `null`, skip bundle detection (custom-only fundraiser).
-- Otherwise run `detectBundleFromAllocations(projectAllocations, workspace)`.
-- If a bundle matches: render the bundle header row above the list (icon + label + em-dashed tagline + uppercase tab tag, e.g. `LOVE BUNDLE`). Use `getDisplayTabForBundle()` for the tag.
+- On render, resolve `workspace = getWorkspaceForCountry(fundraiser.country)`. If `null`, skip bundle rendering (custom-only fundraiser).
+- Otherwise read `fundraiser.settings?.modules?.bundle?.slug` and look it up via `getBundleBySlug` (move this helper from `bundle-selection.tsx` into `src/lib/utils/bundle.ts` so the public view can share it). Validate the slug against `BUNDLE_SLUGS` the same way `fundraiserToFormValues` does, so unknown/legacy values don't render a stale header.
+- If a bundle resolves: render the bundle header row above the list (icon + label + em-dashed tagline + uppercase tab tag, e.g. `LOVE BUNDLE`). Use `getDisplayTabForBundle()` for the tag.
 - Add `percentage` rendering on each `ProjectItem` (currently hidden in this component, only shown in edit). Show as a right-aligned `XX%`.
 - Add a "See all →" link on the right of the header — opens the same `BundlePreviewModal` from Step 5 in read-only mode (no "Use this bundle" CTA in public view).
 
@@ -282,7 +287,7 @@ Extend [projects-supported-display.tsx](src/components/fundraisers/projects-supp
 - `src/components/fundraisers/bundle-selection/bundle-preview-modal.tsx` — accept `mode: 'select' | 'view'` prop to toggle the CTA
 - `locales/en/fundraisers.json`, `locales/de/fundraisers.json` — add `Fundraisers.publicView.bundle.{header,tag.{rage,wonder,love,staffPicks},seeAll}` and the percentage suffix already exists as `allocationLabel`
 
-**Visual test:** Open `/fundraisers/<slug>` for a fundraiser whose allocations match a bundle → bundle header renders with correct tab tag and tagline, project rows show percentages. For non-matching (custom) fundraisers → no header, just the project list with percentages (or current behaviour, TBD — see Step 7a).
+**Visual test:** Open `/fundraisers/<slug>` for a fundraiser whose stored `bundle.slug` resolves to a configured bundle → bundle header renders with correct tab tag and tagline, project rows show percentages. For fundraisers with `bundle.slug: null` (custom, or legacy without the field) → no header, just the project list with percentages (or current behaviour, TBD — see Step 7a).
 
 **Step 7a — Custom-fundraiser public view:** confirm with stakeholders whether percentages should display for custom fundraisers too. Default in this plan: yes, always show percentages. Easy to flip with a single condition.
 
@@ -351,6 +356,5 @@ Every user-facing string — including `aria-label`, `title`, `alt`, `placeholde
 
 ## Out of Scope (for this plan)
 
-- Persisting `selectedBundleSlug` on the API (current detection-by-match approach is simpler and covers the requirement).
 - Editing bundle config from a CMS — config is hard-coded for now.
 - Analytics events on bundle selection (deferred).

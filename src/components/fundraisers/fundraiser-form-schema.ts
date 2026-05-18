@@ -10,6 +10,7 @@ import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
   ALLOWED_COUNTRIES,
@@ -91,6 +92,9 @@ export const fundraiserFormSchema = z.object({
         show_avatar: z.boolean(),
         aggregate_top_by_donor: z.boolean(),
       }),
+      bundle: z.object({
+        slug: z.enum(BUNDLE_SLUGS).nullable(),
+      }),
     }),
   }),
 });
@@ -138,6 +142,7 @@ export function buildDefaultCreateValues(
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
+        bundle: { slug: defaultBundle?.slug ?? null },
       },
     },
   };
@@ -179,6 +184,13 @@ export function fundraiserToFormValues(
     ? rawCountry
     : 'ROW';
 
+  const storedBundleSlug = fundraiser.settings?.modules?.bundle?.slug;
+  const bundleSlug = (BUNDLE_SLUGS as readonly string[]).includes(
+    storedBundleSlug ?? ''
+  )
+    ? (storedBundleSlug as (typeof BUNDLE_SLUGS)[number])
+    : null;
+
   return {
     title: fundraiser.title,
     description: fundraiser.description ?? '',
@@ -207,6 +219,7 @@ export function fundraiserToFormValues(
           ...DEFAULT_LEADERBOARD,
           ...fundraiser.settings?.modules?.leaderboard,
         },
+        bundle: { slug: bundleSlug },
       },
     },
   };

@@ -71,6 +71,9 @@ export interface FundraiserSettings {
   };
   modules: {
     leaderboard?: LeaderboardModuleSettings;
+    bundle?: {
+      slug: string | null;
+    };
     contribution?: {
       options: Array<{
         unit?: number;
@@ -156,7 +159,10 @@ export interface UpdateFundraiserRequest {
   // Expand modules as new module settings are added
   settings?: {
     theme?: FundraiserSettings['theme'];
-    modules?: { leaderboard?: LeaderboardModuleSettings };
+    modules?: {
+      leaderboard?: LeaderboardModuleSettings;
+      bundle?: { slug: string | null };
+    };
   };
   imageFile?: string; // base64 encoded, only sent when image changed
 }

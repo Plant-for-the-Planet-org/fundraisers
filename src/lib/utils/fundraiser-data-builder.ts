@@ -26,6 +26,13 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(leaderboard).some(Boolean);
 }
 
+function isBundleDirty(dirty: UpdateDirtyFields): boolean {
+  const bundle = dirty.settings?.modules?.bundle;
+  if (!bundle) return false;
+  if (typeof bundle === 'boolean') return bundle;
+  return Object.values(bundle).some(Boolean);
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -94,7 +101,19 @@ export function buildUpdateFundraiserRequest(
   if (isLeaderboardDirty(dirtyFields)) {
     request.settings = {
       ...request.settings,
-      modules: { leaderboard: values.settings.modules.leaderboard },
+      modules: {
+        ...request.settings?.modules,
+        leaderboard: values.settings.modules.leaderboard,
+      },
+    };
+  }
+  if (isBundleDirty(dirtyFields)) {
+    request.settings = {
+      ...request.settings,
+      modules: {
+        ...request.settings?.modules,
+        bundle: values.settings.modules.bundle,
+      },
     };
   }
   if (imageFile) request.imageFile = imageFile;
@@ -120,6 +139,7 @@ export function buildCreateFundraiserRequest(
       modules: {
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
+        bundle: values.settings.modules.bundle,
       },
     },
     startDate: getTodayString(),

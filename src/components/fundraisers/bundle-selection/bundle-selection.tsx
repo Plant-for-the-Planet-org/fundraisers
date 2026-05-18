@@ -9,17 +9,14 @@ import type {
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { BUNDLE_TAB_IDS } from '@/lib/types/bundle';
-import {
-  bundleToAllocations,
-  detectBundleFromAllocations,
-} from '@/lib/utils/bundle';
+import { bundleToAllocations } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { SectionHeader } from '../typography';
@@ -37,6 +34,11 @@ interface BundleSelectionProps {
   mode: 'create' | 'edit';
 }
 
+function getBundleBySlug(slug: BundleSlug | null): Bundle | undefined {
+  if (!slug) return undefined;
+  return BUNDLE_CONFIG.bundles.find(b => b.slug === slug);
+}
+
 function getInitialActiveTab({
   bundleWorkspace,
   selectedBundle,
@@ -51,12 +53,12 @@ function getInitialActiveTab({
     return 'custom';
   }
 
-  // Use the first tab from the detected bundle.
+  // Use the first tab from the persisted bundle slug.
   if (selectedBundle) {
     return selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab;
   }
 
-  // Edit mode without a matching bundle → custom selection.
+  // Edit mode without a stored bundle slug → custom selection.
   if (mode === 'edit') {
     return 'custom';
   }
@@ -72,17 +74,16 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
     control,
     name: 'country',
   });
-  const projectAllocations = useWatch<
+  const bundleSlug = useWatch<
     FundraiserFormValues,
-    'projectAllocations'
-  >({ control, name: 'projectAllocations' });
+    'settings.modules.bundle.slug'
+  >({ control, name: 'settings.modules.bundle.slug' });
 
   const bundleWorkspace = getWorkspaceForCountry(country);
 
-  const selectedBundle = useMemo(() => {
-    if (!bundleWorkspace || !projectAllocations) return undefined;
-    return detectBundleFromAllocations(projectAllocations, bundleWorkspace);
-  }, [projectAllocations, bundleWorkspace]);
+  const selectedBundle = bundleWorkspace
+    ? getBundleBySlug(bundleSlug)
+    : undefined;
 
   const [activeTab, setActiveTab] = useState<BundleTabId>(() =>
     getInitialActiveTab({ bundleWorkspace, selectedBundle, mode })
@@ -99,6 +100,10 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
         shouldValidate: true,
       }
     );
+    setValue('settings.modules.bundle.slug', bundle.slug, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setPreviewBundle(null);
   }
 
@@ -106,13 +111,19 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
     (nextTab: BundleTabId) => {
       // When switching INTO Custom from a bundle tab, drop the prefilled bundle
       // selection so the user starts fresh with only the support project.
-      if (nextTab === 'custom' && activeTab !== 'custom' && selectedBundle) {
-        const supportId = getDefaultCauseId(country);
-        setValue(
-          'projectAllocations',
-          [{ project_id: supportId, percentage: 100 }],
-          { shouldDirty: true, shouldValidate: true }
-        );
+      if (nextTab === 'custom' && activeTab !== 'custom') {
+        if (selectedBundle) {
+          const supportId = getDefaultCauseId(country);
+          setValue(
+            'projectAllocations',
+            [{ project_id: supportId, percentage: 100 }],
+            { shouldDirty: true, shouldValidate: true }
+          );
+        }
+        setValue('settings.modules.bundle.slug', null, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
       }
       setActiveTab(nextTab);
     },
