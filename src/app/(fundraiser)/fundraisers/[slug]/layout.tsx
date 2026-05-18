@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 
 import { getLocale } from 'next-intl/server';
 import { Toaster } from 'sonner';
-import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { DEFAULT_THEME } from '@/lib/theme/themes';
 import { Footer } from '@/components/footer';

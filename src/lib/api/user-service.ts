@@ -1,7 +1,7 @@
 import type { UserType } from '@planet-sdk/common';
 import type { Nullable } from '../types/utility';
 
-import { platformAPIClient, PlatformAPIError } from './external-client';
+import { PlatformAPIError, platformFetch } from './platform-fetch';
 
 export interface Address {
   id: string;
@@ -95,22 +95,7 @@ export class UserService {
    * Note: This endpoint requires authentication and will create user if doesn't exist
    */
   async getProfile(token: string): Promise<UserProfileResponse> {
-    try {
-      const endpoint = '/profile';
-      return await platformAPIClient.getAuthenticated<UserProfileResponse>(
-        endpoint,
-        token
-      );
-    } catch (error) {
-      if (error instanceof PlatformAPIError) {
-        throw error;
-      }
-      throw new PlatformAPIError(
-        error instanceof Error ? error.message : 'Failed to fetch user profile',
-        'PROFILE_FETCH_ERROR',
-        0
-      );
-    }
+    return platformFetch<UserProfileResponse>('/profile', { token });
   }
 
   /**
@@ -123,27 +108,14 @@ export class UserService {
     email: string,
     pin: string
   ): Promise<UserProfileResponse> {
-    try {
-      return await platformAPIClient.getAuthenticatedWithHeaders<UserProfileResponse>(
-        '/profile',
-        token,
-        {
-          'x-switch-user': email,
-          'x-user-support-pin': pin,
-        }
-      );
-    } catch (error) {
-      if (error instanceof PlatformAPIError) {
-        throw error;
-      }
-      throw new PlatformAPIError(
-        error instanceof Error
-          ? error.message
-          : 'Impersonation validation failed',
-        'IMPERSONATION_VALIDATION_ERROR',
-        0
-      );
-    }
+    return platformFetch<UserProfileResponse>('/profile', {
+      token,
+      skipImpersonationFromStore: true,
+      extraHeaders: {
+        'x-switch-user': email,
+        'x-user-support-pin': pin,
+      },
+    });
   }
 
   /**

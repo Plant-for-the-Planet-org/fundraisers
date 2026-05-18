@@ -1,4 +1,4 @@
-import { platformAPIClient, PlatformAPIError } from './external-client';
+import { platformFetch } from './platform-fetch';
 
 // Request interface for creating new addresses
 export interface CreateAddressRequest {
@@ -33,23 +33,11 @@ export class AddressService {
     token: string,
     addressData: CreateAddressRequest
   ): Promise<CreateAddressResponse> {
-    try {
-      const endpoint = '/addresses';
-      return await platformAPIClient.postAuthenticated<CreateAddressResponse>(
-        endpoint,
-        addressData,
-        token
-      );
-    } catch (error) {
-      if (error instanceof PlatformAPIError) {
-        throw error;
-      }
-      throw new PlatformAPIError(
-        error instanceof Error ? error.message : 'Failed to create address',
-        'ADDRESS_CREATE_ERROR',
-        0
-      );
-    }
+    return platformFetch<CreateAddressResponse>('/addresses', {
+      method: 'POST',
+      body: addressData,
+      token,
+    });
   }
 }
 

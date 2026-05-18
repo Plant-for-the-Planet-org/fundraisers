@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PlatformAPIError } from '@/lib/api/external-client';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { userService } from '@/lib/api/user-service';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
