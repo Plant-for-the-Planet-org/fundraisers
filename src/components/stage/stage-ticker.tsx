@@ -2,7 +2,7 @@
 
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
@@ -68,7 +68,21 @@ interface StageTickerProps {
 export function StageTicker({ recent, offline, locale }: StageTickerProps) {
   const t = useTranslations('Stage');
   const remaining = useCountdown();
-  const items = recent.length > 0 ? [...recent, ...recent] : [];
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
+
+  useLayoutEffect(() => {
+    const tickerElement = trackRef.current;
+    if (!tickerElement) return;
+    const contentWidth = shouldScroll
+      ? tickerElement.scrollWidth / 2
+      : tickerElement.scrollWidth;
+    const willOverflow = contentWidth > tickerElement.clientWidth;
+    if (willOverflow !== shouldScroll) setShouldScroll(willOverflow);
+  }, [recent, shouldScroll]);
+
+  const items =
+    recent.length > 0 ? (shouldScroll ? [...recent, ...recent] : recent) : [];
 
   return (
     <div
@@ -130,8 +144,13 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
       >
         {items.length > 0 ? (
           <div
-            className='flex h-full items-center gap-12 whitespace-nowrap px-6'
-            style={{ animation: 'stage-tickscroll 60s linear infinite' }}
+            ref={trackRef}
+            className={`flex h-full items-center gap-12 whitespace-nowrap px-6 ${shouldScroll ? '' : 'justify-center'}`}
+            style={
+              shouldScroll
+                ? { animation: 'ticker-scroll 60s linear infinite' }
+                : undefined
+            }
           >
             {items.map((d, i) => (
               <span
@@ -189,7 +208,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
       </div>
 
       <style>{`
-        @keyframes stage-tickscroll {
+        @keyframes ticker-scroll {
           from { transform: translateX(0) }
           to   { transform: translateX(-50%) }
         }
