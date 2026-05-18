@@ -230,7 +230,12 @@
         "iban": "IBAN",
         "bic": "BIC",
         "bank": "Bank",
-        "transactionId": "Transaction ID {id}",
+        "detailsTab": "Details",
+        "qrTab": "QR Code",
+        "qrAlt": "EPC QR code for SEPA bank transfer",
+        "qrBadge": "SEPA Transfer Code",
+        "qrHint": "Open your banking app to scan",
+        "qrCameraWarning": "Your phone's camera app won't work. Use the QR scanner inside Deutsche Bank, Sparkasse, Revolut, and most EU banking apps.",
         "error": "Transfer details not found, please reach out to <link>support@plant-for-the-planet.org</link> for help."
       },
       "copy": {

@@ -41,7 +41,8 @@ export function DonationThankYou({
               locale,
               'code'
             )}
-            donationId={thankYouState.donationId}
+            amount={thankYouState.amount}
+            currency={thankYouState.currency}
             uid={thankYouState.uid}
           />
         </ThankYouCard>
