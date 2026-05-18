@@ -197,7 +197,7 @@ function WalletButtonInner({
   }, [onWalletError, onAttemptComplete]);
 
   const handleConfirm = useCallback(async () => {
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || isProcessing) return;
 
     setIsProcessing(true);
     try {
@@ -226,6 +226,7 @@ function WalletButtonInner({
     wallet,
     stripe,
     elements,
+    isProcessing,
     getValues,
     onWalletConfirm,
     onWalletError,
@@ -250,7 +251,7 @@ function WalletButtonInner({
         )}
         <div
           className={
-            !isValid
+            !isValid || isProcessing
               ? 'opacity-50 pointer-events-none transition-opacity'
               : 'transition-opacity'
           }
