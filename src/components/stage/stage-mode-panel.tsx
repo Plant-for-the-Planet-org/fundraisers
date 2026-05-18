@@ -1,17 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useFormContext, useFieldArray, useWatch, Controller } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
-import { ChevronRight, Plus, Trash2, X, ChevronUp, ChevronDown, Clock, ImageIcon } from 'lucide-react';
-
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
+
+import { useState } from 'react';
+import {
+  Controller,
+  useFieldArray,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clock,
+  ImageIcon,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { STAGE_LIMITS } from '@/components/stage/constants';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -19,6 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 
 const DEFAULT_SLIDE = {
   position: 1,
@@ -56,10 +70,18 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const slideCount = fields.length;
   const atSlideLimit = slideCount >= STAGE_LIMITS.maxSlides;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const stageTitleVal = (useWatch({ control, name: 'settings.modules.stage.title' as any }) as string) ?? '';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const stageDescVal = (useWatch({ control, name: 'settings.modules.stage.description' as any }) as string) ?? '';
+   
+  const stageTitleVal =
+    (useWatch({
+      control,
+      name: 'settings.modules.stage.title' as any,
+    }) as string) ?? '';
+   
+  const stageDescVal =
+    (useWatch({
+      control,
+      name: 'settings.modules.stage.description' as any,
+    }) as string) ?? '';
 
   return (
     <div>
@@ -88,7 +110,9 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                 : t('slideCountMany', { count: String(slideCount) })}
             </span>
           </div>
-          <p className='text-xs text-muted-foreground mt-0.5'>{t('subtitle')}</p>
+          <p className='text-xs text-muted-foreground mt-0.5'>
+            {t('subtitle')}
+          </p>
         </div>
 
         <Button
@@ -121,7 +145,10 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
           <div className='flex flex-col gap-1.5'>
             <div className='flex items-center justify-between'>
               <Label className='text-xs font-semibold'>{t('stageTitle')}</Label>
-              <CharCount current={stageTitleVal.length} max={STAGE_LIMITS.stageTitle} />
+              <CharCount
+                current={stageTitleVal.length}
+                max={STAGE_LIMITS.stageTitle}
+              />
             </div>
             <Input
               {...register('settings.modules.stage.title')}
@@ -134,8 +161,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
           {/* Stage description */}
           <div className='flex flex-col gap-1.5'>
             <div className='flex items-center justify-between'>
-              <Label className='text-xs font-semibold'>{t('stageDescription')}</Label>
-              <CharCount current={stageDescVal.length} max={STAGE_LIMITS.stageDescription} />
+              <Label className='text-xs font-semibold'>
+                {t('stageDescription')}
+              </Label>
+              <CharCount
+                current={stageDescVal.length}
+                max={STAGE_LIMITS.stageDescription}
+              />
             </div>
             <Textarea
               {...register('settings.modules.stage.description')}
@@ -171,7 +203,9 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
             <div className='flex flex-col gap-1.5 col-span-2'>
               <Label className='text-xs font-semibold'>
                 {t('partnerLogo')}{' '}
-                <span className='font-normal text-muted-foreground'>({t('optional')})</span>
+                <span className='font-normal text-muted-foreground'>
+                  ({t('optional')})
+                </span>
               </Label>
               <PartnerLogoField register={register} t={t} />
             </div>
@@ -187,7 +221,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                 size='sm'
                 className='h-7 gap-1 text-xs border-dashed'
                 disabled={atSlideLimit}
-                title={atSlideLimit ? t('maxSlidesReached', { max: String(STAGE_LIMITS.maxSlides) }) : undefined}
+                title={
+                  atSlideLimit
+                    ? t('maxSlidesReached', {
+                        max: String(STAGE_LIMITS.maxSlides),
+                      })
+                    : undefined
+                }
                 onClick={() =>
                   append({ ...DEFAULT_SLIDE, position: fields.length + 1 })
                 }
@@ -235,9 +275,12 @@ function PartnerLogoField({
   register: ReturnType<typeof useFormContext<FundraiserFormValues>>['register'];
   t: ReturnType<typeof useTranslations>;
 }) {
-  const { formState: { errors } } = useFormContext<FundraiserFormValues>();
+  const {
+    formState: { errors },
+  } = useFormContext<FundraiserFormValues>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const error = (errors.settings?.modules?.stage as any)?.partner_logo_url?.message as string | undefined;
+  const error = (errors.settings?.modules?.stage as any)?.partner_logo_url
+    ?.message as string | undefined;
 
   return (
     <div className='flex flex-col gap-1'>
@@ -268,15 +311,22 @@ function SlideRow({
   onRemove: () => void;
 }) {
   const t = useTranslations('Fundraisers.form.options.stage');
-  const { control, register, formState: { errors } } = useFormContext<FundraiserFormValues>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<FundraiserFormValues>();
   const base = `settings.modules.stage.slides.${idx}` as const;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const imageUrl = (useWatch({ control, name: `${base}.image` as any }) as string) ?? '';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const titleVal = (useWatch({ control, name: `${base}.title` as any }) as string) ?? '';
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const descVal = (useWatch({ control, name: `${base}.description` as any }) as string) ?? '';
+   
+  const imageUrl =
+    (useWatch({ control, name: `${base}.image` as any }) as string) ?? '';
+   
+  const titleVal =
+    (useWatch({ control, name: `${base}.title` as any }) as string) ?? '';
+   
+  const descVal =
+    (useWatch({ control, name: `${base}.description` as any }) as string) ?? '';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const slideErrors = (errors.settings?.modules?.stage as any)?.slides?.[idx];
@@ -312,7 +362,12 @@ function SlideRow({
       {/* Image preview */}
       <div className='w-24 h-[60px] shrink-0 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center self-start mt-1'>
         {imageUrl ? (
-          <img src={imageUrl} alt='' className='w-full h-full object-cover' crossOrigin='anonymous' />
+          <img
+            src={imageUrl}
+            alt=''
+            className='w-full h-full object-cover'
+            crossOrigin='anonymous'
+          />
         ) : (
           <ImageIcon size={16} className='text-muted-foreground' />
         )}
@@ -321,7 +376,7 @@ function SlideRow({
       {/* Fields */}
       <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
         <div>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          { }
           <Input
             {...register(`${base}.title` as any)}
             placeholder={t('slideTitlePlaceholder')}
@@ -329,12 +384,15 @@ function SlideRow({
             className='text-sm font-medium h-8'
           />
           <div className='flex justify-end mt-0.5'>
-            <CharCount current={titleVal.length} max={STAGE_LIMITS.slideTitle} />
+            <CharCount
+              current={titleVal.length}
+              max={STAGE_LIMITS.slideTitle}
+            />
           </div>
         </div>
 
         <div>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          { }
           <Textarea
             {...register(`${base}.description` as any)}
             placeholder={t('slideDescriptionPlaceholder')}
@@ -343,12 +401,15 @@ function SlideRow({
             className='text-sm min-h-8 field-sizing-content resize-none py-1.5'
           />
           <div className='flex justify-end mt-0.5'>
-            <CharCount current={descVal.length} max={STAGE_LIMITS.slideDescription} />
+            <CharCount
+              current={descVal.length}
+              max={STAGE_LIMITS.slideDescription}
+            />
           </div>
         </div>
 
         <div>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          { }
           <Input
             {...register(`${base}.image` as any)}
             type='url'
@@ -356,14 +417,16 @@ function SlideRow({
             className='text-xs text-muted-foreground h-8'
           />
           {imageError && (
-            <p className='text-xs text-destructive mt-0.5'>{t('imageUrlError')}</p>
+            <p className='text-xs text-destructive mt-0.5'>
+              {t('imageUrlError')}
+            </p>
           )}
         </div>
 
         <div className='flex items-center gap-2 mt-0.5'>
           <Clock size={11} className='text-muted-foreground shrink-0' />
           <span className='text-xs text-muted-foreground'>{t('duration')}</span>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          { }
           <Input
             {...register(`${base}.duration` as any, { valueAsNumber: true })}
             type='number'

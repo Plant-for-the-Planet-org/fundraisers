@@ -7,8 +7,7 @@ import { startTransition } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Monitor, Plus } from 'lucide-react';
-
-import { Switch } from '@/components/ui/switch';
+import { StageModePanel } from '@/components/stage/stage-mode-panel';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -17,8 +16,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
 import { Heading2 } from './typography';
-import { StageModePanel } from '@/components/stage/stage-mode-panel';
 
 type FormValues = FundraiserFormValues;
 
@@ -95,9 +94,12 @@ export function Options() {
 
   const addStage = () =>
     startTransition(() =>
-      setValue('settings.modules.stage', DEFAULT_STAGE_CONFIG, { shouldDirty: true })
+      setValue('settings.modules.stage', DEFAULT_STAGE_CONFIG, {
+        shouldDirty: true,
+      })
     );
-  const removeStage = () => setValue('settings.modules.stage', null, { shouldDirty: true });
+  const removeStage = () =>
+    setValue('settings.modules.stage', null, { shouldDirty: true });
 
   return (
     <div
@@ -135,7 +137,9 @@ export function Options() {
                   <Monitor size={14} />
                 </div>
                 <div className='flex flex-col min-w-0'>
-                  <span className='text-sm font-semibold'>{tStage('title')}</span>
+                  <span className='text-sm font-semibold'>
+                    {tStage('title')}
+                  </span>
                   <span className='text-xs text-muted-foreground leading-snug mt-0.5'>
                     {tStage('blurb')}
                   </span>
