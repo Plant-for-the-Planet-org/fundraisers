@@ -9,13 +9,12 @@ import type {
 import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 import { getBundlesForTab } from '@/lib/utils/bundle';
 import { BundleCard } from './bundle-card';
 
 interface BundleTabPanelProps {
   activeTab: BundleTabId;
-  workspace: BundleWorkspace;
+  bundleWorkspace: BundleWorkspace;
   selectedBundleSlug: BundleSlug | undefined;
   getProject: (id: string) => ProjectData;
   onSelectBundle: (bundle: Bundle) => void;
@@ -24,13 +23,12 @@ interface BundleTabPanelProps {
 
 export function BundleTabPanel({
   activeTab,
-  workspace,
+  bundleWorkspace,
   selectedBundleSlug,
   getProject,
   onSelectBundle,
   onOpenBundle,
 }: BundleTabPanelProps) {
-  const t = useTranslations('Bundles');
   const bundles = useMemo(() => getBundlesForTab(activeTab), [activeTab]);
 
   return (
@@ -40,7 +38,7 @@ export function BundleTabPanel({
           <BundleCard
             key={bundle.slug}
             bundle={bundle}
-            workspace={workspace}
+            bundleWorkspace={bundleWorkspace}
             isSelected={selectedBundleSlug === bundle.slug}
             getProject={getProject}
             onSelect={() => onSelectBundle(bundle)}

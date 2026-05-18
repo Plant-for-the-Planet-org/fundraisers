@@ -33,11 +33,11 @@ const MOBILE_HIDDEN: BundleTabId[] = BUNDLE_TAB_IDS.filter(
   id => !MOBILE_VISIBLE.includes(id)
 );
 
-interface BundleTabsProps {
+interface BundleSelectionProps {
   mode: 'create' | 'edit';
 }
 
-export function BundleTabs({ mode }: BundleTabsProps) {
+export function BundleSelection({ mode }: BundleSelectionProps) {
   const t = useTranslations('Bundles');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
 
@@ -50,12 +50,12 @@ export function BundleTabs({ mode }: BundleTabsProps) {
     'projectAllocations'
   >({ control, name: 'projectAllocations' });
 
-  const workspace = getWorkspaceForCountry(country);
+  const bundleWorkspace = getWorkspaceForCountry(country);
 
   const selectedBundle = useMemo(() => {
-    if (!workspace || !projectAllocations) return undefined;
-    return detectBundleFromAllocations(projectAllocations, workspace);
-  }, [projectAllocations, workspace]);
+    if (!bundleWorkspace || !projectAllocations) return undefined;
+    return detectBundleFromAllocations(projectAllocations, bundleWorkspace);
+  }, [projectAllocations, bundleWorkspace]);
 
   const [activeTab, setActiveTab] = useState<BundleTabId>(() => {
     if (selectedBundle) {
@@ -68,11 +68,15 @@ export function BundleTabs({ mode }: BundleTabsProps) {
   const [previewBundle, setPreviewBundle] = useState<Bundle | null>(null);
 
   function handleUseBundle(bundle: Bundle) {
-    if (!workspace) return;
-    setValue('projectAllocations', bundleToAllocations(bundle, workspace), {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
+    if (!bundleWorkspace) return;
+    setValue(
+      'projectAllocations',
+      bundleToAllocations(bundle, bundleWorkspace),
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
+    );
     setPreviewBundle(null);
   }
 
@@ -94,7 +98,7 @@ export function BundleTabs({ mode }: BundleTabsProps) {
   );
 
   // Country has no bundle workspace (ES, CH) — Custom only.
-  if (!workspace) {
+  if (!bundleWorkspace) {
     return (
       <div className='flex flex-col gap-3'>
         <SectionHeader>{t('sectionHeading')}</SectionHeader>
@@ -104,27 +108,27 @@ export function BundleTabs({ mode }: BundleTabsProps) {
   }
 
   return (
-    <BundleTabsContent
+    <BundleSelectionContent
       activeTab={activeTab}
       setActiveTab={handleTabChange}
       previewBundle={previewBundle}
       setPreviewBundle={setPreviewBundle}
       selectedBundleSlug={selectedBundle?.slug}
       country={country}
-      workspace={workspace}
+      bundleWorkspace={bundleWorkspace}
       onUseBundle={handleUseBundle}
     />
   );
 }
 
-interface BundleTabsContentProps {
+interface BundleSelectionContentProps {
   activeTab: BundleTabId;
   setActiveTab: (tab: BundleTabId) => void;
   previewBundle: Bundle | null;
   setPreviewBundle: (bundle: Bundle | null) => void;
   selectedBundleSlug: BundleSlug | undefined;
   country: AllowedCountry;
-  workspace: BundleWorkspace;
+  bundleWorkspace: BundleWorkspace;
   onUseBundle: (bundle: Bundle) => void;
 }
 
@@ -132,16 +136,16 @@ interface BundleTabsContentProps {
  * Inner component so `useBundleProjects` only runs when a workspace exists.
  * Keeps the hook out of the early-return branch above.
  */
-function BundleTabsContent({
+function BundleSelectionContent({
   activeTab,
   setActiveTab,
   previewBundle,
   setPreviewBundle,
   selectedBundleSlug,
   country,
-  workspace,
+  bundleWorkspace,
   onUseBundle,
-}: BundleTabsContentProps) {
+}: BundleSelectionContentProps) {
   const t = useTranslations('Bundles');
   const { getProject } = useBundleProjects(country);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -260,7 +264,7 @@ function BundleTabsContent({
         ) : (
           <BundleTabPanel
             activeTab={activeTab}
-            workspace={workspace}
+            bundleWorkspace={bundleWorkspace}
             selectedBundleSlug={selectedBundleSlug}
             getProject={getProject}
             onSelectBundle={onUseBundle}
@@ -273,7 +277,7 @@ function BundleTabsContent({
         <BundlePreviewModal
           bundle={previewBundle}
           activeTab={activeTab}
-          workspace={workspace}
+          bundleWorkspace={bundleWorkspace}
           isOpen
           getProject={getProject}
           onClose={() => setPreviewBundle(null)}

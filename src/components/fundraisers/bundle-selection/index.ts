@@ -1,1 +1,1 @@
-export { BundleTabs } from './bundle-tabs';
+export { BundleSelection } from './bundle-selection';

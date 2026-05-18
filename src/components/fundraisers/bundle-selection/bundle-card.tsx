@@ -11,7 +11,7 @@ import { resolveProjectImageSource } from '@/lib/utils/images';
 
 interface BundleCardProps {
   bundle: Bundle;
-  workspace: BundleWorkspace;
+  bundleWorkspace: BundleWorkspace;
   isSelected: boolean;
   getProject: (id: string) => ProjectData;
   onSelect: () => void;
@@ -20,7 +20,7 @@ interface BundleCardProps {
 
 export function BundleCard({
   bundle,
-  workspace,
+  bundleWorkspace,
   isSelected,
   getProject,
   onSelect,
@@ -29,7 +29,7 @@ export function BundleCard({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-  const projectIds = getBundleProjectIds(bundle, workspace);
+  const projectIds = getBundleProjectIds(bundle, bundleWorkspace);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;

@@ -14,7 +14,7 @@ import { SelectedProjectRow } from './selected-project-row';
 
 interface BundlePreviewModalProps {
   bundle: Bundle;
-  workspace: BundleWorkspace;
+  bundleWorkspace: BundleWorkspace;
   activeTab: Exclude<BundleTabId, 'custom'>;
   isOpen: boolean;
   getProject: (id: string) => ProjectData;
@@ -24,7 +24,7 @@ interface BundlePreviewModalProps {
 
 export function BundlePreviewModal({
   bundle,
-  workspace,
+  bundleWorkspace,
   activeTab,
   isOpen,
   getProject,
@@ -54,10 +54,10 @@ export function BundlePreviewModal({
   }, [isOpen, onClose]);
 
   const projectIds = useMemo(
-    () => getBundleProjectIds(bundle, workspace),
-    [bundle, workspace]
+    () => getBundleProjectIds(bundle, bundleWorkspace),
+    [bundle, bundleWorkspace]
   );
-  const supportProjectId = getSupportProjectId(workspace);
+  const supportProjectId = getSupportProjectId(bundleWorkspace);
 
   const allocations = useMemo(() => {
     const projects = projectIds.map(id => ({ id, ...getProject(id) }));

@@ -15,7 +15,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 | 1 — Bundle config + types | ✅ Shipped | |
 | 2 — Bundle helpers | ✅ Shipped | `getEqualSplit` was inlined into `bundleToAllocations` and removed; `getDisplayableUnitCost` added for the per-row unit-cost metric |
 | 3 — Form schema + provider wiring | ✅ Shipped (simpler than spec) | No ephemeral form fields. Active tab is component-local `useState`; selected bundle is derived on each render via `detectBundleFromAllocations`. `buildDefaultCreateValues` now seeds the default bundle (first slug of `meta.defaultTab`) via `bundleToAllocations`, so a fresh form mounts with that bundle pre-selected on its tab |
-| 4 — `BundleTabs` shell | ✅ Shipped (create + edit) | Both create and edit forms render `<BundleTabs />`. Edit-mode initial-tab logic: bundle match → bundle's first tab; no match → `custom` (so existing custom selections land where they can be edited). Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
+| 4 — `BundleSelection` shell | ✅ Shipped (create + edit) | Both create and edit forms render `<BundleSelection />`. Edit-mode initial-tab logic: bundle match → bundle's first tab; no match → `custom` (so existing custom selections land where they can be edited). Tabs are a custom segmented-pill control (matches `FundraiserStatusFilter`), not the shadcn `Tabs` primitive |
 | 4a — Country gating | ✅ Shipped | Tab visibility flips correctly between DE/ROW (all tabs) and ES/CH (Custom-only). Country-change reconciliation handled via `workspace-selector` — switching country wipes allocations and reseeds the new country's default cause at 100% |
 | 5 — Bundle preview modal | ✅ Shipped | UX iterated past spec; see step body for the shipped behaviour |
 | 5a — `projectsService.getProjectById` | 🟡 Deferred | Not needed in practice. Synthetic fallback in `useBundleProjects` covers the support-project miss using `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` |
@@ -50,7 +50,7 @@ The API layer is **unchanged**: bundle identity is not persisted. Selecting a bu
 
 - Static typed bundle config module
 - Pure helpers: bundle lookup, ID-set match against `projectAllocations`
-- New `BundleTabs` component (replaces `<ProjectSelection />` slot)
+- New `BundleSelection` component (replaces `<ProjectSelection />` slot)
 - Per-tab panels: 4 bundle tabs + 1 Custom tab
 - Bundle preview modal ("Use this bundle")
 - Public-view bundle header
@@ -118,12 +118,12 @@ Create pure helpers used by both the form and the public view:
 
 The Zod schema is **unchanged**. `projectAllocations` is still the only persisted field, and there are no ephemeral form additions. UX state lives outside the form:
 
-- **Active tab** — component-local `useState<BundleTabId>` inside `BundleTabs`. Defaults to `selectedBundle?.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab` so an existing bundle is shown on its tab when the form mounts.
+- **Active tab** — component-local `useState<BundleTabId>` inside `BundleSelection`. Defaults to `selectedBundle?.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab` so an existing bundle is shown on its tab when the form mounts.
 - **Selected bundle** — derived per render via `detectBundleFromAllocations(allocations, workspace)`. No state to keep in sync, no stripping before submit.
 
-`buildDefaultCreateValues` seeds `projectAllocations` from the default bundle (first slug of `BUNDLE_CONFIG.meta.defaultTab`) via `bundleToAllocations`, resolved against the default country's workspace. A fresh DE/ROW form mounts with that bundle's allocations, so `detectBundleFromAllocations` matches on first render and `BundleTabs` lands on the bundle's tab with the bundle card shown selected. If the default country has no workspace (shouldn't happen for `DE`), it falls back to the legacy single-support-project allocation at 100%.
+`buildDefaultCreateValues` seeds `projectAllocations` from the default bundle (first slug of `BUNDLE_CONFIG.meta.defaultTab`) via `bundleToAllocations`, resolved against the default country's workspace. A fresh DE/ROW form mounts with that bundle's allocations, so `detectBundleFromAllocations` matches on first render and `BundleSelection` lands on the bundle's tab with the bundle card shown selected. If the default country has no workspace (shouldn't happen for `DE`), it falls back to the legacy single-support-project allocation at 100%.
 
-`fundraiserToFormValues` is **unchanged**. Edit-mode bundle detection is not needed because the edit form doesn't use `<BundleTabs />` yet (see Step 4) — it still renders `<ProjectSelection />`.
+`fundraiserToFormValues` is **unchanged**. Edit-mode bundle detection is not needed because the edit form doesn't use `<BundleSelection />` yet (see Step 4) — it still renders `<ProjectSelection />`.
 
 **Why simpler than spec:** the original spec proposed `selectedBundleSlug` + `activeBundleTab` form fields with strip-before-send plumbing. Deriving the selection on every render eliminated that whole layer and removed any drift risk between form state and UI state. The active-tab `useState` is acceptable: tabs reset on form remount, but that's not a real UX concern for a single-page form.
 
@@ -133,24 +133,24 @@ The Zod schema is **unchanged**. `projectAllocations` is still the only persiste
 
 ---
 
-### Step 4 — `BundleTabs` shell + tab navigation (shipped)
+### Step 4 — `BundleSelection` shell + tab navigation (shipped)
 
 **What we shipped:**
 
 Created `src/components/fundraisers/bundle-selection/` with:
 
-- `bundle-tabs.tsx` — top-level container. Reads `country` and `projectAllocations` via `useWatch`, resolves workspace via `getWorkspaceForCountry`, computes `selectedBundle` via `detectBundleFromAllocations`. Renders all 5 tab triggers + the matching panel when a workspace exists; renders the Custom-only placeholder when the country has no workspace (ES, CH).
+- `bundle-selection.tsx` — top-level container (exports `BundleSelection`). Reads `country` and `projectAllocations` via `useWatch`, resolves workspace via `getWorkspaceForCountry`, computes `selectedBundle` via `detectBundleFromAllocations`. Renders all 5 tab triggers + the matching panel when a workspace exists; renders the Custom-only placeholder when the country has no workspace (ES, CH).
 - `bundle-tab-panel.tsx` — bundle list view (used for the 4 bundle tabs). Renders cards via `getBundlesForTab(tabId)`. Each card opens the preview modal.
 - `bundle-card.tsx` — single bundle tile with icon, label, tagline, the 5 project image thumbnails (real images via shared `useBundleProjects`, gradient placeholder fallback), project count, and a "See inside" link.
-- `use-bundle-projects.ts` — shared hook **lifted from the modal up to `BundleTabs`** so cards and modal use the same fetched project data (single fetch per workspace; service-level cache).
+- `use-bundle-projects.ts` — shared hook **lifted from the modal up to `BundleSelection`** so cards and modal use the same fetched project data (single fetch per workspace; service-level cache).
 - `index.ts` — barrel export.
 
 **Departures from spec:**
 
 - **Tabs are a custom segmented-pill control**, not the shadcn `Tabs` primitive. Matches the dashboard's `FundraiserStatusFilter` pattern: rounded muted container, white active pill with shadow, `flex-1` per tab so they share the container width equally, segmented-control look. Mobile gets `overflow-x-auto` plus `pr-3` so the right tab doesn't clip while scrolling.
 - **No `subline` rendering.** The spec described showing the meta `subline` per tab; the shipped UI just renders the tab description (italic muted text) above the card grid.
-- **Swap covers both create and edit.** `fundraiser-form-body.tsx` renders `<BundleTabs mode={mode} />` for both forms. The `mode` prop drives the initial-tab fallback when no bundle is detected: create → `BUNDLE_CONFIG.meta.defaultTab` (Staff Picks); edit → `'custom'`, so a fundraiser whose existing allocations don't match any curated bundle opens directly on the Custom tab where the user can edit them. Bundle-match behaviour is identical in both modes (open on the bundle's first tab). The legacy `<ProjectSelection />` and `<ProjectSelectionOverlay />` files are now fully orphaned — Step 8 cleanup is unblocked.
-- **`useBundleProjects` lifted to `BundleTabs`** rather than created per-modal-instance, so the bundle cards can render real project thumbnails (was a follow-up fix once thumbnails were noticed to be placeholders).
+- **Swap covers both create and edit.** `fundraiser-form-body.tsx` renders `<BundleSelection mode={mode} />` for both forms. The `mode` prop drives the initial-tab fallback when no bundle is detected: create → `BUNDLE_CONFIG.meta.defaultTab` (Staff Picks); edit → `'custom'`, so a fundraiser whose existing allocations don't match any curated bundle opens directly on the Custom tab where the user can edit them. Bundle-match behaviour is identical in both modes (open on the bundle's first tab). The legacy `<ProjectSelection />` and `<ProjectSelectionOverlay />` files are now fully orphaned — Step 8 cleanup is unblocked.
+- **`useBundleProjects` lifted to `BundleSelection`** rather than created per-modal-instance, so the bundle cards can render real project thumbnails (was a follow-up fix once thumbnails were noticed to be placeholders).
 
 **Step 4a — Country gating behaviour (shipped):**
 
@@ -163,7 +163,7 @@ Deliberate trade-off: this is a full reset, not a swap-and-resplit. The original
 
 **Files:**
 
-- `src/components/fundraisers/bundle-selection/{bundle-tabs,bundle-tab-panel,bundle-card,use-bundle-projects,index}.{ts,tsx}` — new
+- `src/components/fundraisers/bundle-selection/{bundle-selection,bundle-tab-panel,bundle-card,use-bundle-projects,index}.{ts,tsx}` — new
 - `src/components/fundraisers/fundraiser-form-body.tsx` — `mode === 'create'` branch
 - `locales/{en,de}/bundles.json` — `Bundles.tabs.*` plus `card.{seeInside,projectCount}` and `aria.{openBundle,selectedBundle}`
 
@@ -198,7 +198,7 @@ If support-project metadata becomes important enough to require live data (it cu
 **Files actually touched:**
 
 - `src/components/fundraisers/bundle-selection/bundle-preview-modal.tsx` — new
-- `src/components/fundraisers/bundle-selection/use-bundle-projects.ts` — new (lifted to `BundleTabs` per Step 4)
+- `src/components/fundraisers/bundle-selection/use-bundle-projects.ts` — new (lifted to `BundleSelection` per Step 4)
 - `src/lib/types/project-selection.ts` — added `unitCost`, `unitType`, `ProjectUnitType`
 - `src/lib/api/projects-service.ts` — added `normalizeUnitCost` / `normalizeUnitType` to `normalizeProject`
 - `src/lib/utils/bundle.ts` — added `getDisplayableUnitCost`
@@ -344,7 +344,7 @@ Every user-facing string — including `aria-label`, `title`, `alt`, `placeholde
 ### Testing strategy per step
 
 - Unit tests for Step 2 helpers (highest leverage — every other step depends on these).
-- Component tests for `BundleTabs`, `BundlePreviewModal`, `CustomTabPanel` — happy path + edge cases (empty bundle, all projects selected, missing project metadata).
+- Component tests for `BundleSelection`, `BundlePreviewModal`, `CustomTabPanel` — happy path + edge cases (empty bundle, all projects selected, missing project metadata).
 - Visual smoke test in browser per step as listed above. The user has confirmed they cannot run automated UI tests, so each step's "Visual test" is the merge gate.
 
 ---

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { BundleTabs } from './bundle-selection';
+import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
@@ -60,7 +60,7 @@ export function FundraiserFormBody({
           <GoalInput />
         </div>
         <WorkspaceInfo />
-        <BundleTabs mode={mode} />
+        <BundleSelection mode={mode} />
         <Options />
         {submitButton}
       </MainPanel>
