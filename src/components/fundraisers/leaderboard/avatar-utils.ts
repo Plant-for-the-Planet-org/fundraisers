@@ -1,5 +1,7 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
+import { getImageUrl } from '@/lib/utils/images';
+
 const FALLBACK_COLORS = [
   'bg-amber-500',
   'bg-blue-500',
@@ -25,4 +27,12 @@ export function isAnonymousDonor(
   anonymize: boolean
 ): boolean {
   return anonymize || donation.isAnonymous || false;
+}
+
+export function getDonorAvatarSrc(
+  donation: LeaderboardDonation,
+  isAnonymous: boolean
+): string | null {
+  if (isAnonymous || !donation.avatarUrl) return null;
+  return getImageUrl('profile', 'thumb', donation.avatarUrl);
 }

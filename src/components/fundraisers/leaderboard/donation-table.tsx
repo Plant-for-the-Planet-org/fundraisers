@@ -3,10 +3,13 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarColor, isAnonymousDonor } from './avatar-utils';
+import {
+  getAvatarColor,
+  getDonorAvatarSrc,
+  isAnonymousDonor,
+} from './avatar-utils';
 
 interface DonationTableProps {
   donations: LeaderboardDonation[];
@@ -31,10 +34,7 @@ function DonationRow({
 }) {
   const t = useTranslations('Leaderboard.view');
   const isAnonymous = isAnonymousDonor(donation, anonymize);
-  const avatarSrc =
-    !isAnonymous && donation.avatarUrl
-      ? getImageUrl('profile', 'thumb', donation.avatarUrl)
-      : null;
+  const avatarSrc = getDonorAvatarSrc(donation, isAnonymous);
   const displayName = isAnonymous
     ? t('donation.anonymous')
     : donation.donorName;
