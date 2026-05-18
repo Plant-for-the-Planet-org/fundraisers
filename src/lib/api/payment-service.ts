@@ -1,9 +1,8 @@
 import type { PaymentRequest, PaymentResponse } from '../types/payment';
 import type { ErrorType } from './http-error-classifier';
 
-import { API_BASE_URL } from '../constants/app-config';
-import { getSessionId } from '../utils/session-id';
-import { classifyHttpError } from './http-error-classifier';
+import { classifyPlatformError } from './http-error-classifier';
+import { PlatformAPIError, platformFetch } from './platform-fetch';
 
 export class PaymentError extends Error {
   constructor(
@@ -18,13 +17,34 @@ export class PaymentError extends Error {
   }
 }
 
-export class PaymentService {
-  private baseURL: string;
+function toPaymentError(err: unknown): PaymentError {
+  if (err instanceof PaymentError) return err;
 
-  constructor(baseURL: string = API_BASE_URL) {
-    this.baseURL = baseURL;
+  if (err instanceof PlatformAPIError) {
+    if (err.kind === 'timeout') {
+      return new PaymentError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+    }
+    if (err.kind === 'network') {
+      return new PaymentError(err.message, 'api', 'NETWORK_ERROR', 0, {
+        originalError: err.message,
+      });
+    }
+    const { type, code } = classifyPlatformError(err.status);
+    return new PaymentError(err.message, type, code, err.status, {
+      body: err.body,
+    });
   }
 
+  return new PaymentError(
+    err instanceof Error ? err.message : 'Failed to process payment',
+    'api',
+    'NETWORK_ERROR',
+    0,
+    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+  );
+}
+
+export class PaymentService {
   /**
    * Process payment for a donation
    */
@@ -34,64 +54,25 @@ export class PaymentService {
     authToken?: string,
     idempotencyKey?: string
   ): Promise<PaymentResponse> {
-    const url = `${this.baseURL}/donations/${donationId}`;
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-SESSION-ID': getSessionId(),
-    };
-
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-    }
-
-    if (idempotencyKey) {
-      headers['Idempotency-Key'] = idempotencyKey;
-    }
-
     try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({ paymentRequest }),
-      });
-
-      if (!response.ok) {
-        await this.handleErrorResponse(response);
-      }
-
-      const data = await response.json();
+      const data = await platformFetch<PaymentResponse>(
+        `/donations/${donationId}`,
+        {
+          method: 'PUT',
+          token: authToken,
+          idempotencyKey,
+          body: { paymentRequest },
+        }
+      );
 
       // TODO: Confirm with backend that the following fields from the prior implementation
       // are not returned by this API: success (boolean), paymentId, status 'completed',
       // redirectUrl, message (on success), type (top-level). In real responses, type was
       // nested inside data.response — the top-level field was never populated.
-      return data as PaymentResponse;
-    } catch (error) {
-      if (error instanceof PaymentError) {
-        throw error;
-      }
-
-      throw new PaymentError(
-        error instanceof Error ? error.message : 'Failed to process payment',
-        'api',
-        'NETWORK_ERROR',
-        0,
-        {
-          originalError:
-            error instanceof Error ? error.message : 'Unknown error',
-        }
-      );
+      return data;
+    } catch (err) {
+      throw toPaymentError(err);
     }
-  }
-
-  private async handleErrorResponse(response: Response): Promise<never> {
-    const { type, code, debugMessage, status, errorData } =
-      await classifyHttpError(response);
-
-    throw new PaymentError(debugMessage, type, code, status, {
-      details: errorData,
-    });
   }
 }
 
