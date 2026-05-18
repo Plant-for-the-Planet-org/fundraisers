@@ -16,11 +16,11 @@
 <!-- Planet, ForestCloud, Academies, Fundraiser, Stage Mode, etc. Short definitions. -->
 
 ## API calls to ForestCloud
-Any request to `app*.plant-for-the-planet.org` (the ForestCloud platform API) must go through `platformAPIClient` in `src/lib/api/external-client.ts`. Do not use raw `fetch()` for these endpoints.
+Any request to `app*.plant-for-the-planet.org` (the ForestCloud platform API) must go through `platformFetch` in `src/lib/api/platform-fetch.ts`. Do not use raw `fetch()` for these endpoints.
 
-Why: the client sets shared headers (`X-SESSION-ID`, `Content-Type`, `Authorization`) and handles error classification in one place. Raw `fetch()` sites drift over time and miss new headers when they are added centrally.
+Why: `platformFetch` owns HTTP-level concerns in one place — base URL, `X-SESSION-ID`, `Authorization`, `Content-Type`, impersonation headers, idempotency keys, timeouts, and `PlatformAPIError` classification (`http` / `timeout` / `network`). Raw `fetch()` sites drift over time and miss headers when they are added centrally.
 
-If a service needs behavior the client does not expose yet (e.g. custom error types, idempotency keys), extend the client rather than bypassing it.
+Domain concerns (response shaping, field-level error mapping, retries) belong in the service that calls `platformFetch`, not in the transport itself. If a service needs HTTP-level behavior `platformFetch` does not yet expose, extend `platformFetch` rather than bypassing it.
 
 ## Conventions
 <!-- Code style notes, naming, file layout patterns, comment policy. -->
