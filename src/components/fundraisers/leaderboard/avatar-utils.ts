@@ -1,3 +1,5 @@
+import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+
 const FALLBACK_COLORS = [
   'bg-amber-500',
   'bg-blue-500',
@@ -16,4 +18,11 @@ const FALLBACK_COLORS = [
 export function getAvatarColor(id: string): string {
   const hash = id.split('').reduce((sum, c) => sum + c.charCodeAt(0), 0);
   return FALLBACK_COLORS[hash % FALLBACK_COLORS.length] ?? 'bg-gray-500';
+}
+
+export function isAnonymousDonor(
+  donation: LeaderboardDonation,
+  anonymize: boolean
+): boolean {
+  return anonymize || donation.isAnonymous || false;
 }
