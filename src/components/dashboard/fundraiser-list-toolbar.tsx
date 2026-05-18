@@ -30,25 +30,25 @@ export function FundraiserListToolbar({
 
   return (
     <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 md:flex-row md:items-center'>
-      <div className='flex items-center gap-3 md:contents'>
-        <FundraiserSearchInput
-          value={filters.search}
-          onChange={handleSearchChange}
-          className='min-w-0 flex-1'
-        />
+      <FundraiserSearchInput
+        value={filters.search}
+        onChange={handleSearchChange}
+        className='min-w-0 flex-1'
+      />
+      <div className='flex items-center gap-3'>
         <FundraiserStatusFilter
           value={filters.status}
           statusCounts={statusCounts}
           onChange={handleStatusChange}
           tabsClassName='hidden lg:block'
-          dropdownClassName='w-40 sm:w-52 lg:hidden'
+          dropdownClassName='lg:hidden grow shrink'
+        />
+        <FundraiserSortMenu
+          value={filters.sort}
+          onChange={handleSortChange}
+          className='grow shrink'
         />
       </div>
-      <FundraiserSortMenu
-        value={filters.sort}
-        onChange={handleSortChange}
-        className='w-full md:w-52 md:shrink-0'
-      />
     </div>
   );
 }

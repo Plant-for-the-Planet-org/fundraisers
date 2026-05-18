@@ -6,7 +6,7 @@ import type {
 } from '@/lib/utils/fundraiser-list';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, ListFilter } from 'lucide-react';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { cn } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
@@ -77,11 +77,15 @@ export function FundraiserStatusFilter({
             size='sm'
             aria-label={t('groupLabel')}
             className={cn(
-              'h-9 w-full justify-between border-border/60 bg-background px-4 has-[>svg]:px-4',
+              'h-9 w-full justify-between border-border/60 bg-background px-2',
               dropdownClassName
             )}
           >
             <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
+              <ListFilter
+                className='h-4 w-4 m-1 shrink-0 text-muted-foreground'
+                aria-hidden='true'
+              />
               <span className='truncate font-medium text-foreground'>
                 {t(value)}
               </span>
