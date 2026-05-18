@@ -9,7 +9,8 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDonationForm } from './donation-form-context';
 
@@ -75,7 +76,7 @@ export function DonationSummary() {
     if (publicHosts.length === 0) {
       return (
         <Avatar className='w-6 h-6'>
-          <AvatarFallback className='bg-neutral text-neutral-foreground' />
+          <FallbackAvatar seed='anonymous-host' />
         </Avatar>
       );
     }
@@ -87,9 +88,7 @@ export function DonationSummary() {
           className={cn('w-6 h-6 border-2 border-card', index > 0 && '-ml-1')}
         >
           {avatarUrl && <AvatarImage src={avatarUrl} alt='' loading='lazy' />}
-          <AvatarFallback className='bg-muted text-muted-foreground text-xs'>
-            {host.displayName?.charAt(0)?.toUpperCase()}
-          </AvatarFallback>
+          <FallbackAvatar seed={host.id ?? host.displayName ?? ''} />
         </Avatar>
       );
     });

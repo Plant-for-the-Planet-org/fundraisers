@@ -8,7 +8,8 @@ import { ChevronDown, CreditCard, Plus, UserCog } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarImage } from '../ui/avatar';
+import { FallbackAvatar } from '../ui/fallback-avatar';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -75,7 +76,9 @@ export function UserMenu() {
                   loading='lazy'
                 />
               )}
-              <AvatarFallback className='bg-linear-to-br from-blue-500 to-purple-600' />
+              <FallbackAvatar
+                seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
+              />
             </Avatar>
             <ChevronDown
               className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
