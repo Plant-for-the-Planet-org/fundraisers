@@ -2,6 +2,7 @@
   "Fundraisers": {
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
+    "donorsAndOthers": "{names} und {count, plural, one {# weitere*r} other {# weitere}}",
     "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
@@ -88,10 +89,6 @@
         "raised": "{amount} gesammelt",
         "goalLine": "{amount} vom gesetzten Ziel",
         "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
-      },
-      "donorsPreview": {
-        "donorCount": "{count, plural, one {# Spender*in} other {# Spender*innen}}",
-        "others": " und {count, plural, one {# Anderer} other {# Andere}}"
       },
       "theme": {
         "sectionHeading": "Thema",
