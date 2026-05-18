@@ -30,7 +30,7 @@ interface StageModuleSettings {
   description?: string; // Falls back to fundraiser.description (first paragraph)
   partner_logo_url?: string; // PNG, 56×56, optional — shown in top bar
 
-  locale?: string; // Fixed display locale ("en" | "de"). Overrides viewer's browser locale
+  locale?: string; // Fixed display locale ("en" | "de"). Independent of the viewer's app locale.
 
   slides: {
     position: number; // Display order (1-based)
@@ -41,6 +41,8 @@ interface StageModuleSettings {
   }[];
 }
 ```
+
+The stage locale is resolved from `modules.stage.locale`, falling back to the organizer's selected app locale (`ui-locale` cookie). Because this can differ from the locale used to render the rest of the app, `StagePage` wraps `StageView` in a second `NextIntlClientProvider` scoped to `stageLocale`. This ensures client components in the stage subtree read the correct strings regardless of what language the organizer has the app set to.
 
 **Driven by other modules — no Stage override:**
 

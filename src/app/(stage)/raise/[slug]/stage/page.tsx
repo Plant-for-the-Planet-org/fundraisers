@@ -26,13 +26,13 @@ export default async function StagePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const browserLocale = await getLocale();
+  const appLocale = await getLocale();
 
   let fundraiser;
   let theme;
 
   try {
-    fundraiser = await getCachedFundraiser(slug, browserLocale);
+    fundraiser = await getCachedFundraiser(slug, appLocale);
     theme = buildTheme(fundraiser.settings?.theme ?? null);
   } catch (e) {
     if (e instanceof PlatformAPIError && e.status && [404].includes(e.status)) {
@@ -50,9 +50,7 @@ export default async function StagePage({
     fundraiser.settings?.modules as Record<string, unknown> | undefined
   )?.stage as Record<string, unknown> | undefined;
 
-  const stageLocale = resolveStageLocale(
-    stageSettings?.locale ?? browserLocale
-  );
+  const stageLocale = resolveStageLocale(stageSettings?.locale ?? appLocale);
 
   const [t, stageMessages] = await Promise.all([
     getTranslations({ locale: stageLocale, namespace: 'Stage' }),
