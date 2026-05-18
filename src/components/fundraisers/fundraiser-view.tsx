@@ -8,12 +8,15 @@ import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
+import { DonorsStripSkeleton } from '@/components/fundraisers/donors-strip';
+import { DonorsSummary } from '@/components/fundraisers/donors-summary';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import TitleDisplay from '@/components/fundraisers/title-display';
+import { SectionHeader } from '@/components/fundraisers/typography';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
@@ -66,13 +69,20 @@ export function FundraiserView({
           daysLeft={daysLeft}
         />
 
-        {/* Donation count */}
-        <div className='text-foreground text-sm font-semibold leading-tight'>
-          {t('donationCount', {
-            count: fundraiser.donationCount,
-            formattedCount: fundraiser.donationCount.toLocaleString(),
-          })}
-        </div>
+        {/* Donation count + donor avatars (only when leaderboard module is on) */}
+        {canShowLeaderboard && (
+          <div className='flex flex-col gap-3'>
+            <SectionHeader>
+              {t('donationCount', {
+                count: fundraiser.donationCount,
+                formattedCount: fundraiser.donationCount.toLocaleString(),
+              })}
+            </SectionHeader>
+            <Suspense fallback={<DonorsStripSkeleton />}>
+              <DonorsSummary fundraiser={fundraiser} />
+            </Suspense>
+          </div>
+        )}
 
         {/* Hosts */}
         <Hosts mode='display' fundraiser={fundraiser} />
