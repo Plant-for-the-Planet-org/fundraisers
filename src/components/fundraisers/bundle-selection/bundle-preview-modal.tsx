@@ -3,10 +3,11 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 import type { ProjectData } from '@/lib/types/project-selection';
 
-import { useEffect, useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
+import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
 import { getBundleProjectIds, getSupportProjectId } from '@/lib/utils/bundle';
 import { calculateProjectAllocations } from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
@@ -35,23 +36,8 @@ export function BundlePreviewModal({
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalDialog({ isOpen, onClose, dialogRef });
 
   const projectIds = useMemo(
     () => getBundleProjectIds(bundle, bundleWorkspace),
@@ -68,7 +54,9 @@ export function BundlePreviewModal({
 
   return createPortal(
     <div
-      className='fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-black/30 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-6'
+      ref={dialogRef}
+      tabIndex={-1}
+      className='fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-black/30 px-3 py-3 backdrop-blur-sm outline-none sm:px-4 sm:py-6'
       onMouseDown={event => {
         if (event.target === event.currentTarget) onClose();
       }}
