@@ -105,6 +105,7 @@ export async function platformFetch<T>(
       signal: opts.timeoutMs ? AbortSignal.timeout(opts.timeoutMs) : undefined,
     });
   } catch (err) {
+    // AbortError is unreachable today — no external signal is accepted. If opts gains an abortSignal field, this branch will fire but should map to a separate 'cancelled' kind, not 'timeout'.
     if (
       err instanceof DOMException &&
       (err.name === 'TimeoutError' || err.name === 'AbortError')
