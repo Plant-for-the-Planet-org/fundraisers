@@ -16,7 +16,9 @@ export const PROJECT_PURPOSES = [
 
 export type ProjectPurpose = (typeof PROJECT_PURPOSES)[number];
 
-export type ProjectUnitType = 'tree' | 'm2' | 'currency';
+export const PROJECT_UNIT_TYPES = ['tree', 'm2', 'currency'] as const;
+
+export type ProjectUnitType = (typeof PROJECT_UNIT_TYPES)[number];
 
 export interface ProjectData {
   id: string;

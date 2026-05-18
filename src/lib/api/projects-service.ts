@@ -6,7 +6,10 @@ import type {
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { API_BASE_URL } from '@/lib/constants/app-config';
-import { PROJECT_PURPOSES } from '@/lib/types/project-selection';
+import {
+  PROJECT_PURPOSES,
+  PROJECT_UNIT_TYPES,
+} from '@/lib/types/project-selection';
 
 type ApiCountry = Exclude<AllowedCountry, 'ROW'>;
 
@@ -24,15 +27,11 @@ function isProjectPurpose(value: string): value is ProjectPurpose {
   return PROJECT_PURPOSE_SET.has(value);
 }
 
-const PROJECT_UNIT_TYPES: ReadonlySet<ProjectUnitType> = new Set([
-  'tree',
-  'm2',
-  'currency',
-]);
+const PROJECT_UNIT_TYPE_SET: ReadonlySet<string> = new Set(PROJECT_UNIT_TYPES);
 
 function normalizeUnitType(value: unknown): ProjectUnitType | undefined {
   if (typeof value !== 'string') return undefined;
-  return PROJECT_UNIT_TYPES.has(value as ProjectUnitType)
+  return PROJECT_UNIT_TYPE_SET.has(value)
     ? (value as ProjectUnitType)
     : undefined;
 }

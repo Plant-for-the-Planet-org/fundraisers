@@ -1,4 +1,5 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type { ProjectUnitType } from '../types/project-selection';
 
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
@@ -16,7 +17,7 @@ export function getBundlesForTab(tabId: BundleTabId): Bundle[] {
   const bySlug = new Map(BUNDLE_CONFIG.bundles.map(b => [b.slug, b]));
   return tab.bundleSlugs
     .map(slug => bySlug.get(slug))
-    .filter((bundle): bundle is Bundle => bundle !== undefined);
+    .filter(bundle => bundle !== undefined);
 }
 
 export function getSupportProjectId(workspace: BundleWorkspace): string {
@@ -59,9 +60,6 @@ export function bundleToAllocations(
   }
 
   // Path 2 — boost the support project to the 25% floor.
-  if (otherIds.length === 0) {
-    return [{ project_id: supportId, percentage: 100 }];
-  }
   const remainingPercent = 100 - MIN_DEFAULT_CAUSE_PERCENT;
   const otherShare = Math.floor(remainingPercent / otherIds.length);
   const remainder = remainingPercent - otherShare * otherIds.length;
@@ -104,7 +102,7 @@ export function detectBundleFromAllocations(
  */
 export function getDisplayableUnitCost(
   unitCost: number | undefined,
-  unitType: string | undefined
+  unitType: ProjectUnitType | undefined
 ): { value: number; unitType: 'tree' | 'm2' } | null {
   if (unitType !== 'tree' && unitType !== 'm2') return null;
   if (unitCost === undefined || !Number.isFinite(unitCost) || unitCost <= 0) {

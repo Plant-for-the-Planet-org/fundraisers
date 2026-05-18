@@ -38,10 +38,6 @@
     "modal": {
       "projectsInside": "{count, plural, one {# project inside} other {# projects inside}}",
       "useBundle": "Use this bundle",
-      "loading": "Loading projects...",
-      "errorTitle": "Failed to load projects",
-      "errorMessage": "Unable to load this bundle. Please try again.",
-      "retry": "Try Again",
       "tag": {
         "rage": "RAGE",
         "wonder": "WONDER",

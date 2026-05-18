@@ -15,7 +15,11 @@ interface ProjectSearchCardProps {
   disabled?: boolean;
 }
 
-export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCardProps) {
+export function ProjectSearchCard({
+  project,
+  onAdd,
+  disabled,
+}: ProjectSearchCardProps) {
   const t = useTranslations('Bundles');
   const tCustom = useTranslations('Bundles.custom');
   const getCountryLabel = useCountryLabel();
@@ -46,10 +50,8 @@ export function ProjectSearchCard({ project, onAdd, disabled }: ProjectSearchCar
           <p className='text-sm font-semibold text-foreground'>
             {project.isTopProject ? `${project.name} ✨` : project.name}
           </p>
-          {(countryLabel || unitDisplay !== null) && (
-            <p className='text-xs text-muted-foreground'>
-              {countryLabel}
-            </p>
+          {countryLabel && (
+            <p className='text-xs text-muted-foreground'>{countryLabel}</p>
           )}
         </div>
       </div>

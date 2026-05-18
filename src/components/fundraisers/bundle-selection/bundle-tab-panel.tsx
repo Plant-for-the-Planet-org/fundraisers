@@ -1,6 +1,11 @@
 'use client';
 
-import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type {
+  Bundle,
+  BundleSlug,
+  BundleTabId,
+  BundleWorkspace,
+} from '@/lib/types/bundle';
 import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useMemo } from 'react';
@@ -11,7 +16,7 @@ import { BundleCard } from './bundle-card';
 interface BundleTabPanelProps {
   activeTab: BundleTabId;
   workspace: BundleWorkspace;
-  selectedBundleSlug: string | undefined;
+  selectedBundleSlug: BundleSlug | undefined;
   getProject: (id: string) => ProjectData;
   onSelectBundle: (bundle: Bundle) => void;
   onOpenBundle: (bundle: Bundle) => void;

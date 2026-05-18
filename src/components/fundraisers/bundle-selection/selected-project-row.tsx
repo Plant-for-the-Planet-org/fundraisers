@@ -86,7 +86,8 @@ export function SelectedProjectRow({
             {project.description}
           </p>
         ) : null}
-        {(project.purpose === 'trees' || project.purpose === 'conservation') && (
+        {(project.purpose === 'trees' ||
+          project.purpose === 'conservation') && (
           <a
             href={buildProjectUrl(project.id)}
             target='_blank'

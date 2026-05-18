@@ -1,6 +1,11 @@
 'use client';
 
-import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type {
+  Bundle,
+  BundleSlug,
+  BundleTabId,
+  BundleWorkspace,
+} from '@/lib/types/bundle';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
@@ -10,24 +15,23 @@ import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
+import { BUNDLE_TAB_IDS } from '@/lib/types/bundle';
 import {
   bundleToAllocations,
   detectBundleFromAllocations,
 } from '@/lib/utils/bundle';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { cn } from '@/lib/utils/cn';
+import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { SectionHeader } from '../typography';
 import { BundlePreviewModal } from './bundle-preview-modal';
 import { BundleTabPanel } from './bundle-tab-panel';
 import { CustomTabPanel } from './custom-tab-panel';
 import { useBundleProjects } from './use-bundle-projects';
 
-type BundleSubTab = Exclude<BundleTabId, 'custom'>;
-
-const BUNDLE_TABS: BundleSubTab[] = ['staff-picks', 'wonder', 'rage', 'love'];
-const ALL_TABS: BundleTabId[] = [...BUNDLE_TABS, 'custom'];
 const MOBILE_VISIBLE: BundleTabId[] = ['staff-picks'];
-const MOBILE_HIDDEN: BundleTabId[] = ['wonder', 'rage', 'love', 'custom'];
+const MOBILE_HIDDEN: BundleTabId[] = BUNDLE_TAB_IDS.filter(
+  id => !MOBILE_VISIBLE.includes(id)
+);
 
 interface BundleTabsProps {
   mode: 'create' | 'edit';
@@ -118,7 +122,7 @@ interface BundleTabsContentProps {
   setActiveTab: (tab: BundleTabId) => void;
   previewBundle: Bundle | null;
   setPreviewBundle: (bundle: Bundle | null) => void;
-  selectedBundleSlug: string | undefined;
+  selectedBundleSlug: BundleSlug | undefined;
   country: AllowedCountry;
   workspace: BundleWorkspace;
   onUseBundle: (bundle: Bundle) => void;
@@ -164,7 +168,10 @@ function BundleTabsContent({
         role='tab'
         type='button'
         aria-selected={isSelected}
-        onClick={() => { setActiveTab(tabId); setMoreOpen(false); }}
+        onClick={() => {
+          setActiveTab(tabId);
+          setMoreOpen(false);
+        }}
         className={cn(
           'inline-flex h-8 flex-1 items-center justify-center whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
           isSelected
@@ -187,7 +194,7 @@ function BundleTabsContent({
         aria-label={t('sectionHeading')}
         className='hidden md:flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted/50 py-1 pl-1 pr-1 shadow-xs'
       >
-        {ALL_TABS.map(tabId => renderTab(tabId))}
+        {BUNDLE_TAB_IDS.map(tabId => renderTab(tabId))}
       </div>
 
       {/* Mobile: 3 visible + more dropdown */}
@@ -210,8 +217,15 @@ function BundleTabsContent({
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <span>{moreIsActive ? t(`tabs.${activeTab}.label`) : 'More'}</span>
-              <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', moreOpen && 'rotate-180')} />
+              <span>
+                {moreIsActive ? t(`tabs.${activeTab}.label`) : 'More'}
+              </span>
+              <ChevronDown
+                className={cn(
+                  'h-3.5 w-3.5 transition-transform',
+                  moreOpen && 'rotate-180'
+                )}
+              />
             </button>
 
             {moreOpen && (
@@ -220,10 +234,15 @@ function BundleTabsContent({
                   <button
                     key={tabId}
                     type='button'
-                    onClick={() => { setActiveTab(tabId); setMoreOpen(false); }}
+                    onClick={() => {
+                      setActiveTab(tabId);
+                      setMoreOpen(false);
+                    }}
                     className={cn(
                       'flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-muted',
-                      activeTab === tabId ? 'font-medium text-foreground' : 'text-muted-foreground'
+                      activeTab === tabId
+                        ? 'font-medium text-foreground'
+                        : 'text-muted-foreground'
                     )}
                   >
                     {t(`tabs.${tabId}.label`)}

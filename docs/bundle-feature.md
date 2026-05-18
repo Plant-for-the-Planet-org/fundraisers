@@ -202,7 +202,7 @@ If support-project metadata becomes important enough to require live data (it cu
 - `src/lib/types/project-selection.ts` — added `unitCost`, `unitType`, `ProjectUnitType`
 - `src/lib/api/projects-service.ts` — added `normalizeUnitCost` / `normalizeUnitType` to `normalizeProject`
 - `src/lib/utils/bundle.ts` — added `getDisplayableUnitCost`
-- `locales/{en,de}/bundles.json` — `Bundles.modal.{projectsInside,useBundle,unitCost,learnMore,tag.{rage,wonder,love,staffPicks},errorTitle,errorMessage,retry,loading}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
+- `locales/{en,de}/bundles.json` — `Bundles.modal.{projectsInside,useBundle,unitCost,learnMore,tag.{rage,wonder,love,staffPicks}}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
 
 **Visual test:** open `/fundraisers/create`, click any bundle card on the page background → modal opens with 5 rows and full metadata. Click "Use this bundle" → modal closes, the bundle's card on the page now shows the selected check; `projectAllocations` reflects the 28%/18×4 split. Try a card click directly (without opening modal) → also selects.
 
