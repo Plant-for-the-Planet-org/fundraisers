@@ -4,6 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { useAlltimeStats } from './hooks/use-alltime-stats';
 
 interface StageCounterProps {
@@ -36,13 +37,8 @@ export function StageCounter({
   const t = useTranslations('Stage');
 
   function formatDonorCount(n: number): string {
-    if (n < 1000) return n.toLocaleString(locale);
-    const formatted = new Intl.NumberFormat(locale, {
-      notation: 'compact',
-      compactDisplay: 'short',
-      maximumFractionDigits: 1,
-    }).format(n);
-    return `${formatted}+`;
+    const formatted = getLocalizedAbbreviatedCount(n, locale);
+    return n >= 1000 ? `${formatted}+` : formatted;
   }
 
   return (
