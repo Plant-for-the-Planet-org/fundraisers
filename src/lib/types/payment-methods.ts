@@ -23,6 +23,7 @@ export const SUPPORTED_METHOD_IDS: ReadonlySet<PaymentMethodId> = new Set([
   'card',
   'sepa_debit',
   'apple_pay',
+  'google_pay',
   'planet_cash',
 ]);
 

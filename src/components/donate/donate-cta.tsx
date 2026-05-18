@@ -4,15 +4,16 @@ import type { ReactNode } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { DonationFormValues } from './donation-form-context';
+import type { WalletKind } from './wallet-button';
 
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Button } from '../ui/button';
 import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
-import { ApplePayButton } from './apple-pay-button';
 import { useDonationForm } from './donation-form-context';
 import { PayPalButton } from './paypal-button';
+import { WalletButton } from './wallet-button';
 
 interface DonateCTAProps {
   isLoading: boolean;
@@ -20,12 +21,13 @@ interface DonateCTAProps {
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
-  onApplePayConfirm?: (
+  onWalletConfirm?: (
+    wallet: WalletKind,
     values: DonationFormValues,
     paymentMethodId: string,
     stripe: Stripe
   ) => Promise<void>;
-  onApplePayError?: () => void;
+  onWalletError?: () => void;
 }
 
 export function DonateCTA({
@@ -34,8 +36,8 @@ export function DonateCTA({
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
-  onApplePayConfirm,
-  onApplePayError,
+  onWalletConfirm,
+  onWalletError,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
@@ -63,11 +65,16 @@ export function DonateCTA({
     );
   }
 
-  if (selectedPaymentMethod === 'apple_pay' && onApplePayConfirm) {
+  if (
+    (selectedPaymentMethod === 'apple_pay' ||
+      selectedPaymentMethod === 'google_pay') &&
+    onWalletConfirm
+  ) {
     return (
-      <ApplePayButton
-        onApplePayConfirm={onApplePayConfirm}
-        onApplePayError={onApplePayError ?? (() => undefined)}
+      <WalletButton
+        wallet={selectedPaymentMethod}
+        onWalletConfirm={onWalletConfirm}
+        onWalletError={onWalletError ?? (() => undefined)}
       />
     );
   }
