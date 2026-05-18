@@ -10,12 +10,7 @@ export default async function CreateFundraiserPage() {
   return (
     <AuthGuard>
       <div className='flex flex-col gap-2 mb-8'>
-        <h1
-          className='text-4xl font-bold'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
-        >
-          {t('title')}
-        </h1>
+        <h1 className='text-4xl font-bold'>{t('title')}</h1>
         <p className='text-base text-muted-foreground'>{t('subtitle')}</p>
       </div>
       <CreateFundraiserFormProvider>

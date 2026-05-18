@@ -5,8 +5,8 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
 
 const TITLE_MAX_LENGTH = 50;
 
