@@ -133,7 +133,7 @@ export function FundraiserActionMenu({
         <Button
           variant='ghost'
           size='icon'
-          className='h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground'
+          className='h-4 w-4 rounded-full shrink-0 text-muted-foreground hover:text-foreground'
           aria-label={t('menuLabel')}
           disabled={isMutating}
         >
