@@ -27,6 +27,8 @@ const withNextIntl = createNextIntlPlugin({
       './locales/en/auth.json',
       './locales/en/dashboard.json',
       './locales/en/donate.json',
+      './locales/en/stage.json',
+      './locales/en/leaderboard.json',
     ],
   },
 });

@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { StageView } from '@/components/stage/stage-view';
 

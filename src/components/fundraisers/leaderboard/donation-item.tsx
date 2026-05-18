@@ -30,7 +30,7 @@ export function DonationItem({
       ? getImageUrl('profile', 'thumb', donation.avatarUrl)
       : null;
   const displayName = isAnonymous
-    ? t('anonymous')
+    ? t('donation.anonymous')
     : donation.donorName.length > 17
       ? `${donation.donorName.substring(0, 17)}...`
       : donation.donorName;
