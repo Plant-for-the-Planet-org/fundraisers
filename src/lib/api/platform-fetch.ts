@@ -29,13 +29,22 @@ export class PlatformAPIError extends Error {
   }
 }
 
+type ManagedHeader =
+  | 'X-SESSION-ID' // always from getSessionId()
+  | 'Authorization' // always from opts.token
+  | 'Content-Type' // auto-set from body type
+  | 'Idempotency-Key'; // always from opts.idempotencyKey
+
+type ExtraHeaders = Record<string, string> &
+  Partial<Record<ManagedHeader, never>>;
+
 export interface PlatformFetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   body?: unknown;
   token?: string;
   timeoutMs?: number;
   idempotencyKey?: string;
-  extraHeaders?: Record<string, string>;
+  extraHeaders?: ExtraHeaders;
   /**
    * Skip injecting impersonation headers from the impersonation store.
    * Use when the caller is *itself* validating impersonation credentials
@@ -49,8 +58,8 @@ export async function platformFetch<T>(
   opts: PlatformFetchOptions = {}
 ): Promise<T> {
   const headers: Record<string, string> = {
+    ...(opts.extraHeaders as Record<string, string> | undefined),
     'X-SESSION-ID': getSessionId(),
-    ...opts.extraHeaders,
   };
 
   const hasJsonBody =
