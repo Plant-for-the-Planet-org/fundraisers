@@ -17,7 +17,7 @@ import {
   SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
 import { getImageUrl } from '@/lib/utils/images';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {

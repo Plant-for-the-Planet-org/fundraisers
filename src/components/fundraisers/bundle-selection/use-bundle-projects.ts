@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { projectsService } from '@/lib/api/projects-service';
 import { DEFAULT_NON_EARMARKED_CAUSE_FALLBACK } from '@/lib/constants/project-selection';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 
 type ProjectsById = Record<string, ProjectData>;
 

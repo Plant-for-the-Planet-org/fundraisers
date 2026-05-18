@@ -9,7 +9,7 @@ import {
   getAllowedCountries,
   getCurrencyForCountry,
 } from '@/lib/utils/country-currency';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { CountryFlag } from '@/components/ui/country-flag';
 import {
   Select,

@@ -236,7 +236,7 @@ If support-project metadata becomes important enough to require live data (it cu
 
 **Allocation rule:**
 
-Reuses the existing `calculateProjectAllocations` from `@/lib/utils/project-selection` rather than extracting a shared `splitWithDefaultMinimum`. That helper already enforces `MIN_DEFAULT_CAUSE_PERCENT` (25% floor on the default cause) — same rule as Decision #10, no divergent code path. The `applyAllocationsFromIds` callback in `custom-tab-panel.tsx` builds placeholder `SelectedProject[]` objects from the IDs, runs them through `calculateProjectAllocations(placeholderProjects, defaultCauseId, MIN_DEFAULT_CAUSE_PERCENT)`, and writes the resulting `{ project_id, percentage }` array.
+Reuses the existing `calculateProjectAllocations` from `@/lib/utils/project-allocation` rather than extracting a shared `splitWithDefaultMinimum`. That helper already enforces `MIN_DEFAULT_CAUSE_PERCENT` (25% floor on the default cause) — same rule as Decision #10, no divergent code path. The `applyAllocationsFromIds` callback in `custom-tab-panel.tsx` builds placeholder `SelectedProject[]` objects from the IDs, runs them through `calculateProjectAllocations(placeholderProjects, defaultCauseId, MIN_DEFAULT_CAUSE_PERCENT)`, and writes the resulting `{ project_id, percentage }` array.
 
 **Bundle detection coexistence:**
 
@@ -298,7 +298,7 @@ Now that the bundle UI is the only entry point on both create and edit forms (St
   - `src/components/fundraisers/project-selection.tsx`
   - `src/components/fundraisers/project-selection-overlay.tsx`
   - `docs/project-selection.md`
-- **Trimmed `src/lib/utils/project-selection.ts`:** removed `mapProjectToSelectedCause` and `createDefaultCause` (only consumed by the deleted components). `resolveCauseCountry` is now a non-exported internal helper (still used by `getDefaultCauseId`). `getDefaultCauseId` and `calculateProjectAllocations` stay — both are core dependencies of the bundle/custom flows.
+- **Trimmed `src/lib/utils/project-allocation.ts`** (renamed from `project-selection.ts`)**:** removed `mapProjectToSelectedCause` and `createDefaultCause` (only consumed by the deleted components). `resolveCauseCountry` is now a non-exported internal helper (still used by `getDefaultCauseId`). `getDefaultCauseId` and `calculateProjectAllocations` stay — both are core dependencies of the bundle/custom flows.
 - **Kept `src/lib/constants/project-selection.ts` as-is:** every exported constant is still used (`MIN_DEFAULT_CAUSE_PERCENT` by `bundleToAllocations` and custom tab; `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` by `useBundleProjects`; `DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY` and `DEFAULT_NON_EARMARKED_CAUSE_ID` by `getDefaultCauseId`).
 - **Trimmed `Fundraisers.form.projectSelection.*` locale namespace** in both en and de. The 4 keys still referenced by [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx) were preserved: `viewModeSectionHeading`, `projectImageAlt`, `expandDescription`, `collapseDescription`. Everything else (`addCause`, `removeCause`, `modal.*`, `aria.*`, `defaultCause`, etc.) was dropped.
 

@@ -21,7 +21,7 @@ import {
   detectBundleFromAllocations,
 } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { SectionHeader } from '../typography';
 import { BundlePreviewModal } from './bundle-preview-modal';
 import { BundleTabPanel } from './bundle-tab-panel';

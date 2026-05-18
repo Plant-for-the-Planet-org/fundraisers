@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { getBundleProjectIds, getSupportProjectId } from '@/lib/utils/bundle';
-import { calculateProjectAllocations } from '@/lib/utils/project-selection';
+import { calculateProjectAllocations } from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
 import { SelectedProjectRow } from './selected-project-row';
 

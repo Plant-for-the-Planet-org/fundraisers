@@ -12,7 +12,7 @@ import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
 import {
   calculateProjectAllocations,
   getDefaultCauseId,
-} from '@/lib/utils/project-selection';
+} from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProjectSearchCard } from './project-search-card';
