@@ -16,6 +16,7 @@ import {
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import { STAGE_LIMITS } from '@/components/stage/constants';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,
@@ -50,14 +51,6 @@ const projectAllocationSchema = z.object({
   project_id: z.string().trim().min(1),
   percentage: z.number().int().min(1).max(100),
 });
-
-export const STAGE_LIMITS = {
-  stageTitle: 80,
-  stageDescription: 200,
-  slideTitle: 60,
-  slideDescription: 160,
-  maxSlides: 10,
-} as const;
 
 // Trusted hostnames for stage images. Prevents javascript:/data: injection and SSRF.
 const ALLOWED_IMAGE_HOSTNAME_SUFFIXES = [

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { ChevronRight, Plus, Trash2, X, ChevronUp, ChevronDown, Clock, ImageIcon } from 'lucide-react';
 
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
-import { STAGE_LIMITS } from '@/components/fundraisers/fundraiser-form-schema';
+import { STAGE_LIMITS } from '@/components/stage/constants';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
