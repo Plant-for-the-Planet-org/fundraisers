@@ -163,6 +163,10 @@
       "unavailable": "Apple Pay is not available in this browser. Try Safari on macOS or iOS, or scan the QR code prompt with your iPhone.",
       "processing": "Processing Apple Pay donation…"
     },
+    "googlePay": {
+      "unavailable": "Google Pay is not available in this browser. Try Chrome on Android, or choose a different payment method.",
+      "processing": "Processing Google Pay donation…"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",

@@ -163,6 +163,10 @@
       "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche es mit Safari auf macOS oder iOS, oder scanne den QR-Code mit deinem iPhone.",
       "processing": "Apple-Pay-Spende wird verarbeitet…"
     },
+    "googlePay": {
+      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche es mit Chrome auf Android, oder wähle eine andere Zahlungsmethode.",
+      "processing": "Google-Pay-Spende wird verarbeitet…"
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
       "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es nochmal.",

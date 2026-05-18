@@ -22,31 +22,44 @@ import { getStripe } from '@/lib/utils/get-stripe';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDonationForm } from './donation-form-context';
 
-interface ApplePayButtonProps {
-  onApplePayConfirm: (
+export type WalletKind = 'apple_pay' | 'google_pay';
+
+// Stripe SDK uses camelCase identifiers for its wallet APIs
+// (`availablePaymentMethods`, `paymentMethods` config, `buttonType`).
+// Internal payment-method ids stay snake_case to match the platform API.
+const STRIPE_WALLET_KEY = {
+  apple_pay: 'applePay',
+  google_pay: 'googlePay',
+} as const;
+
+export interface WalletButtonProps {
+  wallet: WalletKind;
+  onWalletConfirm: (
+    wallet: WalletKind,
     values: DonationFormValues,
     paymentMethodId: string,
     stripe: Stripe
   ) => Promise<void>;
-  onApplePayError: () => void;
+  onWalletError: () => void;
 }
 
-interface ApplePayButtonInnerProps extends ApplePayButtonProps {
+interface WalletButtonInnerProps extends WalletButtonProps {
   onAttemptComplete: () => void;
 }
 
 /**
- * Apple Pay button rendered via Stripe's ExpressCheckoutElement.
+ * Renders Apple Pay or Google Pay via Stripe's ExpressCheckoutElement.
  *
  * Uses its own inner <Elements> provider with `mode: 'payment'` so the
  * deferred-PaymentIntent flow is enabled — required by ExpressCheckoutElement.
  * The outer Elements provider in donate-overlay (no `mode`) keeps card/SEPA
  * flows on their existing token-first path.
  */
-export function ApplePayButton({
-  onApplePayConfirm,
-  onApplePayError,
-}: ApplePayButtonProps) {
+export function WalletButton({
+  wallet,
+  onWalletConfirm,
+  onWalletError,
+}: WalletButtonProps) {
   const locale = useLocale();
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
 
@@ -62,6 +75,15 @@ export function ApplePayButton({
   // re-keys <Elements> and gives every attempt a fresh instance.
   const [attemptKey, setAttemptKey] = useState(0);
   const bumpAttempt = useCallback(() => setAttemptKey(k => k + 1), []);
+
+  // ExpressCheckoutElement's `paymentMethods` and `buttonType` options are
+  // read-only after mount — and `availablePaymentMethods` in `onReady`
+  // reflects only the wallets enabled at mount, not device capability alone.
+  // So switching from Google Pay to Apple Pay (or vice versa) on the same
+  // Elements instance leaves `availablePaymentMethods.applePay` stuck at
+  // false. Including `wallet` in the key remounts <Elements> on wallet
+  // change so each wallet gets a fresh availability check.
+  const elementsKey = `${wallet}-${attemptKey}`;
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = useMemo(
@@ -79,13 +101,14 @@ export function ApplePayButton({
         donationAmountCents: donationData.amountCents,
         donationCurrency: donationData.currency,
         workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod: 'apple_pay',
+        selectedPaymentMethod: wallet,
       });
     return (
       donationData.amountCents +
       (willAbsorbFee && hasProcessingFee ? processingFeeCents : 0)
     );
   }, [
+    wallet,
     willAbsorbFee,
     donationData.amountCents,
     donationData.currency,
@@ -108,27 +131,32 @@ export function ApplePayButton({
 
   return (
     <Elements
-      key={attemptKey}
+      key={elementsKey}
       stripe={stripePromise}
       options={elementsOptions}
     >
-      <ApplePayButtonInner
-        onApplePayConfirm={onApplePayConfirm}
-        onApplePayError={onApplePayError}
+      <WalletButtonInner
+        wallet={wallet}
+        onWalletConfirm={onWalletConfirm}
+        onWalletError={onWalletError}
         onAttemptComplete={bumpAttempt}
       />
     </Elements>
   );
 }
 
-function ApplePayButtonInner({
-  onApplePayConfirm,
-  onApplePayError,
+function WalletButtonInner({
+  wallet,
+  onWalletConfirm,
+  onWalletError,
   onAttemptComplete,
-}: ApplePayButtonInnerProps) {
+}: WalletButtonInnerProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const t = useTranslations('Donate.applePay');
+  const tApple = useTranslations('Donate.applePay');
+  const tGoogle = useTranslations('Donate.googlePay');
+  const t = wallet === 'apple_pay' ? tApple : tGoogle;
+  const stripeWalletKey = STRIPE_WALLET_KEY[wallet];
   const {
     getValues,
     formState: { isValid },
@@ -139,16 +167,16 @@ function ApplePayButtonInner({
 
   const handleReady = useCallback(
     (event: StripeExpressCheckoutElementReadyEvent) => {
-      setIsAvailable(Boolean(event.availablePaymentMethods?.applePay));
+      setIsAvailable(Boolean(event.availablePaymentMethods?.[stripeWalletKey]));
     },
-    []
+    [stripeWalletKey]
   );
 
   const handleClick = useCallback(
     (event: StripeExpressCheckoutElementClickEvent) => {
       // Donor identity (name, email, address, TIN) is collected by our form
       // — it's required for the donation record and receipts regardless of
-      // payment method — so Apple Pay doesn't need to collect any of it.
+      // payment method — so the wallet doesn't need to collect any of it.
       event.resolve({
         emailRequired: false,
         phoneNumberRequired: false,
@@ -164,18 +192,18 @@ function ApplePayButtonInner({
   // error path and bump the attempt counter so the next try gets a fresh
   // Elements instance.
   const handleCancel = useCallback(() => {
-    onApplePayError();
+    onWalletError();
     onAttemptComplete();
-  }, [onApplePayError, onAttemptComplete]);
+  }, [onWalletError, onAttemptComplete]);
 
   const handleConfirm = useCallback(async () => {
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || isProcessing) return;
 
     setIsProcessing(true);
     try {
       const { error: submitError } = await elements.submit();
       if (submitError) {
-        onApplePayError();
+        onWalletError();
         return;
       }
 
@@ -183,23 +211,25 @@ function ApplePayButtonInner({
         elements,
       });
       if (error || !paymentMethod) {
-        onApplePayError();
+        onWalletError();
         return;
       }
 
-      await onApplePayConfirm(getValues(), paymentMethod.id, stripe);
+      await onWalletConfirm(wallet, getValues(), paymentMethod.id, stripe);
     } finally {
       setIsProcessing(false);
       // Signal the parent to remount <Elements> so a retry uses a fresh
-      // instance — see the comment on `attemptKey` in ApplePayButton.
+      // instance — see the comment on `attemptKey` in WalletButton.
       onAttemptComplete();
     }
   }, [
+    wallet,
     stripe,
     elements,
+    isProcessing,
     getValues,
-    onApplePayConfirm,
-    onApplePayError,
+    onWalletConfirm,
+    onWalletError,
     onAttemptComplete,
   ]);
 
@@ -221,7 +251,7 @@ function ApplePayButtonInner({
         )}
         <div
           className={
-            !isValid
+            !isValid || isProcessing
               ? 'opacity-50 pointer-events-none transition-opacity'
               : 'transition-opacity'
           }
@@ -230,14 +260,17 @@ function ApplePayButtonInner({
           <ExpressCheckoutElement
             options={{
               paymentMethods: {
-                applePay: 'always',
-                googlePay: 'never',
+                applePay: wallet === 'apple_pay' ? 'always' : 'never',
+                googlePay: wallet === 'google_pay' ? 'always' : 'never',
                 link: 'never',
                 paypal: 'never',
                 amazonPay: 'never',
                 klarna: 'never',
               },
-              buttonType: { applePay: 'donate' },
+              buttonType:
+                wallet === 'apple_pay'
+                  ? { applePay: 'donate' }
+                  : { googlePay: 'donate' },
               buttonHeight: 48,
             }}
             onReady={handleReady}

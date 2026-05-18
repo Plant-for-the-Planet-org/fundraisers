@@ -544,8 +544,9 @@ export function useDonationSubmit(
     [paymentOptions, token]
   );
 
-  const onApplePayConfirm = useCallback(
+  const onWalletConfirm = useCallback(
     async (
+      wallet: 'apple_pay' | 'google_pay',
       values: DonationFormValues,
       paymentMethodId: string,
       stripe: Stripe
@@ -567,22 +568,22 @@ export function useDonationSubmit(
         isAuthenticated
       );
 
-      const { processingFeeCents: applePayProcessingFeeCents } =
+      const { processingFeeCents: walletProcessingFeeCents } =
         getDonationProcessingFeeInfo({
           paymentOptions,
           donationAmountCents: donationData.amountCents,
           donationCurrency: donationData.currency,
           workspaceCountry: fundraiser.workspace?.country,
-          selectedPaymentMethod: 'apple_pay',
+          selectedPaymentMethod: wallet,
         });
 
       const payload = buildDonationPayload(
         formData,
         fundraiser,
         donorProfile,
-        'apple_pay',
+        wallet,
         values.willAbsorbFee,
-        applePayProcessingFeeCents
+        walletProcessingFeeCents
       );
 
       const donationAttemptKey = donationKeyRef.current;
@@ -595,7 +596,7 @@ export function useDonationSubmit(
             token: token || undefined,
             donationIdempotencyKey: donationAttemptKey,
             paymentIdempotencyKey: paymentAttemptKey,
-            selectedPaymentMethod: 'apple_pay',
+            selectedPaymentMethod: wallet,
             paymentOptions,
             paymentDetails: { paymentMethodId },
           });
@@ -717,10 +718,11 @@ export function useDonationSubmit(
     submittingRef.current = false;
   }, []);
 
-  // Surfaces client-side Stripe.js failures from the Apple Pay flow
-  // (elements.submit or createPaymentMethod). Server-side failures in the
-  // donation/payment APIs are already handled inside onApplePayConfirm.
-  const onApplePayError = useCallback(() => {
+  // Surfaces client-side Stripe.js failures and wallet dismissal from the
+  // Apple Pay / Google Pay flow (elements.submit, createPaymentMethod, or
+  // sheet cancel). Server-side failures in the donation/payment APIs are
+  // already handled inside onWalletConfirm.
+  const onWalletError = useCallback(() => {
     setDonationState(prev => ({
       ...prev,
       isLoading: false,
@@ -741,8 +743,8 @@ export function useDonationSubmit(
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
-    onApplePayConfirm,
-    onApplePayError,
+    onWalletConfirm,
+    onWalletError,
     reset,
   };
 }
