@@ -37,6 +37,33 @@ interface BundleSelectionProps {
   mode: 'create' | 'edit';
 }
 
+function getInitialActiveTab({
+  bundleWorkspace,
+  selectedBundle,
+  mode,
+}: {
+  bundleWorkspace: BundleWorkspace | null;
+  selectedBundle: Bundle | undefined;
+  mode: BundleSelectionProps['mode'];
+}): BundleTabId {
+  // Workspace without bundles (ES, CH) → only Custom is shown.
+  if (!bundleWorkspace) {
+    return 'custom';
+  }
+
+  // Use the first tab from the detected bundle.
+  if (selectedBundle) {
+    return selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab;
+  }
+
+  // Edit mode without a matching bundle → custom selection.
+  if (mode === 'edit') {
+    return 'custom';
+  }
+
+  return BUNDLE_CONFIG.meta.defaultTab;
+}
+
 export function BundleSelection({ mode }: BundleSelectionProps) {
   const t = useTranslations('Bundles');
   const { control, setValue } = useFormContext<FundraiserFormValues>();
@@ -57,14 +84,9 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
     return detectBundleFromAllocations(projectAllocations, bundleWorkspace);
   }, [projectAllocations, bundleWorkspace]);
 
-  const [activeTab, setActiveTab] = useState<BundleTabId>(() => {
-    if (selectedBundle) {
-      return selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab;
-    }
-    // Edit mode with no bundle match → user has a custom selection; land on Custom.
-    if (mode === 'edit') return 'custom';
-    return BUNDLE_CONFIG.meta.defaultTab;
-  });
+  const [activeTab, setActiveTab] = useState<BundleTabId>(() =>
+    getInitialActiveTab({ bundleWorkspace, selectedBundle, mode })
+  );
   const [previewBundle, setPreviewBundle] = useState<Bundle | null>(null);
 
   function handleUseBundle(bundle: Bundle) {
