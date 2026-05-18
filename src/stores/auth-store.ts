@@ -6,6 +6,10 @@ import { userService } from '@/lib/api/user-service';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
+import {
+  IMPERSONATION_STORAGE_KEY,
+  useImpersonationStore,
+} from '@/stores/impersonation-store';
 
 interface User {
   sub: string;
@@ -105,6 +109,11 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: (customReturnTo?: string) => {
+        useImpersonationStore.getState().stop();
+        if (isBrowser) {
+          localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
+        }
+
         const currentPage = window.location.pathname + window.location.search;
         const redirectAfterLogout = customReturnTo || currentPage;
 
@@ -131,8 +140,10 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       clearAuth: () => {
+        useImpersonationStore.getState().stop();
         if (isBrowser) {
           localStorage.removeItem('access_token');
+          localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
         }
         set(
           {

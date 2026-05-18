@@ -5,7 +5,7 @@ import type {
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
-import { API_BASE_URL } from '@/lib/constants/app-config';
+import { platformFetch } from '@/lib/api/platform-fetch';
 import {
   PROJECT_PURPOSES,
   PROJECT_UNIT_TYPES,
@@ -109,24 +109,11 @@ export class ProjectsService {
     locale?: string
   ): Promise<ProjectData[]> {
     const apiCountry = resolveProjectsApiCountry(country);
-    const url = new URL(`${API_BASE_URL}/countryProjects/${apiCountry}`);
-    if (locale) {
-      url.searchParams.append('locale', locale);
-    }
+    const path = locale
+      ? `/countryProjects/${apiCountry}?locale=${encodeURIComponent(locale)}`
+      : `/countryProjects/${apiCountry}`;
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch projects: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const data: unknown = await response.json();
+    const data = await platformFetch<unknown>(path);
     const projects = Array.isArray(data)
       ? data
       : ((data as ProjectsApiEnvelope)?.projects ?? []);

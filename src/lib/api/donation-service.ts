@@ -5,8 +5,8 @@ import type {
 } from '../types/donation';
 import type { ErrorType } from './http-error-classifier';
 
-import { API_BASE_URL } from '../constants/app-config';
-import { classifyHttpError } from './http-error-classifier';
+import { classifyPlatformError } from './http-error-classifier';
+import { PlatformAPIError, platformFetch } from './platform-fetch';
 
 export class DonationError extends Error {
   constructor(
@@ -23,153 +23,105 @@ export class DonationError extends Error {
 
 const DONATION_TIMEOUT_MS = 30_000;
 
-export class DonationService {
-  private baseURL: string;
+function toDonationError(err: unknown, timeoutMessage: string): DonationError {
+  if (err instanceof DonationError) return err;
 
-  constructor(baseURL: string = API_BASE_URL) {
-    this.baseURL = baseURL;
-  }
-
-  private buildHeaders(
-    authToken?: string,
-    idempotencyKey?: string
-  ): Record<string, string> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-SESSION-ID': 'web-client',
-    };
-
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
+  if (err instanceof PlatformAPIError) {
+    if (err.kind === 'timeout') {
+      return new DonationError(timeoutMessage, 'api', 'TIMEOUT_ERROR', 0, {
+        originalError: err,
+      });
     }
-
-    if (idempotencyKey) {
-      headers['Idempotency-Key'] = idempotencyKey;
+    if (err.kind === 'network') {
+      return new DonationError(err.message, 'api', 'NETWORK_ERROR', 0, {
+        originalError: err,
+      });
     }
-
-    return headers;
-  }
-
-  private async safeJsonParse(response: Response): Promise<unknown> {
-    try {
-      return await response.json();
-    } catch {
-      return {};
-    }
-  }
-
-  private transformResponse(data: any): DonationResponse {
-    if (!data?.donationId && !data?.id) {
-      throw new DonationError(
-        'Invalid response from server',
-        'api',
-        'INVALID_RESPONSE',
-        200,
-        { data }
-      );
-    }
-
-    return {
-      success: true,
-      donationId: data.donationId || data.id,
-      uid: data.uid,
-      amount: data.amount,
-      currency: data.currency,
-      frequency: data.frequency ?? 'once',
-      message: data.message || 'Donation processed successfully',
-    };
-  }
-
-  private async handleErrorResponse(response: Response): Promise<never> {
-    const { type, code, debugMessage, status, errorData } =
-      await classifyHttpError(response);
-
-    const details: Record<string, unknown> = { details: errorData };
-
+    const { type, code } = classifyPlatformError(err.status);
+    const details: Record<string, unknown> = { body: err.body };
     // Preserve field-level errors for validation/business statuses
     if (
-      (status === 400 || status === 422) &&
-      errorData &&
-      typeof errorData === 'object' &&
-      'errors' in errorData
+      (err.status === 400 || err.status === 422) &&
+      err.body &&
+      typeof err.body === 'object' &&
+      'errors' in err.body
     ) {
-      details.errors = (errorData as { errors: unknown }).errors;
+      details.errors = (err.body as { errors: unknown }).errors;
     }
-
-    throw new DonationError(debugMessage, type, code, status, details);
+    return new DonationError(err.message, type, code, err.status, details);
   }
 
-  private transformStatusResponse(data: any): DonationStatusResponse {
-    if (!data?.id || !data?.paymentStatus) {
-      throw new DonationError(
-        'Invalid status response from server',
-        'api',
-        'INVALID_RESPONSE',
-        200,
-        { data }
-      );
-    }
+  return new DonationError(
+    err instanceof Error ? err.message : 'Donation request failed',
+    'api',
+    'NETWORK_ERROR',
+    0,
+    { originalError: err }
+  );
+}
 
-    return {
-      id: data.id,
-      gateway: data.gateway,
-      paymentStatus: data.paymentStatus,
-      paymentDate: data.paymentDate ?? null,
-      uid: data.uid,
-      amount: data.amount,
-      currency: data.currency,
-      frequency: data.frequency ?? null,
-      account: data.account ?? undefined,
-    };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformResponse(data: any): DonationResponse {
+  if (!data?.donationId && !data?.id) {
+    throw new DonationError(
+      'Invalid response from server',
+      'api',
+      'INVALID_RESPONSE',
+      200,
+      { data }
+    );
   }
 
+  return {
+    success: true,
+    donationId: data.donationId || data.id,
+    uid: data.uid,
+    amount: data.amount,
+    currency: data.currency,
+    frequency: data.frequency ?? 'once',
+    message: data.message || 'Donation processed successfully',
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformStatusResponse(data: any): DonationStatusResponse {
+  if (!data?.id || !data?.paymentStatus) {
+    throw new DonationError(
+      'Invalid status response from server',
+      'api',
+      'INVALID_RESPONSE',
+      200,
+      { data }
+    );
+  }
+
+  return {
+    id: data.id,
+    gateway: data.gateway,
+    paymentStatus: data.paymentStatus,
+    paymentDate: data.paymentDate ?? null,
+    uid: data.uid,
+    amount: data.amount,
+    currency: data.currency,
+    frequency: data.frequency ?? null,
+    account: data.account ?? undefined,
+  };
+}
+
+export class DonationService {
   async getDonation(
     donationId: string,
     authToken?: string
   ): Promise<DonationStatusResponse> {
-    const url = `${this.baseURL}/donations/${donationId}`;
-    const headers = this.buildHeaders(authToken);
-
     try {
-      const response = await fetch(url, {
+      const data = await platformFetch<unknown>(`/donations/${donationId}`, {
         method: 'GET',
-        headers,
-        signal: AbortSignal.timeout(DONATION_TIMEOUT_MS),
+        token: authToken,
+        timeoutMs: DONATION_TIMEOUT_MS,
       });
-
-      if (!response.ok) {
-        await this.handleErrorResponse(response);
-      }
-
-      const data = await this.safeJsonParse(response);
-      return this.transformStatusResponse(data);
-    } catch (error) {
-      if (error instanceof DonationError) {
-        throw error;
-      }
-
-      if (
-        error instanceof DOMException &&
-        (error.name === 'TimeoutError' || error.name === 'AbortError')
-      ) {
-        throw new DonationError(
-          'Donation status request timed out',
-          'api',
-          'TIMEOUT_ERROR',
-          0,
-          { originalError: error }
-        );
-      }
-
-      throw new DonationError(
-        error instanceof Error
-          ? error.message
-          : 'Failed to fetch donation status',
-        'api',
-        'NETWORK_ERROR',
-        0,
-        { originalError: error }
-      );
+      return transformStatusResponse(data);
+    } catch (err) {
+      throw toDonationError(err, 'Donation status request timed out');
     }
   }
 
@@ -178,49 +130,17 @@ export class DonationService {
     authToken?: string,
     idempotencyKey?: string
   ): Promise<DonationResponse> {
-    const url = `${this.baseURL}/donations`;
-
-    const headers = this.buildHeaders(authToken, idempotencyKey);
-
     try {
-      const response = await fetch(url, {
+      const data = await platformFetch<unknown>('/donations', {
         method: 'POST',
-        headers,
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(DONATION_TIMEOUT_MS),
+        body: payload,
+        token: authToken,
+        idempotencyKey,
+        timeoutMs: DONATION_TIMEOUT_MS,
       });
-
-      if (!response.ok) {
-        await this.handleErrorResponse(response);
-      }
-
-      const data = await this.safeJsonParse(response);
-      return this.transformResponse(data);
-    } catch (error) {
-      if (error instanceof DonationError) {
-        throw error;
-      }
-
-      if (
-        error instanceof DOMException &&
-        (error.name === 'TimeoutError' || error.name === 'AbortError')
-      ) {
-        throw new DonationError(
-          'Donation request timed out',
-          'api',
-          'TIMEOUT_ERROR',
-          0,
-          { originalError: error }
-        );
-      }
-
-      throw new DonationError(
-        error instanceof Error ? error.message : 'Failed to submit donation',
-        'api',
-        'NETWORK_ERROR',
-        0,
-        { originalError: error }
-      );
+      return transformResponse(data);
+    } catch (err) {
+      throw toDonationError(err, 'Donation request timed out');
     }
   }
 }

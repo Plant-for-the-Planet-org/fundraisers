@@ -46,7 +46,7 @@ export function BundlePreviewModal({
   const supportProjectId = getSupportProjectId(bundleWorkspace);
 
   const allocations = useMemo(() => {
-    const projects = projectIds.map(id => ({ id, ...getProject(id) }));
+    const projects = projectIds.map(id => getProject(id));
     return calculateProjectAllocations(projects, supportProjectId);
   }, [projectIds, supportProjectId, getProject]);
 
