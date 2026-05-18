@@ -1,6 +1,6 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { platformAPIClient } from '@/lib/api/external-client';
+import { platformFetch } from '@/lib/api/platform-fetch';
 
 interface FundraisersApiEnvelope {
   fundraisers?: unknown;
@@ -43,10 +43,7 @@ function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
 }
 
 export async function getFundraisers(token: string): Promise<Fundraiser[]> {
-  const payload = await platformAPIClient.getAuthenticated<unknown>(
-    '/fundraisers',
-    token
-  );
+  const payload = await platformFetch<unknown>('/fundraisers', { token });
 
   return normalizeFundraisersResponse(payload);
 }

@@ -6,7 +6,7 @@
 import type { Category } from '@/lib/types/category';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { API_BASE_URL } from '@/lib/constants/app-config';
+import { platformFetch } from '@/lib/api/platform-fetch';
 
 export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
   workspace: Fundraiser['workspace'] | [];
@@ -61,30 +61,37 @@ function normalizeFundraisersResponse(
   };
 }
 
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number
+): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('Unknown error');
+      if (attempt === maxRetries) break;
+      await new Promise(resolve =>
+        setTimeout(resolve, Math.pow(2, attempt) * 1000)
+      );
+    }
+  }
+
+  throw lastError!;
+}
+
 export class CategoriesService {
   /**
    * Get categories by type
    * Note: This endpoint does not require authentication
    */
   async getCategories(type?: 'cause' | 'location'): Promise<Category[]> {
-    const params = new URLSearchParams();
-    if (type) {
-      params.append('type', type);
-    }
-
-    const url = `${API_BASE_URL}/fundraiser/categories${params.toString() ? `?${params.toString()}` : ''}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch categories: ${response.statusText}`);
-    }
-
-    return response.json();
+    const path = type
+      ? `/fundraiser/categories?type=${encodeURIComponent(type)}`
+      : `/fundraiser/categories`;
+    return platformFetch<Category[]>(path);
   }
 
   /**
@@ -94,25 +101,7 @@ export class CategoriesService {
     type?: 'cause' | 'location',
     maxRetries: number = 2
   ): Promise<Category[]> {
-    let lastError: Error;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await this.getCategories(type);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-        if (attempt === maxRetries) {
-          break;
-        }
-
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve =>
-          setTimeout(resolve, Math.pow(2, attempt) * 1000)
-        );
-      }
-    }
-
-    throw lastError!;
+    return withRetry(() => this.getCategories(type), maxRetries);
   }
 
   /**
@@ -123,26 +112,10 @@ export class CategoriesService {
     slug: string,
     options?: CategoryOptions
   ): Promise<CategoryFundraisersResponse> {
-    const params = new URLSearchParams();
-    if (options?.sort_by) {
-      params.append('sort_by', options.sort_by);
-    }
-
-    const url = `${API_BASE_URL}/fundraiser/categories/${slug}${params.toString() ? `?${params.toString()}` : ''}`;
-
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch category fundraisers: ${response.statusText}`
-      );
-    }
-
-    const data: RawCategoryFundraisersResponse = await response.json();
+    const path = options?.sort_by
+      ? `/fundraiser/categories/${slug}?sort_by=${encodeURIComponent(options.sort_by)}`
+      : `/fundraiser/categories/${slug}`;
+    const data = await platformFetch<RawCategoryFundraisersResponse>(path);
     return normalizeFundraisersResponse(data);
   }
 
@@ -154,25 +127,10 @@ export class CategoriesService {
     options?: CategoryOptions,
     maxRetries: number = 2
   ): Promise<CategoryFundraisersResponse> {
-    let lastError: Error;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await this.getCategoryFundraisers(slug, options);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-        if (attempt === maxRetries) {
-          break;
-        }
-
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve =>
-          setTimeout(resolve, Math.pow(2, attempt) * 1000)
-        );
-      }
-    }
-
-    throw lastError!;
+    return withRetry(
+      () => this.getCategoryFundraisers(slug, options),
+      maxRetries
+    );
   }
 }
 

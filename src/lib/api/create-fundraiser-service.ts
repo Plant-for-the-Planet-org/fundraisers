@@ -3,15 +3,15 @@ import type {
   Fundraiser,
 } from '@/lib/types/fundraiser';
 
-import { platformAPIClient } from './external-client';
+import { platformFetch } from './platform-fetch';
 
 export async function createFundraiser(
   data: CreateFundraiserRequest,
   token: string
 ): Promise<Fundraiser> {
-  return platformAPIClient.postAuthenticated<Fundraiser>(
-    '/fundraisers',
-    data,
-    token
-  );
+  return platformFetch<Fundraiser>('/fundraisers', {
+    method: 'POST',
+    body: data,
+    token,
+  });
 }

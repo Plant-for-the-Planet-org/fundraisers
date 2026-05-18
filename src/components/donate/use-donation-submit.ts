@@ -544,10 +544,6 @@ export function useDonationSubmit(
     [paymentOptions, token]
   );
 
-  // TODO: API fetch is being refactored in a separate PR. When that lands,
-  // adapt the donation/payment service calls below (submitStandardPostpaidDonation,
-  // paymentService.processPayment) to the new client. Same applies to the card
-  // and PayPal flows above.
   const onWalletConfirm = useCallback(
     async (
       wallet: 'apple_pay' | 'google_pay',
