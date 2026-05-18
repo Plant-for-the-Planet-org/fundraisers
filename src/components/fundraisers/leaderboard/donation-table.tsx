@@ -3,10 +3,8 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarColor } from './avatar-utils';
+import { DonorAvatar, isAnonymousDonor } from './donor-avatar';
 
 interface DonationTableProps {
   donations: LeaderboardDonation[];
@@ -30,11 +28,7 @@ function DonationRow({
   showDate?: boolean;
 }) {
   const t = useTranslations('Leaderboard.view');
-  const isAnonymous = anonymize || donation.isAnonymous || false;
-  const avatarSrc =
-    !isAnonymous && donation.avatarUrl
-      ? getImageUrl('profile', 'thumb', donation.avatarUrl)
-      : null;
+  const isAnonymous = isAnonymousDonor(donation, anonymize);
   const displayName = isAnonymous
     ? t('donation.anonymous')
     : donation.donorName;
@@ -44,16 +38,7 @@ function DonationRow({
       <td className='py-3 px-4'>
         <div className='flex items-center gap-3 min-w-0'>
           {showAvatar && (
-            <Avatar className='h-8 w-8 shrink-0 ring-2 ring-white/20 dark:ring-gray-500/20'>
-              {avatarSrc !== null && (
-                <AvatarImage
-                  src={avatarSrc}
-                  alt={donation.donorName}
-                  loading='lazy'
-                />
-              )}
-              <AvatarFallback className={getAvatarColor(donation.id)} />
-            </Avatar>
+            <DonorAvatar donation={donation} anonymize={anonymize} />
           )}
           <div className='flex flex-col min-w-0'>
             <span

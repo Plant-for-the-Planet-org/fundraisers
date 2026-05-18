@@ -1,11 +1,10 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarColor } from './avatar-utils';
+import { DonorAvatar, isAnonymousDonor } from './donor-avatar';
 
 interface DonationItemProps {
   donation: LeaderboardDonation;
@@ -22,31 +21,17 @@ export function DonationItem({
   showAvatar,
   showDate = true,
 }: DonationItemProps) {
-  const isAnonymous = anonymize || donation.isAnonymous || false;
-  const avatarSrc =
-    !isAnonymous && donation.avatarUrl
-      ? getImageUrl('profile', 'thumb', donation.avatarUrl)
-      : null;
+  const t = useTranslations('Leaderboard.view');
+  const isAnonymous = isAnonymousDonor(donation, anonymize);
   const displayName = isAnonymous
-    ? 'Anonymous'
+    ? t('donation.anonymous')
     : donation.donorName.length > 17
       ? `${donation.donorName.substring(0, 17)}...`
       : donation.donorName;
 
   return (
     <div className='donation-item flex items-center gap-3 shrink-0'>
-      {showAvatar && (
-        <Avatar className='h-8 w-8 ring-2 ring-white/20 dark:ring-gray-500/20'>
-          {avatarSrc !== null && (
-            <AvatarImage
-              src={avatarSrc}
-              alt={donation.donorName}
-              loading='lazy'
-            />
-          )}
-          <AvatarFallback className={getAvatarColor(donation.id)} />
-        </Avatar>
-      )}
+      {showAvatar && <DonorAvatar donation={donation} anonymize={anonymize} />}
       <div className='flex flex-col justify-center items-start gap-0.5 min-w-0'>
         <div
           className={cn(
