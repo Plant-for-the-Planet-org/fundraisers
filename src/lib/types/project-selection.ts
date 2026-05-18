@@ -16,10 +16,6 @@ export const PROJECT_PURPOSES = [
 
 export type ProjectPurpose = (typeof PROJECT_PURPOSES)[number];
 
-export const PROJECT_UNIT_TYPES = ['tree', 'm2', 'currency'] as const;
-
-export type ProjectUnitType = (typeof PROJECT_UNIT_TYPES)[number];
-
 export interface ProjectData {
   id: string;
   slug?: string;
@@ -30,10 +26,6 @@ export interface ProjectData {
   country: string;
   purpose?: ProjectPurpose;
   image?: string;
-  /** Cost per unit, in the project's currency. */
-  unitCost?: number;
-  /** What `unitCost` is denominated in — e.g. one tree, one m², one currency unit. */
-  unitType?: ProjectUnitType;
   tpo?: {
     name: string;
     image?: string;

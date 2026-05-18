@@ -102,7 +102,6 @@ Create pure helpers used by both the form and the public view:
 
 `detectBundleFromAllocations` was part of the original Step 2 set but was removed when bundle identity moved to a persisted slug — see Context and Decision #1.
 - `getDisplayTabForBundle(bundle): BundleTabId` — picks the first non-`staff-picks` tab; falls back to `staff-picks` if it is the only one
-- `getDisplayableUnitCost(unitCost, unitType): { value, unitType } | null` — gates the per-row "~8 €/tree" / "~12 €/m²" metric in the modal. Returns `null` for `currency`-typed projects or missing data so the caller hides the line
 
 **Files:**
 
@@ -188,7 +187,7 @@ Deliberate trade-off: this is a full reset, not a swap-and-resplit. The original
 
 **Departures from spec:**
 
-- **Metric flipped** from "trees per €" to "unit cost per unit". Spec showed `~1.4 trees/€`; we ship `~8 € per tree` / `~12 € per m²`. Driven by `unitCost` + `unitType` fields added to `ProjectData` and normalized in `projects-service.ts`. ICU `select` on `unitType` localizes the unit name (en `tree` / de `Baum`, m² unchanged). Currency-typed projects show country only, no metric.
+- **Per-row unit-cost metric dropped.** Spec showed `~1.4 trees/€`; an interim version shipped `~8 € per tree` / `~12 € per m²` driven by `unitCost` + `unitType` fields on `ProjectData`. Those fields and the `getDisplayableUnitCost` helper were later removed — rows now show country only.
 - **"Learn More" link replaces row-as-link.** Earlier iteration had the whole `<li>` be an `<a>`; final version has the row as a plain element with a right-aligned link, so clicking the row text doesn't accidentally navigate away.
 - **Width**: `max-w-[min(56rem, 100dvw - 1.5rem)]` — matches `image-selection-overlay`'s ceiling on desktop and pins to the dynamic visual viewport on mobile (resolves a class of mobile-overflow bugs). Outer overlay uses block layout + `mx-auto` (not flex centering) for predictable width on iOS Safari.
 - **Colors**: orange-themed palette (header band `bg-orange-100`, footer band `bg-orange-50/50`, "LOVE/RAGE/etc" tag pill `bg-orange-200`, Learn More `text-orange-700`). The contextual tag is the bundle's identity moment.
@@ -204,10 +203,7 @@ If support-project metadata becomes important enough to require live data (it cu
 
 - `src/components/fundraisers/bundle-selection/bundle-preview-modal.tsx` — new
 - `src/components/fundraisers/bundle-selection/use-bundle-projects.ts` — new (lifted to `BundleSelection` per Step 4)
-- `src/lib/types/project-selection.ts` — added `unitCost`, `unitType`, `ProjectUnitType`
-- `src/lib/api/projects-service.ts` — added `normalizeUnitCost` / `normalizeUnitType` to `normalizeProject`
-- `src/lib/utils/bundle.ts` — added `getDisplayableUnitCost`
-- `locales/{en,de}/bundles.json` — `Bundles.modal.{projectsInside,useBundle,unitCost,learnMore,tag.{rage,wonder,love,staffPicks}}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
+- `locales/{en,de}/bundles.json` — `Bundles.modal.{projectsInside,useBundle,learnMore,tag.{rage,wonder,love,staffPicks}}` plus `aria.{closeModal,openProject,selectedBundle,openBundle}` and `projectImageAlt`
 
 **Visual test:** open `/fundraisers/create`, click any bundle card on the page background → modal opens with 5 rows and full metadata. Click "Use this bundle" → modal closes, the bundle's card on the page now shows the selected check; `projectAllocations` reflects the 28%/18×4 split. Try a card click directly (without opening modal) → also selects.
 
@@ -310,7 +306,7 @@ Now that the bundle UI is the only entry point on both create and edit forms (St
 **Not touched (intentionally):**
 
 - The public-view `projects-supported-display.tsx` component itself stays — it's a different component from the form-side `ProjectSelection` and remains the active surface for the fundraiser detail page.
-- Types in `src/lib/types/project-selection.ts` are all still in use (`ProjectData`, `SelectedProject`, `ProjectAllocationPreview`, `ProjectPurpose`, `PROJECT_PURPOSES`, `ProjectUnitType`, `DefaultCauseIdByCountry`) — no trims.
+- Types in `src/lib/types/project-selection.ts` are all still in use (`ProjectData`, `SelectedProject`, `ProjectAllocationPreview`, `ProjectPurpose`, `PROJECT_PURPOSES`, `DefaultCauseIdByCountry`) — no trims.
 
 **Visual test:** Full create + edit + public-view smoke run, both `/en` and `/de` locales. Edit form should load existing fundraisers into the bundle UI (matching bundles open on their tab; non-matching land on Custom).
 

@@ -5,7 +5,6 @@ import type { ProjectData } from '@/lib/types/project-selection';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
-import { getDisplayableUnitCost } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { useCountryLabel } from './use-country-label';
 
@@ -27,10 +26,6 @@ export function ProjectSearchCard({
   const imageSource = resolveProjectImageSource(project.image);
   const [imageFailed, setImageFailed] = useState(false);
   const countryLabel = project.country ? getCountryLabel(project.country) : '';
-  const unitDisplay = getDisplayableUnitCost(
-    project.unitCost,
-    project.unitType
-  );
 
   return (
     <div className='flex min-w-0 cursor-default items-start gap-2 rounded-xl border border-border bg-background p-2 hover:border-primary'>

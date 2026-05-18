@@ -1,5 +1,4 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
-import type { ProjectUnitType } from '../types/project-selection';
 
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
@@ -74,23 +73,4 @@ export function bundleToAllocations(
       percentage: otherShare,
     })),
   ];
-}
-
-/**
- * Returns a project's display-ready unit cost when it is a measurable physical
- * unit (`tree` or `m2`). Returns `null` for `currency`-typed or missing data so
- * the caller can hide the metric.
- *
- * Format produced (by the locale string): "~{cost} {currency}/{unit}",
- * e.g. unitCost=8, unitType='tree' → "~8 €/tree".
- */
-export function getDisplayableUnitCost(
-  unitCost: number | undefined,
-  unitType: ProjectUnitType | undefined
-): { value: number; unitType: 'tree' | 'm2' } | null {
-  if (unitType !== 'tree' && unitType !== 'm2') return null;
-  if (unitCost === undefined || !Number.isFinite(unitCost) || unitCost <= 0) {
-    return null;
-  }
-  return { value: unitCost, unitType };
 }

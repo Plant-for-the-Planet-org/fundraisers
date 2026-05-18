@@ -1,15 +1,11 @@
 import type {
   ProjectData,
   ProjectPurpose,
-  ProjectUnitType,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
-import {
-  PROJECT_PURPOSES,
-  PROJECT_UNIT_TYPES,
-} from '@/lib/types/project-selection';
+import { PROJECT_PURPOSES } from '@/lib/types/project-selection';
 
 type ApiCountry = Exclude<AllowedCountry, 'ROW'>;
 
@@ -25,26 +21,6 @@ const PROJECT_PURPOSE_SET: ReadonlySet<string> = new Set(PROJECT_PURPOSES);
 
 function isProjectPurpose(value: string): value is ProjectPurpose {
   return PROJECT_PURPOSE_SET.has(value);
-}
-
-const PROJECT_UNIT_TYPE_SET: ReadonlySet<string> = new Set(PROJECT_UNIT_TYPES);
-
-function normalizeUnitType(value: unknown): ProjectUnitType | undefined {
-  if (typeof value !== 'string') return undefined;
-  return PROJECT_UNIT_TYPE_SET.has(value)
-    ? (value as ProjectUnitType)
-    : undefined;
-}
-
-function normalizeUnitCost(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
-    return value;
-  }
-  if (typeof value === 'string') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-  }
-  return undefined;
 }
 
 function normalizePurpose(purpose: unknown): ProjectPurpose | undefined {
@@ -95,8 +71,6 @@ function normalizeProject(project: unknown): ProjectData | null {
     country: typeof rawProject.country === 'string' ? rawProject.country : '',
     purpose: normalizePurpose(rawProject.purpose),
     image: typeof rawProject.image === 'string' ? rawProject.image : undefined,
-    unitCost: normalizeUnitCost(rawProject.unitCost),
-    unitType: normalizeUnitType(rawProject.unitType),
     tpo: normalizeTpo(rawProject.tpo),
   };
 }
