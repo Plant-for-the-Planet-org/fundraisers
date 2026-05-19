@@ -3,7 +3,7 @@
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
-    "amountRaised": "{formattedAmountWithCurrency} gesammelt",
+    "amountRaised": "{formattedAmountWithCurrency}",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
@@ -90,8 +90,8 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} gesammelt",
-        "goalLine": "vom gesetzten Ziel von {amount}",
+        "raised": "{amount} ",
+        "goalLine": "von {amount} gesammelt",
         "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
       },
       "theme": {
@@ -102,7 +102,7 @@
       "title": {
         "label": "Name des Spendenaufrufs",
         "placeholder": "z.B. Mache meinen Geburtstag zu einem Wald",
-        "helper": "Das erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite. <br>Sei spezifisch.",
+        "helper": "Das erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite.\nSei spezifisch.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
