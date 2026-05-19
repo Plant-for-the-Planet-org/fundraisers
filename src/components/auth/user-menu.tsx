@@ -62,7 +62,7 @@ export function UserMenu() {
 
   return (
     <>
-      <DropdownMenu onOpenChange={setIsOpen}>
+      <DropdownMenu onOpenChange={setIsOpen} modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
