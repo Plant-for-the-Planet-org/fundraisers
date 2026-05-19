@@ -94,7 +94,7 @@ export function LeaderboardView({
         {show_recent_list && (
           <TabsContent value='recent' className='mt-0'>
             <ScrollingDonationList
-              donations={initialRecentDonations}
+              initialDonations={initialRecentDonations}
               isActive={effectiveTab === 'recent'}
               anonymize={anonymize}
               showAmount={show_amount}
@@ -105,7 +105,7 @@ export function LeaderboardView({
         {show_top_list && (
           <TabsContent value='top' className='mt-0'>
             <ScrollingDonationList
-              donations={initialTopDonations}
+              initialDonations={initialTopDonations}
               isActive={effectiveTab === 'top'}
               anonymize={anonymize}
               showAmount={show_amount}
