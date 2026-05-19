@@ -104,7 +104,7 @@
       },
       "title": {
         "label": "Fundraiser title",
-        "placeholder": "Turn my birthday into a forest",
+        "placeholder": "e.g. Turn my birthday into a forest",
         "helper": "This appears on share previews, emails, and the top of your page. Keep it specific.",
         "errors": {
           "required": "Please enter a fundraiser name.",

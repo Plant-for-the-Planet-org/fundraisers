@@ -104,7 +104,7 @@
       },
       "title": {
         "label": "Titel des Spendenaufrufs",
-        "placeholder": "Mach meinen Geburtstag zu einem Wald",
+        "placeholder": "z.B. Mach meinen Geburtstag zu einem Wald",
         "helper": "Erscheint in Share-Vorschauen, E-Mails und oben auf deiner Seite. Sei konkret.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
