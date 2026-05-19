@@ -7,7 +7,7 @@
 ## Tech stack
 
 <!-- Framework, language, key libraries, package manager, node version. -->
-
+@AGENTS.md
 ## Commands
 
 Requires a `.env.local` file in the project root before running locally.
