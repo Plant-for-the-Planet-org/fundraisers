@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
+import { localeDeclarations } from './next.config.utils';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -20,16 +21,7 @@ const nextConfig: NextConfig = {
 const withNextIntl = createNextIntlPlugin({
   requestConfig: './src/i18n/request.ts',
   experimental: {
-    createMessagesDeclaration: [
-      './locales/en/common.json',
-      './locales/en/explore.json',
-      './locales/en/fundraisers.json',
-      './locales/en/auth.json',
-      './locales/en/dashboard.json',
-      './locales/en/donate.json',
-      './locales/en/stage.json',
-      './locales/en/leaderboard.json',
-    ],
+    createMessagesDeclaration: localeDeclarations,
   },
 });
 

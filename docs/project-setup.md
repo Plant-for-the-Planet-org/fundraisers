@@ -214,6 +214,7 @@ export function WelcomeMessage() {
    - `src/i18n/types.ts` augments `next-intl`'s `AppConfig.Messages` with the actual message types
    - Provides autocomplete for translation keys in `useTranslations()` / `getTranslations()`
    - `createMessagesDeclaration` in `next.config.ts` generates `.d.json.ts` files at dev/build time for ICU message argument checking (e.g. missing `{ count }` in a plural message)
+   - The list is built dynamically in `next.config.utils.ts` by reading `locales/en/` at startup — no static array to keep in sync when new locale files are added. `cookie.json` is excluded as it is not loaded via `request.ts`.
    - Generated `.d.json.ts` files are gitignored — run `next dev` once on a fresh clone to generate them
    - Trade-off: in namespaces with ICU placeholders (e.g. Fundraisers, Explore), invalid key errors show as `Expected 2-3 arguments, but got 1` rather than a "key not found" message — this is a TypeScript overload resolution limitation, not a bug. Namespaces with only plain strings (e.g. Common) are unaffected and give clear errors.
 
