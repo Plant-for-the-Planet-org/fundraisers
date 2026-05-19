@@ -67,7 +67,7 @@ function AddModuleMenu() {
   const t = useTranslations('Fundraisers.form.options');
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           type='button'

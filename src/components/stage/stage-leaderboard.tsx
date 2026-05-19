@@ -23,7 +23,7 @@ export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
   if (top.length === 0) return null;
 
   return (
-    <GlassPanel className='absolute right-12 top-[380px] z-[17] w-[440px] px-[22px] pb-3.5 pt-5'>
+    <GlassPanel className='absolute right-12 top-[350px] z-[17] w-[440px] px-[22px] pb-3.5 pt-5'>
       {/* Header */}
       <div className='mb-2 flex items-baseline justify-between'>
         <span className='text-[18px] font-bold'>{t('topDonors')}</span>

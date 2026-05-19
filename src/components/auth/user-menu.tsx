@@ -9,7 +9,6 @@ import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
 import { Avatar, AvatarImage } from '../ui/avatar';
-import { FallbackAvatar } from '../ui/fallback-avatar';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -19,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/drop-down-menu';
+import { FallbackAvatar } from '../ui/fallback-avatar';
 import { ImpersonationModal } from './impersonation-modal';
 import { SignInButton } from './sign-in-button';
 import { SignOutButton } from './sign-out-button';
@@ -62,7 +62,7 @@ export function UserMenu() {
 
   return (
     <>
-      <DropdownMenu onOpenChange={setIsOpen}>
+      <DropdownMenu onOpenChange={setIsOpen} modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'

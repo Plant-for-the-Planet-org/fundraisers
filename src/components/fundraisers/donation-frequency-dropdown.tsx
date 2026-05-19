@@ -27,7 +27,7 @@ export function DonationFrequencyDropdown({
   onOptionChange,
 }: DonationFrequencyDropdownProps) {
   return (
-    <DropdownMenu data-component='donation-frequency-dropdown'>
+    <DropdownMenu modal={false} data-component='donation-frequency-dropdown'>
       <DropdownMenuTrigger className='flex items-center gap-2.5 text-zinc-700 text-sm font-semibold hover:opacity-70 transition-opacity'>
         {selectedOption.label}
         <ChevronDown className='w-4 h-4' />
