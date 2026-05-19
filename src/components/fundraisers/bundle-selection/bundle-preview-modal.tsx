@@ -91,7 +91,7 @@ export function BundlePreviewModal({
             type='button'
             onClick={onClose}
             aria-label={t('aria.closeModal')}
-            className='flex h-9 min-w-9 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground transition-colors hover:bg-background/80'
+            className='flex h-9 min-w-9 shrink-0 items-center justify-center self-start rounded-md bg-background text-muted-foreground transition-colors hover:bg-background/80 sm:self-auto'
           >
             <X className='h-5 w-5' />
           </button>
