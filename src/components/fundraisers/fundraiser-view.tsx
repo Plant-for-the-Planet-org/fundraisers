@@ -21,19 +21,20 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
-import {
-  LeaderboardLoader,
-  LeaderboardSkeleton,
-} from './leaderboard/leaderboard-loader';
+import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
+import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
+import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
 
 export function FundraiserView({
   fundraiser,
   paymentOptions,
   paymentOptionsAreAuthenticated = false,
+  leaderboardFetchStrategy = 'ssr',
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
   paymentOptionsAreAuthenticated?: boolean;
+  leaderboardFetchStrategy?: 'ssr' | 'client';
 }) {
   const t = useTranslations('Fundraisers');
 
@@ -95,14 +96,20 @@ export function FundraiserView({
         <TitleDisplay value={fundraiser.title} />
 
         {/* Leaderboard */}
-        {canShowLeaderboard && (
-          <Suspense fallback={<LeaderboardSkeleton />}>
-            <LeaderboardLoader
+        {canShowLeaderboard &&
+          (leaderboardFetchStrategy === 'client' ? (
+            <LeaderboardClientLoader
               idOrSlug={fundraiser.slug}
               settings={leaderboardSettings}
             />
-          </Suspense>
-        )}
+          ) : (
+            <Suspense fallback={<LeaderboardSkeleton />}>
+              <LeaderboardServerLoader
+                idOrSlug={fundraiser.slug}
+                settings={leaderboardSettings}
+              />
+            </Suspense>
+          ))}
 
         {/* Donation form + overlay */}
         {fundraiser.canDonate && paymentOptions && fundraiser.workspace ? (

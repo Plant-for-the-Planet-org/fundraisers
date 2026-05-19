@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { DonationItem } from './donation-item';
 
 interface ScrollingDonationListProps {
-  donations: LeaderboardDonation[];
+  initialDonations: LeaderboardDonation[];
   isActive: boolean;
   anonymize: boolean;
   showAmount: boolean;
@@ -16,7 +16,7 @@ interface ScrollingDonationListProps {
 }
 
 export function ScrollingDonationList({
-  donations,
+  initialDonations,
   isActive,
   anonymize,
   showAmount,
@@ -60,11 +60,11 @@ export function ScrollingDonationList({
       setTimeout(() => startAutoScroll(el), 100);
     }
     return () => stopAutoScroll();
-  }, [isActive, donations, startAutoScroll, stopAutoScroll]);
+  }, [isActive, initialDonations.length, startAutoScroll, stopAutoScroll]);
 
   useEffect(() => () => stopAutoScroll(), [stopAutoScroll]);
 
-  if (donations.length === 0) {
+  if (initialDonations.length === 0) {
     return (
       <div className='scrolling-donation-list flex items-center justify-center py-4'>
         <p className='text-sm text-muted-foreground'>{t('emptyState')}</p>
@@ -83,7 +83,7 @@ export function ScrollingDonationList({
         if (el) setTimeout(() => startAutoScroll(el), 100);
       }}
     >
-      {donations.map(donation => (
+      {initialDonations.map(donation => (
         <DonationItem
           key={donation.id}
           donation={donation}
