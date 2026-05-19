@@ -1,6 +1,7 @@
 {
   "Bundles": {
     "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
+    "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
         "label": "Team-Auswahl",

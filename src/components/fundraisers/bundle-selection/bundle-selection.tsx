@@ -12,13 +12,14 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { BUNDLE_TAB_IDS } from '@/lib/types/bundle';
 import { bundleToAllocations } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { BundlePreviewModal } from './bundle-preview-modal';
 import { BundleTabPanel } from './bundle-tab-panel';
@@ -197,65 +198,56 @@ function BundleSelectionContent({
 
   const moreIsActive = MOBILE_HIDDEN.includes(activeTab);
 
-  function renderTab(tabId: BundleTabId) {
-    const isSelected = tabId === activeTab;
-    return (
-      <button
-        key={tabId}
-        role='tab'
-        type='button'
-        aria-selected={isSelected}
-        onClick={() => {
-          setActiveTab(tabId);
-          setMoreOpen(false);
-        }}
-        className={cn(
-          'inline-flex h-8 flex-1 items-center justify-center whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
-          isSelected
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground hover:text-foreground'
-        )}
-      >
-        {t(`tabs.${tabId}.label`)}
-      </button>
-    );
-  }
+  const handleValueChange = (value: string) => {
+    setActiveTab(value as BundleTabId);
+    setMoreOpen(false);
+  };
 
   return (
     <div className='flex flex-col gap-3'>
       <SectionHeader>{t('sectionHeading')}</SectionHeader>
 
-      {/* Desktop: all tabs */}
-      <div
-        role='tablist'
-        aria-label={t('sectionHeading')}
-        className='hidden md:flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted/50 py-1 pl-1 pr-1 shadow-xs'
-      >
-        {BUNDLE_TAB_IDS.map(tabId => renderTab(tabId))}
-      </div>
-
-      {/* Mobile: 3 visible + more dropdown */}
-      <div className='md:hidden'>
-        <div
-          role='tablist'
+      <Tabs value={activeTab} onValueChange={handleValueChange}>
+        {/* Desktop: all tabs */}
+        <TabsList
           aria-label={t('sectionHeading')}
-          className='flex h-11 w-full items-center gap-1 rounded-xl border border-border/60 bg-muted/50 py-1 pl-1 pr-1 shadow-xs'
+          className='hidden w-full gap-1 md:inline-flex'
         >
-          {MOBILE_VISIBLE.map(tabId => renderTab(tabId))}
+          {BUNDLE_TAB_IDS.map(tabId => (
+            <TabsTrigger key={tabId} value={tabId}>
+              {t(`tabs.${tabId}.label`)}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-          <div ref={moreRef} className='relative'>
+        {/* Mobile: visible tabs + More dropdown (overlays content below).
+            Outer pill mimics TabsList's bg so the inner TabsList + sibling
+            "More" button still read as a single segmented control. */}
+        <div ref={moreRef} className='relative flex flex-col gap-2 md:hidden'>
+          <div className='flex h-9 w-full items-center gap-1 rounded-lg bg-muted p-0.75 text-muted-foreground'>
+            <TabsList
+              aria-label={t('sectionHeading')}
+              className='h-full! w-auto basis-[70%] rounded-none bg-transparent p-0'
+            >
+              {MOBILE_VISIBLE.map(tabId => (
+                <TabsTrigger key={tabId} value={tabId}>
+                  {t(`tabs.${tabId}.label`)}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
             <button
               type='button'
               onClick={() => setMoreOpen(v => !v)}
+              aria-expanded={moreOpen}
+              aria-haspopup='menu'
               className={cn(
-                'inline-flex h-8 items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors',
-                moreIsActive
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                'inline-flex h-[calc(100%-1px)] basis-[30%] items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-2 py-1 text-sm font-medium text-foreground/60 transition-all hover:text-foreground focus-visible:border-ring focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                moreIsActive && 'bg-background text-foreground shadow-sm'
               )}
             >
               <span>
-                {moreIsActive ? t(`tabs.${activeTab}.label`) : 'More'}
+                {moreIsActive ? t(`tabs.${activeTab}.label`) : t('moreLabel')}
               </span>
               <ChevronDown
                 className={cn(
@@ -264,47 +256,59 @@ function BundleSelectionContent({
                 )}
               />
             </button>
+          </div>
 
-            {moreOpen && (
-              <div className='absolute right-0 top-full z-50 mt-1 min-w-32 overflow-hidden rounded-lg border border-border bg-background shadow-md'>
-                {MOBILE_HIDDEN.map(tabId => (
+          {moreOpen && (
+            <div
+              role='menu'
+              className='absolute right-0 top-full z-50 mt-2 min-w-44 overflow-hidden rounded-xl border border-border bg-background shadow-lg'
+            >
+              {MOBILE_HIDDEN.map(tabId => {
+                const isActive = activeTab === tabId;
+                return (
                   <button
                     key={tabId}
                     type='button'
-                    onClick={() => {
-                      setActiveTab(tabId);
-                      setMoreOpen(false);
-                    }}
+                    role='menuitem'
+                    onClick={() => handleValueChange(tabId)}
                     className={cn(
-                      'flex w-full items-center px-3 py-2 text-sm transition-colors hover:bg-muted',
-                      activeTab === tabId
+                      'flex w-full items-center gap-2 px-3 py-3 text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none',
+                      isActive
                         ? 'font-medium text-foreground'
                         : 'text-muted-foreground'
                     )}
                   >
-                    {t(`tabs.${tabId}.label`)}
+                    <span className='flex h-4 w-4 items-center justify-center'>
+                      {isActive && (
+                        <Check
+                          className='h-4 w-4 text-emerald-600 dark:text-emerald-400'
+                          aria-hidden='true'
+                        />
+                      )}
+                    </span>
+                    <span>{t(`tabs.${tabId}.label`)}</span>
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </div>
 
-      <div role='tabpanel'>
-        {activeTab === 'custom' ? (
-          <CustomTabPanel country={country} />
-        ) : (
-          <BundleTabPanel
-            activeTab={activeTab}
-            bundleWorkspace={bundleWorkspace}
-            selectedBundleSlug={selectedBundleSlug}
-            getProject={getProject}
-            onSelectBundle={onUseBundle}
-            onOpenBundle={setPreviewBundle}
-          />
-        )}
-      </div>
+        <TabsContent value={activeTab}>
+          {activeTab === 'custom' ? (
+            <CustomTabPanel country={country} />
+          ) : (
+            <BundleTabPanel
+              activeTab={activeTab}
+              bundleWorkspace={bundleWorkspace}
+              selectedBundleSlug={selectedBundleSlug}
+              getProject={getProject}
+              onSelectBundle={onUseBundle}
+              onOpenBundle={setPreviewBundle}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
 
       {previewBundle && activeTab !== 'custom' && (
         <BundlePreviewModal

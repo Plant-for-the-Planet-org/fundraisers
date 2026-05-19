@@ -1,6 +1,7 @@
 {
   "Bundles": {
     "sectionHeading": "Pick Causes Supported by your Fundraiser",
+    "moreLabel": "More",
     "tabs": {
       "staff-picks": {
         "label": "Staff Picks",
