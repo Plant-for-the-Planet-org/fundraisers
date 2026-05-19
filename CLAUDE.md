@@ -12,6 +12,8 @@
 
 Requires a `.env.local` file in the project root before running locally.
 
+Node 24 is required (Next.js needs ≥20.9). The dev server may already be running on port 3000 — check first. If not, `nvm use 24` then `npm run dev`. The `.claude/launch.json` `fundraisers-dev` preset handles this automatically via `bash -lc`.
+
 | Command | When to use |
 |---|---|
 | `npm run dev` | Start the local dev server |

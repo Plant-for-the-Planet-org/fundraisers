@@ -7,9 +7,10 @@ import { GlassPanel } from './glass-panel';
 
 interface StageQRPanelProps {
   fundraiserId: string;
+  slug: string;
 }
 
-export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
+export function StageQRPanel({ fundraiserId, slug }: StageQRPanelProps) {
   const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
   const [donateUrl, setDonateUrl] = useState('');
@@ -21,9 +22,9 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
       utm_campaign: 'stage-mode',
     });
     const target = `${window.location.origin}/raise/${fundraiserId}?${params.toString()}`;
-    setDonateUrl(`${window.location.host}/raise/${fundraiserId}`);
+    setDonateUrl(`stage.pp.eco/${slug}`);
     setQrSrc(`https://qr.pp.eco/?data=${encodeURIComponent(target)}`);
-  }, [fundraiserId]);
+  }, [fundraiserId, slug]);
 
   return (
     <GlassPanel className='absolute bottom-[170px] left-12 z-[18] w-[300px] p-[18px]'>
@@ -43,11 +44,11 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
           {t('scanToDonate')}
         </div>
         <div
-          className='flex items-center gap-1.5 text-[13px] font-bold tracking-tight opacity-70'
+          className='text-[13px] font-bold tracking-tight opacity-70'
           style={{ color: '#0B1220' }}
         >
-          <Globe size={13} />
-          {donateUrl}
+          <Globe size={13} className='mr-1 inline align-[-2px]' />
+          <span>{donateUrl}</span>
         </div>
       </div>
     </GlassPanel>

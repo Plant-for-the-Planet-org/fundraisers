@@ -98,7 +98,7 @@ export function StageView({
         )}
 
         {/* QR panel — bottom left */}
-        <StageQRPanel fundraiserId={fundraiser.id} />
+        <StageQRPanel fundraiserId={fundraiser.id} slug={slug} />
 
         {/* Ticker — bottom bar */}
         <StageTicker
