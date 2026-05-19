@@ -4,8 +4,8 @@ import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { getMockLeaderboardDonations } from './leaderboard/mock-data';
 import { DonorsStrip } from './donors-strip';
+import { getMockLeaderboardDonations } from './leaderboard/mock-data';
 import { SectionHeader } from './typography';
 
 export function DonorsPreview() {
