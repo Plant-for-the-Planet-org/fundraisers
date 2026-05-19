@@ -23,7 +23,7 @@ export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
 
   return (
     <div
-      className='absolute right-12 top-[380px] z-[17] w-[440px] rounded-3xl border px-[22px] pb-3.5 pt-5'
+      className='absolute right-12 top-[350px] z-[17] w-[440px] rounded-3xl border px-[22px] pb-3.5 pt-5'
       style={{
         background: 'rgba(255,255,255,0.78)',
         borderColor: 'rgba(255,255,255,0.55)',
