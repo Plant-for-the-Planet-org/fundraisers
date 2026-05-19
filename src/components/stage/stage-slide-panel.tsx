@@ -1,25 +1,17 @@
 'use client';
 
+import type { StageSlide } from '@/lib/types/fundraiser';
+
 import { useEffect, useState } from 'react';
 
-interface Slide {
-  position: number;
-  title: string;
-  description?: string;
-  image?: string;
-  duration?: number;
-}
-
 interface StageSlidePanelProps {
-  slides: unknown[];
+  slides: StageSlide[];
 }
 
 export function StageSlidePanel({ slides }: StageSlidePanelProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const sorted = (slides as Slide[])
-    .slice()
-    .sort((a, b) => a.position - b.position);
+  const sorted = slides.slice().sort((a, b) => a.position - b.position);
 
   useEffect(() => {
     if (sorted.length <= 1) return;

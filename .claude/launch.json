@@ -3,8 +3,11 @@
   "configurations": [
     {
       "name": "fundraisers-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "source \"$HOME/.nvm/nvm.sh\" && nvm use 24 >/dev/null && npm run dev"
+      ],
       "port": 3000,
       "autoPort": true
     }

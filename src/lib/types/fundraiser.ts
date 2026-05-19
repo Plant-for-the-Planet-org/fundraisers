@@ -1,3 +1,4 @@
+import type { Locale } from '@/i18n/routing';
 import type { Nullable } from './utility';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
@@ -69,11 +70,13 @@ export interface StageSlide {
 
 export interface StageModuleSettings {
   enabled: boolean;
-  locale: 'en' | 'de' | 'es';
+  locale: Locale;
   title: string;
   description: string;
   partner_logo_url: string;
   slides: StageSlide[];
+  show_impact?: boolean;
+  show_progress_bar?: boolean;
 }
 
 export interface FundraiserSettings {

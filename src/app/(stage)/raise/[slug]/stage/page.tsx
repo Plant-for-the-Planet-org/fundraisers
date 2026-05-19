@@ -1,21 +1,12 @@
-import { NextIntlClientProvider } from 'next-intl';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { StageView } from '@/components/stage/stage-view';
+import { routing, type Locale } from '@/i18n/routing';
 
-import { routing } from '@/i18n/routing';
-
-type SupportedLocale = (typeof routing.locales)[number];
-
-function resolveStageLocale(raw: unknown): SupportedLocale {
-  return (routing.locales as readonly string[]).includes(raw as string)
-    ? (raw as SupportedLocale)
-    : routing.defaultLocale;
-}
-
-async function loadStageMessages(locale: SupportedLocale) {
+async function loadStageMessages(locale: Locale) {
   const mod = await import(`../../../../../../locales/${locale}/stage.json`);
   return mod.default;
 }
@@ -46,18 +37,10 @@ export default async function StagePage({
     throw e;
   }
 
-  const stageSettings = (
-    fundraiser.settings?.modules as Record<string, unknown> | undefined
-  )?.stage as Record<string, unknown> | undefined;
-
-  const stageLocale = resolveStageLocale(stageSettings?.locale ?? appLocale);
-
-  const [t, stageMessages] = await Promise.all([
-    getTranslations({ locale: stageLocale, namespace: 'Stage' }),
-    loadStageMessages(stageLocale),
-  ]);
+  const stageSettings = fundraiser.settings?.modules?.stage ?? undefined;
 
   if (!stageSettings?.enabled) {
+    const t = await getTranslations({ locale: appLocale, namespace: 'Stage' });
     return (
       <div className='flex h-dvh w-screen flex-col items-center justify-center gap-3 bg-[#0b1220] text-center'>
         <p className='text-lg font-semibold text-white'>{t('notEnabled')}</p>
@@ -65,6 +48,12 @@ export default async function StagePage({
       </div>
     );
   }
+
+  const stageLocale: Locale = hasLocale(routing.locales, stageSettings.locale)
+    ? stageSettings.locale
+    : routing.defaultLocale;
+
+  const stageMessages = await loadStageMessages(stageLocale);
 
   return (
     <NextIntlClientProvider locale={stageLocale} messages={stageMessages}>
