@@ -1,43 +1,28 @@
 'use client';
 
+import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+
 import { useEffect, useState } from 'react';
 import { platformFetch } from '@/lib/api/platform-fetch';
 import {
-  STAGE_POLL_INTERVAL_MS,
   msUntilNextBucket,
+  STAGE_POLL_INTERVAL_MS,
   stageHash,
 } from '../stage-hash';
 
-export interface AlltimeStats {
-  stats: {
-    donationCount: number;
-    goal: { amount: number; currency: string };
-    daysLeft: number;
-    raised: { total: number; currency: string };
-    impact: {
-      trees: number;
-      conservedM2: number;
-      restoredM2: number;
-      funding: number;
-    };
-    lastUpdated: string;
-  };
-  settings: {
-    enabled: boolean;
-    show_goal: boolean;
-    show_days_left: boolean;
-    show_impact: boolean;
-  };
+interface LeaderboardData {
+  recent: LeaderboardDonation[];
+  top: LeaderboardDonation[];
 }
 
-async function fetchAlltimeStats(slug: string): Promise<AlltimeStats> {
-  return platformFetch<AlltimeStats>(
-    `/fundraisers/${slug}/alltime-stats?stagehash=${stageHash()}`
+async function fetchLeaderboard(slug: string): Promise<LeaderboardData> {
+  return platformFetch<LeaderboardData>(
+    `/fundraisers/${slug}/leaderboard?stagehash=${stageHash()}`
   );
 }
 
-export function useAlltimeStats(slug: string) {
-  const [data, setData] = useState<AlltimeStats | null>(null);
+export function useLeaderboard(slug: string) {
+  const [data, setData] = useState<LeaderboardData | null>(null);
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
@@ -45,7 +30,7 @@ export function useAlltimeStats(slug: string) {
 
     async function poll() {
       try {
-        const result = await fetchAlltimeStats(slug);
+        const result = await fetchLeaderboard(slug);
         if (!cancelled) {
           setData(result);
           setOffline(false);

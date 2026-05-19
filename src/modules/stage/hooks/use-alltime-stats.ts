@@ -1,28 +1,15 @@
-'use client';
-
-import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+import type { AlltimeStats } from '@/lib/types/alltime-stats';
 
 import { useEffect, useState } from 'react';
-import { platformFetch } from '@/lib/api/platform-fetch';
+import { getAlltimeStats } from '@/lib/api/fundraiser-service';
 import {
-  STAGE_POLL_INTERVAL_MS,
   msUntilNextBucket,
+  STAGE_POLL_INTERVAL_MS,
   stageHash,
 } from '../stage-hash';
 
-interface LeaderboardData {
-  recent: LeaderboardDonation[];
-  top: LeaderboardDonation[];
-}
-
-async function fetchLeaderboard(slug: string): Promise<LeaderboardData> {
-  return platformFetch<LeaderboardData>(
-    `/fundraisers/${slug}/leaderboard?stagehash=${stageHash()}`
-  );
-}
-
-export function useLeaderboard(slug: string) {
-  const [data, setData] = useState<LeaderboardData | null>(null);
+export function useAlltimeStats(slug: string) {
+  const [data, setData] = useState<AlltimeStats | null>(null);
   const [offline, setOffline] = useState(false);
 
   useEffect(() => {
@@ -30,7 +17,7 @@ export function useLeaderboard(slug: string) {
 
     async function poll() {
       try {
-        const result = await fetchLeaderboard(slug);
+        const result = await getAlltimeStats(slug, { cacheBuster: stageHash() });
         if (!cancelled) {
           setData(result);
           setOffline(false);

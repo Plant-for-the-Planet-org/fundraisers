@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { STAGE_POLL_INTERVAL_SECONDS } from './stage-hash';
+import { STAGE_POLL_INTERVAL_SECONDS } from '../stage-hash';
 
 function getRemaining() {
   return (

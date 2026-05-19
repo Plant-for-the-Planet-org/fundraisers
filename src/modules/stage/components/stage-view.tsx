@@ -2,15 +2,12 @@
 
 import type React from 'react';
 import type { Theme } from '@/lib/theme/types';
-import type {
-  Fundraiser,
-  StageModuleSettings,
-} from '@/lib/types/fundraiser';
+import type { Fundraiser, StageModuleSettings } from '@/lib/types/fundraiser';
 
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
-import { useLeaderboard } from './hooks/use-leaderboard';
-import { useStageScale } from './hooks/use-stage-scale';
+import { useLeaderboard } from '../hooks/use-leaderboard';
+import { useStageScale } from '../hooks/use-stage-scale';
 import { StageCounter } from './stage-counter';
 import { StageLeaderboard } from './stage-leaderboard';
 import { StageQRPanel } from './stage-qr-panel';

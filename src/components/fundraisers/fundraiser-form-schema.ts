@@ -16,7 +16,8 @@ import {
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
-import { STAGE_LIMITS } from '@/components/stage/constants';
+import { STAGE_LIMITS } from '@/modules/stage';
+
 import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
