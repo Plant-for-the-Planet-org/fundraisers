@@ -18,7 +18,6 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
-import { useDonateThemeMode } from './donate-overlay-theme';
 import { FormField } from './form-field';
 
 export interface StripeCardFormHandle {
@@ -45,7 +44,9 @@ export interface StripeCardFormHandle {
 export const StripeCardForm = forwardRef<StripeCardFormHandle>(
   function StripeCardForm(_props, ref) {
     const stripe = useStripe();
-    const isDark = useDonateThemeMode() === 'dark';
+    const isDark =
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark');
     const cardElementOptions = {
       style: {
         base: {

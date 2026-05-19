@@ -202,7 +202,7 @@ export function DonationForm({
   return (
     <Card className='donation-form border-2 border-card shadow py-0 gap-0 rounded-2xl'>
       <CardHeader className='px-4 py-2.5 mx-1 mt-1 bg-muted rounded-tl-lg rounded-tr-lg flex flex-row justify-between items-center gap-0 space-y-0'>
-        <div className='text-muted-foreground text-sm font-semibold'>
+        <div className='text-foreground text-sm font-semibold'>
           {t('cardHeader')}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
