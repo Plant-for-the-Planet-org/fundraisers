@@ -84,6 +84,10 @@
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
     },
+    "createPage": {
+      "title": "Erstelle deinen Spendenaufruf",
+      "subtitle": "Gib Menschen etwas zu fühlen. Dann gib ihnen einen Weg zu spenden."
+    },
     "form": {
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -96,8 +100,9 @@
         "selectAccent": "Wähle {accent} als Akzentfarbe"
       },
       "title": {
-        "label": "Name des Spendenaufrufs",
-        "placeholder": "Name des Spendenaufrufs",
+        "label": "Titel des Spendenaufrufs",
+        "placeholder": "z.B. Mach meinen Geburtstag zu einem Wald",
+        "helper": "Erscheint in Share-Vorschauen, E-Mails und oben auf deiner Seite. Sei konkret.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
