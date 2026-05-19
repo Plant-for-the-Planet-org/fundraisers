@@ -21,6 +21,12 @@ import {
   X,
 } from 'lucide-react';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { routing } from '@/i18n/routing';
+
+const LOCALE_OPTIONS: Record<string, string> = {
+  en: '🇬🇧 English',
+  de: '🇩🇪 Deutsch',
+};
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -191,9 +197,11 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value='en'>🇬🇧 English</SelectItem>
-                      <SelectItem value='de'>🇩🇪 Deutsch</SelectItem>
-                      <SelectItem value='es'>🇪🇸 Español</SelectItem>
+                      {routing.locales.map(locale => (
+                        <SelectItem key={locale} value={locale}>
+                          {LOCALE_OPTIONS[locale] ?? locale}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}

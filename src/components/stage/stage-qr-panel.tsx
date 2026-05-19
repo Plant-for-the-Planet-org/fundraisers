@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
+import { GlassPanel } from './glass-panel';
 
 interface StageQRPanelProps {
   fundraiserId: string;
@@ -14,29 +15,18 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
   const [donateUrl, setDonateUrl] = useState('');
 
   useEffect(() => {
-    const base = window.location.origin;
     const params = new URLSearchParams({
       utm_source: 'stage',
       utm_medium: 'qr',
       utm_campaign: 'stage-mode',
     });
-    const url = `${base}/raise/${fundraiserId}?${params.toString()}`;
-    setDonateUrl(`stage.pp.eco/${fundraiserId}`);
-    setQrSrc(`https://qr.pp.eco/?${url}`);
+    const target = `${window.location.origin}/raise/${fundraiserId}?${params.toString()}`;
+    setDonateUrl(`${window.location.host}/raise/${fundraiserId}`);
+    setQrSrc(`https://qr.pp.eco/?data=${encodeURIComponent(target)}`);
   }, [fundraiserId]);
 
   return (
-    <div
-      className='absolute bottom-[170px] left-12 z-[18] w-[300px] rounded-3xl border p-[18px]'
-      style={{
-        background: 'rgba(255,255,255,0.78)',
-        borderColor: 'rgba(255,255,255,0.55)',
-        backdropFilter: 'blur(22px) saturate(140%)',
-        boxShadow:
-          '0 30px 60px -20px rgba(8,15,35,.45), 0 10px 24px -10px rgba(8,15,35,.35), inset 0 1px 0 rgba(255,255,255,.7)',
-        color: '#0B1220',
-      }}
-    >
+    <GlassPanel className='absolute bottom-[170px] left-12 z-[18] w-[300px] p-[18px]'>
       <div className='flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5'>
         {qrSrc ? (
           <img src={qrSrc} alt={t('scanToDonate')} className='h-full w-full' />
@@ -60,6 +50,6 @@ export function StageQRPanel({ fundraiserId }: StageQRPanelProps) {
           {donateUrl}
         </div>
       </div>
-    </div>
+    </GlassPanel>
   );
 }

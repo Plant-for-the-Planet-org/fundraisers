@@ -2,7 +2,10 @@
 
 import type React from 'react';
 import type { Theme } from '@/lib/theme/types';
-import type { Fundraiser } from '@/lib/types/fundraiser';
+import type {
+  Fundraiser,
+  StageModuleSettings,
+} from '@/lib/types/fundraiser';
 
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
@@ -19,7 +22,7 @@ import { StageTopBar } from './stage-top-bar';
 interface StageViewProps {
   fundraiser: Fundraiser;
   theme: Theme;
-  stageSettings: Record<string, unknown> | undefined;
+  stageSettings: StageModuleSettings | undefined;
   locale: string;
 }
 
@@ -33,16 +36,14 @@ export function StageView({
   const slug = fundraiser.slug ?? fundraiser.id;
   const { data: leaderboardData, offline } = useLeaderboard(slug);
 
-  const leaderboardSettings = (
-    fundraiser.settings?.modules as Record<string, unknown> | undefined
-  )?.leaderboard as Record<string, unknown> | undefined;
-  const showLeaderboard = Boolean(leaderboardSettings?.enabled);
-  const showImpact = Boolean(stageSettings?.show_impact ?? true);
-  const showProgressBar = Boolean(stageSettings?.show_progress_bar ?? true);
-  const slides = (stageSettings?.slides as unknown[]) ?? [];
-  const stageTitle =
-    (stageSettings?.title as string | undefined) || fundraiser.title;
-  const stageDescription = stageSettings?.description as string | undefined;
+  const showLeaderboard = Boolean(
+    fundraiser.settings?.modules?.leaderboard?.enabled
+  );
+  const showImpact = stageSettings?.show_impact ?? true;
+  const showProgressBar = stageSettings?.show_progress_bar ?? true;
+  const slides = stageSettings?.slides ?? [];
+  const stageTitle = stageSettings?.title || fundraiser.title;
+  const stageDescription = stageSettings?.description;
 
   return (
     <div
@@ -80,7 +81,7 @@ export function StageView({
         <StageTopBar
           title={stageTitle}
           description={stageDescription}
-          logoUrl={stageSettings?.partner_logo_url as string | undefined}
+          logoUrl={stageSettings?.partner_logo_url}
         />
 
         {/* Counter — top right */}

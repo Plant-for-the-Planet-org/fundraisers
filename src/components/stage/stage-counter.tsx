@@ -5,6 +5,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
+import { GlassPanel } from './glass-panel';
 import { useAlltimeStats } from './hooks/use-alltime-stats';
 
 interface StageCounterProps {
@@ -42,17 +43,7 @@ export function StageCounter({
   }
 
   return (
-    <div
-      className='absolute right-12 top-12 z-[18] w-[440px] rounded-3xl border p-6'
-      style={{
-        background: 'rgba(255,255,255,0.78)',
-        borderColor: 'rgba(255,255,255,0.55)',
-        backdropFilter: 'blur(22px) saturate(140%)',
-        boxShadow:
-          '0 30px 60px -20px rgba(8,15,35,.45), 0 10px 24px -10px rgba(8,15,35,.35), inset 0 1px 0 rgba(255,255,255,.7)',
-        color: '#0B1220',
-      }}
-    >
+    <GlassPanel className='absolute right-12 top-12 z-[18] w-[440px] p-6'>
       <div className='text-[11px] font-bold uppercase tracking-[.18em] opacity-60'>
         {t('raisedSoFar')}
       </div>
@@ -154,6 +145,6 @@ export function StageCounter({
           </div>
         )}
       </div>
-    </div>
+    </GlassPanel>
   );
 }

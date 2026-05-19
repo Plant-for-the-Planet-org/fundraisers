@@ -6,15 +6,17 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
-
-const POLL_SECONDS = 15;
+import { STAGE_POLL_INTERVAL_SECONDS } from './stage-hash';
 
 function getRemaining() {
-  return POLL_SECONDS - (Math.floor(Date.now() / 1000) % POLL_SECONDS);
+  return (
+    STAGE_POLL_INTERVAL_SECONDS -
+    (Math.floor(Date.now() / 1000) % STAGE_POLL_INTERVAL_SECONDS)
+  );
 }
 
 function useCountdown() {
-  const [remaining, setRemaining] = useState(POLL_SECONDS);
+  const [remaining, setRemaining] = useState(STAGE_POLL_INTERVAL_SECONDS);
 
   useEffect(() => {
     setRemaining(getRemaining());
@@ -30,7 +32,7 @@ function CountdownRing({ remaining }: { remaining: number }) {
   const stroke = 3;
   const r = (size - stroke) / 2;
   const circumference = 2 * Math.PI * r;
-  const progress = remaining / POLL_SECONDS;
+  const progress = remaining / STAGE_POLL_INTERVAL_SECONDS;
   const dashoffset = circumference * (1 - progress);
 
   return (

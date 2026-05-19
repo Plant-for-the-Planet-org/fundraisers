@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { platformFetch } from '@/lib/api/platform-fetch';
-
-const POLL_INTERVAL = 15_000;
+import {
+  STAGE_POLL_INTERVAL_MS,
+  msUntilNextBucket,
+  stageHash,
+} from '../stage-hash';
 
 export interface AlltimeStats {
   stats: {
@@ -25,10 +28,6 @@ export interface AlltimeStats {
     show_days_left: boolean;
     show_impact: boolean;
   };
-}
-
-export function stageHash() {
-  return Math.floor(Date.now() / 15_000);
 }
 
 async function fetchAlltimeStats(slug: string): Promise<AlltimeStats> {
@@ -57,10 +56,15 @@ export function useAlltimeStats(slug: string) {
     }
 
     poll();
-    const id = setInterval(poll, POLL_INTERVAL);
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const timeoutId = setTimeout(() => {
+      poll();
+      intervalId = setInterval(poll, STAGE_POLL_INTERVAL_MS);
+    }, msUntilNextBucket());
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
     };
   }, [slug]);
 

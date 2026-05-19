@@ -4,14 +4,16 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useEffect, useState } from 'react';
 import { platformFetch } from '@/lib/api/platform-fetch';
-import { stageHash } from './use-alltime-stats';
+import {
+  STAGE_POLL_INTERVAL_MS,
+  msUntilNextBucket,
+  stageHash,
+} from '../stage-hash';
 
 interface LeaderboardData {
   recent: LeaderboardDonation[];
   top: LeaderboardDonation[];
 }
-
-const POLL_INTERVAL = 15_000;
 
 async function fetchLeaderboard(slug: string): Promise<LeaderboardData> {
   return platformFetch<LeaderboardData>(
@@ -39,10 +41,15 @@ export function useLeaderboard(slug: string) {
     }
 
     poll();
-    const id = setInterval(poll, POLL_INTERVAL);
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const timeoutId = setTimeout(() => {
+      poll();
+      intervalId = setInterval(poll, STAGE_POLL_INTERVAL_MS);
+    }, msUntilNextBucket());
     return () => {
       cancelled = true;
-      clearInterval(id);
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
     };
   }, [slug]);
 
