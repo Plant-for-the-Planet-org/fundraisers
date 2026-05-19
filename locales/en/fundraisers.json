@@ -13,6 +13,7 @@
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
+    "andMore": "& more...",
     "error": {
       "title": "Something went wrong",
       "description": "This fundraiser could not be loaded. Please try again, or browse other fundraisers.",

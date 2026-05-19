@@ -55,7 +55,7 @@ export function DonorsStrip({ donations, donationCount }: DonorsStripProps) {
               key={donor.id}
               className={cn(
                 'w-6 h-6 border-2 border-card',
-                index > 0 && '-ml-1'
+                index > 0 && '-ml-2'
               )}
               title={donor.donorName}
             >
@@ -89,7 +89,7 @@ export function DonorsStripSkeleton() {
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton
             key={i}
-            className={cn('w-6 h-6 rounded-full', i > 0 && '-ml-1')}
+            className={cn('w-6 h-6 rounded-full', i > 0 && '-ml-2')}
           />
         ))}
       </div>

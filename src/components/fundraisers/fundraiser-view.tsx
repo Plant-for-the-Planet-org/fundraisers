@@ -61,6 +61,9 @@ export function FundraiserView({
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
 
+        {/* Title */}
+        <TitleDisplay className='md:hidden' value={fundraiser.title} />
+
         {/* Goal progress */}
         <GoalProgressDisplay
           raisedAmount={fundraiser.totalRaised}
@@ -71,29 +74,39 @@ export function FundraiserView({
         />
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
-        {canShowLeaderboard && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('donationCount', {
-                count: fundraiser.donationCount,
-                formattedCount: fundraiser.donationCount.toLocaleString(),
-              })}
-            </SectionHeader>
-            <Suspense fallback={<DonorsStripSkeleton />}>
-              <DonorsSummary fundraiser={fundraiser} />
-            </Suspense>
-          </div>
-        )}
+        <div className='hidden md:block'>
+          {canShowLeaderboard && (
+            <div className='flex flex-col gap-3'>
+              <SectionHeader>
+                {t('donationCount', {
+                  count: fundraiser.donationCount,
+                  formattedCount: fundraiser.donationCount.toLocaleString(),
+                })}
+              </SectionHeader>
+              <Suspense fallback={<DonorsStripSkeleton />}>
+                <DonorsSummary fundraiser={fundraiser} />
+              </Suspense>
+            </div>
+          )}
+        </div>
 
         {/* Hosts */}
-        <Hosts mode='display' fundraiser={fundraiser} />
+        <div className='md:hidden'>
+          <Hosts mode='display' fundraiser={fundraiser} variant='strip' />
+        </div>
+        <div className='hidden md:block'>
+          <Hosts mode='display' fundraiser={fundraiser} />
+        </div>
+
         {/** Copy link */}
-        {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        <div className='hidden md:block'>
+          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        </div>
       </SidebarPanel>
 
       <MainPanel>
         {/* Title */}
-        <TitleDisplay value={fundraiser.title} />
+        <TitleDisplay className='hidden md:block' value={fundraiser.title} />
 
         {/* Leaderboard */}
         {canShowLeaderboard &&
@@ -143,6 +156,29 @@ export function FundraiserView({
           projectAllocations={fundraiser.projectAllocations}
         />
       </MainPanel>
+
+      <div className='md:hidden flex flex-col gap-6'>
+        {/* Donation count + donor avatars (only when leaderboard module is on) */}
+        {canShowLeaderboard && (
+          <div className='flex flex-col gap-3'>
+            <SectionHeader>
+              {t('donationCount', {
+                count: fundraiser.donationCount,
+                formattedCount: fundraiser.donationCount.toLocaleString(),
+              })}
+            </SectionHeader>
+            <Suspense fallback={<DonorsStripSkeleton />}>
+              <DonorsSummary fundraiser={fundraiser} />
+            </Suspense>
+          </div>
+        )}
+
+        {/* Hosts */}
+        <Hosts mode='display' fundraiser={fundraiser} />
+
+        {/** Copy link */}
+        {fundraiser.visibility === 'public' && <CopyLinkButton />}
+      </div>
     </FundraiserLayout>
   );
 }
