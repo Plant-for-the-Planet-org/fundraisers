@@ -27,6 +27,23 @@ Node 24 is required (Next.js needs ≥20.9). The dev server may already be runni
 
 <!-- Top-level directories and what lives where. Routing model. -->
 
+## Core vs. modules
+
+The codebase has two parts:
+
+- **Core** — the fundraiser product itself: the page route, the donation form, auth, theme, shared types, API service layer. Lives in `src/lib/`, `src/components/`, `src/app/`, `src/stores/`, `src/i18n/`, `src/styles/`. These are the standard Next.js conventions; we have not renamed them to `src/core/`. Think of them as core even though the folders don't say so.
+- **Modules** — pluggable per-fundraiser features (Stage Mode, Leaderboard, etc.) under `src/modules/<id>/`. Each module is self-contained: UI, hooks, settings type, defaults, `module.ts` metadata, its own `README.md`.
+
+The dependency rule: **modules consume core; core does not consume modules.** The one allowed bridge is the modules type registry at [`src/modules/index.ts`](src/modules/index.ts) — `src/lib/types/fundraiser.ts` imports `FundraiserModules` from there to compose the central settings shape.
+
+**Before editing anything in `src/modules/*`:**
+1. Read [`src/modules/README.md`](src/modules/README.md) for conventions (folder layout, persistence rules, registry, public surface).
+2. Read the target module's own `README.md` for what it does and how it works.
+
+**External code imports from `@/modules/<id>` only** (the barrel `index.ts`) — never reach into a module's subfolders. This keeps modules swappable.
+
+When adding a new module or migrating an existing feature, follow the checklist in `src/modules/README.md` and write a module-level `README.md` covering: what it does, when it's enabled, what data it reads, what settings it owns, dependencies on other modules.
+
 ## Domain glossary
 
 <!-- Planet, ForestCloud, Academies, Fundraiser, Stage Mode, etc. Short definitions. -->
