@@ -19,10 +19,8 @@ import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { CopyLinkButton } from './copy-link-button';
 import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
-import {
-  LeaderboardLoader,
-  LeaderboardSkeleton,
-} from './leaderboard/leaderboard-loader';
+import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
+import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
 
 export function FundraiserView({
   fundraiser,
@@ -96,7 +94,7 @@ export function FundraiserView({
             />
           ) : (
             <Suspense fallback={<LeaderboardSkeleton />}>
-              <LeaderboardLoader
+              <LeaderboardServerLoader
                 idOrSlug={fundraiser.slug}
                 settings={leaderboardSettings}
               />

@@ -5,7 +5,7 @@ import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
 
 import { useEffect, useRef, useState } from 'react';
 import { getLeaderboard } from '@/lib/api/leaderboard-service';
-import { LeaderboardSkeleton } from './leaderboard-loader';
+import { LeaderboardSkeleton } from './leaderboard-skeleton';
 import { LeaderboardView } from './leaderboard-view';
 
 interface LeaderboardClientLoaderProps {
