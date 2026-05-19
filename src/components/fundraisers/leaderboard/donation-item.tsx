@@ -1,5 +1,6 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
@@ -22,13 +23,14 @@ export function DonationItem({
   showAvatar,
   showDate = true,
 }: DonationItemProps) {
+  const t = useTranslations('Leaderboard.view');
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const avatarSrc =
     !isAnonymous && donation.avatarUrl
       ? getImageUrl('profile', 'thumb', donation.avatarUrl)
       : null;
   const displayName = isAnonymous
-    ? 'Anonymous'
+    ? t('donation.anonymous')
     : donation.donorName.length > 17
       ? `${donation.donorName.substring(0, 17)}...`
       : donation.donorName;

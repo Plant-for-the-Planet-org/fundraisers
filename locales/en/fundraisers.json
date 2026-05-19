@@ -240,6 +240,38 @@
         "visibility": {
           "label": "Make the fundraiser discoverable",
           "description": "Allow people to find this fundraiser in search and browse"
+        },
+        "addModule": "Add a module",
+        "stage": {
+          "title": "Stage Mode",
+          "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
+          "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
+          "collapse": "Collapse",
+          "expand": "Expand",
+          "remove": "Remove Stage Mode",
+          "toggleEnabled": "Toggle Stage Mode",
+          "slideCountOne": "1 slide",
+          "slideCountMany": "{count} slides",
+          "stageTitle": "Stage title",
+          "stageTitlePlaceholder": "Leave blank to use fundraiser title",
+          "stageDescription": "Stage description",
+          "stageDescriptionPlaceholder": "Short tagline shown beneath the title on the stage screen",
+          "locale": "Stage language",
+          "partnerLogo": "Logo URL",
+          "optional": "optional",
+          "slides": "Slides",
+          "addSlide": "Add slide",
+          "noSlides": "No slides yet. Add one to start your rotation.",
+          "slideTitlePlaceholder": "Slide title",
+          "slideDescriptionPlaceholder": "Slide description",
+          "slideImagePlaceholder": "Image URL (https://…)",
+          "duration": "Duration",
+          "seconds": "seconds",
+          "moveUp": "Move up",
+          "moveDown": "Move down",
+          "removeSlide": "Remove slide",
+          "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
+          "maxSlidesReached": "Maximum {max} slides reached"
         }
       },
       "contributionSettings": {
