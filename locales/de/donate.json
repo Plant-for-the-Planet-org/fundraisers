@@ -76,7 +76,7 @@
     },
     "gift": {
       "dedicatedTo": "Gewidmet an {recipientName}",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight> {recipientEmail}</highlight> geschickt.",
+      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
       "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
       "emailNoticeNoEmail": "Ein Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
     },
