@@ -1,0 +1,20 @@
+{
+  "Stage": {
+    "live": "Live",
+    "offline": "Offline",
+    "recentGifts": "Aktuelle Spenden",
+    "scanToDonate": "Jetzt per QR-Code spenden",
+    "topDonors": "Top-Spender",
+    "contribution": "Beitrag",
+    "waitingForDonations": "Warte auf Spenden...",
+    "raisedSoFar": "Bisher gesammelt",
+    "ofGoal": "von {goal} Ziel",
+    "donors": "Spender",
+    "trees": "Bäume",
+    "daysLeft": "Tage verbleibend",
+    "notEnabled": "Stage Mode ist für diesen Spendenaufruf nicht aktiviert.",
+    "notEnabledHint": "Aktualisiere es in den Einstellungen oder frage den Veranstalter.",
+    "fundraiserNotFound": "Spendenaufruf nicht gefunden.",
+    "anonymous": "Anonym"
+  }
+}

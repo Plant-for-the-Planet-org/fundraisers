@@ -2,6 +2,7 @@
   "Fundraisers": {
     "startFundraiser": "Start Fundraiser",
     "donationCount": "{count, plural, =0 {0 Donations} one {1 Donation} other {{formattedCount} Donations}}",
+    "donorsAndOthers": "{names} and {count, plural, one {# other} other {# others}}",
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",
     "hostedByWithOthers": "by {hostName} and {othersCount, plural, one {1 other} other {# others}}",
@@ -83,15 +84,15 @@
         "makeMonthly": "Make my donation monthly"
       }
     },
+    "createPage": {
+      "title": "Create your fundraiser",
+      "subtitle": "Give people something to feel. Then give them a way to give."
+    },
     "form": {
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
         "daysLeft": "{days, plural, one {#d left} other {#d left}}"
-      },
-      "donorsPreview": {
-        "donorCount": "{count, plural, one {# Donor} other {# Donors}}",
-        "others": " and {count, plural, one {# other} other {# others}}"
       },
       "theme": {
         "sectionHeading": "Theme",
@@ -99,8 +100,9 @@
         "selectAccent": "Select {accent} accent color"
       },
       "title": {
-        "label": "Fundraiser name",
-        "placeholder": "Fundraiser Name",
+        "label": "Fundraiser title",
+        "placeholder": "e.g. Turn my birthday into a forest",
+        "helper": "This appears on share previews, emails, and the top of your page. Keep it specific.",
         "errors": {
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max, number} characters."
@@ -243,6 +245,38 @@
         "visibility": {
           "label": "Make the fundraiser discoverable",
           "description": "Allow people to find this fundraiser in search and browse"
+        },
+        "addModule": "Add a module",
+        "stage": {
+          "title": "Stage Mode",
+          "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
+          "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
+          "collapse": "Collapse",
+          "expand": "Expand",
+          "remove": "Remove Stage Mode",
+          "toggleEnabled": "Toggle Stage Mode",
+          "slideCountOne": "1 slide",
+          "slideCountMany": "{count} slides",
+          "stageTitle": "Stage title",
+          "stageTitlePlaceholder": "Leave blank to use fundraiser title",
+          "stageDescription": "Stage description",
+          "stageDescriptionPlaceholder": "Short tagline shown beneath the title on the stage screen",
+          "locale": "Stage language",
+          "partnerLogo": "Logo URL",
+          "optional": "optional",
+          "slides": "Slides",
+          "addSlide": "Add slide",
+          "noSlides": "No slides yet. Add one to start your rotation.",
+          "slideTitlePlaceholder": "Slide title",
+          "slideDescriptionPlaceholder": "Slide description",
+          "slideImagePlaceholder": "Image URL (https://…)",
+          "duration": "Duration",
+          "seconds": "seconds",
+          "moveUp": "Move up",
+          "moveDown": "Move down",
+          "removeSlide": "Remove slide",
+          "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
+          "maxSlidesReached": "Maximum {max} slides reached"
         }
       },
       "contributionSettings": {

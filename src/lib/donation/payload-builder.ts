@@ -10,8 +10,8 @@ import type {
   DonorInfo,
   GuestFormData,
 } from '../types/donation';
-import type { PaymentMethodId } from '../types/payment-methods';
 import type { Fundraiser } from '../types/fundraiser';
+import type { PaymentMethodId } from '../types/payment-methods';
 
 import { getPrimaryAddress } from '../utils/profile';
 import { calculateLineItems } from './line-item-calculator';

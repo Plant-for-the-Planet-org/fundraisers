@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDisplayName } from '@/lib/utils/profile';
 import { useAuthStore } from '@/stores/auth-store';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarImage } from '../ui/avatar';
+import { FallbackAvatar } from '../ui/fallback-avatar';
 
 export const ProfileCard = () => {
   const tDonate = useTranslations('Donate');
@@ -18,7 +19,7 @@ export const ProfileCard = () => {
     <div className='profile-card w-full flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200'>
       <Avatar className='w-10 h-10'>
         {imageUrl && <AvatarImage src={imageUrl} loading='lazy' />}
-        <AvatarFallback className='bg-linear-to-br from-green-500 to-blue-600' />
+        <FallbackAvatar seed={profile.id ?? profile.email ?? displayName} />
       </Avatar>
 
       <div className='flex-1 space-y-1'>

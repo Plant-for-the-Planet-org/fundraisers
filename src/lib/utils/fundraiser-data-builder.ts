@@ -26,6 +26,13 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(leaderboard).some(Boolean);
 }
 
+function isStageDirty(dirty: UpdateDirtyFields): boolean {
+  const stage = dirty.settings?.modules?.stage;
+  if (!stage) return false;
+  if (typeof stage === 'boolean') return stage;
+  return true;
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -91,10 +98,13 @@ export function buildUpdateFundraiserRequest(
   if (isThemeDirty(dirtyFields)) {
     request.settings = { ...request.settings, theme: values.settings.theme };
   }
-  if (isLeaderboardDirty(dirtyFields)) {
+  if (isLeaderboardDirty(dirtyFields) || isStageDirty(dirtyFields)) {
     request.settings = {
       ...request.settings,
-      modules: { leaderboard: values.settings.modules.leaderboard },
+      modules: {
+        leaderboard: values.settings.modules.leaderboard,
+        stage: values.settings.modules.stage,
+      },
     };
   }
   if (imageFile) request.imageFile = imageFile;
