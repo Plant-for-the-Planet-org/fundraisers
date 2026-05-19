@@ -26,12 +26,12 @@ export function FundraiserView({
   fundraiser,
   paymentOptions,
   paymentOptionsAreAuthenticated = false,
-  leaderboardLoader = 'server',
+  leaderboardFetchStrategy = 'ssr',
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
   paymentOptionsAreAuthenticated?: boolean;
-  leaderboardLoader?: 'server' | 'client';
+  leaderboardFetchStrategy?: 'ssr' | 'client';
 }) {
   const t = useTranslations('Fundraisers');
 
@@ -87,7 +87,7 @@ export function FundraiserView({
 
         {/* Leaderboard */}
         {canShowLeaderboard &&
-          (leaderboardLoader === 'client' ? (
+          (leaderboardFetchStrategy === 'client' ? (
             <LeaderboardClientLoader
               idOrSlug={fundraiser.slug}
               settings={leaderboardSettings}
