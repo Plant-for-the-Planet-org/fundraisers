@@ -6,7 +6,7 @@
     "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Einstellungen verwalten",
     "closeIconLabel": "Alle ablehnen und schließen",
-    "footer": "<a href=\"https://www.plant-for-the-planet.org/de/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/de/privacy-terms/\">Datenschutzerklärung</a><a href=\"https://www.plant-for-the-planet.org/de/terms-and-conditions\">Nutzungsbedingungen</a>"
+    "footer": "<a href=\"https://www.plant-for-the-planet.org/de/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/de/privacy-terms/\">Datenschutzbestimmung</a><a href=\"https://www.plant-for-the-planet.org/de/terms-and-conditions\">Nutzungsbedingungen</a>"
   },
   "preferencesModal": {
     "title": "Cookie-Einstellungen",
