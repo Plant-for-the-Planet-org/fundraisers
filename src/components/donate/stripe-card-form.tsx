@@ -18,6 +18,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
+import { useDonateThemeMode } from './donate-overlay-theme';
 import { FormField } from './form-field';
 
 export interface StripeCardFormHandle {
@@ -41,20 +42,20 @@ export interface StripeCardFormHandle {
   ): Promise<{ error?: string }>;
 }
 
-const CARD_ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      fontSize: '14px',
-      color: '#030712',
-      '::placeholder': { color: '#6b7280' },
-    },
-    invalid: { color: '#dc2626' },
-  },
-};
-
 export const StripeCardForm = forwardRef<StripeCardFormHandle>(
   function StripeCardForm(_props, ref) {
     const stripe = useStripe();
+    const isDark = useDonateThemeMode() === 'dark';
+    const cardElementOptions = {
+      style: {
+        base: {
+          fontSize: '14px',
+          color: isDark ? '#f1f5f9' : '#030712',
+          '::placeholder': { color: isDark ? '#94a3b8' : '#6b7280' },
+        },
+        invalid: { color: '#dc2626' },
+      },
+    };
     const elements = useElements();
     const t = useTranslations('Donate.card');
 
@@ -211,7 +212,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         >
           <div className='mt-2 border border-border rounded-lg p-3'>
             <CardNumberElement
-              options={CARD_ELEMENT_OPTIONS}
+              options={cardElementOptions}
               onChange={handleCardNumberChange}
             />
           </div>
@@ -224,7 +225,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           >
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardExpiryElement
-                options={CARD_ELEMENT_OPTIONS}
+                options={cardElementOptions}
                 onChange={handleCardExpiryChange}
               />
             </div>
@@ -232,7 +233,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           <FormField label={t('cvcLabel')} error={cardCvcError ?? undefined}>
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardCvcElement
-                options={CARD_ELEMENT_OPTIONS}
+                options={cardElementOptions}
                 onChange={handleCardCvcChange}
               />
             </div>

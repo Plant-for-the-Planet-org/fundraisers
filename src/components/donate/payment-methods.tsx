@@ -196,7 +196,9 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
           ? 'cursor-not-allowed border-border bg-muted opacity-70'
           : 'hover:border-gray-400',
         !disabled &&
-          (isSelected ? 'border-foreground bg-muted' : 'border-border bg-white')
+          (isSelected
+            ? 'border-foreground bg-muted'
+            : 'border-border bg-background/60 backdrop-blur-sm')
       )}
     >
       <div className='flex items-center justify-between'>

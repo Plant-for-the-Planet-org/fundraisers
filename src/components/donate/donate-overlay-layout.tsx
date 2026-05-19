@@ -12,19 +12,14 @@ export function DonateOverlayLayout({
   rightColumn,
 }: DonateOverlayLayoutProps) {
   return (
-    <div
-      className='fixed inset-0 z-50 bg-gray-50 overflow-auto'
-      role='dialog'
-      aria-modal='true'
-      aria-label='donation details'
-    >
+    <div role='dialog' aria-modal='true' aria-label='donation details'>
       <button
         type='button'
         onClick={onClose}
-        className='fixed top-6 right-6 z-10 p-3 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all hover:bg-gray-50'
+        className='fixed top-6 right-6 z-10 p-3 rounded-full bg-background/80 backdrop-blur border border-border shadow-sm transition-all hover:shadow-md hover:bg-muted'
         aria-label='Close donation overlay'
       >
-        <X className='w-5 h-5 text-gray-600' />
+        <X className='w-5 h-5' />
       </button>
 
       <div className='w-full max-w-[960px] mx-auto px-6 py-12'>

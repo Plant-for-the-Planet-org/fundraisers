@@ -8,6 +8,7 @@ import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { useDonateThemeMode } from './donate-overlay-theme';
 import { FormField } from './form-field';
 
 export interface StripeSepaFormHandle {
@@ -25,24 +26,24 @@ export interface StripeSepaFormHandle {
   confirmSepaDebitPayment(clientSecret: string): Promise<{ error?: string }>;
 }
 
-const IBAN_ELEMENT_OPTIONS = {
-  supportedCountries: ['SEPA'],
-  style: {
-    base: {
-      fontSize: '14px',
-      color: '#030712',
-      '::placeholder': { color: '#6b7280' },
-    },
-    invalid: { color: '#dc2626' },
-  },
-};
-
 // TODO: make creditor ID dynamic (source TBD)
 const CREDITOR_ID = 'DE98ZZZ09999999999';
 
 export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
   function StripeSepaForm(_props, ref) {
     const stripe = useStripe();
+    const isDark = useDonateThemeMode() === 'dark';
+    const ibanElementOptions = {
+      supportedCountries: ['SEPA'],
+      style: {
+        base: {
+          fontSize: '14px',
+          color: isDark ? '#f1f5f9' : '#030712',
+          '::placeholder': { color: isDark ? '#94a3b8' : '#6b7280' },
+        },
+        invalid: { color: '#dc2626' },
+      },
+    };
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
 
@@ -114,7 +115,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
         <FormField label={t('ibanLabel')} error={ibanError ?? undefined}>
           <div className='border border-border rounded-lg p-3'>
             <IbanElement
-              options={IBAN_ELEMENT_OPTIONS}
+              options={ibanElementOptions}
               onChange={handleIbanChange}
             />
           </div>
