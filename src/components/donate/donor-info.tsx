@@ -14,7 +14,7 @@ export function DonorInfo() {
 
   return (
     <div className='donor-info flex flex-col gap-4'>
-      <h2 className='text-gray-900 text-lg font-semibold'>
+      <h2 className='text-foreground text-lg font-semibold'>
         {tDonate('yourInfo')}
       </h2>
 
