@@ -6,7 +6,7 @@ import type { FundraiserFormValues } from './fundraiser-form-schema';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
-import { StageMenuItem, StageSection } from '@/components/stage/stage-settings';
+import { StageMenuItem, StageSection } from '@/modules/stage';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

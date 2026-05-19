@@ -5,7 +5,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
-import { StageView } from '@/components/stage/stage-view';
+import { StageView } from '@/modules/stage';
 import { routing } from '@/i18n/routing';
 
 async function loadStageMessages(locale: Locale) {

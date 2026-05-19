@@ -1,40 +1,12 @@
-'use client';
+import type { AlltimeStats } from '@/lib/types/alltime-stats';
 
 import { useEffect, useState } from 'react';
-import { platformFetch } from '@/lib/api/platform-fetch';
+import { getAlltimeStats } from '@/lib/api/fundraiser-service';
 import {
   msUntilNextBucket,
   STAGE_POLL_INTERVAL_MS,
   stageHash,
 } from '../stage-hash';
-
-export interface AlltimeStats {
-  stats: {
-    donationCount: number;
-    goal: { amount: number; currency: string };
-    daysLeft: number;
-    raised: { total: number; currency: string };
-    impact: {
-      trees: number;
-      conservedM2: number;
-      restoredM2: number;
-      funding: number;
-    };
-    lastUpdated: string;
-  };
-  settings: {
-    enabled: boolean;
-    show_goal: boolean;
-    show_days_left: boolean;
-    show_impact: boolean;
-  };
-}
-
-async function fetchAlltimeStats(slug: string): Promise<AlltimeStats> {
-  return platformFetch<AlltimeStats>(
-    `/fundraisers/${slug}/alltime-stats?stagehash=${stageHash()}`
-  );
-}
 
 export function useAlltimeStats(slug: string) {
   const [data, setData] = useState<AlltimeStats | null>(null);
@@ -45,7 +17,7 @@ export function useAlltimeStats(slug: string) {
 
     async function poll() {
       try {
-        const result = await fetchAlltimeStats(slug);
+        const result = await getAlltimeStats(slug, { cacheBuster: stageHash() });
         if (!cancelled) {
           setData(result);
           setOffline(false);
