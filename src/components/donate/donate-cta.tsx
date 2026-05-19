@@ -84,7 +84,7 @@ export function DonateCTA({
   return (
     <div className='space-y-6'>
       <Button
-        className='w-full h-12 bg-accent-color hover:bg-accent-color/90 text-white font-medium disabled:opacity-50'
+        className='w-full h-12 bg-foreground hover:bg-foreground/90 text-background font-medium disabled:opacity-50'
         onClick={handleSubmit(onSubmit)}
         disabled={isLoading || isSuccess}
       >

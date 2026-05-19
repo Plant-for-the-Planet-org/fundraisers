@@ -15,7 +15,7 @@ export const ProfileCard = () => {
   const displayName = getDisplayName(profile);
 
   return (
-    <div className='profile-card w-full flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200'>
+    <div className='profile-card w-full flex items-center gap-3 p-4 bg-background rounded-lg border border-background'>
       <Avatar className='w-10 h-10'>
         {imageUrl && <AvatarImage src={imageUrl} loading='lazy' />}
         <AvatarFallback className='bg-linear-to-br from-green-500 to-blue-600' />

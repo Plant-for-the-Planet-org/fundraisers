@@ -8,7 +8,6 @@ import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { useDonateThemeMode } from './donate-overlay-theme';
 import { FormField } from './form-field';
 
 export interface StripeSepaFormHandle {
@@ -32,7 +31,9 @@ const CREDITOR_ID = 'DE98ZZZ09999999999';
 export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
   function StripeSepaForm(_props, ref) {
     const stripe = useStripe();
-    const isDark = useDonateThemeMode() === 'dark';
+    const isDark =
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('dark');
     const ibanElementOptions = {
       supportedCountries: ['SEPA'],
       style: {

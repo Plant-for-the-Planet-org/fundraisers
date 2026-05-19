@@ -194,11 +194,9 @@ const PaymentMethodOption = memo(function PaymentMethodOption({
         'w-full rounded-lg border p-3 text-left transition-all',
         disabled
           ? 'cursor-not-allowed border-border bg-muted opacity-70'
-          : 'hover:border-gray-400',
+          : 'hover:border-gray-400 dark:hover:border-gray-500',
         !disabled &&
-          (isSelected
-            ? 'border-foreground bg-muted'
-            : 'border-border bg-background/60 backdrop-blur-sm')
+          (isSelected ? 'border-foreground bg-muted' : 'border-border bg-background')
       )}
     >
       <div className='flex items-center justify-between'>

@@ -16,7 +16,6 @@ import { DonateCTA } from './donate-cta';
 import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 import { DonateOverlaySkeleton } from './donate-overlay-skeleton';
-import { ThemedPortalRoot } from './donate-overlay-theme';
 import { DonationFailureBanner } from './donation-failure-banner';
 import { DonationFormProvider } from './donation-form-context';
 import { DonationSummary } from './donation-summary';
@@ -64,10 +63,7 @@ export function DonateOverlay({
   if (!isClient || !isOpen) return null;
 
   // Show skeleton while donation data is still being fetched
-  if (!donationData)
-    return (
-      <DonateOverlaySkeleton onClose={onClose} fundraiser={fundraiser} />
-    );
+  if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
 
   return (
     <DonateOverlayInner
@@ -171,26 +167,24 @@ function DonateOverlayInner({
   );
 
   return createPortal(
-    <ThemedPortalRoot fundraiser={fundraiser}>
-      <Elements stripe={stripePromise}>
-        <DonationFormProvider
-          fundraiser={fundraiser}
-          donationData={donationData}
-          paymentOptions={paymentOptions}
-          paymentOptionsReady={paymentOptionsReady}
-          onSubmit={onSubmit}
-          sepaFormRef={sepaFormRef}
-          cardFormRef={cardFormRef}
-          isOpen={isOpen}
-        >
-          <DonateOverlayLayout
-            onClose={onClose}
-            leftColumn={leftColumn}
-            rightColumn={rightColumn}
-          />
-        </DonationFormProvider>
-      </Elements>
-    </ThemedPortalRoot>,
+    <Elements stripe={stripePromise}>
+      <DonationFormProvider
+        fundraiser={fundraiser}
+        donationData={donationData}
+        paymentOptions={paymentOptions}
+        paymentOptionsReady={paymentOptionsReady}
+        onSubmit={onSubmit}
+        sepaFormRef={sepaFormRef}
+        cardFormRef={cardFormRef}
+        isOpen={isOpen}
+      >
+        <DonateOverlayLayout
+          onClose={onClose}
+          leftColumn={leftColumn}
+          rightColumn={rightColumn}
+        />
+      </DonationFormProvider>
+    </Elements>,
     document.body
   );
 }
