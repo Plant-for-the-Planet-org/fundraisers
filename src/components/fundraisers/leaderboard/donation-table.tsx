@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarColor } from './avatar-utils';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 
 interface DonationTableProps {
   donations: LeaderboardDonation[];
@@ -52,7 +52,7 @@ function DonationRow({
                   loading='lazy'
                 />
               )}
-              <AvatarFallback className={getAvatarColor(donation.id)} />
+              <FallbackAvatar seed={donation.id} />
             </Avatar>
           )}
           <div className='flex flex-col min-w-0'>
