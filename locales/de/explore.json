@@ -1,7 +1,7 @@
 {
   "Explore": {
     "title": "Spendenaufrufe entdecken",
-    "description": "Entdecke beliebte Spendenaufrufe in deiner Nähe oder stöbere in Kategorien.",
+    "description": "Entdecke beliebte Spendenaufrufe in deiner Nähe oder stöbere in den Kategorien.",
     "categories": {
       "title": "In Kategorien stöbern",
       "loading": "Kategorien werden geladen",
