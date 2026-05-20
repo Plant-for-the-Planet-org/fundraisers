@@ -240,7 +240,6 @@ function BundleSelectionContent({
               type='button'
               onClick={() => setMoreOpen(v => !v)}
               aria-expanded={moreOpen}
-              aria-haspopup='menu'
               className={cn(
                 'inline-flex h-[calc(100%-1px)] basis-[30%] items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-2 py-1 text-sm font-medium text-foreground/60 transition-all hover:text-foreground focus-visible:border-ring focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
                 moreIsActive && 'bg-background text-foreground shadow-sm'
@@ -259,17 +258,13 @@ function BundleSelectionContent({
           </div>
 
           {moreOpen && (
-            <div
-              role='menu'
-              className='absolute right-0 top-full z-50 mt-2 min-w-44 overflow-hidden rounded-xl border border-border bg-background shadow-lg'
-            >
+            <div className='absolute right-0 top-full z-50 mt-2 min-w-44 overflow-hidden rounded-xl border border-border bg-background shadow-lg'>
               {MOBILE_HIDDEN.map(tabId => {
                 const isActive = activeTab === tabId;
                 return (
                   <button
                     key={tabId}
                     type='button'
-                    role='menuitem'
                     onClick={() => handleValueChange(tabId)}
                     className={cn(
                       'flex w-full items-center gap-2 px-3 py-3 text-sm transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none',
