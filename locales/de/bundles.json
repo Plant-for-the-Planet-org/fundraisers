@@ -1,23 +1,23 @@
 {
   "Bundles": {
-    "sectionHeading": "Wähle die Projekte, die von deinem Spendenaufruf unterstützt werden",
+    "sectionHeading": "Wähle die Projekte für deinen Spendenaufruf aus",
     "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
         "label": "Mitarbeiter Auswahl",
-        "description": "Handverlesen durch das Team von Plant-for-the-Planet."
+        "description": "Handverlesen vom Plant-for-the-Planet-Team."
       },
       "wonder": {
-        "label": "Wunder",
-        "description": "Die Welt ist groß und schön."
+        "label": "Staunen",
+        "description": "Die Welt ist riesengroß und wunderschön."
       },
       "rage": {
         "label": "Wut",
-        "description": "Das ist kaputt und muss repariert werden."
+        "description": "Hier läuft etwas schief und muss repariert werden."
       },
       "love": {
         "label": "Liebe",
-        "description": "Für Menschen, Orte, Dinge, die mir wichtig sind."
+        "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
       },
       "custom": {
         "label": "Benutzerdefiniert",
@@ -41,7 +41,7 @@
       "useBundle": "Dieses Paket verwenden",
       "tag": {
         "rage": "WUT",
-        "wonder": "WUNDER",
+        "wonder": "STAUNEN",
         "love": "LIEBE",
         "staff-picks": "MITARBEITER AUSWAHL"
       }
@@ -52,11 +52,11 @@
       "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
       "showingCount": "Top {shown, number} von {total, number} - Suche nach mehr - ✨ Top-Projekten",
       "noResults": "Keine Projekte entsprechen \"{query}\"",
-      "youMightLike": "Diese könnten dich interessieren",
+      "youMightLike": "Das könnte dir gefallen",
       "clearSearch": "Suche löschen",
       "loading": "Projekte werden geladen...",
       "errorTitle": "Projekte konnten nicht geladen werden",
-      "errorMessage": "Es können keine Projekte geladen werden. Bitte versuche es nochmal.",
+      "errorMessage": "Es konnte keine Projekte geladen werden. Bitte versuche es nochmal.",
       "retry": "Nochmal versuchen",
       "yourBundle": "Dein individuelles Paket",
       "projectCount": "{count, plural, =0 {Keine Projekte} one {# Projekt} other {# Projekte}}",
@@ -78,23 +78,23 @@
     "unknownProject": "Unbekanntes Projekt",
     "entries": {
       "ancestral-lands": {
-        "label": "Angestammte Länder",
-        "tagline": "Verwurzelt in der Gemeinschaft. Angeführt von den Menschen, die nie weggegangen sind."
+        "label": "Land der Vorfahren",
+        "tagline": "Verwurzelt in der Gemeinschaft. Angeführt von den Menschen, die nie gegangen sind."
       },
       "fix-what-we-broke": {
-        "label": "Reparieren, was wir kaputt gemacht haben",
+        "label": "Reparieren, was wir zerstört haben",
         "tagline": "Keine Schuld. Nur Verantwortung. Nur eine Schaufel."
       },
       "for-your-children": {
         "label": "Für meine Kinder",
-        "tagline": "Ein Wald, der noch kräftig wachsen wird, wenn sie erwachsen sind."
+        "tagline": "Ein Wald, der noch kraftvoll wachsen wird, wenn sie groß sind."
       },
       "roof-of-the-world": {
         "label": "Das Dach der Welt",
         "tagline": "Hoch oben, wo die Luft dünn ist und viel auf dem Spiel steht."
       },
       "supply-chain-guilt-trip": {
-        "label": "Lieferketten-Schuldgefühle",
+        "label": "Lieferketten-Gewissensbisse",
         "tagline": "Hinter allem, was du kaufst, steht ein Wald. Lerne ihn kennen."
       },
       "amazon-route": {
@@ -107,7 +107,7 @@
       },
       "undo-your-amazon-order": {
         "label": "Mache deine Amazon-Bestellung rückgängig",
-        "tagline": "Du hast auf Kaufen geklickt. Klicke jetzt auf Wiederherstellen."
+        "tagline": "Du hast \"Kaufen\" geklickt. Jetzt klicke \"Wiederherstellen\"."
       },
       "where-your-coffee-grows": {
         "label": "Wo dein Kaffee wächst",
