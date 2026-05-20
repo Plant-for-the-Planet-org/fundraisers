@@ -13,7 +13,7 @@ export function DonateOverlayLayout({
 }: DonateOverlayLayoutProps) {
   return (
     <div
-      className='fixed inset-0 z-50 bg-background/75 backdrop-blur-xl overflow-auto'
+      className='fixed inset-0 z-50 bg-background/80 backdrop-blur-2xl overflow-auto'
       role='dialog'
       aria-modal='true'
       aria-label='donation details'
