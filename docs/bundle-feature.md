@@ -20,7 +20,7 @@ Bundle identity is **persisted** on the fundraiser as `settings.modules.bundle.s
 | 5 — Bundle preview modal | ✅ Shipped | UX iterated past spec; see step body for the shipped behaviour |
 | 5a — `projectsService.getProjectById` | 🟡 Deferred | Not needed in practice. Synthetic fallback in `useBundleProjects` covers the support-project miss using `DEFAULT_NON_EARMARKED_CAUSE_FALLBACK` |
 | 6 — Custom tab panel | ✅ Shipped | Default project is locked (not removable); 8-card paginated grid; image + name in grid links to project page in new tab; selected rows non-interactive |
-| 7 — Public view | ⏸ Pending | |
+| 7 — Public view | ✅ Shipped (partial) | `ProjectsSupportedDisplay` now accepts the full `Fundraiser`. When the persisted slug resolves to a configured bundle it renders a header row with the bold bundle label + em-dashed italic tagline. Each `ProjectItem` shows `country · percentage` underneath the title (mirrors `SelectedProjectRow`), with country enriched via `useBundleProjects(workspace.country)`. The icon, the "See all →" link, and the uppercase tab tag (e.g. `LOVE BUNDLE`) from the original spec were deliberately omitted |
 | 8 — Cleanup | ✅ Shipped | Deleted `project-selection.tsx`, `project-selection-overlay.tsx`, `docs/project-selection.md`. Dropped `mapProjectToSelectedCause`, `createDefaultCause`, and the exported `resolveCauseCountry` (now internal) from `lib/utils/project-selection.ts`. Trimmed the `Fundraisers.form.projectSelection.*` locale namespace to the 4 keys still consumed by the public-view `ProjectsSupportedDisplay` component |
 
 ## Open Decisions Captured (defaults assumed unless overridden)
@@ -93,7 +93,7 @@ Define types:
 
 Create pure helpers used by both the form and the public view:
 
-- `getBundleBySlug(slug): Bundle | undefined` — currently lives as a local helper inside `bundle-selection.tsx`; move into `bundle.ts` when the public view (Step 7) needs the same lookup, to avoid duplication
+- `getBundleBySlug(slug): Bundle | undefined` — lives in `src/lib/utils/bundle.ts` (moved from the local `bundle-selection.tsx` helper when Step 7 needed the same lookup). Accepts `string | null | undefined` and validates against `BUNDLE_SLUGS`, so unknown / legacy values resolve to `undefined`
 - `getBundlesForTab(tabId): Bundle[]` — uses `tabs[].bundleSlugs` ordering
 - `getSupportProjectId(workspace: BundleWorkspace): string` — reads from `supportProjects` map
 - `getWorkspaceForCountry(country: string | undefined): BundleWorkspace | null` — wraps `bundle-country-mapping.ts`. Returns `null` when only Custom should be exposed
@@ -265,27 +265,40 @@ Entering the Custom tab explicitly clears `settings.modules.bundle.slug` (handle
 
 ---
 
-### Step 7 — Public view: bundle header + per-row percentages
+### Step 7 — Public view: bundle header + per-row metadata (shipped, partial)
 
-**What:**
+**What shipped:**
 
-Extend [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx):
+Extended [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx):
 
-- On render, resolve `workspace = getWorkspaceForCountry(fundraiser.country)`. If `null`, skip bundle rendering (custom-only fundraiser).
-- Otherwise read `fundraiser.settings?.modules?.bundle?.slug` and look it up via `getBundleBySlug` (move this helper from `bundle-selection.tsx` into `src/lib/utils/bundle.ts` so the public view can share it). Validate the slug against `BUNDLE_SLUGS` the same way `fundraiserToFormValues` does, so unknown/legacy values don't render a stale header.
-- If a bundle resolves: render the bundle header row above the list (icon + label + em-dashed tagline + uppercase tab tag, e.g. `LOVE BUNDLE`). Use `getDisplayTabForBundle()` for the tag.
-- Add `percentage` rendering on each `ProjectItem` (currently hidden in this component, only shown in edit). Show as a right-aligned `XX%`.
-- Add a "See all →" link on the right of the header — opens the same `BundlePreviewModal` from Step 5 in read-only mode (no "Use this bundle" CTA in public view).
+- Component now takes the full `Fundraiser` (was just `projectAllocations`) so it has access to `settings.modules.bundle.slug` and `workspace.country`.
+- Reads `fundraiser.settings?.modules?.bundle?.slug` and resolves it via `getBundleBySlug` (now in `src/lib/utils/bundle.ts` — moved out of `bundle-selection.tsx` for the public view to share). The helper validates against `BUNDLE_SLUGS` so unknown / legacy values resolve to `undefined` and don't render a stale header.
+- When the slug resolves: renders a header row above the list — the bundle label (bold), an em-dash, and the tagline in italic quotes. Looks up the label / tagline from `Bundles.entries.<slug>.{label,tagline}` (already populated in en + de). No icon is rendered (intentionally — see the omitted list below).
+- Each `ProjectItem` now renders `country · NN% of fundraiser` under the project title (mirrors the `SelectedProjectRow` meta line used in the bundle preview modal). Allocation comes from the existing `ProjectAllocation.percentage`. Country comes from `useBundleProjects(workspace.country)` — same hook used by the bundle preview modal — which fetches the `/countryProjects/<country>` list once (service-level cached). The country code is rendered through `useCountryLabel` so users see a localised region name (e.g. "Kenya", "Spanien"). Allocation label reuses the existing `Bundles.custom.allocationLabel` string.
 
-**Files:**
+**Deliberately omitted vs. original spec:**
 
-- `src/components/fundraisers/projects-supported-display.tsx` — extend
-- `src/components/fundraisers/bundle-selection/bundle-preview-modal.tsx` — accept `mode: 'select' | 'view'` prop to toggle the CTA
-- `locales/en/fundraisers.json`, `locales/de/fundraisers.json` — add `Fundraisers.publicView.bundle.{header,tag.{rage,wonder,love,staffPicks},seeAll}` and the percentage suffix already exists as `allocationLabel`
+- No header icon (a `Package` Lucide icon was shipped briefly and then removed at review — there is no per-slug icon mapping yet, and a generic icon added visual noise without communicating bundle identity).
+- No "See all →" link / no read-only bundle preview modal trigger in the public view.
+- No uppercase tab tag (e.g. `LOVE BUNDLE`) next to the bundle name.
 
-**Visual test:** Open `/fundraisers/<slug>` for a fundraiser whose stored `bundle.slug` resolves to a configured bundle → bundle header renders with correct tab tag and tagline, project rows show percentages. For fundraisers with `bundle.slug: null` (custom, or legacy without the field) → no header, just the project list with percentages (or current behaviour, TBD — see Step 7a).
+These were excluded by request when this slice shipped. All three can be added later — `getDisplayTabForBundle` is still mentioned in [What Must Be Built](#what-must-be-built) for whenever the tag returns. For the icon, the natural next step is a slug → Lucide-icon map (or an `icon` field on `Bundle` in `bundle-config.ts`) so each bundle gets a themed glyph.
 
-**Step 7a — Custom-fundraiser public view:** confirm with stakeholders whether percentages should display for custom fundraisers too. Default in this plan: yes, always show percentages. Easy to flip with a single condition.
+**Files touched:**
+
+- `src/components/fundraisers/projects-supported-display.tsx` — extended (now `'use client'`, accepts `fundraiser` prop, renders header + enriched item meta)
+- `src/components/fundraisers/fundraiser-view.tsx` — pass-through change (`fundraiser={fundraiser}` instead of `projectAllocations={...}`)
+- `src/lib/utils/bundle.ts` — added `getBundleBySlug` (moved from `bundle-selection.tsx`)
+- `src/components/fundraisers/bundle-selection/bundle-selection.tsx` — drops its local `getBundleBySlug`, imports the shared helper
+
+**No new locale keys.** The header label/tagline reuse `Bundles.entries.<slug>.{label,tagline}` and the per-row allocation reuses `Bundles.custom.allocationLabel`.
+
+**Edge cases:**
+
+- `workspace.country` is typed as `string` (not `AllowedCountry`); a local `toAllowedCountry` helper coerces it (anything outside `ALLOWED_COUNTRIES` falls back to `'ROW'`, which the projects API maps to DE). Custom-only workspaces (ES, CH) still get the per-row country + percentage because `useBundleProjects` runs unconditionally; they just don't render the header (no bundle slug).
+- Unknown project IDs (e.g. legacy fundraisers referencing a project not in the country list) resolve to the `useBundleProjects` fallback with `country: ''`, so the country segment is silently dropped and only the percentage shows.
+
+**Visual test:** open `/fundraisers/<slug>` for a fundraiser whose stored `bundle.slug` resolves to a configured bundle → header renders with icon + label + italic tagline. Each project row shows `Country · NN% of fundraiser`. For fundraisers with `bundle.slug: null` (custom, or legacy without the field) → no header, project rows still show country + percentage.
 
 ---
 

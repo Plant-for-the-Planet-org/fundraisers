@@ -132,9 +132,7 @@ export function FundraiserView({
         <DescriptionDisplay value={fundraiser.description} />
 
         {/* Project allocations */}
-        <ProjectsSupportedDisplay
-          projectAllocations={fundraiser.projectAllocations}
-        />
+        <ProjectsSupportedDisplay fundraiser={fundraiser} />
       </MainPanel>
     </FundraiserLayout>
   );

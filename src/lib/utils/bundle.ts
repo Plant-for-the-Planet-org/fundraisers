@@ -3,10 +3,24 @@ import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
+import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 
 export function buildProjectUrl(projectId: string): string {
   const normalizedBaseUrl = PLATFORM_BASE_URL.replace(/\/+$/, '');
   return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}`;
+}
+
+/**
+ * Look up a bundle by slug. Accepts an unvalidated `string | null | undefined`
+ * so callers (form values, persisted fundraiser settings) don't have to pre-cast.
+ * Unknown / legacy slugs resolve to `undefined`.
+ */
+export function getBundleBySlug(
+  slug: string | null | undefined
+): Bundle | undefined {
+  if (!slug) return undefined;
+  if (!(BUNDLE_SLUGS as readonly string[]).includes(slug)) return undefined;
+  return BUNDLE_CONFIG.bundles.find(b => b.slug === slug);
 }
 
 export function getBundlesForTab(tabId: BundleTabId): Bundle[] {

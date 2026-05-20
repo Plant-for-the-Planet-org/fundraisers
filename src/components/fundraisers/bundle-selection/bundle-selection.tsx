@@ -16,7 +16,7 @@ import { Check, ChevronDown } from 'lucide-react';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { BUNDLE_TAB_IDS } from '@/lib/types/bundle';
-import { bundleToAllocations } from '@/lib/utils/bundle';
+import { bundleToAllocations, getBundleBySlug } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,11 +33,6 @@ const MOBILE_HIDDEN: BundleTabId[] = BUNDLE_TAB_IDS.filter(
 
 interface BundleSelectionProps {
   mode: 'create' | 'edit';
-}
-
-function getBundleBySlug(slug: BundleSlug | null): Bundle | undefined {
-  if (!slug) return undefined;
-  return BUNDLE_CONFIG.bundles.find(b => b.slug === slug);
 }
 
 function getInitialActiveTab({
