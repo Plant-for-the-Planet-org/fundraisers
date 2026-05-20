@@ -114,10 +114,6 @@
   --neutral-foreground: 220 13% 84%;
 }
 
-html {
-  scrollbar-gutter: stable;
-}
-
 body {
   font-family: var(
     --theme-body-font,

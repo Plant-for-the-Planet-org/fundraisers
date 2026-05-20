@@ -86,14 +86,30 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
 
   const unselectedProjects = useMemo(
     () =>
-      searchableProjects.filter(({ project }) => !selectedIdSet.has(project.id)),
+      searchableProjects.filter(
+        ({ project }) => !selectedIdSet.has(project.id)
+      ),
     [searchableProjects, selectedIdSet]
   );
 
   const topProjects = useMemo(
-    () => unselectedProjects.filter(({ project }) => project.isTopProject).map(({ project }) => project),
+    () =>
+      unselectedProjects
+        .filter(({ project }) => project.isTopProject)
+        .map(({ project }) => project),
     [unselectedProjects]
   );
+
+  // Shuffle once when projects load. Depends only on `projects` so add/remove
+  // does not reshuffle — selections just disappear from the stable list.
+  const shuffledTopProjects = useMemo(() => {
+    const top = projects.filter(p => p.isTopProject).slice();
+    for (let i = top.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [top[i], top[j]] = [top[j]!, top[i]!];
+    }
+    return top;
+  }, [projects]);
 
   const filteredProjects = useMemo(() => {
     if (trimmedQuery) {
@@ -102,13 +118,8 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
         .map(({ project }) => project)
         .sort((a, b) => a.name.localeCompare(b.name));
     }
-    const shuffled = topProjects.slice();
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }, [unselectedProjects, topProjects, trimmedQuery]);
+    return shuffledTopProjects.filter(p => !selectedIdSet.has(p.id));
+  }, [shuffledTopProjects, unselectedProjects, trimmedQuery, selectedIdSet]);
 
   const visibleProjects = filteredProjects.slice(0, INITIAL_VISIBLE_COUNT);
   const suggestedProjects = topProjects.slice(0, 6);
@@ -173,7 +184,11 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
           <Input
             value={searchQuery}
             onChange={event => setSearchQuery(event.target.value)}
-            placeholder={allocations.length >= MAX_PROJECTS ? t('maxReached') : t('searchPlaceholder')}
+            placeholder={
+              allocations.length >= MAX_PROJECTS
+                ? t('maxReached')
+                : t('searchPlaceholder')
+            }
             className='bg-background pl-10'
             aria-label={t('aria.search')}
             disabled={allocations.length >= MAX_PROJECTS}
@@ -213,8 +228,10 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
               </div>
               {suggestedProjects.length > 0 && (
                 <div className='flex flex-col gap-2'>
-                  <p className='text-xs text-muted-foreground'>{t('youMightLike')}</p>
-                  <div className='columns-1 gap-2 sm:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
+                  <p className='text-xs text-muted-foreground'>
+                    {t('youMightLike')}
+                  </p>
+                  <div className='columns-1 gap-2 sm:columns-2 *:mb-2 *:break-inside-avoid'>
                     {suggestedProjects.map(project => (
                       <ProjectSearchCard
                         key={project.id}
@@ -249,7 +266,7 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
           )
         ) : (
           <>
-            <div className='columns-1 gap-2 sm:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
+            <div className='columns-1 gap-2 sm:columns-2 *:mb-2 *:break-inside-avoid'>
               {visibleProjects.map(project => (
                 <ProjectSearchCard
                   key={project.id}
@@ -259,13 +276,13 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
               ))}
             </div>
             {filteredProjects.length > INITIAL_VISIBLE_COUNT && (
-                <p className='mt-3 text-center text-xs italic text-muted-foreground'>
-                  {t('showingCount', {
-                    shown: visibleProjects.length,
-                    total: filteredProjects.length,
-                  })}
-                </p>
-              )}
+              <p className='mt-3 text-center text-xs italic text-muted-foreground'>
+                {t('showingCount', {
+                  shown: visibleProjects.length,
+                  total: filteredProjects.length,
+                })}
+              </p>
+            )}
           </>
         )}
       </div>

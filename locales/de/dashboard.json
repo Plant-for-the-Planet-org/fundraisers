@@ -12,7 +12,7 @@
       "loading": "Übersicht wird geladen...",
       "fundraisers": {
         "label": "Spendenaufrufe",
-        "activeSuffix": "aktiv",
+        "activeSuffix": "davon aktiv",
         "noActive": "Keine aktiven Spendenaufrufe"
       },
       "totalRaised": {

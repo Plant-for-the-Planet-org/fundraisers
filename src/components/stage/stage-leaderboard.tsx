@@ -4,6 +4,7 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { GlassPanel } from './glass-panel';
 
 interface StageLeaderboardProps {
   top: LeaderboardDonation[];
@@ -22,17 +23,7 @@ export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
   if (top.length === 0) return null;
 
   return (
-    <div
-      className='absolute right-12 top-[350px] z-[17] w-[440px] rounded-3xl border px-[22px] pb-3.5 pt-5'
-      style={{
-        background: 'rgba(255,255,255,0.78)',
-        borderColor: 'rgba(255,255,255,0.55)',
-        backdropFilter: 'blur(22px) saturate(140%)',
-        boxShadow:
-          '0 30px 60px -20px rgba(8,15,35,.45), 0 10px 24px -10px rgba(8,15,35,.35), inset 0 1px 0 rgba(255,255,255,.7)',
-        color: '#0B1220',
-      }}
-    >
+    <GlassPanel className='absolute right-12 top-[350px] z-[17] w-[440px] px-[22px] pb-3.5 pt-5'>
       {/* Header */}
       <div className='mb-2 flex items-baseline justify-between'>
         <span className='text-[18px] font-bold'>{t('topDonors')}</span>
@@ -88,6 +79,6 @@ export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
           );
         })}
       </div>
-    </div>
+    </GlassPanel>
   );
 }

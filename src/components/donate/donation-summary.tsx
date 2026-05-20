@@ -10,8 +10,8 @@ import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees'
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { Card, CardContent } from '@/components/ui/card';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { useDonationForm } from './donation-form-context';
 
 export function DonationSummary() {

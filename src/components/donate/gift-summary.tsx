@@ -18,7 +18,9 @@ export function GiftSummary() {
 function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
   const t = useTranslations('Donate.gift');
 
-  const emailNoticeKey = gift.message ? 'emailNotice' : 'emailNoticeNoMessage';
+  const recipientEmailNoticeKey = gift.message
+    ? 'emailNotice'
+    : 'emailNoticeNoMessage';
 
   return (
     <Card className='gift-summary border border-card'>
@@ -39,11 +41,18 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
             </blockquote>
           )}
 
-          {gift.recipientEmail !== undefined && (
-            <p className='text-muted-foreground text-sm'>
-              {t(emailNoticeKey, { recipientEmail: gift.recipientEmail })}
-            </p>
-          )}
+          <p className='text-muted-foreground text-sm'>
+            {gift.recipientEmail !== undefined
+              ? t.rich(recipientEmailNoticeKey, {
+                  recipientEmail: gift.recipientEmail,
+                  highlight: chunks => (
+                    <span className='font-semibold text-foreground'>
+                      {chunks}
+                    </span>
+                  ),
+                })
+              : t('emailNoticeNoEmail')}
+          </p>
         </div>
       </CardContent>
     </Card>

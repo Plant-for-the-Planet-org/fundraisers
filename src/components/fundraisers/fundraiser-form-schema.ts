@@ -21,6 +21,7 @@ import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,
@@ -94,7 +95,7 @@ const stageSlideSchema = z.object({
 
 export const stageModeSchema = z.object({
   enabled: z.boolean(),
-  locale: z.enum(['en', 'de', 'es']),
+  locale: z.enum(routing.locales),
   title: z.string().max(STAGE_LIMITS.stageTitle),
   description: z.string().max(STAGE_LIMITS.stageDescription),
   partner_logo_url: stageImageUrlSchema,

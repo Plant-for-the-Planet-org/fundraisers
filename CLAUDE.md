@@ -1,21 +1,38 @@
 # Fundraisers app
 
 ## Overview
+
 <!-- One paragraph: what this app does, who uses it, where it sits in ForestCloud. -->
 
 ## Tech stack
-<!-- Framework, language, key libraries, package manager, node version. -->
 
+<!-- Framework, language, key libraries, package manager, node version. -->
+@AGENTS.md
 ## Commands
-<!-- dev, build, test, lint, typecheck. Exact commands to run. -->
+
+Requires a `.env.local` file in the project root before running locally.
+
+Node 24 is required (Next.js needs ≥20.9). The dev server may already be running on port 3000 — check first. If not, `nvm use 24` then `npm run dev`. The `.claude/launch.json` `fundraisers-dev` preset handles this automatically via `bash -lc`.
+
+| Command | When to use |
+|---|---|
+| `npm run dev` | Start the local dev server |
+| `npm run build` | Production build — run before pushing to catch type/build errors |
+| `npm run lint` | ESLint checks |
+| `npm run type-check` | TypeScript checks without emitting files |
+| `npm run format` | Auto-format code style issues |
+| `npm run imports:sort` | Sort import order |
 
 ## Project structure
+
 <!-- Top-level directories and what lives where. Routing model. -->
 
 ## Domain glossary
+
 <!-- Planet, ForestCloud, Academies, Fundraiser, Stage Mode, etc. Short definitions. -->
 
 ## API calls to ForestCloud
+
 Any request to `app*.plant-for-the-planet.org` (the ForestCloud platform API) must go through `platformFetch` in `src/lib/api/platform-fetch.ts`. Do not use raw `fetch()` for these endpoints.
 
 Why: `platformFetch` owns HTTP-level concerns in one place — base URL, `X-SESSION-ID`, `Authorization`, `Content-Type`, impersonation headers, idempotency keys, timeouts, and `PlatformAPIError` classification (`http` / `timeout` / `network`). Raw `fetch()` sites drift over time and miss headers when they are added centrally.
@@ -23,16 +40,21 @@ Why: `platformFetch` owns HTTP-level concerns in one place — base URL, `X-SESS
 Domain concerns (response shaping, field-level error mapping, retries) belong in the service that calls `platformFetch`, not in the transport itself. If a service needs HTTP-level behavior `platformFetch` does not yet expose, extend `platformFetch` rather than bypassing it.
 
 ## Conventions
+
 <!-- Code style notes, naming, file layout patterns, comment policy. -->
 
 ## Auth
+
 <!-- Auth0 setup, token flow, how to test authenticated paths locally. -->
 
 ## Testing
+
 <!-- Test runner, where tests live, what to run before pushing. -->
 
 ## Gotchas
+
 <!-- Non-obvious traps: SSR/CSR boundaries, stale .next types, env quirks. -->
 
 ## Deployment
+
 <!-- Where it deploys, how releases work, env vars, feature flags. -->

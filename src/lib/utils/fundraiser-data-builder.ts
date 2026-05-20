@@ -105,24 +105,19 @@ export function buildUpdateFundraiserRequest(
   if (isThemeDirty(dirtyFields)) {
     request.settings = { ...request.settings, theme: values.settings.theme };
   }
-  if (isLeaderboardDirty(dirtyFields) || isStageDirty(dirtyFields)) {
+  // Each module's dirty check and value are kept together here.
+  // New modules: add an if-block below, nowhere else.
+  const dirtyModules: Partial<FundraiserSettings['modules']> = {};
+  if (isLeaderboardDirty(dirtyFields))
+    dirtyModules.leaderboard = values.settings.modules.leaderboard;
+  if (isStageDirty(dirtyFields))
+    dirtyModules.stage = values.settings.modules.stage;
+  if (isBundleDirty(dirtyFields))
+    dirtyModules.bundle = values.settings.modules.bundle;
+  if (Object.keys(dirtyModules).length > 0) {
     request.settings = {
       ...request.settings,
-      modules: {
-        ...request.settings?.modules,
-        leaderboard: values.settings.modules.leaderboard,
-      },
-    };
-  }
-  if (isBundleDirty(dirtyFields)) {
-    request.settings = {
-      ...request.settings,
-      modules: {
-        ...request.settings?.modules,
-        bundle: values.settings.modules.bundle,
-        leaderboard: values.settings.modules.leaderboard,
-        stage: values.settings.modules.stage,
-      },
+      modules: { ...request.settings?.modules, ...dirtyModules },
     };
   }
   if (imageFile) request.imageFile = imageFile;

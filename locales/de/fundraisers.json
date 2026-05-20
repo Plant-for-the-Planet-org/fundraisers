@@ -2,8 +2,8 @@
   "Fundraisers": {
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
-    "donorsAndOthers": "{names} und {count, plural, one {# weitere*r} other {# weitere}}",
-    "amountRaised": "{formattedAmountWithCurrency} gesammelt",
+    "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
+    "amountRaised": "{formattedAmountWithCurrency}",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
@@ -57,7 +57,7 @@
         },
         "planetCash": {
           "availableBalance": "Verfügbar: {amount}",
-          "insufficientBalance": "Unzureichendes Guthaben"
+          "insufficientBalance": "Guthaben nicht ausreichend"
         },
         "providers": {
           "stripe": "Stripe",
@@ -86,12 +86,12 @@
     },
     "createPage": {
       "title": "Erstelle deinen Spendenaufruf",
-      "subtitle": "Gib Menschen etwas zu fühlen. Dann gib ihnen einen Weg zu spenden."
+      "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} gesammelt",
-        "goalLine": "{amount} vom gesetzten Ziel",
+        "raised": "{amount} ",
+        "goalLine": "von {amount} gesammelt",
         "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
       },
       "theme": {
@@ -100,9 +100,9 @@
         "selectAccent": "Wähle {accent} als Akzentfarbe"
       },
       "title": {
-        "label": "Titel des Spendenaufrufs",
-        "placeholder": "z.B. Mach meinen Geburtstag zu einem Wald",
-        "helper": "Erscheint in Share-Vorschauen, E-Mails und oben auf deiner Seite. Sei konkret.",
+        "label": "Name des Spendenaufrufs",
+        "placeholder": "z.B. Mache meinen Geburtstag zu einem Wald",
+        "helper": "Das erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite.\nSei spezifisch.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
@@ -208,33 +208,33 @@
         "addModule": "Modul hinzufügen",
         "stage": {
           "title": "Bühnenmodus",
-          "blurb": "Schreibgeschützte Vollbildanzeige für Live-Events. Spender geben per QR; der Bildschirm aktualisiert sich in Echtzeit.",
-          "subtitle": "Zeige deinen Spendenaufruf in Vollbild bei Konzerten, Galas und Events",
-          "collapse": "Einklappen",
-          "expand": "Ausklappen",
+          "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Die Spender spenden über den QR-Code; der Bildschirm wird in Echtzeit aktualisiert.",
+          "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
+          "collapse": "Zusammenklappen",
+          "expand": "Erweitern",
           "remove": "Bühnenmodus entfernen",
-          "toggleEnabled": "Bühnenmodus umschalten",
+          "toggleEnabled": "Bühnenmodus einschalten",
           "slideCountOne": "1 Folie",
           "slideCountMany": "{count} Folien",
           "stageTitle": "Bühnentitel",
-          "stageTitlePlaceholder": "Leer lassen, um den Spendenaufruf-Titel zu verwenden",
+          "stageTitlePlaceholder": "Frei lassen, um den Namen des Spendenaufrufs zu verwenden",
           "stageDescription": "Bühnenbeschreibung",
-          "stageDescriptionPlaceholder": "Kurzer Slogan unter dem Titel auf dem Bühnenbildschirm",
+          "stageDescriptionPlaceholder": "Kurzer Slogan, der unter dem Titel auf dem Bühnenbildschirm erscheint.",
           "locale": "Bühnensprache",
           "partnerLogo": "Logo-URL",
           "optional": "optional",
           "slides": "Folien",
           "addSlide": "Folie hinzufügen",
-          "noSlides": "Noch keine Folien. Füge eine hinzu, um deine Rotation zu starten.",
-          "slideTitlePlaceholder": "Folientitel",
-          "slideDescriptionPlaceholder": "Folienbeschreibung",
-          "slideImagePlaceholder": "Bild-URL (https://…)",
+          "noSlides": "Noch keine Folien. Füge eine hinzu, um die Rotation zu starten.",
+          "slideTitlePlaceholder": "Folien-Titel",
+          "slideDescriptionPlaceholder": "Folien-Beschreibung",
+          "slideImagePlaceholder": "Bild-URL (https://...)",
           "duration": "Dauer",
           "seconds": "Sekunden",
           "moveUp": "Nach oben",
           "moveDown": "Nach unten",
           "removeSlide": "Folie entfernen",
-          "imageUrlError": "Nur Bilder von vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org usw.)",
+          "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum von {max} Folien erreicht"
         }
       },
