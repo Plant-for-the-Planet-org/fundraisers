@@ -45,7 +45,9 @@ function getRedirectUri(): string {
     return `${window.location.origin}/api/auth/callback`;
   }
 
-  return `${process.env.BASE_URL}/api/auth/callback`;
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  return `${siteUrl}/api/auth/callback`;
 }
 
 /**

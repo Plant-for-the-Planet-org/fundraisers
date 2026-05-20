@@ -58,7 +58,9 @@ async function getMetadataBase(): Promise<URL> {
     return new URL(`${protocol}://${host}`);
   }
 
-  return new URL('http://localhost:3000');
+  return new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  );
 }
 
 export async function generateMetadata(): Promise<Metadata> {
