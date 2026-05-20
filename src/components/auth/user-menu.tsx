@@ -66,7 +66,7 @@ export function UserMenu() {
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
-            className='h-8 w-auto rounded-full p-0 pr-1 flex items-center gap-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
+            className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
           >
             <Avatar className='h-8 w-8'>
               {profileImageUrl && (
@@ -86,7 +86,7 @@ export function UserMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className='w-66  rounded-xl shadow-lg bg-white border-0'
+          className='w-66 rounded-xl border border-border bg-background/95 backdrop-blur shadow-xl'
           align='end'
           forceMount
         >
