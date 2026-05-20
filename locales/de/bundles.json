@@ -1,6 +1,6 @@
 {
   "Bundles": {
-    "sectionHeading": "Wähle die Projekte für deinen Spendenaufruf aus",
+    "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
     "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
@@ -9,7 +9,7 @@
       },
       "wonder": {
         "label": "Staunen",
-        "description": "Die Welt ist riesengroß und wunderschön."
+        "description": "Die Welt ist riesig und wunderschön."
       },
       "rage": {
         "label": "Wut",
