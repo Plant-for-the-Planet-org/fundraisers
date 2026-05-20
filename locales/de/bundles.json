@@ -4,7 +4,7 @@
     "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
-        "label": "Team-Auswahl",
+        "label": "Mitarbeiter Auswahl",
         "description": "Handverlesen vom Plant-for-the-Planet-Team."
       },
       "wonder": {
@@ -20,59 +20,55 @@
         "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
       },
       "custom": {
-        "label": "Individuell",
-        "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus."
+        "label": "Benutzerdefiniert",
+        "description": "Stelle dein eigenes Paket zusammen - wähle Projekte einzeln aus."
       }
     },
     "card": {
       "projectCount": "{count, plural, one {# Projekt} other {# Projekte}}",
-      "seeInside": "Reinschauen",
+      "seeInside": "Ansehen",
       "selected": "Ausgewählt"
     },
     "aria": {
-      "openBundle": "Schaue in das Paket {name} hinein",
-      "selectBundle": "Das Paket {name} auswählen",
-      "selectedBundle": "Das Paket {name} ist aktuell ausgewählt",
-      "openProject": "Mehr über {name} erfahren (öffnet in einem neuen Tab)",
+      "openBundle": "Sehe dir das Paket {name} an",
+      "selectBundle": "Wähle das Paket {name} ",
+      "selectedBundle": "Das {name} Paket ist gerade ausgewählt",
+      "openProject": "Erfahre mehr über {name} (öffnet in einem neuen Tab)",
       "closeModal": "Paketvorschau schließen"
     },
     "modal": {
       "projectsInside": "{count, plural, one {# Projekt enthalten} other {# Projekte enthalten}}",
       "useBundle": "Dieses Paket verwenden",
-      "loading": "Projekte werden geladen...",
-      "errorTitle": "Projekte konnten nicht geladen werden",
-      "errorMessage": "Dieses Paket konnte nicht geladen werden. Bitte versuche es nochmal.",
-      "retry": "Nochmal versuchen",
       "tag": {
         "rage": "WUT",
         "wonder": "STAUNEN",
         "love": "LIEBE",
-        "staff-picks": "TEAM-AUSWAHL"
+        "staff-picks": "MITARBEITER AUSWAHL"
       }
     },
     "custom": {
-      "description": "Stelle dein eigenes Paket zusammen — wähle Projekte einzeln aus.",
-      "searchPlaceholder": "Projekte suchen und auswählen, um dein Paket zu erstellen",
+      "description": "Stelle dein eigenes Paket zusammen - wähle Projekte einzeln aus.",
+      "searchPlaceholder": "Suche und wähle Projekte aus, um dein Paket zu erstellen",
       "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
-      "showingCount": "Top {shown, number} von {total, number} · Suche, um mehr zu finden · ✨ Top-Projekte",
-      "noResults": "Kein Projekt entspricht „{query}“",
+      "showingCount": "Top {shown, number} von {total, number} - Suche nach mehr - ✨ Top-Projekten",
+      "noResults": "Keine Projekte entsprechen \"{query}\"",
       "youMightLike": "Das könnte dir gefallen",
-      "clearSearch": "Suche zurücksetzen",
-      "loading": "Projekte werden geladen…",
+      "clearSearch": "Suche löschen",
+      "loading": "Projekte werden geladen...",
       "errorTitle": "Projekte konnten nicht geladen werden",
-      "errorMessage": "Projekte konnten nicht geladen werden. Bitte versuche es nochmal.",
+      "errorMessage": "Es konnte keine Projekte geladen werden. Bitte versuche es nochmal.",
       "retry": "Nochmal versuchen",
-      "yourBundle": "Dein eigenes Paket",
+      "yourBundle": "Dein individuelles Paket",
       "projectCount": "{count, plural, =0 {Keine Projekte} one {# Projekt} other {# Projekte}}",
       "emptyState": "Wähle mindestens ein Projekt aus, das du unterstützen möchtest.",
       "allAddedTitle": "Alle Projekte hinzugefügt",
-      "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Fundraiser hinzugefügt",
+      "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt",
       "allocationLabel": "{percentage, number}% des Spendenaufrufs",
       "globalLabel": "Global",
-      "viewTransparency": "Transparenz ansehen →",
-      "defaultCauseTooltip": "Dein Spendenaufruf unterstützt unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu stärken, Wälder wiederherzustellen und eine nachhaltige Zukunft zu fördern.",
+      "viewTransparency": "Transparenz: Mehr über das Projekt →",
+      "defaultCauseTooltip": "Mit deinem Spendenaufruf unterstützt du unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu empowern, Wälder wiederherzustellen und für eine nachhaltige Zukunft einzutreten.",
       "aria": {
-        "search": "Projekte durchsuchen",
+        "search": "Projekte suchen",
         "addProject": "{name} hinzufügen",
         "removeProject": "{name} entfernen",
         "defaultProjectLocked": "{name} ist das Standardprojekt und kann nicht entfernt werden"
@@ -83,7 +79,7 @@
     "entries": {
       "ancestral-lands": {
         "label": "Land der Vorfahren",
-        "tagline": "Verwurzelt in der Gemeinschaft. Geführt von den Menschen, die nie gegangen sind."
+        "tagline": "Verwurzelt in der Gemeinschaft. Angeführt von den Menschen, die nie gegangen sind."
       },
       "fix-what-we-broke": {
         "label": "Reparieren, was wir zerstört haben",
@@ -91,11 +87,11 @@
       },
       "for-your-children": {
         "label": "Für meine Kinder",
-        "tagline": "Ein Wald, der noch immer kraftvoll wächst, wenn sie groß sind."
+        "tagline": "Ein Wald, der noch kraftvoll wachsen wird, wenn sie groß sind."
       },
       "roof-of-the-world": {
-        "label": "Dach der Welt",
-        "tagline": "Hoch oben, wo die Luft dünn und der Einsatz hoch ist."
+        "label": "Das Dach der Welt",
+        "tagline": "Hoch oben, wo die Luft dünn ist und viel auf dem Spiel steht."
       },
       "supply-chain-guilt-trip": {
         "label": "Lieferketten-Gewissensbisse",
@@ -110,16 +106,16 @@
         "tagline": "Kleine Projekte. Stille Arbeit. Riesige Herzen."
       },
       "undo-your-amazon-order": {
-        "label": "Mach deine Amazon-Bestellung rückgängig",
-        "tagline": "Du hast „Kaufen“ geklickt. Jetzt klicke „Wiederherstellen“."
+        "label": "Mache deine Amazon-Bestellung rückgängig",
+        "tagline": "Du hast \"Kaufen\" geklickt. Jetzt klicke \"Wiederherstellen\"."
       },
       "where-your-coffee-grows": {
         "label": "Wo dein Kaffee wächst",
-        "tagline": "Jede Tasse am Morgen beginnt an einem schönen Ort. Halte es so."
+        "tagline": "Jede Tasse am Morgen beginnt an einem schönen Ort. So soll es auch bleiben."
       },
       "worst-of-the-worst": {
-        "label": "Die schlimmsten Orte",
-        "tagline": "Die am stärksten betroffenen Orte. Die, die dich am dringendsten brauchen."
+        "label": "Das Schlimmste vom Schlimmsten",
+        "tagline": "Die am stärksten betroffenen Orte. Diejenigen, die dich am meisten brauchen."
       }
     }
   }
