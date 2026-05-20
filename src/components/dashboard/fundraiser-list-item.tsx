@@ -114,7 +114,7 @@ export function FundraiserListItem({
             daysLeft={daysLeft}
             showEnded={showEnded}
             displayStatus={displayStatus}
-            className='inline-flex xl:hidden'
+            className='inline-flex'
           />
         </div>
 
@@ -132,12 +132,6 @@ export function FundraiserListItem({
             <Users className='h-3.5 w-3.5' aria-hidden='true' />
             {t('donations', { count: fundraiser.donationCount })}
           </span>
-          <DaysLeftLabel
-            daysLeft={daysLeft}
-            showEnded={showEnded}
-            displayStatus={displayStatus}
-            className='hidden xl:inline-flex'
-          />
         </div>
 
         <p className='mt-1 truncate text-sm text-muted-foreground'>
