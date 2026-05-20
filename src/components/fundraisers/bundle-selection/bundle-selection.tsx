@@ -54,9 +54,12 @@ function getInitialActiveTab({
     return 'custom';
   }
 
-  // Use the first tab from the persisted bundle slug.
+  // Derive the tab from the config's tab list rather than Bundle.tabs[].
   if (selectedBundle) {
-    return selectedBundle.tabs[0] ?? BUNDLE_CONFIG.meta.defaultTab;
+    const tab = BUNDLE_CONFIG.tabs.find(t =>
+      t.bundleSlugs.includes(selectedBundle.slug)
+    );
+    return tab?.id ?? BUNDLE_CONFIG.meta.defaultTab;
   }
 
   // Edit mode without a stored bundle slug → custom selection.

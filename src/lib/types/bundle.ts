@@ -30,6 +30,7 @@ export type BundleWorkspace = (typeof BUNDLE_WORKSPACES)[number];
 
 export interface Bundle {
   slug: BundleSlug;
+  /** Config-only — not consumed at runtime. Derive tab from BundleTab.bundleSlugs instead. Can remove in future if not needed. */
   tabs: BundleTabId[];
   /** 4 curated project IDs. The workspace's support project is added at runtime. */
   projectIds: string[];
