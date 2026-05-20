@@ -13,7 +13,6 @@ import type {
 import type { Fundraiser } from '../types/fundraiser';
 import type { PaymentMethodId } from '../types/payment-methods';
 
-import { getPrimaryAddress } from '../utils/profile';
 import { calculateLineItems } from './line-item-calculator';
 
 export function calculateFrequency(
@@ -61,27 +60,17 @@ export function buildDonationMetadata(
     }),
   };
 }
-/**
- * Maps guest form data to API donor structure.
- * Pre-populates missing fields from user profile if available.
- */
-export function buildGuestDonorInfo(
-  formData: GuestFormData,
-  userProfile?: UserProfileResponse
-): DonorInfo {
-  const primaryAddress = getPrimaryAddress(userProfile?.addresses ?? []);
+export function buildGuestDonorInfo(formData: GuestFormData): DonorInfo {
   const donorInfo: DonorInfo = {
-    firstname: formData.donor.firstname || userProfile?.firstname || '',
-    lastname: formData.donor.lastname || userProfile?.lastname || '',
-    email: formData.donor.email || userProfile?.email || '',
-    address: formData.donor.address || primaryAddress.address,
-    zipCode: formData.donor.zipCode || primaryAddress.zipCode || '',
-    city: formData.donor.city || primaryAddress.city || '',
-    country:
-      formData.donor.country ||
-      primaryAddress.country ||
-      userProfile?.country ||
-      '',
+    firstname: formData.donor.firstname,
+    lastname: formData.donor.lastname,
+    email: formData.donor.email,
+    address: formData.donor.address,
+    address2: formData.donor.address2 || undefined,
+    zipCode: formData.donor.zipCode,
+    city: formData.donor.city,
+    state: formData.donor.state || undefined,
+    country: formData.donor.country,
     tin: formData.tin || null,
   };
 
@@ -109,8 +98,10 @@ export function buildAuthenticatedDonorInfo(
     lastname: userProfile?.lastname || '',
     email: userProfile?.email || '',
     address: selectedAddress?.address,
+    address2: selectedAddress?.address2 ?? undefined,
     zipCode: selectedAddress?.zipCode,
     city: selectedAddress?.city,
+    state: selectedAddress?.state ?? undefined,
     country: selectedAddress?.country || userProfile?.country || '',
     tin: formData.tin || null,
   };
@@ -250,7 +241,7 @@ export function buildDonationPayload(
   const donor =
     formData.type === 'authenticated'
       ? buildAuthenticatedDonorInfo(formData, donorProfile)
-      : buildGuestDonorInfo(formData, donorProfile);
+      : buildGuestDonorInfo(formData);
 
   return { ...baseDonationPayload, ...absorbedFee, donor };
 }
