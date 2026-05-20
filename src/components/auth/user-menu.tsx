@@ -32,6 +32,7 @@ export function UserMenu() {
 
   const tDashboard = useTranslations('Dashboard');
   const tFundraiser = useTranslations('Fundraisers');
+  const tAuth = useTranslations('Auth');
 
   const pathname = usePathname();
   // store: state
@@ -122,7 +123,9 @@ export function UserMenu() {
             >
               <UserCog className='mr-2 h-4 w-4' />
               <span>
-                {isImpersonating ? 'Switch impersonation' : 'Impersonate user'}
+                {isImpersonating
+                  ? 'Switch impersonation'
+                  : tAuth('impersonation.title')}
               </span>
             </DropdownMenuItem>
           )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { userService } from '@/lib/api/user-service';
 import { useAuthStore } from '@/stores/auth-store';
@@ -23,6 +24,7 @@ interface ImpersonationModalProps {
 }
 
 export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
+  const t = useTranslations('Auth');
   const start = useImpersonationStore(state => state.start);
   const accessToken = useAuthStore(state => state.accessToken);
 
@@ -92,7 +94,7 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Impersonate user</DialogTitle>
+          <DialogTitle>{t('impersonation.title')}</DialogTitle>
           <DialogDescription>
             Sign in as another user for support. Enter their email and support
             pin.
