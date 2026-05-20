@@ -91,6 +91,9 @@ export interface FundraiserSettings {
   };
   modules: {
     leaderboard?: LeaderboardModuleSettings;
+    bundle?: {
+      slug: string | null;
+    };
     stage?: StageModuleSettings | null;
     contribution?: {
       options: Array<{
@@ -179,6 +182,7 @@ export interface UpdateFundraiserRequest {
     theme?: FundraiserSettings['theme'];
     modules?: {
       leaderboard?: LeaderboardModuleSettings;
+      bundle?: { slug: string | null };
       stage?: Nullable<StageModuleSettings>;
     };
   };

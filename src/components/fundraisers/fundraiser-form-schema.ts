@@ -6,15 +6,19 @@ import type { SelectedImage } from '@/lib/types/image-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { z } from 'zod';
+import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
+import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { BUNDLE_SLUGS } from '@/lib/types/bundle';
+import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
   ALLOWED_COUNTRIES,
   getCurrencyForCountry,
   SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
 import { getImageUrl } from '@/lib/utils/images';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { STAGE_LIMITS } from '@/components/stage/constants';
 import { routing } from '@/i18n/routing';
@@ -135,6 +139,9 @@ export const fundraiserFormSchema = z.object({
         show_avatar: z.boolean(),
         aggregate_top_by_donor: z.boolean(),
       }),
+      bundle: z.object({
+        slug: z.enum(BUNDLE_SLUGS).nullable(),
+      }),
       stage: stageModeSchema.nullable(),
     }),
   }),
@@ -152,6 +159,15 @@ export function buildDefaultCreateValues(
   const initialTheme = getThemeForPath(pathname);
   const defaultCountry: AllowedCountry = 'DE';
 
+  const workspace = getWorkspaceForCountry(defaultCountry);
+  const defaultBundle = workspace
+    ? getBundlesForTab(BUNDLE_CONFIG.meta.defaultTab)[0]
+    : undefined;
+  const projectAllocations =
+    workspace && defaultBundle
+      ? bundleToAllocations(defaultBundle, workspace)
+      : [{ project_id: getDefaultCauseId(defaultCountry), percentage: 100 }];
+
   return {
     title: '',
     description: '',
@@ -161,12 +177,7 @@ export function buildDefaultCreateValues(
     goalAmount: undefined as unknown as number,
     visibility: 'public',
     status: 'draft',
-    projectAllocations: [
-      {
-        project_id: getDefaultCauseId(defaultCountry),
-        percentage: 100,
-      },
-    ],
+    projectAllocations,
     settings: {
       theme: {
         base_id: initialTheme.id,
@@ -179,6 +190,7 @@ export function buildDefaultCreateValues(
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
+        bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
       },
     },
@@ -221,6 +233,13 @@ export function fundraiserToFormValues(
     ? rawCountry
     : 'ROW';
 
+  const storedBundleSlug = fundraiser.settings?.modules?.bundle?.slug;
+  const bundleSlug = (BUNDLE_SLUGS as readonly string[]).includes(
+    storedBundleSlug ?? ''
+  )
+    ? (storedBundleSlug as (typeof BUNDLE_SLUGS)[number])
+    : null;
+
   return {
     title: fundraiser.title,
     description: fundraiser.description ?? '',
@@ -249,6 +268,7 @@ export function fundraiserToFormValues(
           ...DEFAULT_LEADERBOARD,
           ...fundraiser.settings?.modules?.leaderboard,
         },
+        bundle: { slug: bundleSlug },
         stage: fundraiser.settings?.modules?.stage ?? null,
       },
     },
