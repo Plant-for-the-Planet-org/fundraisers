@@ -146,18 +146,17 @@ export function DonationSummary() {
             </dd>
           </div>
         ))}
+        {willAbsorbFee && hasProcessingFee && (
+          <div className='flex justify-between items-baseline gap-2'>
+            <dt className='text-muted-foreground text-sm'>
+              {t('donate.summary.processingFee')}
+            </dt>
+            <dd className='text-foreground text-sm font-medium'>
+              {formatCurrency(processingFeeCents, donationData.currency)}
+            </dd>
+          </div>
+        )}
       </div>
-
-      {willAbsorbFee && hasProcessingFee && (
-        <div className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {t('donate.summary.processingFee')}
-          </dt>
-          <dd className='text-foreground text-sm font-medium'>
-            {formatCurrency(processingFeeCents, donationData.currency)}
-          </dd>
-        </div>
-      )}
 
       <div className='flex justify-between items-center gap-2 pt-4 border-t border-border'>
         <dt className='font-semibold text-foreground'>{totalLabel}</dt>
