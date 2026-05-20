@@ -6,6 +6,7 @@ import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { readThemeHslColor } from '@/lib/theme/css-var';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { FormField } from './form-field';
@@ -31,18 +32,19 @@ const CREDITOR_ID = 'DE98ZZZ09999999999';
 export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
   function StripeSepaForm(_props, ref) {
     const stripe = useStripe();
-    const isDark =
-      typeof document !== 'undefined' &&
-      document.documentElement.classList.contains('dark');
     const ibanElementOptions = {
       supportedCountries: ['SEPA'],
       style: {
         base: {
           fontSize: '14px',
-          color: isDark ? '#f1f5f9' : '#030712',
-          '::placeholder': { color: isDark ? '#94a3b8' : '#6b7280' },
+          color: readThemeHslColor('--foreground'),
+          '::placeholder': {
+            color: readThemeHslColor('--muted-foreground'),
+          },
         },
-        invalid: { color: '#dc2626' },
+        invalid: {
+          color: readThemeHslColor('--destructive'),
+        },
       },
     };
     const elements = useElements();
