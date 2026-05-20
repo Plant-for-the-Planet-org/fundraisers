@@ -5,7 +5,8 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useTranslations } from 'next-intl';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from './typography';
 
@@ -24,15 +25,17 @@ export function Hosts(props: HostProps) {
 function SingleHost({
   name,
   avatarUrl,
+  seed,
 }: {
   name: string;
   avatarUrl: string | null;
+  seed: string;
 }) {
   return (
     <div className='flex flex-row items-center gap-2.5'>
       <Avatar className='h-6 w-6'>
         {avatarUrl && <AvatarImage src={avatarUrl} alt={name} loading='lazy' />}
-        <AvatarFallback className='bg-linear-to-br from-blue-500 to-purple-600' />
+        <FallbackAvatar seed={seed} />
       </Avatar>
       <div className='text-zinc-800 dark:text-gray-100 text-base font-medium leading-tight'>
         {name}
@@ -65,10 +68,13 @@ function HostsDisplay({
           </div>
         ) : (
           hosts.map((host, i) => (
+            // Seed falls back to name when id is missing; two hosts sharing a
+            // name (without ids) will get the same tree icon.
             <SingleHost
               key={host.id ?? i}
               name={host.name}
               avatarUrl={host.avatarUrl}
+              seed={host.id ?? host.name}
             />
           ))
         )}

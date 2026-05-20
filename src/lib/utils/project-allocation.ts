@@ -1,24 +1,18 @@
 import type {
   ProjectAllocationPreview,
-  ProjectData,
   SelectedProject,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import {
   DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY,
-  DEFAULT_NON_EARMARKED_CAUSE_FALLBACK,
   DEFAULT_NON_EARMARKED_CAUSE_ID,
   MIN_DEFAULT_CAUSE_PERCENT,
 } from '@/lib/constants/project-selection';
 
-function normalizeCountryCode(countryCode?: string | null): string {
-  return (countryCode ?? '').trim().toUpperCase();
-}
-
-export function resolveCauseCountry(countryCode: string): string {
-  const normalizedCountryCode = normalizeCountryCode(countryCode);
-  return normalizedCountryCode === 'ROW' ? 'DE' : normalizedCountryCode;
+function resolveCauseCountry(countryCode: string): string {
+  const normalized = countryCode.trim().toUpperCase();
+  return normalized === 'ROW' ? 'DE' : normalized;
 }
 
 export function getDefaultCauseId(countryCode: string): string {
@@ -29,53 +23,6 @@ export function getDefaultCauseId(countryCode: string): string {
     DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY.DE ??
     DEFAULT_NON_EARMARKED_CAUSE_ID
   );
-}
-
-export function mapProjectToSelectedCause(
-  project: ProjectData
-): SelectedProject {
-  return {
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    image: project.image,
-    country: project.country,
-  };
-}
-
-interface DefaultCauseFallback {
-  name?: string;
-  description?: string;
-  image?: string;
-}
-
-export function createDefaultCause(
-  countryCode: string,
-  projects: ProjectData[] = [],
-  fallback: DefaultCauseFallback = {}
-): SelectedProject {
-  const defaultCauseId = getDefaultCauseId(countryCode);
-  const defaultCauseFromProjects = projects.find(
-    project => project.id === defaultCauseId
-  );
-
-  if (defaultCauseFromProjects) {
-    return {
-      ...mapProjectToSelectedCause(defaultCauseFromProjects),
-      isDefault: true,
-    };
-  }
-
-  return {
-    id: defaultCauseId,
-    name: fallback.name?.trim() || DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.name,
-    description:
-      fallback.description?.trim() ||
-      DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.description,
-    image: fallback.image || DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.image,
-    country: resolveCauseCountry(countryCode),
-    isDefault: true,
-  };
 }
 
 function equalSplitAllocations(

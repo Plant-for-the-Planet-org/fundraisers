@@ -6,8 +6,8 @@ import { useTranslations } from 'next-intl';
 import { getSafeRedirectPath } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
+import { SignInHeroImage } from '@/components/auth/sign-in-hero-image';
 import { Loader } from '@/components/ui/loader';
-import { SignInHeroImage } from '../../../components/auth/sign-in-hero-image';
 
 export default function LoginPage() {
   const tAuth = useTranslations('Auth');

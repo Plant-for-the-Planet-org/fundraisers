@@ -45,7 +45,8 @@ export async function FundraiserCities() {
   let cities: AdaptedCategory[] = [];
 
   try {
-    const rawCities = await categoriesService.getCategoriesWithRetry('cause'); //TODO: Change to 'location' before release
+    const rawCities =
+      await categoriesService.getCategoriesWithRetry('location');
 
     cities = rawCities
       .filter(city => city.metadata?.featured === true)

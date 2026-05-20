@@ -1,0 +1,122 @@
+{
+  "Bundles": {
+    "sectionHeading": "Pick Causes Supported by your Fundraiser",
+    "moreLabel": "More",
+    "tabs": {
+      "staff-picks": {
+        "label": "Staff Picks",
+        "description": "Handpicked by the Plant-for-the-Planet team."
+      },
+      "wonder": {
+        "label": "Wonder",
+        "description": "The world is vast and beautiful."
+      },
+      "rage": {
+        "label": "Rage",
+        "description": "This is broken and needs fixing."
+      },
+      "love": {
+        "label": "Love",
+        "description": "For people, places, things I care about."
+      },
+      "custom": {
+        "label": "Custom",
+        "description": "Build your own bundle — pick projects one by one."
+      }
+    },
+    "card": {
+      "projectCount": "{count, plural, one {# project} other {# projects}}",
+      "seeInside": "See inside",
+      "selected": "Selected"
+    },
+    "aria": {
+      "openBundle": "See inside the {name} bundle",
+      "selectBundle": "Select the {name} bundle",
+      "selectedBundle": "{name} bundle is currently selected",
+      "openProject": "Learn more about {name} (opens in a new tab)",
+      "closeModal": "Close bundle preview"
+    },
+    "modal": {
+      "projectsInside": "{count, plural, one {# project inside} other {# projects inside}}",
+      "useBundle": "Use this bundle",
+      "tag": {
+        "rage": "RAGE",
+        "wonder": "WONDER",
+        "love": "LOVE",
+        "staff-picks": "STAFF PICKS"
+      }
+    },
+    "custom": {
+      "description": "Build your own bundle — pick projects one by one.",
+      "searchPlaceholder": "Search and pick projects to create your bundle",
+      "maxReached": "6 projects selected. Remove one to add another.",
+      "showingCount": "Top {shown, number} of {total, number} · Search to find more · ✨ top projects",
+      "noResults": "No projects match \"{query}\"",
+      "youMightLike": "You might like these",
+      "clearSearch": "Clear search",
+      "loading": "Loading projects…",
+      "errorTitle": "Failed to load projects",
+      "errorMessage": "Unable to load projects. Please try again.",
+      "retry": "Try Again",
+      "yourBundle": "Your Custom Bundle",
+      "projectCount": "{count, plural, =0 {No projects} one {# project} other {# projects}}",
+      "emptyState": "Pick at least one project to support.",
+      "allAddedTitle": "All projects added",
+      "allAddedDescription": "You've added all available projects to your fundraiser",
+      "allocationLabel": "{percentage, number}% of fundraiser",
+      "globalLabel": "Global",
+      "viewTransparency": "View Transparency →",
+      "defaultCauseTooltip": "Your fundraiser supports our work to empower young people as ambassadors for climate justice, restoring forests and advocating for a sustainable future.",
+      "aria": {
+        "search": "Search projects",
+        "addProject": "Add {name}",
+        "removeProject": "Remove {name}",
+        "defaultProjectLocked": "{name} is the default project and cannot be removed"
+      }
+    },
+    "projectImageAlt": "Image for {name}",
+    "unknownProject": "Unknown project",
+    "entries": {
+      "ancestral-lands": {
+        "label": "Ancestral Lands",
+        "tagline": "Rooted in Community. Led by the people that never left."
+      },
+      "fix-what-we-broke": {
+        "label": "Fix What We Broke",
+        "tagline": "Not guilt. Just responsibility. Just a shovel."
+      },
+      "for-your-children": {
+        "label": "For My Kids",
+        "tagline": "A forest that will still be growing strong when they are grown."
+      },
+      "roof-of-the-world": {
+        "label": "Roof of the World",
+        "tagline": "High up where the air is thin and the stakes are high."
+      },
+      "supply-chain-guilt-trip": {
+        "label": "Supply Chain Guilt Trip",
+        "tagline": "Everything you buy has a forest behind it. Meet it."
+      },
+      "amazon-route": {
+        "label": "The Amazon Route",
+        "tagline": "Somewhere in this river basin, a tree is waiting for you."
+      },
+      "underdog-bundle": {
+        "label": "The Underdog Bundle",
+        "tagline": "Small projects. Quiet work. Enormous hearts."
+      },
+      "undo-your-amazon-order": {
+        "label": "Undo Your Amazon Order",
+        "tagline": "You clicked buy. Now click restore."
+      },
+      "where-your-coffee-grows": {
+        "label": "Where Your Coffee Grows",
+        "tagline": "Every morning cup starts somewhere beautiful. Keep it that way."
+      },
+      "worst-of-the-worst": {
+        "label": "Worst of the Worst",
+        "tagline": "The hardest hit places. The ones that need you most."
+      }
+    }
+  }
+}

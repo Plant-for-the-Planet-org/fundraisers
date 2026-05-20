@@ -2,7 +2,8 @@
   "Fundraisers": {
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
-    "amountRaised": "{formattedAmountWithCurrency} gesammelt",
+    "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
+    "amountRaised": "{formattedAmountWithCurrency}",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
@@ -56,7 +57,7 @@
         },
         "planetCash": {
           "availableBalance": "Verfügbar: {amount}",
-          "insufficientBalance": "Unzureichendes Guthaben"
+          "insufficientBalance": "Guthaben nicht ausreichend"
         },
         "providers": {
           "stripe": "Stripe",
@@ -83,15 +84,15 @@
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
     },
+    "createPage": {
+      "title": "Erstelle deinen Spendenaufruf",
+      "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
+    },
     "form": {
       "goalPreview": {
-        "raised": "{amount} gesammelt",
-        "goalLine": "{amount} vom gesetzten Ziel",
+        "raised": "{amount} ",
+        "goalLine": "von {amount} gesammelt",
         "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
-      },
-      "donorsPreview": {
-        "donorCount": "{count, plural, one {# Spender*in} other {# Spender*innen}}",
-        "others": " und {count, plural, one {# Anderer} other {# Andere}}"
       },
       "theme": {
         "sectionHeading": "Thema",
@@ -100,7 +101,8 @@
       },
       "title": {
         "label": "Name des Spendenaufrufs",
-        "placeholder": "Name des Spendenaufrufs",
+        "placeholder": "z.B. Mache meinen Geburtstag zu einem Wald",
+        "helper": "Das erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite.\nSei spezifisch.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."
@@ -188,51 +190,10 @@
         }
       },
       "projectSelection": {
-        "sectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
         "viewModeSectionHeading": "Diese Projekte werden durch diesen Spendenaufruf unterstützt.",
-        "addCause": "Projekt hinzufügen",
-        "removeCause": "Projekt entfernen",
-        "allocationLabel": "{percentage, number}%-Zuweisung",
         "projectImageAlt": "Bild für {name}",
         "expandDescription": "Mehr erfahren",
-        "collapseDescription": "Weniger lesen",
-        "defaultCause": {
-          "name": "Junge Menschen empowern und Wälder zurückbringen",
-          "description": "Unterstütze die Mission von Plant-for-the-Planet, junge Menschen auf der ganzen Welt zu empowern und sich für den Klimaschutz einzusetzen. Wir stellen Wälder wieder her, klären die Öffentlichkeit auf und setzen uns für Klimagerechtigkeit ein, um eine nachhaltige Zukunft für alle zu schaffen."
-        },
-        "aria": {
-          "closeModal": "Projektauswahl schließen",
-          "selectCause": "Projekt {name} hinzufügen"
-        },
-        "modal": {
-          "title": "Projekt hinzufügen",
-          "subtitle": "Wähle weitere Projekte zur Unterstützung aus",
-          "searchPlaceholder": "Projekte werden durchsucht...",
-          "searchAriaLabel": "Projekte werden durchsucht",
-          "tabs": {
-            "top": "Top-Projekte",
-            "all": "Alle Projekte"
-          },
-          "resultsCount": "{count, plural, one {# Ergebnis} other {# Ergebnisse}}",
-          "loading": "Projekte werden geladen...",
-          "errorTitle": "Projekte konnten nicht geladen werden",
-          "errorMessage": "Es können keine Projekte geladen werden. Bitte versuche es nochmal.",
-          "retry": "Nochmal versuchen",
-          "byOrganization": "von {organization}",
-          "tags": {
-            "topProject": "Top-Projekt",
-            "restoration": "Renaturierung",
-            "conservation": "Waldschutz",
-            "learnMore": "Mehr erfahren",
-            "restOfWorld": "Rest der Welt"
-          },
-          "add": "Hinzufügen",
-          "emptySearchTitle": "Es wurden keine Projekte gefunden",
-          "emptySearchDescription": "Keine Projekt entspricht \"{query}\"",
-          "clearSearch": "Suchbegriff löschen",
-          "emptyAllTitle": "Alle Projekte hinzugefügt",
-          "emptyAllDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt"
-        }
+        "collapseDescription": "Weniger lesen"
       },
       "options": {
         "sectionHeading": "Spendenaufruf-Optionen",
@@ -243,6 +204,38 @@
         "visibility": {
           "label": "Mache den Spendenaufruf entdeckbar",
           "description": "Ermögliche es anderen, diesen Spendenaufruf über die Suche zu finden und zu entdecken"
+        },
+        "addModule": "Modul hinzufügen",
+        "stage": {
+          "title": "Bühnenmodus",
+          "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Die Spender spenden über den QR-Code; der Bildschirm wird in Echtzeit aktualisiert.",
+          "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
+          "collapse": "Zusammenklappen",
+          "expand": "Erweitern",
+          "remove": "Bühnenmodus entfernen",
+          "toggleEnabled": "Bühnenmodus einschalten",
+          "slideCountOne": "1 Folie",
+          "slideCountMany": "{count} Folien",
+          "stageTitle": "Bühnentitel",
+          "stageTitlePlaceholder": "Frei lassen, um den Namen des Spendenaufrufs zu verwenden",
+          "stageDescription": "Bühnenbeschreibung",
+          "stageDescriptionPlaceholder": "Kurzer Slogan, der unter dem Titel auf dem Bühnenbildschirm erscheint.",
+          "locale": "Bühnensprache",
+          "partnerLogo": "Logo-URL",
+          "optional": "optional",
+          "slides": "Folien",
+          "addSlide": "Folie hinzufügen",
+          "noSlides": "Noch keine Folien. Füge eine hinzu, um die Rotation zu starten.",
+          "slideTitlePlaceholder": "Folien-Titel",
+          "slideDescriptionPlaceholder": "Folien-Beschreibung",
+          "slideImagePlaceholder": "Bild-URL (https://...)",
+          "duration": "Dauer",
+          "seconds": "Sekunden",
+          "moveUp": "Nach oben",
+          "moveDown": "Nach unten",
+          "removeSlide": "Folie entfernen",
+          "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
+          "maxSlidesReached": "Maximum von {max} Folien erreicht"
         }
       },
       "contributionSettings": {

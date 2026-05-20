@@ -9,8 +9,9 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { useDonationForm } from './donation-form-context';
 
 export function DonationSummary() {
@@ -75,7 +76,7 @@ export function DonationSummary() {
     if (publicHosts.length === 0) {
       return (
         <Avatar className='w-6 h-6'>
-          <AvatarFallback className='bg-neutral text-neutral-foreground' />
+          <FallbackAvatar seed='anonymous-host' />
         </Avatar>
       );
     }
@@ -87,9 +88,7 @@ export function DonationSummary() {
           className={cn('w-6 h-6 border-2 border-card', index > 0 && '-ml-1')}
         >
           {avatarUrl && <AvatarImage src={avatarUrl} alt='' loading='lazy' />}
-          <AvatarFallback className='bg-muted text-muted-foreground text-xs'>
-            {host.displayName?.charAt(0)?.toUpperCase()}
-          </AvatarFallback>
+          <FallbackAvatar seed={host.id ?? host.displayName ?? ''} />
         </Avatar>
       );
     });
@@ -125,36 +124,40 @@ export function DonationSummary() {
   const renderBreakdown = () => (
     <dl
       aria-label={t('donate.summary.breakdown')}
-      className='space-y-1 border-t border-border pt-4'
+      className='border-t border-border'
     >
-      {fundraiser.projectAllocations.map((allocation, index) => (
-        <div key={index} className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {allocation.project.name}
-          </dt>
-          <dd className='text-foreground text-sm'>
-            {formatCurrency(
-              Math.round(
-                (allocation.percentage / 100) * donationData.amountCents
-              ),
-              donationData.currency
-            )}
-          </dd>
-        </div>
-      ))}
+      <div className='py-4'>
+        {fundraiser.projectAllocations.map((allocation, index) => (
+          <div
+            key={index}
+            className='flex justify-between items-baseline gap-2'
+          >
+            <dt className='text-muted-foreground text-sm'>
+              {allocation.project.name}
+            </dt>
+            <dd className='text-foreground text-sm'>
+              {formatCurrency(
+                Math.round(
+                  (allocation.percentage / 100) * donationData.amountCents
+                ),
+                donationData.currency
+              )}
+            </dd>
+          </div>
+        ))}
+        {willAbsorbFee && hasProcessingFee && (
+          <div className='flex justify-between items-baseline gap-2'>
+            <dt className='text-muted-foreground text-sm'>
+              {t('donate.summary.processingFee')}
+            </dt>
+            <dd className='text-foreground text-sm font-medium'>
+              {formatCurrency(processingFeeCents, donationData.currency)}
+            </dd>
+          </div>
+        )}
+      </div>
 
-      {willAbsorbFee && hasProcessingFee && (
-        <div className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {t('donate.summary.processingFee')}
-          </dt>
-          <dd className='text-foreground text-sm font-medium'>
-            {formatCurrency(processingFeeCents, donationData.currency)}
-          </dd>
-        </div>
-      )}
-
-      <div className='flex justify-between items-center gap-2 pt-3 border-t border-border'>
+      <div className='flex justify-between items-center gap-2 pt-4 border-t border-border'>
         <dt className='font-semibold text-foreground'>{totalLabel}</dt>
         <dd className='font-semibold text-lg text-foreground'>
           {formatCurrency(totalCents, donationData.currency)}

@@ -2,10 +2,11 @@
 
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
 
 const TITLE_MAX_LENGTH = 50;
 
@@ -25,6 +26,7 @@ export function Title() {
     <TitleInput
       label={t('label')}
       placeholder={t('placeholder')}
+      helper={t('helper')}
       requiredMessage={t('errors.required')}
       maxLengthMessage={t('errors.maxLength', { max: TITLE_MAX_LENGTH })}
     />
@@ -34,6 +36,7 @@ export function Title() {
 interface TitleInputProps {
   label: string;
   placeholder: string;
+  helper: string;
   requiredMessage: string;
   maxLengthMessage: string;
 }
@@ -41,11 +44,13 @@ interface TitleInputProps {
 function TitleInput({
   label,
   placeholder,
+  helper,
   requiredMessage,
   maxLengthMessage,
 }: TitleInputProps) {
   const inputId = 'form-title';
   const errorId = `${inputId}-error`;
+  const helperId = `${inputId}-helper`;
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
@@ -55,13 +60,9 @@ function TitleInput({
   } = useFormContext<FundraiserFormValues>();
   const titleValue = useWatch({ control, name: 'title' });
 
-  const resizeTextarea = useCallback((element: HTMLTextAreaElement | null) => {
-    resizeToContent(element);
-  }, []);
-
   useEffect(() => {
-    resizeTextarea(textareaRef.current);
-  }, [titleValue, resizeTextarea]);
+    resizeToContent(textareaRef.current);
+  }, [titleValue]);
 
   const { ref: registerRef, ...titleField } = register('title');
 
@@ -71,24 +72,44 @@ function TitleInput({
   const titleErrorMessage =
     errors.title?.type === 'too_big' ? maxLengthMessage : requiredMessage;
 
+  const count = titleValue?.length ?? 0;
+
   return (
     <div className='flex flex-col gap-2'>
-      <label htmlFor={inputId} className='sr-only'>
-        {label}
-      </label>
-      <textarea
+      <div className='flex items-baseline justify-between gap-2'>
+        <label htmlFor={inputId} className='text-sm font-medium'>
+          {label}
+          <span aria-hidden='true' className='text-destructive ml-0.5'>
+            *
+          </span>
+        </label>
+        <span
+          aria-live='polite'
+          className={cn(
+            'text-xs tabular-nums text-muted-foreground',
+            count >= TITLE_MAX_LENGTH && 'text-destructive'
+          )}
+        >
+          {count} / {TITLE_MAX_LENGTH}
+        </span>
+      </div>
+      <Textarea
         id={inputId}
         rows={1}
         maxLength={TITLE_MAX_LENGTH} // Keeping this will restrict the content & Error would never appear.
         placeholder={placeholder}
+        style={{ fontFamily: 'var(--theme-title-font)' }}
         className={cn(
-          'font-poppins typo-form-title-input border-b border-transparent bg-transparent outline-none w-full resize-none overflow-hidden',
-          hasTitleError && 'border-b border-destructive'
+          'text-4xl font-bold wrap-anywhere',
+          'rounded-none border-0 border-b border-transparent px-0 py-0 shadow-none overflow-hidden',
+          'focus-visible:ring-0 focus-visible:border-transparent',
+          'aria-invalid:ring-0 aria-invalid:border-b-destructive',
+          hasTitleError && 'border-b-destructive'
         )}
         aria-invalid={hasTitleError}
-        aria-describedby={hasTitleError ? errorId : undefined}
+        aria-describedby={hasTitleError ? `${errorId} ${helperId}` : helperId}
         onInput={event => {
-          resizeTextarea(event.currentTarget);
+          resizeToContent(event.currentTarget);
         }}
         {...titleField}
         ref={element => {
@@ -96,9 +117,15 @@ function TitleInput({
           textareaRef.current = element;
         }}
       />
-      <p id={errorId} className='text-sm h-5 text-destructive'>
-        {hasTitleError ? titleErrorMessage : ''}
-      </p>
+      {hasTitleError ? (
+        <p id={errorId} className='text-sm text-destructive'>
+          {titleErrorMessage}
+        </p>
+      ) : (
+        <p id={helperId} className='text-sm text-muted-foreground'>
+          {helper}
+        </p>
+      )}
     </div>
   );
 }
