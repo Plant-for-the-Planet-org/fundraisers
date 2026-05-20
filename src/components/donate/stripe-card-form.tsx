@@ -15,6 +15,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { readThemeHslColor } from '@/lib/theme/css-var';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
@@ -44,17 +45,18 @@ export interface StripeCardFormHandle {
 export const StripeCardForm = forwardRef<StripeCardFormHandle>(
   function StripeCardForm(_props, ref) {
     const stripe = useStripe();
-    const isDark =
-      typeof document !== 'undefined' &&
-      document.documentElement.classList.contains('dark');
     const cardElementOptions = {
       style: {
         base: {
           fontSize: '14px',
-          color: isDark ? '#f1f5f9' : '#030712',
-          '::placeholder': { color: isDark ? '#94a3b8' : '#6b7280' },
+          color: readThemeHslColor('--foreground'),
+          '::placeholder': {
+            color: readThemeHslColor('--muted-foreground'),
+          },
         },
-        invalid: { color: '#dc2626' },
+        invalid: {
+          color: readThemeHslColor('--destructive'),
+        },
       },
     };
     const elements = useElements();
