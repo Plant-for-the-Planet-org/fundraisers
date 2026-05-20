@@ -19,6 +19,7 @@ export default getRequestConfig(async () => {
       ...(await import(`../../locales/${locale}/common.json`)).default,
       ...(await import(`../../locales/${locale}/explore.json`)).default,
       ...(await import(`../../locales/${locale}/fundraisers.json`)).default,
+      ...(await import(`../../locales/${locale}/bundles.json`)).default,
       ...(await import(`../../locales/${locale}/auth.json`)).default,
       ...(await import(`../../locales/${locale}/dashboard.json`)).default,
       ...(await import(`../../locales/${locale}/donate.json`)).default,

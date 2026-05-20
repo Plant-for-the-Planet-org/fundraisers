@@ -1,11 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { SelectedProject } from '@/lib/types/project-selection';
 
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
@@ -15,7 +15,6 @@ import { Hosts } from './hosts';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
-import { ProjectSelection } from './project-selection';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
 import { WorkspaceInfo } from './workspace-info';
@@ -24,7 +23,6 @@ import { WorkspaceSelector } from './workspace-selector';
 interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
-  nonDefaultInitialProjects?: SelectedProject[];
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
@@ -34,7 +32,6 @@ interface FundraiserFormBodyProps {
 export function FundraiserFormBody({
   mode,
   submitButton,
-  nonDefaultInitialProjects,
   totalRaised,
   endDate,
 }: FundraiserFormBodyProps) {
@@ -63,9 +60,7 @@ export function FundraiserFormBody({
           <GoalInput />
         </div>
         <WorkspaceInfo />
-        <ProjectSelection
-          nonDefaultInitialProjects={nonDefaultInitialProjects}
-        />
+        <BundleSelection mode={mode} />
         <Options />
         {submitButton}
       </MainPanel>
