@@ -89,11 +89,11 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
           }
         }
 
-        const message = error instanceof Error ? error.message : t('loadError');
+        console.error('Failed to load fundraiser for edit:', error);
         setState({
           status: 'error',
           fundraiser: null,
-          errorMessage: message,
+          errorMessage: t('loadError'),
         });
       }
     })();

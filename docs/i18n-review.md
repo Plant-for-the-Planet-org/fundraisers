@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-21 — restructured to group issues by page for one-commit-per-page execution. Impersonation modal, banner, and user-menu strings already localized (commit `7496821`).
+> **Last updated:** 2026-05-21 — fundraiser detail page (§3) fully localized in one commit; doc restructured to group issues by page for one-commit-per-page execution. Impersonation modal, banner, and user-menu strings already localized (commit `7496821`).
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -14,6 +14,7 @@
 - ✅ **Impersonation Banner** — banner message and stop button localized (`Auth.impersonation.bannerMessage`, `Auth.impersonation.stop`).
 - ✅ **Impersonation validation errors** — all `setError` paths now route through translated keys under `Auth.impersonation.errors`.
 - ✅ **User fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
+- ✅ **Fundraiser detail page (§3)** — not-found copy translated; contribution-settings preview alert replaced with translated sonner toast (ICU select for dedicated/frequency); create/update toasts drop raw `err.message` in favor of translated `errorDescription`; edit hook surfaces translated `loadError`; `toLocaleString()` calls in donors-preview and fundraiser-view now pass `useLocale()`.
 
 ---
 
@@ -69,7 +70,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 
 | # | Commit | Scope | Section |
 |---|---|---|---|
-| 1 | `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
+| 1 | ✅ `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
 | 2 | `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
 | 3 | `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
 | 4 | `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
@@ -87,11 +88,13 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 
 ---
 
-## 3. Page: Fundraiser Detail (`/raise/[slug]`)
+## 3. Page: Fundraiser Detail (`/raise/[slug]`) ✅ Resolved (2026-05-21)
 
-Components under `src/components/fundraisers/*` plus the route's own files.
+Components under `src/components/fundraisers/*` plus the route's own files. Sections 3.1–3.5 landed in a single commit; section 3.7 (currency call sites) remains scope for utility commit U1.
 
-### 3.1 Not-Found Page — entire component hardcoded
+### 3.1 Not-Found Page — entire component hardcoded ✅ Resolved (2026-05-21)
+
+Converted to async server component using `getTranslations` from `next-intl/server`; copy now reads from `Fundraisers.notFound.{title, description, browseCta, homeCta}`. Literal `'404'` kept as-is (numeric code).
 
 **File:** [src/app/(fundraiser)/raise/[slug]/not-found.tsx:8-19](../src/app/(fundraiser)/raise/[slug]/not-found.tsx#L8-L19)
 
@@ -101,67 +104,30 @@ Components under `src/components/fundraisers/*` plus the route's own files.
 
 **Fix:** Add `Fundraisers.notFound.{title, description, browseCta, homeCta}`.
 
-### 3.2 Contribution Settings — Native `alert()`
+### 3.2 Contribution Settings — Native `alert()` ✅ Resolved (2026-05-21)
 
-**File:** [src/components/fundraisers/contribution-settings.tsx:18-22](../src/components/fundraisers/contribution-settings.tsx#L18-L22)
+Replaced native `alert()` with `toast.message()` (sonner). Strings live under `Fundraisers.form.contributionSettings.preview.{title, description, frequencyLabel}`; `description` uses ICU `select` on `isDedicated`, and `frequencyLabel` uses ICU `select` on the `'once' | 'monthly' | 'yearly'` runtime values. Also threaded `useLocale()` into the `formatCurrency` call at this site (small slice of utility commit U1 — opportunistic fix while editing the line).
 
-```ts
-alert(
-  `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency}${isDedicated ? ' (dedicated)' : ''}`
-);
-```
+### 3.3 Create / Update Fundraiser Buttons — Raw error in toast description ✅ Resolved (2026-05-21)
 
-**Why:** Native `alert()` is poor UX and the strings are English-only.
+Both buttons now show translated `Fundraisers.create.formSubmission.errorDescription` / `Fundraisers.edit.formSubmission.errorDescription` in the toast body. Raw `err` goes to `console.error` for diagnostics only. The deeper error-code → translation mapping is deferred to utility commit U4 ([§11.4](#114-error-code--translation-pattern-for-services)).
 
-**Fix:** Replace with a translated toast/dialog using `Fundraisers.form.contributionSettings.preview.{previewMode, previewDonation, dedicated}`.
+### 3.4 Edit Hook — Raw API error surface ✅ Resolved (2026-05-21)
 
-### 3.3 Create / Update Fundraiser Buttons — Raw error in toast description
+User-facing `errorMessage` now always uses `t('loadError')`. Raw error is logged via `console.error` for diagnostics.
 
-**Files:**
+### 3.5 `toLocaleString()` Without Locale (also SSR risk — see §12.2) ✅ Resolved (2026-05-21)
 
-- [src/components/fundraisers/create-fundraiser-button.tsx:56](../src/components/fundraisers/create-fundraiser-button.tsx#L56)
-- [src/components/fundraisers/update-fundraiser-button.tsx:80](../src/components/fundraisers/update-fundraiser-button.tsx#L80)
+Both call sites now pass `useLocale()` to `toLocaleString(locale)`. Server component `fundraiser-view.tsx` and client component `donors-preview.tsx` use the sync `useLocale` hook from `next-intl`, matching the pattern in [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx). Resolves the SSR/client hydration-mismatch risk for these spots.
 
-```ts
-const message = err instanceof Error ? err.message : 'Failed to create fundraiser';
-toast.error(t('errorMessage'), { description: message });
-```
-
-**Why:** Toast title is translated, but description leaks raw English from `err.message` or the English fallback.
-
-**Fix:** Drop raw `err.message` from the description, or map known error codes to translated messages (see [§11.4](#114-error-code--translation-pattern-for-services)).
-
-### 3.4 Edit Hook — Raw API error surface
-
-**File:** [src/components/fundraisers/use-fundraiser-for-edit.ts:92](../src/components/fundraisers/use-fundraiser-for-edit.ts#L92)
-
-```ts
-const message = error instanceof Error ? error.message : t('loadError');
-```
-
-**Why:** Truthy branch shows raw English API messages.
-
-**Fix:** Prefer `t('loadError')`; log `error.message` to console only.
-
-### 3.5 `toLocaleString()` Without Locale (also SSR risk — see §12.2)
-
-**Files:**
-
-- [src/components/fundraisers/donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23)
-- [src/components/fundraisers/fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79)
-
-```ts
-recent.length.toLocaleString()    // ❌ Uses runtime default
-```
-
-**Fix:** `recent.length.toLocaleString(locale)` from `useLocale()`.
-
-### 3.6 Missing Keys
+### 3.6 Missing Keys ✅ Added (2026-05-21)
 
 | Key | File | Purpose |
 |---|---|---|
-| `Fundraisers.notFound.*` | `fundraisers.json` | Not-found page |
-| `Fundraisers.form.contributionSettings.preview.*` | `fundraisers.json` | Preview alert |
+| ~~`Fundraisers.notFound.*`~~ | `fundraisers.json` | ✅ Added — `title`, `description`, `browseCta`, `homeCta` |
+| ~~`Fundraisers.form.contributionSettings.preview.*`~~ | `fundraisers.json` | ✅ Added — `title`, `description`, `frequencyLabel` |
+| ~~`Fundraisers.create.formSubmission.errorDescription`~~ | `fundraisers.json` | ✅ Added (new key, not in original plan) |
+| ~~`Fundraisers.edit.formSubmission.errorDescription`~~ | `fundraisers.json` | ✅ Added (new key, not in original plan) |
 
 ### 3.7 Notes — Currency call sites on this page
 
@@ -169,7 +135,7 @@ These call sites omit `locale` and will be cleaned up by utility commit U1 ([§1
 
 - [donation-form.tsx:108](../src/components/fundraisers/donation-form.tsx)
 - [donation-amounts.tsx:72](../src/components/fundraisers/donation-amounts.tsx)
-- [contribution-settings.tsx:20](../src/components/fundraisers/contribution-settings.tsx)
+- ~~[contribution-settings.tsx:20](../src/components/fundraisers/contribution-settings.tsx)~~ ✅ Already passing `locale` (fixed in §3.2 commit)
 - [leaderboard/donation-table.tsx:79](../src/components/fundraisers/leaderboard/donation-table.tsx#L79)
 - [leaderboard/donation-item.tsx:65](../src/components/fundraisers/leaderboard/donation-item.tsx#L65)
 - [goal-progress-display.tsx:25,41](../src/components/fundraisers/goal-progress-display.tsx)
@@ -647,11 +613,9 @@ Add a `Common.aria` namespace. Refactor `Dialog`, `InfoTooltip`, and the donatio
 - **Risk:** Caches and CDNs **must vary on the `ui-locale` cookie** or users will see a snapshot in the wrong language.
 - **Action:** Verify Vercel/Next caching does not strip cookies on cached routes.
 
-### 12.2 `toLocaleString()` without args
+### 12.2 `toLocaleString()` without args ✅ Resolved (2026-05-21)
 
-- [donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23), [fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79).
-- Returns runtime-default locale → grouping differs server vs. client → React hydration warnings.
-- **Fix:** Always pass `useLocale()` or use ICU `{count, number}` via `next-intl`. (Fixed as part of [§3.5](#35-tolocalestring-without-locale-also-ssr-risk--see-122).)
+Both call sites in [donors-preview.tsx](../src/components/fundraisers/donors-preview.tsx) and [fundraiser-view.tsx](../src/components/fundraisers/fundraiser-view.tsx) now pass `useLocale()` to `toLocaleString(locale)`. Fixed as part of [§3.5](#35-tolocalestring-without-locale-also-ssr-risk--see-122).
 
 ### 12.3 `formatTimeAgo`
 

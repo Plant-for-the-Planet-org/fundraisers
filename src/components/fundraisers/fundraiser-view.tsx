@@ -2,7 +2,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { Suspense } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
@@ -37,6 +37,7 @@ export function FundraiserView({
   leaderboardFetchStrategy?: 'ssr' | 'client';
 }) {
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const workspaceName = fundraiser.workspace?.name ?? '';
   const workspaceCountry = fundraiser.workspace?.country ?? '';
@@ -76,7 +77,7 @@ export function FundraiserView({
             <SectionHeader>
               {t('donationCount', {
                 count: fundraiser.donationCount,
-                formattedCount: fundraiser.donationCount.toLocaleString(),
+                formattedCount: fundraiser.donationCount.toLocaleString(locale),
               })}
             </SectionHeader>
             <Suspense fallback={<DonorsStripSkeleton />}>
