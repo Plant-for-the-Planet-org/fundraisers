@@ -15,7 +15,6 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { readThemeHslColor } from '@/lib/theme/css-var';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
@@ -42,23 +41,21 @@ export interface StripeCardFormHandle {
   ): Promise<{ error?: string }>;
 }
 
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      fontSize: '14px',
+      color: '#030712',
+      '::placeholder': { color: '#6b7280' },
+      ':focus': { color: '#6b7280' },
+    },
+    invalid: { color: '#dc2626' },
+  },
+};
+
 export const StripeCardForm = forwardRef<StripeCardFormHandle>(
   function StripeCardForm(_props, ref) {
     const stripe = useStripe();
-    const cardElementOptions = {
-      style: {
-        base: {
-          fontSize: '14px',
-          color: readThemeHslColor('--foreground'),
-          '::placeholder': {
-            color: readThemeHslColor('--muted-foreground'),
-          },
-        },
-        invalid: {
-          color: readThemeHslColor('--destructive'),
-        },
-      },
-    };
     const elements = useElements();
     const t = useTranslations('Donate.card');
 
@@ -215,7 +212,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         >
           <div className='mt-2 border border-border rounded-lg p-3'>
             <CardNumberElement
-              options={cardElementOptions}
+              options={CARD_ELEMENT_OPTIONS}
               onChange={handleCardNumberChange}
             />
           </div>
@@ -228,7 +225,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           >
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardExpiryElement
-                options={cardElementOptions}
+                options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardExpiryChange}
               />
             </div>
@@ -236,7 +233,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           <FormField label={t('cvcLabel')} error={cardCvcError ?? undefined}>
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardCvcElement
-                options={cardElementOptions}
+                options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardCvcChange}
               />
             </div>
