@@ -16,13 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface FundraiserStatusFilterProps {
   value: FundraiserListStatusFilter;
   statusCounts: FundraiserStatusCounts;
   onChange: (next: FundraiserListStatusFilter) => void;
-  className?: string;
   tabsClassName?: string;
   dropdownClassName?: string;
 }
@@ -47,29 +46,29 @@ export function FundraiserStatusFilter({
 
   return (
     <>
-      <Tabs
+      <ToggleGroup
+        type='single'
         value={value}
-        onValueChange={v => onChange(v as FundraiserListStatusFilter)}
-        className={cn('fundraiser-status-filter', tabsClassName)}
+        onValueChange={v => { if (v) onChange(v as FundraiserListStatusFilter); }}
+        aria-label={t('groupLabel')}
+        className={cn('w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible', tabsClassName)}
       >
-        <TabsList className='w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible'>
-          {STATUS_FILTER_OPTIONS.map(option => (
-            <TabsTrigger key={option} value={option} className='gap-1.5 px-4'>
-              <span>{t(option)}</span>
-              <span
-                className={cn(
-                  'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
-                  value === option
-                    ? 'bg-muted text-foreground'
-                    : 'bg-background/70 text-muted-foreground'
-                )}
-              >
-                {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
-              </span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+        {STATUS_FILTER_OPTIONS.map(option => (
+          <ToggleGroupItem key={option} value={option} className='px-4'>
+            <span>{t(option)}</span>
+            <span
+              className={cn(
+                'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
+                value === option
+                  ? 'bg-muted text-foreground'
+                  : 'bg-background/70 text-muted-foreground'
+              )}
+            >
+              {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
+            </span>
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
