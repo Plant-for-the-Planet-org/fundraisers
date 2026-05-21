@@ -2,6 +2,7 @@
 
 import type {
   StripeCardCvcElementChangeEvent,
+  StripeCardElementOptions,
   StripeCardExpiryElementChangeEvent,
   StripeCardNumberElementChangeEvent,
 } from '@stripe/stripe-js';
@@ -41,7 +42,7 @@ export interface StripeCardFormHandle {
   ): Promise<{ error?: string }>;
 }
 
-const CARD_ELEMENT_OPTIONS = {
+const CARD_ELEMENT_OPTIONS: StripeCardElementOptions = {
   style: {
     base: {
       fontSize: '14px',
