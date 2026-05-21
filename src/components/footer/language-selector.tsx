@@ -15,12 +15,12 @@ export function LanguageSelector() {
       className='language-selector'
       aria-labelledby='language-selector-label'
     >
-      <ul className='flex items-center justify-center md:justify-start gap-2 text-xs text-zinc-500 list-none p-0 m-0'>
+      <ul className='flex items-center justify-center md:justify-start gap-2 text-xs text-muted-foreground list-none p-0 m-0'>
         <li id='language-selector-label'>{t('languageSelectionLabel')}</li>
         {routing.locales.map((locale, index) => (
           <li key={locale} className='flex items-center gap-2'>
             {index > 0 && (
-              <span className='text-zinc-300' aria-hidden='true'>
+              <span className='text-muted-foreground/40' aria-hidden='true'>
                 |
               </span>
             )}
@@ -30,8 +30,8 @@ export function LanguageSelector() {
               aria-current={localeFromStore === locale ? 'page' : undefined}
               className={
                 localeFromStore === locale
-                  ? 'underline text-zinc-900'
-                  : 'hover:text-zinc-700'
+                  ? 'underline text-foreground'
+                  : 'hover:text-foreground'
               }
             >
               {locale.toUpperCase()}
