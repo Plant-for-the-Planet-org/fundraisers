@@ -69,7 +69,7 @@ export function AddressSelector() {
                   <span className='text-foreground font-medium'>
                     {addr.address}
                   </span>
-                  <span className='px-2 py-0.5 text-xs bg-gray-100 text-muted-foreground rounded-full'>
+                  <span className='px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-muted-foreground rounded-full'>
                     {addr.type.charAt(0).toUpperCase() + addr.type.slice(1)}
                   </span>
                 </div>
