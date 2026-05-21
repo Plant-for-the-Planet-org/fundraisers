@@ -271,8 +271,8 @@ Entering the Custom tab explicitly clears `settings.modules.bundle.slug` (handle
 
 Extended [projects-supported-display.tsx](src/components/fundraisers/projects-supported-display.tsx):
 
-- Component now takes the full `Fundraiser` (was just `projectAllocations`) so it has access to `settings.modules.bundle.slug` and `workspace.country`.
-- Reads `fundraiser.settings?.modules?.bundle?.slug` and resolves it via `getBundleBySlug` (now in `src/lib/utils/bundle.ts` — moved out of `bundle-selection.tsx` for the public view to share). The helper validates against `BUNDLE_SLUGS` so unknown / legacy values resolve to `undefined` and don't render a stale header.
+- Component now takes three explicit props — `projectAllocations`, `workspaceCountry`, `bundleSlug` — instead of the full `Fundraiser`. The call site in `fundraiser-view.tsx` reads the individual fields from `fundraiser` and passes them through.
+- Resolves the bundle via `getBundleBySlug(bundleSlug)` (now in `src/lib/utils/bundle.ts` — moved out of `bundle-selection.tsx` for the public view to share). Unknown / legacy values resolve to `undefined` and don't render a stale header.
 - When the slug resolves: renders a header row above the list — the bundle label (bold), an em-dash, and the tagline in italic quotes. Looks up the label / tagline from `Bundles.entries.<slug>.{label,tagline}` (already populated in en + de). No icon is rendered (intentionally — see the omitted list below).
 - Each `ProjectItem` now renders `country · NN% of fundraiser` under the project title (mirrors the `SelectedProjectRow` meta line used in the bundle preview modal). Allocation comes from the existing `ProjectAllocation.percentage`. Country comes from `useBundleProjects(workspace.country)` — same hook used by the bundle preview modal — which fetches the `/countryProjects/<country>` list once (service-level cached). The country code is rendered through `useCountryLabel` so users see a localised region name (e.g. "Kenya", "Spanien"). Allocation label reuses the existing `Bundles.custom.allocationLabel` string.
 
@@ -286,8 +286,8 @@ These were excluded by request when this slice shipped. All three can be added l
 
 **Files touched:**
 
-- `src/components/fundraisers/projects-supported-display.tsx` — extended (now `'use client'`, accepts `fundraiser` prop, renders header + enriched item meta)
-- `src/components/fundraisers/fundraiser-view.tsx` — pass-through change (`fundraiser={fundraiser}` instead of `projectAllocations={...}`)
+- `src/components/fundraisers/projects-supported-display.tsx` — extended (now `'use client'`, accepts `projectAllocations` + `workspaceCountry` + `bundleSlug` props, renders header + enriched item meta)
+- `src/components/fundraisers/fundraiser-view.tsx` — updated call site (passes three separate props instead of full `fundraiser`)
 - `src/lib/utils/bundle.ts` — added `getBundleBySlug` (moved from `bundle-selection.tsx`)
 - `src/components/fundraisers/bundle-selection/bundle-selection.tsx` — drops its local `getBundleBySlug`, imports the shared helper
 
