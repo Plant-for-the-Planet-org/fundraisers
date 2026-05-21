@@ -12,9 +12,9 @@ export type PaymentResultGroup =
 type BadgeVariant = 'completed' | 'bankTransferPending' | 'paymentProcessing';
 
 const BADGE_STYLES: Record<BadgeVariant, string> = {
-  completed: 'bg-green-50 text-green-700 ring-green-600/20',
-  bankTransferPending: 'bg-amber-50 text-amber-700 ring-amber-600/20',
-  paymentProcessing: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+  completed: 'bg-success/10 text-success ring-success/20',
+  bankTransferPending: 'bg-warning/10 text-warning ring-warning/20',
+  paymentProcessing: 'bg-warning/10 text-warning ring-warning/20',
 };
 
 interface StatusBadgeProps {
@@ -32,7 +32,7 @@ export function StatusBadge({ variant, paymentResultGroup }: StatusBadgeProps) {
 
   return (
     <div className='inline-flex items-center gap-1.5 text-xs'>
-      <span className='font-medium text-gray-500'>{t('label')}</span>
+      <span className='font-medium text-muted-foreground'>{t('label')}</span>
       <span
         className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-semibold ring-1 ring-inset ${BADGE_STYLES[variant]}`}
       >

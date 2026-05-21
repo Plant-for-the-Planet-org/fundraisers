@@ -67,24 +67,24 @@ export function ThankYouCard({
   }
 
   return (
-    <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
+    <div className='overflow-hidden rounded-2xl border border-border bg-card shadow-sm'>
       {/* Header band */}
-      <div className='bg-[#fdf8f0] px-6 pt-8 pb-6 text-center'>
+      <div className='bg-muted px-6 pt-8 pb-6 text-center'>
         {variant === 'completed' && (
           <CircleCheckBig
-            className='mx-auto mb-4 size-14 text-green-700'
+            className='mx-auto mb-4 size-14 text-success'
             strokeWidth={1.5}
           />
         )}
 
-        <h2 className='mb-2 text-xl font-bold text-gray-900'>{title}</h2>
+        <h2 className='mb-2 text-xl font-bold text-foreground'>{title}</h2>
 
         <StatusBadge
           variant={variant}
           paymentResultGroup={paymentResultGroup}
         />
 
-        <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
+        <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground'>
           {message}
         </p>
       </div>

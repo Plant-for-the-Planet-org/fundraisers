@@ -40,7 +40,7 @@ export function TransferDetailsList({
   if (visibleBank.length === 0) {
     return (
       <div className='space-y-2'>
-        <p className='text-sm text-gray-500'>
+        <p className='text-sm text-muted-foreground'>
           {t.rich('error', {
             link: chunks => (
               <a
@@ -53,7 +53,7 @@ export function TransferDetailsList({
           })}
         </p>
         {donationId !== null && (
-          <p className='text-center text-xs text-gray-400'>
+          <p className='text-center text-xs text-muted-foreground/70'>
             {t('transactionId', { id: donationId })}
           </p>
         )}
@@ -69,7 +69,7 @@ export function TransferDetailsList({
         ))}
       </FieldGroup>
       {donationId !== null && (
-        <p className='text-center text-xs text-gray-400'>
+        <p className='text-center text-xs text-muted-foreground/70'>
           {t('transactionId', { id: donationId })}
         </p>
       )}
@@ -86,10 +86,10 @@ function FieldGroup({
 }) {
   return (
     <div>
-      <p className='mb-2.5 text-xs font-semibold tracking-wide text-gray-500'>
+      <p className='mb-2.5 text-xs font-semibold tracking-wide text-muted-foreground'>
         {heading}
       </p>
-      <div className='rounded-xl border border-gray-100 bg-white px-4'>
+      <div className='rounded-xl border border-border bg-card px-4'>
         {children}
       </div>
     </div>

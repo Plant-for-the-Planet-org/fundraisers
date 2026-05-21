@@ -27,23 +27,23 @@ export function CopyFieldRow({ label, value }: CopyFieldRowProps) {
   };
 
   return (
-    <div className='flex items-center justify-between border-b border-gray-100 py-3.5 last:border-b-0'>
+    <div className='flex items-center justify-between border-b border-border py-3.5 last:border-b-0'>
       <div className='min-w-0 flex-1'>
-        <p className='text-xs font-medium tracking-wide text-gray-400'>
+        <p className='text-xs font-medium tracking-wide text-muted-foreground/70'>
           {label}
         </p>
-        <p className='mt-0.5 truncate text-sm font-semibold text-gray-900'>
+        <p className='mt-0.5 truncate text-sm font-semibold text-foreground'>
           {value}
         </p>
       </div>
       <button
         type='button'
         onClick={handleCopy}
-        className='ml-3 shrink-0 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600'
+        className='ml-3 shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
         aria-label={t('label', { field: label })}
       >
         {copied ? (
-          <Check className='size-4 text-green-500' />
+          <Check className='size-4 text-success' />
         ) : (
           <Copy className='size-4' />
         )}
