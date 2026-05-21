@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { pickByHash } from '@/lib/utils/avatar-seed';
+import { getHashIndex } from '@/lib/utils/avatar-seed';
 import { AvatarFallback } from './avatar';
 import {
   LeafMapleIcon,
@@ -40,8 +40,9 @@ interface FallbackAvatarProps {
 }
 
 export function FallbackAvatar({ seed, className }: FallbackAvatarProps) {
-  const Icon = pickByHash(TREE_ICONS, seed);
-  const colorClass = pickByHash(COLOR_CLASSES, seed);
+  const Icon = TREE_ICONS[getHashIndex(TREE_ICONS.length, seed)];
+  const colorClass = COLOR_CLASSES[getHashIndex(COLOR_CLASSES.length, seed)];
+
   return (
     <AvatarFallback className={cn(colorClass, className)}>
       <Icon className='h-1/2 w-1/2' aria-hidden />
