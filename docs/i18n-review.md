@@ -1,8 +1,19 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
+> **Last updated:** 2026-05-21 — impersonation modal, banner, and user-menu strings now localized (commit `7496821`).
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
+
+---
+
+## Recently Resolved
+
+- ✅ **§2.1 Impersonation Modal** — all labels, placeholders, buttons, and 8 validation messages migrated to `Auth.impersonation.*`.
+- ✅ **§2.8 User Menu** — `userMenuLabel`, `'User'` fallback, and impersonate/switch labels translated; avatar `alt` reduced to decorative empty string.
+- ✅ **Impersonation Banner** — banner message and stop button localized (`Auth.impersonation.bannerMessage`, `Auth.impersonation.stop`).
+- ✅ **§5.1 Impersonation validation errors** — all `setError` paths now route through translated keys under `Auth.impersonation.errors`.
+- ✅ **§6 fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
 
 ---
 
@@ -67,7 +78,9 @@ stage.json        en: 16    de: 16    ✅
 
 ## 2. Hardcoded UI Strings
 
-### 2.1 Impersonation Modal — Entire component untranslated
+### 2.1 Impersonation Modal — Entire component untranslated ✅ Resolved (2026-05-21)
+
+Migrated end-to-end to `Auth.impersonation.*` (modal copy + 8 validation messages). See commit `7496821`.
 
 **File:** [src/components/auth/impersonation-modal.tsx:44-141](../src/components/auth/impersonation-modal.tsx#L44-L141)
 
@@ -209,19 +222,16 @@ alt='Partner'
 
 ---
 
-### 2.8 User Menu — Multiple issues
+### 2.8 User Menu — Multiple issues ✅ Resolved (2026-05-21)
 
-**File:** [src/components/auth/user-menu.tsx:75,96,125](../src/components/auth/user-menu.tsx#L75-L125)
+**File:** [src/components/auth/user-menu.tsx](../src/components/auth/user-menu.tsx)
 
-```tsx
-alt='Profile'
-{displayName || 'User'}                                  // English fallback
-{isImpersonating ? 'Switch impersonation' : 'Impersonate user'}
-```
+- `alt='Profile'` → reduced to `alt=''` (decorative; `FallbackAvatar` provides identity).
+- `displayName || 'User'` → `tAuth('impersonation.userDefault')`.
+- `'Switch impersonation' / 'Impersonate user'` → `tAuth('impersonation.switch')` / `tAuth('impersonation.title')`.
+- Button `aria-label` → `tAuth('userMenuLabel')`.
 
-**Suggested fix:** `Auth.userMenu.{profileAvatarAlt, defaultDisplayName, switchImpersonation, impersonate}`
-
-**Namespace:** `Auth.userMenu`
+Keys live under `Auth.impersonation.*` and `Auth.userMenuLabel`, not a new `Auth.userMenu` namespace.
 
 ---
 
@@ -497,8 +507,8 @@ Keys that have **no entry at all yet** — must be added in both `en` and `de`:
 
 | Key | Locale File | Purpose |
 |---|---|---|
-| `Auth.impersonation.*` | `auth.json` | Impersonation modal |
-| `Auth.userMenu.{profileAvatarAlt, defaultDisplayName, impersonate, switchImpersonation}` | `auth.json` | User menu |
+| ~~`Auth.impersonation.*`~~ | ~~`auth.json`~~ | ✅ Added 2026-05-21 |
+| ~~`Auth.userMenu.{profileAvatarAlt, defaultDisplayName, impersonate, switchImpersonation}`~~ | ~~`auth.json`~~ | ✅ Resolved 2026-05-21 — folded into `Auth.impersonation.*` and `Auth.userMenuLabel`; avatar `alt` made decorative. |
 | `Common.metadata.{title, description}` | `common.json` | Root layout metadata |
 | `Common.actions.close` | `common.json` | Reusable Close label for dialog |
 | `Common.aria.{loading, primaryNavigation, legalLinks, moreInformation}` | `common.json` | Shared aria labels |
@@ -517,11 +527,9 @@ Keys that have **no entry at all yet** — must be added in both `en` and `de`:
 
 ## 5. Validation & Error Messages Bypassing Translations
 
-### 5.1 Impersonation Modal
+### 5.1 Impersonation Modal ✅ Resolved (2026-05-21)
 
-**File:** [impersonation-modal.tsx:44-86](../src/components/auth/impersonation-modal.tsx#L44-L86)
-
-Six `setError('English literal')` paths. API failure handler routes raw English to UI. See [§2.1](#21-impersonation-modal--entire-component-untranslated).
+All `setError` paths now use `tAuth('impersonation.errors.*')`. See [§2.1](#21-impersonation-modal--entire-component-untranslated--resolved-2026-05-21).
 
 ### 5.2 Fundraiser Create/Update Buttons
 
@@ -574,7 +582,7 @@ API client services that propagate English strings via `PlatformAPIError`:
 
 | Location | Fallback |
 |---|---|
-| [user-menu.tsx:96](../src/components/auth/user-menu.tsx#L96) | `displayName \|\| 'User'` |
+| ~~[user-menu.tsx:96](../src/components/auth/user-menu.tsx#L96)~~ | ~~`displayName \|\| 'User'`~~ ✅ Now `tAuth('impersonation.userDefault')` |
 | [info-tooltip.tsx:48](../src/components/ui/info-tooltip.tsx#L48) | `triggerLabel ?? 'More information'` |
 | [create-fundraiser-button.tsx:56](../src/components/fundraisers/create-fundraiser-button.tsx#L56) | `'Failed to create fundraiser'` |
 | [update-fundraiser-button.tsx:80](../src/components/fundraisers/update-fundraiser-button.tsx#L80) | `'Failed to update fundraiser'` |
@@ -720,7 +728,7 @@ Others are literal English in the same feature area:
 |---|---|---|---|
 | 1 | Make `locale` mandatory in `formatCurrency*` + fix all call sites | 🔴 High (currency is broken for DE users today) | Medium |
 | 2 | Rewrite `formatTimeAgo` with `Intl.RelativeTimeFormat` | 🔴 High (visible English in public pages) | Small |
-| 3 | Translate `ImpersonationModal` end-to-end | 🟡 Medium | Medium |
+| 3 | ~~Translate `ImpersonationModal` end-to-end~~ ✅ Done 2026-05-21 | 🟡 Medium | Medium |
 | 4 | Translate `not-found.tsx` (fundraiser) and `donate-overlay-layout.tsx` aria labels | 🟡 Medium | Small |
 | 5 | Replace `'User'`, `'More information'`, `'Loading'`, `'Close'` fallbacks with translated keys | 🟢 Low | Small |
 | 6 | Localize root layout metadata | 🟡 Medium (SEO) | Small |
