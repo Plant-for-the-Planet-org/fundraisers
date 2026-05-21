@@ -108,17 +108,7 @@ export function FundraiserView({
         </div>
 
         {/* Hosts */}
-        <div className='md:hidden'>
-          <Hosts
-            mode='display'
-            fundraiser={fundraiser}
-            variant='strip'
-            allowStripCollapse
-          />
-        </div>
-        <div className='hidden md:block'>
-          <Hosts mode='display' fundraiser={fundraiser} />
-        </div>
+        <Hosts mode='display' fundraiser={fundraiser} variant='strip' />
 
         {/** Copy link */}
         <div className='hidden md:block'>
@@ -187,9 +177,6 @@ export function FundraiserView({
             fundraiser={fundraiser}
           />
         )}
-
-        {/* Hosts */}
-        <Hosts mode='display' fundraiser={fundraiser} />
 
         {/** Copy link */}
         {fundraiser.visibility === 'public' && <CopyLinkButton />}
