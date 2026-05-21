@@ -1,9 +1,7 @@
 'use client';
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { DisplayStatus } from '@/lib/utils/fundraiser-list';
 
-import { memo } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
@@ -15,33 +13,6 @@ import { cn } from '@/lib/utils/index';
 import { FundraiserCardImage } from '@/components/explore/fundraiser-card-image';
 import { FundraiserActionMenu } from './fundraiser-action-menu';
 import { FundraiserStatusBadge } from './fundraiser-status-badge';
-
-const DaysLeftLabel = memo(function DaysLeftLabel({
-  daysLeft,
-  showEnded,
-  displayStatus,
-  className,
-}: {
-  daysLeft: number;
-  showEnded: boolean;
-  displayStatus: DisplayStatus;
-  className: string;
-}) {
-  const t = useTranslations('Dashboard.list.item');
-  if (displayStatus === 'draft' || daysLeft <= 0) return null;
-  return (
-    <span
-      className={cn(
-        'items-center gap-1 text-sm text-muted-foreground',
-        displayStatus === 'ending-soon' && 'text-warning',
-        className
-      )}
-    >
-      <Clock className='h-3.5 w-3.5' aria-hidden='true' />
-      {showEnded ? t('ended') : t('daysLeft', { count: daysLeft })}
-    </span>
-  );
-});
 
 interface FundraiserListItemProps {
   fundraiser: Fundraiser;
@@ -110,12 +81,17 @@ export function FundraiserListItem({
 
         <div className='mt-1 flex items-center gap-2'>
           <FundraiserStatusBadge status={displayStatus} />
-          <DaysLeftLabel
-            daysLeft={daysLeft}
-            showEnded={showEnded}
-            displayStatus={displayStatus}
-            className='inline-flex'
-          />
+          {displayStatus !== 'draft' && daysLeft > 0 && (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 text-sm text-muted-foreground',
+                displayStatus === 'ending-soon' && 'text-warning'
+              )}
+            >
+              <Clock className='h-3.5 w-3.5' aria-hidden='true' />
+              {showEnded ? t('ended') : t('daysLeft', { count: daysLeft })}
+            </span>
+          )}
         </div>
 
         <div className='mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground'>

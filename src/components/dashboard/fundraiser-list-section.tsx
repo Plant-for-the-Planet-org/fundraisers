@@ -4,12 +4,12 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { formatCompactNumber } from '@/lib/utils';
 import {
   filterFundraisers,
   getStatusCounts,
   sortFundraisers,
 } from '@/lib/utils/fundraiser-list';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { FundraiserList } from './fundraiser-list';
 import { FundraiserListToolbar } from './fundraiser-list-toolbar';
 import { useFundraiserListFilters } from './use-fundraiser-list-filters';
@@ -77,8 +77,11 @@ export function FundraiserListSection({
       {showCount && (
         <p className='text-sm text-muted-foreground'>
           {t.rich('resultCount', {
-            visible: getLocalizedAbbreviatedCount(visibleFundraisers.length, locale),
-            total: getLocalizedAbbreviatedCount(fundraisers.length, locale),
+            visible: formatCompactNumber(
+              visibleFundraisers.length,
+              locale
+            ),
+            total: formatCompactNumber(fundraisers.length, locale),
             bold: chunks => (
               <strong className='font-semibold text-foreground'>
                 {chunks}

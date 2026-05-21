@@ -3,8 +3,8 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { Suspense } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { formatCompactNumber } from '@/lib/utils';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
@@ -78,10 +78,10 @@ export function FundraiserView({
             <SectionHeader>
               {t('donationCount', {
                 count: fundraiser.donationCount,
-                formattedCount: getLocalizedAbbreviatedCount(
+                formattedCount: formatCompactNumber(
                   fundraiser.donationCount,
                   locale
-                ),              
+                ),
               })}
             </SectionHeader>
             <Suspense fallback={<DonorsStripSkeleton />}>

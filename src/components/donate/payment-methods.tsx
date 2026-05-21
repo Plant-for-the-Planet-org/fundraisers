@@ -329,11 +329,7 @@ export function PaymentMethods() {
       }
 
       return t('fees.feeAmount', {
-        amount: formatCurrency(
-          method.feeAmountCents,
-          donationCurrency,
-          undefined
-        ),
+        amount: formatCurrency(method.feeAmountCents, donationCurrency),
       });
     },
     [t]
@@ -352,11 +348,7 @@ export function PaymentMethods() {
 
       return t('fees.tooltip.withFee', {
         provider: getProviderLabel(method.provider),
-        amount: formatCurrency(
-          method.feeAmountCents,
-          donationCurrency,
-          undefined
-        ),
+        amount: formatCurrency(method.feeAmountCents, donationCurrency),
         alternatives,
       });
     },

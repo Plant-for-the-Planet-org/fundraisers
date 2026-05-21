@@ -92,7 +92,7 @@
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
-        "daysLeft": "{days, plural, one {#d left} other {#d left}}"
+        "daysLeft": "{days, number}d left"
       },
       "theme": {
         "sectionHeading": "Theme",

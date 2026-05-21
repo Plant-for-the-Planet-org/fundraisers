@@ -3,7 +3,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { UsersRound } from 'lucide-react';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
@@ -83,7 +83,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   <dd>
                     {tFundraisers('donationCount', {
                       count: fundraiser.donationCount,
-                      formattedCount: getLocalizedAbbreviatedCount(
+                      formattedCount: formatCompactNumber(
                         fundraiser.donationCount,
                         locale
                       ),

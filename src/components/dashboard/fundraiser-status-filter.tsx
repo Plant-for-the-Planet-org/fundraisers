@@ -7,7 +7,7 @@ import type {
 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, ChevronDown } from 'lucide-react';
-import { cn, getLocalizedAbbreviatedCount } from '@/lib/utils/index';
+import { cn, formatCompactNumber } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface FundraiserStatusFilterProps {
   value: FundraiserListStatusFilter;
@@ -58,7 +59,7 @@ export function FundraiserStatusFilter({
                 {t(value)}
               </span>
               <span className='inline-flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-xs font-medium text-muted-foreground'>
-                {statusCounts[value].toLocaleString(locale)}
+                {formatCompactNumber(statusCounts[value], locale)}
               </span>
             </span>
             <ChevronDown className='ml-2 h-4 w-4 shrink-0' aria-hidden='true' />
@@ -86,7 +87,7 @@ export function FundraiserStatusFilter({
                 </span>
                 <span className='flex-1'>{t(option)}</span>
                 <span className='inline-flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-xs font-medium text-muted-foreground'>
-                  {statusCounts[option].toLocaleString(locale)}
+                  {formatCompactNumber(statusCounts[option], locale)}
                 </span>
               </DropdownMenuItem>
             );
@@ -94,44 +95,36 @@ export function FundraiserStatusFilter({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div
-        role='toolbar'
-        aria-label={t('groupLabel')}
-        className={cn(
-          'fundraiser-status-filter hidden h-11 shrink-0 items-center gap-1 rounded-xl border border-border/60 bg-muted px-1 shadow-xs md:inline-flex',
-          className
-        )}
+      <Tabs
+        value={value}
+        onValueChange={v => onChange(v as FundraiserListStatusFilter)}
+        className={cn('hidden md:inline-flex', className)}
       >
-        {STATUS_FILTER_OPTIONS.map(option => {
-          const isSelected = option === value;
-          return (
-            <button
-              key={option}
-              type='button'
-              aria-pressed={isSelected}
-              onClick={() => onChange(option)}
-              className={cn(
-                'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-4 text-sm font-medium transition-colors',
-                isSelected
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <span>{t(option)}</span>
-              <span
-                className={cn(
-                  'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
-                  isSelected
-                    ? 'bg-muted text-foreground'
-                    : 'bg-background/70 text-muted-foreground'
-                )}
+        <TabsList className='h-11 gap-1 rounded-xl border border-border/60 px-1 shadow-xs'>
+          {STATUS_FILTER_OPTIONS.map(option => {
+            const isSelected = option === value;
+            return (
+              <TabsTrigger
+                key={option}
+                value={option}
+                className='h-8 flex-initial shrink-0 gap-1.5 rounded-lg px-4'
               >
-                {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                <span>{t(option)}</span>
+                <span
+                  className={cn(
+                    'inline-flex min-w-4 items-center justify-center rounded-full px-1 text-xs font-medium',
+                    isSelected
+                      ? 'bg-muted text-foreground'
+                      : 'bg-background/70 text-muted-foreground'
+                  )}
+                >
+                  {formatCompactNumber(statusCounts[option], locale)}
+                </span>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+      </Tabs>
     </>
   );
 }

@@ -22,13 +22,9 @@ export function GoalProgressDisplay({
     <div className='goal-progress-display flex flex-col'>
       <div className='text-foreground text-lg font-bold'>
         {t('raised', {
-          amount: formatCurrencyFromDecimal(
-            raisedAmount,
-            currency,
-            'en-US',
-            'symbol',
-            false
-          ),
+          amount: formatCurrencyFromDecimal(raisedAmount, currency, {
+            compact: false,
+          }),
         })}
       </div>
 
@@ -44,13 +40,9 @@ export function GoalProgressDisplay({
       <div className='mt-2 flex items-center justify-between text-sm text-muted-foreground'>
         <div>
           {t('goalLine', {
-            amount: formatCurrencyFromDecimal(
-              goalAmount,
-              currency,
-              'en-US',
-              'symbol',
-              false
-            ),
+            amount: formatCurrencyFromDecimal(goalAmount, currency, {
+              compact: false,
+            }),
           })}
         </div>
         <div>{t('daysLeft', { days: daysLeft })}</div>

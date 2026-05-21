@@ -92,7 +92,7 @@
       "goalPreview": {
         "raised": "{amount} ",
         "goalLine": "von {amount} gesammelt",
-        "daysLeft": "{days, plural, one {# Tag übrig} other {# Tage übrig}}"
+        "daysLeft": "{days, number}T übrig"
       },
       "theme": {
         "sectionHeading": "Thema",

@@ -2,6 +2,8 @@
  * Currency formatting utilities
  */
 
+import { formatCompactNumber } from './formatting';
+
 // Map of major currencies to their symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: '$',
@@ -32,107 +34,102 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   THB: '฿',
 };
 
+interface FormatCurrencyOptions {
+  locale?: string;
+  compact?: boolean;
+}
+
+interface FormatCurrencyFromDecimalOptions extends FormatCurrencyOptions {
+  currencyDisplay?: 'symbol' | 'code';
+}
+
 /**
- * Format currency amount from cents with appropriate symbol or code
- * For major currencies, uses symbols (e.g., $, €, £)
- * For others, uses 3-character currency code
+ * Resolve locale from the app's html lang attribute (set by next-intl),
+ * an explicit override, or fall back to 'en'.
+ */
+function resolveLocale(locale?: string): string {
+  if (locale) return locale;
+  if (typeof document !== 'undefined') {
+    return document.documentElement.lang || 'en';
+  }
+  return 'en';
+}
+
+/** Format a number with the given locale, respecting compact mode. */
+function formatAmount(value: number, locale: string, compact: boolean): string {
+  if (compact) return formatCompactNumber(value, locale);
+
+  // German always shows 2 decimal places for uniform display (e.g. 1.122,00)
+  const alwaysDecimals = locale.startsWith('de');
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: alwaysDecimals || value % 1 !== 0 ? 2 : 0,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+/** Attach the currency symbol (or code) to a formatted number string. */
+function attachSymbol(formattedAmount: string, currencyUpper: string): string {
+  const symbol = CURRENCY_SYMBOLS[currencyUpper];
+
+  if (symbol) {
+    const symbolAfter = ['SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF'].includes(
+      currencyUpper
+    );
+    return symbolAfter
+      ? `${formattedAmount} ${symbol}`
+      : `${symbol}${formattedAmount}`;
+  }
+
+  return `${formattedAmount} ${currencyUpper}`;
+}
+
+/**
+ * Format currency amount from cents with appropriate symbol or code.
+ *
+ * Locale is auto-detected from the app. Compact notation is on by default.
  *
  * @param amountInCents - The amount in cents from API (e.g., 1234 = $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
- * @param locale - The locale for number formatting (defaults to 'en-US')
+ * @param options - Optional: locale override, compact toggle
  */
 export function formatCurrency(
   amountInCents: number,
   currency: string,
-  locale: string = 'en-US',
-  compact: boolean = true
+  options?: FormatCurrencyOptions
 ): string {
+  const locale = resolveLocale(options?.locale);
+  const compact = options?.compact ?? true;
   const currencyUpper = currency.toUpperCase();
-
-  // Convert cents to major currency unit (divide by 100)
   const amount = amountInCents / 100;
-
-  const formattedAmount = compact
-    ? new Intl.NumberFormat(locale, {
-        notation: 'compact',
-        maximumFractionDigits: 1,
-      }).format(amount)
-    : new Intl.NumberFormat(locale, {
-        minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
-        maximumFractionDigits: 2,
-      }).format(amount);
-
-  // Use symbol if available, otherwise use currency code
-  const symbol = CURRENCY_SYMBOLS[currencyUpper];
-
-  if (symbol) {
-    // For most currencies, symbol goes before the amount
-    // Special cases where symbol goes after
-    const symbolAfter = ['SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF'].includes(
-      currencyUpper
-    );
-
-    if (symbolAfter) {
-      return `${formattedAmount} ${symbol}`;
-    } else {
-      return `${symbol}${formattedAmount}`;
-    }
-  } else {
-    // Fallback to currency code for unsupported currencies
-    return `${formattedAmount} ${currencyUpper}`;
-  }
+  const formattedAmount = formatAmount(amount, locale, compact);
+  return attachSymbol(formattedAmount, currencyUpper);
 }
 
 /**
- * Format currency amount from decimal value (for backward compatibility with old data)
+ * Format currency amount from decimal value.
+ *
+ * Locale is auto-detected from the app. Compact notation is on by default.
  *
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
- * @param locale - The locale for number formatting (defaults to 'en-US')
- * @param currencyDisplay - 'symbol' (default, e.g. €12.34) or 'code' (e.g. EUR 12.34)
+ * @param options - Optional: locale override, currencyDisplay, compact toggle
  */
 export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
-  locale: string = 'en-US',
-  currencyDisplay: 'symbol' | 'code' = 'symbol',
-  compact: boolean = true
+  options?: FormatCurrencyFromDecimalOptions
 ): string {
+  const locale = resolveLocale(options?.locale);
+  const compact = options?.compact ?? true;
+  const currencyDisplay = options?.currencyDisplay ?? 'symbol';
   const currencyUpper = currency.toUpperCase();
-
-  const formattedAmount = compact
-    ? new Intl.NumberFormat(locale, {
-        notation: 'compact',
-        maximumFractionDigits: 1,
-      }).format(amount)
-    : new Intl.NumberFormat(locale, {
-        minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
-        maximumFractionDigits: 2,
-      }).format(amount);
+  const formattedAmount = formatAmount(amount, locale, compact);
 
   if (currencyDisplay === 'code') {
     return `${currencyUpper} ${formattedAmount}`;
   }
 
-  // Use symbol if available, otherwise use currency code
-  const symbol = CURRENCY_SYMBOLS[currencyUpper];
-
-  if (symbol) {
-    // For most currencies, symbol goes before the amount
-    // Special cases where symbol goes after
-    const symbolAfter = ['SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF'].includes(
-      currencyUpper
-    );
-
-    if (symbolAfter) {
-      return `${formattedAmount} ${symbol}`;
-    } else {
-      return `${symbol}${formattedAmount}`;
-    }
-  } else {
-    // Fallback to currency code for unsupported currencies
-    return `${formattedAmount} ${currencyUpper}`;
-  }
+  return attachSymbol(formattedAmount, currencyUpper);
 }
 
 /**

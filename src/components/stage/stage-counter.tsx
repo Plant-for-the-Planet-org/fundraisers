@@ -3,8 +3,8 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useTranslations } from 'next-intl';
+import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { GlassPanel } from './glass-panel';
 import { useAlltimeStats } from './hooks/use-alltime-stats';
 
@@ -38,7 +38,7 @@ export function StageCounter({
   const t = useTranslations('Stage');
 
   function formatDonorCount(n: number): string {
-    const formatted = getLocalizedAbbreviatedCount(n, locale);
+    const formatted = formatCompactNumber(n, locale);
     return n >= 1000 ? `${formatted}+` : formatted;
   }
 
@@ -55,13 +55,13 @@ export function StageCounter({
           color: 'var(--accent-color)',
         }}
       >
-        {formatCurrencyFromDecimal(raised, currency, locale)}
+        {formatCurrencyFromDecimal(raised, currency)}
       </div>
 
       <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
         <span>
           {t('ofGoal', {
-            goal: formatCurrencyFromDecimal(goal, currency, locale),
+            goal: formatCurrencyFromDecimal(goal, currency),
           })}
         </span>
         <span>{pct}%</span>
