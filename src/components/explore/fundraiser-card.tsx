@@ -70,7 +70,8 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                     {tFundraisers('amountRaised', {
                       formattedAmountWithCurrency: formatCurrencyFromDecimal(
                         fundraiser.totalRaised,
-                        fundraiser.currency
+                        fundraiser.currency,
+                        { compact: true }
                       ),
                     })}
                   </dd>

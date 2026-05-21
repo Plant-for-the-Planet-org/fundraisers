@@ -42,11 +42,13 @@ export function FundraiserListItem({
 
   const raised = formatCurrencyFromDecimal(
     fundraiser.totalRaised,
-    fundraiser.currency
+    fundraiser.currency,
+    { compact: true }
   );
   const goal = formatCurrencyFromDecimal(
     fundraiser.goalAmount,
-    fundraiser.currency
+    fundraiser.currency,
+    { compact: true }
   );
 
   const showEnded =

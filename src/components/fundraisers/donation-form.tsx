@@ -105,7 +105,7 @@ export function DonationForm({
   const getDonateButtonText = () => {
     const amount = customAmount || selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
-      ? `${formatCurrency(amount, currency, { compact: false })} • `
+      ? `${formatCurrency(amount, currency)} • `
       : '';
 
     switch (selectedFrequency.value) {

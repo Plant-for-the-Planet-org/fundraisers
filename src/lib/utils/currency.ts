@@ -86,7 +86,8 @@ function attachSymbol(formattedAmount: string, currencyUpper: string): string {
 /**
  * Format currency amount from cents with appropriate symbol or code.
  *
- * Locale is auto-detected from the app. Compact notation is on by default.
+ * Locale is auto-detected from the app. Exact notation by default;
+ * pass { compact: true } for abbreviated display (e.g. $12.3K).
  *
  * @param amountInCents - The amount in cents from API (e.g., 1234 = $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
@@ -98,7 +99,7 @@ export function formatCurrency(
   options?: FormatCurrencyOptions
 ): string {
   const locale = resolveLocale(options?.locale);
-  const compact = options?.compact ?? true;
+  const compact = options?.compact ?? false;
   const currencyUpper = currency.toUpperCase();
   const amount = amountInCents / 100;
   const formattedAmount = formatAmount(amount, locale, compact);
@@ -108,7 +109,8 @@ export function formatCurrency(
 /**
  * Format currency amount from decimal value.
  *
- * Locale is auto-detected from the app. Compact notation is on by default.
+ * Locale is auto-detected from the app. Exact notation by default;
+ * pass { compact: true } for abbreviated display (e.g. €18.7K).
  *
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
@@ -120,7 +122,7 @@ export function formatCurrencyFromDecimal(
   options?: FormatCurrencyFromDecimalOptions
 ): string {
   const locale = resolveLocale(options?.locale);
-  const compact = options?.compact ?? true;
+  const compact = options?.compact ?? false;
   const currencyDisplay = options?.currencyDisplay ?? 'symbol';
   const currencyUpper = currency.toUpperCase();
   const formattedAmount = formatAmount(amount, locale, compact);
