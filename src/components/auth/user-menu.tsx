@@ -67,15 +67,12 @@ export function UserMenu() {
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
+            aria-label={tAuth('userMenuLabel')}
             className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
           >
             <Avatar className='h-8 w-8'>
               {profileImageUrl && (
-                <AvatarImage
-                  src={profileImageUrl}
-                  alt='Profile'
-                  loading='lazy'
-                />
+                <AvatarImage src={profileImageUrl} alt='' loading='lazy' />
               )}
               <FallbackAvatar
                 seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
@@ -94,7 +91,7 @@ export function UserMenu() {
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
               <span className='text-sm font-medium leading-normal truncate max-w-full'>
-                {displayName || 'User'}
+                {displayName || tAuth('impersonation.userDefault')}
               </span>
               <span className='text-xs leading-normal text-muted-foreground truncate max-w-full'>
                 {userEmail}
