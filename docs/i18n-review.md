@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-21 — impersonation modal, banner, and user-menu strings now localized (commit `7496821`).
+> **Last updated:** 2026-05-21 — restructured to group issues by page for one-commit-per-page execution. Impersonation modal, banner, and user-menu strings already localized (commit `7496821`).
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -9,27 +9,30 @@
 
 ## Recently Resolved
 
-- ✅ **§2.1 Impersonation Modal** — all labels, placeholders, buttons, and 8 validation messages migrated to `Auth.impersonation.*`.
-- ✅ **§2.8 User Menu** — `userMenuLabel`, `'User'` fallback, and impersonate/switch labels translated; avatar `alt` reduced to decorative empty string.
+- ✅ **Impersonation Modal** — all labels, placeholders, buttons, and 8 validation messages migrated to `Auth.impersonation.*`.
+- ✅ **User Menu** — `userMenuLabel`, `'User'` fallback, and impersonate/switch labels translated; avatar `alt` reduced to decorative empty string.
 - ✅ **Impersonation Banner** — banner message and stop button localized (`Auth.impersonation.bannerMessage`, `Auth.impersonation.stop`).
-- ✅ **§5.1 Impersonation validation errors** — all `setError` paths now route through translated keys under `Auth.impersonation.errors`.
-- ✅ **§6 fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
+- ✅ **Impersonation validation errors** — all `setError` paths now route through translated keys under `Auth.impersonation.errors`.
+- ✅ **User fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
 
 ---
 
 ## Table of Contents
 
 1. [Summary](#1-summary)
-2. [Hardcoded UI Strings](#2-hardcoded-ui-strings)
-3. [Hardcoded Locale Usage & Formatting](#3-hardcoded-locale-usage--formatting)
-4. [Missing Translation Keys](#4-missing-translation-keys)
-5. [Validation & Error Messages Bypassing Translations](#5-validation--error-messages-bypassing-translations)
-6. [Fallback Text Not Localized](#6-fallback-text-not-localized)
-7. [Unused / Orphan Translation Concerns](#7-unused--orphan-translation-concerns)
-8. [SSR / Client Locale Mismatch Risks](#8-ssr--client-locale-mismatch-risks)
-9. [Repeated Patterns & Refactor Opportunities](#9-repeated-patterns--refactor-opportunities)
-10. [Inconsistencies](#10-inconsistencies)
-11. [Quick-Win Priority List](#11-quick-win-priority-list)
+2. [Execution Plan — One Commit Per Page](#2-execution-plan--one-commit-per-page)
+3. [Page: Fundraiser Detail (`/raise/[slug]`)](#3-page-fundraiser-detail-raiseslug)
+4. [Page: Donate Overlay](#4-page-donate-overlay)
+5. [Page: Explore](#5-page-explore)
+6. [Page: Dashboard](#6-page-dashboard)
+7. [Page: Stage](#7-page-stage)
+8. [Page: Auth & User Menu (mostly resolved)](#8-page-auth--user-menu-mostly-resolved)
+9. [Shared Chrome (Header, Footer, Dialog, Tooltip)](#9-shared-chrome-header-footer-dialog-tooltip)
+10. [App-Level (Root layout, Home, Sentry test)](#10-app-level-root-layout-home-sentry-test)
+11. [Cross-Cutting Utilities (separate commits)](#11-cross-cutting-utilities-separate-commits)
+12. [SSR / Client Locale Mismatch Risks](#12-ssr--client-locale-mismatch-risks)
+13. [Orphan Keys & CI Guardrails](#13-orphan-keys--ci-guardrails)
+14. [Appendix: Locale Setup Reference](#14-appendix-locale-setup-reference)
 
 ---
 
@@ -42,22 +45,6 @@
 | **i18n library** | `next-intl` |
 | **Locale detection** | Cookie (`ui-locale`); no URL prefix |
 | **EN/DE key parity** | ✅ All 9 namespaces have matching key counts |
-
-### Issue Categories
-
-| # | Category | Severity |
-|---|---|---|
-| 1 | Hardcoded user-visible strings in JSX | 🔴 High |
-| 2 | Hardcoded `'en-US'` defaults in currency utilities | 🔴 High |
-| 3 | Hardcoded English `formatTimeAgo` (no locale support) | 🔴 High |
-| 4 | Hardcoded English in `alt` / `aria-label` attributes | 🟡 Medium |
-| 5 | Hardcoded `' and '` host joiner; inconsistent `Intl.ListFormat` | 🟡 Medium |
-| 6 | `setError(...)` with raw English literals | 🟡 Medium |
-| 7 | Locale arg omitted at many `formatCurrency*` call sites | 🔴 High |
-| 8 | Fallback `'More information'` literal in `InfoTooltip` | 🟢 Low |
-| 9 | Hardcoded `'Loading'` aria-label on `CategoryPageSkeleton` | 🟢 Low |
-| 10 | Root layout metadata title/description hardcoded | 🟡 Medium |
-| 11 | UI fallback `'User'` literal in `UserMenu` | 🟢 Low |
 
 ### EN/DE Key Count Parity
 
@@ -76,77 +63,124 @@ stage.json        en: 16    de: 16    ✅
 
 ---
 
-## 2. Hardcoded UI Strings
+## 2. Execution Plan — One Commit Per Page
 
-### 2.1 Impersonation Modal — Entire component untranslated ✅ Resolved (2026-05-21)
+Each row below is intended to land as a single commit. Pages are independent; utilities at the bottom can ripple through pages and should land first if you want page-level changes to absorb their benefits cleanly.
 
-Migrated end-to-end to `Auth.impersonation.*` (modal copy + 8 validation messages). See commit `7496821`.
+| # | Commit | Scope | Section |
+|---|---|---|---|
+| 1 | `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
+| 2 | `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
+| 3 | `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
+| 4 | `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
+| 5 | `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
+| 6 | `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
+| 7 | `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
+| U1 | `refactor(i18n): require locale in formatCurrency*` | utility change + migrate all call sites (or via `useFormatCurrency` hook) | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
+| U2 | `refactor(i18n): rewrite formatTimeAgo with Intl.RelativeTimeFormat` | utility change + migrate 3 call sites | [§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook) |
+| U3 | `refactor(i18n): add joinNames helper using Intl.ListFormat` | extract helper + replace `' and '` join | [§11.3](#113-joinnames-helper-via-intllistformat) |
+| U4 | `refactor(i18n): error-code → translation pattern for services` | generalize `donation-failure-banner` pattern across services | [§11.4](#114-error-code--translation-pattern-for-services) |
+| Z1 | `chore(i18n): load cookie.json or document separate dictionary` | request.ts + types.ts | [§13.1](#131-cookiejson-is-not-loaded-by-next-intl) |
+| Z2 | `ci(i18n): add EN/DE key-parity guardrail` | script + CI step | [§13.2](#132-no-automated-key-audit) |
 
-**File:** [src/components/auth/impersonation-modal.tsx:44-141](../src/components/auth/impersonation-modal.tsx#L44-L141)
-
-**Hardcoded strings:**
-
-- `'Impersonate user'` (title)
-- `'User email'`, `'Support pin'` (labels)
-- `'user@example.com'`, `'Support pin'` (placeholders)
-- `'Cancel'`, `'Validating...'`, `'Impersonate'` (buttons)
-- Validation errors:
-  - `'Enter a valid email'`
-  - `'Pin must be 4 digits'`
-  - `'You are not signed in'`
-  - `'Profile email did not match. Check the email and pin and try again.'`
-  - `'Invalid email or support pin'`
-  - `'No user found with that email'`
-  - `'Validation failed'`, `'Validation failed. Try again.'`
-
-**Why it's an issue:** The entire modal — including all validation messages — bypasses `useTranslations`. German support staff cannot use it natively.
-
-**Suggested fix:** Add to `auth.json`:
-
-```jsonc
-"Auth": {
-  "impersonation": {
-    "title": "...",
-    "description": "...",
-    "emailLabel": "...",
-    "emailPlaceholder": "...",
-    "pinLabel": "...",
-    "pinPlaceholder": "...",
-    "cancel": "...",
-    "submit": "...",
-    "submitting": "...",
-    "errors": {
-      "invalidEmail": "...",
-      "invalidPin": "...",
-      "notSignedIn": "...",
-      "profileMismatch": "...",
-      "invalidCredentials": "...",
-      "notFound": "...",
-      "generic": "..."
-    }
-  }
-}
-```
-
-**Namespace:** `Auth.impersonation`
+**Recommended order:** utilities (U1–U4) first if you want page commits to be free of mixed concerns; otherwise pages 1–7 first, utilities after.
 
 ---
 
-### 2.2 Fundraiser Not-Found Page
+## 3. Page: Fundraiser Detail (`/raise/[slug]`)
+
+Components under `src/components/fundraisers/*` plus the route's own files.
+
+### 3.1 Not-Found Page — entire component hardcoded
 
 **File:** [src/app/(fundraiser)/raise/[slug]/not-found.tsx:8-19](../src/app/(fundraiser)/raise/[slug]/not-found.tsx#L8-L19)
 
-**Hardcoded strings:** `'404'`, `'Fundraiser Not Found'`, `"The fundraiser you're looking for doesn't exist or may have been removed."`, `'Browse Fundraisers'`, `'Go Home'`
+**Hardcoded:** `'404'`, `'Fundraiser Not Found'`, `"The fundraiser you're looking for doesn't exist or may have been removed."`, `'Browse Fundraisers'`, `'Go Home'`
 
-**Why it's an issue:** The sibling [`error.tsx`](../src/app/(fundraiser)/raise/[slug]/error.tsx) already uses `Fundraisers.error.*` — the not-found page is inconsistent.
+**Why:** The sibling [`error.tsx`](../src/app/(fundraiser)/raise/[slug]/error.tsx) already uses `Fundraisers.error.*` — the not-found page is inconsistent.
 
-**Suggested fix:** Add `Fundraisers.notFound.{title, description, browseCta, homeCta}`.
+**Fix:** Add `Fundraisers.notFound.{title, description, browseCta, homeCta}`.
 
-**Namespace:** `Fundraisers.notFound`
+### 3.2 Contribution Settings — Native `alert()`
+
+**File:** [src/components/fundraisers/contribution-settings.tsx:18-22](../src/components/fundraisers/contribution-settings.tsx#L18-L22)
+
+```ts
+alert(
+  `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency}${isDedicated ? ' (dedicated)' : ''}`
+);
+```
+
+**Why:** Native `alert()` is poor UX and the strings are English-only.
+
+**Fix:** Replace with a translated toast/dialog using `Fundraisers.form.contributionSettings.preview.{previewMode, previewDonation, dedicated}`.
+
+### 3.3 Create / Update Fundraiser Buttons — Raw error in toast description
+
+**Files:**
+
+- [src/components/fundraisers/create-fundraiser-button.tsx:56](../src/components/fundraisers/create-fundraiser-button.tsx#L56)
+- [src/components/fundraisers/update-fundraiser-button.tsx:80](../src/components/fundraisers/update-fundraiser-button.tsx#L80)
+
+```ts
+const message = err instanceof Error ? err.message : 'Failed to create fundraiser';
+toast.error(t('errorMessage'), { description: message });
+```
+
+**Why:** Toast title is translated, but description leaks raw English from `err.message` or the English fallback.
+
+**Fix:** Drop raw `err.message` from the description, or map known error codes to translated messages (see [§11.4](#114-error-code--translation-pattern-for-services)).
+
+### 3.4 Edit Hook — Raw API error surface
+
+**File:** [src/components/fundraisers/use-fundraiser-for-edit.ts:92](../src/components/fundraisers/use-fundraiser-for-edit.ts#L92)
+
+```ts
+const message = error instanceof Error ? error.message : t('loadError');
+```
+
+**Why:** Truthy branch shows raw English API messages.
+
+**Fix:** Prefer `t('loadError')`; log `error.message` to console only.
+
+### 3.5 `toLocaleString()` Without Locale (also SSR risk — see §12.2)
+
+**Files:**
+
+- [src/components/fundraisers/donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23)
+- [src/components/fundraisers/fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79)
+
+```ts
+recent.length.toLocaleString()    // ❌ Uses runtime default
+```
+
+**Fix:** `recent.length.toLocaleString(locale)` from `useLocale()`.
+
+### 3.6 Missing Keys
+
+| Key | File | Purpose |
+|---|---|---|
+| `Fundraisers.notFound.*` | `fundraisers.json` | Not-found page |
+| `Fundraisers.form.contributionSettings.preview.*` | `fundraisers.json` | Preview alert |
+
+### 3.7 Notes — Currency call sites on this page
+
+These call sites omit `locale` and will be cleaned up by utility commit U1 ([§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook)). Listed here so reviewers know which files are touched by both this page commit and the utility commit:
+
+- [donation-form.tsx:108](../src/components/fundraisers/donation-form.tsx)
+- [donation-amounts.tsx:72](../src/components/fundraisers/donation-amounts.tsx)
+- [contribution-settings.tsx:20](../src/components/fundraisers/contribution-settings.tsx)
+- [leaderboard/donation-table.tsx:79](../src/components/fundraisers/leaderboard/donation-table.tsx#L79)
+- [leaderboard/donation-item.tsx:65](../src/components/fundraisers/leaderboard/donation-item.tsx#L65)
+- [goal-progress-display.tsx:25,41](../src/components/fundraisers/goal-progress-display.tsx)
 
 ---
 
-### 2.3 Donate Overlay Layout — Aria labels
+## 4. Page: Donate Overlay
+
+Components under `src/components/donate/*`.
+
+### 4.1 Overlay Layout — Aria labels
 
 **File:** [src/components/donate/donate-overlay-layout.tsx:19,25](../src/components/donate/donate-overlay-layout.tsx#L19-L25)
 
@@ -155,106 +189,9 @@ aria-label='donation details'
 aria-label='Close donation overlay'
 ```
 
-**Suggested fix:** `tDonate('overlay.aria.label')`, `tDonate('overlay.aria.close')`
+**Fix:** `tDonate('overlay.aria.label')`, `tDonate('overlay.aria.close')`.
 
-**Namespace:** `Donate.overlay.aria`
-
----
-
-### 2.4 Shared Dialog Primitive
-
-**File:** [src/components/ui/dialog.tsx:75,113](../src/components/ui/dialog.tsx#L75-L113)
-
-```tsx
-<span className='sr-only'>Close</span>
-<Button variant='outline'>Close</Button>
-```
-
-**Why it's an issue:** This is a shared shadcn-style primitive used by many consumers; the screen-reader Close text reaches every dialog in the app.
-
-**Suggested fix:** Accept a `closeLabel` prop, or read from `Common.actions.close`.
-
-**Namespace:** `Common.actions`
-
----
-
-### 2.5 Footer & Header — Navigation aria labels
-
-| File | Line | Hardcoded |
-|---|---|---|
-| [footer/links-bar.tsx](../src/components/footer/links-bar.tsx#L12) | 12 | `aria-label='Legal links'` |
-| [header/navigation.tsx](../src/components/header/navigation.tsx#L11) | 11 | `aria-label='Primary navigation'` |
-| [header/logo.tsx](../src/components/header/logo.tsx#L10) | 10 | `aria-label='Plant-for-the-Planet'` (brand — debatable) |
-
-**Suggested fix:** Centralize under `Common.aria.{legalLinks, primaryNavigation}`; `Common.brand.name` for the brand string (used in 3+ places).
-
-**Namespace:** `Common.aria`, `Common.brand`
-
----
-
-### 2.6 Footer Logos — Image alt text
-
-**File:** [src/components/footer/logos.tsx:13,25](../src/components/footer/logos.tsx#L13-L25)
-
-```tsx
-alt='Plant-for-the-Planet'
-alt='UN Environment Program'
-```
-
-**Suggested fix:** `Common.partners.{plantForThePlanetAlt, unepAlt}`
-
-**Namespace:** `Common.partners`
-
----
-
-### 2.7 Stage Top Bar — Image alt text
-
-**File:** [src/components/stage/stage-top-bar.tsx:21,32](../src/components/stage/stage-top-bar.tsx#L21-L32)
-
-```tsx
-alt='Plant-for-the-Planet'
-alt='Partner'
-```
-
-**Suggested fix:** `Stage.topBar.{brandAlt, partnerAlt}`
-
-**Namespace:** `Stage.topBar`
-
----
-
-### 2.8 User Menu — Multiple issues ✅ Resolved (2026-05-21)
-
-**File:** [src/components/auth/user-menu.tsx](../src/components/auth/user-menu.tsx)
-
-- `alt='Profile'` → reduced to `alt=''` (decorative; `FallbackAvatar` provides identity).
-- `displayName || 'User'` → `tAuth('impersonation.userDefault')`.
-- `'Switch impersonation' / 'Impersonate user'` → `tAuth('impersonation.switch')` / `tAuth('impersonation.title')`.
-- Button `aria-label` → `tAuth('userMenuLabel')`.
-
-Keys live under `Auth.impersonation.*` and `Auth.userMenuLabel`, not a new `Auth.userMenu` namespace.
-
----
-
-### 2.9 Donation Method Icons — Aria labels
-
-**Files:**
-
-- [ApplePayIcon.tsx:15](../src/components/icons/donation/ApplePayIcon.tsx#L15) → `'Apple Pay'`
-- [BankIcon.tsx:15](../src/components/icons/donation/BankIcon.tsx#L15) → `'Bank Transfer'` ⚠️
-- [CreditCard.tsx:11](../src/components/icons/donation/CreditCard.tsx#L11) → `'Credit Card'` ⚠️
-- [GooglePayIcon.tsx:15](../src/components/icons/donation/GooglePayIcon.tsx#L15) → `'Google Pay'`
-- [PaypalIcon.tsx:11](../src/components/icons/donation/PaypalIcon.tsx#L11) → `'PayPal'`
-- [SepaIcon.tsx:11](../src/components/icons/donation/SepaIcon.tsx#L11) → `'SEPA Direct Debit'` ⚠️
-
-**Why it's an issue:** Brand names (PayPal, Apple Pay, Google Pay) can stay, but "Bank Transfer", "Credit Card", and "SEPA Direct Debit" must be translated.
-
-**Suggested fix:** Accept `aria-label` as a prop — the parent [`payment-methods.tsx`](../src/components/donate/payment-methods.tsx) already translates method names; pass them down.
-
-**Namespace:** `Donate.methods`
-
----
-
-### 2.10 Stripe SEPA Form — Validation errors & placeholder
+### 4.2 Stripe SEPA Form — Validation errors & placeholder
 
 **File:** [src/components/donate/stripe-sepa-form.tsx](../src/components/donate/stripe-sepa-form.tsx)
 
@@ -267,13 +204,9 @@ Keys live under `Auth.impersonation.*` and `Auth.userMenuLabel`, not a new `Auth
 | 101 | `return { error: 'Stripe not initialized' }` |
 | 133 | `placeholder='Jane Doe'` |
 
-**Suggested fix:** `Donate.sepa.errors.*` and `Donate.sepa.accountHolderNamePlaceholder`.
+**Fix:** `Donate.sepa.errors.*` and `Donate.sepa.accountHolderNamePlaceholder`.
 
-**Namespace:** `Donate.sepa.errors`
-
----
-
-### 2.11 Stripe Card Form — Error fallbacks
+### 4.3 Stripe Card Form — Error fallbacks
 
 **File:** [src/components/donate/stripe-card-form.tsx:164,172](../src/components/donate/stripe-card-form.tsx#L164-L172)
 
@@ -282,27 +215,65 @@ return { error: error.message ?? 'Payment method creation failed' };
 if (error) return { error: error.message ?? 'Card action failed' };
 ```
 
-**Suggested fix:** `Donate.card.errors.{paymentMethodFailed, cardActionFailed}`
+**Fix:** `Donate.card.errors.{paymentMethodFailed, cardActionFailed}`.
 
----
+### 4.4 Address Form — Raw error in UI
 
-### 2.12 Contribution Settings — Native `alert()`
+**File:** [src/components/donate/address-form.tsx:75-77](../src/components/donate/address-form.tsx#L75-L77)
 
-**File:** [src/components/fundraisers/contribution-settings.tsx:18-22](../src/components/fundraisers/contribution-settings.tsx#L18-L22)
+Surfaces raw `err.message` — same pattern as [§3.3](#33-create--update-fundraiser-buttons--raw-error-in-toast-description).
+
+### 4.5 Donation Summary — Hardcoded `' and '` joiner
+
+**File:** [src/components/donate/donation-summary.tsx:69](../src/components/donate/donation-summary.tsx#L69)
 
 ```ts
-alert(
-  `Preview Mode\nWould donate ${formatCurrency(amount, currency)} ${frequency}${isDedicated ? ' (dedicated)' : ''}`
-);
+const joinedNames = publicHosts.map(h => h.displayName).filter(Boolean).join(' and ');
 ```
 
-**Why it's an issue:** Native `alert()` is poor UX, and the strings are English-only.
+**Why:** `' and '` is English-only; German expects `' und '`. Locale-aware joining already exists in [`fundraiser-list-item.tsx:38`](../src/components/dashboard/fundraiser-list-item.tsx#L38) using `Intl.ListFormat`.
 
-**Suggested fix:** Replace with a translated toast/dialog using `Fundraisers.form.contributionSettings.preview.{previewMode, previewDonation, dedicated}`.
+**Fix:** Use the shared `joinNames(names, locale)` helper from utility commit U3 ([§11.3](#113-joinnames-helper-via-intllistformat)). If U3 lands first, this is a one-line swap.
+
+### 4.6 Donation Method Icons — Aria labels
+
+**Files:**
+
+- [ApplePayIcon.tsx:15](../src/components/icons/donation/ApplePayIcon.tsx#L15) → `'Apple Pay'`
+- [BankIcon.tsx:15](../src/components/icons/donation/BankIcon.tsx#L15) → `'Bank Transfer'` ⚠️
+- [CreditCard.tsx:11](../src/components/icons/donation/CreditCard.tsx#L11) → `'Credit Card'` ⚠️
+- [GooglePayIcon.tsx:15](../src/components/icons/donation/GooglePayIcon.tsx#L15) → `'Google Pay'`
+- [PaypalIcon.tsx:11](../src/components/icons/donation/PaypalIcon.tsx#L11) → `'PayPal'`
+- [SepaIcon.tsx:11](../src/components/icons/donation/SepaIcon.tsx#L11) → `'SEPA Direct Debit'` ⚠️
+
+**Why:** Brand names (PayPal, Apple Pay, Google Pay) can stay; "Bank Transfer", "Credit Card", "SEPA Direct Debit" must be translated.
+
+**Fix:** Accept `aria-label` as a prop — parent [`payment-methods.tsx`](../src/components/donate/payment-methods.tsx) already translates method names; pass them down.
+
+### 4.7 Missing Keys
+
+| Key | File |
+|---|---|
+| `Donate.overlay.aria.{label, close}` | `donate.json` |
+| `Donate.sepa.{accountHolderNamePlaceholder, errors.*}` | `donate.json` |
+| `Donate.card.errors.{paymentMethodFailed, cardActionFailed}` | `donate.json` |
+
+### 4.8 Notes — Currency call sites on this page
+
+Cleaned up by utility commit U1:
+
+- [donate-options.tsx:74](../src/components/donate/donate-options.tsx#L74)
+- [donation-summary.tsx:139,154,163](../src/components/donate/donation-summary.tsx#L139)
+- [payment-methods.tsx:332,355,406](../src/components/donate/payment-methods.tsx#L332) ⚠️ explicitly passes `undefined`
+- [donation-thank-you.tsx:30,38](../src/components/donate/donation-thank-you.tsx)
 
 ---
 
-### 2.13 Location Category Map — Placeholder copy
+## 5. Page: Explore
+
+Components under `src/components/explore/*`.
+
+### 5.1 Location Category Map — Placeholder copy
 
 **File:** [src/components/explore/location-category-map.tsx:7-8](../src/components/explore/location-category-map.tsx#L7-L8)
 
@@ -311,13 +282,9 @@ alert(
 <p className='text-sm'>Interactive map coming soon</p>
 ```
 
-**Suggested fix:** `Explore.locationMap.{title, comingSoon}` — even temporary copy must be translated.
+**Fix:** `Explore.locationMap.{title, comingSoon}` — even temporary copy must be translated.
 
-**Namespace:** `Explore.locationMap`
-
----
-
-### 2.14 Category Page Skeleton — Loading aria
+### 5.2 Category Page Skeleton — Loading aria
 
 **File:** [src/components/explore/category-page-skeleton.tsx:6](../src/components/explore/category-page-skeleton.tsx#L6)
 
@@ -325,13 +292,137 @@ alert(
 <div className='category-page-skeleton' role='status' aria-label='Loading'>
 ```
 
-**Why it's an issue:** Sibling skeletons use `t('loading')` (Dashboard.list.item.loading, Dashboard.summary.loading) — this one is inconsistent.
+**Why:** Sibling skeletons use `t('loading')` (Dashboard.list.item.loading, Dashboard.summary.loading) — this one is inconsistent.
 
-**Suggested fix:** `Explore.categoryPage.loadingAria` or reuse `Common.aria.loading`.
+**Fix:** `Explore.categoryPage.loadingAria` or reuse `Common.aria.loading`.
+
+### 5.3 Missing Keys
+
+| Key | File |
+|---|---|
+| `Explore.locationMap.{title, comingSoon}` | `explore.json` |
+| `Explore.categoryPage.loadingAria` | `explore.json` |
+
+### 5.4 Notes — Currency call site on this page
+
+Cleaned up by utility commit U1:
+
+- [fundraiser-card.tsx:72](../src/components/explore/fundraiser-card.tsx#L72)
 
 ---
 
-### 2.15 Info Tooltip — English fallback
+## 6. Page: Dashboard
+
+Components under `src/components/dashboard/*`.
+
+### 6.1 Dashboard Summary — Plural-sensitive formatting via pre-stringified count
+
+`Dashboard.list.item.donations` correctly uses an ICU `count` param, but plural-sensitive count formatting in `dashboard-summary.tsx` interpolates a pre-`toLocaleString`-formatted string.
+
+**Fix:** Audit all `formattedCount` usages and prefer ICU `{count, plural, ...}` so DE plural forms can diverge from EN when needed.
+
+### 6.2 Fundraiser Search Input — One key for two attributes
+
+**File:** [src/components/dashboard/fundraiser-search-input.tsx:52-53](../src/components/dashboard/fundraiser-search-input.tsx#L52-L53)
+
+Reuses `searchPlaceholder` for both `placeholder` and `aria-label`. Functional, but consider a distinct `searchAria` key in case UX wants a more descriptive aria string.
+
+### 6.3 Notes — Currency call sites on this page
+
+Cleaned up by utility commit U1:
+
+- [fundraiser-list-item.tsx:43-50](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50)
+
+Already-correct call sites (kept for reference):
+
+- ✅ [dashboard-summary.tsx:50](../src/components/dashboard/dashboard-summary.tsx#L50)
+
+---
+
+## 7. Page: Stage
+
+Components under `src/components/stage/*`.
+
+### 7.1 Stage Top Bar — Image alt text
+
+**File:** [src/components/stage/stage-top-bar.tsx:21,32](../src/components/stage/stage-top-bar.tsx#L21-L32)
+
+```tsx
+alt='Plant-for-the-Planet'
+alt='Partner'
+```
+
+**Fix:** `Stage.topBar.{brandAlt, partnerAlt}`.
+
+### 7.2 Missing Keys
+
+| Key | File |
+|---|---|
+| `Stage.topBar.{brandAlt, partnerAlt}` | `stage.json` |
+
+### 7.3 Notes — `formatTimeAgo` on the public stage ticker
+
+The Stage Ticker uses the English-only `formatTimeAgo` and is **public-facing** — German users see `5m ago`, `2h ago`, `3d ago`.
+
+- [stage-ticker.tsx:180](../src/components/stage/stage-ticker.tsx#L180)
+
+Cleaned up by utility commit U2 ([§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook)).
+
+Already-correct currency call site (kept for reference):
+
+- ✅ [stage-counter.tsx:58](../src/components/stage/stage-counter.tsx#L58)
+
+---
+
+## 8. Page: Auth & User Menu (mostly resolved)
+
+Components under `src/components/auth/*`.
+
+### 8.1 Impersonation Modal ✅ Resolved (2026-05-21)
+
+Migrated end-to-end to `Auth.impersonation.*` (modal copy + 8 validation messages). See commit `7496821`.
+
+**File:** [src/components/auth/impersonation-modal.tsx:44-141](../src/components/auth/impersonation-modal.tsx#L44-L141)
+
+### 8.2 User Menu ✅ Resolved (2026-05-21)
+
+**File:** [src/components/auth/user-menu.tsx](../src/components/auth/user-menu.tsx)
+
+- `alt='Profile'` → reduced to `alt=''` (decorative; `FallbackAvatar` provides identity).
+- `displayName || 'User'` → `tAuth('impersonation.userDefault')`.
+- `'Switch impersonation' / 'Impersonate user'` → `tAuth('impersonation.switch')` / `tAuth('impersonation.title')`.
+- Button `aria-label` → `tAuth('userMenuLabel')`.
+
+Keys live under `Auth.impersonation.*` and `Auth.userMenuLabel`, not a new `Auth.userMenu` namespace.
+
+### 8.3 Impersonation Banner ✅ Resolved (2026-05-21)
+
+Banner message and stop button localized: `Auth.impersonation.bannerMessage`, `Auth.impersonation.stop`.
+
+### 8.4 Impersonation Validation Errors ✅ Resolved (2026-05-21)
+
+All `setError` paths route through `tAuth('impersonation.errors.*')`.
+
+---
+
+## 9. Shared Chrome (Header, Footer, Dialog, Tooltip)
+
+Primitives & layout components used across many pages. One commit covers all of these.
+
+### 9.1 Shared Dialog Primitive — Close text
+
+**File:** [src/components/ui/dialog.tsx:75,113](../src/components/ui/dialog.tsx#L75-L113)
+
+```tsx
+<span className='sr-only'>Close</span>
+<Button variant='outline'>Close</Button>
+```
+
+**Why:** Shared shadcn-style primitive used by many consumers; the screen-reader Close text reaches every dialog in the app.
+
+**Fix:** Accept a `closeLabel` prop, or read from `Common.actions.close`.
+
+### 9.2 Info Tooltip — English fallback
 
 **File:** [src/components/ui/info-tooltip.tsx:48](../src/components/ui/info-tooltip.tsx#L48)
 
@@ -339,39 +430,57 @@ alert(
 <span className='sr-only'>{triggerLabel ?? 'More information'}</span>
 ```
 
-**Why it's an issue:** Ships English to users when callers omit the prop.
+**Why:** Ships English to users when callers omit the prop.
 
-**Suggested fix:** Either require `triggerLabel`, or default from `Common.aria.moreInformation`.
+**Fix:** Either require `triggerLabel`, or default from `Common.aria.moreInformation`.
 
----
+### 9.3 Footer & Header — Navigation aria labels
 
-### 2.16 Donation Summary — Hardcoded conjunction
+| File | Line | Hardcoded |
+|---|---|---|
+| [footer/links-bar.tsx](../src/components/footer/links-bar.tsx#L12) | 12 | `aria-label='Legal links'` |
+| [header/navigation.tsx](../src/components/header/navigation.tsx#L11) | 11 | `aria-label='Primary navigation'` |
+| [header/logo.tsx](../src/components/header/logo.tsx#L10) | 10 | `aria-label='Plant-for-the-Planet'` (brand — debatable) |
 
-**File:** [src/components/donate/donation-summary.tsx:69](../src/components/donate/donation-summary.tsx#L69)
+**Fix:** Centralize under `Common.aria.{legalLinks, primaryNavigation}`; `Common.brand.name` for the brand string (used in 3+ places).
 
-```ts
-const joinedNames = publicHosts.map(h => h.displayName).filter(Boolean).join(' and ');
+### 9.4 Footer Logos — Image alt text
+
+**File:** [src/components/footer/logos.tsx:13,25](../src/components/footer/logos.tsx#L13-L25)
+
+```tsx
+alt='Plant-for-the-Planet'
+alt='UN Environment Program'
 ```
 
-**Why it's an issue:** `' and '` is English-only; German would expect `' und '`. Locale-aware joining already exists in [`fundraiser-list-item.tsx:38`](../src/components/dashboard/fundraiser-list-item.tsx#L38) using `Intl.ListFormat`.
+**Fix:** `Common.partners.{plantForThePlanetAlt, unepAlt}`.
 
-**Suggested fix:** Use `new Intl.ListFormat(locale, { type: 'conjunction' })`. Extract a shared `joinNames(names, locale)` helper.
+### 9.5 Image Selection Utility — English diagnostic messages
+
+**File:** [src/lib/utils/image-selection.ts:24-48](../src/lib/utils/image-selection.ts#L24-L48)
+
+Strings: `'Selected file is empty.'`, `'Image must be ${MB}MB or smaller.'`, `'Please upload a JPG, PNG, WEBP, or GIF image.'`
+
+The `error.code` is used in the UI ([image-selection-overlay:88-101](../src/components/fundraisers/image-selection-overlay.tsx#L88-L101)), but the literal `message` field is still set on the result object.
+
+**Fix:** Either drop the `message` field or rename to `devMessage` to clarify it's diagnostic-only.
+
+### 9.6 Missing Keys
+
+| Key | File |
+|---|---|
+| `Common.actions.close` | `common.json` |
+| `Common.aria.{loading, primaryNavigation, legalLinks, moreInformation}` | `common.json` |
+| `Common.partners.{plantForThePlanetAlt, unepAlt}` | `common.json` |
+| `Common.brand.name` | `common.json` |
 
 ---
 
-### 2.17 Sentry Test Page — Entire page
+## 10. App-Level (Root layout, Home, Sentry test)
 
-**File:** [src/app/(standard)/sentry-test/page.tsx](../src/app/(standard)/sentry-test/page.tsx)
+App-shell concerns — one commit.
 
-**Hardcoded:** Page title, all error labels/descriptions, `'Trigger'` button.
-
-**Why it's an issue:** This dev/QA route is reachable in production builds.
-
-**Suggested fix:** Either gate with `process.env.NODE_ENV !== 'production'` or localize.
-
----
-
-### 2.18 Root Layout Metadata
+### 10.1 Root Layout Metadata
 
 **File:** [src/app/layout.tsx:67-68](../src/app/layout.tsx#L67-L68)
 
@@ -383,15 +492,11 @@ return {
 };
 ```
 
-**Why it's an issue:** Renders in browser tab and search engines; affects SEO and user trust.
+**Why:** Renders in browser tab and search engines; affects SEO and user trust.
 
-**Suggested fix:** Use `getTranslations({ namespace: 'Common.metadata' })`.
+**Fix:** Use `getTranslations({ namespace: 'Common.metadata' })`.
 
-**Namespace:** `Common.metadata.{title, description}`
-
----
-
-### 2.19 Home Page Scaffold
+### 10.2 Home Page Scaffold
 
 **File:** [src/app/page.tsx:15](../src/app/page.tsx#L15)
 
@@ -399,55 +504,83 @@ return {
 alt='Next.js logo'
 ```
 
-**Suggested fix:** Likely leftover scaffolding — remove or replace.
+**Fix:** Likely leftover scaffolding — remove or replace.
+
+### 10.3 Sentry Test Page — Entire page hardcoded
+
+**File:** [src/app/(standard)/sentry-test/page.tsx](../src/app/(standard)/sentry-test/page.tsx)
+
+**Hardcoded:** page title, all error labels/descriptions, `'Trigger'` button.
+
+**Why:** This dev/QA route is reachable in production builds.
+
+**Fix:** Either gate with `process.env.NODE_ENV !== 'production'` or localize.
+
+### 10.4 Missing Keys
+
+| Key | File |
+|---|---|
+| `Common.metadata.{title, description}` | `common.json` |
 
 ---
 
-## 3. Hardcoded Locale Usage & Formatting
+## 11. Cross-Cutting Utilities (separate commits)
 
-### 3.1 Currency Utilities — Default `'en-US'`
+Each subsection is its own commit. Landing these first lets per-page commits (§3–§10) be smaller and more focused.
+
+### 11.1 `formatCurrency` — Make `locale` mandatory + `useFormatCurrency` hook
 
 **File:** [src/lib/utils/currency.ts:47,96](../src/lib/utils/currency.ts#L47)
-
-**Current code:**
 
 ```ts
 export function formatCurrency(amountInCents, currency, locale: string = 'en-US')
 export function formatCurrencyFromDecimal(amount, currency, locale: string = 'en-US', currencyDisplay)
 ```
 
-**Why it's an issue:** Many callers omit the locale argument, producing US grouping/decimal separators inside a German UI (e.g. `€12,345.67` instead of `12.345,67 €`).
+**Why:** Many callers omit the locale argument, producing US grouping/decimal separators inside a German UI (e.g. `€12,345.67` instead of `12.345,67 €`). **This is the single biggest source of subtle bugs for German users.**
 
 **Affected call sites omitting locale:**
 
-| File | Line |
-|---|---|
-| [donate-options.tsx](../src/components/donate/donate-options.tsx#L74) | 74 |
-| [fundraisers/donation-form.tsx](../src/components/fundraisers/donation-form.tsx) | 108 |
-| [fundraisers/donation-amounts.tsx](../src/components/fundraisers/donation-amounts.tsx) | 72 |
-| [fundraisers/contribution-settings.tsx](../src/components/fundraisers/contribution-settings.tsx) | 20 |
-| [fundraisers/leaderboard/donation-table.tsx](../src/components/fundraisers/leaderboard/donation-table.tsx#L79) | 79 |
-| [fundraisers/leaderboard/donation-item.tsx](../src/components/fundraisers/leaderboard/donation-item.tsx#L65) | 65 |
-| [fundraisers/goal-progress-display.tsx](../src/components/fundraisers/goal-progress-display.tsx) | 25, 41 |
-| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L139) | 139, 154, 163 |
-| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332) | 332, 355, 406 ⚠️ explicitly passes `undefined` |
-| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx) | 30, 38 |
-| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L72) | 72 |
-| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50) | 43-50 |
+| File | Line | Page |
+|---|---|---|
+| [donate/donate-options.tsx](../src/components/donate/donate-options.tsx#L74) | 74 | Donate |
+| [fundraisers/donation-form.tsx](../src/components/fundraisers/donation-form.tsx) | 108 | Fundraiser |
+| [fundraisers/donation-amounts.tsx](../src/components/fundraisers/donation-amounts.tsx) | 72 | Fundraiser |
+| [fundraisers/contribution-settings.tsx](../src/components/fundraisers/contribution-settings.tsx) | 20 | Fundraiser |
+| [fundraisers/leaderboard/donation-table.tsx](../src/components/fundraisers/leaderboard/donation-table.tsx#L79) | 79 | Fundraiser |
+| [fundraisers/leaderboard/donation-item.tsx](../src/components/fundraisers/leaderboard/donation-item.tsx#L65) | 65 | Fundraiser |
+| [fundraisers/goal-progress-display.tsx](../src/components/fundraisers/goal-progress-display.tsx) | 25, 41 | Fundraiser |
+| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L139) | 139, 154, 163 | Donate |
+| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332) | 332, 355, 406 ⚠️ explicitly passes `undefined` | Donate |
+| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx) | 30, 38 | Donate |
+| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L72) | 72 | Explore |
+| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50) | 43-50 | Dashboard |
 
-**Suggested fix:**
+**Fix:**
 
 1. Make `locale` **required** (no default).
-2. Create a `useFormatCurrency()` hook that binds locale once.
+2. Add a `useFormatCurrency()` hook that binds locale once:
+
+   ```ts
+   export function useFormatCurrency() {
+     const locale = useLocale();
+     return useCallback(
+       (cents: number, currency: string) => formatCurrency(cents, currency, locale),
+       [locale]
+     );
+   }
+   ```
+
 3. Migrate all call sites to the hook.
 
----
+Already-correct call sites (kept for reference):
 
-### 3.2 `formatTimeAgo` — English-only, no locale support
+- ✅ [stage-counter.tsx:58](../src/components/stage/stage-counter.tsx#L58)
+- ✅ [dashboard-summary.tsx:50](../src/components/dashboard/dashboard-summary.tsx#L50)
+
+### 11.2 `formatTimeAgo` — `Intl.RelativeTimeFormat` + `useFormatTimeAgo` hook
 
 **File:** [src/lib/utils/time.ts](../src/lib/utils/time.ts)
-
-**Current code:**
 
 ```ts
 export function formatTimeAgo(timestamp: string | Date): string {
@@ -464,9 +597,9 @@ export function formatTimeAgo(timestamp: string | Date): string {
 - [donation-item.tsx:67](../src/components/fundraisers/leaderboard/donation-item.tsx#L67)
 - [stage-ticker.tsx:180](../src/components/stage/stage-ticker.tsx#L180) — public-facing!
 
-**Why it's an issue:** German users see `5m ago`, `2h ago`, `3d ago` on the public fundraiser page.
+**Why:** German users see `5m ago`, `2h ago`, `3d ago` on the public fundraiser/stage pages.
 
-**Suggested fix:**
+**Fix:**
 
 ```ts
 export function formatTimeAgo(ts: string | Date, locale: string): string {
@@ -478,125 +611,59 @@ export function formatTimeAgo(ts: string | Date, locale: string): string {
 
 Or expose as `useFormatTimeAgo()` hook.
 
----
+### 11.3 `joinNames` helper via `Intl.ListFormat`
 
-### 3.3 `toLocaleString()` Without Locale
+Standardize on `Intl.ListFormat(locale, { type: 'conjunction' })` via a `joinNames(names, locale)` helper. Fixes [donation-summary.tsx:69](../src/components/donate/donation-summary.tsx#L69) and any other ad-hoc joins. The pattern already exists in [`fundraiser-list-item.tsx:38`](../src/components/dashboard/fundraiser-list-item.tsx#L38) — extract and share.
 
-**Files:**
+### 11.4 Error-code → translation pattern for services
 
-- [donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23)
-- [fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79)
-
-```ts
-recent.length.toLocaleString()    // ❌ Uses runtime default
-```
-
-**Why it's an issue:** Defaults to the JS runtime locale, which differs between SSR and client and isn't the active UI locale. Causes hydration mismatches.
-
-**Suggested fix:** Always pass `useLocale()`:
-
-```ts
-recent.length.toLocaleString(locale)
-```
-
----
-
-## 4. Missing Translation Keys
-
-Keys that have **no entry at all yet** — must be added in both `en` and `de`:
-
-| Key | Locale File | Purpose |
-|---|---|---|
-| ~~`Auth.impersonation.*`~~ | ~~`auth.json`~~ | ✅ Added 2026-05-21 |
-| ~~`Auth.userMenu.{profileAvatarAlt, defaultDisplayName, impersonate, switchImpersonation}`~~ | ~~`auth.json`~~ | ✅ Resolved 2026-05-21 — folded into `Auth.impersonation.*` and `Auth.userMenuLabel`; avatar `alt` made decorative. |
-| `Common.metadata.{title, description}` | `common.json` | Root layout metadata |
-| `Common.actions.close` | `common.json` | Reusable Close label for dialog |
-| `Common.aria.{loading, primaryNavigation, legalLinks, moreInformation}` | `common.json` | Shared aria labels |
-| `Common.partners.{plantForThePlanetAlt, unepAlt}` | `common.json` | Footer logos |
-| `Common.brand.name` | `common.json` | Centralized brand string |
-| `Donate.overlay.aria.{label, close}` | `donate.json` | Donate overlay |
-| `Donate.sepa.{accountHolderNamePlaceholder, errors.*}` | `donate.json` | SEPA form |
-| `Donate.card.errors.*` | `donate.json` | Stripe card form |
-| `Explore.locationMap.{title, comingSoon}` | `explore.json` | Map placeholder |
-| `Explore.categoryPage.loadingAria` | `explore.json` | Skeleton aria |
-| `Fundraisers.notFound.*` | `fundraisers.json` | Not-found page |
-| `Fundraisers.form.contributionSettings.preview.*` | `fundraisers.json` | Preview alert |
-| `Stage.topBar.{brandAlt, partnerAlt}` | `stage.json` | Stage top bar |
-
----
-
-## 5. Validation & Error Messages Bypassing Translations
-
-### 5.1 Impersonation Modal ✅ Resolved (2026-05-21)
-
-All `setError` paths now use `tAuth('impersonation.errors.*')`. See [§2.1](#21-impersonation-modal--entire-component-untranslated--resolved-2026-05-21).
-
-### 5.2 Fundraiser Create/Update Buttons
-
-**Files:**
-
-- [create-fundraiser-button.tsx:56](../src/components/fundraisers/create-fundraiser-button.tsx#L56)
-- [update-fundraiser-button.tsx:80](../src/components/fundraisers/update-fundraiser-button.tsx#L80)
-
-```ts
-const message = err instanceof Error ? err.message : 'Failed to create fundraiser';
-toast.error(t('errorMessage'), { description: message });
-```
-
-**Why it's an issue:** The toast title is translated, but the description leaks raw English from `err.message` or the English fallback.
-
-**Fix:** Drop raw `err.message` from the description, or map known error codes to translated messages.
-
-### 5.3 Fundraiser Edit Hook
-
-**File:** [use-fundraiser-for-edit.ts:92](../src/components/fundraisers/use-fundraiser-for-edit.ts#L92)
-
-```ts
-const message = error instanceof Error ? error.message : t('loadError');
-```
-
-**Why it's an issue:** Truthy branch shows raw English API messages.
-
-**Fix:** Prefer `t('loadError')`; log `error.message` to console only.
-
-### 5.4 Address Form
-
-**File:** [address-form.tsx:75-77](../src/components/donate/address-form.tsx#L75-L77)
-
-Same pattern — surfaces raw `err.message`.
-
-### 5.5 API Services Propagate English
-
-API client services that propagate English strings via `PlatformAPIError`:
+API client services currently propagate English strings via `PlatformAPIError`:
 
 - [donation-service.ts:13,82](../src/lib/api/donation-service.ts)
 - [payment-service.ts](../src/lib/api/payment-service.ts)
 - [paypal-order-service.ts:8](../src/lib/api/paypal-order-service.ts)
 - [unsplash-service.ts:16](../src/lib/api/unsplash-service.ts)
 
-**Recommended pattern:** Services should throw typed **error codes**; UI calls `t(code)`. The pattern in [`donation-failure-banner.tsx`](../src/components/donate/donation-failure-banner.tsx) (`SubmissionErrorKey` + `Donate.submissionErrors`) is the correct shape — generalize it across features.
+**Pattern:** Services should throw typed **error codes**; UI calls `t(code)`. The pattern in [`donation-failure-banner.tsx`](../src/components/donate/donation-failure-banner.tsx) (`SubmissionErrorKey` + `Donate.submissionErrors`) is the correct shape — generalize across features.
+
+Apply to: fundraiser create/update, address save, impersonation (done), SEPA/card validation.
+
+### 11.5 (Optional) Consolidate formatting helpers
+
+`getLocalizedAbbreviatedCount` already lives in `src/lib/utils/formatting.ts`. Move `formatCurrency*`, `formatTimeAgo`, and the new `joinNames` into the same module — all accepting `locale`. Provide `useFormatters()` returning `{ currency, timeAgo, list, number }` to standardize component-level usage.
+
+### 11.6 (Optional) Aria labels for shared primitives
+
+Add a `Common.aria` namespace. Refactor `Dialog`, `InfoTooltip`, and the donation `*Icon.tsx` files to accept a `label` prop defaulting to translations at the consumer. (Some of this is also covered by §9 and §4.6.)
 
 ---
 
-## 6. Fallback Text Not Localized
+## 12. SSR / Client Locale Mismatch Risks
 
-| Location | Fallback |
-|---|---|
-| ~~[user-menu.tsx:96](../src/components/auth/user-menu.tsx#L96)~~ | ~~`displayName \|\| 'User'`~~ ✅ Now `tAuth('impersonation.userDefault')` |
-| [info-tooltip.tsx:48](../src/components/ui/info-tooltip.tsx#L48) | `triggerLabel ?? 'More information'` |
-| [create-fundraiser-button.tsx:56](../src/components/fundraisers/create-fundraiser-button.tsx#L56) | `'Failed to create fundraiser'` |
-| [update-fundraiser-button.tsx:80](../src/components/fundraisers/update-fundraiser-button.tsx#L80) | `'Failed to update fundraiser'` |
-| [stripe-sepa-form.tsx:96](../src/components/donate/stripe-sepa-form.tsx#L96) | `'Payment method creation failed'` |
-| [stripe-card-form.tsx:164,172](../src/components/donate/stripe-card-form.tsx#L164-L172) | `'Payment method creation failed'`, `'Card action failed'` |
-| [image-selection.ts:24-48](../src/lib/utils/image-selection.ts#L24-L48) | `'Selected file is empty.'`, `'Image must be ${MB}MB or smaller.'`, `'Please upload a JPG, PNG, WEBP, or GIF image.'` |
+### 12.1 Cookie-based locale + no URL prefix
 
-**Note on `image-selection.ts`:** The `error.code` is used in the UI ([overlay:88-101](../src/components/fundraisers/image-selection-overlay.tsx#L88-L101)), but the literal `message` field is still set on the result object. Either drop the `message` field or rename to `devMessage` to clarify it's diagnostic-only.
+- [`request.ts`](../src/i18n/request.ts) reads `ui-locale` cookie.
+- Routing is `localePrefix: 'never'` — the URL is identical across locales.
+- **Risk:** Caches and CDNs **must vary on the `ui-locale` cookie** or users will see a snapshot in the wrong language.
+- **Action:** Verify Vercel/Next caching does not strip cookies on cached routes.
+
+### 12.2 `toLocaleString()` without args
+
+- [donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23), [fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79).
+- Returns runtime-default locale → grouping differs server vs. client → React hydration warnings.
+- **Fix:** Always pass `useLocale()` or use ICU `{count, number}` via `next-intl`. (Fixed as part of [§3.5](#35-tolocalestring-without-locale-also-ssr-risk--see-122).)
+
+### 12.3 `formatTimeAgo`
+
+- Time-sensitive AND locale-agnostic.
+- Server timestamp diff differs from client; combined with English-only output, this is a double SSR risk.
+- **Fix:** Resolved by utility commit U2 ([§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook)).
 
 ---
 
-## 7. Unused / Orphan Translation Concerns
+## 13. Orphan Keys & CI Guardrails
 
-### 7.1 `cookie.json` Is Not Loaded by next-intl
+### 13.1 `cookie.json` is not loaded by next-intl
 
 - [`src/i18n/request.ts`](../src/i18n/request.ts) does **not** import `cookie.json`.
 - [`src/i18n/types.ts`](../src/i18n/types.ts) does not include it in the `Messages` type.
@@ -606,138 +673,18 @@ API client services that propagate English strings via `PlatformAPIError`:
 
 **Fix:** Either (a) load it in `request.ts` and add to `types.ts`, or (b) document explicitly that it's a separate dictionary for `vanilla-cookieconsent`.
 
-### 7.2 No Automated Key Audit
+### 13.2 No automated key audit
 
-No tooling currently detects orphan keys.
+No tooling currently detects orphan keys, and no build-time check guarantees EN/DE key parity (currently true but unguarded).
 
-**Recommendation:** Add a CI step using `i18next-scanner`, `lint-i18n-json`, or a small Node script that diffs flattened JSON keys against `t('...')` usages in source.
+**Recommendation:** Add a CI step using `i18next-scanner`, `lint-i18n-json`, or a small Node script that:
 
----
-
-## 8. SSR / Client Locale Mismatch Risks
-
-### 8.1 Cookie-based Locale + No URL Prefix
-
-- [`request.ts`](../src/i18n/request.ts) reads `ui-locale` cookie.
-- Routing is `localePrefix: 'never'` — the URL is identical across locales.
-- **Risk:** Caches and CDNs **must vary on the `ui-locale` cookie** or users will see a snapshot in the wrong language.
-- **Action:** Verify Vercel/Next caching does not strip cookies on cached routes.
-
-### 8.2 `toLocaleString()` Without Args
-
-- [donors-preview.tsx:23](../src/components/fundraisers/donors-preview.tsx#L23), [fundraiser-view.tsx:79](../src/components/fundraisers/fundraiser-view.tsx#L79).
-- Returns runtime-default locale → grouping differs server vs. client → React hydration warnings.
-- **Fix:** Always pass `useLocale()` or use ICU `{count, number}` via `next-intl`.
-
-### 8.3 `formatTimeAgo`
-
-- Time-sensitive AND locale-agnostic.
-- Server timestamp diff differs from client; combined with English-only output, this is a double SSR risk.
+1. Flattens both `en/` and `de/` JSON trees and asserts key-set equality.
+2. Diffs flattened JSON keys against `t('...')` usages in source.
 
 ---
 
-## 9. Repeated Patterns & Refactor Opportunities
-
-### 9.1 `useFormatCurrency()` Hook
-
-Build a hook that returns a bound function reading `useLocale()`:
-
-```ts
-export function useFormatCurrency() {
-  const locale = useLocale();
-  return useCallback(
-    (cents: number, currency: string) => formatCurrency(cents, currency, locale),
-    [locale]
-  );
-}
-```
-
-Then make `locale` mandatory in the underlying utility. **Eliminates 17+ inconsistent call sites.**
-
-### 9.2 `useFormatTimeAgo()` Hook
-
-Add a hook with `Intl.RelativeTimeFormat`. Replaces 3 usages and handles SSR consistently.
-
-### 9.3 Host Name List Joining
-
-Standardize on `Intl.ListFormat(locale, { type: 'conjunction' })` via a `joinNames(names, locale)` helper. Fixes [donation-summary.tsx:69](../src/components/donate/donation-summary.tsx#L69) and any other ad-hoc joins.
-
-### 9.4 Aria Labels for Shared Primitives
-
-Add a `Common.aria` namespace. Refactor `Dialog`, `InfoTooltip`, and the donation `*Icon.tsx` files to accept a `label` prop defaulting to translations at the consumer.
-
-### 9.5 Error Code → Message Mapping
-
-Generalize the pattern used in [`donation-failure-banner.tsx`](../src/components/donate/donation-failure-banner.tsx):
-
-- Services throw **typed codes**.
-- UI calls `t(code)`.
-
-Apply to: fundraiser create/update, address save, impersonation, SEPA/card validation.
-
-### 9.6 Pluralization
-
-`Dashboard.list.item.donations` correctly uses an ICU `count` param, but plural-sensitive count formatting in `dashboard-summary.tsx` interpolates a pre-`toLocaleString`-formatted string. Audit all `formattedCount` usages and prefer ICU `{count, plural, ...}` so DE plural forms can diverge from EN when needed.
-
-### 9.7 One Key for Two Attributes
-
-[fundraiser-search-input.tsx:52-53](../src/components/dashboard/fundraiser-search-input.tsx#L52-L53) reuses `searchPlaceholder` for both `placeholder` and `aria-label`. Functional, but consider a distinct `searchAria` key in case UX wants a more descriptive aria string.
-
-### 9.8 Centralization in `src/lib/utils/formatting.ts`
-
-`getLocalizedAbbreviatedCount` already lives there. Move `formatCurrency*`, `formatTimeAgo`, and new `joinNames` into the same module — all accepting locale.
-
-Provide `useFormatters()` returning `{ currency, timeAgo, list, number }` to standardize component-level usage.
-
-### 9.9 CI Guardrail
-
-Add a build-time script that flattens both `en/` and `de/` JSON trees and asserts key-set equality (currently true, but no guard).
-
----
-
-## 10. Inconsistencies
-
-### 10.1 Locale Arg Drift
-
-Some components correctly pass `locale` to `formatCurrencyFromDecimal`:
-
-- ✅ [stage-counter.tsx:58](../src/components/stage/stage-counter.tsx#L58)
-- ✅ [dashboard-summary.tsx:50](../src/components/dashboard/dashboard-summary.tsx#L50)
-
-Others omit it (see [§3.1](#31-currency-utilities--default-en-us)). **This is the single biggest source of subtle bugs for German users.**
-
-### 10.2 Aria Label Coverage
-
-Some aria-labels come from translations:
-
-- ✅ [dashboard/fundraiser-action-menu.tsx:137](../src/components/dashboard/fundraiser-action-menu.tsx#L137)
-- ✅ [image-selection-overlay.tsx:257](../src/components/fundraisers/image-selection-overlay.tsx#L257)
-
-Others are literal English in the same feature area:
-
-- ❌ [donate-overlay-layout.tsx](../src/components/donate/donate-overlay-layout.tsx)
-- ❌ [ui/dialog.tsx](../src/components/ui/dialog.tsx)
-
-**Action:** Apply the rule uniformly.
-
----
-
-## 11. Quick-Win Priority List
-
-| # | Action | Impact | Effort |
-|---|---|---|---|
-| 1 | Make `locale` mandatory in `formatCurrency*` + fix all call sites | 🔴 High (currency is broken for DE users today) | Medium |
-| 2 | Rewrite `formatTimeAgo` with `Intl.RelativeTimeFormat` | 🔴 High (visible English in public pages) | Small |
-| 3 | ~~Translate `ImpersonationModal` end-to-end~~ ✅ Done 2026-05-21 | 🟡 Medium | Medium |
-| 4 | Translate `not-found.tsx` (fundraiser) and `donate-overlay-layout.tsx` aria labels | 🟡 Medium | Small |
-| 5 | Replace `'User'`, `'More information'`, `'Loading'`, `'Close'` fallbacks with translated keys | 🟢 Low | Small |
-| 6 | Localize root layout metadata | 🟡 Medium (SEO) | Small |
-| 7 | Replace `.join(' and ')` and ad-hoc list joins with `Intl.ListFormat(locale)` | 🟡 Medium | Small |
-| 8 | Add CI key-parity check; load `cookie.json` (or document the separate dictionary) | 🟢 Low (prevention) | Small |
-
----
-
-## Appendix: Locale Setup Reference
+## 14. Appendix: Locale Setup Reference
 
 **Loader:** [src/i18n/request.ts](../src/i18n/request.ts)
 
