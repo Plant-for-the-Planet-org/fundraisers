@@ -295,7 +295,7 @@ These were excluded by request when this slice shipped. All three can be added l
 
 **Edge cases:**
 
-- `workspace.country` is typed as `string` (not `AllowedCountry`); a local `toAllowedCountry` helper coerces it (anything outside `ALLOWED_COUNTRIES` falls back to `'ROW'`, which the projects API maps to DE). Custom-only workspaces (ES, CH) still get the per-row country + percentage because `useBundleProjects` runs unconditionally; they just don't render the header (no bundle slug).
+- `workspace.country` is typed as `string` (not `AllowedCountry`); the shared `toAllowedCountry` helper from `country-currency.ts` coerces it (anything outside `ALLOWED_COUNTRIES` falls back to `'ROW'`, which the projects API maps to DE). Custom-only workspaces (ES, CH) still get the per-row country + percentage because `useBundleProjects` runs unconditionally; they just don't render the header (no bundle slug).
 - Unknown project IDs (e.g. legacy fundraisers referencing a project not in the country list) resolve to the `useBundleProjects` fallback with `country: ''`, so the country segment is silently dropped and only the percentage shows.
 
 **Visual test:** open `/fundraisers/<slug>` for a fundraiser whose stored `bundle.slug` resolves to a configured bundle → header renders with icon + label + italic tagline. Each project row shows `Country · NN% of fundraiser`. For fundraisers with `bundle.slug: null` (custom, or legacy without the field) → no header, project rows still show country + percentage.

@@ -139,7 +139,11 @@ export function FundraiserView({
         <DescriptionDisplay value={fundraiser.description} />
 
         {/* Project allocations */}
-        <ProjectsSupportedDisplay fundraiser={fundraiser} />
+        <ProjectsSupportedDisplay
+          projectAllocations={fundraiser.projectAllocations}
+          workspaceCountry={fundraiser.workspace?.country}
+          bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
+        />
       </MainPanel>
     </FundraiserLayout>
   );
