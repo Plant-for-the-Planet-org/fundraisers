@@ -40,8 +40,8 @@ export function FundraiserListToolbar({
           value={filters.status}
           statusCounts={statusCounts}
           onChange={handleStatusChange}
-          tabsClassName='hidden lg:inline-flex'
-          dropdownClassName='lg:hidden grow shrink basis-0 md:basis-auto md:w-40 md:grow-0'
+          inlineFilterClassName='hidden lg:inline-flex'
+          dropdownFilterClassName='lg:hidden grow shrink basis-0 md:basis-auto md:w-40 md:grow-0'
         />
         <FundraiserSortMenu
           value={filters.sort}

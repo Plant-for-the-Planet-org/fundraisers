@@ -22,8 +22,8 @@ interface FundraiserStatusFilterProps {
   value: FundraiserListStatusFilter;
   statusCounts: FundraiserStatusCounts;
   onChange: (next: FundraiserListStatusFilter) => void;
-  tabsClassName?: string;
-  dropdownClassName?: string;
+  inlineFilterClassName?: string;
+  dropdownFilterClassName?: string;
 }
 
 const STATUS_FILTER_OPTIONS: FundraiserListStatusFilter[] = [
@@ -38,8 +38,8 @@ export function FundraiserStatusFilter({
   value,
   statusCounts,
   onChange,
-  tabsClassName,
-  dropdownClassName,
+  inlineFilterClassName,
+  dropdownFilterClassName,
 }: FundraiserStatusFilterProps) {
   const t = useTranslations('Dashboard.statusFilter');
   const locale = useLocale();
@@ -49,9 +49,14 @@ export function FundraiserStatusFilter({
       <ToggleGroup
         type='single'
         value={value}
-        onValueChange={v => { if (v) onChange(v as FundraiserListStatusFilter); }}
+        onValueChange={(v: FundraiserListStatusFilter) => {
+          if (v) onChange(v);
+        }}
         aria-label={t('groupLabel')}
-        className={cn('w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible', tabsClassName)}
+        className={cn(
+          'w-full shrink-0 justify-between overflow-x-auto md:w-fit md:justify-start md:overflow-x-visible',
+          inlineFilterClassName
+        )}
       >
         {STATUS_FILTER_OPTIONS.map(option => (
           <ToggleGroupItem key={option} value={option} className='px-4'>
@@ -77,19 +82,19 @@ export function FundraiserStatusFilter({
             aria-label={t('groupLabel')}
             className={cn(
               'h-9 min-w-0 w-full justify-between border-border/60 bg-background px-2',
-              dropdownClassName
+              dropdownFilterClassName
             )}
           >
             <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
               <ListFilter
-                className='h-4 w-4 m-1 shrink-0 text-muted-foreground'
+                className='h-4 w-4 shrink-0 m-1 text-muted-foreground'
                 aria-hidden='true'
               />
               <span className='truncate font-medium text-foreground'>
                 {t(value)}
               </span>
               <span className='inline-flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-xs font-medium text-muted-foreground'>
-                {statusCounts[value].toLocaleString(locale)}
+                {getLocalizedAbbreviatedCount(statusCounts[value], locale)}
               </span>
             </span>
             <ChevronDown className='ml-2 h-4 w-4 shrink-0' aria-hidden='true' />

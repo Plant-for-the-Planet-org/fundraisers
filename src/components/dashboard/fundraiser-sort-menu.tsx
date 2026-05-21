@@ -49,7 +49,7 @@ export function FundraiserSortMenu({
         >
           <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
             <ArrowDownUp
-              className='h-4 w-4 m-1 shrink-0 text-muted-foreground'
+              className='h-4 w-4 shrink-0 m-1 text-muted-foreground'
               aria-hidden='true'
             />
             <span className='truncate font-medium text-foreground'>
