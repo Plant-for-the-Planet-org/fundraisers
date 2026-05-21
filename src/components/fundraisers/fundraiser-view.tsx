@@ -92,7 +92,12 @@ export function FundraiserView({
 
         {/* Hosts */}
         <div className='md:hidden'>
-          <Hosts mode='display' fundraiser={fundraiser} variant='strip' />
+          <Hosts
+            mode='display'
+            fundraiser={fundraiser}
+            variant='strip'
+            allowStripCollapse
+          />
         </div>
         <div className='hidden md:block'>
           <Hosts mode='display' fundraiser={fundraiser} />

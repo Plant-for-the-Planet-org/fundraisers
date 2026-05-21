@@ -17,7 +17,12 @@ const MAX_STRIP_NAMED = 3;
 
 type HostProps =
   | { mode: 'preview' }
-  | { mode: 'display'; fundraiser: Fundraiser; variant?: 'list' | 'strip' };
+  | {
+      mode: 'display';
+      fundraiser: Fundraiser;
+      variant?: 'list' | 'strip';
+      allowStripCollapse?: boolean;
+    };
 
 export function Hosts(props: HostProps) {
   if (props.mode === 'display') {
@@ -25,6 +30,7 @@ export function Hosts(props: HostProps) {
       <FundraiserHosts
         fundraiser={props.fundraiser}
         variant={props.variant ?? 'list'}
+        allowStripCollapse={props.allowStripCollapse ?? false}
       />
     );
   }
@@ -150,9 +156,11 @@ function HostsStripDisplay({
 function FundraiserHosts({
   fundraiser,
   variant,
+  allowStripCollapse,
 }: {
   fundraiser: Fundraiser;
   variant: 'list' | 'strip';
+  allowStripCollapse: boolean;
 }) {
   const t = useTranslations('Fundraisers');
   const [expanded, setExpanded] = useState(variant === 'list');
@@ -170,7 +178,20 @@ function FundraiserHosts({
 
   if (variant === 'strip') {
     if (expanded) {
-      return <HostsDisplay hosts={hosts} />;
+      return (
+        <div className='flex flex-col gap-2'>
+          <HostsDisplay hosts={hosts} />
+          {allowStripCollapse && (
+            <button
+              type='button'
+              onClick={() => setExpanded(false)}
+              className='self-start text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors'
+            >
+              {t('hostsStripCollapse')}
+            </button>
+          )}
+        </div>
+      );
     }
     return (
       <HostsStripDisplay hosts={hosts} onToggle={() => setExpanded(true)} />
