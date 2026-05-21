@@ -3,7 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
@@ -60,7 +60,7 @@ function SingleHost({
   );
 }
 
-function HostsDisplay({
+function HostsListDisplay({
   hosts,
   loading = false,
 }: {
@@ -105,7 +105,7 @@ function HostsStripDisplay({
   onToggle: () => void;
 }) {
   const t = useTranslations('Fundraisers');
-  const locale = useLocale();
+  const format = useFormatter();
 
   if (hosts.length === 0) return null;
 
@@ -117,13 +117,9 @@ function HostsStripDisplay({
 
   let namesText: string;
   if (hasMore) {
-    namesText = `${displayNames.join(', ')} ${t('andMore')}`;
+    namesText = `${format.list(displayNames, { type: 'conjunction' })} ${t('andMore')}`;
   } else {
-    const formatter = new Intl.ListFormat(locale, {
-      style: 'long',
-      type: 'conjunction',
-    });
-    namesText = formatter.format(displayNames);
+    namesText = format.list(displayNames, { type: 'conjunction' });
   }
 
   return (
@@ -180,7 +176,7 @@ function FundraiserHosts({
     if (expanded) {
       return (
         <div className='flex flex-col gap-2'>
-          <HostsDisplay hosts={hosts} />
+          <HostsListDisplay hosts={hosts} />
           {allowStripCollapse && (
             <button
               type='button'
@@ -198,7 +194,7 @@ function FundraiserHosts({
     );
   }
 
-  return <HostsDisplay hosts={hosts} />;
+  return <HostsListDisplay hosts={hosts} />;
 }
 
 function HostsPreview() {
@@ -209,7 +205,7 @@ function HostsPreview() {
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
   if (isAuthInitializing) {
-    return <HostsDisplay hosts={[]} loading />;
+    return <HostsListDisplay hosts={[]} loading />;
   }
 
   if (!isAuthenticated || !user) {
@@ -224,5 +220,5 @@ function HostsPreview() {
     profile?.image || user.picture
   );
 
-  return <HostsDisplay hosts={[{ name, avatarUrl }]} />;
+  return <HostsListDisplay hosts={[{ name, avatarUrl }]} />;
 }

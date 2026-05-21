@@ -25,6 +25,30 @@ import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader
 import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
 import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
 
+function DonationCountSummary({
+  donationCount,
+  fundraiser,
+}: {
+  donationCount: number;
+  fundraiser: Fundraiser;
+}) {
+  const t = useTranslations('Fundraisers');
+
+  return (
+    <div className='flex flex-col gap-3'>
+      <SectionHeader>
+        {t('donationCount', {
+          count: donationCount,
+          formattedCount: donationCount.toLocaleString(),
+        })}
+      </SectionHeader>
+      <Suspense fallback={<DonorsStripSkeleton />}>
+        <DonorsSummary fundraiser={fundraiser} />
+      </Suspense>
+    </div>
+  );
+}
+
 export function FundraiserView({
   fundraiser,
   paymentOptions,
@@ -76,17 +100,10 @@ export function FundraiserView({
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
         <div className='hidden md:block'>
           {canShowLeaderboard && (
-            <div className='flex flex-col gap-3'>
-              <SectionHeader>
-                {t('donationCount', {
-                  count: fundraiser.donationCount,
-                  formattedCount: fundraiser.donationCount.toLocaleString(),
-                })}
-              </SectionHeader>
-              <Suspense fallback={<DonorsStripSkeleton />}>
-                <DonorsSummary fundraiser={fundraiser} />
-              </Suspense>
-            </div>
+            <DonationCountSummary
+              donationCount={fundraiser.donationCount}
+              fundraiser={fundraiser}
+            />
           )}
         </div>
 
@@ -165,17 +182,10 @@ export function FundraiserView({
       <div className='md:hidden flex flex-col gap-6'>
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
         {canShowLeaderboard && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('donationCount', {
-                count: fundraiser.donationCount,
-                formattedCount: fundraiser.donationCount.toLocaleString(),
-              })}
-            </SectionHeader>
-            <Suspense fallback={<DonorsStripSkeleton />}>
-              <DonorsSummary fundraiser={fundraiser} />
-            </Suspense>
-          </div>
+          <DonationCountSummary
+            donationCount={fundraiser.donationCount}
+            fundraiser={fundraiser}
+          />
         )}
 
         {/* Hosts */}
