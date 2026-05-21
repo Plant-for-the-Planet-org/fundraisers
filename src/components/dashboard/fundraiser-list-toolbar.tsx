@@ -41,12 +41,12 @@ export function FundraiserListToolbar({
           statusCounts={statusCounts}
           onChange={handleStatusChange}
           tabsClassName='hidden lg:inline-flex'
-          dropdownClassName='lg:hidden grow shrink'
+          dropdownClassName='lg:hidden grow shrink basis-0 md:basis-auto md:w-40 md:grow-0'
         />
         <FundraiserSortMenu
           value={filters.sort}
           onChange={handleSortChange}
-          className='grow shrink'
+          className='grow shrink basis-0 md:basis-auto md:w-50 md:grow-0'
         />
       </div>
     </div>

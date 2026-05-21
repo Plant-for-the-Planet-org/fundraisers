@@ -76,7 +76,7 @@ export function FundraiserStatusFilter({
             size='sm'
             aria-label={t('groupLabel')}
             className={cn(
-              'h-9 w-full justify-between border-border/60 bg-background px-2',
+              'h-9 min-w-0 w-full justify-between border-border/60 bg-background px-2',
               dropdownClassName
             )}
           >

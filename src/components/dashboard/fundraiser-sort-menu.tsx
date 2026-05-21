@@ -43,7 +43,7 @@ export function FundraiserSortMenu({
           variant='outline'
           size='sm'
           className={cn(
-            'h-9 w-full justify-between border-border/60 bg-background px-2',
+            'h-9 min-w-0 w-full justify-between border-border/60 bg-background px-2',
             className
           )}
         >
