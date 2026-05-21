@@ -48,7 +48,7 @@
     },
     "custom": {
       "description": "Stelle dein eigenes Paket zusammen - wähle Projekte einzeln aus.",
-      "searchPlaceholder": "Suche und wähle Projekte aus, um dein Paket zu erstellen",
+      "searchPlaceholder": "Suche und wähle Projekte aus, um dein individuelles Paket zu erstellen",
       "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
       "showingCount": "Top {shown, number} von {total, number} - Suche nach mehr - ✨ Top-Projekten",
       "noResults": "Keine Projekte entsprechen \"{query}\"",
