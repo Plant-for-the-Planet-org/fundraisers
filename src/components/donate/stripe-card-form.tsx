@@ -7,7 +7,7 @@ import type {
   StripeCardNumberElementChangeEvent,
 } from '@stripe/stripe-js';
 
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   CardCvcElement,
@@ -16,6 +16,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { useIsDarkTheme } from '@/lib/hooks/use-is-dark-theme';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
@@ -42,23 +43,31 @@ export interface StripeCardFormHandle {
   ): Promise<{ error?: string }>;
 }
 
-const CARD_ELEMENT_OPTIONS: StripeCardElementOptions = {
-  style: {
-    base: {
-      fontSize: '14px',
-      color: '#030712',
-      '::placeholder': { color: '#6b7280' },
-      ':focus': { color: '#6b7280' },
-    },
-    invalid: { color: '#dc2626' },
-  },
-};
-
 export const StripeCardForm = forwardRef<StripeCardFormHandle>(
   function StripeCardForm(_props, ref) {
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.card');
+    const isDark = useIsDarkTheme();
+
+    const cardElementOptions = useMemo<StripeCardElementOptions>(
+      () => ({
+        style: {
+          base: {
+            fontSize: '14px',
+            color: isDark ? '#94a3b8' : '#6b7280',
+            '::placeholder': {
+              color: isDark ? '#6b7280' : '#b0b4bb',
+            },
+            ':focus': {
+              color: isDark ? '#94a3b8' : '#6b7280',
+            },
+          },
+          invalid: { color: '#dc2626' },
+        },
+      }),
+      [isDark]
+    );
 
     const [cardNumberComplete, setCardNumberComplete] = useState(false);
     const [cardNumberError, setCardNumberError] = useState<string | null>(null);
@@ -213,7 +222,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         >
           <div className='mt-2 border border-border rounded-lg p-3'>
             <CardNumberElement
-              options={CARD_ELEMENT_OPTIONS}
+              options={cardElementOptions}
               onChange={handleCardNumberChange}
             />
           </div>
@@ -226,7 +235,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           >
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardExpiryElement
-                options={CARD_ELEMENT_OPTIONS}
+                options={cardElementOptions}
                 onChange={handleCardExpiryChange}
               />
             </div>
@@ -234,7 +243,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
           <FormField label={t('cvcLabel')} error={cardCvcError ?? undefined}>
             <div className='mt-2 border border-border rounded-lg p-3'>
               <CardCvcElement
-                options={CARD_ELEMENT_OPTIONS}
+                options={cardElementOptions}
                 onChange={handleCardCvcChange}
               />
             </div>
