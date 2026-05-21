@@ -43,15 +43,15 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
 
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
-      setError('Enter a valid email');
+      setError(t('impersonation.errors.invalidEmail'));
       return;
     }
     if (!/^\d{4}$/.test(pin)) {
-      setError('Pin must be 4 digits');
+      setError(t('impersonation.errors.invalidPin'));
       return;
     }
     if (!accessToken) {
-      setError('You are not signed in');
+      setError(t('impersonation.errors.notSignedIn'));
       return;
     }
 
@@ -64,9 +64,7 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
       );
 
       if (profile.email?.toLowerCase() !== trimmedEmail.toLowerCase()) {
-        setError(
-          'Profile email did not match. Check the email and pin and try again.'
-        );
+        setError(t('impersonation.errors.emailMismatch'));
         setIsSubmitting(false);
         return;
       }
@@ -77,14 +75,14 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
     } catch (err) {
       if (err instanceof PlatformAPIError) {
         if (err.status === 401 || err.status === 403) {
-          setError('Invalid email or support pin');
+          setError(t('impersonation.errors.invalidCredentials'));
         } else if (err.status === 404) {
-          setError('No user found with that email');
+          setError(t('impersonation.errors.userNotFound'));
         } else {
-          setError(err.message || 'Validation failed');
+          setError(t('impersonation.errors.validationFailed'));
         }
       } else {
-        setError('Validation failed. Try again.');
+        setError(t('impersonation.errors.validationFailedRetry'));
       }
       setIsSubmitting(false);
     }
@@ -96,18 +94,19 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
         <DialogHeader>
           <DialogTitle>{t('impersonation.title')}</DialogTitle>
           <DialogDescription>
-            Sign in as another user for support. Enter their email and support
-            pin.
+            {t('impersonation.description')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='impersonate-email'>User email</Label>
+            <Label htmlFor='impersonate-email'>
+              {t('impersonation.emailLabel')}
+            </Label>
             <Input
               id='impersonate-email'
               type='email'
               autoComplete='off'
-              placeholder='user@example.com'
+              placeholder={t('impersonation.emailPlaceholder')}
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={isSubmitting}
@@ -115,14 +114,16 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
             />
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='impersonate-pin'>Support pin</Label>
+            <Label htmlFor='impersonate-pin'>
+              {t('impersonation.pinLabel')}
+            </Label>
             <Input
               id='impersonate-pin'
               type='text'
               inputMode='numeric'
               autoComplete='off'
               maxLength={4}
-              placeholder='Support pin'
+              placeholder={t('impersonation.pinPlaceholder')}
               value={pin}
               onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
               disabled={isSubmitting}
@@ -137,10 +138,12 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('impersonation.cancel')}
             </Button>
             <Button type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'Validating...' : 'Impersonate'}
+              {isSubmitting
+                ? t('impersonation.validating')
+                : t('impersonation.submit')}
             </Button>
           </DialogFooter>
         </form>
