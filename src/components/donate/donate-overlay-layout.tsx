@@ -21,7 +21,7 @@ export function DonateOverlayLayout({
       <button
         type='button'
         onClick={onClose}
-        className='fixed top-6 right-6 z-10 p-3 rounded-full bg-background border border-border shadow-sm hover:shadow-md transition-all hover:bg-muted'
+        className='fixed top-6 right-6 z-10 p-3 rounded-full bg-background border border-foreground/20 shadow-sm hover:shadow-md transition-all hover:bg-muted'
         aria-label='Close donation overlay'
       >
         <X className='w-5 h-5 text-muted-foreground' />

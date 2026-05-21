@@ -56,8 +56,6 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
 
   return {
     ...base,
-    id: 'fundraiser-custom',
-    name: 'Custom',
     background: settings.background ?? base.background,
     accent: VALID_ACCENTS.has(settings.accent ?? '')
       ? (settings.accent as AccentColor)
