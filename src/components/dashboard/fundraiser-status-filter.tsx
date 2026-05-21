@@ -7,7 +7,6 @@ import type {
 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, ChevronDown, ListFilter } from 'lucide-react';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
 import { cn, formatCompactNumber } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
 import {
@@ -69,7 +68,7 @@ export function FundraiserStatusFilter({
                   : 'bg-background/70 text-muted-foreground'
               )}
             >
-              {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
+              {formatCompactNumber(statusCounts[option], locale)}
             </span>
           </ToggleGroupItem>
         ))}
