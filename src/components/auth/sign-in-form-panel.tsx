@@ -96,7 +96,7 @@ export function SignInFormPanel({ redirectTo }: { redirectTo: RedirectPath }) {
             {tAuth.rich('termsAgreement', {
               termsLink: chunks => (
                 <a
-                  href='https://www.plant-for-the-planet.org/terms-and-conditions/'
+                  href={tAuth('termsUrl')}
                   className='underline hover:text-primary'
                   target='_blank'
                   rel='noopener noreferrer'
@@ -106,7 +106,7 @@ export function SignInFormPanel({ redirectTo }: { redirectTo: RedirectPath }) {
               ),
               privacyLink: chunks => (
                 <a
-                  href='https://www.plant-for-the-planet.org/privacy-terms/'
+                  href={tAuth('privacyUrl')}
                   className='underline hover:text-primary'
                   target='_blank'
                   rel='noopener noreferrer'

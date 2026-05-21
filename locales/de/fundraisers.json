@@ -102,7 +102,7 @@
       "title": {
         "label": "Name des Spendenaufrufs",
         "placeholder": "z.B. Mache meinen Geburtstag zu einem Wald",
-        "helper": "Das erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite.\nSei spezifisch.",
+        "helper": "Der Titel erscheint in den Vorschauen für das Teilen, in E-Mails und oben auf der Seite.\nSei spezifisch.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Spendenaufrufs darf nicht länger als {max, number} Zeichen lang sein."

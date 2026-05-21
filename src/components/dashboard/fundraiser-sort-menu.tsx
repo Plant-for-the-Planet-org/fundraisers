@@ -3,7 +3,7 @@
 import type { FundraiserListSort } from '@/lib/utils/fundraiser-list';
 
 import { useTranslations } from 'next-intl';
-import { Check, ChevronDown } from 'lucide-react';
+import { ArrowDownUp, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,12 +43,15 @@ export function FundraiserSortMenu({
           variant='outline'
           size='sm'
           className={cn(
-            'h-11 w-full justify-between rounded-xl border-border/60 bg-background px-4 has-[>svg]:px-4 md:w-52',
+            'h-9 min-w-0 w-full justify-between border-border/60 bg-background px-2',
             className
           )}
         >
-          <span className='inline-flex min-w-0 items-center gap-1 truncate'>
-            <span className='text-muted-foreground'>{t('triggerLabel')}</span>
+          <span className='inline-flex min-w-0 items-center gap-1.5 truncate'>
+            <ArrowDownUp
+              className='h-4 w-4 shrink-0 m-1 text-muted-foreground'
+              aria-hidden='true'
+            />
             <span className='truncate font-medium text-foreground'>
               {selectedSortLabel}
             </span>
