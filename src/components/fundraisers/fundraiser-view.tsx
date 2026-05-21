@@ -141,6 +141,8 @@ export function FundraiserView({
         {/* Project allocations */}
         <ProjectsSupportedDisplay
           projectAllocations={fundraiser.projectAllocations}
+          workspaceCountry={fundraiser.workspace?.country}
+          bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
         />
       </MainPanel>
     </FundraiserLayout>

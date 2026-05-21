@@ -9,6 +9,19 @@ export function buildProjectUrl(projectId: string): string {
   return `${normalizedBaseUrl}/${encodeURIComponent(projectId)}`;
 }
 
+/**
+ * Looks up a bundle by slug.
+ * Accepts `string | null | undefined` so callers don't need to pre-validate
+ * values from forms or persisted fundraiser settings.
+ * Returns `undefined` for unknown or legacy slugs.
+ */
+export function getBundleBySlug(
+  slug: string | null | undefined
+): Bundle | undefined {
+  if (!slug) return undefined;
+  return BUNDLE_CONFIG.bundles.find(b => b.slug === slug);
+}
+
 export function getBundlesForTab(tabId: BundleTabId): Bundle[] {
   const tab = BUNDLE_CONFIG.tabs.find(t => t.id === tabId);
   if (!tab) return [];
