@@ -1,14 +1,17 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export function Logo() {
+  const t = useTranslations('Common.brand');
+
   return (
     <Link href='/' className='logo flex items-center gap-2'>
       <svg
         xmlns='http://www.w3.org/2000/svg'
         viewBox='1 14 502 177'
         role='img'
-        aria-label='Start Planting'
         className='h-10 w-auto'
+        aria-label={t('name')}
       >
         <style>{`
           .logo {
@@ -62,7 +65,12 @@ export function Logo() {
         </g>
 
         <g className='sp-planet-face'>
-          <svg width='85' height='85' viewBox='0 0 83.405 85' overflow='visible'>
+          <svg
+            width='85'
+            height='85'
+            viewBox='0 0 83.405 85'
+            overflow='visible'
+          >
             <path
               className='sp-planet'
               transform='translate(-36.47 -28.31)'

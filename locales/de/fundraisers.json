@@ -20,6 +20,12 @@
       "retry": "Erneut versuchen",
       "browse": "Spendenaufrufe durchstöbern"
     },
+    "notFound": {
+      "title": "Spendenaufruf nicht gefunden",
+      "description": "Der gesuchte Spendenaufruf existiert nicht oder wurde möglicherweise entfernt.",
+      "browseCta": "Spendenaufrufe durchstöbern",
+      "homeCta": "Zur Startseite"
+    },
     "metadata": {
       "fallbackTitle": "Spendenaufruf"
     },
@@ -241,6 +247,11 @@
       },
       "contributionSettings": {
         "sectionHeading": "Spendeneinstellungen",
+        "preview": {
+          "title": "Vorschaumodus",
+          "description": "{isDedicated, select, true {Würde {amount} {frequency} spenden (gewidmet)} other {Würde {amount} {frequency} spenden}}",
+          "frequencyLabel": "{frequency, select, once {einmalig} monthly {monatlich} yearly {jährlich} other {{frequency}}}"
+        },
         "cardHeader": "Spende",
         "giftTitle": "Widme jemandem deine Spende",
         "giftSubtitle": "Feiere, beschenke oder erinnere an jemanden, indem du deine Bäume widmest.",
@@ -287,7 +298,8 @@
         "buttonProcessing": "Spendenaufruf wird erstellt...",
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
-        "errorMessage": "Fehler"
+        "errorMessage": "Fehler",
+        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Bitte überprüfe deine Angaben und versuche es nochmal."
       }
     },
     "edit": {
@@ -305,7 +317,8 @@
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
         "buttonSubmit": "Spendenaufruf aktualisieren",
         "successMessage": "Spendenaufruf aktualisiert!",
-        "errorMessage": "Aktualisierung fehlgeschlagen"
+        "errorMessage": "Aktualisierung fehlgeschlagen",
+        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Bitte versuche es nochmal."
       }
     },
     "copyLinkButton": {

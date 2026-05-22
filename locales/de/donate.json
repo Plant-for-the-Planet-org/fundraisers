@@ -1,5 +1,11 @@
 {
   "Donate": {
+    "overlay": {
+      "aria": {
+        "label": "Spendendetails",
+        "close": "Spendenfenster schließen"
+      }
+    },
     "preferences": {
       "anonymousDonationLabel": "Anonymisiere meine Spende.",
       "anonymousDonationDescription": "Dein Name erscheint nicht öffentlich auf der Seite des Spendenaufrufs."
@@ -117,7 +123,14 @@
       "ibanLabel": "IBAN",
       "ibanRequired": "IBAN ist erforderlich",
       "accountHolderName": "Name des Kontoinhabers",
+      "accountHolderNamePlaceholder": "Erika Mustermann",
       "accountHolderNameRequired": "Name des Kontoinhabers ist erforderlich",
+      "errors": {
+        "validationFailed": "Validierung fehlgeschlagen",
+        "stripeNotInitialized": "Stripe ist nicht initialisiert",
+        "ibanElementNotFound": "IBAN-Element nicht gefunden",
+        "paymentMethodFailed": "Erstellung der Zahlungsmethode fehlgeschlagen"
+      },
       "mandateTitle": "SEPA-Lastschriftmandat",
       "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
       "creditor": "Gläubiger",
@@ -158,7 +171,15 @@
       "countryLabel": "Land *",
       "countryRequired": "Land ist erforderlich",
       "countryPlaceholder": "Land auswählen",
-      "countryNoResults": "Kein Land gefunden"
+      "countryNoResults": "Kein Land gefunden",
+      "errors": {
+        "validationFailed": "Validierung fehlgeschlagen",
+        "stripeNotInitialized": "Stripe ist nicht initialisiert",
+        "cardElementNotFound": "Kartenelement nicht gefunden",
+        "paymentMethodFailed": "Erstellung der Zahlungsmethode fehlgeschlagen",
+        "cardActionFailed": "Kartenaktion fehlgeschlagen",
+        "paymentIntentNotReturned": "Zahlungsabsicht nicht zurückgegeben"
+      }
     },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",

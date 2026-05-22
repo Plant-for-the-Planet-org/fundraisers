@@ -58,26 +58,20 @@ export function DashboardSummary({
       ? t('totalRaised.moreCurrencies', { count: extraCurrencies })
       : t('totalRaised.helper');
 
-  const fundraisersHelper =
-    summary.activeFundraiserCount > 0 ? (
-      <>
-        <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
-          {formatCompactNumber(summary.activeFundraiserCount, locale)}
-        </span>{' '}
-        {t('fundraisers.activeSuffix')}
-      </>
-    ) : (
-      t('fundraisers.noActive')
-    );
+  const fundraisersHelper = t.rich('fundraisers.activeStatus', {
+    count: summary.activeFundraiserCount,
+    bold: chunks => (
+      <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
+        {chunks}
+      </span>
+    ),
+  });
 
   return (
     <div className='grid gap-4 md:grid-cols-3'>
       <SummaryStatCard
         label={t('fundraisers.label')}
-        value={formatCompactNumber(
-          summary.totalFundraiserCount,
-          locale
-        )}
+        value={formatCompactNumber(summary.totalFundraiserCount, locale)}
         helper={fundraisersHelper}
       />
       <SummaryStatCard

@@ -1,9 +1,16 @@
+import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FundraiserCardSkeletonGrid } from './fundraiser-card-skeleton';
 
 export function CategoryPageSkeleton() {
+  const t = useTranslations('Explore.categoryPage');
+
   return (
-    <div className='category-page-skeleton' role='status' aria-label='Loading'>
+    <div
+      className='category-page-skeleton'
+      role='status'
+      aria-label={t('loadingAria')}
+    >
       {/* Header */}
       <div className='mb-8'>
         <div className='space-y-4'>

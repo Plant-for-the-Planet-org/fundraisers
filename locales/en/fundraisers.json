@@ -20,6 +20,12 @@
       "retry": "Try again",
       "browse": "Browse fundraisers"
     },
+    "notFound": {
+      "title": "Fundraiser Not Found",
+      "description": "The fundraiser you're looking for doesn't exist or may have been removed.",
+      "browseCta": "Browse Fundraisers",
+      "homeCta": "Go Home"
+    },
     "metadata": {
       "fallbackTitle": "Fundraiser"
     },
@@ -241,6 +247,11 @@
       },
       "contributionSettings": {
         "sectionHeading": "Contribution Settings",
+        "preview": {
+          "title": "Preview Mode",
+          "description": "{isDedicated, select, true {Would donate {amount} {frequency} (dedicated)} other {Would donate {amount} {frequency}}}",
+          "frequencyLabel": "{frequency, select, once {once} monthly {monthly} yearly {yearly} other {{frequency}}}"
+        },
         "cardHeader": "Contribution",
         "giftTitle": "Dedicate this donation",
         "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
@@ -287,7 +298,8 @@
         "buttonProcessing": "Creating Fundraiser...",
         "buttonSubmit": "Create Fundraiser",
         "successMessage": "Fundraiser created!",
-        "errorMessage": "Error"
+        "errorMessage": "Error",
+        "errorDescription": "Your fundraiser could not be created. Please check your details and try again."
       }
     },
     "edit": {
@@ -305,7 +317,8 @@
         "buttonProcessing": "Updating fundraiser...",
         "buttonSubmit": "Update fundraiser",
         "successMessage": "Fundraiser updated!",
-        "errorMessage": "Update failed"
+        "errorMessage": "Update failed",
+        "errorDescription": "Your changes could not be saved. Please try again."
       }
     },
     "copyLinkButton": {

@@ -15,6 +15,10 @@
     "notEnabled": "Stage Mode is not enabled for this fundraiser.",
     "notEnabledHint": "Update it on fundraiser settings or ask the Host.",
     "fundraiserNotFound": "Fundraiser not found.",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "topBar": {
+      "brandAlt": "Plant-for-the-Planet logo",
+      "partnerAlt": "Partner logo"
+    }
   }
 }

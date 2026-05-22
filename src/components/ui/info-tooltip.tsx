@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -17,6 +18,7 @@ export function InfoTooltip({
   className,
   iconClassName,
 }: InfoTooltipProps) {
+  const t = useTranslations('Common.aria');
   const tooltipId = useId();
   const [visible, setVisible] = useState(false);
 
@@ -45,7 +47,9 @@ export function InfoTooltip({
         }}
       >
         <Info className={cn('h-4 w-4', iconClassName)} aria-hidden='true' />
-        <span className='sr-only'>{triggerLabel ?? 'More information'}</span>
+        <span className='sr-only'>
+          {triggerLabel ?? t('moreInformation')}
+        </span>
       </span>
 
       {visible && (

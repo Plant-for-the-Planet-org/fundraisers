@@ -4,7 +4,7 @@ import type { DonationFormValues } from './donation-form-context';
 
 import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
@@ -23,6 +23,7 @@ export function DonationSummary() {
     name: 'selectedPaymentMethod',
   });
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const fundraiserImageUrl = getImageUrl(
     'fundraiser',
@@ -63,10 +64,12 @@ export function DonationSummary() {
     .filter(h => h.isPublic)
     .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
 
-  const joinedNames = publicHosts
-    .map(h => h.displayName)
-    .filter(Boolean)
-    .join(' and ');
+  const joinedNames = new Intl.ListFormat(locale, {
+    style: 'long',
+    type: 'conjunction',
+  }).format(
+    publicHosts.map(h => h.displayName).filter((n): n is string => Boolean(n))
+  );
 
   const hostText = joinedNames
     ? t('hostedBy', { hostName: joinedNames })
