@@ -33,7 +33,7 @@
       "exploreLinkText": "Spendenaufrufe entdecken"
     },
     "toolbar": {
-      "searchPlaceholder": "Name oder Ersteller...",
+      "searchPlaceholder": "Name o. Ersteller*in...",
       "resultCount": "<bold>{visible}</bold> von {total} angezeigt"
     },
     "statusFilter": {

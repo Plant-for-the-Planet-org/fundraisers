@@ -3,7 +3,7 @@
     "title": "Spendenaufrufe entdecken",
     "description": "Entdecke beliebte Aufrufe in deiner Nähe oder stöbere in den Kategorien.",
     "categories": {
-      "title": "In Kategorien stöbern",
+      "title": "Kategorien",
       "loading": "Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
