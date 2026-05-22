@@ -2,7 +2,8 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { Suspense } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatCompactNumber } from '@/lib/utils';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import { getDaysLeft } from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
@@ -61,6 +62,7 @@ export function FundraiserView({
   leaderboardFetchStrategy?: 'ssr' | 'client';
 }) {
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const workspaceName = fundraiser.workspace?.name ?? '';
   const workspaceCountry = fundraiser.workspace?.country ?? '';
@@ -99,11 +101,19 @@ export function FundraiserView({
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
         {canShowLeaderboard && (
-          <div className='hidden md:block'>
-            <DonationCountSummary
-              donationCount={fundraiser.donationCount}
-              fundraiser={fundraiser}
-            />
+          <div className='flex flex-col gap-3'>
+            <SectionHeader>
+              {t('donationCount', {
+                count: fundraiser.donationCount,
+                formattedCount: formatCompactNumber(
+                  fundraiser.donationCount,
+                  locale
+                ),
+              })}
+            </SectionHeader>
+            <Suspense fallback={<DonorsStripSkeleton />}>
+              <DonorsSummary fundraiser={fundraiser} />
+            </Suspense>
           </div>
         )}
 
