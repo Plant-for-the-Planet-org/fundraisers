@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — donate overlay (§4) fully localized in one commit: overlay aria labels, SEPA/card form error fallbacks + placeholder, address-form raw-error leak, donation-summary `' and '` joiner → `Intl.ListFormat`, and payment-method icons marked decorative (`aria-hidden`). Fundraiser detail page (§3) and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — explore page (§5) fully localized in one commit: location-category-map placeholder copy and category-page-skeleton loading aria. Donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -16,6 +16,7 @@
 - ✅ **User fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
 - ✅ **Fundraiser detail page (§3)** — not-found copy translated; contribution-settings preview alert replaced with translated sonner toast (ICU select for dedicated/frequency); create/update toasts drop raw `err.message` in favor of translated `errorDescription`; edit hook surfaces translated `loadError`; `toLocaleString()` calls in donors-preview and fundraiser-view now pass `useLocale()`.
 - ✅ **Donate overlay (§4)** — overlay aria labels translated (`Donate.overlay.aria.*`); SEPA form (5 errors + placeholder) and card form (6 errors) now read from `Donate.{sepa,card}.errors.*`; address-form drops raw `err.message` in favor of translated `saveAddressError`; donation-summary swaps `' and '` join for `Intl.ListFormat`; payment-method icons marked decorative (`aria-hidden='true'`) so the already-translated visible button text isn't double-announced.
+- ✅ **Explore page (§5)** — location-category-map placeholder copy reads from `Explore.locationMap.*` (converted to async server component); category-page-skeleton's `aria-label='Loading'` now reads from `Explore.categoryPage.loadingAria` via the sync `useTranslations` hook (safe for use as a Suspense fallback).
 
 ---
 
@@ -57,7 +58,7 @@ common.json       en: 9     de: 9     ✅
 cookie.json       en: 23    de: 23    ✅
 dashboard.json    en: 61    de: 61    ✅
 donate.json       en: 165   de: 165   ✅
-explore.json      en: 26    de: 26    ✅
+explore.json      en: 29    de: 29    ✅
 fundraisers.json  en: 209   de: 209   ✅
 leaderboard.json  en: 29    de: 29    ✅
 stage.json        en: 16    de: 16    ✅
@@ -73,7 +74,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 |---|---|---|---|
 | 1 | ✅ `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
 | 2 | ✅ `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
-| 3 | `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
+| 3 | ✅ `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
 | 4 | `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
 | 5 | `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
 | 6 | `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
@@ -190,39 +191,24 @@ Cleaned up by utility commit U1:
 
 ---
 
-## 5. Page: Explore
+## 5. Page: Explore ✅ Resolved (2026-05-22)
 
-Components under `src/components/explore/*`.
+Components under `src/components/explore/*`. Sections 5.1–5.3 landed in a single commit; section 5.4 (currency call site) remains scope for utility commit U1.
 
-### 5.1 Location Category Map — Placeholder copy
+### 5.1 Location Category Map — Placeholder copy ✅ Resolved (2026-05-22)
 
-**File:** [src/components/explore/location-category-map.tsx:7-8](../src/components/explore/location-category-map.tsx#L7-L8)
+Converted to async server component using `getTranslations`; both lines now read from `Explore.locationMap.{title, comingSoon}`. Component is currently commented out in `category-page-loader.tsx` but the placeholder copy was still translated per "every user-facing string must be localized."
 
-```tsx
-<p className='text-lg font-medium mb-2'>Map View</p>
-<p className='text-sm'>Interactive map coming soon</p>
-```
+### 5.2 Category Page Skeleton — Loading aria ✅ Resolved (2026-05-22)
 
-**Fix:** `Explore.locationMap.{title, comingSoon}` — even temporary copy must be translated.
+`aria-label` now reads from `Explore.categoryPage.loadingAria` via the sync `useTranslations` hook (next-intl v4 runs it in server components). Kept the component sync because it's used as a `<Suspense fallback>`, where async server components are unsafe. Picked a namespace-scoped key over `Common.aria.loading` (which doesn't exist yet) to keep this commit's scope tight.
 
-### 5.2 Category Page Skeleton — Loading aria
+### 5.3 Missing Keys ✅ Added (2026-05-22)
 
-**File:** [src/components/explore/category-page-skeleton.tsx:6](../src/components/explore/category-page-skeleton.tsx#L6)
-
-```tsx
-<div className='category-page-skeleton' role='status' aria-label='Loading'>
-```
-
-**Why:** Sibling skeletons use `t('loading')` (Dashboard.list.item.loading, Dashboard.summary.loading) — this one is inconsistent.
-
-**Fix:** `Explore.categoryPage.loadingAria` or reuse `Common.aria.loading`.
-
-### 5.3 Missing Keys
-
-| Key | File |
-|---|---|
-| `Explore.locationMap.{title, comingSoon}` | `explore.json` |
-| `Explore.categoryPage.loadingAria` | `explore.json` |
+| Key | File | Status |
+|---|---|---|
+| ~~`Explore.locationMap.{title, comingSoon}`~~ | `explore.json` | ✅ Added |
+| ~~`Explore.categoryPage.loadingAria`~~ | `explore.json` | ✅ Added |
 
 ### 5.4 Notes — Currency call site on this page
 
