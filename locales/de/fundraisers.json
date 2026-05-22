@@ -103,7 +103,7 @@
       "title": {
         "label": "Name des Spendenaufrufs",
         "placeholder": "z.B. Mache meinen Geburtstag zu einem Wald",
-        "helper": "Der Name erscheint in der Vorschau für das Teilen, in E-Mails und oben auf der Seite.\nSei konkret.",
+        "helper": "Der Name erscheint in der Vorschau für das Teilen, in E-Mails und oben auf der Seite. Sei konkret.",
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Aufrufs darf nicht länger als {max, number} Zeichen lang sein."
@@ -298,7 +298,7 @@
       "unauthorizedDescription": "Nur die Ersteller des Spendenaufrufs können ihn bearbeiten.",
       "loadError": "Spendenaufruf konnte nicht geladen werden",
       "errorTitle": "Etwas ist schief gelaufen",
-      "errorDescription": "Ein unerwarteter Fehler ist aufgetreten. Versuche es nochmal.",
+      "errorDescription": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut.",
       "invalidUrlDescription": "Daten konnten nicht abgerufen werden. Die Fundraiser-URL ({slug}) ist möglicherweise nicht gültig. Du kannst uns unter support@plant-for-the-planet.org erreichen",
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
