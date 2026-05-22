@@ -13,6 +13,7 @@
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Erstellt von",
+    "hostsStripNames": "{names}{remaining, plural, =0 {} one { und # weitere} other { und # weitere}}",
     "error": {
       "title": "Etwas ist schief gelaufen",
       "description": "Dieser Spendenaufruf konnte nicht geladen werden. Bitte versuche es nochmal, oder durchstöbere andere Spendenaufrufe.",

@@ -26,6 +26,30 @@ import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader
 import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
 import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
 
+function DonationCountSummary({
+  donationCount,
+  fundraiser,
+}: {
+  donationCount: number;
+  fundraiser: Fundraiser;
+}) {
+  const t = useTranslations('Fundraisers');
+
+  return (
+    <div className='flex flex-col gap-3'>
+      <SectionHeader>
+        {t('donationCount', {
+          count: donationCount,
+          formattedCount: donationCount.toLocaleString(),
+        })}
+      </SectionHeader>
+      <Suspense fallback={<DonorsStripSkeleton />}>
+        <DonorsSummary fundraiser={fundraiser} />
+      </Suspense>
+    </div>
+  );
+}
+
 export function FundraiserView({
   fundraiser,
   paymentOptions,
@@ -63,6 +87,9 @@ export function FundraiserView({
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
 
+        {/* Title */}
+        <TitleDisplay className='md:hidden' value={fundraiser.title} />
+
         {/* Goal progress */}
         <GoalProgressDisplay
           raisedAmount={fundraiser.totalRaised}
@@ -92,13 +119,18 @@ export function FundraiserView({
 
         {/* Hosts */}
         <Hosts mode='display' fundraiser={fundraiser} />
+
         {/** Copy link */}
-        {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        {fundraiser.visibility === 'public' && (
+          <div className='hidden md:block'>
+            <CopyLinkButton />
+          </div>
+        )}
       </SidebarPanel>
 
       <MainPanel>
         {/* Title */}
-        <TitleDisplay value={fundraiser.title} />
+        <TitleDisplay className='hidden md:block' value={fundraiser.title} />
 
         {/* Leaderboard */}
         {canShowLeaderboard &&
@@ -150,6 +182,21 @@ export function FundraiserView({
           bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
         />
       </MainPanel>
+
+      {(canShowLeaderboard || fundraiser.visibility === 'public') && (
+        <div className='md:hidden flex flex-col gap-6'>
+          {/* Donation count + donor avatars (only when leaderboard module is on) */}
+          {canShowLeaderboard && (
+            <DonationCountSummary
+              donationCount={fundraiser.donationCount}
+              fundraiser={fundraiser}
+            />
+          )}
+
+          {/** Copy link */}
+          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        </div>
+      )}
     </FundraiserLayout>
   );
 }
