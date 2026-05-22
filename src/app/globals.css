@@ -63,7 +63,7 @@
   --radius-lg: var(--radius);
 
   /* Breakpoints */
-  --breakpoint-xs: 425px;
+  --breakpoint-xs: 475px;
 }
 
 :root {
