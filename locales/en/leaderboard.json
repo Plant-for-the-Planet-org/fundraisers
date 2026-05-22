@@ -23,6 +23,7 @@
       }
     },
     "view": {
+      "title": "Leaderboard",
       "donation": {
         "anonymous": "Anonymous"
       },

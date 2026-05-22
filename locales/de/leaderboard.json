@@ -23,6 +23,7 @@
       }
     },
     "view": {
+      "title": "Bestenliste",
       "donation": {
         "anonymous": "Anonym"
       },
