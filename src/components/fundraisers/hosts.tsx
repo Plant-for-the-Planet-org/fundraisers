@@ -16,20 +16,11 @@ const MAX_STRIP_NAMED = 3;
 
 type HostProps =
   | { mode: 'preview' }
-  | {
-      mode: 'display';
-      fundraiser: Fundraiser;
-      variant?: 'list' | 'strip';
-    };
+  | { mode: 'display'; fundraiser: Fundraiser };
 
 export function Hosts(props: HostProps) {
   if (props.mode === 'display') {
-    return (
-      <FundraiserHosts
-        fundraiser={props.fundraiser}
-        variant={props.variant ?? 'strip'}
-      />
-    );
+    return <FundraiserHosts fundraiser={props.fundraiser} />;
   }
 
   return <HostsPreview />;
@@ -105,9 +96,7 @@ function HostsStripDisplay({
   if (hosts.length === 0) return null;
 
   const avatarHosts = hosts.slice(0, MAX_STRIP_AVATARS);
-  const displayNames = hosts
-    .slice(0, MAX_STRIP_NAMED)
-    .map(h => h.name.split(' ')[0] ?? h.name);
+  const displayNames = hosts.slice(0, MAX_STRIP_NAMED).map(h => h.name);
   const remaining = Math.max(0, hosts.length - displayNames.length);
 
   const namesText = t('hostsStripNames', {
@@ -143,13 +132,7 @@ function HostsStripDisplay({
   );
 }
 
-function FundraiserHosts({
-  fundraiser,
-  variant,
-}: {
-  fundraiser: Fundraiser;
-  variant: 'list' | 'strip';
-}) {
+function FundraiserHosts({ fundraiser }: { fundraiser: Fundraiser }) {
   const t = useTranslations('Fundraisers');
 
   const publicHosts = fundraiser.hosts.filter(host => host.isPublic);
@@ -163,11 +146,16 @@ function FundraiserHosts({
       : null,
   }));
 
-  if (variant === 'strip') {
-    return <HostsStripDisplay hosts={hosts} />;
-  }
-
-  return <HostsListDisplay hosts={hosts} />;
+  return (
+    <>
+      <div className='md:hidden'>
+        <HostsStripDisplay hosts={hosts} />
+      </div>
+      <div className='hidden md:block'>
+        <HostsListDisplay hosts={hosts} />
+      </div>
+    </>
+  );
 }
 
 function HostsPreview() {

@@ -107,13 +107,8 @@ export function FundraiserView({
           </div>
         )}
 
-        {/* Hosts — strip on mobile, list on desktop */}
-        <div className='md:hidden'>
-          <Hosts mode='display' fundraiser={fundraiser} variant='strip' />
-        </div>
-        <div className='hidden md:block'>
-          <Hosts mode='display' fundraiser={fundraiser} variant='list' />
-        </div>
+        {/* Hosts */}
+        <Hosts mode='display' fundraiser={fundraiser} />
 
         {/** Copy link */}
         {fundraiser.visibility === 'public' && (
