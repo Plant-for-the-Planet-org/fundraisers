@@ -40,6 +40,7 @@ const eslintConfig = defineConfig([
               '^@/lib/',
               '^@/stores/',
               '^@/components/',
+              '^@/', // remaining internal paths (@/i18n/, @/hooks/, etc.)
               '^\\.\\.', // relative parent (../)
               '^\\./', // relative sibling (./)
             ],

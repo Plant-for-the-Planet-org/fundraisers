@@ -5,8 +5,8 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useEffect, useState } from 'react';
 import { platformFetch } from '@/lib/api/platform-fetch';
 import {
-  STAGE_POLL_INTERVAL_MS,
   msUntilNextBucket,
+  STAGE_POLL_INTERVAL_MS,
   stageHash,
 } from '../stage-hash';
 
