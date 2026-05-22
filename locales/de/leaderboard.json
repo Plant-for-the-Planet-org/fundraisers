@@ -1,7 +1,7 @@
 {
   "Leaderboard": {
     "form": {
-      "sectionHeading": "Bestenliste",
+      "sectionHeading": "Bestenlisten-Einstellungen",
       "labels": {
         "enableLeaderboard": "Bestenliste aktivieren",
         "openSettings": "Einstellungen für die Bestenliste",
@@ -23,6 +23,8 @@
       }
     },
     "view": {
+      "title": "Bestenliste",
+      "titleRecent": "Neueste Spenden",
       "donation": {
         "anonymous": "Anonym"
       },
