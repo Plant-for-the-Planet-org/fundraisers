@@ -7,6 +7,7 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
+import { PROVIDER_DISPLAY_NAMES } from '@/lib/utils/payment-methods';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useDonationForm } from './donation-form-context';
@@ -20,7 +21,7 @@ export function DonateOptions() {
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
   const t = useTranslations('Fundraisers');
 
-  const { feeCollectionEnabled, hasProcessingFee, processingFeeCents } =
+  const { feeCollectionEnabled, hasProcessingFee, processingFeeCents, selectedMethod } =
     useMemo(() => {
       return getDonationProcessingFeeInfo({
         paymentOptions,
@@ -37,9 +38,16 @@ export function DonateOptions() {
       selectedPaymentMethod,
     ]);
 
+  const paymentProviderName = selectedMethod
+    ? (PROVIDER_DISPLAY_NAMES[selectedMethod.provider] ?? selectedMethod.provider)
+    : '';
+
   const isInitiallyOneTime = donationData.frequency === 'once';
   const showCoverFees =
-    feeCollectionEnabled && hasProcessingFee && isInitiallyOneTime;
+    feeCollectionEnabled &&
+    hasProcessingFee &&
+    isInitiallyOneTime &&
+    !!paymentProviderName;
   const showMakeMonthly =
     paymentOptions.recurrency.supported && isInitiallyOneTime;
 
@@ -75,10 +83,11 @@ export function DonateOptions() {
                   processingFeeCents,
                   donationData.currency
                 ),
+                providerName: paymentProviderName,
               })}
             </label>
             <InfoTooltip
-              content={t('donate.options.coverFeesTooltip')}
+              content={t('donate.options.coverFeesTooltip', { providerName: paymentProviderName })}
               triggerLabel={t('donate.options.coverFeesTooltipTriggerLabel')}
               className='mt-0.5'
             />

@@ -9,6 +9,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
+import { PROVIDER_DISPLAY_NAMES } from '@/lib/utils/payment-methods';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
@@ -99,21 +100,27 @@ export function DonationSummary() {
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
   const isYearly = donationData.frequency === 'yearly';
-  const { hasProcessingFee, processingFeeCents } = useMemo(() => {
-    return getDonationProcessingFeeInfo({
+  const { hasProcessingFee, processingFeeCents, selectedMethod } =
+    useMemo(() => {
+      return getDonationProcessingFeeInfo({
+        paymentOptions,
+        donationAmountCents: donationData.amountCents,
+        donationCurrency: donationData.currency,
+        workspaceCountry: fundraiser.workspace?.country,
+        selectedPaymentMethod,
+      });
+    }, [
+      donationData.amountCents,
+      donationData.currency,
+      fundraiser.workspace?.country,
       paymentOptions,
-      donationAmountCents: donationData.amountCents,
-      donationCurrency: donationData.currency,
-      workspaceCountry: fundraiser.workspace?.country,
       selectedPaymentMethod,
-    });
-  }, [
-    donationData.amountCents,
-    donationData.currency,
-    fundraiser.workspace?.country,
-    paymentOptions,
-    selectedPaymentMethod,
-  ]);
+    ]);
+
+  const paymentProviderName = selectedMethod
+    ? (PROVIDER_DISPLAY_NAMES[selectedMethod.provider] ??
+      selectedMethod.provider)
+    : '';
 
   const totalCents =
     donationData.amountCents +
@@ -148,10 +155,12 @@ export function DonationSummary() {
             </dd>
           </div>
         ))}
-        {willAbsorbFee && hasProcessingFee && (
+        {willAbsorbFee && hasProcessingFee && paymentProviderName && (
           <div className='flex justify-between items-baseline gap-2'>
             <dt className='text-muted-foreground text-sm'>
-              {t('donate.summary.processingFee')}
+              {t('donate.summary.processingFee', {
+                providerName: paymentProviderName,
+              })}
             </dt>
             <dd className='text-foreground text-sm font-medium'>
               {formatCurrency(processingFeeCents, donationData.currency)}

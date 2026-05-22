@@ -11,6 +11,13 @@ import {
 } from '@/lib/utils/payment-method-normalizer';
 import { getProcessingFee } from '@/lib/utils/processing-fees';
 
+export const PROVIDER_DISPLAY_NAMES: Partial<
+  Record<PaymentMethodProvider, string>
+> = {
+  stripe: 'Stripe',
+  paypal: 'PayPal',
+};
+
 interface PaymentMethodContext {
   country: string;
   currency: string;
