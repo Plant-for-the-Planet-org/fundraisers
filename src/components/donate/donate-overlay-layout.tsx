@@ -15,7 +15,7 @@ export function DonateOverlayLayout({
   const tDonate = useTranslations('Donate');
   return (
     <div
-      className='fixed inset-0 z-50 bg-gray-50 overflow-auto'
+      className='light fixed inset-0 z-50 bg-gray-50 text-foreground overflow-auto'
       role='dialog'
       aria-modal='true'
       aria-label={tDonate('overlay.aria.label')}

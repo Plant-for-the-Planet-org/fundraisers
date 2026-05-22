@@ -60,7 +60,7 @@ export function AddressSelector() {
 
         <SelectContent
           position='popper'
-          className='border border-gray-300 rounded-md shadow-sm'
+          className='light border border-gray-300 rounded-md shadow-sm bg-popover text-popover-foreground'
         >
           {profile.addresses.map(addr => (
             <SelectItem key={addr.id} value={addr.id}>
