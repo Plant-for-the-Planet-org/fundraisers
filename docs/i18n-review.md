@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-21 — fundraiser detail page (§3) fully localized in one commit; doc restructured to group issues by page for one-commit-per-page execution. Impersonation modal, banner, and user-menu strings already localized (commit `7496821`).
+> **Last updated:** 2026-05-22 — donate overlay (§4) fully localized in one commit: overlay aria labels, SEPA/card form error fallbacks + placeholder, address-form raw-error leak, donation-summary `' and '` joiner → `Intl.ListFormat`, and payment-method icons marked decorative (`aria-hidden`). Fundraiser detail page (§3) and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -15,6 +15,7 @@
 - ✅ **Impersonation validation errors** — all `setError` paths now route through translated keys under `Auth.impersonation.errors`.
 - ✅ **User fallback** — `displayName || 'User'` now uses `Auth.impersonation.userDefault`.
 - ✅ **Fundraiser detail page (§3)** — not-found copy translated; contribution-settings preview alert replaced with translated sonner toast (ICU select for dedicated/frequency); create/update toasts drop raw `err.message` in favor of translated `errorDescription`; edit hook surfaces translated `loadError`; `toLocaleString()` calls in donors-preview and fundraiser-view now pass `useLocale()`.
+- ✅ **Donate overlay (§4)** — overlay aria labels translated (`Donate.overlay.aria.*`); SEPA form (5 errors + placeholder) and card form (6 errors) now read from `Donate.{sepa,card}.errors.*`; address-form drops raw `err.message` in favor of translated `saveAddressError`; donation-summary swaps `' and '` join for `Intl.ListFormat`; payment-method icons marked decorative (`aria-hidden='true'`) so the already-translated visible button text isn't double-announced.
 
 ---
 
@@ -55,7 +56,7 @@ bundles.json      en: 72    de: 72    ✅
 common.json       en: 9     de: 9     ✅
 cookie.json       en: 23    de: 23    ✅
 dashboard.json    en: 61    de: 61    ✅
-donate.json       en: 152   de: 152   ✅
+donate.json       en: 165   de: 165   ✅
 explore.json      en: 26    de: 26    ✅
 fundraisers.json  en: 209   de: 209   ✅
 leaderboard.json  en: 29    de: 29    ✅
@@ -71,7 +72,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | # | Commit | Scope | Section |
 |---|---|---|---|
 | 1 | ✅ `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
-| 2 | `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
+| 2 | ✅ `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
 | 3 | `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
 | 4 | `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
 | 5 | `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
@@ -142,87 +143,41 @@ These call sites omit `locale` and will be cleaned up by utility commit U1 ([§1
 
 ---
 
-## 4. Page: Donate Overlay
+## 4. Page: Donate Overlay ✅ Resolved (2026-05-22)
 
-Components under `src/components/donate/*`.
+Components under `src/components/donate/*`. Sections 4.1–4.7 landed in a single commit; section 4.8 (currency call sites) remains scope for utility commit U1.
 
-### 4.1 Overlay Layout — Aria labels
+### 4.1 Overlay Layout — Aria labels ✅ Resolved (2026-05-22)
 
-**File:** [src/components/donate/donate-overlay-layout.tsx:19,25](../src/components/donate/donate-overlay-layout.tsx#L19-L25)
+`donate-overlay-layout.tsx` now reads both aria labels from `Donate.overlay.aria.{label, close}` via `useTranslations('Donate')`.
 
-```tsx
-aria-label='donation details'
-aria-label='Close donation overlay'
-```
+### 4.2 Stripe SEPA Form — Validation errors & placeholder ✅ Resolved (2026-05-22)
 
-**Fix:** `tDonate('overlay.aria.label')`, `tDonate('overlay.aria.close')`.
+All 6 hardcoded strings in `stripe-sepa-form.tsx` (5 error fallbacks + the `'Jane Doe'` placeholder) now read from `Donate.sepa.errors.*` and `Donate.sepa.accountHolderNamePlaceholder`. German placeholder uses `'Erika Mustermann'`.
 
-### 4.2 Stripe SEPA Form — Validation errors & placeholder
+### 4.3 Stripe Card Form — Error fallbacks ✅ Resolved (2026-05-22)
 
-**File:** [src/components/donate/stripe-sepa-form.tsx](../src/components/donate/stripe-sepa-form.tsx)
+Card form errors now read from `Donate.card.errors.{validationFailed, stripeNotInitialized, cardElementNotFound, paymentMethodFailed, cardActionFailed, paymentIntentNotReturned}`. The wider error set (beyond the 2 in the original review) was added while at the file.
 
-| Line | Hardcoded |
-|---|---|
-| 72 | `return { error: 'Validation failed' }` |
-| 74 | `return { error: 'Stripe not initialized' }` |
-| 76 | `return { error: 'IBAN element not found' }` |
-| 96 | `error.message ?? 'Payment method creation failed'` |
-| 101 | `return { error: 'Stripe not initialized' }` |
-| 133 | `placeholder='Jane Doe'` |
+### 4.4 Address Form — Raw error in UI ✅ Resolved (2026-05-22)
 
-**Fix:** `Donate.sepa.errors.*` and `Donate.sepa.accountHolderNamePlaceholder`.
+User-facing `saveAddressError` now always uses the translated `Donate.userAddress.saveAddressError` string (key already existed). Raw error is logged via `console.error` for diagnostics — same pattern as [§3.3](#33-create--update-fundraiser-buttons--raw-error-in-toast-description).
 
-### 4.3 Stripe Card Form — Error fallbacks
+### 4.5 Donation Summary — Hardcoded `' and '` joiner ✅ Resolved (2026-05-22)
 
-**File:** [src/components/donate/stripe-card-form.tsx:164,172](../src/components/donate/stripe-card-form.tsx#L164-L172)
+Replaced `' and '` join with inline `Intl.ListFormat(locale, { style: 'long', type: 'conjunction' })` (matching the existing pattern in [`fundraiser-list-item.tsx:38`](../src/components/dashboard/fundraiser-list-item.tsx#L38)). Threaded `useLocale()` into the component. When utility commit U3 ([§11.3](#113-joinnames-helper-via-intllistformat)) extracts the shared `joinNames` helper, both call sites become a one-line swap.
 
-```ts
-return { error: error.message ?? 'Payment method creation failed' };
-if (error) return { error: error.message ?? 'Card action failed' };
-```
+### 4.6 Donation Method Icons — Aria labels ✅ Resolved (2026-05-22)
 
-**Fix:** `Donate.card.errors.{paymentMethodFailed, cardActionFailed}`.
+These icons are only rendered inside `<PaymentMethodOption>` next to a visible text label (`<span>{methodLabel}</span>`), so any `aria-label` on the icon would double-announce ("Apple Pay, Apple Pay"). Fix: marked all six icons (`ApplePayIcon`, `BankIcon`, `CreditCard`, `GooglePayIcon`, `PaypalIcon`, `SepaIcon`) as decorative (`aria-hidden='true'`) and dropped their `role='img'` + `aria-label`. The visible button text — already translated via `Fundraisers.donate.paymentMethods.methods.*` — is what screen readers announce. Also resolves the inconsistency in `BankIcon` where `aria-hidden='true'` and `aria-label='Bank Transfer'` both existed (aria-hidden won; the label was dead code).
 
-### 4.4 Address Form — Raw error in UI
+### 4.7 Missing Keys ✅ Added (2026-05-22)
 
-**File:** [src/components/donate/address-form.tsx:75-77](../src/components/donate/address-form.tsx#L75-L77)
-
-Surfaces raw `err.message` — same pattern as [§3.3](#33-create--update-fundraiser-buttons--raw-error-in-toast-description).
-
-### 4.5 Donation Summary — Hardcoded `' and '` joiner
-
-**File:** [src/components/donate/donation-summary.tsx:69](../src/components/donate/donation-summary.tsx#L69)
-
-```ts
-const joinedNames = publicHosts.map(h => h.displayName).filter(Boolean).join(' and ');
-```
-
-**Why:** `' and '` is English-only; German expects `' und '`. Locale-aware joining already exists in [`fundraiser-list-item.tsx:38`](../src/components/dashboard/fundraiser-list-item.tsx#L38) using `Intl.ListFormat`.
-
-**Fix:** Use the shared `joinNames(names, locale)` helper from utility commit U3 ([§11.3](#113-joinnames-helper-via-intllistformat)). If U3 lands first, this is a one-line swap.
-
-### 4.6 Donation Method Icons — Aria labels
-
-**Files:**
-
-- [ApplePayIcon.tsx:15](../src/components/icons/donation/ApplePayIcon.tsx#L15) → `'Apple Pay'`
-- [BankIcon.tsx:15](../src/components/icons/donation/BankIcon.tsx#L15) → `'Bank Transfer'` ⚠️
-- [CreditCard.tsx:11](../src/components/icons/donation/CreditCard.tsx#L11) → `'Credit Card'` ⚠️
-- [GooglePayIcon.tsx:15](../src/components/icons/donation/GooglePayIcon.tsx#L15) → `'Google Pay'`
-- [PaypalIcon.tsx:11](../src/components/icons/donation/PaypalIcon.tsx#L11) → `'PayPal'`
-- [SepaIcon.tsx:11](../src/components/icons/donation/SepaIcon.tsx#L11) → `'SEPA Direct Debit'` ⚠️
-
-**Why:** Brand names (PayPal, Apple Pay, Google Pay) can stay; "Bank Transfer", "Credit Card", "SEPA Direct Debit" must be translated.
-
-**Fix:** Accept `aria-label` as a prop — parent [`payment-methods.tsx`](../src/components/donate/payment-methods.tsx) already translates method names; pass them down.
-
-### 4.7 Missing Keys
-
-| Key | File |
-|---|---|
-| `Donate.overlay.aria.{label, close}` | `donate.json` |
-| `Donate.sepa.{accountHolderNamePlaceholder, errors.*}` | `donate.json` |
-| `Donate.card.errors.{paymentMethodFailed, cardActionFailed}` | `donate.json` |
+| Key | File | Status |
+|---|---|---|
+| ~~`Donate.overlay.aria.{label, close}`~~ | `donate.json` | ✅ Added in §4.1 |
+| ~~`Donate.sepa.{accountHolderNamePlaceholder, errors.*}`~~ | `donate.json` | ✅ Added in §4.2 |
+| ~~`Donate.card.errors.{paymentMethodFailed, cardActionFailed}`~~ | `donate.json` | ✅ Added in §4.3 |
 
 ### 4.8 Notes — Currency call sites on this page
 
