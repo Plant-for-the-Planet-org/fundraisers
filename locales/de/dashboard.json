@@ -86,7 +86,7 @@
         "byHost": "von {host}",
         "goalProgress": "<b>{achievedAmount}</b> von {goal}",
         "donations": "{count, plural, =0 {0 Spenden} one {1 Spende} other {# Spenden}}",
-        "daysLeft": "{count, plural, one {1 Tag übrig} other {# Tage übrig}}",
+        "daysLeft": "{count, number}T übrig",
         "ended": "Beendet"
       },
       "empty": {

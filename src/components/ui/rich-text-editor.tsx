@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { TextStyle } from '@tiptap/extension-text-style';
-import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
@@ -99,7 +98,6 @@ export function RichTextEditor({
       Placeholder.configure({
         placeholder,
       }),
-      Underline,
       TextStyle,
     ],
     content: value,

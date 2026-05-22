@@ -7,8 +7,7 @@ import type {
 
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, ChevronDown, ListFilter } from 'lucide-react';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
-import { cn } from '@/lib/utils/index';
+import { cn, formatCompactNumber } from '@/lib/utils/index';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -69,7 +68,7 @@ export function FundraiserStatusFilter({
                   : 'bg-background/70 text-muted-foreground'
               )}
             >
-              {getLocalizedAbbreviatedCount(statusCounts[option], locale)}
+              {formatCompactNumber(statusCounts[option], locale)}
             </span>
           </ToggleGroupItem>
         ))}
@@ -94,7 +93,7 @@ export function FundraiserStatusFilter({
                 {t(value)}
               </span>
               <span className='inline-flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-xs font-medium text-muted-foreground'>
-                {getLocalizedAbbreviatedCount(statusCounts[value], locale)}
+                {formatCompactNumber(statusCounts[value], locale)}
               </span>
             </span>
             <ChevronDown className='ml-2 h-4 w-4 shrink-0' aria-hidden='true' />
@@ -122,7 +121,7 @@ export function FundraiserStatusFilter({
                 </span>
                 <span className='flex-1'>{t(option)}</span>
                 <span className='inline-flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-xs font-medium text-muted-foreground'>
-                  {statusCounts[option].toLocaleString(locale)}
+                  {formatCompactNumber(statusCounts[option], locale)}
                 </span>
               </DropdownMenuItem>
             );
