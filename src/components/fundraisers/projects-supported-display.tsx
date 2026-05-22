@@ -17,19 +17,16 @@ const DESCRIPTION_TRUNCATION_THRESHOLD = 180;
 
 interface ProjectItemProps {
   project: ProjectAllocation['project'];
-  percentage: number;
   enrichedProject: ProjectData;
   getCountryLabel: (code: string) => string;
 }
 
 function ProjectItem({
   project,
-  percentage,
   enrichedProject,
   getCountryLabel,
 }: ProjectItemProps) {
   const t = useTranslations('Fundraisers.form.projectSelection');
-  const tBundles = useTranslations('Bundles.custom');
   const [isExpanded, setIsExpanded] = useState(false);
 
   const imageSource = getImageUrl('project', 'small', project.image);
@@ -37,10 +34,9 @@ function ProjectItem({
   const needsTruncation = description.length > DESCRIPTION_TRUNCATION_THRESHOLD;
   const descriptionId = `project-description-${project.id}`;
 
-  const countryCode = enrichedProject.country;
-  const countryLabel = countryCode ? getCountryLabel(countryCode) : '';
-  const allocationLabel = tBundles('allocationLabel', { percentage });
-  const meta = [countryLabel, allocationLabel].filter(Boolean).join(' · ');
+  const countryLabel = enrichedProject.country
+    ? getCountryLabel(enrichedProject.country)
+    : '';
 
   return (
     <li className='project-item flex gap-4'>
@@ -62,7 +58,9 @@ function ProjectItem({
         <h3 className='text-foreground text-base font-semibold leading-tight'>
           {project.name}
         </h3>
-        {meta && <p className='text-sm text-foreground'>{meta}</p>}
+        {countryLabel && (
+          <p className='text-sm text-foreground'>{countryLabel}</p>
+        )}
         {description && (
           <div className='flex flex-col gap-1 items-start'>
             <p
@@ -143,11 +141,10 @@ export function ProjectsSupportedDisplay({
         {t('viewModeSectionHeading')}
       </SectionHeader>
       <ul className='space-y-4'>
-        {projectAllocations.map(({ project, percentage }) => (
+        {projectAllocations.map(({ project }) => (
           <ProjectItem
             key={project.id}
             project={project}
-            percentage={percentage}
             enrichedProject={getProject(project.id)}
             getCountryLabel={getCountryLabel}
           />
