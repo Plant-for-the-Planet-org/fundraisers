@@ -72,6 +72,8 @@ function HostsListDisplay({
           </div>
         ) : (
           hosts.map((host, i) => (
+            // Seed falls back to name when id is missing; two hosts sharing a
+            // name (without ids) will get the same tree icon.
             <SingleHost
               key={host.id ?? i}
               name={host.name}
