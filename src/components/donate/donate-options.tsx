@@ -17,7 +17,6 @@ export function DonateOptions() {
     control,
     name: 'selectedPaymentMethod',
   });
-  const makeMonthly = useWatch({ control, name: 'makeMonthly' });
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
   const t = useTranslations('Fundraisers');
 
@@ -38,14 +37,15 @@ export function DonateOptions() {
       selectedPaymentMethod,
     ]);
 
-  const isOneTime = donationData.frequency === 'once' && !makeMonthly;
-  const showCoverFees = feeCollectionEnabled && hasProcessingFee && isOneTime;
+  const isInitiallyOneTime = donationData.frequency === 'once';
+  const showCoverFees =
+    feeCollectionEnabled && hasProcessingFee && isInitiallyOneTime;
   const showMakeMonthly =
-    paymentOptions.recurrency.supported && donationData.frequency === 'once';
+    paymentOptions.recurrency.supported && isInitiallyOneTime;
 
   useEffect(() => {
-    if (!isOneTime) setValue('willAbsorbFee', false);
-  }, [isOneTime, setValue]);
+    if (!isInitiallyOneTime) setValue('willAbsorbFee', false);
+  }, [isInitiallyOneTime, setValue]);
 
   if (!showCoverFees && !showMakeMonthly) return null;
 
