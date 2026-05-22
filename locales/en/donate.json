@@ -209,7 +209,7 @@
         }
       },
       "message": {
-        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
+        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days via pp.eco/profile.",
         "paymentProcessing": {
           "processing": "Your payment is being processed. You will receive an email when it is confirmed.",
           "failed": "Unfortunately, your payment was unsuccessful. Please try again or use a different payment method.",
