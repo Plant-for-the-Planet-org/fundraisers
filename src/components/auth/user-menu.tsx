@@ -96,11 +96,6 @@ export function UserMenu() {
               <span className='text-xs leading-normal text-muted-foreground truncate max-w-full'>
                 {userEmail}
               </span>
-              {profile?.type && (
-                <span className='text-xs leading-normal text-muted-foreground capitalize'>
-                  {profile.type}
-                </span>
-              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
