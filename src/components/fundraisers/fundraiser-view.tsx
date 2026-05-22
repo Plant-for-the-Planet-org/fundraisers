@@ -98,14 +98,14 @@ export function FundraiserView({
         />
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
-        <div className='hidden md:block'>
-          {canShowLeaderboard && (
+        {canShowLeaderboard && (
+          <div className='hidden md:block'>
             <DonationCountSummary
               donationCount={fundraiser.donationCount}
               fundraiser={fundraiser}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Hosts — strip on mobile, list on desktop */}
         <div className='md:hidden'>
@@ -116,9 +116,11 @@ export function FundraiserView({
         </div>
 
         {/** Copy link */}
-        <div className='hidden md:block'>
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
-        </div>
+        {fundraiser.visibility === 'public' && (
+          <div className='hidden md:block'>
+            <CopyLinkButton />
+          </div>
+        )}
       </SidebarPanel>
 
       <MainPanel>
@@ -174,18 +176,20 @@ export function FundraiserView({
         />
       </MainPanel>
 
-      <div className='md:hidden flex flex-col gap-6'>
-        {/* Donation count + donor avatars (only when leaderboard module is on) */}
-        {canShowLeaderboard && (
-          <DonationCountSummary
-            donationCount={fundraiser.donationCount}
-            fundraiser={fundraiser}
-          />
-        )}
+      {(canShowLeaderboard || fundraiser.visibility === 'public') && (
+        <div className='md:hidden flex flex-col gap-6'>
+          {/* Donation count + donor avatars (only when leaderboard module is on) */}
+          {canShowLeaderboard && (
+            <DonationCountSummary
+              donationCount={fundraiser.donationCount}
+              fundraiser={fundraiser}
+            />
+          )}
 
-        {/** Copy link */}
-        {fundraiser.visibility === 'public' && <CopyLinkButton />}
-      </div>
+          {/** Copy link */}
+          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        </div>
+      )}
     </FundraiserLayout>
   );
 }
