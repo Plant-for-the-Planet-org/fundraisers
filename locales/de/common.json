@@ -3,6 +3,10 @@
     "greeting": "Hallo, Welt!",
     "welcome": "Willkommen bei unserer Anwendung.",
     "languageSelectionLabel": "Sprache:",
+    "metadata": {
+      "title": "Spendenaufrufe",
+      "description": "Spendenplattform"
+    },
     "actions": {
       "close": "Schließen"
     },

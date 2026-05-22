@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — shared chrome (§9) fully localized in one commit: dialog Close text, info-tooltip default fallback, header/footer aria labels, header brand label, footer logo alts; dropped the unused diagnostic `message` field from `ImageUploadError`. Stage (§7), dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — app-level (§10) closed out in one commit: root-layout metadata reads from `Common.metadata.*`, the Next.js scaffold logo is now decorative (`alt=''`), and the sentry-test page is gated behind `NODE_ENV !== 'production'` (split into a server-component gate + client child). Shared chrome (§9), stage (§7), dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -20,6 +20,7 @@
 - ✅ **Dashboard (§6)** — dashboard-summary's active-fundraisers helper now uses a single ICU rich-text plural (`Dashboard.summary.fundraisers.activeStatus`) instead of a JS `> 0` branch + count/suffix concat; fundraiser-search-input's `aria-label` reads from a distinct `Dashboard.toolbar.searchAria` key.
 - ✅ **Stage (§7)** — `stage-top-bar.tsx` brand + partner `<img alt>` attributes now read from `Stage.topBar.{brandAlt, partnerAlt}` (EN adds "logo" for screen-reader context; DE uses `"…-Logo"` / `"Partnerlogo"`).
 - ✅ **Shared chrome (§9)** — dialog primitive's Close text (sr-only + visible button), info-tooltip's English `'More information'` fallback, header/footer nav `aria-label`s, header logo brand label, and footer partner `<img alt>` strings all moved to `Common.{actions,aria,brand,partners}.*`. Also dropped the unused diagnostic `message` field from `ImageUploadError` (UI already routed via `error.code`).
+- ✅ **App-level (§10)** — root-layout `generateMetadata` now uses `getTranslations('Common.metadata')`; home-page Next.js scaffold logo set to `alt=''` (decorative); sentry-test page gated behind `NODE_ENV !== 'production'` via a server-component shell that calls `notFound()`, with the interactive UI extracted to `sentry-test-client.tsx`.
 
 ---
 
@@ -57,7 +58,7 @@
 ```
 auth.json         en: 17    de: 17    ✅
 bundles.json      en: 72    de: 72    ✅
-common.json       en: 16    de: 16    ✅
+common.json       en: 18    de: 18    ✅
 cookie.json       en: 23    de: 23    ✅
 dashboard.json    en: 61    de: 61    ✅
 donate.json       en: 165   de: 165   ✅
@@ -81,7 +82,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | 4 | ✅ `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
 | 5 | ✅ `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
 | 6 | ✅ `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
-| 7 | `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
+| 7 | ✅ `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
 | U1 | `refactor(i18n): require locale in formatCurrency*` | utility change + migrate all call sites (or via `useFormatCurrency` hook) | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
 | U2 | `refactor(i18n): rewrite formatTimeAgo with Intl.RelativeTimeFormat` | utility change + migrate 3 call sites | [§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook) |
 | U3 | `refactor(i18n): add joinNames helper using Intl.ListFormat` | extract helper + replace `' and '` join | [§11.3](#113-joinnames-helper-via-intllistformat) |
@@ -342,51 +343,27 @@ Dropped the unused `message` field from `ImageUploadError`. The UI was already r
 
 ---
 
-## 10. App-Level (Root layout, Home, Sentry test)
+## 10. App-Level (Root layout, Home, Sentry test) ✅ Resolved (2026-05-22)
 
 App-shell concerns — one commit.
 
-### 10.1 Root Layout Metadata
+### 10.1 Root Layout Metadata ✅ Resolved (2026-05-22)
 
-**File:** [src/app/layout.tsx:67-68](../src/app/layout.tsx#L67-L68)
+`generateMetadata` now uses `getTranslations('Common.metadata')`; title and description read from `Common.metadata.{title, description}` (EN: `"Fundraisers"` / `"Fundraising platform"`, DE: `"Spendenaufrufe"` / `"Spendenplattform"`).
 
-```ts
-return {
-  metadataBase: await getMetadataBase(),
-  title: 'Fundraisers',
-  description: 'Fundraising platform',
-};
-```
+### 10.2 Home Page Scaffold ✅ Resolved (2026-05-22)
 
-**Why:** Renders in browser tab and search engines; affects SEO and user trust.
+Set `alt=''` on the Next.js scaffold logo to mark it decorative — no English alt string ships. The wider question of removing or replacing the scaffold page is a product decision left for a follow-up; this commit only addresses the i18n leak.
 
-**Fix:** Use `getTranslations({ namespace: 'Common.metadata' })`.
+### 10.3 Sentry Test Page — Entire page hardcoded ✅ Resolved (2026-05-22)
 
-### 10.2 Home Page Scaffold
+Gated behind `NODE_ENV !== 'production'` rather than localizing. The page is a dev/QA tool — production users shouldn't reach it at all. Split into `page.tsx` (server component that calls `notFound()` in production) and `sentry-test-client.tsx` (the interactive client component) to keep the env check on the server side and avoid violating React's rules-of-hooks. The dev/QA strings stay English by design — they're for engineers.
 
-**File:** [src/app/page.tsx:15](../src/app/page.tsx#L15)
+### 10.4 Missing Keys ✅ Added (2026-05-22)
 
-```tsx
-alt='Next.js logo'
-```
-
-**Fix:** Likely leftover scaffolding — remove or replace.
-
-### 10.3 Sentry Test Page — Entire page hardcoded
-
-**File:** [src/app/(standard)/sentry-test/page.tsx](../src/app/(standard)/sentry-test/page.tsx)
-
-**Hardcoded:** page title, all error labels/descriptions, `'Trigger'` button.
-
-**Why:** This dev/QA route is reachable in production builds.
-
-**Fix:** Either gate with `process.env.NODE_ENV !== 'production'` or localize.
-
-### 10.4 Missing Keys
-
-| Key | File |
-|---|---|
-| `Common.metadata.{title, description}` | `common.json` |
+| Key | File | Status |
+|---|---|---|
+| ~~`Common.metadata.{title, description}`~~ | `common.json` | ✅ Added |
 
 ---
 

@@ -3,6 +3,10 @@
     "greeting": "Hello, World!",
     "welcome": "Welcome to our application.",
     "languageSelectionLabel": "Language:",
+    "metadata": {
+      "title": "Fundraisers",
+      "description": "Fundraising platform"
+    },
     "actions": {
       "close": "Close"
     },
