@@ -1,13 +1,16 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export function Logo() {
+  const t = useTranslations('Common.brand');
+
   return (
     <Link href='/' className='logo flex items-center gap-2'>
       <svg
         xmlns='http://www.w3.org/2000/svg'
         viewBox='0 0 83.405 85'
         className='h-10 w-auto'
-        aria-label='Plant-for-the-Planet'
+        aria-label={t('name')}
       >
         <path
           id='Path_3040'

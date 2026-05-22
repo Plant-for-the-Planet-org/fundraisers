@@ -3,6 +3,21 @@
     "greeting": "Hallo, Welt!",
     "welcome": "Willkommen bei unserer Anwendung.",
     "languageSelectionLabel": "Sprache:",
+    "actions": {
+      "close": "Schließen"
+    },
+    "aria": {
+      "primaryNavigation": "Hauptnavigation",
+      "legalLinks": "Rechtliche Links",
+      "moreInformation": "Weitere Informationen"
+    },
+    "brand": {
+      "name": "Plant-for-the-Planet"
+    },
+    "partners": {
+      "plantForThePlanetAlt": "Plant-for-the-Planet-Logo",
+      "unepAlt": "Logo des UN-Umweltprogramms"
+    },
     "legalLinks": {
       "privacy": "Datenschutzbestimmungen",
       "terms": "Nutzungsbedingungen",

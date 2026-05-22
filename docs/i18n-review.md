@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — stage (§7) top-bar image alt text moved to `Stage.topBar.{brandAlt, partnerAlt}`. Dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — shared chrome (§9) fully localized in one commit: dialog Close text, info-tooltip default fallback, header/footer aria labels, header brand label, footer logo alts; dropped the unused diagnostic `message` field from `ImageUploadError`. Stage (§7), dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -19,6 +19,7 @@
 - ✅ **Explore page (§5)** — location-category-map placeholder copy reads from `Explore.locationMap.*` (converted to async server component); category-page-skeleton's `aria-label='Loading'` now reads from `Explore.categoryPage.loadingAria` via the sync `useTranslations` hook (safe for use as a Suspense fallback).
 - ✅ **Dashboard (§6)** — dashboard-summary's active-fundraisers helper now uses a single ICU rich-text plural (`Dashboard.summary.fundraisers.activeStatus`) instead of a JS `> 0` branch + count/suffix concat; fundraiser-search-input's `aria-label` reads from a distinct `Dashboard.toolbar.searchAria` key.
 - ✅ **Stage (§7)** — `stage-top-bar.tsx` brand + partner `<img alt>` attributes now read from `Stage.topBar.{brandAlt, partnerAlt}` (EN adds "logo" for screen-reader context; DE uses `"…-Logo"` / `"Partnerlogo"`).
+- ✅ **Shared chrome (§9)** — dialog primitive's Close text (sr-only + visible button), info-tooltip's English `'More information'` fallback, header/footer nav `aria-label`s, header logo brand label, and footer partner `<img alt>` strings all moved to `Common.{actions,aria,brand,partners}.*`. Also dropped the unused diagnostic `message` field from `ImageUploadError` (UI already routed via `error.code`).
 
 ---
 
@@ -56,7 +57,7 @@
 ```
 auth.json         en: 17    de: 17    ✅
 bundles.json      en: 72    de: 72    ✅
-common.json       en: 9     de: 9     ✅
+common.json       en: 16    de: 16    ✅
 cookie.json       en: 23    de: 23    ✅
 dashboard.json    en: 61    de: 61    ✅
 donate.json       en: 165   de: 165   ✅
@@ -79,7 +80,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | 3 | ✅ `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
 | 4 | ✅ `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
 | 5 | ✅ `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
-| 6 | `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
+| 6 | ✅ `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
 | 7 | `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
 | U1 | `refactor(i18n): require locale in formatCurrency*` | utility change + migrate all call sites (or via `useFormatCurrency` hook) | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
 | U2 | `refactor(i18n): rewrite formatTimeAgo with Intl.RelativeTimeFormat` | utility change + migrate 3 call sites | [§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook) |
@@ -303,74 +304,41 @@ All `setError` paths route through `tAuth('impersonation.errors.*')`.
 
 ---
 
-## 9. Shared Chrome (Header, Footer, Dialog, Tooltip)
+## 9. Shared Chrome (Header, Footer, Dialog, Tooltip) ✅ Resolved (2026-05-22)
 
 Primitives & layout components used across many pages. One commit covers all of these.
 
-### 9.1 Shared Dialog Primitive — Close text
+### 9.1 Shared Dialog Primitive — Close text ✅ Resolved (2026-05-22)
 
-**File:** [src/components/ui/dialog.tsx:75,113](../src/components/ui/dialog.tsx#L75-L113)
+Both the `sr-only` "Close" in `DialogContent` and the visible "Close" button in `DialogFooter` now read from `Common.actions.close` via `useTranslations`. Reaches every dialog in the app in one change.
 
-```tsx
-<span className='sr-only'>Close</span>
-<Button variant='outline'>Close</Button>
-```
+### 9.2 Info Tooltip — English fallback ✅ Resolved (2026-05-22)
 
-**Why:** Shared shadcn-style primitive used by many consumers; the screen-reader Close text reaches every dialog in the app.
+Default fallback for `triggerLabel` now reads from `Common.aria.moreInformation`. Callers can still pass an explicit `triggerLabel` to override.
 
-**Fix:** Accept a `closeLabel` prop, or read from `Common.actions.close`.
+### 9.3 Footer & Header — Navigation aria labels ✅ Resolved (2026-05-22)
 
-### 9.2 Info Tooltip — English fallback
+- `footer/links-bar.tsx`: `aria-label` reads from `Common.aria.legalLinks`.
+- `header/navigation.tsx`: `aria-label` reads from `Common.aria.primaryNavigation`.
+- `header/logo.tsx`: `aria-label` reads from `Common.brand.name`.
 
-**File:** [src/components/ui/info-tooltip.tsx:48](../src/components/ui/info-tooltip.tsx#L48)
+### 9.4 Footer Logos — Image alt text ✅ Resolved (2026-05-22)
 
-```tsx
-<span className='sr-only'>{triggerLabel ?? 'More information'}</span>
-```
+Both `<img alt>` attributes now read from `Common.partners.{plantForThePlanetAlt, unepAlt}`. EN/DE values include the word "logo" / "Logo" for screen-reader context. EN was upgraded from `'UN Environment Program'` to `'UN Environment Programme logo'` (correct UNEP spelling).
 
-**Why:** Ships English to users when callers omit the prop.
+### 9.5 Image Selection Utility — English diagnostic messages ✅ Resolved (2026-05-22)
 
-**Fix:** Either require `triggerLabel`, or default from `Common.aria.moreInformation`.
+Dropped the unused `message` field from `ImageUploadError`. The UI was already reading `error.code` and looking up the translation via `Fundraisers.*.errors.{emptyFile, fileTooLarge, invalidFileType}` in `image-selection-overlay.tsx` — the literal English `message` was dead code.
 
-### 9.3 Footer & Header — Navigation aria labels
+### 9.6 Missing Keys ✅ Added (2026-05-22)
 
-| File | Line | Hardcoded |
+| Key | File | Status |
 |---|---|---|
-| [footer/links-bar.tsx](../src/components/footer/links-bar.tsx#L12) | 12 | `aria-label='Legal links'` |
-| [header/navigation.tsx](../src/components/header/navigation.tsx#L11) | 11 | `aria-label='Primary navigation'` |
-| [header/logo.tsx](../src/components/header/logo.tsx#L10) | 10 | `aria-label='Plant-for-the-Planet'` (brand — debatable) |
-
-**Fix:** Centralize under `Common.aria.{legalLinks, primaryNavigation}`; `Common.brand.name` for the brand string (used in 3+ places).
-
-### 9.4 Footer Logos — Image alt text
-
-**File:** [src/components/footer/logos.tsx:13,25](../src/components/footer/logos.tsx#L13-L25)
-
-```tsx
-alt='Plant-for-the-Planet'
-alt='UN Environment Program'
-```
-
-**Fix:** `Common.partners.{plantForThePlanetAlt, unepAlt}`.
-
-### 9.5 Image Selection Utility — English diagnostic messages
-
-**File:** [src/lib/utils/image-selection.ts:24-48](../src/lib/utils/image-selection.ts#L24-L48)
-
-Strings: `'Selected file is empty.'`, `'Image must be ${MB}MB or smaller.'`, `'Please upload a JPG, PNG, WEBP, or GIF image.'`
-
-The `error.code` is used in the UI ([image-selection-overlay:88-101](../src/components/fundraisers/image-selection-overlay.tsx#L88-L101)), but the literal `message` field is still set on the result object.
-
-**Fix:** Either drop the `message` field or rename to `devMessage` to clarify it's diagnostic-only.
-
-### 9.6 Missing Keys
-
-| Key | File |
-|---|---|
-| `Common.actions.close` | `common.json` |
-| `Common.aria.{loading, primaryNavigation, legalLinks, moreInformation}` | `common.json` |
-| `Common.partners.{plantForThePlanetAlt, unepAlt}` | `common.json` |
-| `Common.brand.name` | `common.json` |
+| ~~`Common.actions.close`~~ | `common.json` | ✅ Added |
+| ~~`Common.aria.{primaryNavigation, legalLinks, moreInformation}`~~ | `common.json` | ✅ Added |
+| ~~`Common.partners.{plantForThePlanetAlt, unepAlt}`~~ | `common.json` | ✅ Added |
+| ~~`Common.brand.name`~~ | `common.json` | ✅ Added |
+| `Common.aria.loading` | `common.json` | Deferred — no current consumer (§5.2 used a scoped key) |
 
 ---
 
