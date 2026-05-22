@@ -33,6 +33,7 @@ export function ScrollingDonationList({
   const scrollPositionRef = useRef(0);
   const isActiveRef = useRef(isActive);
   const hoverPausedRef = useRef(false);
+  const [shouldScroll, setShouldScroll] = useState(true);
   const [numCopies, setNumCopies] = useState(2);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export function ScrollingDonationList({
   // sets are identical, the reset is visually seamless — but only if the viewport
   // is always covered by content. numCopies ensures that: we need enough copies
   // so that (numCopies × setWidth) covers (containerWidth + setWidth).
+  // If all items already fit, scrolling is skipped entirely.
   useLayoutEffect(() => {
     const container = containerRef.current;
     const set1 = set1Ref.current;
@@ -54,7 +56,13 @@ export function ScrollingDonationList({
     const setWidth = set1.offsetWidth;
     if (setWidth <= 0) return;
 
-    setNumCopies(Math.max(2, Math.floor(containerWidth / setWidth) + 2));
+    if (setWidth <= containerWidth) {
+      setShouldScroll(false);
+      setNumCopies(1);
+    } else {
+      setShouldScroll(true);
+      setNumCopies(Math.max(2, Math.floor(containerWidth / setWidth) + 2));
+    }
   }, [initialDonations.length]);
 
   // Animation loop: advances scrollPosition by SCROLL_SPEED px/s on each frame.
@@ -63,6 +71,11 @@ export function ScrollingDonationList({
     const inner = innerRef.current;
     const set1 = set1Ref.current;
     if (!inner || !set1) return;
+
+    if (!shouldScroll) {
+      inner.style.transform = 'translateX(0)';
+      return;
+    }
 
     // time: ms since page load, provided by requestAnimationFrame on each frame.
     // lastTime: same value from the previous frame; the difference gives elapsed ms.
@@ -98,7 +111,7 @@ export function ScrollingDonationList({
       if (animationFrameRef.current)
         cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [initialDonations.length, numCopies]);
+  }, [initialDonations.length, numCopies, shouldScroll]);
 
   if (initialDonations.length === 0) {
     return (
@@ -135,14 +148,18 @@ export function ScrollingDonationList({
         className='flex'
         style={{ width: 'max-content', willChange: 'transform' }}
       >
-        <div ref={set1Ref} className='flex items-center gap-4 pr-4'>
+        <div
+          ref={set1Ref}
+          className={`flex items-center gap-4${shouldScroll ? ' pr-4' : ''}`}
+        >
           {donationItemSet}
         </div>
-        {Array.from({ length: numCopies - 1 }, (_, i) => (
-          <div key={i} aria-hidden className='flex items-center gap-4 pr-4'>
-            {donationItemSet}
-          </div>
-        ))}
+        {shouldScroll &&
+          Array.from({ length: numCopies - 1 }, (_, i) => (
+            <div key={i} aria-hidden className='flex items-center gap-4 pr-4'>
+              {donationItemSet}
+            </div>
+          ))}
       </div>
     </div>
   );
