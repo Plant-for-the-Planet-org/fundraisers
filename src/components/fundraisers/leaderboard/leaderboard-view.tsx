@@ -43,47 +43,49 @@ export function LeaderboardView({
   const [activeTab, setActiveTab] = useState<'recent' | 'top'>(default_tab);
   const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
-  const effectiveTab =
-    activeTab === 'recent' && !show_recent_list
-      ? 'top'
-      : activeTab === 'top' && !show_top_list
-        ? 'recent'
-        : activeTab;
+  let resolvedTab = activeTab;
+  if (activeTab === 'recent' && !show_recent_list) resolvedTab = 'top';
+  if (activeTab === 'top' && !show_top_list) resolvedTab = 'recent';
+
+  const shouldShowTabs = show_recent_list && show_top_list;
+
+  let sectionTitle = t('title');
+  if (!shouldShowTabs) {
+    if (show_recent_list) sectionTitle = t('titleRecent');
+    else if (aggregate_top_by_donor) sectionTitle = t('tabs.topDonors');
+    else sectionTitle = t('tabs.topDonations');
+  }
 
   return (
     <div className='leaderboard-view w-full flex flex-col gap-4'>
       <Tabs
-        value={effectiveTab}
+        value={resolvedTab}
         onValueChange={value => setActiveTab(value as 'recent' | 'top')}
       >
         <SectionHeader
           className='flex-row items-center justify-between'
           showDivider={false}
           actionSlot={
-            (show_recent_list || show_top_list) && (
+            shouldShowTabs && (
               <TabsList>
-                {show_recent_list && (
-                  <TabsTrigger value='recent'>{t('tabs.latest')}</TabsTrigger>
-                )}
-                {show_top_list && (
-                  <TabsTrigger value='top'>
-                    {aggregate_top_by_donor
-                      ? t('tabs.topDonors')
-                      : t('tabs.topDonations')}
-                  </TabsTrigger>
-                )}
+                <TabsTrigger value='recent'>{t('tabs.latest')}</TabsTrigger>
+                <TabsTrigger value='top'>
+                  {aggregate_top_by_donor
+                    ? t('tabs.topDonors')
+                    : t('tabs.topDonations')}
+                </TabsTrigger>
               </TabsList>
             )
           }
         >
-          {t('title')}
+          {sectionTitle}
         </SectionHeader>
 
         {show_recent_list && (
           <TabsContent value='recent' className='mt-0'>
             <ScrollingDonationList
               initialDonations={initialRecentDonations}
-              isActive={effectiveTab === 'recent'}
+              isActive={resolvedTab === 'recent'}
               anonymize={anonymize}
               showAmount={show_amount}
               showAvatar={show_avatar}
@@ -94,7 +96,7 @@ export function LeaderboardView({
           <TabsContent value='top' className='mt-0'>
             <ScrollingDonationList
               initialDonations={initialTopDonations}
-              isActive={effectiveTab === 'top'}
+              isActive={resolvedTab === 'top'}
               anonymize={anonymize}
               showAmount={show_amount}
               showAvatar={show_avatar}
@@ -127,7 +129,7 @@ export function LeaderboardView({
         initialTopDonations={initialTopDonations}
         totalRecentDonationCount={totalRecentDonationCount}
         totalTopDonationCount={totalTopDonationCount}
-        activeTab={effectiveTab}
+        activeTab={resolvedTab}
         showRecentList={show_recent_list}
         showTopList={show_top_list}
         anonymize={anonymize}
