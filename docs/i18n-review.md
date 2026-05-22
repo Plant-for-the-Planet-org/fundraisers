@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — dashboard (§6) tidied in one commit: replaced JS-side count + suffix concat with an ICU rich-text plural for the active-fundraisers helper, and added a distinct `searchAria` key for the toolbar search input. Explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — stage (§7) top-bar image alt text moved to `Stage.topBar.{brandAlt, partnerAlt}`. Dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -18,6 +18,7 @@
 - ✅ **Donate overlay (§4)** — overlay aria labels translated (`Donate.overlay.aria.*`); SEPA form (5 errors + placeholder) and card form (6 errors) now read from `Donate.{sepa,card}.errors.*`; address-form drops raw `err.message` in favor of translated `saveAddressError`; donation-summary swaps `' and '` join for `Intl.ListFormat`; payment-method icons marked decorative (`aria-hidden='true'`) so the already-translated visible button text isn't double-announced.
 - ✅ **Explore page (§5)** — location-category-map placeholder copy reads from `Explore.locationMap.*` (converted to async server component); category-page-skeleton's `aria-label='Loading'` now reads from `Explore.categoryPage.loadingAria` via the sync `useTranslations` hook (safe for use as a Suspense fallback).
 - ✅ **Dashboard (§6)** — dashboard-summary's active-fundraisers helper now uses a single ICU rich-text plural (`Dashboard.summary.fundraisers.activeStatus`) instead of a JS `> 0` branch + count/suffix concat; fundraiser-search-input's `aria-label` reads from a distinct `Dashboard.toolbar.searchAria` key.
+- ✅ **Stage (§7)** — `stage-top-bar.tsx` brand + partner `<img alt>` attributes now read from `Stage.topBar.{brandAlt, partnerAlt}` (EN adds "logo" for screen-reader context; DE uses `"…-Logo"` / `"Partnerlogo"`).
 
 ---
 
@@ -62,7 +63,7 @@ donate.json       en: 165   de: 165   ✅
 explore.json      en: 29    de: 29    ✅
 fundraisers.json  en: 209   de: 209   ✅
 leaderboard.json  en: 29    de: 29    ✅
-stage.json        en: 16    de: 16    ✅
+stage.json        en: 18    de: 18    ✅
 ```
 
 ---
@@ -77,7 +78,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | 2 | ✅ `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
 | 3 | ✅ `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
 | 4 | ✅ `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
-| 5 | `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
+| 5 | ✅ `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
 | 6 | `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
 | 7 | `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
 | U1 | `refactor(i18n): require locale in formatCurrency*` | utility change + migrate all call sites (or via `useFormatCurrency` hook) | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
@@ -243,26 +244,19 @@ Already-correct call sites (kept for reference):
 
 ---
 
-## 7. Page: Stage
+## 7. Page: Stage ✅ Resolved (2026-05-22)
 
-Components under `src/components/stage/*`.
+Components under `src/components/stage/*`. Section 7.1 landed in a single commit; section 7.3 (`formatTimeAgo` on the stage ticker) remains scope for utility commit U2.
 
-### 7.1 Stage Top Bar — Image alt text
+### 7.1 Stage Top Bar — Image alt text ✅ Resolved (2026-05-22)
 
-**File:** [src/components/stage/stage-top-bar.tsx:21,32](../src/components/stage/stage-top-bar.tsx#L21-L32)
+Both `<img alt>` attributes now read from `Stage.topBar.{brandAlt, partnerAlt}`. EN uses `"Plant-for-the-Planet logo"` / `"Partner logo"` (added `logo` to give screen readers context, not just the brand string); DE uses `"Plant-for-the-Planet-Logo"` / `"Partnerlogo"`.
 
-```tsx
-alt='Plant-for-the-Planet'
-alt='Partner'
-```
+### 7.2 Missing Keys ✅ Added (2026-05-22)
 
-**Fix:** `Stage.topBar.{brandAlt, partnerAlt}`.
-
-### 7.2 Missing Keys
-
-| Key | File |
-|---|---|
-| `Stage.topBar.{brandAlt, partnerAlt}` | `stage.json` |
+| Key | File | Status |
+|---|---|---|
+| ~~`Stage.topBar.{brandAlt, partnerAlt}`~~ | `stage.json` | ✅ Added |
 
 ### 7.3 Notes — `formatTimeAgo` on the public stage ticker
 

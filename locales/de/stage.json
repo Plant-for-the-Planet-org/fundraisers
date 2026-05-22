@@ -15,6 +15,10 @@
     "notEnabled": "Der Bühnenmodus ist für diesen Spendenaufruf nicht aktiviert.",
     "notEnabledHint": "Aktualisiere die Einstellungen des Spendenaufrufs oder frage den Veranstalter.",
     "fundraiserNotFound": "Spendenaufruf nicht gefunden.",
-    "anonymous": "Anonym"
+    "anonymous": "Anonym",
+    "topBar": {
+      "brandAlt": "Plant-for-the-Planet-Logo",
+      "partnerAlt": "Partnerlogo"
+    }
   }
 }
