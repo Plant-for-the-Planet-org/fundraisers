@@ -31,6 +31,7 @@ export function ScrollingDonationList({
   const set1Ref = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const scrollPositionRef = useRef(0);
+  const setWidthRef = useRef(0);
   const isActiveRef = useRef(isActive);
   const hoverPausedRef = useRef(false);
   const [shouldScroll, setShouldScroll] = useState(true);
@@ -56,6 +57,8 @@ export function ScrollingDonationList({
     const setWidth = set1.offsetWidth;
     if (setWidth <= 0) return;
 
+    setWidthRef.current = setWidth;
+
     if (setWidth <= containerWidth) {
       setShouldScroll(false);
       setNumCopies(1);
@@ -69,8 +72,7 @@ export function ScrollingDonationList({
   // Resets lastTime to null while paused so there's no position jump on resume.
   useEffect(() => {
     const inner = innerRef.current;
-    const set1 = set1Ref.current;
-    if (!inner || !set1) return;
+    if (!inner) return;
 
     if (!shouldScroll) {
       inner.style.transform = 'translateX(0)';
@@ -86,7 +88,7 @@ export function ScrollingDonationList({
 
       if (!paused) {
         if (lastTime !== null) {
-          const setWidth = set1!.offsetWidth;
+          const setWidth = setWidthRef.current;
           if (setWidth > 0) {
             scrollPositionRef.current +=
               SCROLL_SPEED * ((time - lastTime) / 1000);
