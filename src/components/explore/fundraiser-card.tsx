@@ -71,7 +71,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                       formattedAmountWithCurrency: formatCurrencyFromDecimal(
                         fundraiser.totalRaised,
                         fundraiser.currency,
-                        { compact: true }
+                        { compact: true, locale }
                       ),
                     })}
                   </dd>
