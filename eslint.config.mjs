@@ -10,6 +10,9 @@ const eslintConfig = defineConfig([
   ...nextTypescript,
   prettierConfig,
   {
+    linterOptions: {
+      reportUnusedDisableDirectives: false,
+    },
     plugins: {
       prettier: prettierPlugin,
       'simple-import-sort': simpleImportSort,
