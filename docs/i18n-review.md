@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — app-level (§10) closed out in one commit: root-layout metadata reads from `Common.metadata.*`, the Next.js scaffold logo is now decorative (`alt=''`), and the sentry-test page is gated behind `NODE_ENV !== 'production'` (split into a server-component gate + client child). Shared chrome (§9), stage (§7), dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — rebased against `develop`: §11.1 rewritten to reflect the new options-bag `formatCurrency` API that auto-detects locale from `document.documentElement.lang`; §1 parity counts refreshed. App-level (§10) closed out in one commit: root-layout metadata reads from `Common.metadata.*`, the Next.js scaffold logo is now decorative (`alt=''`), and the sentry-test page is gated behind `NODE_ENV !== 'production'` (split into a server-component gate + client child). Shared chrome (§9), stage (§7), dashboard (§6), explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -56,14 +56,14 @@
 ### EN/DE Key Count Parity
 
 ```
-auth.json         en: 17    de: 17    ✅
+auth.json         en: 39    de: 39    ✅
 bundles.json      en: 72    de: 72    ✅
 common.json       en: 18    de: 18    ✅
 cookie.json       en: 23    de: 23    ✅
 dashboard.json    en: 61    de: 61    ✅
 donate.json       en: 165   de: 165   ✅
 explore.json      en: 29    de: 29    ✅
-fundraisers.json  en: 209   de: 209   ✅
+fundraisers.json  en: 219   de: 219   ✅
 leaderboard.json  en: 29    de: 29    ✅
 stage.json        en: 18    de: 18    ✅
 ```
@@ -371,55 +371,66 @@ Gated behind `NODE_ENV !== 'production'` rather than localizing. The page is a d
 
 Each subsection is its own commit. Landing these first lets per-page commits (§3–§10) be smaller and more focused.
 
-### 11.1 `formatCurrency` — Make `locale` mandatory + `useFormatCurrency` hook
+### 11.1 `formatCurrency` — SSR fallback to `'en'` (rewritten 2026-05-22)
 
-**File:** [src/lib/utils/currency.ts:47,96](../src/lib/utils/currency.ts#L47)
+**File:** [src/lib/utils/currency.ts](../src/lib/utils/currency.ts)
+
+**Status update:** The original recommendation here (make `locale` mandatory + introduce a `useFormatCurrency` hook) was superseded by a `develop` refactor (PR #118, `feature/consistent-formatting-numbers`) that landed in this branch via the latest merge. The new signature is:
 
 ```ts
-export function formatCurrency(amountInCents, currency, locale: string = 'en-US')
-export function formatCurrencyFromDecimal(amount, currency, locale: string = 'en-US', currencyDisplay)
+export function formatCurrency(amountInCents, currency, options?: { locale?, compact? })
+export function formatCurrencyFromDecimal(amount, currency, options?: { locale?, compact?, currencyDisplay? })
 ```
 
-**Why:** Many callers omit the locale argument, producing US grouping/decimal separators inside a German UI (e.g. `€12,345.67` instead of `12.345,67 €`). **This is the single biggest source of subtle bugs for German users.**
+Locale is auto-detected via:
 
-**Affected call sites omitting locale:**
+```ts
+function resolveLocale(locale?: string): string {
+  if (locale) return locale;
+  if (typeof document !== 'undefined') return document.documentElement.lang || 'en';
+  return 'en';
+}
+```
+
+Since next-intl writes the active locale to `<html lang>`, client components now render with correct German grouping/decimal separators **without** every call site passing `locale` explicitly. The "single biggest source of subtle bugs" framing in the original write-up no longer applies — most of the call sites listed in the old table are now correct by construction.
+
+**Remaining residual concern — SSR fallback:**
+
+`resolveLocale` falls back to `'en'` on the server (no `document`). Any call from a server component or during initial render for a `de` session will produce US separators until hydration replaces the markup. This is hard to spot in screenshots but a real flash-of-wrong-locale risk.
+
+**Recommended follow-up (smaller in scope than the original §11.1):**
+
+1. Add a `useFormatCurrency()` hook for client components that binds `useLocale()` once and removes reliance on `document.documentElement.lang` (which is also a layered escape hatch — the source of truth is next-intl, not the DOM).
+2. For server components that format currency (e.g. when the goal/raised totals are rendered server-side), pass `{ locale }` from `getLocale()` explicitly.
+3. Audit which of the call sites below currently render under SSR vs. only on the client — only the SSR ones need the explicit-locale fix; client-only ones can stay as-is or migrate to the hook for clarity.
+
+**Call sites to audit for SSR vs. client (no longer "broken", just worth confirming):**
 
 | File | Line | Page |
 |---|---|---|
 | [donate/donate-options.tsx](../src/components/donate/donate-options.tsx#L74) | 74 | Donate |
 | [fundraisers/donation-form.tsx](../src/components/fundraisers/donation-form.tsx) | 108 | Fundraiser |
 | [fundraisers/donation-amounts.tsx](../src/components/fundraisers/donation-amounts.tsx) | 72 | Fundraiser |
-| [fundraisers/contribution-settings.tsx](../src/components/fundraisers/contribution-settings.tsx) | 20 | Fundraiser |
 | [fundraisers/leaderboard/donation-table.tsx](../src/components/fundraisers/leaderboard/donation-table.tsx#L79) | 79 | Fundraiser |
 | [fundraisers/leaderboard/donation-item.tsx](../src/components/fundraisers/leaderboard/donation-item.tsx#L65) | 65 | Fundraiser |
 | [fundraisers/goal-progress-display.tsx](../src/components/fundraisers/goal-progress-display.tsx) | 25, 41 | Fundraiser |
-| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L139) | 139, 154, 163 | Donate |
-| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332) | 332, 355, 406 ⚠️ explicitly passes `undefined` | Donate |
-| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx) | 30, 38 | Donate |
-| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L72) | 72 | Explore |
-| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50) | 43-50 | Dashboard |
+| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L142) | 142, 157, 166 | Donate |
+| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332) | 332, 351, 398 | Donate |
+| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx#L27) | 27, 34 | Donate |
+| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L71) | 71 | Explore |
+| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50) | 43-48 | Dashboard |
+| [fundraisers/goal-input.tsx](../src/components/fundraisers/goal-input.tsx#L85) | 85 | Fundraiser |
 
-**Fix:**
+Already passes explicit `{ locale }` (kept for reference):
 
-1. Make `locale` **required** (no default).
-2. Add a `useFormatCurrency()` hook that binds locale once:
+- ✅ [fundraisers/contribution-settings.tsx:23](../src/components/fundraisers/contribution-settings.tsx#L23)
 
-   ```ts
-   export function useFormatCurrency() {
-     const locale = useLocale();
-     return useCallback(
-       (cents: number, currency: string) => formatCurrency(cents, currency, locale),
-       [locale]
-     );
-   }
-   ```
+Already-correct via `compact: true` + auto-detected locale:
 
-3. Migrate all call sites to the hook.
-
-Already-correct call sites (kept for reference):
-
-- ✅ [stage-counter.tsx:58](../src/components/stage/stage-counter.tsx#L58)
-- ✅ [dashboard-summary.tsx:50](../src/components/dashboard/dashboard-summary.tsx#L50)
+- ✅ [stage-counter.tsx:58,64](../src/components/stage/stage-counter.tsx#L58)
+- ✅ [stage-leaderboard.tsx:72](../src/components/stage/stage-leaderboard.tsx#L72)
+- ✅ [stage-ticker.tsx:177](../src/components/stage/stage-ticker.tsx#L177)
+- ✅ [dashboard-summary.tsx:51](../src/components/dashboard/dashboard-summary.tsx#L51)
 
 ### 11.2 `formatTimeAgo` — `Intl.RelativeTimeFormat` + `useFormatTimeAgo` hook
 
