@@ -2,9 +2,7 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useState } from 'react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
@@ -62,11 +60,9 @@ function SingleHost({
 function HostsListDisplay({
   hosts,
   loading = false,
-  onCollapse,
 }: {
   hosts: Array<{ id?: string; name: string; avatarUrl: string | null }>;
   loading?: boolean;
-  onCollapse?: () => void;
 }) {
   const t = useTranslations('Fundraisers');
 
@@ -75,23 +71,8 @@ function HostsListDisplay({
   }
 
   return (
-    <>
-      <SectionHeader
-        className='w-full flex-row justify-between'
-        actionSlot={
-          onCollapse && (
-            <button
-              type='button'
-              onClick={onCollapse}
-              className='p-1 text-muted-foreground hover:text-foreground transition-colors'
-            >
-              <ChevronUp className='w-4 h-4' />
-            </button>
-          )
-        }
-      >
-        {t('hostedByLabel')}
-      </SectionHeader>
+    <div className='flex flex-col gap-3'>
+      <SectionHeader>{t('hostedByLabel')}</SectionHeader>
       <div className='flex flex-col gap-2'>
         {loading ? (
           <div className='flex flex-row items-center gap-2.5'>
@@ -109,16 +90,14 @@ function HostsListDisplay({
           ))
         )}
       </div>
-    </>
+    </div>
   );
 }
 
 function HostsStripDisplay({
   hosts,
-  onToggle,
 }: {
   hosts: Array<{ id?: string; name: string; avatarUrl: string | null }>;
-  onToggle?: () => void;
 }) {
   const t = useTranslations('Fundraisers');
   const format = useFormatter();
@@ -129,58 +108,39 @@ function HostsStripDisplay({
   const displayNames = hosts
     .slice(0, MAX_STRIP_NAMED)
     .map(h => h.name.split(' ')[0] ?? h.name);
-  const hasMore = hosts.length > MAX_STRIP_NAMED;
+  const remaining = Math.max(0, hosts.length - displayNames.length);
 
-  let namesText: string;
-  if (hasMore) {
-    namesText = `${format.list(displayNames, { type: 'conjunction' })} ${t('andMore')}`;
-  } else {
-    namesText = format.list(displayNames, { type: 'conjunction' });
-  }
+  const namesText = t('hostsStripNames', {
+    names: format.list(displayNames, {
+      type: remaining > 0 ? 'unit' : 'conjunction',
+    }),
+    remaining,
+  });
 
-  const content = (
-    <>
-      <div className='flex gap-2.5 items-center'>
-        <div className='flex items-center shrink-0'>
-          {avatarHosts.map((host, index) => (
-            <Avatar
-              key={host.id ?? index}
-              className={cn(
-                'w-6 h-6 border-2 border-card',
-                index > 0 && '-ml-2'
-              )}
-              title={host.name}
-            >
-              {host.avatarUrl && (
-                <AvatarImage src={host.avatarUrl} alt='' loading='lazy' />
-              )}
-              <FallbackAvatar seed={host.id ?? host.name} />
-            </Avatar>
-          ))}
-        </div>
-        <div className='text-foreground text-sm font-semibold leading-tight'>
-          {t('hostedByLabel')} {namesText}
-        </div>
+  return (
+    <div className='flex gap-2.5 items-center'>
+      <div className='flex items-center shrink-0'>
+        {avatarHosts.map((host, index) => (
+          <Avatar
+            key={host.id ?? index}
+            className={cn(
+              'w-6 h-6 border-2 border-card',
+              index > 0 && '-ml-2'
+            )}
+            title={host.name}
+          >
+            {host.avatarUrl && (
+              <AvatarImage src={host.avatarUrl} alt='' loading='lazy' />
+            )}
+            <FallbackAvatar seed={host.id ?? host.name} />
+          </Avatar>
+        ))}
       </div>
-      {onToggle && (
-        <ChevronDown className='w-4 h-4 shrink-0 text-muted-foreground' />
-      )}
-    </>
+      <div className='text-foreground text-sm font-semibold leading-tight'>
+        {t('hostedByLabel')} {namesText}
+      </div>
+    </div>
   );
-
-  if (onToggle) {
-    return (
-      <button
-        type='button'
-        onClick={onToggle}
-        className='flex justify-between items-center gap-2.5 text-left'
-      >
-        {content}
-      </button>
-    );
-  }
-
-  return <div className='flex items-center gap-2.5'>{content}</div>;
 }
 
 function FundraiserHosts({
@@ -191,7 +151,6 @@ function FundraiserHosts({
   variant: 'list' | 'strip';
 }) {
   const t = useTranslations('Fundraisers');
-  const [expanded, setExpanded] = useState(variant === 'list');
 
   const publicHosts = fundraiser.hosts.filter(host => host.isPublic);
   const hostsToShow = publicHosts.length > 0 ? publicHosts : fundraiser.hosts;
@@ -205,17 +164,7 @@ function FundraiserHosts({
   }));
 
   if (variant === 'strip') {
-    if (expanded && hosts.length > 1) {
-      return (
-        <HostsListDisplay hosts={hosts} onCollapse={() => setExpanded(false)} />
-      );
-    }
-    return (
-      <HostsStripDisplay
-        hosts={hosts}
-        onToggle={hosts.length > 1 ? () => setExpanded(true) : undefined}
-      />
-    );
+    return <HostsStripDisplay hosts={hosts} />;
   }
 
   return <HostsListDisplay hosts={hosts} />;
