@@ -8,8 +8,12 @@ import { ChevronDown, CreditCard, Plus, UserCog } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
-import { Avatar, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
+import { ImpersonationModal } from '@/components/auth/impersonation-modal';
+import { SignInButton } from '@/components/auth/sign-in-button';
+import { SignOutButton } from '@/components/auth/sign-out-button';
+import { HEADER_LINKS } from '@/components/header/config';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +21,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/drop-down-menu';
-import { FallbackAvatar } from '../ui/fallback-avatar';
-import { ImpersonationModal } from './impersonation-modal';
-import { SignInButton } from './sign-in-button';
-import { SignOutButton } from './sign-out-button';
+} from '@/components/ui/drop-down-menu';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 
 const IMPERSONATION_DOMAIN = '@plant-for-the-planet.org';
 
@@ -32,6 +33,7 @@ export function UserMenu() {
 
   const tDashboard = useTranslations('Dashboard');
   const tFundraiser = useTranslations('Fundraisers');
+  const tHeaderLinks = useTranslations('Common.headerLinks');
   const tAuth = useTranslations('Auth');
 
   const pathname = usePathname();
@@ -60,6 +62,9 @@ export function UserMenu() {
   const displayName = profile?.displayName || user?.name;
   const userEmail = profile?.email || user?.email;
   const canImpersonate = !!userEmail?.endsWith(IMPERSONATION_DOMAIN);
+  const headerLinksInUserMenu = HEADER_LINKS.filter(
+    link => link.showInMobileUserMenu
+  );
 
   return (
     <>
@@ -104,6 +109,20 @@ export function UserMenu() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          {headerLinksInUserMenu.map(link => (
+            <DropdownMenuItem
+              key={`header-link-${link.labelKey}`}
+              asChild
+              className='cursor-pointer xs:hidden'
+            >
+              <Link href={link.href} className='flex items-center'>
+                <span>{tHeaderLinks(link.labelKey)}</span>
+              </Link>
+            </DropdownMenuItem>
+          ))}
+          {headerLinksInUserMenu.length > 0 && (
+            <DropdownMenuSeparator className='xs:hidden' />
+          )}
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
               <CreditCard className='mr-2 h-4 w-4' />
