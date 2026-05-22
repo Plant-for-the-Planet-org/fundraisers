@@ -1,7 +1,7 @@
 # i18n / Localization Review — Fundraisers App
 
 > **Review date:** 2026-05-21
-> **Last updated:** 2026-05-22 — explore page (§5) fully localized in one commit: location-category-map placeholder copy and category-page-skeleton loading aria. Donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
+> **Last updated:** 2026-05-22 — dashboard (§6) tidied in one commit: replaced JS-side count + suffix concat with an ICU rich-text plural for the active-fundraisers helper, and added a distinct `searchAria` key for the toolbar search input. Explore page (§5), donate overlay (§4), fundraiser detail page (§3), and impersonation strings previously resolved.
 > **Scope:** Full codebase audit of internationalization (i18n) coverage, locale-aware formatting, and accessibility text localization.
 > **Stack:** `next-intl` + cookie-based locale (`ui-locale`), locales `en` and `de` (default `de`), `localePrefix: 'never'`.
 
@@ -17,6 +17,7 @@
 - ✅ **Fundraiser detail page (§3)** — not-found copy translated; contribution-settings preview alert replaced with translated sonner toast (ICU select for dedicated/frequency); create/update toasts drop raw `err.message` in favor of translated `errorDescription`; edit hook surfaces translated `loadError`; `toLocaleString()` calls in donors-preview and fundraiser-view now pass `useLocale()`.
 - ✅ **Donate overlay (§4)** — overlay aria labels translated (`Donate.overlay.aria.*`); SEPA form (5 errors + placeholder) and card form (6 errors) now read from `Donate.{sepa,card}.errors.*`; address-form drops raw `err.message` in favor of translated `saveAddressError`; donation-summary swaps `' and '` join for `Intl.ListFormat`; payment-method icons marked decorative (`aria-hidden='true'`) so the already-translated visible button text isn't double-announced.
 - ✅ **Explore page (§5)** — location-category-map placeholder copy reads from `Explore.locationMap.*` (converted to async server component); category-page-skeleton's `aria-label='Loading'` now reads from `Explore.categoryPage.loadingAria` via the sync `useTranslations` hook (safe for use as a Suspense fallback).
+- ✅ **Dashboard (§6)** — dashboard-summary's active-fundraisers helper now uses a single ICU rich-text plural (`Dashboard.summary.fundraisers.activeStatus`) instead of a JS `> 0` branch + count/suffix concat; fundraiser-search-input's `aria-label` reads from a distinct `Dashboard.toolbar.searchAria` key.
 
 ---
 
@@ -75,7 +76,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | 1 | ✅ `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
 | 2 | ✅ `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
 | 3 | ✅ `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
-| 4 | `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
+| 4 | ✅ `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
 | 5 | `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
 | 6 | `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
 | 7 | `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
@@ -218,21 +219,17 @@ Cleaned up by utility commit U1:
 
 ---
 
-## 6. Page: Dashboard
+## 6. Page: Dashboard ✅ Resolved (2026-05-22)
 
-Components under `src/components/dashboard/*`.
+Components under `src/components/dashboard/*`. Sections 6.1–6.2 landed in a single commit; section 6.3 (currency call sites) remains scope for utility commit U1.
 
-### 6.1 Dashboard Summary — Plural-sensitive formatting via pre-stringified count
+### 6.1 Dashboard Summary — Plural-sensitive formatting via pre-stringified count ✅ Resolved (2026-05-22)
 
-`Dashboard.list.item.donations` correctly uses an ICU `count` param, but plural-sensitive count formatting in `dashboard-summary.tsx` interpolates a pre-`toLocaleString`-formatted string.
+Replaced the JS-side `> 0` branch + string-concat (`<span>{n.toLocaleString()}</span> <suffix>`) with a single ICU rich-text plural: `Dashboard.summary.fundraisers.activeStatus` uses `{count, plural, =0 {…} other {<bold>{count, number}</bold> …}}`. `dashboard-summary.tsx` now calls `t.rich('fundraisers.activeStatus', { count, bold: chunks => <span class='…'>{chunks}</span> })` — same pattern as the existing `resultCount`. Dropped now-unused `activeSuffix` and `noActive` keys (net key count unchanged: +1 activeStatus, +1 searchAria, −2 obsolete).
 
-**Fix:** Audit all `formattedCount` usages and prefer ICU `{count, plural, ...}` so DE plural forms can diverge from EN when needed.
+### 6.2 Fundraiser Search Input — One key for two attributes ✅ Resolved (2026-05-22)
 
-### 6.2 Fundraiser Search Input — One key for two attributes
-
-**File:** [src/components/dashboard/fundraiser-search-input.tsx:52-53](../src/components/dashboard/fundraiser-search-input.tsx#L52-L53)
-
-Reuses `searchPlaceholder` for both `placeholder` and `aria-label`. Functional, but consider a distinct `searchAria` key in case UX wants a more descriptive aria string.
+Added `Dashboard.toolbar.searchAria` (EN: "Search fundraisers by name or host", DE: "Spendenaufrufe nach Name oder Ersteller suchen") and wired it into the input's `aria-label`. Placeholder still uses the shorter `searchPlaceholder`.
 
 ### 6.3 Notes — Currency call sites on this page
 

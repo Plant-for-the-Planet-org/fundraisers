@@ -12,8 +12,7 @@
       "loading": "Übersicht wird geladen...",
       "fundraisers": {
         "label": "Spendenaufrufe",
-        "activeSuffix": "davon aktiv",
-        "noActive": "Keine aktiven Spendenaufrufe"
+        "activeStatus": "{count, plural, =0 {Keine aktiven Spendenaufrufe} other {<bold>{count, number}</bold> davon aktiv}}"
       },
       "totalRaised": {
         "label": "Insgesamt gesammelt",
@@ -34,6 +33,7 @@
     },
     "toolbar": {
       "searchPlaceholder": "Name oder Ersteller",
+      "searchAria": "Spendenaufrufe nach Name oder Ersteller suchen",
       "resultCount": "<bold>{visible}</bold> von {total} angezeigt"
     },
     "statusFilter": {
