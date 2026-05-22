@@ -114,10 +114,7 @@ function HostsStripDisplay({
         {avatarHosts.map((host, index) => (
           <Avatar
             key={host.id ?? index}
-            className={cn(
-              'w-6 h-6 border-2 border-card',
-              index > 0 && '-ml-2'
-            )}
+            className={cn('w-6 h-6 border-2 border-card', index > 0 && '-ml-2')}
             title={host.name}
           >
             {host.avatarUrl && (
@@ -183,5 +180,16 @@ function HostsPreview() {
     profile?.image || user.picture
   );
 
-  return <HostsStripDisplay hosts={[{ name, avatarUrl }]} />;
+  const hosts = [{ name, avatarUrl }];
+
+  return (
+    <>
+      <div className='md:hidden'>
+        <HostsStripDisplay hosts={hosts} />
+      </div>
+      <div className='hidden md:block'>
+        <HostsListDisplay hosts={hosts} />
+      </div>
+    </>
+  );
 }
