@@ -137,11 +137,6 @@ function DonateOverlayInner({
     />
   ) : (
     <>
-      {error?.code && (
-        <div ref={errorBannerRef}>
-          <DonationFailureBanner errorCode={error.code} reset={reset} />
-        </div>
-      )}
       <DonorInfo />
       <PaymentMethods />
     </>
@@ -154,6 +149,11 @@ function DonateOverlayInner({
       {thankYouState === null && (
         <>
           <DonateOptions />
+          {error?.code && (
+            <div ref={errorBannerRef}>
+              <DonationFailureBanner errorCode={error.code} reset={reset} />
+            </div>
+          )}
           <DonateCTA
             isLoading={isLoading}
             isSuccess={false}
