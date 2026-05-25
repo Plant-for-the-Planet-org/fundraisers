@@ -252,9 +252,10 @@
           "expand": "Expand",
           "remove": "Remove Thank You Message",
           "toggleEnabled": "Toggle Thank You Message",
-          "messageLabel": "Message",
+          "messageLabel": "Write a message",
           "editorPlaceholder": "Write your thank-you message...",
-          "presetTopic": "Pick a topic for inspiration",
+          "presetTopic": "Pick a topic",
+          "pickMessage": "Pick a message",
           "presetTopicPlaceholder": "Choose a topic...",
           "presetTopics": {
             "climateJustice": "Climate Justice",

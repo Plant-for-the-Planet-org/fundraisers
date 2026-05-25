@@ -136,7 +136,10 @@ export function ThankYouMessagePanel({ onRemove }: { onRemove: () => void }) {
 
           {/* Preset message cards */}
           {presetMessages.length > 0 && (
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-1.5'>
+              <span className='text-xs font-semibold'>
+                {t('pickMessage')}
+              </span>
               {presetMessages.map(preset => (
                 <button
                   key={preset.id}

@@ -252,9 +252,10 @@
           "expand": "Erweitern",
           "remove": "Dankesnachricht entfernen",
           "toggleEnabled": "Dankesnachricht umschalten",
-          "messageLabel": "Nachricht",
+          "messageLabel": "Nachricht verfassen",
           "editorPlaceholder": "Schreibe deine Dankesnachricht...",
-          "presetTopic": "Wähle ein Thema zur Inspiration",
+          "presetTopic": "Thema wählen",
+          "pickMessage": "Nachricht wählen",
           "presetTopicPlaceholder": "Thema auswählen...",
           "presetTopics": {
             "climateJustice": "Klimagerechtigkeit",
