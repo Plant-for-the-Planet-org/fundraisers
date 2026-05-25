@@ -283,11 +283,15 @@
           },
           "errors": {
             "recipientName": {
-              "required": "Recipient name is required"
+              "required": "Recipient name is required",
+              "tooLong": "Recipient Name must be 35 characters or less"
             },
             "recipientEmail": {
               "invalid": "Please enter a valid email address",
               "requiredWithMessage": "Email is required when a message is added"
+            },
+            "message": {
+              "tooLong": "Personal message cannot exceed 250 characters"
             }
           }
         }

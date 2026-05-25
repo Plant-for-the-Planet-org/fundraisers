@@ -128,7 +128,14 @@ export function DonationGiftSection({
               placeholder={t('gift.message.placeholder')}
               value={values.message}
               onChange={e => onFieldChange('message', e.target.value)}
+              aria-invalid={!!errors.message}
+              aria-describedby='gift-message-error'
             />
+            {errors.message && (
+              <p id='gift-message-error' className='text-sm text-destructive'>
+                {errors.message}
+              </p>
+            )}
           </div>
         </div>
       )}

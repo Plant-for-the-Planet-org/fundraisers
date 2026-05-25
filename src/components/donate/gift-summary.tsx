@@ -36,7 +36,7 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
           </h3>
 
           {gift.message !== undefined && (
-            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm'>
+            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm wrap-anywhere'>
               &ldquo;{gift.message}&rdquo;
             </blockquote>
           )}
