@@ -1,12 +1,21 @@
 'use client';
 
+import type { ChangeEvent } from 'react';
 import type {
   StripeCardCvcElementChangeEvent,
   StripeCardExpiryElementChangeEvent,
   StripeCardNumberElementChangeEvent,
 } from '@stripe/stripe-js';
+import type { DonationFormValues } from './donation-form-context';
 
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import {
   CardCvcElement,
@@ -15,6 +24,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { useAuthStore } from '@/stores/auth-store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
@@ -58,6 +68,15 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const elements = useElements();
     const t = useTranslations('Donate.card');
 
+    const { control } = useFormContext<DonationFormValues>();
+    const [firstname, lastname] = useWatch({
+      control,
+      name: ['firstname', 'lastname'],
+    });
+    const profileDisplayName = useAuthStore(
+      state => state.user?.profile?.displayName
+    );
+
     const [cardNumberComplete, setCardNumberComplete] = useState(false);
     const [cardNumberError, setCardNumberError] = useState<string | null>(null);
     const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
@@ -68,6 +87,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const [cardholderNameError, setCardholderNameError] = useState<
       string | null
     >(null);
+    const cardholderNameEditedRef = useRef(false);
     const [useDonorAddress, setUseDonorAddress] = useState(true);
     const [billingAddress, setBillingAddress] = useState('');
     const [billingAddressError, setBillingAddressError] = useState<
@@ -87,6 +107,13 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const [billingCountryError, setBillingCountryError] = useState<
       string | null
     >(null);
+
+    // Track donor name until the donor edits the cardholder field manually.
+    useEffect(() => {
+      if (cardholderNameEditedRef.current) return;
+      const fromForm = `${firstname ?? ''} ${lastname ?? ''}`.trim();
+      setCardholderName(fromForm || profileDisplayName?.trim() || '');
+    }, [firstname, lastname, profileDisplayName]);
 
     useImperativeHandle(ref, () => ({
       async createPaymentMethod({ email, donorAddress }) {
@@ -207,6 +234,14 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
       setCardCvcError(event.error?.message ?? null);
     };
 
+    const handleCardholderNameChange = (
+      event: ChangeEvent<HTMLInputElement>
+    ) => {
+      cardholderNameEditedRef.current = true;
+      setCardholderName(event.target.value);
+      if (cardholderNameError) setCardholderNameError(null);
+    };
+
     return (
       <div className='space-y-4'>
         <FormField
@@ -249,10 +284,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         >
           <Input
             value={cardholderName}
-            onChange={e => {
-              setCardholderName(e.target.value);
-              if (cardholderNameError) setCardholderNameError(null);
-            }}
+            onChange={handleCardholderNameChange}
             placeholder={t('cardholderNamePlaceholder')}
             className='mt-2'
           />
