@@ -243,6 +243,30 @@
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum von {max} Folien erreicht"
+        },
+        "thankYouMessage": {
+          "title": "Dankesnachricht",
+          "blurb": "Zeige Spendern nach Abschluss ihrer Spende eine individuelle Nachricht.",
+          "subtitle": "Personalisiere, was Spender nach ihrer Spende sehen",
+          "collapse": "Zusammenklappen",
+          "expand": "Erweitern",
+          "remove": "Dankesnachricht entfernen",
+          "toggleEnabled": "Dankesnachricht umschalten",
+          "messageLabel": "Nachricht",
+          "editorPlaceholder": "Schreibe deine Dankesnachricht...",
+          "presetTopic": "Wähle ein Thema zur Inspiration",
+          "presetTopicPlaceholder": "Thema auswählen...",
+          "presetTopics": {
+            "climateJustice": "Klimagerechtigkeit",
+            "events": "Veranstaltungen",
+            "sports": "Sport",
+            "birthday": "Geburtstag",
+            "tech": "Technologie",
+            "wedding": "Hochzeit",
+            "memorial": "Gedenken",
+            "school": "Schule",
+            "corporate": "Unternehmen"
+          }
         }
       },
       "contributionSettings": {

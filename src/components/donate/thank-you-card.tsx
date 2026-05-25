@@ -5,6 +5,7 @@ import type {
   DonationFrequency,
   DonationPaymentStatus,
 } from '@/lib/types/donation';
+import type { SafeHtml } from '@/lib/types/safe-html';
 import type { PaymentResultGroup } from './status-badge';
 
 import { useTranslations } from 'next-intl';
@@ -35,6 +36,7 @@ interface ThankYouCardProps {
   formattedAmount?: string;
   children?: ReactNode;
   paymentResult?: DonationPaymentStatus;
+  customMessage?: SafeHtml | null;
 }
 
 export function ThankYouCard({
@@ -43,6 +45,7 @@ export function ThankYouCard({
   formattedAmount,
   children,
   paymentResult,
+  customMessage,
 }: ThankYouCardProps) {
   const t = useTranslations('Donate.thankYou');
 
@@ -84,9 +87,17 @@ export function ThankYouCard({
           paymentResultGroup={paymentResultGroup}
         />
 
-        <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
-          {message}
-        </p>
+        {/* Custom thank-you message replaces default i18n message for completed variant */}
+        {variant === 'completed' && customMessage ? (
+          <div
+            className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500 [&_strong]:font-semibold [&_em]:italic [&_u]:underline'
+            dangerouslySetInnerHTML={{ __html: customMessage as string }}
+          />
+        ) : (
+          <p className='mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-500'>
+            {message}
+          </p>
+        )}
       </div>
 
       {/* Body — transfer details or other payment-specific content */}

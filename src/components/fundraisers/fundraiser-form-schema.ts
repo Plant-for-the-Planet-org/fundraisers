@@ -21,6 +21,7 @@ import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { THANK_YOU_MESSAGE_LIMITS } from '@/components/thank-you-message/constants';
 import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
@@ -93,6 +94,17 @@ const stageSlideSchema = z.object({
   duration: z.number().int().min(1).max(60),
 });
 
+export const thankYouMessageSchema = z.object({
+  enabled: z.boolean(),
+  message: z
+    .string()
+    .refine(
+      val =>
+        getRichTextTextContent(val).length <= THANK_YOU_MESSAGE_LIMITS.message,
+      { message: 'maxLength' }
+    ),
+});
+
 export const stageModeSchema = z.object({
   enabled: z.boolean(),
   locale: z.enum(routing.locales),
@@ -143,6 +155,7 @@ export const fundraiserFormSchema = z.object({
         slug: z.enum(BUNDLE_SLUGS).nullable(),
       }),
       stage: stageModeSchema.nullable(),
+      thankYouMessage: thankYouMessageSchema.nullable(),
     }),
   }),
 });
@@ -192,6 +205,7 @@ export function buildDefaultCreateValues(
         leaderboard: { ...DEFAULT_LEADERBOARD },
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
+        thankYouMessage: null,
       },
     },
   };
@@ -270,6 +284,7 @@ export function fundraiserToFormValues(
         },
         bundle: { slug: bundleSlug },
         stage: fundraiser.settings?.modules?.stage ?? null,
+        thankYouMessage: fundraiser.settings?.modules?.thankYouMessage ?? null,
       },
     },
   };

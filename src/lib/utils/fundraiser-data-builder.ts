@@ -40,6 +40,13 @@ function isStageDirty(dirty: UpdateDirtyFields): boolean {
   return true;
 }
 
+function isThankYouMessageDirty(dirty: UpdateDirtyFields): boolean {
+  const thankYouMessage = dirty.settings?.modules?.thankYouMessage;
+  if (!thankYouMessage) return false;
+  if (typeof thankYouMessage === 'boolean') return thankYouMessage;
+  return true;
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -112,6 +119,8 @@ export function buildUpdateFundraiserRequest(
     dirtyModules.leaderboard = values.settings.modules.leaderboard;
   if (isStageDirty(dirtyFields))
     dirtyModules.stage = values.settings.modules.stage;
+  if (isThankYouMessageDirty(dirtyFields))
+    dirtyModules.thankYouMessage = values.settings.modules.thankYouMessage;
   if (isBundleDirty(dirtyFields))
     dirtyModules.bundle = values.settings.modules.bundle;
   if (Object.keys(dirtyModules).length > 0) {
@@ -144,6 +153,7 @@ export function buildCreateFundraiserRequest(
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
+        thankYouMessage: values.settings.modules.thankYouMessage,
       },
     },
     startDate: getTodayString(),

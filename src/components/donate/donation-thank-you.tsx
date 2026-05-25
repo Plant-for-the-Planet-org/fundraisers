@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
+import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { ShareSection } from './share-section';
@@ -11,11 +12,13 @@ import { TransferDetailsList } from './transfer-details-list';
 interface DonationThankYouProps {
   thankYouState: ThankYouState;
   fundraiserSlug: string;
+  customThankYouMessage?: SafeHtml | null;
 }
 
 export function DonationThankYou({
   thankYouState,
   fundraiserSlug,
+  customThankYouMessage,
 }: DonationThankYouProps) {
   let card: ReactNode;
   switch (thankYouState.status) {
@@ -51,7 +54,12 @@ export function DonationThankYou({
       );
       break;
     default:
-      card = <ThankYouCard variant='completed' />;
+      card = (
+        <ThankYouCard
+          variant='completed'
+          customMessage={customThankYouMessage}
+        />
+      );
   }
 
   return (

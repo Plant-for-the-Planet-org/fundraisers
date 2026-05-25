@@ -243,6 +243,30 @@
           "removeSlide": "Remove slide",
           "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum {max} slides reached"
+        },
+        "thankYouMessage": {
+          "title": "Thank You Message",
+          "blurb": "Show a custom message to donors after they complete their donation.",
+          "subtitle": "Personalize what donors see after giving",
+          "collapse": "Collapse",
+          "expand": "Expand",
+          "remove": "Remove Thank You Message",
+          "toggleEnabled": "Toggle Thank You Message",
+          "messageLabel": "Message",
+          "editorPlaceholder": "Write your thank-you message...",
+          "presetTopic": "Pick a topic for inspiration",
+          "presetTopicPlaceholder": "Choose a topic...",
+          "presetTopics": {
+            "climateJustice": "Climate Justice",
+            "events": "Events",
+            "sports": "Sports",
+            "birthday": "Birthday",
+            "tech": "Tech",
+            "wedding": "Wedding",
+            "memorial": "Memorial",
+            "school": "School",
+            "corporate": "Corporate"
+          }
         }
       },
       "contributionSettings": {

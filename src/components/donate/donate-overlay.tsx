@@ -12,6 +12,7 @@ import { createPortal } from 'react-dom';
 import { useLocale } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/utils/get-stripe';
+import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
 import { DonateCTA } from './donate-cta';
 import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
@@ -130,10 +131,17 @@ function DonateOverlayInner({
     }
   }, [error?.code]);
 
+  const thankYouModule = fundraiser.settings?.modules?.thankYouMessage;
+  const customThankYouMessage =
+    thankYouModule?.enabled && thankYouModule?.message
+      ? sanitizeThankYouHtml(thankYouModule.message)
+      : null;
+
   const leftColumn = thankYouState ? (
     <DonationThankYou
       thankYouState={thankYouState}
       fundraiserSlug={fundraiser.slug}
+      customThankYouMessage={customThankYouMessage}
     />
   ) : (
     <>
