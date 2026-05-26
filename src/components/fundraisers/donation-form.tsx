@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   GIFT_MESSAGE_MAX_LENGTH,
+  RECIPIENT_EMAIL_MAX_LENGTH,
   RECIPIENT_NAME_MAX_LENGTH,
   validateDonationGift,
 } from '@/lib/donation/gift-validation';
@@ -133,6 +134,7 @@ export function DonationForm({
     'recipientName.required': t('gift.errors.recipientName.required'),
     'recipientName.tooLong': t('gift.errors.recipientName.tooLong'),
     'recipientEmail.invalid': t('gift.errors.recipientEmail.invalid'),
+    'recipientEmail.tooLong': t('gift.errors.recipientEmail.tooLong'),
     'recipientEmail.requiredWithMessage': t(
       'gift.errors.recipientEmail.requiredWithMessage'
     ),
@@ -161,13 +163,23 @@ export function DonationForm({
       setGiftErrors(prev => ({
         ...prev,
         message: tooLong ? giftErrorMessages['message.tooLong'] : undefined,
-        ...(prev.recipientEmail ? { recipientEmail: undefined } : {}),
+        ...(prev.recipientEmail ===
+        giftErrorMessages['recipientEmail.requiredWithMessage']
+          ? { recipientEmail: undefined }
+          : {}),
       }));
       return;
     }
 
-    if (field === 'recipientEmail' && giftErrors.recipientEmail) {
-      setGiftErrors(prev => ({ ...prev, recipientEmail: undefined }));
+    if (field === 'recipientEmail') {
+      const tooLong = value.trim().length > RECIPIENT_EMAIL_MAX_LENGTH;
+      setGiftErrors(prev => ({
+        ...prev,
+        recipientEmail: tooLong
+          ? giftErrorMessages['recipientEmail.tooLong']
+          : undefined,
+      }));
+      return;
     }
   };
 

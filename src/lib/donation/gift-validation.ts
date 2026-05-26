@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const RECIPIENT_NAME_MAX_LENGTH = 35;
+export const RECIPIENT_EMAIL_MAX_LENGTH = 254;
 export const GIFT_MESSAGE_MAX_LENGTH = 250;
 
 export interface DonationGiftValues {
@@ -19,6 +20,7 @@ export type DonationGiftErrorCode =
   | 'recipientName.required'
   | 'recipientName.tooLong'
   | 'recipientEmail.invalid'
+  | 'recipientEmail.tooLong'
   | 'recipientEmail.requiredWithMessage'
   | 'message.tooLong';
 
@@ -31,7 +33,14 @@ const donationGiftSchema = z
       .max(RECIPIENT_NAME_MAX_LENGTH, { message: 'recipientName.tooLong' }),
     recipientEmail: z.preprocess(
       value => (typeof value === 'string' ? value.trim() : value),
-      z.union([z.literal(''), z.email({ message: 'recipientEmail.invalid' })])
+      z.union([
+        z.literal(''),
+        z
+          .email({ message: 'recipientEmail.invalid' })
+          .max(RECIPIENT_EMAIL_MAX_LENGTH, {
+            message: 'recipientEmail.tooLong',
+          }),
+      ])
     ),
     message: z
       .string()
@@ -81,7 +90,9 @@ export function validateDonationGift(values: DonationGiftValues):
     }
 
     if (issue.path[0] === 'recipientEmail' && !errorCodes.recipientEmail) {
-      if (issue.message === 'recipientEmail.requiredWithMessage') {
+      if (issue.message === 'recipientEmail.tooLong') {
+        errorCodes.recipientEmail = 'recipientEmail.tooLong';
+      } else if (issue.message === 'recipientEmail.requiredWithMessage') {
         errorCodes.recipientEmail = 'recipientEmail.requiredWithMessage';
       } else {
         errorCodes.recipientEmail = 'recipientEmail.invalid';

@@ -41,7 +41,7 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
             </blockquote>
           )}
 
-          <p className='text-muted-foreground text-sm'>
+          <p className='text-muted-foreground text-sm wrap-anywhere'>
             {gift.recipientEmail !== undefined
               ? t.rich(recipientEmailNoticeKey, {
                   recipientEmail: gift.recipientEmail,

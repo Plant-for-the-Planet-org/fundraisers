@@ -288,6 +288,7 @@
             },
             "recipientEmail": {
               "invalid": "Bitte gib eine gültige E-Mail ein",
+              "tooLong": "E-Mail darf höchstens 254 Zeichen lang sein",
               "requiredWithMessage": "E-Mail ist erforderlich, wenn eine persönliche Nachricht eingegeben wurde"
             },
             "message": {

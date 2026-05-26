@@ -288,6 +288,7 @@
             },
             "recipientEmail": {
               "invalid": "Please enter a valid email address",
+              "tooLong": "Email must be 254 characters or less",
               "requiredWithMessage": "Email is required when a message is added"
             },
             "message": {
