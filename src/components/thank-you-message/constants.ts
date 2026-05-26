@@ -46,7 +46,7 @@ export const THANK_YOU_PRESET_MESSAGES: Record<
     de: [
       {
         id: 'cj-1',
-        text: 'Deine Spende pflanzt echte Bäume und bekämpft den Klimawandel. Danke, dass du bei uns stehst!',
+        text: 'Deine Spende pflanzt echte Bäume und bekämpft die Klimakrise. Danke, dass du mit uns zusammen stehst!',
       },
       {
         id: 'cj-2',
