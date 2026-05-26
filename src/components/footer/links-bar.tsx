@@ -30,7 +30,7 @@ export function LinksBar() {
           </li>
         ))}
         <span className='text-muted-foreground/40'>•</span>
-        <CookieSettingsButton className='text-xs text-muted-foreground hover:text-foreground p-0 h-auto' />
+        <CookieSettingsButton className='text-xs text-muted-foreground hover:text-foreground hover:opacity-90 p-0 h-auto no-underline' />
       </ul>
     </nav>
   );
