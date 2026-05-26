@@ -4,6 +4,11 @@ import type { ReactNode } from 'react';
 import type { BgSettings, Theme } from '@/lib/theme/types';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
+  ssr: false,
+});
 import { usePathname } from 'next/navigation';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import {
@@ -86,6 +91,9 @@ export function ThemeShell({
           opacity={bg.opacity}
           mode={activeTheme.mode}
         />
+      )}
+      {bg.animation !== 'none' && (
+        <AnimationOverlay animation={bg.animation} mode={activeTheme.mode} />
       )}
       <div className='relative z-10 flex flex-col min-h-screen'>{children}</div>
     </div>
