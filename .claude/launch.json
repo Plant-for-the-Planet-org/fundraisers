@@ -6,7 +6,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "eval \"$(fnm env)\" && fnm use 24 >/dev/null && npm run dev"
+        "source \"$HOME/.nvm/nvm.sh\" && nvm use 24 >/dev/null && npm run dev"
       ],
       "port": 3000,
       "autoPort": true
