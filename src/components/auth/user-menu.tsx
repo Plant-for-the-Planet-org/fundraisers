@@ -106,6 +106,12 @@ export function UserMenu() {
               <span>{tHeaderLinks('explore')}</span>
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild className='cursor-pointer md:hidden'>
+            <Link href='/fundraisers/create' className='flex items-center'>
+              <Plus className='mr-2 h-4 w-4' />
+              <span>{tFundraiser('startFundraiser')}</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
               <CreditCard className='mr-2 h-4 w-4' />
@@ -128,12 +134,6 @@ export function UserMenu() {
               </span>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem asChild className='cursor-pointer md:hidden'>
-            <Link href='/fundraisers/create' className='flex items-center'>
-              <Plus className='mr-2 h-4 w-4' />
-              <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <SignOutButton />
