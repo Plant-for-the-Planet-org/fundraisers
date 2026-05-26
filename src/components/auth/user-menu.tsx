@@ -11,7 +11,6 @@ import { useImpersonationStore } from '@/stores/impersonation-store';
 import { ImpersonationModal } from '@/components/auth/impersonation-modal';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { SignOutButton } from '@/components/auth/sign-out-button';
-import { HEADER_LINKS } from '@/components/header/config';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +34,6 @@ export function UserMenu() {
   const tFundraiser = useTranslations('Fundraisers');
   const tHeaderLinks = useTranslations('Common.headerLinks');
   const tAuth = useTranslations('Auth');
-  const tHeaderLinks = useTranslations('Common.headerLinks');
 
   const pathname = usePathname();
   // store: state
@@ -63,9 +61,6 @@ export function UserMenu() {
   const displayName = profile?.displayName || user?.name;
   const userEmail = profile?.email || user?.email;
   const canImpersonate = !!userEmail?.endsWith(IMPERSONATION_DOMAIN);
-  const headerLinksInUserMenu = HEADER_LINKS.filter(
-    link => link.showInMobileUserMenu
-  );
 
   return (
     <>

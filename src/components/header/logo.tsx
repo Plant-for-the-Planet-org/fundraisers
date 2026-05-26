@@ -5,7 +5,7 @@ export function Logo() {
   const t = useTranslations('Common.brand');
 
   return (
-    <Link href='/' className='logo flex items-center gap-2'>
+    <Link href='/' className='logo flex items-center mr-4'>
       <svg
         xmlns='http://www.w3.org/2000/svg'
         viewBox='1 14 502 177'

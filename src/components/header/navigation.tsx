@@ -8,10 +8,10 @@ export function Navigation() {
 
   return (
     <nav
-      className='navigation hidden xs:flex items-center gap-6'
+      className='navigation hidden xs:flex items-center gap-4'
       aria-label={tAria('primaryNavigation')}
     >
-      <ul className='flex items-center gap-6 list-none p-0 m-0'>
+      <ul className='flex items-center gap-4 list-none p-0 m-0'>
         {HEADER_LINKS.map(link => (
           <li key={link.labelKey}>
             <Link
