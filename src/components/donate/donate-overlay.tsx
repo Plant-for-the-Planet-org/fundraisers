@@ -7,7 +7,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
@@ -120,6 +120,17 @@ function DonateOverlayInner({
   );
   const { thankYouState, error, isLoading } = donationState;
 
+  const [isPaymentFormReady, setIsPaymentFormReady] = useState(false);
+  const handlePaymentFormReadyChange = useCallback(
+    (isReady: boolean) => setIsPaymentFormReady(isReady),
+    []
+  );
+
+  // Reset donation state (backend errors) when overlay closes
+  useEffect(() => {
+    if (!isOpen) reset();
+  }, [isOpen, reset]);
+
   const errorBannerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (error?.code) {
@@ -138,7 +149,7 @@ function DonateOverlayInner({
   ) : (
     <>
       <DonorInfo />
-      <PaymentMethods />
+      <PaymentMethods onReadyChange={handlePaymentFormReadyChange} />
     </>
   );
 
@@ -157,6 +168,8 @@ function DonateOverlayInner({
           <DonateCTA
             isLoading={isLoading}
             isSuccess={false}
+            isPaymentFormReady={isPaymentFormReady}
+            resetError={reset}
             onPayPalCreateOrder={onPayPalCreateOrder}
             onPayPalApproved={onPayPalApproved}
             onPayPalError={onPayPalError}

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
 import type { DonationFormValues } from './donation-form-context';
 
+import { useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Button } from '../ui/button';
@@ -15,6 +16,9 @@ import { PayPalButton } from './paypal-button';
 interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
+  /** true when card/SEPA form fields are complete and have no inline errors */
+  isPaymentFormReady: boolean;
+  resetError: () => void;
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
@@ -23,6 +27,8 @@ interface DonateCTAProps {
 export function DonateCTA({
   isLoading,
   isSuccess,
+  isPaymentFormReady,
+  resetError,
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
@@ -41,6 +47,24 @@ export function DonateCTA({
   const makeMonthly = useWatch<DonationFormValues, 'makeMonthly'>({
     name: 'makeMonthly',
   });
+
+  // Clear submission error when user switches payment method
+  const prevMethodRef = useRef(selectedPaymentMethod);
+  useEffect(() => {
+    if (
+      prevMethodRef.current !== undefined &&
+      prevMethodRef.current !== selectedPaymentMethod
+    ) {
+      resetError();
+    }
+    prevMethodRef.current = selectedPaymentMethod;
+  }, [selectedPaymentMethod, resetError]);
+
+  // Card/SEPA: disabled until form is complete and error-free
+  // PayPal/bank_transfer/planet_cash: no inline form, always ready
+  const needsFormReady =
+    selectedPaymentMethod === 'card' || selectedPaymentMethod === 'sepa_debit';
+  const isFormIncomplete = needsFormReady && !isPaymentFormReady;
 
   if (selectedPaymentMethod === 'paypal') {
     return (
@@ -86,7 +110,7 @@ export function DonateCTA({
       <Button
         className='w-full h-12 bg-gray-900 hover:bg-gray-700 text-white font-medium disabled:opacity-50'
         onClick={handleSubmit(onSubmit)}
-        disabled={isLoading || isSuccess}
+        disabled={isLoading || isSuccess || isFormIncomplete}
       >
         <div className='flex items-center gap-2'>{buttonContent}</div>
       </Button>

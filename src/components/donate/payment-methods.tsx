@@ -40,7 +40,11 @@ import {
 import { useFieldError } from '@/components/donate/use-field-error';
 import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-methods';
 
-export function PaymentMethods() {
+interface PaymentMethodsProps {
+  onReadyChange?: (isReady: boolean) => void;
+}
+
+export function PaymentMethods({ onReadyChange }: PaymentMethodsProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const translateError = useFieldError();
 
@@ -393,8 +397,10 @@ export function PaymentMethods() {
       });
       // Entering new details — clear any previously selected saved method.
       setValue('selectedSavedMethodId', '', { shouldDirty: true });
+      // Previous form unmounts on method switch, reset readiness
+      onReadyChange?.(false);
     },
-    [setValue]
+    [setValue, onReadyChange]
   );
 
   const handleSavedMethodSelect = useCallback(
@@ -597,7 +603,7 @@ export function PaymentMethods() {
       )}
 
       <div ref={formSectionRef} className='scroll-mt-4'>
-        <PaymentEntryForms />
+        <PaymentEntryForms onReadyChange={onReadyChange} />
       </div>
     </div>
   );
