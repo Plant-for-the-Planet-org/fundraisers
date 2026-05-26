@@ -32,7 +32,7 @@ export const THANK_YOU_PRESET_MESSAGES: Record<
     en: [
       {
         id: 'cj-1',
-        text: 'Your gift plants real trees and fights climate change. Thank you for standing with us!',
+        text: 'Your gift plants real trees and fights the climate crisis. Thank you for standing with us!',
       },
       {
         id: 'cj-2',
