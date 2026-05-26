@@ -106,7 +106,7 @@ export function UserMenu() {
           <DropdownMenuSeparator />
           {headerLinksInUserMenu.map(link => (
             <DropdownMenuItem
-              key={`header-link-${link.labelKey}`}
+              key={link.labelKey}
               asChild
               className='cursor-pointer xs:hidden'
             >
