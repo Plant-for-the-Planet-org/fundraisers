@@ -2,9 +2,24 @@ export const THANK_YOU_MESSAGE_LIMITS = {
   message: 250,
 } as const;
 
+export const THANK_YOU_TOPIC_LABEL_KEYS = [
+  'climateJustice',
+  'events',
+  'sports',
+  'birthday',
+  'tech',
+  'wedding',
+  'memorial',
+  'school',
+  'corporate',
+] as const;
+
+export type ThankYouTopicLabelKey =
+  (typeof THANK_YOU_TOPIC_LABEL_KEYS)[number];
+
 export interface ThankYouTopic {
   id: string;
-  labelKey: string;
+  labelKey: ThankYouTopicLabelKey;
 }
 
 export interface ThankYouPresetMessage {
