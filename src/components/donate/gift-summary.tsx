@@ -31,17 +31,17 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
             aria-hidden='true'
           />
 
-          <h3 className='font-semibold leading-tight text-foreground wrap-anywhere pr-8'>
+          <h3 className='font-semibold leading-tight text-foreground wrap-break-word pr-8'>
             {t('dedicatedTo', { recipientName: gift.recipientName })}
           </h3>
 
           {gift.message !== undefined && (
-            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm wrap-anywhere'>
+            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm wrap-break-word'>
               &ldquo;{gift.message}&rdquo;
             </blockquote>
           )}
 
-          <p className='text-muted-foreground text-sm wrap-anywhere'>
+          <p className='text-muted-foreground text-sm wrap-break-word'>
             {gift.recipientEmail !== undefined
               ? t.rich(recipientEmailNoticeKey, {
                   recipientEmail: gift.recipientEmail,

@@ -76,7 +76,9 @@ export function DonationGiftSection({
               onChange={e => onFieldChange('recipientName', e.target.value)}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
               aria-invalid={!!errors.recipientName}
-              aria-describedby='gift-recipient-name-error'
+              aria-describedby={
+                errors.recipientName ? 'gift-recipient-name-error' : undefined
+              }
             />
             {errors.recipientName && (
               <p
@@ -103,7 +105,9 @@ export function DonationGiftSection({
               onChange={e => onFieldChange('recipientEmail', e.target.value)}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500'
               aria-invalid={!!errors.recipientEmail}
-              aria-describedby='gift-recipient-email-error'
+              aria-describedby={
+                errors.recipientEmail ? 'gift-recipient-email-error' : undefined
+              }
             />
             {errors.recipientEmail && (
               <p
@@ -129,7 +133,9 @@ export function DonationGiftSection({
               value={values.message}
               onChange={e => onFieldChange('message', e.target.value)}
               aria-invalid={!!errors.message}
-              aria-describedby='gift-message-error'
+              aria-describedby={
+                errors.message ? 'gift-message-error' : undefined
+              }
             />
             {errors.message && (
               <p id='gift-message-error' className='text-sm text-destructive'>
