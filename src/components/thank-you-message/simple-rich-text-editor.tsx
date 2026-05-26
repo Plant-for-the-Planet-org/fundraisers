@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { Bold, Italic, Underline as UnderlineIcon } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
@@ -76,7 +75,6 @@ export function SimpleRichTextEditor({
         code: false,
         codeBlock: false,
       }),
-      Underline,
       Placeholder.configure({ placeholder }),
     ],
     content: value,
