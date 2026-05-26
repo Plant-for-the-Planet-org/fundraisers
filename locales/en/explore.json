@@ -22,7 +22,12 @@
       "noCategoriesFound": "No local fundraisers available at the moment.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
     },
+    "locationMap": {
+      "title": "Map View",
+      "comingSoon": "Interactive map coming soon"
+    },
     "categoryPage": {
+      "loadingAria": "Loading category page",
       "metadata": {
         "title": "{categoryName} Fundraisers",
         "description": "Discover {categoryName} fundraisers and support causes you care about."

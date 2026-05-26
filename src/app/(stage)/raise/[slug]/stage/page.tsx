@@ -1,10 +1,12 @@
+import type { Locale } from '@/i18n/routing';
+
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { StageView } from '@/components/stage/stage-view';
-import { routing, type Locale } from '@/i18n/routing';
+import { routing } from '@/i18n/routing';
 
 async function loadStageMessages(locale: Locale) {
   const mod = await import(`../../../../../../locales/${locale}/stage.json`);

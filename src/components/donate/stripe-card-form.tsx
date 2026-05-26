@@ -126,11 +126,13 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             hasError = true;
           }
         }
-        if (hasError) return { error: 'Validation failed' };
+        if (hasError) return { error: t('errors.validationFailed') };
 
-        if (!stripe || !elements) return { error: 'Stripe not initialized' };
+        if (!stripe || !elements)
+          return { error: t('errors.stripeNotInitialized') };
         const cardNumberElement = elements.getElement(CardNumberElement);
-        if (!cardNumberElement) return { error: 'Card element not found' };
+        if (!cardNumberElement)
+          return { error: t('errors.cardElementNotFound') };
 
         const stripeAddress = useDonorAddress
           ? {
@@ -161,21 +163,23 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         });
 
         if (error)
-          return { error: error.message ?? 'Payment method creation failed' };
+          return { error: error.message ?? t('errors.paymentMethodFailed') };
         return { paymentMethodId: paymentMethod.id };
       },
 
       async handleCardAction(clientSecret) {
-        if (!stripe) return { error: 'Stripe not initialized' };
+        if (!stripe) return { error: t('errors.stripeNotInitialized') };
         const { paymentIntent, error } =
           await stripe.handleCardAction(clientSecret);
-        if (error) return { error: error.message ?? 'Card action failed' };
-        if (!paymentIntent) return { error: 'Payment intent not returned' };
+        if (error)
+          return { error: error.message ?? t('errors.cardActionFailed') };
+        if (!paymentIntent)
+          return { error: t('errors.paymentIntentNotReturned') };
         return { paymentIntentId: paymentIntent.id };
       },
 
       async confirmCardPayment(clientSecret, paymentMethod) {
-        if (!stripe) return { error: 'Stripe not initialized' };
+        if (!stripe) return { error: t('errors.stripeNotInitialized') };
         const { error } = await stripe.confirmCardPayment(
           clientSecret,
           paymentMethod ? { payment_method: paymentMethod } : {}

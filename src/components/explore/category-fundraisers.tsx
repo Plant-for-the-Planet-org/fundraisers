@@ -42,7 +42,7 @@ export function CategoryFundraisers({
         value={optimisticSort}
         onValueChange={handleSortChange}
       >
-        <div className='flex flex-wrap gap-y-1 items-center justify-between'>
+        <div className='flex flex-wrap gap-y-2 gap-x-2 items-center justify-between'>
           <h2 className='text-xl font-semibold text-foreground'>
             {tCategoryPage('fundraisers.title')}
           </h2>

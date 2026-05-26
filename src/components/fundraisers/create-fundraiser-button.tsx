@@ -52,9 +52,8 @@ export function CreateFundraiserButton() {
       toast.success(t('successMessage'));
       router.replace(`/raise/${fundraiser.slug}`);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to create fundraiser';
-      toast.error(t('errorMessage'), { description: message });
+      console.error('Failed to create fundraiser:', err);
+      toast.error(t('errorMessage'), { description: t('errorDescription') });
       setIsSubmitting(false);
     }
   };

@@ -10,8 +10,9 @@
     format('woff2');
 }
 
-/* Class-based dark mode: activates when any ancestor has class="dark" */
-@variant dark (&:is(.dark *));
+/* Class-based dark mode: activates when any ancestor has class="dark",
+   but NOT inside a .light boundary (used by the donation overlay to force light mode). */
+@variant dark (&:is(.dark *):not(:is(.light *)));
 
 @theme {
   /* Fonts — referencing Next.js font CSS variables set in layout.tsx */
@@ -92,6 +93,7 @@
   --neutral-foreground: 220 14% 34%;
 }
 
+/* When adding variables here, also add them to .light in the block below */
 .dark {
   --tab-border-color: rgb(255 255 255 / 0.5);
   --background: 224 71.4% 4.1%;
@@ -112,6 +114,48 @@
   --accent-foreground: 210 20% 98%;
   --neutral: 220 14% 34%;
   --neutral-foreground: 220 13% 84%;
+}
+
+.light {
+  --tab-border-color: rgb(0 0 0 / 0.3);
+  --background: 0 0% 100%;
+  --foreground: 224 71.4% 4.1%;
+  --muted: 220 14.3% 95.9%;
+  --muted-foreground: 220 8.9% 46.1%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 71.4% 4.1%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 71.4% 4.1%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 142 76% 36%;
+  --destructive: 0 72% 51%;
+  --warning: 21 90% 48%;
+  --success: 160 84% 24%;
+  --accent: 220 14.3% 95.9%;
+  --accent-foreground: 220.9 39.3% 11%;
+  --neutral: 220 13% 84%;
+  --neutral-foreground: 220 14% 34%;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-destructive: hsl(var(--destructive));
+  --color-warning: hsl(var(--warning));
+  --color-success: hsl(var(--success));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-neutral: hsl(var(--neutral));
+  --color-neutral-foreground: hsl(var(--neutral-foreground));
+  --color-tab-border: var(--tab-border-color);
 }
 
 body {

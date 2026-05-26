@@ -3,13 +3,14 @@
 import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { DonorsStrip } from './donors-strip';
 import { getMockLeaderboardDonations } from './leaderboard/mock-data';
 import { SectionHeader } from './typography';
 
 export function DonorsPreview() {
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
   const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
@@ -20,7 +21,7 @@ export function DonorsPreview() {
       <SectionHeader>
         {t('donationCount', {
           count: recent.length,
-          formattedCount: recent.length.toLocaleString(),
+          formattedCount: recent.length.toLocaleString(locale),
         })}
       </SectionHeader>
       <DonorsStrip donations={recent} donationCount={recent.length} />

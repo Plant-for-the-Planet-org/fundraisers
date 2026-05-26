@@ -1,10 +1,10 @@
 {
   "Bundles": {
-    "sectionHeading": "Wähle Projekte für deinen Spendenaufruf aus",
+    "sectionHeading": "Wähle Projekte für deinen Aufruf aus",
     "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
-        "label": "Mitarbeiter Auswahl",
+        "label": "Team-Auswahl",
         "description": "Handverlesen vom Plant-for-the-Planet-Team."
       },
       "wonder": {
@@ -13,15 +13,15 @@
       },
       "rage": {
         "label": "Wut",
-        "description": "Hier läuft etwas schief und muss repariert werden."
+        "description": "Das ist defekt und muss repariert werden."
       },
       "love": {
         "label": "Liebe",
         "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
       },
       "custom": {
-        "label": "Benutzerdefiniert",
-        "description": "Stelle dein eigenes Paket zusammen - wähle Projekte einzeln aus."
+        "label": "Individuell",
+        "description": "Erstelle dein eigenes Paket - wähle Projekte einzeln aus."
       }
     },
     "card": {
@@ -30,43 +30,43 @@
       "selected": "Ausgewählt"
     },
     "aria": {
-      "openBundle": "Sehe dir das Paket {name} an",
-      "selectBundle": "Wähle das Paket {name} ",
+      "openBundle": "Sehe dir das {name} Paket an",
+      "selectBundle": "Wähle das {name} Paket",
       "selectedBundle": "Das {name} Paket ist gerade ausgewählt",
-      "openProject": "Erfahre mehr über {name} (öffnet in einem neuen Tab)",
-      "closeModal": "Paketvorschau schließen"
+      "openProject": "Erfahre mehr über {name} (öffnet in neuem Tab)",
+      "closeModal": "Vorschau schließen"
     },
     "modal": {
-      "projectsInside": "{count, plural, one {# Projekt enthalten} other {# Projekte enthalten}}",
-      "useBundle": "Dieses Paket verwenden",
+      "projectsInside": "{count, plural, one {# Projekt} other {# Projekte}}",
+      "useBundle": "Paket verwenden",
       "tag": {
         "rage": "WUT",
         "wonder": "STAUNEN",
         "love": "LIEBE",
-        "staff-picks": "MITARBEITER AUSWAHL"
+        "staff-picks": "TEAM-AUSWAHL"
       }
     },
     "custom": {
-      "description": "Stelle dein eigenes Paket zusammen - wähle Projekte einzeln aus.",
-      "searchPlaceholder": "Suche und wähle Projekte aus, um dein individuelles Paket zu erstellen",
+      "description": "Erstelle dein eigenes Paket - wähle Projekte einzeln aus.",
+      "searchPlaceholder": "Suche und wähle Projekte aus, um dein Paket zu erstellen",
       "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
-      "showingCount": "Top {shown, number} von {total, number} - Suche nach mehr - ✨ Top-Projekten",
+      "showingCount": "Top {shown, number} von {total, number} · Suche nach mehr · ✨ Top-Projekten",
       "noResults": "Keine Projekte entsprechen \"{query}\"",
-      "youMightLike": "Das könnte dir gefallen",
+      "youMightLike": "Die könnten dir gefallen",
       "clearSearch": "Suche löschen",
       "loading": "Projekte werden geladen...",
       "errorTitle": "Projekte konnten nicht geladen werden",
-      "errorMessage": "Es konnte keine Projekte geladen werden. Bitte versuche es nochmal.",
-      "retry": "Nochmal versuchen",
+      "errorMessage": "Projekte konnte nicht geladen werden. Versuche es erneut.",
+      "retry": "Erneut versuchen",
       "yourBundle": "Dein individuelles Paket",
       "projectCount": "{count, plural, =0 {Keine Projekte} one {# Projekt} other {# Projekte}}",
-      "emptyState": "Wähle mindestens ein Projekt aus, das du unterstützen möchtest.",
+      "emptyState": "Wähle mind. ein Projekt zur Unterstützung aus.",
       "allAddedTitle": "Alle Projekte hinzugefügt",
-      "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Spendenaufruf hinzugefügt",
+      "allAddedDescription": "Du hast alle verfügbaren Projekte zu deinem Aufruf hinzugefügt",
       "allocationLabel": "{percentage, number}% des Spendenaufrufs",
       "globalLabel": "Global",
       "viewTransparency": "Transparenz: Mehr über das Projekt →",
-      "defaultCauseTooltip": "Mit deinem Spendenaufruf unterstützt du unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu empowern, Wälder wiederherzustellen und für eine nachhaltige Zukunft einzutreten.",
+      "defaultCauseTooltip": "Dein Aufruf unterstützt unsere Arbeit, junge Menschen als Botschafter für Klimagerechtigkeit zu empowern, Wälder wiederherzustellen und für eine nachhaltige Zukunft einzutreten.",
       "aria": {
         "search": "Projekte suchen",
         "addProject": "{name} hinzufügen",
@@ -87,15 +87,15 @@
       },
       "for-your-children": {
         "label": "Für meine Kinder",
-        "tagline": "Ein Wald, der noch kraftvoll wachsen wird, wenn sie groß sind."
+        "tagline": "Ein Wald, der weiter kraftvoll wächst, wenn sie groß sind."
       },
       "roof-of-the-world": {
-        "label": "Das Dach der Welt",
+        "label": "Dach der Welt",
         "tagline": "Hoch oben, wo die Luft dünn ist und viel auf dem Spiel steht."
       },
       "supply-chain-guilt-trip": {
         "label": "Lieferketten-Gewissensbisse",
-        "tagline": "Hinter allem, was du kaufst, steht ein Wald. Lerne ihn kennen."
+        "tagline": "Hinter allem, was du kaufst, steht ein Wald. Treffe ihn."
       },
       "amazon-route": {
         "label": "Die Amazonas-Route",
@@ -111,11 +111,11 @@
       },
       "where-your-coffee-grows": {
         "label": "Wo dein Kaffee wächst",
-        "tagline": "Jede Tasse am Morgen beginnt an einem schönen Ort. So soll es auch bleiben."
+        "tagline": "Jede Tasse am Morgen beginnt an einem schönen Ort. So soll es bleiben."
       },
       "worst-of-the-worst": {
-        "label": "Das Schlimmste vom Schlimmsten",
-        "tagline": "Die am stärksten betroffenen Orte. Diejenigen, die dich am meisten brauchen."
+        "label": "Schlimmer gehts nicht",
+        "tagline": "Die am stärksten betroffenen Orte. Die, die dich am meisten brauchen."
       }
     }
   }

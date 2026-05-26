@@ -1,5 +1,5 @@
-import type { Locale } from '@/i18n/routing';
 import type { Nullable } from './utility';
+import type { Locale } from '@/i18n/routing';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 

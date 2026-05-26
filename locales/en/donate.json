@@ -1,5 +1,11 @@
 {
   "Donate": {
+    "overlay": {
+      "aria": {
+        "label": "donation details",
+        "close": "Close donation overlay"
+      }
+    },
     "preferences": {
       "anonymousDonationLabel": "Make my donation anonymous",
       "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
@@ -117,7 +123,14 @@
       "ibanLabel": "IBAN",
       "ibanRequired": "IBAN is required",
       "accountHolderName": "Account Holder Name",
+      "accountHolderNamePlaceholder": "Jane Doe",
       "accountHolderNameRequired": "Account holder name is required",
+      "errors": {
+        "validationFailed": "Validation failed",
+        "stripeNotInitialized": "Stripe not initialized",
+        "ibanElementNotFound": "IBAN element not found",
+        "paymentMethodFailed": "Payment method creation failed"
+      },
       "mandateTitle": "SEPA Direct Debit Mandate",
       "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
       "creditor": "Creditor",
@@ -158,7 +171,15 @@
       "countryLabel": "Country *",
       "countryRequired": "Country is required",
       "countryPlaceholder": "Select country",
-      "countryNoResults": "No countries found"
+      "countryNoResults": "No countries found",
+      "errors": {
+        "validationFailed": "Validation failed",
+        "stripeNotInitialized": "Stripe not initialized",
+        "cardElementNotFound": "Card element not found",
+        "paymentMethodFailed": "Payment method creation failed",
+        "cardActionFailed": "Card action failed",
+        "paymentIntentNotReturned": "Payment intent not returned"
+      }
     },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
@@ -209,7 +230,7 @@
         }
       },
       "message": {
-        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days.",
+        "completed": "We’ve sent you a donation confirmation via email. You can download a tax-deductible receipt after 60 days via pp.eco/profile.",
         "paymentProcessing": {
           "processing": "Your payment is being processed. You will receive an email when it is confirmed.",
           "failed": "Unfortunately, your payment was unsuccessful. Please try again or use a different payment method.",

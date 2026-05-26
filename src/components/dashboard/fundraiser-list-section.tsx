@@ -77,10 +77,7 @@ export function FundraiserListSection({
       {showCount && (
         <p className='text-sm text-muted-foreground'>
           {t.rich('resultCount', {
-            visible: formatCompactNumber(
-              visibleFundraisers.length,
-              locale
-            ),
+            visible: formatCompactNumber(visibleFundraisers.length, locale),
             total: formatCompactNumber(fundraisers.length, locale),
             bold: chunks => (
               <strong className='font-semibold text-foreground'>

@@ -76,9 +76,8 @@ export function UpdateFundraiserButton({
       toast.success(t('successMessage'));
       return updated;
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to update fundraiser';
-      toast.error(t('errorMessage'), { description: message });
+      console.error('Failed to update fundraiser:', err);
+      toast.error(t('errorMessage'), { description: t('errorDescription') });
     } finally {
       setIsSubmitting(false);
     }

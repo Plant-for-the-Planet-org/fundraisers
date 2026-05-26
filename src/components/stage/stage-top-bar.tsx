@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 interface StageTopBarProps {
   title: string;
   description?: string;
@@ -7,6 +9,8 @@ interface StageTopBarProps {
 }
 
 export function StageTopBar({ title, description, logoUrl }: StageTopBarProps) {
+  const t = useTranslations('Stage.topBar');
+
   return (
     <div className='absolute left-12 right-12 top-12 z-20'>
       <div className='flex flex-col gap-5'>
@@ -18,7 +22,7 @@ export function StageTopBar({ title, description, logoUrl }: StageTopBarProps) {
           <div className='flex h-16 items-center'>
             <img
               src='https://cdn.plant-for-the-planet.org/logo/svg/planet.svg'
-              alt='Plant-for-the-Planet'
+              alt={t('brandAlt')}
               className='h-16 w-auto brightness-0 invert'
             />
           </div>
@@ -29,7 +33,7 @@ export function StageTopBar({ title, description, logoUrl }: StageTopBarProps) {
               <div className='flex h-16 items-center'>
                 <img
                   src={logoUrl}
-                  alt='Partner'
+                  alt={t('partnerAlt')}
                   className='h-full w-auto object-contain'
                 />
               </div>
