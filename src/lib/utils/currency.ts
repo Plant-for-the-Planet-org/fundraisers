@@ -2,7 +2,7 @@
  * Currency formatting utilities
  */
 
-import { formatCompactNumber } from './formatting';
+import { formatCompactNumber, formatLocalizedNumber } from './formatting';
 
 // Map of major currencies to their symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -58,13 +58,7 @@ function resolveLocale(locale?: string): string {
 /** Format a number with the given locale, respecting compact mode. */
 function formatAmount(value: number, locale: string, compact: boolean): string {
   if (compact) return formatCompactNumber(value, locale);
-
-  // German always shows 2 decimal places for uniform display (e.g. 1.122,00)
-  const alwaysDecimals = locale.startsWith('de');
-  return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: alwaysDecimals || value % 1 !== 0 ? 2 : 0,
-    maximumFractionDigits: 2,
-  }).format(value);
+  return formatLocalizedNumber(value, locale);
 }
 
 /** Attach the currency symbol (or code) to a formatted number string. */
