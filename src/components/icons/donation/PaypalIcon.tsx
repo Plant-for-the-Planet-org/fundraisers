@@ -7,8 +7,7 @@ function PaypalIcon(): ReactElement {
       width='52.427'
       height='12.702'
       viewBox='0 0 52.427 12.702'
-      role='img'
-      aria-label='PayPal'
+      aria-hidden='true'
     >
       <g id='paypal-seeklogo.com' transform='translate(-0.001)'>
         <path

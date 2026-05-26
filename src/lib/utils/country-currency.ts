@@ -47,13 +47,25 @@ const COUNTRY_CURRENCY_MAP: Record<AllowedCountry, SupportedCurrency> = {
 };
 
 /**
+ * Coerce an arbitrary country string to an `AllowedCountry`.
+ * Unknown or empty values fall back to `'ROW'`.
+ */
+export function toAllowedCountry(
+  country: string | null | undefined
+): AllowedCountry {
+  const normalized = (country ?? '').toUpperCase();
+  return (ALLOWED_COUNTRIES as readonly string[]).includes(normalized)
+    ? (normalized as AllowedCountry)
+    : 'ROW';
+}
+
+/**
  * Get the primary currency for a given country
  * @param countryCode - ISO 3166-1 alpha-2 country code or 'ROW' for Rest of World
  * @returns Currency code (supported currencies only) or 'EUR' as fallback
  */
 export function getCurrencyForCountry(countryCode: string): SupportedCurrency {
-  const code = countryCode.toUpperCase() as AllowedCountry;
-  return COUNTRY_CURRENCY_MAP[code] || 'EUR';
+  return COUNTRY_CURRENCY_MAP[toAllowedCountry(countryCode)];
 }
 
 /**
@@ -132,7 +144,7 @@ export function getTaxDeductibilityInfo(
   isDeductible: boolean;
   countryName: string;
 } {
-  const code = (countryCode || 'ROW').toUpperCase() as AllowedCountry;
+  const code = toAllowedCountry(countryCode);
   const resolvedCode = code === 'ROW' ? 'DE' : code; // ROW uses DE as the default workspace country
   let countryName: string;
   try {

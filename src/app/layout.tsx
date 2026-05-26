@@ -9,7 +9,7 @@ import {
 } from 'next/font/google';
 import { headers } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
@@ -62,10 +62,11 @@ async function getMetadataBase(): Promise<URL> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Common.metadata');
   return {
     metadataBase: await getMetadataBase(),
-    title: 'Fundraisers',
-    description: 'Fundraising platform',
+    title: t('title'),
+    description: t('description'),
   };
 }
 

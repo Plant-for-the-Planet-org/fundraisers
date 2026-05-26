@@ -1,7 +1,7 @@
 {
   "Leaderboard": {
     "form": {
-      "sectionHeading": "Leaderboard",
+      "sectionHeading": "Leaderboard Settings",
       "labels": {
         "enableLeaderboard": "Enable leaderboard",
         "openSettings": "Leaderboard settings",
@@ -23,6 +23,8 @@
       }
     },
     "view": {
+      "title": "Leaderboard",
+      "titleRecent": "Latest Donations",
       "donation": {
         "anonymous": "Anonymous"
       },

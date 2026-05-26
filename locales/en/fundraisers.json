@@ -1,7 +1,7 @@
 {
   "Fundraisers": {
     "startFundraiser": "Start Fundraiser",
-    "donationCount": "{count, plural, =0 {0 Donations} one {1 Donation} other {{formattedCount} Donations}}",
+    "donationCount": "{count, plural, =0 {0 donations} one {1 donation} other {{formattedCount} donations}}",
     "donorsAndOthers": "{names} and {count, plural, one {# other} other {# others}}",
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",
@@ -13,11 +13,18 @@
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
+    "hostsStripNames": "{names}{remaining, plural, =0 {} one { and # other} other { and # others}}",
     "error": {
       "title": "Something went wrong",
       "description": "This fundraiser could not be loaded. Please try again, or browse other fundraisers.",
       "retry": "Try again",
       "browse": "Browse fundraisers"
+    },
+    "notFound": {
+      "title": "Fundraiser Not Found",
+      "description": "The fundraiser you're looking for doesn't exist or may have been removed.",
+      "browseCta": "Browse Fundraisers",
+      "homeCta": "Go Home"
     },
     "metadata": {
       "fallbackTitle": "Fundraiser"
@@ -92,7 +99,7 @@
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
-        "daysLeft": "{days, plural, one {# day left} other {# days left}}"
+        "daysLeft": "{days, number}d left"
       },
       "theme": {
         "sectionHeading": "Theme",
@@ -240,6 +247,11 @@
       },
       "contributionSettings": {
         "sectionHeading": "Contribution Settings",
+        "preview": {
+          "title": "Preview Mode",
+          "description": "{isDedicated, select, true {Would donate {amount} {frequency} (dedicated)} other {Would donate {amount} {frequency}}}",
+          "frequencyLabel": "{frequency, select, once {once} monthly {monthly} yearly {yearly} other {{frequency}}}"
+        },
         "cardHeader": "Contribution",
         "giftTitle": "Dedicate this donation",
         "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
@@ -286,7 +298,8 @@
         "buttonProcessing": "Creating Fundraiser...",
         "buttonSubmit": "Create Fundraiser",
         "successMessage": "Fundraiser created!",
-        "errorMessage": "Error"
+        "errorMessage": "Error",
+        "errorDescription": "Your fundraiser could not be created. Please check your details and try again."
       }
     },
     "edit": {
@@ -304,7 +317,8 @@
         "buttonProcessing": "Updating fundraiser...",
         "buttonSubmit": "Update fundraiser",
         "successMessage": "Fundraiser updated!",
-        "errorMessage": "Update failed"
+        "errorMessage": "Update failed",
+        "errorDescription": "Your changes could not be saved. Please try again."
       }
     },
     "copyLinkButton": {

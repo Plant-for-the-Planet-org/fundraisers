@@ -76,13 +76,12 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const slideCount = fields.length;
   const atSlideLimit = slideCount >= STAGE_LIMITS.maxSlides;
 
-   
   const stageTitleVal =
     (useWatch({
       control,
       name: 'settings.modules.stage.title' as any,
     }) as string) ?? '';
-   
+
   const stageDescVal =
     (useWatch({
       control,
@@ -286,7 +285,7 @@ function PartnerLogoField({
   const {
     formState: { errors },
   } = useFormContext<FundraiserFormValues>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const error = (errors.settings?.modules?.stage as any)?.partner_logo_url
     ?.message as string | undefined;
 
@@ -326,17 +325,15 @@ function SlideRow({
   } = useFormContext<FundraiserFormValues>();
   const base = `settings.modules.stage.slides.${idx}` as const;
 
-   
   const imageUrl =
     (useWatch({ control, name: `${base}.image` as any }) as string) ?? '';
-   
+
   const titleVal =
     (useWatch({ control, name: `${base}.title` as any }) as string) ?? '';
-   
+
   const descVal =
     (useWatch({ control, name: `${base}.description` as any }) as string) ?? '';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const slideErrors = (errors.settings?.modules?.stage as any)?.slides?.[idx];
   const imageError = slideErrors?.image?.message as string | undefined;
 
@@ -384,7 +381,7 @@ function SlideRow({
       {/* Fields */}
       <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
         <div>
-          { }
+          {}
           <Input
             {...register(`${base}.title` as any)}
             placeholder={t('slideTitlePlaceholder')}
@@ -400,7 +397,7 @@ function SlideRow({
         </div>
 
         <div>
-          { }
+          {}
           <Textarea
             {...register(`${base}.description` as any)}
             placeholder={t('slideDescriptionPlaceholder')}
@@ -417,7 +414,7 @@ function SlideRow({
         </div>
 
         <div>
-          { }
+          {}
           <Input
             {...register(`${base}.image` as any)}
             type='url'
@@ -434,7 +431,7 @@ function SlideRow({
         <div className='flex items-center gap-2 mt-0.5'>
           <Clock size={11} className='text-muted-foreground shrink-0' />
           <span className='text-xs text-muted-foreground'>{t('duration')}</span>
-          { }
+          {}
           <Input
             {...register(`${base}.duration` as any, { valueAsNumber: true })}
             type='number'
