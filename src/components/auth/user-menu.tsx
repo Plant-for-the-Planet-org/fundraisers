@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, CreditCard, Plus, UserCog } from 'lucide-react';
+import { ChevronDown, Compass, CreditCard, Plus, UserCog } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
@@ -33,6 +33,7 @@ export function UserMenu() {
   const tDashboard = useTranslations('Dashboard');
   const tFundraiser = useTranslations('Fundraisers');
   const tAuth = useTranslations('Auth');
+  const tHeaderLinks = useTranslations('Common.headerLinks');
 
   const pathname = usePathname();
   // store: state
@@ -99,6 +100,18 @@ export function UserMenu() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild className='cursor-pointer md:hidden'>
+            <Link href='/explore' className='flex items-center'>
+              <Compass className='mr-2 h-4 w-4' />
+              <span>{tHeaderLinks('explore')}</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className='cursor-pointer md:hidden'>
+            <Link href='/fundraisers/create' className='flex items-center'>
+              <Plus className='mr-2 h-4 w-4' />
+              <span>{tFundraiser('startFundraiser')}</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
               <CreditCard className='mr-2 h-4 w-4' />
@@ -121,12 +134,6 @@ export function UserMenu() {
               </span>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem asChild className='cursor-pointer'>
-            <Link href='/fundraisers/create' className='flex items-center'>
-              <Plus className='mr-2 h-4 w-4' />
-              <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <SignOutButton />
