@@ -226,7 +226,7 @@ export const THANK_YOU_PRESET_MESSAGES: Record<
     de: [
       {
         id: 'me-1',
-        text: 'Ein Baum im Gedenken ist ein Vermächtnis, das weiterlebt. Danke für diese Würdigung.',
+        text: 'Ein Baum im Andenken ist ein Vermächtnis, das weiterlebt. Danke für diese Würdigung.',
       },
       {
         id: 'me-2',
