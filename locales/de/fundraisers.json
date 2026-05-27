@@ -23,8 +23,8 @@
     "notFound": {
       "title": "Spendenaufruf nicht gefunden",
       "description": "Der gesuchte Spendenaufruf existiert nicht oder wurde möglicherweise entfernt.",
-      "browseCta": "Spendenaufrufe durchstöbern",
-      "homeCta": "Zur Startseite"
+      "browseCta": "Spendenaufrufe entdecken",
+      "homeCta": "Home"
     },
     "metadata": {
       "fallbackTitle": "Spendenaufruf"
@@ -39,7 +39,7 @@
     },
     "donate": {
       "summary": {
-        "processingFee": "Cover {providerName}-Gebühren",
+        "processingFee": "{providerName} Gebühren decken",
         "breakdown": "Aufschlüsselung",
         "total": "Gesamt",
         "totalMonthly": "Jeden Monat insgesamt",
@@ -85,8 +85,8 @@
         }
       },
       "options": {
-        "coverFeesLabel": "Spende {feeAmount} mehr, um die {providerName}-Gebühren aufzufangen. (freiwillig)",
-        "coverFeesTooltip": "Die {providerName}-Gebühren werden unter den von diesem Spendenaufruf unterstützten Projekten aufgeteilt.",
+        "coverFeesLabel": "Spende {feeAmount} mehr, um die {providerName} Gebühren zu decken. (freiwillig)",
+        "coverFeesTooltip": "Die {providerName} Gebühren für die Abwicklung werden unter den von diesem Aufruf unterstützten Projekten aufgeteilt.",
         "coverFeesTooltipTriggerLabel": "Weitere Informationen über Zahlungsgebühren",
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
@@ -248,8 +248,8 @@
       "contributionSettings": {
         "sectionHeading": "Spendeneinstellungen",
         "preview": {
-          "title": "Vorschaumodus",
-          "description": "{isDedicated, select, true {Würde {amount} {frequency} spenden (gewidmet)} other {Würde {amount} {frequency} spenden}}",
+          "title": "Vorschau-Modus",
+          "description": "{isDedicated, select, true {Würde {frequency} {amount} spenden (gewidmet)} other {Würde {frequency} {amount} spenden}}",
           "frequencyLabel": "{frequency, select, once {einmalig} monthly {monatlich} yearly {jährlich} other {{frequency}}}"
         },
         "cardHeader": "Spende",
@@ -284,7 +284,7 @@
           "errors": {
             "recipientName": {
               "required": "Name des/der Beschenkten ist erforderlich",
-              "tooLong": "Name des/der Beschenkten darf höchstens 35 Zeichen lang sein"
+              "tooLong": "Empfängername darf höchstens 35 Zeichen lang sein"
             },
             "recipientEmail": {
               "invalid": "Bitte gib eine gültige E-Mail ein",
@@ -292,7 +292,7 @@
               "requiredWithMessage": "E-Mail ist erforderlich, wenn eine persönliche Nachricht eingegeben wurde"
             },
             "message": {
-              "tooLong": "Persönliche Nachricht darf 250 Zeichen nicht überschreiten"
+              "tooLong": "Persönliche Nachricht darf max. 250 Zeichen haben."
             }
           }
         }
@@ -304,7 +304,7 @@
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler",
-        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Bitte überprüfe deine Angaben und versuche es nochmal."
+        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut."
       }
     },
     "edit": {
@@ -323,7 +323,7 @@
         "buttonSubmit": "Spendenaufruf aktualisieren",
         "successMessage": "Spendenaufruf aktualisiert!",
         "errorMessage": "Aktualisierung fehlgeschlagen",
-        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Bitte versuche es nochmal."
+        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
     },
     "copyLinkButton": {
