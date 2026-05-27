@@ -1,20 +1,31 @@
 'use client';
 
 import type { ProjectAllocation } from '@/lib/types/fundraiser';
+import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { getBundleBySlug } from '@/lib/utils/bundle';
+import { toAllowedCountry } from '@/lib/utils/country-currency';
 import { getImageUrl } from '@/lib/utils/images';
+import { useBundleProjects } from '@/components/fundraisers/bundle-selection/use-bundle-projects';
+import { useCountryLabel } from '@/components/fundraisers/bundle-selection/use-country-label';
 import { SectionHeader } from '@/components/fundraisers/typography';
 
 const DESCRIPTION_TRUNCATION_THRESHOLD = 180;
 
 interface ProjectItemProps {
   project: ProjectAllocation['project'];
+  enrichedProject: ProjectData;
+  getCountryLabel: (code: string) => string;
 }
 
-function ProjectItem({ project }: ProjectItemProps) {
+function ProjectItem({
+  project,
+  enrichedProject,
+  getCountryLabel,
+}: ProjectItemProps) {
   const t = useTranslations('Fundraisers.form.projectSelection');
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -22,6 +33,10 @@ function ProjectItem({ project }: ProjectItemProps) {
   const description = project.description ?? '';
   const needsTruncation = description.length > DESCRIPTION_TRUNCATION_THRESHOLD;
   const descriptionId = `project-description-${project.id}`;
+
+  const countryLabel = enrichedProject.country
+    ? getCountryLabel(enrichedProject.country)
+    : '';
 
   return (
     <li className='project-item flex gap-4'>
@@ -43,6 +58,9 @@ function ProjectItem({ project }: ProjectItemProps) {
         <h3 className='text-foreground text-base font-semibold leading-tight'>
           {project.name}
         </h3>
+        {countryLabel && (
+          <p className='text-sm text-foreground'>{countryLabel}</p>
+        )}
         {description && (
           <div className='flex flex-col gap-1 items-start'>
             <p
@@ -71,23 +89,65 @@ function ProjectItem({ project }: ProjectItemProps) {
   );
 }
 
+interface BundleHeaderProps {
+  label: string;
+  tagline: string;
+}
+
+function BundleHeader({ label, tagline }: BundleHeaderProps) {
+  return (
+    <p className='mb-2 text-sm leading-snug'>
+      <span className='font-semibold text-foreground'>{label}</span>
+      <span className='text-muted-foreground'> — </span>
+      <span className='italic text-muted-foreground'>
+        &ldquo;{tagline}&rdquo;
+      </span>
+    </p>
+  );
+}
+
 interface ProjectsSupportedDisplayProps {
   projectAllocations: ProjectAllocation[];
+  workspaceCountry: string | null | undefined;
+  bundleSlug: string | null;
 }
 
 export function ProjectsSupportedDisplay({
   projectAllocations,
+  workspaceCountry,
+  bundleSlug,
 }: ProjectsSupportedDisplayProps) {
   const t = useTranslations('Fundraisers.form.projectSelection');
+  const tBundles = useTranslations('Bundles');
+
+  const { getProject } = useBundleProjects(toAllowedCountry(workspaceCountry));
+  const getCountryLabel = useCountryLabel();
+  const bundle = getBundleBySlug(bundleSlug);
 
   if (!projectAllocations?.length) return null;
 
   return (
     <div className='project-supported-display flex flex-col gap-3'>
-      <SectionHeader>{t('viewModeSectionHeading')}</SectionHeader>
+      <SectionHeader
+        actionSlot={
+          bundle && (
+            <BundleHeader
+              label={tBundles(`entries.${bundle.slug}.label`)}
+              tagline={tBundles(`entries.${bundle.slug}.tagline`)}
+            />
+          )
+        }
+      >
+        {t('viewModeSectionHeading')}
+      </SectionHeader>
       <ul className='space-y-4'>
         {projectAllocations.map(({ project }) => (
-          <ProjectItem key={project.id} project={project} />
+          <ProjectItem
+            key={project.id}
+            project={project}
+            enrichedProject={getProject(project.id)}
+            getCountryLabel={getCountryLabel}
+          />
         ))}
       </ul>
     </div>

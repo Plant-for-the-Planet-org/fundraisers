@@ -1,28 +1,28 @@
 {
   "consentModal": {
-    "title": "Hallo, es ist Zeit für Cookies!",
-    "description": "Wir verwenden Cookies auf unserer Website. Mit deiner Zustimmung verwenden wir auch Analyse-Cookies. Du kannst die Zustimmung jederzeit ändern.",
+    "title": "Hat jemand Kekse gesagt?",
+    "description": "Wir nutzen Cookies auf unserer Website. Mit deiner Zustimmung verwenden wir auch Analyse-Cookies. Du kannst die Zusage jederzeit ändern.",
     "acceptAllBtn": "Alle akzeptieren",
     "acceptNecessaryBtn": "Optionale ablehnen",
-    "showPreferencesBtn": "Einstellungen verwalten",
+    "showPreferencesBtn": "Präferenzen verwalten",
     "closeIconLabel": "Alle ablehnen und schließen",
-    "footer": "<a href=\"https://www.plant-for-the-planet.org/de/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/de/privacy-terms/\">Datenschutzerklärung</a><a href=\"https://www.plant-for-the-planet.org/de/terms-and-conditions\">Nutzungsbedingungen</a>"
+    "footer": "<a href=\"https://www.plant-for-the-planet.org/de/imprint\">Impressum</a><a href=\"https://www.plant-for-the-planet.org/de/privacy-terms/\">Datenschutzbestimmung</a><a href=\"https://www.plant-for-the-planet.org/de/terms-and-conditions\">Nutzungsbedingungen</a>"
   },
   "preferencesModal": {
     "title": "Cookie-Einstellungen",
     "acceptAllBtn": "Alle akzeptieren",
-    "acceptNecessaryBtn": "Optionale Cookies ablehnen",
-    "savePreferencesBtn": "Einstellungen speichern",
+    "acceptNecessaryBtn": "Optionale ablehnen",
+    "savePreferencesBtn": "Präferenzen speichern",
     "closeIconLabel": "Fenster schließen",
     "serviceCounterLabel": "Service|Dienstleistungen",
     "sections": {
       "intro": {
-        "title": "Hat jemand Cookies gesagt?",
-        "description": "Unsere Website verwendet notwendige Cookies, um ihren ordnungsgemäßen Betrieb zu gewährleisten, und Tracking-Cookies, um zu verstehen, wie du mit ihr interagierst. Letztere werden nur nach Zustimmung gesetzt."
+        "title": "Hat jemand Kekse gesagt?",
+        "description": "Unsere Website nutzt notwendige Cookies, um ihren ordnungsgemäßen Betrieb zu gewährleisten, und Tracking-Cookies, um zu verstehen, wie du mit ihr interagierst. Letztere werden nur nach Zustimmung gesetzt."
       },
       "necessary": {
         "title": "Notwendige Cookies <span class=\"pm__badge\">Immer aktiviert</span>",
-        "description": "Diese Cookies sind für das ordnungsgemäße Funktionieren der Website erforderlich, einschließlich der Speicherung Ihrer Spracheinstellung.",
+        "description": "Diese Cookies sind für den ordnungsgemäßen Betrieb der Website erforderlich, einschließlich der Speicherung deiner Spracheinstellung.",
         "linkedCategory": "Notwendig"
       },
       "analytics": {
@@ -31,8 +31,8 @@
         "linkedCategory": "Analyse"
       },
       "moreInfo": {
-        "title": "Weitere Informationen",
-        "description": "Wenn du Fragen zu unseren Cookies und deinen Auswahlmöglichkeiten hast, wende dich bitte an uns."
+        "title": "Mehr Informationen",
+        "description": "Wenn du Fragen zu unseren Cookies und deinen Wahlmöglichkeiten hast, wende dich bitte an uns."
       }
     }
   }

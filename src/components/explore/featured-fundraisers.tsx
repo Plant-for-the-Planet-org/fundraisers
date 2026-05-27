@@ -39,7 +39,7 @@ export function FeaturedFundraisers({
         value={currentSort}
         onValueChange={handleSortChange}
       >
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-wrap gap-y-2 gap-x-2 items-center justify-between'>
           <h2 className='text-xl font-semibold text-foreground'>
             {tFeaturedFundraisers('title')}
           </h2>

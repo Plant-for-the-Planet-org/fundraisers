@@ -1,28 +1,33 @@
 {
   "Explore": {
     "title": "Spendenaufrufe entdecken",
-    "description": "Entdecke beliebte Spendenaufrufe in deiner Nähe oder stöbere in Kategorien.",
+    "description": "Entdecke beliebte Aufrufe in deiner Nähe oder stöbere in den Kategorien.",
     "categories": {
-      "title": "In Kategorien stöbern",
+      "title": "Kategorien",
       "loading": "Kategorien werden geladen",
       "noCategoriesFound": "Derzeit sind keine Kategorien verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
     "featuredFundraisers": {
-      "title": "Beliebte Spendenaufrufe",
+      "title": "Beliebte Aufrufe",
       "tabs": {
         "popular": "Beliebt",
-        "gross": "Größtes Spendenaufkommen"
+        "gross": "Größte Spendensumme"
       },
       "noFundraisersFound": "Derzeit sind keine Spendenaufrufe verfügbar."
     },
     "fundraiserCities": {
-      "title": "Spendenaufrufe in deiner Nähe",
+      "title": "Aufrufe in deiner Nähe",
       "loading": "Spendenaufrufe in deiner Nähe werden geladen",
       "noCategoriesFound": "Derzeit sind keine Spendenaufrufe in deiner Nähe verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
+    "locationMap": {
+      "title": "Kartenansicht",
+      "comingSoon": "Interaktive Karte folgt in Kürze"
+    },
     "categoryPage": {
+      "loadingAria": "Kategorieseite wird geladen",
       "metadata": {
         "title": "{categoryName} Spendenaufrufe",
         "description": "Entdecke {categoryName} Spendenaufrufe und unterstütze Projekte, die dir am Herzen liegen."
@@ -33,10 +38,10 @@
         "tabs": {
           "popular": "Beliebt",
           "recent": "Neueste",
-          "gross": "Größtes Spendenvolumen"
+          "gross": "Größte Spendensumme"
         },
         "noFundraisersFound": "Keine Spendenaufrufe gefunden",
-        "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Spendenaufrufe in dieser Kategorie."
+        "noFundraisersFoundDescription": "Derzeit gibt es keine aktiven Aufrufe in dieser Kategorie."
       },
       "notFound": {
         "title": "Seite wurde nicht gefunden",

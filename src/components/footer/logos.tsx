@@ -1,4 +1,8 @@
+import { useTranslations } from 'next-intl';
+
 export function Logos() {
+  const t = useTranslations('Common.partners');
+
   return (
     <div className='logos flex items-center justify-center md:justify-start gap-4 h-[34px]'>
       <a
@@ -9,7 +13,7 @@ export function Logos() {
       >
         <img
           src='https://cdn.plant-for-the-planet.org/logo/svg/planet.svg'
-          alt='Plant-for-the-Planet'
+          alt={t('plantForThePlanetAlt')}
           className='h-[34px] w-[33px]'
         />
       </a>
@@ -21,7 +25,7 @@ export function Logos() {
       >
         <img
           src='https://cdn.plant-for-the-planet.org/logo/svg/unep.svg?12'
-          alt='UN Environment Program'
+          alt={t('unepAlt')}
           className='h-full w-auto'
         />
       </a>

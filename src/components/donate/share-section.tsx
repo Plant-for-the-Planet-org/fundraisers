@@ -11,7 +11,7 @@ export function ShareSection({ fundraiserSlug }: ShareSectionProps) {
   const t = useTranslations('Donate.thankYou.share');
   const shareUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/fundraisers/${fundraiserSlug}`
+      ? `${window.location.origin}/raise/${fundraiserSlug}`
       : undefined;
 
   return (

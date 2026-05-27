@@ -1,0 +1,24 @@
+{
+  "Stage": {
+    "live": "Live",
+    "offline": "Offline",
+    "recentGifts": "Aktuelle Geschenke",
+    "scanToDonate": "Scannen und spenden",
+    "topDonors": "Top-Spender",
+    "contribution": "Beitrag",
+    "waitingForDonations": "Warten auf Spenden...",
+    "raisedSoFar": "Bisher gesammelt",
+    "ofGoal": "vom Ziel von {goal} ",
+    "donors": "Spender",
+    "trees": "Bäume",
+    "daysLeft": "T übrig",
+    "notEnabled": "Bühnenmodus ist für diesen Spendenaufruf nicht aktiviert.",
+    "notEnabledHint": "Aktualisiere die Einstellungen des Aufrufs oder frage den Ersteller.",
+    "fundraiserNotFound": "Spendenaufruf nicht gefunden.",
+    "anonymous": "Anonym",
+    "topBar": {
+      "brandAlt": "Plant-for-the-Planet-Logo",
+      "partnerAlt": "Partnerlogo"
+    }
+  }
+}

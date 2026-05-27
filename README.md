@@ -107,7 +107,7 @@ See [`docs/structure.md`](docs/structure.md) for the full annotated directory tr
 | `main`                        | Production-ready code                           |
 | `develop`                     | Development branch                              |
 | `feature/<short-description>` | New features                                    |
-| `bugfix/<short-description>`  | Bug fixes                                       |
+| `fix/<short-description>`     | Bug fixes                                       |
 | `hotfix/<short-description>`  | Urgent production fixes                         |
 | `chore/<short-description>`   | Maintenance: deps, config, tooling, refactoring |
 | `docs/<short-description>`    | Documentation-only changes                      |

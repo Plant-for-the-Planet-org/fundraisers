@@ -11,8 +11,7 @@ function GooglePayIcon({ textColor }: Props): ReactElement {
       width='100%'
       height='100%'
       viewBox='0 0 523 205.2'
-      role='img'
-      aria-label='Google Pay'
+      aria-hidden='true'
     >
       <g transform='translate(-285.2 -284.4)'>
         <g fill={textColor ? textColor : '#fff'}>

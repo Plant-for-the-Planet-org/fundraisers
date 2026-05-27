@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { PlatformAPIError } from '@/lib/api/external-client';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';

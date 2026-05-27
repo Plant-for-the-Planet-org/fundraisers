@@ -69,11 +69,12 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           setMandateError(t('mandateRequired'));
           hasError = true;
         }
-        if (hasError) return { error: 'Validation failed' };
+        if (hasError) return { error: t('errors.validationFailed') };
 
-        if (!stripe || !elements) return { error: 'Stripe not initialized' };
+        if (!stripe || !elements)
+          return { error: t('errors.stripeNotInitialized') };
         const ibanElement = elements.getElement(IbanElement);
-        if (!ibanElement) return { error: 'IBAN element not found' };
+        if (!ibanElement) return { error: t('errors.ibanElementNotFound') };
 
         const { paymentMethod, error } = await stripe.createPaymentMethod({
           type: 'sepa_debit',
@@ -93,12 +94,12 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
         });
 
         if (error)
-          return { error: error.message ?? 'Payment method creation failed' };
+          return { error: error.message ?? t('errors.paymentMethodFailed') };
         return { paymentMethodId: paymentMethod.id };
       },
 
       async confirmSepaDebitPayment(clientSecret) {
-        if (!stripe) return { error: 'Stripe not initialized' };
+        if (!stripe) return { error: t('errors.stripeNotInitialized') };
         const { error } = await stripe.confirmSepaDebitPayment(clientSecret);
         return { error: error?.message };
       },
@@ -130,7 +131,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
               setAccountHolderName(e.target.value);
               if (nameError) setNameError(null);
             }}
-            placeholder='Jane Doe'
+            placeholder={t('accountHolderNamePlaceholder')}
           />
         </FormField>
 

@@ -50,8 +50,8 @@ export function FundraiserSearchInput({
         value={draftSearch}
         onChange={event => setDraftSearch(event.target.value)}
         placeholder={t('searchPlaceholder')}
-        aria-label={t('searchPlaceholder')}
-        className='h-11 rounded-xl bg-background pl-9 pr-4 [&::-webkit-search-cancel-button]:cursor-pointer'
+        aria-label={t('searchAria')}
+        className='h-9 bg-background pl-9 pr-4 [&::-webkit-search-cancel-button]:cursor-pointer'
       />
     </div>
   );

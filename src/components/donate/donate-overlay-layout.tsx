@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 
 interface DonateOverlayLayoutProps {
@@ -11,18 +12,19 @@ export function DonateOverlayLayout({
   leftColumn,
   rightColumn,
 }: DonateOverlayLayoutProps) {
+  const tDonate = useTranslations('Donate');
   return (
     <div
-      className='fixed inset-0 z-50 bg-gray-50 overflow-auto'
+      className='light fixed inset-0 z-50 bg-gray-50 text-foreground overflow-auto'
       role='dialog'
       aria-modal='true'
-      aria-label='donation details'
+      aria-label={tDonate('overlay.aria.label')}
     >
       <button
         type='button'
         onClick={onClose}
         className='fixed top-6 right-6 z-10 p-3 rounded-full bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all hover:bg-gray-50'
-        aria-label='Close donation overlay'
+        aria-label={tDonate('overlay.aria.close')}
       >
         <X className='w-5 h-5 text-gray-600' />
       </button>

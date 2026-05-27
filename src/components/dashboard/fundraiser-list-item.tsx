@@ -42,11 +42,13 @@ export function FundraiserListItem({
 
   const raised = formatCurrencyFromDecimal(
     fundraiser.totalRaised,
-    fundraiser.currency
+    fundraiser.currency,
+    { compact: true }
   );
   const goal = formatCurrencyFromDecimal(
     fundraiser.goalAmount,
-    fundraiser.currency
+    fundraiser.currency,
+    { compact: true }
   );
 
   const showEnded =
@@ -64,8 +66,8 @@ export function FundraiserListItem({
       </Link>
 
       <div className='min-w-0 flex-1'>
-        <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
-          <h3 className='line-clamp-1 text-base font-semibold text-foreground'>
+        <div className='flex items-center justify-between gap-x-2 gap-y-1'>
+          <h3 className='text-base font-semibold text-foreground line-clamp-2'>
             <Link
               href={getFundraiserUrl(fundraiser)}
               className='hover:text-primary transition-colors'
@@ -73,14 +75,28 @@ export function FundraiserListItem({
               {fundraiser.title}
             </Link>
           </h3>
-          <FundraiserStatusBadge status={displayStatus} />
+          <FundraiserActionMenu
+            fundraiser={fundraiser}
+            onFundraiserUpdated={onFundraiserUpdated}
+          />
         </div>
 
-        <p className='mt-0.5 truncate text-sm text-muted-foreground'>
-          {t('byHost', { host: hostName })}
-        </p>
+        <div className='mt-1 flex items-center gap-2'>
+          <FundraiserStatusBadge status={displayStatus} />
+          {displayStatus !== 'draft' && daysLeft > 0 && (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 text-sm text-muted-foreground',
+                displayStatus === 'ending-soon' && 'text-warning'
+              )}
+            >
+              <Clock className='h-3.5 w-3.5' aria-hidden='true' />
+              {showEnded ? t('ended') : t('daysLeft', { count: daysLeft })}
+            </span>
+          )}
+        </div>
 
-        <div className='mt-2 flex flex-wrap items-center gap-x-7 gap-y-1 text-sm text-muted-foreground'>
+        <div className='mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground'>
           <span>
             {t.rich('goalProgress', {
               achievedAmount: raised,
@@ -94,22 +110,12 @@ export function FundraiserListItem({
             <Users className='h-3.5 w-3.5' aria-hidden='true' />
             {t('donations', { count: fundraiser.donationCount })}
           </span>
-          <span
-            className={cn(
-              'inline-flex items-center gap-1',
-              displayStatus === 'ending-soon' && 'text-warning'
-            )}
-          >
-            <Clock className='h-3.5 w-3.5' aria-hidden='true' />
-            {showEnded ? t('ended') : t('daysLeft', { count: daysLeft })}
-          </span>
         </div>
-      </div>
 
-      <FundraiserActionMenu
-        fundraiser={fundraiser}
-        onFundraiserUpdated={onFundraiserUpdated}
-      />
+        <p className='mt-1 truncate text-sm text-muted-foreground'>
+          {t('byHost', { host: hostName })}
+        </p>
+      </div>
     </li>
   );
 }
