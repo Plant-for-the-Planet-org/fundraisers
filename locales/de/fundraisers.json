@@ -283,11 +283,16 @@
           },
           "errors": {
             "recipientName": {
-              "required": "Name des/der Beschenkten ist erforderlich"
+              "required": "Name des/der Beschenkten ist erforderlich",
+              "tooLong": "Name des/der Beschenkten darf höchstens 35 Zeichen lang sein"
             },
             "recipientEmail": {
               "invalid": "Bitte gib eine gültige E-Mail ein",
+              "tooLong": "E-Mail darf höchstens 254 Zeichen lang sein",
               "requiredWithMessage": "E-Mail ist erforderlich, wenn eine persönliche Nachricht eingegeben wurde"
+            },
+            "message": {
+              "tooLong": "Persönliche Nachricht darf 250 Zeichen nicht überschreiten"
             }
           }
         }
