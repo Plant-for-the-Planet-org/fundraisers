@@ -46,5 +46,11 @@ export default function RedirectingPage() {
     }
   }, [logoutSuccess, router, safeRedirectPath, nonce]);
 
-  return <Loader text={tAuth('redirecting')} />;
+  const getLoaderKey = () => {
+    if (nonce) return 'signingIn';
+    if (logoutSuccess === 'true') return 'signingOut';
+    return 'redirecting';
+  };
+
+  return <Loader text={tAuth(getLoaderKey())} />;
 }
