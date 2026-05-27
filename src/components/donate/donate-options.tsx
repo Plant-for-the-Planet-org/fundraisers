@@ -2,45 +2,25 @@
 
 import type { DonationFormValues } from './donation-form-context';
 
-import { useEffect, useMemo } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
-import { PROVIDER_DISPLAY_NAMES } from '@/lib/utils/payment-methods';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useDonationForm } from './donation-form-context';
+import { useProcessingFeeInfo } from './use-processing-fee-info';
 
 export function DonateOptions() {
   const { control, setValue } = useFormContext<DonationFormValues>();
-  const selectedPaymentMethod = useWatch({
-    control,
-    name: 'selectedPaymentMethod',
-  });
-  const { fundraiser, paymentOptions, donationData } = useDonationForm();
+  const { paymentOptions, donationData } = useDonationForm();
+  const {
+    feeCollectionEnabled,
+    hasProcessingFee,
+    processingFeeCents,
+    paymentProviderName,
+  } = useProcessingFeeInfo();
   const t = useTranslations('Fundraisers');
-
-  const { feeCollectionEnabled, hasProcessingFee, processingFeeCents, selectedMethod } =
-    useMemo(() => {
-      return getDonationProcessingFeeInfo({
-        paymentOptions,
-        donationAmountCents: donationData.amountCents,
-        donationCurrency: donationData.currency,
-        workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod,
-      });
-    }, [
-      donationData.amountCents,
-      donationData.currency,
-      fundraiser.workspace?.country,
-      paymentOptions,
-      selectedPaymentMethod,
-    ]);
-
-  const paymentProviderName = selectedMethod
-    ? (PROVIDER_DISPLAY_NAMES[selectedMethod.provider] ?? selectedMethod.provider)
-    : '';
 
   const isInitiallyOneTime = donationData.frequency === 'once';
   const showCoverFees =
@@ -87,7 +67,9 @@ export function DonateOptions() {
               })}
             </label>
             <InfoTooltip
-              content={t('donate.options.coverFeesTooltip', { providerName: paymentProviderName })}
+              content={t('donate.options.coverFeesTooltip', {
+                providerName: paymentProviderName,
+              })}
               triggerLabel={t('donate.options.coverFeesTooltipTriggerLabel')}
               className='mt-0.5'
             />

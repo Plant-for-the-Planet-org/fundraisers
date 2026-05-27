@@ -2,27 +2,24 @@
 
 import type { DonationFormValues } from './donation-form-context';
 
-import { useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
-import { PROVIDER_DISPLAY_NAMES } from '@/lib/utils/payment-methods';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { useDonationForm } from './donation-form-context';
+import { useProcessingFeeInfo } from './use-processing-fee-info';
 
 export function DonationSummary() {
-  const { fundraiser, donationData, paymentOptions } = useDonationForm();
+  const { fundraiser, donationData } = useDonationForm();
   const { watch } = useFormContext<DonationFormValues>();
   const willAbsorbFee = watch('willAbsorbFee');
   const makeMonthly = watch('makeMonthly');
-  const selectedPaymentMethod = useWatch({
-    name: 'selectedPaymentMethod',
-  });
+  const { hasProcessingFee, processingFeeCents, paymentProviderName } =
+    useProcessingFeeInfo();
   const t = useTranslations('Fundraisers');
   const locale = useLocale();
 
@@ -100,28 +97,6 @@ export function DonationSummary() {
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
   const isYearly = donationData.frequency === 'yearly';
-  const { hasProcessingFee, processingFeeCents, selectedMethod } =
-    useMemo(() => {
-      return getDonationProcessingFeeInfo({
-        paymentOptions,
-        donationAmountCents: donationData.amountCents,
-        donationCurrency: donationData.currency,
-        workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod,
-      });
-    }, [
-      donationData.amountCents,
-      donationData.currency,
-      fundraiser.workspace?.country,
-      paymentOptions,
-      selectedPaymentMethod,
-    ]);
-
-  const paymentProviderName = selectedMethod
-    ? (PROVIDER_DISPLAY_NAMES[selectedMethod.provider] ??
-      selectedMethod.provider)
-    : '';
-
   const totalCents =
     donationData.amountCents +
     (willAbsorbFee && hasProcessingFee ? processingFeeCents : 0);
