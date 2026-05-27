@@ -9,7 +9,7 @@ import { Sparkles } from 'lucide-react';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Switch } from '@/components/ui/switch';
-import { inferThankYouOccasionId, THANK_YOU_MESSAGE_LIMITS } from './constants';
+import { inferThankYouOccasionId, THANK_YOU_NOTE_LIMITS } from './constants';
 import { ThankYouSuggestionsDialog } from './thank-you-suggestions-dialog';
 
 function CharCount({ current, max }: { current: number; max: number }) {
@@ -37,10 +37,10 @@ export function ThankYouNotePanel() {
     name: 'settings.modules.thankYouNote.enabled',
   });
   const messageVal =
-    (useWatch({
+    useWatch({
       control,
-      name: 'settings.modules.thankYouNote.message' as any,
-    }) as string) ?? '';
+      name: 'settings.modules.thankYouNote.message',
+    }) ?? '';
   const title = useWatch({ control, name: 'title' });
   const bundleSlug = useWatch({
     control,
@@ -112,7 +112,7 @@ export function ThankYouNotePanel() {
             <div className='pointer-events-none absolute bottom-2 right-3'>
               <CharCount
                 current={textLength}
-                max={THANK_YOU_MESSAGE_LIMITS.message}
+                max={THANK_YOU_NOTE_LIMITS.message}
               />
             </div>
           </div>

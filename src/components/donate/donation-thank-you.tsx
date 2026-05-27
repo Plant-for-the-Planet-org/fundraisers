@@ -2,9 +2,11 @@
 
 import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
+import type { FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { HostMessageCard } from './host-message-card';
 import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
 import { TransferDetailsList } from './transfer-details-list';
@@ -12,15 +14,18 @@ import { TransferDetailsList } from './transfer-details-list';
 interface DonationThankYouProps {
   thankYouState: ThankYouState;
   fundraiserSlug: string;
+  hosts: FundraiserHost[];
   customThankYouMessage?: SafeHtml | null;
 }
 
 export function DonationThankYou({
   thankYouState,
   fundraiserSlug,
+  hosts,
   customThankYouMessage,
 }: DonationThankYouProps) {
   let card: ReactNode;
+  let hostMessageCard: ReactNode = null;
   switch (thankYouState.status) {
     case 'bankTransferPending':
       card = (
@@ -54,17 +59,18 @@ export function DonationThankYou({
       );
       break;
     default:
-      card = (
-        <ThankYouCard
-          variant='completed'
-          customMessage={customThankYouMessage}
-        />
-      );
+      card = <ThankYouCard variant='completed' />;
+      if (customThankYouMessage) {
+        hostMessageCard = (
+          <HostMessageCard hosts={hosts} message={customThankYouMessage} />
+        );
+      }
   }
 
   return (
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
       {card}
+      {hostMessageCard}
       <ShareSection fundraiserSlug={fundraiserSlug} />
     </div>
   );

@@ -206,6 +206,8 @@
       "success": "Donation Complete"
     },
     "thankYou": {
+      "hostMessageHeading": "{count, plural, one {Message from Host} other {Message from Hosts}}",
+      "hostMessageSignature": "– {names}{remaining, plural, =0 {} one { and # other} other { and # others}}.",
       "title": {
         "completed": "Thank You for Your Donation!",
         "bankTransferPending": "Thank you for Initiating Your Donation",

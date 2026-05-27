@@ -24,7 +24,7 @@ import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { STAGE_LIMITS } from '@/components/stage/constants';
-import { THANK_YOU_MESSAGE_LIMITS } from '@/components/thank-you-note/constants';
+import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
 import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
@@ -103,7 +103,7 @@ export const thankYouNoteSchema = z.object({
     .string()
     .refine(
       val =>
-        getRichTextTextContent(val).length <= THANK_YOU_MESSAGE_LIMITS.message,
+        getRichTextTextContent(val).length <= THANK_YOU_NOTE_LIMITS.message,
       { message: 'maxLength' }
     ),
 });

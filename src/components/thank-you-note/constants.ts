@@ -1,4 +1,4 @@
-export const THANK_YOU_MESSAGE_LIMITS = {
+export const THANK_YOU_NOTE_LIMITS = {
   message: 400,
 } as const;
 
