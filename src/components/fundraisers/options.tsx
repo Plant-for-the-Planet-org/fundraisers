@@ -7,10 +7,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { StageMenuItem, StageSection } from '@/components/stage/stage-settings';
-import {
-  ThankYouMessageMenuItem,
-  ThankYouMessageSection,
-} from '@/components/thank-you-message/thank-you-message-settings';
+import { ThankYouNoteSection } from '@/components/thank-you-note/thank-you-note-settings';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -88,7 +85,6 @@ function AddModuleMenu() {
           {t('addModule')}
         </DropdownMenuLabel>
         <StageMenuItem />
-        <ThankYouMessageMenuItem />
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -131,8 +127,9 @@ export function Options() {
         offValue='unlisted'
       />
 
+      <ThankYouNoteSection />
+
       <StageSection />
-      <ThankYouMessageSection />
     </div>
   );
 }

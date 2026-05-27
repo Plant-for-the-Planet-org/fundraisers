@@ -8,7 +8,10 @@ import type { AllowedCountry } from '@/lib/utils/country-currency';
 import { z } from 'zod';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
-import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
+import {
+  DESCRIPTION_MAX_LENGTH,
+  GOAL_AMOUNT_MIN,
+} from '@/lib/constants/fundraiser-creation';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
@@ -21,7 +24,7 @@ import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { STAGE_LIMITS } from '@/components/stage/constants';
-import { THANK_YOU_MESSAGE_LIMITS } from '@/components/thank-you-message/constants';
+import { THANK_YOU_MESSAGE_LIMITS } from '@/components/thank-you-note/constants';
 import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
@@ -94,7 +97,7 @@ const stageSlideSchema = z.object({
   duration: z.number().int().min(1).max(60),
 });
 
-export const thankYouMessageSchema = z.object({
+export const thankYouNoteSchema = z.object({
   enabled: z.boolean(),
   message: z
     .string()
@@ -118,7 +121,10 @@ export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
     .string()
-    .refine(value => getRichTextTextContent(value).length > 0),
+    .refine(value => getRichTextTextContent(value).length > 0)
+    .refine(
+      value => getRichTextTextContent(value).length <= DESCRIPTION_MAX_LENGTH
+    ),
   image: selectedImageSchema.nullable(),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
@@ -155,7 +161,7 @@ export const fundraiserFormSchema = z.object({
         slug: z.enum(BUNDLE_SLUGS).nullable(),
       }),
       stage: stageModeSchema.nullable(),
-      thankYouMessage: thankYouMessageSchema.nullable(),
+      thankYouNote: thankYouNoteSchema,
     }),
   }),
 });
@@ -205,7 +211,7 @@ export function buildDefaultCreateValues(
         leaderboard: { ...DEFAULT_LEADERBOARD },
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
-        thankYouMessage: null,
+        thankYouNote: { enabled: false, message: '' },
       },
     },
   };
@@ -284,7 +290,10 @@ export function fundraiserToFormValues(
         },
         bundle: { slug: bundleSlug },
         stage: fundraiser.settings?.modules?.stage ?? null,
-        thankYouMessage: fundraiser.settings?.modules?.thankYouMessage ?? null,
+        thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
+          enabled: false,
+          message: '',
+        },
       },
     },
   };

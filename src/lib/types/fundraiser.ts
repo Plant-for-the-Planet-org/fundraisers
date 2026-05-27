@@ -79,7 +79,7 @@ export interface StageModuleSettings {
   show_progress_bar?: boolean;
 }
 
-export interface ThankYouMessageModuleSettings {
+export interface ThankYouNoteModuleSettings {
   enabled: boolean;
   message: string;
 }
@@ -100,7 +100,7 @@ export interface FundraiserSettings {
       slug: string | null;
     };
     stage?: StageModuleSettings | null;
-    thankYouMessage?: ThankYouMessageModuleSettings | null;
+    thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
       options: Array<{
         unit?: number;
@@ -190,7 +190,7 @@ export interface UpdateFundraiserRequest {
       leaderboard?: LeaderboardModuleSettings;
       bundle?: { slug: string | null };
       stage?: Nullable<StageModuleSettings>;
-      thankYouMessage?: Nullable<ThankYouMessageModuleSettings>;
+      thankYouNote?: Nullable<ThankYouNoteModuleSettings>;
     };
   };
   imageFile?: string; // base64 encoded, only sent when image changed

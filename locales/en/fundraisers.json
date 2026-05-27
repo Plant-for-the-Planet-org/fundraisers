@@ -119,7 +119,8 @@
         "label": "Description",
         "placeholder": "Tell people about your fundraiser...",
         "errors": {
-          "required": "Please enter a fundraiser description."
+          "required": "Please enter a fundraiser description.",
+          "tooLong": "Description must be {max} characters or fewer."
         }
       },
       "image": {
@@ -244,30 +245,18 @@
           "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum {max} slides reached"
         },
-        "thankYouMessage": {
-          "title": "Thank You Message",
-          "blurb": "Show a custom message to donors after they complete their donation.",
-          "subtitle": "Personalize what donors see after giving",
-          "collapse": "Collapse",
-          "expand": "Expand",
-          "remove": "Remove Thank You Message",
-          "toggleEnabled": "Toggle Thank You Message",
-          "messageLabel": "Write a message",
-          "editorPlaceholder": "Write your thank-you message...",
-          "presetTopic": "Pick a topic",
-          "pickMessage": "Pick a message",
-          "presetTopicPlaceholder": "Choose a topic...",
-          "presetTopics": {
-            "climateJustice": "Climate Justice",
-            "events": "Events",
-            "sports": "Sports",
-            "birthday": "Birthday",
-            "tech": "Tech",
-            "wedding": "Wedding",
-            "memorial": "Memorial",
-            "school": "School",
-            "corporate": "Corporate"
-          }
+        "thankYouNote": {
+          "title": "Thank-You Note",
+          "subtitle": "Shown after donation and in the email sent to your donors",
+          "toggleEnabled": "Toggle Thank-You Note",
+          "messageLabel": "Write a note",
+          "editorPlaceholder": "Write your thank-you note...",
+          "suggestionsButton": "Suggestions",
+          "suggestionsTitle": "Message suggestions",
+          "suggestionsSubtitle": "Pick a ready-made message, then make it your own.",
+          "suggestionsHeading": "Suggestions",
+          "moreTemplates": "Other templates",
+          "allTemplates": "Templates"
         }
       },
       "contributionSettings": {

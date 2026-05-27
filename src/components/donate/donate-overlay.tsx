@@ -131,7 +131,7 @@ function DonateOverlayInner({
     }
   }, [error?.code]);
 
-  const thankYouModule = fundraiser.settings?.modules?.thankYouMessage;
+  const thankYouModule = fundraiser.settings?.modules?.thankYouNote;
   const customThankYouMessage =
     thankYouModule?.enabled && thankYouModule?.message
       ? sanitizeThankYouHtml(thankYouModule.message)

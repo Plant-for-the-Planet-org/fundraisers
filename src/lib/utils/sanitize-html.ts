@@ -30,7 +30,16 @@ function toSafeHtml(html: string): SafeHtml {
   return html as SafeHtml;
 }
 
-const THANK_YOU_ALLOWED_TAGS = ['p', 'strong', 'b', 'em', 'u', 'br', 'span'];
+const THANK_YOU_ALLOWED_TAGS = [
+  'p',
+  'strong',
+  'b',
+  'em',
+  'u',
+  'br',
+  'span',
+  'blockquote',
+];
 
 export function sanitizeThankYouHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {

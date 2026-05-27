@@ -27,6 +27,8 @@ interface RichTextEditorProps {
   className?: string;
   ariaInvalid?: boolean;
   ariaDescribedBy?: string;
+  /** Optional actions rendered right-aligned in the toolbar (e.g. a suggestions button). */
+  extraToolbarActions?: ReactNode;
 }
 
 interface ToolbarButtonProps {
@@ -81,6 +83,7 @@ export function RichTextEditor({
   className,
   ariaInvalid = false,
   ariaDescribedBy,
+  extraToolbarActions,
 }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -217,6 +220,12 @@ export function RichTextEditor({
         >
           <Minus className='h-4 w-4' />
         </ToolbarButton>
+
+        {extraToolbarActions && (
+          <div className='ml-auto flex items-center gap-1'>
+            {extraToolbarActions}
+          </div>
+        )}
       </div>
 
       <EditorContent

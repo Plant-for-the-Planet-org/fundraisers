@@ -119,7 +119,8 @@
         "label": "Beschreibung",
         "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
         "errors": {
-          "required": "Gib eine Beschreibung für den Spendenaufruf ein."
+          "required": "Gib eine Beschreibung für den Spendenaufruf ein.",
+          "tooLong": "Die Beschreibung darf höchstens {max} Zeichen lang sein."
         }
       },
       "image": {
@@ -244,30 +245,18 @@
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum von {max} Folien erreicht"
         },
-        "thankYouMessage": {
+        "thankYouNote": {
           "title": "Dankesnachricht",
-          "blurb": "Zeige Spendern nach Abschluss ihrer Spende eine individuelle Nachricht.",
-          "subtitle": "Personalisiere, was Spender nach ihrer Spende sehen",
-          "collapse": "Zusammenklappen",
-          "expand": "Erweitern",
-          "remove": "Dankesnachricht entfernen",
+          "subtitle": "Wird nach der Spende und in der E-Mail an deine Spender angezeigt",
           "toggleEnabled": "Dankesnachricht umschalten",
           "messageLabel": "Nachricht verfassen",
           "editorPlaceholder": "Schreibe deine Dankesnachricht...",
-          "presetTopic": "Thema wählen",
-          "pickMessage": "Nachricht wählen",
-          "presetTopicPlaceholder": "Thema auswählen...",
-          "presetTopics": {
-            "climateJustice": "Klimagerechtigkeit",
-            "events": "Veranstaltungen",
-            "sports": "Sport",
-            "birthday": "Geburtstag",
-            "tech": "Technologie",
-            "wedding": "Hochzeit",
-            "memorial": "Gedenken",
-            "school": "Schule",
-            "corporate": "Unternehmen"
-          }
+          "suggestionsButton": "Vorschläge",
+          "suggestionsTitle": "Nachrichtenvorschläge",
+          "suggestionsSubtitle": "Wähle eine fertige Nachricht und passe sie an.",
+          "suggestionsHeading": "Vorschläge",
+          "moreTemplates": "Andere Vorlagen",
+          "allTemplates": "Vorlagen"
         }
       },
       "contributionSettings": {

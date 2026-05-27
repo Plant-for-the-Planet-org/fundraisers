@@ -40,10 +40,10 @@ function isStageDirty(dirty: UpdateDirtyFields): boolean {
   return true;
 }
 
-function isThankYouMessageDirty(dirty: UpdateDirtyFields): boolean {
-  const thankYouMessage = dirty.settings?.modules?.thankYouMessage;
-  if (!thankYouMessage) return false;
-  if (typeof thankYouMessage === 'boolean') return thankYouMessage;
+function isThankYouNoteDirty(dirty: UpdateDirtyFields): boolean {
+  const thankYouNote = dirty.settings?.modules?.thankYouNote;
+  if (!thankYouNote) return false;
+  if (typeof thankYouNote === 'boolean') return thankYouNote;
   return true;
 }
 
@@ -119,8 +119,8 @@ export function buildUpdateFundraiserRequest(
     dirtyModules.leaderboard = values.settings.modules.leaderboard;
   if (isStageDirty(dirtyFields))
     dirtyModules.stage = values.settings.modules.stage;
-  if (isThankYouMessageDirty(dirtyFields))
-    dirtyModules.thankYouMessage = values.settings.modules.thankYouMessage;
+  if (isThankYouNoteDirty(dirtyFields))
+    dirtyModules.thankYouNote = values.settings.modules.thankYouNote;
   if (isBundleDirty(dirtyFields))
     dirtyModules.bundle = values.settings.modules.bundle;
   if (Object.keys(dirtyModules).length > 0) {
@@ -153,7 +153,7 @@ export function buildCreateFundraiserRequest(
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
-        thankYouMessage: values.settings.modules.thankYouMessage,
+        thankYouNote: values.settings.modules.thankYouNote,
       },
     },
     startDate: getTodayString(),
