@@ -2,8 +2,8 @@
   "Donate": {
     "overlay": {
       "aria": {
-        "label": "Spenden Details",
-        "close": "Spenden-Overlay schließen"
+        "label": "Spendendetails",
+        "close": "Spendenfenster schließen"
       }
     },
     "preferences": {

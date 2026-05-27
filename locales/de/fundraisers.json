@@ -24,7 +24,7 @@
       "title": "Spendenaufruf nicht gefunden",
       "description": "Der gesuchte Spendenaufruf existiert nicht oder wurde möglicherweise entfernt.",
       "browseCta": "Spendenaufrufe entdecken",
-      "homeCta": "Home"
+      "homeCta": "Zur Startseite"
     },
     "metadata": {
       "fallbackTitle": "Spendenaufruf"
