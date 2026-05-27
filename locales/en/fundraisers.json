@@ -76,7 +76,7 @@
           "noFee": "No fee",
           "feeAmount": "{amount} fee",
           "alternatives": {
-            "eu": "Open Banking or Bank Transfer",
+            "eu": "Bank Transfer",
             "default": "Bank Transfer"
           },
           "tooltip": {

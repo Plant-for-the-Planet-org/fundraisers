@@ -76,7 +76,7 @@
           "noFee": "Keine Gebühren",
           "feeAmount": "{amount} Gebühren",
           "alternatives": {
-            "eu": "Open Banking oder Überweisung",
+            "eu": "Überweisung",
             "default": "Überweisung"
           },
           "tooltip": {
