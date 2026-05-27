@@ -343,7 +343,7 @@ export function PaymentMethods() {
 
       const alternatives =
         method.feeRegion === 'EU'
-          ? t('fees.alternatives.eu')
+          ? t('fees.alternatives.eu') // Update alternatives for EU if open banking is added in the future
           : t('fees.alternatives.default');
 
       return t('fees.tooltip.withFee', {

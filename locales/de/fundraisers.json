@@ -39,7 +39,7 @@
     },
     "donate": {
       "summary": {
-        "processingFee": "Zahlungsgebühr",
+        "processingFee": "Cover {providerName}-Gebühren",
         "breakdown": "Aufschlüsselung",
         "total": "Gesamt",
         "totalMonthly": "Jeden Monat insgesamt",
@@ -76,7 +76,7 @@
           "noFee": "Keine Gebühren",
           "feeAmount": "{amount} Gebühren",
           "alternatives": {
-            "eu": "Open Banking oder Überweisung",
+            "eu": "Überweisung",
             "default": "Überweisung"
           },
           "tooltip": {
@@ -85,8 +85,8 @@
         }
       },
       "options": {
-        "coverFeesLabel": "Spende {feeAmount} mehr, um die Gebühren für die Zahlungsabwicklung aufzufangen. (freiwillig)",
-        "coverFeesTooltip": "Die Gebühren für die Zahlungsabwicklung werden unter den von diesem Spendenaufruf unterstützten Projekten aufgeteilt.",
+        "coverFeesLabel": "Spende {feeAmount} mehr, um die {providerName}-Gebühren aufzufangen. (freiwillig)",
+        "coverFeesTooltip": "Die {providerName}-Gebühren werden unter den von diesem Spendenaufruf unterstützten Projekten aufgeteilt.",
         "coverFeesTooltipTriggerLabel": "Weitere Informationen über Zahlungsgebühren",
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
