@@ -51,6 +51,8 @@ Domain concerns (response shaping, field-level error mapping, retries) belong in
 
 <!-- Test runner, where tests live, what to run before pushing. -->
 
+Do not start a dev server or verify changes in the browser. A dev session is usually already running; rely on `npm run type-check` and `npm run lint` for correctness, then let the reviewer check the UI and report back.
+
 ## Gotchas
 
 <!-- Non-obvious traps: SSR/CSR boundaries, stale .next types, env quirks. -->
