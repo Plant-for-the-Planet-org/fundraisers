@@ -182,20 +182,10 @@ export function FundraiserView({
         />
       </MainPanel>
 
-      {(canShowLeaderboard || fundraiser.visibility === 'public') && (
-        <div className='md:hidden flex flex-col gap-6'>
-          {/* Donation count + donor avatars (only when leaderboard module is on) */}
-          {canShowLeaderboard && (
-            <DonationCountSummary
-              donationCount={fundraiser.donationCount}
-              fundraiser={fundraiser}
-            />
-          )}
-
-          {/** Copy link */}
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
-        </div>
-      )}
+      <div className='md:hidden flex flex-col gap-6'>
+        {/** Copy link */}
+        {fundraiser.visibility === 'public' && <CopyLinkButton />}
+      </div>
     </FundraiserLayout>
   );
 }
