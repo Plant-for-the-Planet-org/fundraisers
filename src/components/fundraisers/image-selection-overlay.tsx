@@ -2,7 +2,13 @@
 
 import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
@@ -25,6 +31,14 @@ interface ImageSelectionOverlayProps {
   onImageSelect: (image: SelectedImage) => void;
 }
 
+function useMounted(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
 export function ImageSelectionOverlay({
   isOpen,
   onClose,
@@ -33,16 +47,20 @@ export function ImageSelectionOverlay({
   const t = useTranslations('Fundraisers.form.image');
 
   const categories = useMemo(() => getVisibleImageCategories(), []);
+  const fallbackCategoryId = categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID;
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(
-    categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID
-  );
+  const [selectedCategory, setSelectedCategory] = useState(fallbackCategoryId);
   const [isDragOver, setIsDragOver] = useState(false);
   const [images, setImages] = useState<UnsplashPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
+  const resolvedSelectedCategory = categories.some(
+    category => category.id === selectedCategory
+  )
+    ? selectedCategory
+    : fallbackCategoryId;
 
   const loadCategoryImages = useCallback(
     async (categoryId: string) => {
@@ -65,7 +83,7 @@ export function ImageSelectionOverlay({
   const loadSearchImages = useCallback(
     async (query: string) => {
       if (!query.trim()) {
-        await loadCategoryImages(selectedCategory);
+        await loadCategoryImages(resolvedSelectedCategory);
         return;
       }
 
@@ -82,7 +100,7 @@ export function ImageSelectionOverlay({
         setIsLoading(false);
       }
     },
-    [loadCategoryImages, selectedCategory, t]
+    [loadCategoryImages, resolvedSelectedCategory, t]
   );
 
   const getUploadErrorMessage = useCallback(
@@ -156,24 +174,6 @@ export function ImageSelectionOverlay({
   );
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      return;
-    }
-
-    const categoryExists = categories.some(
-      category => category.id === selectedCategory
-    );
-
-    if (!categoryExists) {
-      setSelectedCategory(categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID);
-    }
-  }, [categories, selectedCategory]);
-
-  useEffect(() => {
     if (!isOpen) {
       return;
     }
@@ -185,7 +185,7 @@ export function ImageSelectionOverlay({
           return;
         }
 
-        void loadCategoryImages(selectedCategory);
+        void loadCategoryImages(resolvedSelectedCategory);
       },
       searchQuery.trim() ? 300 : 0
     );
@@ -197,8 +197,8 @@ export function ImageSelectionOverlay({
     isOpen,
     loadCategoryImages,
     loadSearchImages,
+    resolvedSelectedCategory,
     searchQuery,
-    selectedCategory,
   ]);
 
   useEffect(() => {
@@ -322,7 +322,7 @@ export function ImageSelectionOverlay({
                     }}
                     className={cn(
                       'flex-shrink-0 sm:w-full text-left px-3 py-2 rounded-md text-sm transition-colors whitespace-nowrap',
-                      selectedCategory === category.id
+                      resolvedSelectedCategory === category.id
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 font-medium'
                         : 'text-zinc-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'
                     )}
