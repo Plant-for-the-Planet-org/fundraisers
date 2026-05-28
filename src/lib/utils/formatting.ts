@@ -5,6 +5,32 @@ const COMPACT_SCALES = [
   { threshold: 1_000, divisor: 1_000, suffix: 'K' },
 ] as const;
 
+function normalizeLocale(locale: string): string {
+  return typeof locale === 'string' && locale.length > 0 ? locale : 'en';
+}
+
+function normalizeNumber(value: number): number {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function getCompactSuffix(locale: string, suffix: string): string {
+  const safeLocale = normalizeLocale(locale);
+
+  if (safeLocale.startsWith('de')) {
+    const germanSuffixMap: Record<string, string> = {
+      K: 'Tsd.',
+      M: 'Mio.',
+      B: 'Mrd.',
+      T: 'Bio.',
+    };
+
+    return germanSuffixMap[suffix] ?? suffix;
+  }
+
+  return suffix;
+}
+
 /**
  * Format a number with locale-aware decimal rules.
  *
@@ -13,18 +39,20 @@ const COMPACT_SCALES = [
  * - English (and others): up to 2 decimals, trailing zeros dropped.
  */
 function formatLocalizedNumber(value: number, locale: string): string {
-  const rounded = Math.round(value * 100) / 100;
+  const safeLocale = normalizeLocale(locale);
+  const numericValue = normalizeNumber(value);
+  const rounded = Math.round(numericValue * 100) / 100;
   const isWhole = rounded % 1 === 0;
-  const isGerman = locale.startsWith('de');
+  const isGerman = safeLocale.startsWith('de');
 
   if (isGerman) {
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat(safeLocale, {
       minimumFractionDigits: isWhole ? 0 : 2,
       maximumFractionDigits: isWhole ? 0 : 2,
     }).format(rounded);
   }
 
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat(safeLocale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(rounded);
@@ -32,15 +60,17 @@ function formatLocalizedNumber(value: number, locale: string): string {
 
 /** Format a number in compact notation (e.g. 1200 → "1.2 K"). */
 function formatCompactNumber(value: number, locale: string): string {
-  const abs = Math.abs(value);
+  const numericValue = normalizeNumber(value);
+  const abs = Math.abs(numericValue);
 
   for (const { threshold, divisor, suffix } of COMPACT_SCALES) {
     if (abs >= threshold) {
-      return `${formatLocalizedNumber(value / divisor, locale)} ${suffix}`;
+      const localizedSuffix = getCompactSuffix(locale, suffix);
+      return `${formatLocalizedNumber(numericValue / divisor, locale)} ${localizedSuffix}`;
     }
   }
 
-  return formatLocalizedNumber(value, locale);
+  return formatLocalizedNumber(numericValue, locale);
 }
 
 export { formatCompactNumber, formatLocalizedNumber };
