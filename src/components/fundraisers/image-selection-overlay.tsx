@@ -292,14 +292,6 @@ export function ImageSelectionOverlay({
               </div>
               <div className='text-xs text-gray-500 dark:text-zinc-400'>
                 {t('overlay.uploadSubtitle')}{' '}
-                <a
-                  href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
-                >
-                  {t('attribution.unsplashLink')}
-                </a>
               </div>
             </div>
           </div>
