@@ -52,6 +52,16 @@
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
         "bankTransferRemark": "Please set up a standing order with your bank.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand} card ending in {last4}",
+          "sepaLabelAria": "Bank account ending in {last4}",
+          "defaultBadge": "Default",
+          "expired": "Expired",
+          "newCard": "Use a new card",
+          "newSepa": "Use a new bank account"
+        },
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
