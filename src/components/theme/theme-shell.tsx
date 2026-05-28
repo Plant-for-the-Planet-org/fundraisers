@@ -9,7 +9,7 @@ import { getAccentColor } from '@/lib/theme/accent-utils';
 import {
   DEFAULT_PATTERN_TILE,
   LOGO_LIBRARY,
-  resolveBgImage,
+  resolveBgAsset,
 } from '@/lib/theme/backgrounds';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
@@ -101,7 +101,7 @@ function ImageLayer({
   mode: BgSettings['image_mode'];
   opacity: number;
 }) {
-  const resolved = resolveBgImage(imageUrl);
+  const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
   const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
   return (
@@ -126,7 +126,7 @@ function PatternLayer({
   patternId: string;
   opacity: number;
 }) {
-  const resolved = resolveBgImage(patternId);
+  const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
   const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
   const tileSize =
@@ -153,7 +153,8 @@ const logoTileCache = new Map<string, Promise<string>>();
 async function buildLogoTile(src: string): Promise<string> {
   const resp = await fetch(src);
   const text = await resp.text();
-  const viewBox = text.match(/viewBox\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? '0 0 24 24';
+  const viewBox =
+    text.match(/viewBox\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? '0 0 24 24';
   const inner = text
     .replace(/^[\s\S]*?<svg[^>]*>/, '')
     .replace(/<\/svg>\s*$/, '');

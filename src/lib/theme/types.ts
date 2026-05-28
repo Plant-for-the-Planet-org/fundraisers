@@ -23,12 +23,14 @@ export type AccentColor =
 
 export type FontId = 'open-sans' | 'inter' | 'poppins' | 'playfair' | 'roboto';
 
-export type AnimationType =
-  | 'none'
-  | 'snow'
-  | 'confetti'
-  | 'hearts'
-  | 'particles';
+export const ANIMATION_TYPES = [
+  'none',
+  'snow',
+  'confetti',
+  'hearts',
+  'particles',
+] as const;
+export type AnimationType = (typeof ANIMATION_TYPES)[number];
 
 export type ThemeMode = 'light' | 'dark';
 

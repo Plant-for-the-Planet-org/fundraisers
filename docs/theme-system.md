@@ -51,7 +51,8 @@ src/
     theme/
       types.ts                      ← all theme TypeScript types
       themes.ts                     ← 11 predefined themes registry + DEFAULT_THEME
-      backgrounds.ts                ← BG_LIBRARY (patterns + image illustrations + video placeholders), resolveBgImage, validators
+      backgrounds.ts                ← BG_LIBRARY, LOGO_LIBRARY, DEFAULT_BG, defineBg, resolveBgAsset, validators
+      validators.ts                 ← isValidMode (future home for all theme validators)
       font-utils.ts                 ← FontId → CSS variable font-family string
       accent-utils.ts               ← AccentColor → Tailwind class sets + hex value
       build-theme.ts                ← FundraiserThemeSettings (DB) → validated Theme
@@ -180,6 +181,19 @@ Defines all TypeScript types. Nothing imported from outside the `theme/` directo
 - `Theme` — the complete theme object used throughout the app
 - `FundraiserThemeSettings` — shape stored in `fundraiser.settings.theme` in the DB; uses snake_case and looser string types to match the DB record format; `base_id` references a predefined theme as the base for field-level overrides; background customization is nested under `bg: { gradient, decoration, pattern_id, image_url, image_mode, opacity }`
 - `BgSettings`, `BgDecoration`, `BgImageMode` — the validated runtime shape and its enums, produced by `buildTheme`
+
+---
+
+### `src/lib/theme/backgrounds.ts`
+
+Background asset registries, the `resolveBgAsset` resolver, and enum validators.
+
+- `DEFAULT_BG` — default values for a fresh `bg` block (all fields except `gradient`). Used by `defineBg`.
+- `defineBg(gradient, overrides?)` — builds a `BgSettings` from a gradient class plus optional overrides of `DEFAULT_BG`. Used in theme presets to keep them terse.
+- `BG_LIBRARY: BackgroundAsset[]` — 13 background assets (patterns, image illustrations, video loop placeholders). All currently use inline SVG data URIs for both `thumb` (picker) and `src` (render); real file-based assets are deferred.
+- `LOGO_LIBRARY: LogoAsset[]` — 12 partner logos served from `public/theme-logos/*.svg`.
+- `resolveBgAsset(bgAsset)` — resolves a stored `pattern_id` or `image_url` to a `ResolvedBgAsset` (`library` or `external`). Logos are excluded; they resolve separately via `LOGO_LIBRARY.find`.
+- `isValidDecoration`, `isValidImageMode`, `isValidAnimation` — enum guards used by `buildBg` and `fundraiserToFormValues`; derived from `BG_DECORATIONS`, `BG_IMAGE_MODES`, and `ANIMATION_TYPES` respectively.
 
 ---
 
