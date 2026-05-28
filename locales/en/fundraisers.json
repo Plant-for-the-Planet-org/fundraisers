@@ -144,7 +144,7 @@
         "overlay": {
           "title": "Select an image",
           "uploadTitle": "Drag and drop or click to upload",
-          "uploadSubtitle": "Or choose an image from Unsplash below",
+          "uploadSubtitle": "Or choose an image below",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },

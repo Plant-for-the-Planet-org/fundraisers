@@ -144,7 +144,7 @@
         "overlay": {
           "title": "Wähle ein Bild aus",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
-          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash aus",
+          "uploadSubtitle": "Oder wähle unten ein Bild aus",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
         },
