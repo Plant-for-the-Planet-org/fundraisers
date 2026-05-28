@@ -14,6 +14,10 @@ function normalizeNumber(value: number): number {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
+function roundToTwoDecimals(value: number): number {
+  return Number(Math.round(Number(`${value}e2`)) + 'e-2');
+}
+
 function getCompactSuffix(locale: string, suffix: string): string {
   const safeLocale = normalizeLocale(locale);
 
@@ -41,7 +45,7 @@ function getCompactSuffix(locale: string, suffix: string): string {
 function formatLocalizedNumber(value: number, locale: string): string {
   const safeLocale = normalizeLocale(locale);
   const numericValue = normalizeNumber(value);
-  const rounded = Math.round(numericValue * 100) / 100;
+  const rounded = roundToTwoDecimals(numericValue);
   const isWhole = rounded % 1 === 0;
   const isGerman = safeLocale.startsWith('de');
 

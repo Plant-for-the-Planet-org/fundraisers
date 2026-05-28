@@ -74,17 +74,13 @@ function normalizeTotalRaised(
   }
 
   const byCurrency = totalRaised as Record<string, unknown>;
-
-  const preferredCurrencyAmount = coerceNumber(byCurrency[currency]);
-  if (preferredCurrencyAmount !== null) {
-    return preferredCurrencyAmount;
-  }
-
-  // Fallback for payloads where currency key casing differs or currency is missing.
-  for (const value of Object.values(byCurrency)) {
-    const amount = coerceNumber(value);
-    if (amount !== null) {
-      return amount;
+  const normalizedCurrency = currency.trim().toUpperCase();
+  for (const [key, value] of Object.entries(byCurrency)) {
+    if (key.trim().toUpperCase() === normalizedCurrency) {
+      const amount = coerceNumber(value);
+      if (amount !== null) {
+        return amount;
+      }
     }
   }
 

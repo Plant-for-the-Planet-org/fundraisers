@@ -11,6 +11,7 @@ import { headers } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { setRequestLocale } from '@/lib/utils/request-locale';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
 import { CookieConsentProvider } from '@/components/cookie/cookie-consent-provider';
@@ -76,6 +77,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = await getLocale();
+  setRequestLocale(locale);
   const messages = await getMessages();
   const headersList = await headers();
   const pathname = headersList.get('x-pathname') ?? '/';

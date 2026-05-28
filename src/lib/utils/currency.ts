@@ -3,6 +3,7 @@
  */
 
 import { formatCompactNumber, formatLocalizedNumber } from './formatting';
+import { getRequestLocale } from './request-locale';
 
 // Map of major currencies to their symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -52,7 +53,7 @@ function resolveLocale(locale?: string): string {
   if (typeof document !== 'undefined') {
     return document.documentElement.lang || 'en';
   }
-  return 'en';
+  return getRequestLocale();
 }
 
 /** Format a number with the given locale, respecting compact mode. */
