@@ -7,22 +7,9 @@ import { useTranslations } from 'next-intl';
 import { DESCRIPTION_MAX_LENGTH } from '@/lib/constants/fundraiser-creation';
 import { cn } from '@/lib/utils';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import { CharCount } from '@/components/fundraisers/char-count';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-
-function CharCount({ current, max }: { current: number; max: number }) {
-  const color =
-    current > max
-      ? 'text-destructive'
-      : current > max * 0.85
-        ? 'text-orange-500'
-        : 'text-muted-foreground';
-  return (
-    <span className={`text-[10px] tabular-nums ${color}`}>
-      {current}/{max}
-    </span>
-  );
-}
 
 export default function DescriptionInput() {
   const t = useTranslations('Fundraisers.form.description');

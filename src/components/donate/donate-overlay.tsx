@@ -141,7 +141,7 @@ function DonateOverlayInner({
     <DonationThankYou
       thankYouState={thankYouState}
       fundraiserSlug={fundraiser.slug}
-      hosts={fundraiser.hosts}
+      hosts={fundraiser.hosts ?? []}
       customThankYouMessage={customThankYouMessage}
     />
   ) : (

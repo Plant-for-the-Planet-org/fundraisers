@@ -7,24 +7,11 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import { CharCount } from '@/components/fundraisers/char-count';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Switch } from '@/components/ui/switch';
 import { inferThankYouOccasionId, THANK_YOU_NOTE_LIMITS } from './constants';
 import { ThankYouSuggestionsDialog } from './thank-you-suggestions-dialog';
-
-function CharCount({ current, max }: { current: number; max: number }) {
-  const color =
-    current > max
-      ? 'text-destructive'
-      : current > max * 0.85
-        ? 'text-orange-500'
-        : 'text-muted-foreground';
-  return (
-    <span className={`text-[10px] tabular-nums ${color}`}>
-      {current}/{max}
-    </span>
-  );
-}
 
 export function ThankYouNotePanel() {
   const t = useTranslations('Fundraisers.form.options.thankYouNote');
@@ -32,22 +19,17 @@ export function ThankYouNotePanel() {
 
   const { control, setValue } = useFormContext<FundraiserFormValues>();
 
-  const enabled = useWatch({
+  const [enabled, messageVal, title, bundleSlug] = useWatch({
     control,
-    name: 'settings.modules.thankYouNote.enabled',
-  });
-  const messageVal =
-    useWatch({
-      control,
-      name: 'settings.modules.thankYouNote.message',
-    }) ?? '';
-  const title = useWatch({ control, name: 'title' });
-  const bundleSlug = useWatch({
-    control,
-    name: 'settings.modules.bundle.slug',
+    name: [
+      'settings.modules.thankYouNote.enabled',
+      'settings.modules.thankYouNote.message',
+      'title',
+      'settings.modules.bundle.slug',
+    ],
   });
 
-  const textLength = getRichTextTextContent(messageVal).length;
+  const textLength = getRichTextTextContent(messageVal ?? '').length;
   const recommendedOccasionId = inferThankYouOccasionId(title, bundleSlug);
 
   const fillMessage = (html: string) => {

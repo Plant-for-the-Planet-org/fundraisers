@@ -19,10 +19,19 @@ export function HostMessageCard({
   const format = useFormatter();
 
   const publicHosts = hosts.filter(host => host.isPublic);
-  const hostsToShow = publicHosts.length > 0 ? publicHosts : hosts;
-  const names = hostsToShow.map(
-    host => host.displayName ?? host.user?.name ?? tFundraisers('unknownHost')
-  );
+
+  // TODO: Once the API surfaces anonymity preferences more granularly,
+  // consider showing initials or a customisable anonymous label per host.
+  const isAnonymous = publicHosts.length === 0;
+  const names: string[] = isAnonymous
+    ? [
+        hosts.length > 1
+          ? tFundraisers('anonymousHost') + 's'
+          : tFundraisers('anonymousHost'),
+      ]
+    : publicHosts.map(
+        host => host.displayName ?? host.user?.name ?? tFundraisers('unknownHost')
+      );
 
   const displayNames = names.slice(0, MAX_NAMED_HOSTS);
   const remaining = Math.max(0, names.length - displayNames.length);
