@@ -4,7 +4,6 @@ import type {
   FontId,
   FundraiserThemeSettings,
   Theme,
-  ThemeMode,
 } from './types';
 
 import {
@@ -13,6 +12,7 @@ import {
   isValidImageMode,
 } from './backgrounds';
 import { DEFAULT_THEME, THEMES } from './themes';
+import { isValidMode } from './validators';
 
 function clampOpacity(value: unknown, fallback: number): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
@@ -49,7 +49,6 @@ const VALID_FONTS = new Set([
   'playfair',
   'roboto',
 ]);
-const VALID_MODES = new Set(['light', 'dark']);
 
 function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
   const raw = settings.bg ?? {};
@@ -87,9 +86,7 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
     accent: VALID_ACCENTS.has(settings.accent ?? '')
       ? (settings.accent as AccentColor)
       : base.accent,
-    mode: VALID_MODES.has(settings.mode ?? '')
-      ? (settings.mode as ThemeMode)
-      : base.mode,
+    mode: isValidMode(settings.mode) ? settings.mode : base.mode,
     bodyFont: VALID_FONTS.has(settings.body_font ?? '')
       ? (settings.body_font as FontId)
       : base.bodyFont,

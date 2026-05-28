@@ -15,6 +15,7 @@ import {
   isValidImageMode,
 } from '@/lib/theme/backgrounds';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { isValidMode } from '@/lib/theme/validators';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
@@ -268,7 +269,7 @@ export function fundraiserToFormValues(
     settings: {
       theme: {
         base_id: theme.base_id ?? fallbackTheme.id,
-        mode: theme.mode ?? fallbackTheme.mode,
+        mode: isValidMode(theme.mode) ? theme.mode : fallbackTheme.mode,
         accent: theme.accent ?? fallbackTheme.accent,
         body_font: theme.body_font ?? fallbackTheme.bodyFont,
         title_font: theme.title_font ?? fallbackTheme.titleFont,
