@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 interface GoalProgressDisplayProps {
@@ -17,6 +17,7 @@ export function GoalProgressDisplay({
   daysLeft,
 }: GoalProgressDisplayProps) {
   const t = useTranslations('Fundraisers.form.goalPreview');
+  const locale = useLocale();
 
   return (
     <div className='goal-progress-display flex flex-col'>
@@ -24,6 +25,7 @@ export function GoalProgressDisplay({
         {t('raised', {
           amount: formatCurrencyFromDecimal(raisedAmount, currency, {
             compact: true,
+            locale,
           }),
         })}
       </div>
@@ -42,6 +44,7 @@ export function GoalProgressDisplay({
           {t('goalLine', {
             amount: formatCurrencyFromDecimal(goalAmount, currency, {
               compact: true,
+              locale,
             }),
           })}
         </div>
