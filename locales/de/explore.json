@@ -24,10 +24,10 @@
     },
     "locationMap": {
       "title": "Kartenansicht",
-      "comingSoon": "Interaktive Karte folgt in Kürze"
+      "comingSoon": "Interaktive Karte in Kürze"
     },
     "categoryPage": {
-      "loadingAria": "Kategorieseite wird geladen",
+      "loadingAria": "Kategorie-Seite laden",
       "metadata": {
         "title": "{categoryName} Spendenaufrufe",
         "description": "Entdecke {categoryName} Spendenaufrufe und unterstütze Projekte, die dir am Herzen liegen."

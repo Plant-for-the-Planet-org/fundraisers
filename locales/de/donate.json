@@ -127,9 +127,9 @@
       "accountHolderNameRequired": "Name des Kontoinhabers ist erforderlich",
       "errors": {
         "validationFailed": "Validierung fehlgeschlagen",
-        "stripeNotInitialized": "Stripe ist nicht initialisiert",
+        "stripeNotInitialized": "Stripe nicht initialisiert",
         "ibanElementNotFound": "IBAN-Element nicht gefunden",
-        "paymentMethodFailed": "Erstellung der Zahlungsmethode fehlgeschlagen"
+        "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
       },
       "mandateTitle": "SEPA-Lastschriftmandat",
       "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
@@ -174,9 +174,9 @@
       "countryNoResults": "Kein Land gefunden",
       "errors": {
         "validationFailed": "Validierung fehlgeschlagen",
-        "stripeNotInitialized": "Stripe ist nicht initialisiert",
+        "stripeNotInitialized": "Stripe nicht initialisiert",
         "cardElementNotFound": "Kartenelement nicht gefunden",
-        "paymentMethodFailed": "Erstellung der Zahlungsmethode fehlgeschlagen",
+        "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen",
         "cardActionFailed": "Kartenaktion fehlgeschlagen",
         "paymentIntentNotReturned": "Zahlungsabsicht nicht zurückgegeben"
       }

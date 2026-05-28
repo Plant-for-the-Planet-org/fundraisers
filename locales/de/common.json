@@ -4,22 +4,22 @@
     "welcome": "Willkommen bei unserer Anwendung.",
     "languageSelectionLabel": "Sprache:",
     "metadata": {
-      "title": "Spendenaufrufe",
-      "description": "Spendenplattform"
+      "title": "Spendenaufruf",
+      "description": "Plattform für Spendenaufrufe"
     },
     "actions": {
       "close": "Schließen"
     },
     "aria": {
-      "primaryNavigation": "Hauptnavigation",
-      "legalLinks": "Rechtliche Links",
+      "primaryNavigation": "Primäre Navigation",
+      "legalLinks": "Rechtliche Hinweise",
       "moreInformation": "Weitere Informationen"
     },
     "brand": {
-      "name": "Plant-for-the-Planet"
+      "name": "Start Planting"
     },
     "partners": {
-      "plantForThePlanetAlt": "Plant-for-the-Planet-Logo",
+      "plantForThePlanetAlt": "Plant-for-the-Planet Logo",
       "unepAlt": "Logo des UN-Umweltprogramms"
     },
     "legalLinks": {
