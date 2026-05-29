@@ -17,6 +17,7 @@ import { normalizePaymentMethodId } from '@/lib/utils/payment-method-normalizer'
 import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useAuthStore } from '@/stores/auth-store';
 import { useDonationForm } from '@/components/donate/donation-form-context';
+import { PaymentEntryForms } from '@/components/donate/payment-entry-forms';
 import {
   MethodFeeDetails,
   PaymentMethodOption,
@@ -35,12 +36,6 @@ import {
   NewMethodOption,
   SavedPaymentMethodOption,
 } from '@/components/donate/saved-payment-method-option';
-import { StripeCardForm } from '@/components/donate/stripe-card-form';
-import {
-  StripeCardActionsBridge,
-  StripeSepaActionsBridge,
-} from '@/components/donate/stripe-payment-actions';
-import { StripeSepaForm } from '@/components/donate/stripe-sepa-form';
 import { useFieldError } from '@/components/donate/use-field-error';
 import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-methods';
 
@@ -104,14 +99,8 @@ export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const translateError = useFieldError();
 
-  const {
-    fundraiser,
-    donationData,
-    paymentOptions,
-    paymentOptionsReady,
-    sepaFormRef,
-    cardFormRef,
-  } = useDonationForm();
+  const { fundraiser, donationData, paymentOptions, paymentOptionsReady } =
+    useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const { errors } = useFormState({ control, name: 'selectedPaymentMethod' });
   const paymentMethodError = translateError(
@@ -479,6 +468,25 @@ export function PaymentMethods() {
     [setValue]
   );
 
+  // Reference to the form section so we can scroll to it.
+  const formSectionRef = useRef<HTMLDivElement>(null);
+
+  // When the user selects a new payment method,
+  // show the form and scroll to it.
+  const handleNewMethodSelect = useCallback(
+    (methodId: PaymentMethodId) => {
+      handleMethodSelect(methodId);
+      // Wait for React to render the form, then scroll to it.
+      requestAnimationFrame(() => {
+        formSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+    },
+    [handleMethodSelect]
+  );
+
   if (!paymentOptionsReady) return <PaymentMethodsSkeleton />;
 
   if (visibleMethodOptions.length === 0) {
@@ -606,7 +614,7 @@ export function PaymentMethods() {
                   <NewMethodOption
                     label={newMethodLabel}
                     isSelected={isGenericSelected}
-                    onSelect={() => handleMethodSelect(method.id)}
+                    onSelect={() => handleNewMethodSelect(method.id)}
                   />
                 </div>
               </div>
@@ -619,26 +627,9 @@ export function PaymentMethods() {
         <p className='text-sm text-destructive'>{paymentMethodError}</p>
       )}
 
-      {/* 
-  Saved methods do not need the full Stripe form because the user is not
-  entering new payment details.
-
-  However, Stripe may still require 3DS/SCA authentication through an
-  `action_required` response, so the bridge component exposes only the
-  methods needed to handle those confirmation flows.
-*/}
-      {selectedPaymentMethod === 'card' &&
-        (selectedSavedMethodId ? (
-          <StripeCardActionsBridge ref={cardFormRef} />
-        ) : (
-          <StripeCardForm ref={cardFormRef} />
-        ))}
-      {selectedPaymentMethod === 'sepa_debit' &&
-        (selectedSavedMethodId ? (
-          <StripeSepaActionsBridge ref={sepaFormRef} />
-        ) : (
-          <StripeSepaForm ref={sepaFormRef} />
-        ))}
+      <div ref={formSectionRef} className='scroll-mt-4'>
+        <PaymentEntryForms />
+      </div>
     </div>
   );
 }
