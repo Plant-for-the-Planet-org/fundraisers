@@ -66,16 +66,23 @@ export function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+// A card is marked as "expiring soon" if it is within 60 days of the end of
+// its expiry month, giving recurring donors time to update it before charges fail.
+const EXPIRING_SOON_WINDOW_MS = 60 * 24 * 60 * 60 * 1000;
+
 // Normalizes the platform "expires" string (e.g. "1/2027") to MM/YY and
-// flags expired cards. A card is valid through the last day of its expiry
-// month, matching the issuer convention Stripe and the networks use.
+// flags expired / soon-to-expire cards. A card is valid through the last day
+// of its expiry month, matching the issuer convention Stripe and the networks
+// use.
 export function getExpiryInfo(expires: string | null | undefined): {
-  label: string | null;
+  date: string | null;
   isExpired: boolean;
+  isExpiringSoon: boolean;
 } {
   const fallback = {
-    label: null,
+    date: null,
     isExpired: false,
+    isExpiringSoon: false,
   };
 
   if (!expires) return fallback;
@@ -103,8 +110,14 @@ export function getExpiryInfo(expires: string | null | undefined): {
   // Last moment of expiry month
   const expiryEnd = new Date(fullYear, monthNum, 0, 23, 59, 59);
 
+  const now = Date.now();
+  const expiryEndMs = expiryEnd.getTime();
+  const isExpired = expiryEndMs < now;
+
   return {
-    label: `${formattedMonth}/${shortYear}`,
-    isExpired: expiryEnd.getTime() < Date.now(),
+    date: `${formattedMonth}/${shortYear}`,
+    isExpired,
+    // Not expired yet, but within the warning window.
+    isExpiringSoon: !isExpired && expiryEndMs - now <= EXPIRING_SOON_WINDOW_MS,
   };
 }

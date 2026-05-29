@@ -3,7 +3,7 @@
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 
 import { memo } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CardBrandIcon } from '@/components/icons/donation';
 
@@ -11,12 +11,11 @@ type SavedPaymentMethodOptionProps = {
   typeId: PaymentMethodId;
   brand?: string | null;
   last4: string;
-  expiryLabel?: string | null;
-  isExpired?: boolean;
-  expiredLabel?: string;
+  expiryDate?: string | null;
+  isExpiringSoon?: boolean;
+  expiringSoonLabel?: string;
   ariaLabel: string;
   isSelected: boolean;
-  defaultLabel?: string;
   onSelect: () => void;
 };
 
@@ -24,33 +23,30 @@ export const SavedPaymentMethodOption = memo(function SavedPaymentMethodOption({
   typeId,
   brand,
   last4,
-  expiryLabel,
-  isExpired,
-  expiredLabel,
+  expiryDate,
+  isExpiringSoon,
+  expiringSoonLabel,
   ariaLabel,
   isSelected,
-  defaultLabel,
   onSelect,
 }: SavedPaymentMethodOptionProps) {
   const showBrand = typeId === 'card';
   return (
     <button
       type='button'
-      onClick={isExpired ? undefined : onSelect}
+      onClick={onSelect}
       role='radio'
       aria-checked={isSelected}
-      aria-disabled={isExpired}
       aria-label={
-        isExpired && expiredLabel ? `${ariaLabel} — ${expiredLabel}` : ariaLabel
+        isExpiringSoon && expiringSoonLabel
+          ? `${ariaLabel} — ${expiringSoonLabel}`
+          : ariaLabel
       }
-      disabled={isExpired}
       className={cn(
         'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
-        isExpired
-          ? 'cursor-not-allowed border-border/60 bg-transparent opacity-70'
-          : isSelected
-            ? 'border-foreground bg-muted hover:border-gray-400'
-            : 'border-border/60 bg-transparent hover:border-gray-400'
+        isSelected
+          ? 'border-foreground bg-muted hover:border-gray-400'
+          : 'border-border/60 bg-transparent hover:border-gray-400'
       )}
     >
       <div className='flex flex-1 items-center gap-3'>
@@ -60,30 +56,24 @@ export const SavedPaymentMethodOption = memo(function SavedPaymentMethodOption({
           </div>
         )}
         <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
-          <span
-            className={cn(
-              'text-sm font-medium tabular-nums',
-              isExpired && 'text-muted-foreground'
-            )}
-          >
-            •••• {last4}
-          </span>
-          {!isExpired && expiryLabel && (
-            <span className='text-sm text-muted-foreground tabular-nums'>
-              {expiryLabel}
+          <span className='text-sm font-medium tabular-nums'>•••• {last4}</span>
+          {expiryDate && (
+            <span
+              className={cn(
+                'text-sm tabular-nums',
+                isExpiringSoon ? 'text-amber-700' : 'text-muted-foreground'
+              )}
+            >
+              {expiryDate}
             </span>
           )}
-          {!isExpired && defaultLabel && (
-            <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
-              {defaultLabel}
+          {isExpiringSoon && expiringSoonLabel && (
+            <span className='inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700'>
+              <TriangleAlert className='h-3 w-3 shrink-0' aria-hidden='true' />
+              {expiringSoonLabel}
             </span>
           )}
         </div>
-        {isExpired && expiryLabel && (
-          <span className='ml-auto shrink-0 text-sm font-medium text-destructive tabular-nums'>
-            {expiredLabel} {expiryLabel}
-          </span>
-        )}
       </div>
     </button>
   );

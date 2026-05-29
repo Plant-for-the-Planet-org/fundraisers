@@ -10,6 +10,7 @@ import type { DonationFormValues } from '@/components/donate/donation-form-conte
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { TriangleAlert } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { formatCurrency } from '@/lib/utils/currency';
 import { isFeeCollectionEnabled } from '@/lib/utils/fee-collection';
@@ -219,16 +220,15 @@ export function PaymentMethods() {
           const expiry =
             m.type === 'card'
               ? getExpiryInfo(m.expires)
-              : { label: null, isExpired: false };
+              : { date: null, isExpired: false, isExpiringSoon: false };
           return {
             id: m.id,
             typeId: m.type,
             brand: m.type === 'card' ? (m.brand ?? null) : null,
             last4: m.last4,
-            expiryLabel: expiry.label,
+            expiryDate: expiry.date,
             isExpired: expiry.isExpired,
-            // Spoken by screen readers — uses natural language (no masking
-            // bullets) so it isn't vocalized as "bullet bullet bullet ...".
+            isExpiringSoon: expiry.isExpiringSoon,
             ariaLabel:
               m.type === 'card'
                 ? t('saved.cardLabelAria', {
@@ -236,10 +236,15 @@ export function PaymentMethods() {
                     last4: m.last4,
                   })
                 : t('saved.sepaLabelAria', { last4: m.last4 }),
-            defaultLabel: m.isDefault ? t('saved.defaultBadge') : undefined,
-            expiredLabel: expiry.isExpired ? t('saved.expired') : undefined,
+            isDefault: m.isDefault,
+            expiringSoonLabel: expiry.isExpiringSoon
+              ? t('saved.expiringSoon')
+              : undefined,
           };
-        }),
+        })
+        // Expired cards can't be charged — hide them entirely rather than
+        // showing a disabled, unusable row.
+        .filter(m => !m.isExpired),
     [savedMethods, availableMethodIds, t]
   );
 
@@ -255,12 +260,19 @@ export function PaymentMethods() {
     return map;
   }, [savedMethodOptions]);
 
-  // Returns the saved method we would default to for `methodId`: the user's
-  // platform default if one exists, otherwise the first non-expired entry.
+  // Returns the saved payment method to auto-select for `methodId`.
+  //
+  // We prefer cards that are not expiring soon to avoid future recurring
+  // payment failures. If multiple healthy cards exist, we use the default one,
+  // otherwise the first available card. Expiring-soon cards are only selected
+  // when no better option exists.
   const pickPreferredSaved = useCallback(
     (methodId: PaymentMethodId) => {
-      const saved = savedByType.get(methodId)?.filter(s => !s.isExpired);
-      return saved?.find(s => s.defaultLabel) ?? saved?.[0];
+      const saved = savedByType.get(methodId);
+      if (!saved || saved.length === 0) return undefined;
+      const healthy = saved.filter(s => !s.isExpiringSoon);
+      const pool = healthy.length > 0 ? healthy : saved;
+      return pool.find(s => s.isDefault) ?? pool[0];
     },
     [savedByType]
   );
@@ -593,23 +605,45 @@ export function PaymentMethods() {
                 </div>
                 <div className='space-y-2 p-3'>
                   <div className='space-y-2 pl-6'>
-                    {savedForMethod.map(saved => (
-                      <SavedPaymentMethodOption
-                        key={saved.id}
-                        typeId={saved.typeId}
-                        brand={saved.brand}
-                        last4={saved.last4}
-                        expiryLabel={saved.expiryLabel}
-                        isExpired={saved.isExpired}
-                        expiredLabel={saved.expiredLabel}
-                        ariaLabel={saved.ariaLabel}
-                        isSelected={selectedSavedMethodId === saved.id}
-                        defaultLabel={saved.defaultLabel}
-                        onSelect={() =>
-                          handleSavedMethodSelect(saved.id, saved.typeId)
-                        }
-                      />
-                    ))}
+                    {savedForMethod.map(saved => {
+                      // Warn right under the card it refers to — but only when
+                      // it's selected for a recurring donation, where a later
+                      // charge could fail once the card lapses.
+                      const showRecurringHint =
+                        isSubscription &&
+                        saved.isExpiringSoon &&
+                        selectedSavedMethodId === saved.id;
+                      return (
+                        <div key={saved.id} className='space-y-2'>
+                          <SavedPaymentMethodOption
+                            typeId={saved.typeId}
+                            brand={saved.brand}
+                            last4={saved.last4}
+                            expiryDate={saved.expiryDate}
+                            isExpiringSoon={saved.isExpiringSoon}
+                            expiringSoonLabel={saved.expiringSoonLabel}
+                            ariaLabel={saved.ariaLabel}
+                            isSelected={selectedSavedMethodId === saved.id}
+                            onSelect={() =>
+                              handleSavedMethodSelect(saved.id, saved.typeId)
+                            }
+                          />
+                          {showRecurringHint && (
+                            <p className='flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-5 text-amber-700'>
+                              <span className='flex h-5 shrink-0 items-center'>
+                                <TriangleAlert
+                                  className='h-3.5 w-3.5'
+                                  aria-hidden='true'
+                                />
+                              </span>
+                              <span>
+                                {t('saved.expiringSoonRecurringHint')}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                   <NewMethodOption
                     label={newMethodLabel}
