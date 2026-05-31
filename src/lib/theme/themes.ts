@@ -73,7 +73,7 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-botanic', 'bg-petals', 'bg-paper', 'bg-watercolor'],
     bg: defineBg(
-      'bg-gradient-to-br from-orange-300/25 via-red-200/20 to-pink-300/20',
+      'bg-gradient-to-br from-rose-300/50 via-pink-200/45 to-purple-100/40',
       {
         decoration: 'pattern',
         pattern_id: 'bg-petals',

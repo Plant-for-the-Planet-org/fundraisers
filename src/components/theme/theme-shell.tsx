@@ -15,6 +15,16 @@ import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
 
+/**
+ * Guard against CSS injection via url("...") interpolation.
+ * A URL containing `"` or `)` could break out of the CSS literal.
+ * Library assets are data URIs (safe); this primarily protects external https URLs.
+ */
+function safeCssUrl(src: string): string | null {
+  if (src.includes('"') || src.includes(')') || /[\r\n]/.test(src)) return null;
+  return src;
+}
+
 export function ThemeShell({
   children,
   initialTheme,
@@ -103,14 +113,21 @@ function ImageLayer({
 }) {
   const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
-  const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const rawSrc =
+    resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const src = safeCssUrl(rawSrc);
+  if (!src) return null;
+  const tileSize =
+    resolved.kind === 'library'
+      ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
+      : DEFAULT_PATTERN_TILE;
   return (
     <div
       className='fixed inset-0 pointer-events-none transition-opacity duration-300'
       style={{
         backgroundImage: `url("${src}")`,
         backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
-        backgroundSize: mode === 'repeat' ? '115px 77px' : 'cover',
+        backgroundSize: mode === 'repeat' ? tileSize : 'cover',
         backgroundPosition: 'center',
         opacity,
       }}
@@ -162,18 +179,25 @@ async function buildLogoTile(src: string): Promise<string> {
   return `data:image/svg+xml;utf8,${encodeURIComponent(wrapper)}`;
 }
 
-function useLogoTile(src: string): string | null {
+function useLogoTile(src: string | null): string | null {
   const [tile, setTile] = useState<string | null>(null);
   useEffect(() => {
+    // Skip empty src — avoids fetching the current page URL when logo is unknown.
+    if (!src) return;
     let cancelled = false;
     let promise = logoTileCache.get(src);
     if (!promise) {
       promise = buildLogoTile(src);
       logoTileCache.set(src, promise);
     }
-    promise.then(t => {
-      if (!cancelled) setTile(t);
-    });
+    promise
+      .then(t => {
+        if (!cancelled) setTile(t);
+      })
+      .catch(() => {
+        // On failure evict the cache entry so a later mount can retry.
+        logoTileCache.delete(src);
+      });
     return () => {
       cancelled = true;
     };
@@ -191,7 +215,8 @@ function LogoLayer({
   mode: 'light' | 'dark';
 }) {
   const logo = LOGO_LIBRARY.find(l => l.id === logoId);
-  const tile = useLogoTile(logo?.src ?? '');
+  // Pass null when logo is unknown to skip the fetch entirely.
+  const tile = useLogoTile(logo?.src ?? null);
   if (!logo || !tile) return null;
   return (
     <div

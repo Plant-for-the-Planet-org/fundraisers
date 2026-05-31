@@ -134,7 +134,20 @@ export const fundraiserFormSchema = z.object({
         gradient: z.string(),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
-        image_url: z.string().nullable(),
+        // External URLs must use https and be from an allowed host (same list
+        // as stage images). Library keys (no https:// prefix) are passed
+        // through and validated at render time via resolveBgAsset.
+        image_url: z
+          .string()
+          .nullable()
+          .refine(
+            value => {
+              if (value === null) return true;
+              if (/^https?:\/\//i.test(value)) return isAllowedImageUrl(value);
+              return true;
+            },
+            { message: 'imageUrlNotAllowed' }
+          ),
         image_mode: z.enum(['cover', 'repeat']),
         logo_id: z.string().nullable(),
         opacity: z.number().min(0.05).max(1),
@@ -288,9 +301,13 @@ export function fundraiserToFormValues(
             typeof theme.bg?.opacity === 'number'
               ? Math.min(1, Math.max(0.05, theme.bg.opacity))
               : fallbackTheme.bg.opacity,
+          // Phase 1 records stored animation at the top level (theme.animation).
+          // Phase 2 moved it into bg.animation. Read both for back-compat.
           animation: isValidAnimation(theme.bg?.animation)
             ? theme.bg.animation
-            : fallbackTheme.bg.animation,
+            : isValidAnimation(theme.animation)
+              ? theme.animation
+              : fallbackTheme.bg.animation,
         },
       },
       modules: {

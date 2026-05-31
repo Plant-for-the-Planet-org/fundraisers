@@ -74,6 +74,14 @@ export function ThemeSettings() {
   const applyTheme = (theme: Theme) => {
     // Each preset ships its own bg (decoration, gradient, opacity, animation…).
     // Picking the theme applies them; the user can still tweak afterwards.
+    //
+    // Strip logo decoration for non-staff users who don't have an existing logo:
+    // the Logo picker is hidden from them so they would have no way to remove it.
+    const bg: BgFormValue =
+      theme.bg.decoration === 'logo' && !allowLogo
+        ? { ...theme.bg, decoration: 'none', logo_id: null }
+        : theme.bg;
+
     field.onChange({
       ...field.value,
       base_id: theme.id,
@@ -81,9 +89,9 @@ export function ThemeSettings() {
       accent: theme.accent,
       body_font: theme.bodyFont,
       title_font: theme.titleFont,
-      bg: theme.bg,
+      bg,
     });
-    setSelectedTheme(theme);
+    setSelectedTheme({ ...theme, bg });
     setBrowsing(false);
   };
 

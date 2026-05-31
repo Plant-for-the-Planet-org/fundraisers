@@ -89,6 +89,8 @@ export interface FundraiserThemeSettings {
   mode?: string;
   body_font?: string;
   title_font?: string;
+  /** @deprecated Phase 1 field — moved to bg.animation in Phase 2. Read by buildBg/fundraiserToFormValues for back-compat migration. */
+  animation?: string;
   bg?: {
     gradient?: string;
     decoration?: string;
