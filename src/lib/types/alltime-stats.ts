@@ -19,6 +19,6 @@ export interface AlltimeStats {
     show_goal: boolean;
     show_days_left: boolean;
     show_impact: boolean;
-    highlight_impact: HighlightImpactUnit;
+    highlight_impact?: HighlightImpactUnit;
   };
 }

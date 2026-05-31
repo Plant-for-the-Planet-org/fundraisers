@@ -1,3 +1,5 @@
+'use client';
+
 import type { AlltimeStats } from '@/lib/types/alltime-stats';
 
 import { useEffect, useState } from 'react';

@@ -1,4 +1,5 @@
 import type { Locale } from '@/i18n/routing';
+import type { HighlightImpactUnit } from '@/lib/types/alltime-stats';
 
 export interface StageSlide {
   position: number;
@@ -17,4 +18,5 @@ export interface StageModuleSettings {
   slides: StageSlide[];
   show_impact?: boolean;
   show_progress_bar?: boolean;
+  highlight_impact?: HighlightImpactUnit;
 }

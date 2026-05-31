@@ -2,7 +2,8 @@
 
 import type React from 'react';
 import type { Theme } from '@/lib/theme/types';
-import type { Fundraiser, StageModuleSettings } from '@/lib/types/fundraiser';
+import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { StageModuleSettings } from '../settings';
 
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { getFontStack } from '@/lib/theme/font-utils';

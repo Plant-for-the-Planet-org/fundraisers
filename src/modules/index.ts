@@ -10,11 +10,11 @@
  * for its components, hooks, and metadata. This file is type-only.
  */
 
-import type { StageModuleSettings } from './stage/settings';
+import type { StageModuleSettings } from './stage';
 
-import { stageModule } from './stage/module';
+import { stageModule } from './stage';
 
-export type { StageModuleSettings, StageSlide } from './stage/settings';
+export type { StageModuleSettings, StageSlide } from './stage';
 
 export interface FundraiserModules {
   stage?: StageModuleSettings | null;
