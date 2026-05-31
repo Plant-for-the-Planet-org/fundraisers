@@ -142,9 +142,9 @@
           "selectImageAria": "Select image"
         },
         "overlay": {
-          "title": "Select an image from Unsplash",
+          "title": "Select an image",
+          "subtitle": "Or choose from",
           "uploadTitle": "Drag and drop or click to upload",
-          "uploadSubtitle": "Or browse",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },

@@ -248,9 +248,22 @@ export function ImageSelectionOverlay({
       <div className='w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-gray-200/60 bg-white dark:bg-zinc-900 dark:border-zinc-700 animate-in fade-in-0 zoom-in-95 duration-200'>
         <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-zinc-700'>
           <div className='flex items-center justify-between gap-4'>
-            <h2 className='text-xl font-semibold text-zinc-900 dark:text-zinc-100'>
-              {t('overlay.title')}
-            </h2>
+            <div>
+              <h2 className='text-xl font-semibold text-zinc-900 dark:text-zinc-100'>
+                {t('overlay.title')}
+              </h2>
+              <p className='text-sm text-gray-500 dark:text-zinc-400'>
+                {t('overlay.subtitle')}{' '}
+                <a
+                  href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
+                >
+                  {t('attribution.unsplashLink')}
+                </a>
+              </p>
+            </div>
             <button
               onClick={onClose}
               className='p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-zinc-800'
@@ -290,17 +303,7 @@ export function ImageSelectionOverlay({
               <div className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>
                 {t('overlay.uploadTitle')}
               </div>
-              <div className='text-xs text-gray-500 dark:text-zinc-400'>
-                {t('overlay.uploadSubtitle')}{' '}
-                <a
-                  href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
-                >
-                  {t('attribution.unsplashLink')}
-                </a>
-              </div>
+
             </div>
           </div>
 
