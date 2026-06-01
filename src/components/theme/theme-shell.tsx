@@ -43,6 +43,7 @@ export function ThemeShell({
     }
   }, [pathname, setSelectedTheme]);
 
+  // Clear on unmount so selectedTheme doesn't bleed into a new ThemeShell instance when navigating between route groups (each group has its own ThemeShell).
   useEffect(() => {
     return () => {
       setSelectedTheme(null);
@@ -74,7 +75,7 @@ export function ThemeShell({
         } as React.CSSProperties
       }
     >
-      {/* Layer stack, back → front: image · gradient · pattern · content */}
+      {/* Layer stack, back → front: image · gradient · pattern · logo · content */}
       {bg.decoration === 'image' && bg.image_url && (
         <ImageLayer
           imageUrl={bg.image_url}
@@ -169,6 +170,7 @@ const logoTileCache = new Map<string, Promise<string>>();
 
 async function buildLogoTile(src: string): Promise<string> {
   const resp = await fetch(src);
+  if (!resp.ok) throw new Error(`Failed to fetch logo: ${resp.status}`);
   const text = await resp.text();
   const viewBox =
     text.match(/viewBox\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? '0 0 24 24';
