@@ -170,14 +170,9 @@ export interface UpdateFundraiserRequest {
     percentage: number;
     project_id: string;
   }>;
-  // Expand modules as new module settings are added
   settings?: {
-    theme?: FundraiserSettings['theme'];
-    modules?: {
-      leaderboard?: LeaderboardModuleSettings;
-      bundle?: { slug: string | null };
-      stage?: Nullable<StageModuleSettings>;
-    };
+    theme: FundraiserSettings['theme'];
+    modules: FundraiserSettings['modules'];
   };
   imageFile?: string; // base64 encoded, only sent when image changed
 }
