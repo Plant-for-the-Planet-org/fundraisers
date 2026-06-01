@@ -86,7 +86,8 @@ export type GradientOption = {
   mode: 'light' | 'dark';
 };
 // 1 "None" + 7 preset gradients. All classes come from themes.ts so Tailwind's
-// scanner already includes them in the bundle.
+// scanner already includes them in the bundle. Labels are English-only (theme
+// names + "None") — not translated.
 export const GRADIENT_OPTIONS: GradientOption[] = [
   { id: 'none', value: '', label: 'None', mode: 'light' },
   ...[
@@ -112,5 +113,7 @@ export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
 
-export const pickRandom = <T>(arr: readonly T[]): T =>
-  arr[Math.floor(Math.random() * arr.length)] as T;
+export const pickRandom = <T>(arr: readonly T[]): T => {
+  if (arr.length === 0) throw new Error('pickRandom called with empty array');
+  return arr[Math.floor(Math.random() * arr.length)];
+};
