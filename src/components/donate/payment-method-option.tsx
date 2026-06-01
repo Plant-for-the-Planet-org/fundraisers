@@ -87,10 +87,8 @@ export const PaymentMethodOption = memo(function PaymentMethodOption({
     <button
       type='button'
       onClick={() => !disabled && onSelect(methodId)}
-      role='radio'
-      aria-checked={isSelected}
+      aria-pressed={isSelected}
       aria-disabled={disabled}
-      disabled={disabled}
       className={cn(
         'w-full rounded-lg border p-3 text-left transition-all',
         disabled

@@ -2,7 +2,6 @@
 
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 
-import { memo } from 'react';
 import { Plus, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CardBrandIcon } from '@/components/icons/donation';
@@ -19,7 +18,7 @@ type SavedPaymentMethodOptionProps = {
   onSelect: () => void;
 };
 
-export const SavedPaymentMethodOption = memo(function SavedPaymentMethodOption({
+export function SavedPaymentMethodOption({
   typeId,
   brand,
   last4,
@@ -35,11 +34,10 @@ export const SavedPaymentMethodOption = memo(function SavedPaymentMethodOption({
     <button
       type='button'
       onClick={onSelect}
-      role='radio'
-      aria-checked={isSelected}
+      aria-pressed={isSelected}
       aria-label={
         isExpiringSoon && expiringSoonLabel
-          ? `${ariaLabel} — ${expiringSoonLabel}`
+          ? `${ariaLabel}, ${expiringSoonLabel}`
           : ariaLabel
       }
       className={cn(
@@ -77,7 +75,7 @@ export const SavedPaymentMethodOption = memo(function SavedPaymentMethodOption({
       </div>
     </button>
   );
-});
+}
 
 type NewMethodOptionProps = {
   label: string;
@@ -92,7 +90,7 @@ type NewMethodOptionProps = {
 //
 // The layout intentionally matches saved payment rows so it feels like part
 // of the same selection group.
-export const NewMethodOption = memo(function NewMethodOption({
+export function NewMethodOption({
   label,
   isSelected,
   onSelect,
@@ -102,8 +100,7 @@ export const NewMethodOption = memo(function NewMethodOption({
       <button
         type='button'
         onClick={onSelect}
-        role='radio'
-        aria-checked={isSelected}
+        aria-pressed={isSelected}
         className={cn(
           'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
           isSelected
@@ -125,4 +122,4 @@ export const NewMethodOption = memo(function NewMethodOption({
       </button>
     </div>
   );
-});
+}

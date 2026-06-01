@@ -58,7 +58,7 @@
           "cardLabelAria": "{brand} card ending in {last4}",
           "sepaLabelAria": "Bank account ending in {last4}",
           "expiringSoon": "Expires soon",
-          "expiringSoonRecurringHint": "This card expires soon — it may not work for a future monthly donation.",
+          "expiringSoonRecurringHint": "This card expires soon. it may not work for a future monthly donation.",
           "newCard": "Use a new card",
           "newSepa": "Use a new bank account"
         },

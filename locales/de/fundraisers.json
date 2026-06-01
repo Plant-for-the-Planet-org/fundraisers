@@ -58,7 +58,7 @@
           "cardLabelAria": "{brand}-Karte endend auf {last4}",
           "sepaLabelAria": "Bankkonto endend auf {last4}",
           "expiringSoon": "Läuft bald ab",
-          "expiringSoonRecurringHint": "Diese Karte läuft bald ab – sie funktioniert möglicherweise nicht für eine zukünftige monatliche Spende.",
+          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. sie funktioniert möglicherweise nicht für eine zukünftige monatliche Spende.",
           "newCard": "Neue Karte verwenden",
           "newSepa": "Neues Bankkonto verwenden"
         },

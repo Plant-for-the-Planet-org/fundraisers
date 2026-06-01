@@ -2,7 +2,7 @@
 
 import type { StripeIbanElementChangeEvent } from '@stripe/stripe-js';
 
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
@@ -23,6 +23,11 @@ export interface StripeSepaFormHandle {
     };
   }): Promise<{ paymentMethodId: string } | { error: string }>;
   confirmSepaDebitPayment(clientSecret: string): Promise<{ error?: string }>;
+  /**
+   * Focuses the IBAN field.
+   * If the Stripe element is not ready yet, focus is applied when it mounts.
+   */
+  focus?(): void;
 }
 
 const IBAN_ELEMENT_OPTIONS = {
@@ -52,6 +57,12 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const [nameError, setNameError] = useState<string | null>(null);
     const [mandateAccepted, setMandateAccepted] = useState(false);
     const [mandateError, setMandateError] = useState<string | null>(null);
+
+    // The IBAN iframe is not focusable until Stripe finishes mounting it. When
+    // `focus()` is called before then (e.g. right after switching to "use a
+    // new account"), we defer the focus until `onReady` fires.
+    const ibanReadyRef = useRef(false);
+    const focusPendingRef = useRef(false);
 
     useImperativeHandle(ref, () => ({
       async createPaymentMethod(billingDetails) {
@@ -103,7 +114,24 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
         const { error } = await stripe.confirmSepaDebitPayment(clientSecret);
         return { error: error?.message };
       },
+
+      focus() {
+        const ibanElement = elements?.getElement(IbanElement);
+        if (ibanElement && ibanReadyRef.current) {
+          ibanElement.focus();
+        } else {
+          focusPendingRef.current = true;
+        }
+      },
     }));
+
+    const handleIbanReady = () => {
+      ibanReadyRef.current = true;
+      if (focusPendingRef.current) {
+        focusPendingRef.current = false;
+        elements?.getElement(IbanElement)?.focus();
+      }
+    };
 
     const handleIbanChange = (event: StripeIbanElementChangeEvent) => {
       setIbanComplete(event.complete);
@@ -117,6 +145,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
             <IbanElement
               options={IBAN_ELEMENT_OPTIONS}
               onChange={handleIbanChange}
+              onReady={handleIbanReady}
             />
           </div>
         </FormField>

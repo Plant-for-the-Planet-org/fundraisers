@@ -40,68 +40,18 @@ import {
 import { useFieldError } from '@/components/donate/use-field-error';
 import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-methods';
 
-// Preserved in case we want to switch back to a dropdown for payment method selection in the future
-/* type SelectedMethodTriggerProps = {
-  isExpanded: boolean;
-  selectedMethodLabel: string;
-  showFeeDetails: boolean;
-  selectedMethodFeeText: string | null;
-  selectedMethodFeeTooltip: string | null;
-  onToggle: () => void;
-};
-
-const SelectedMethodTrigger = memo(function SelectedMethodTrigger({
-  isExpanded,
-  selectedMethodLabel,
-  showFeeDetails,
-  selectedMethodFeeText,
-  selectedMethodFeeTooltip,
-  onToggle,
-}: SelectedMethodTriggerProps) {
-  return (
-    <button
-      type='button'
-      onClick={onToggle}
-      aria-expanded={isExpanded}
-      className={cn(
-        'w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer',
-        isExpanded ? 'rounded-t-lg' : 'rounded-lg'
-      )}
-    >
-      <div className='flex items-center gap-3'>
-        <div className='w-4 h-4 rounded-full bg-foreground flex items-center justify-center'>
-          <Check className='w-2.5 h-2.5 text-white' />
-        </div>
-        <div>
-          <span className='text-sm font-medium text-foreground'>
-            {selectedMethodLabel}
-          </span>
-          {showFeeDetails && selectedMethodFeeText && (
-            <MethodFeeDetails
-              feeText={selectedMethodFeeText}
-              feeTooltip={selectedMethodFeeTooltip}
-              containerClassName='mt-1'
-              textClassName='text-muted-foreground'
-              iconClassName='text-muted-foreground'
-            />
-          )}
-        </div>
-      </div>
-      {isExpanded ? (
-        <ChevronUp className='h-5 w-5 text-foreground' />
-      ) : (
-        <ChevronDown className='h-5 w-5 text-foreground' />
-      )}
-    </button>
-  );
-}); */
-
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const translateError = useFieldError();
 
-  const { fundraiser, donationData, paymentOptions, paymentOptionsReady } =
-    useDonationForm();
+  const {
+    fundraiser,
+    donationData,
+    paymentOptions,
+    paymentOptionsReady,
+    cardFormRef,
+    sepaFormRef,
+  } = useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const { errors } = useFormState({ control, name: 'selectedPaymentMethod' });
   const paymentMethodError = translateError(
@@ -123,10 +73,6 @@ export function PaymentMethods() {
   const { savedMethods, savedMethodsReady } = useSavedPaymentMethods(
     fundraiser.workspace?.country
   );
-
-  // Ensures saved payment method auto-selection runs only once.
-  // After initialization, user selections should not be overridden.
-  const hasInitializedSavedRef = useRef(false);
 
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
@@ -357,12 +303,14 @@ export function PaymentMethods() {
   useEffect(() => {
     if (visibleMethodOptions.length === 0) return;
 
-    // Wait for the auth-protected fetch to resolve before pre-selecting.
-    // This prevents the visible "shift" where the first method is picked
-    // initially and then replaced once `lastPaymentMethod` arrives. While
-    // not ready, no method shows as selected — the user simply sees the
-    // list with no radio filled in for a brief moment.
-    if (!paymentOptionsReady) return;
+    // Wait for BOTH the auth-protected payment options and the saved-methods
+    // fetch before pre-selecting. Picking the generic "card" first and only
+    // swapping to a saved card once that fetch lands makes the full card entry
+    // form flash on screen for a frame. Initializing once both are ready sets
+    // the method and its saved-method id together in one batched update, so the
+    // entry form renders directly in its final state. While not ready, no radio
+    // shows selected — the user briefly sees the list with nothing filled in.
+    if (!paymentOptionsReady || !savedMethodsReady) return;
 
     const selectedOption = visibleMethodOptions.find(
       m => m.id === selectedPaymentMethod
@@ -370,25 +318,9 @@ export function PaymentMethods() {
     const isSelectedMethodEnabled =
       selectedOption !== undefined && !selectedOption.disabled;
 
-    if (isSelectedMethodEnabled) {
-      // Method is already valid but the saved-methods fetch may have
-      // resolved after the first run of this effect picked it. Seed the
-      // preferred saved id once that fetch settles — only on first init,
-      // so handleMethodSelect / handleSavedMethodSelect own the value for
-      // the rest of the flow.
-      if (!hasInitializedSavedRef.current && savedMethodsReady) {
-        const preferredSaved = pickPreferredSaved(selectedPaymentMethod);
-        if (preferredSaved) {
-          setValue('selectedSavedMethodId', preferredSaved.id, {
-            shouldDirty: false,
-            shouldTouch: false,
-            shouldValidate: false,
-          });
-        }
-        hasInitializedSavedRef.current = true;
-      }
-      return;
-    }
+    // A valid method is already selected — leave it (and any saved-method
+    // choice the donor has made) alone.
+    if (isSelectedMethodEnabled) return;
 
     const enabledOptions = visibleMethodOptions.filter(m => !m.disabled);
     const candidates =
@@ -416,9 +348,6 @@ export function PaymentMethods() {
       shouldTouch: false,
       shouldValidate: false,
     });
-    if (savedMethodsReady) {
-      hasInitializedSavedRef.current = true;
-    }
   }, [
     visibleMethodOptions,
     selectedPaymentMethod,
@@ -483,20 +412,26 @@ export function PaymentMethods() {
   // Reference to the form section so we can scroll to it.
   const formSectionRef = useRef<HTMLDivElement>(null);
 
-  // When the user selects a new payment method,
-  // show the form and scroll to it.
+  // When the user selects a new payment method, show the form, scroll to it,
+  // and move focus into its first field.
   const handleNewMethodSelect = useCallback(
     (methodId: PaymentMethodId) => {
       handleMethodSelect(methodId);
-      // Wait for React to render the form, then scroll to it.
+      // Wait for React to render the form, then scroll and focus.
       requestAnimationFrame(() => {
         formSectionRef.current?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
+        // Move keyboard focus into the freshly revealed entry form so a
+        // keyboard user lands on the first field instead of being stranded on
+        // the radio (WCAG 2.4.3). The form's focus() defers until its Stripe
+        // element finishes mounting.
+        if (methodId === 'card') cardFormRef.current?.focus?.();
+        else if (methodId === 'sepa_debit') sepaFormRef.current?.focus?.();
       });
     },
-    [handleMethodSelect]
+    [handleMethodSelect, cardFormRef, sepaFormRef]
   );
 
   if (!paymentOptionsReady) return <PaymentMethodsSkeleton />;
