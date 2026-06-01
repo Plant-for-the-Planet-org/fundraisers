@@ -31,7 +31,7 @@ export function CopyLinkButton({ url }: CopyLinkButtonProps) {
     <Button
       variant='outline'
       onClick={handleCopy}
-      className='mt-3 w-max border-border bg-white hover:bg-gray-50'
+      className='w-max border-border bg-white hover:bg-gray-50'
     >
       {copied ? (
         <Check className='text-green-600' aria-hidden='true' />
