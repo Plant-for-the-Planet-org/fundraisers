@@ -36,13 +36,15 @@ export function FontChipRow({
   onChange: (font: FontId) => void;
 }) {
   return (
-    <ThemeChipRow label={label}>
+    <ThemeChipRow label={label} role='radiogroup'>
       {FONT_OPTIONS.map(font => {
         const active = value === font.id;
         return (
           <button
             type='button'
             key={font.id}
+            role='radio'
+            aria-checked={active}
             onClick={() => onChange(font.id)}
             title={font.id}
             className={cn(
@@ -119,6 +121,7 @@ export function AssetGrid({
             key={b.id}
             onClick={() => onPick(active ? null : b.id)}
             title={b.label}
+            aria-pressed={active}
             className={cn(
               'relative aspect-[3/2] rounded-md overflow-hidden border',
               active

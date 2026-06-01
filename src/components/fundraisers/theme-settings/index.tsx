@@ -258,6 +258,7 @@ function CustomizePanels({
       <ThemeChipRow
         label={tTheme('labelAccentColor')}
         aria-label={tTheme('labelAccentColor')}
+        role='radiogroup'
       >
         {activeTheme.colorOptions.map(accent => (
           <button
