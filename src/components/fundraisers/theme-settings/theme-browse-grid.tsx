@@ -3,7 +3,7 @@
 import type { Theme } from '@/lib/theme/types';
 
 import { cn } from '@/lib/utils/cn';
-import { ACCENT_BG, THEME_LIST } from './constants';
+import { ACCENT_BG, FEATURED_THEMES } from './constants';
 
 export function ThemeBrowseGrid({
   activeId,
@@ -14,13 +14,14 @@ export function ThemeBrowseGrid({
 }) {
   return (
     <div className='grid grid-cols-2 gap-2'>
-      {THEME_LIST.map(theme => {
+      {FEATURED_THEMES.map(theme => {
         const active = theme.id === activeId;
         return (
           <button
             type='button'
             key={theme.id}
             onClick={() => onPick(theme)}
+            aria-pressed={active}
             className={cn(
               'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left',
               active
