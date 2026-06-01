@@ -1,3 +1,4 @@
+import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
 import type { Locale } from '@/i18n/routing';
 
@@ -80,15 +81,7 @@ export interface StageModuleSettings {
 }
 
 export interface FundraiserSettings {
-  theme: {
-    base_id?: string;
-    mode?: 'light' | 'dark';
-    accent?: string;
-    background?: string;
-    body_font?: string;
-    title_font?: string;
-    animation?: string;
-  };
+  theme: FundraiserThemeSettings;
   modules: {
     leaderboard?: LeaderboardModuleSettings;
     bundle?: {
