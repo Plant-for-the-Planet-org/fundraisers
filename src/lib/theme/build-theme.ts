@@ -56,14 +56,13 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
   const gradient =
     typeof raw.gradient === 'string' ? raw.gradient : base.bg.gradient;
   const pattern_id =
-    typeof raw.pattern_id === 'string' ? raw.pattern_id : base.bg.pattern_id;
+    raw.pattern_id !== undefined ? raw.pattern_id : base.bg.pattern_id;
   const image_url =
-    typeof raw.image_url === 'string' ? raw.image_url : base.bg.image_url;
+    raw.image_url !== undefined ? raw.image_url : base.bg.image_url;
   const image_mode = isValidImageMode(raw.image_mode)
     ? raw.image_mode
     : base.bg.image_mode;
-  const logo_id =
-    typeof raw.logo_id === 'string' ? raw.logo_id : base.bg.logo_id;
+  const logo_id = raw.logo_id !== undefined ? raw.logo_id : base.bg.logo_id;
   const opacity = clampOpacity(raw.opacity, base.bg.opacity);
 
   // Phase 2 reads bg.animation; Phase 1 records stored animation at the
