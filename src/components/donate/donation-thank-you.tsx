@@ -4,9 +4,9 @@ import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
 
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { BankTransferDetails } from './bank-transfer-details';
 import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
-import { TransferDetailsList } from './transfer-details-list';
 
 interface DonationThankYouProps {
   thankYouState: ThankYouState;
@@ -29,14 +29,15 @@ export function DonationThankYou({
             thankYouState.currency
           )}
         >
-          <TransferDetailsList
+          <BankTransferDetails
             account={thankYouState.transferAccount}
             formattedAmount={formatCurrencyFromDecimal(
               thankYouState.amount,
               thankYouState.currency,
               { currencyDisplay: 'code' }
             )}
-            donationId={thankYouState.donationId}
+            amount={thankYouState.amount}
+            currency={thankYouState.currency}
             uid={thankYouState.uid}
           />
         </ThankYouCard>
