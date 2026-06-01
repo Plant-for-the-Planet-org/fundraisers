@@ -35,7 +35,7 @@ export const THEMES: Record<string, Theme> = {
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    featured: false,
+    featured: true,
     colorOptions: [
       'blue',
       'pink',
