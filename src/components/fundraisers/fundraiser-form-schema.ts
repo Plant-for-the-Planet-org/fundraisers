@@ -291,12 +291,21 @@ export function fundraiserToFormValues(
           decoration: isValidDecoration(theme.bg?.decoration)
             ? theme.bg.decoration
             : fallbackTheme.bg.decoration,
-          pattern_id: theme.bg?.pattern_id ?? fallbackTheme.bg.pattern_id,
-          image_url: theme.bg?.image_url ?? fallbackTheme.bg.image_url,
+          pattern_id:
+            theme.bg?.pattern_id !== undefined
+              ? theme.bg.pattern_id
+              : fallbackTheme.bg.pattern_id,
+          image_url:
+            theme.bg?.image_url !== undefined
+              ? theme.bg.image_url
+              : fallbackTheme.bg.image_url,
           image_mode: isValidImageMode(theme.bg?.image_mode)
             ? theme.bg.image_mode
             : fallbackTheme.bg.image_mode,
-          logo_id: theme.bg?.logo_id ?? fallbackTheme.bg.logo_id,
+          logo_id:
+            theme.bg?.logo_id !== undefined
+              ? theme.bg.logo_id
+              : fallbackTheme.bg.logo_id,
           opacity:
             typeof theme.bg?.opacity === 'number'
               ? Math.min(1, Math.max(0.05, theme.bg.opacity))
