@@ -45,8 +45,8 @@ export function ThemeSettings() {
   const allowLogo = isPlanetStaff || hasExistingLogo;
 
   const [tab, setTab] = useState<'theme' | 'background'>('theme');
-  const [browsing, setBrowsing] = useState(true);
-  const isCustomizing = tab === 'theme' && !browsing;
+  const [isBrowsing, setIsBrowsing] = useState(true);
+  const isCustomizing = tab === 'theme' && !isBrowsing;
 
   const baseFromForm = THEMES[field.value.base_id] ?? getThemeForPath(pathname);
   const activeTheme: Theme = selectedTheme ?? {
@@ -58,17 +58,18 @@ export function ThemeSettings() {
     bg: field.value.bg,
   };
 
-  const patchAndPreview = (
-    next: Partial<FundraiserFormValues['settings']['theme']>,
-    preview: Partial<Theme>
+  // Updates the form field (persisted on save) and the live preview store (ThemeShell) atomically.
+  const syncFormAndPreview = (
+    formPatch: Partial<FundraiserFormValues['settings']['theme']>,
+    previewPatch: Partial<Theme>
   ) => {
-    field.onChange({ ...field.value, ...next });
-    setSelectedTheme({ ...activeTheme, ...preview });
+    field.onChange({ ...field.value, ...formPatch });
+    setSelectedTheme({ ...activeTheme, ...previewPatch });
   };
 
   const patchBg = (next: Partial<BgFormValue>) => {
     const merged: BgFormValue = { ...field.value.bg, ...next };
-    patchAndPreview({ bg: merged }, { bg: merged });
+    syncFormAndPreview({ bg: merged }, { bg: merged });
   };
 
   const applyTheme = (theme: Theme) => {
@@ -92,7 +93,7 @@ export function ThemeSettings() {
       bg,
     });
     setSelectedTheme({ ...theme, bg });
-    setBrowsing(false);
+    setIsBrowsing(false);
   };
 
   const randomize = () => {
@@ -108,16 +109,16 @@ export function ThemeSettings() {
 
   const toggleBrowse = () => {
     if (isCustomizing) {
-      setBrowsing(true);
+      setIsBrowsing(true);
     } else {
       setTab('theme');
-      setBrowsing(false);
+      setIsBrowsing(false);
     }
   };
 
   const toggleMode = () => {
     const nextMode = field.value.mode === 'dark' ? 'light' : 'dark';
-    patchAndPreview({ mode: nextMode }, { mode: nextMode });
+    syncFormAndPreview({ mode: nextMode }, { mode: nextMode });
   };
 
   const modeLabel = tTheme(
@@ -126,15 +127,16 @@ export function ThemeSettings() {
 
   return (
     <div className='theme-settings flex flex-col gap-3'>
-      <div className='flex items-center gap-2 pb-3 border-b border-border'>
+      <div className='theme-settings-toolbar flex items-center gap-2 pb-3 border-b border-border'>
         <div className='flex-1 min-w-0'>
-          <SectionHeader showDivider={false} className='!mb-0'>
+          <SectionHeader showDivider={false}>
             {tTheme('sectionHeading')}
           </SectionHeader>
           <div className='text-xs text-muted-foreground truncate mt-0.5'>
             {activeTheme.name}
           </div>
         </div>
+        {/* TODO - consider using ui/buttons instead of rolling up custom styles here. */}
         <IconButton
           onClick={toggleMode}
           label={modeLabel}
@@ -174,7 +176,7 @@ export function ThemeSettings() {
         </TabsList>
 
         <TabsContent value='theme' className='flex flex-col gap-4'>
-          {browsing ? (
+          {isBrowsing ? (
             <ThemeBrowseGrid
               activeId={field.value.base_id}
               onPick={applyTheme}
@@ -182,12 +184,12 @@ export function ThemeSettings() {
           ) : (
             <CustomizePanels
               activeTheme={activeTheme}
-              onAccent={accent => patchAndPreview({ accent }, { accent })}
+              onAccent={accent => syncFormAndPreview({ accent }, { accent })}
               onTitleFont={titleFont =>
-                patchAndPreview({ title_font: titleFont }, { titleFont })
+                syncFormAndPreview({ title_font: titleFont }, { titleFont })
               }
               onBodyFont={bodyFont =>
-                patchAndPreview({ body_font: bodyFont }, { bodyFont })
+                syncFormAndPreview({ body_font: bodyFont }, { bodyFont })
               }
             />
           )}
@@ -198,7 +200,7 @@ export function ThemeSettings() {
             bg={field.value.bg}
             onGradient={(value, mode) => {
               const nextBg = { ...field.value.bg, gradient: value };
-              patchAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
             }}
             onDecoration={decoration => patchBg({ decoration })}
             onPatternId={pattern_id => patchBg({ pattern_id })}
