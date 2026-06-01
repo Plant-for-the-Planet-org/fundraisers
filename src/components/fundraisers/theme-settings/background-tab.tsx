@@ -68,7 +68,7 @@ export function BackgroundTab({
           imageUrl={bg.image_url}
           imageMode={bg.image_mode}
           opacity={bg.opacity}
-          onPickKey={onImageUrl}
+          onPick={onImageUrl}
           onMode={onImageMode}
           onOpacity={onOpacity}
         />
@@ -104,6 +104,7 @@ function AnimationRow({
             type='button'
             key={id}
             onClick={() => onChange(id)}
+            aria-pressed={active}
             className={cn(
               'inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-semibold',
               active
@@ -112,7 +113,7 @@ function AnimationRow({
             )}
           >
             <AnimIcon className='w-3.5 h-3.5' />
-            <span>{tTheme(`animation_${id}` as 'animation_none')}</span>
+            <span>{tTheme(`animation_${id}`)}</span>
           </button>
         );
       })}
@@ -213,7 +214,7 @@ function DecorationRow({
               aria-pressed={active}
             >
               <Icon className='w-3.5 h-3.5' />
-              <span>{tTheme(`decoration_${id}` as 'decoration_none')}</span>
+              <span>{tTheme(`decoration_${id}`)}</span>
             </button>
           );
         })}
@@ -317,14 +318,14 @@ function ImagePanel({
   imageUrl,
   imageMode,
   opacity,
-  onPickKey,
+  onPick,
   onMode,
   onOpacity,
 }: {
   imageUrl: string | null;
   imageMode: BgImageMode;
   opacity: number;
-  onPickKey: (key: string | null) => void;
+  onPick: (key: string | null) => void;
   onMode: (mode: BgImageMode) => void;
   onOpacity: (value: number) => void;
 }) {
@@ -347,7 +348,7 @@ function ImagePanel({
               )}
               aria-pressed={active}
             >
-              {tTheme(`imageMode_${mode}` as 'imageMode_cover')}
+              {tTheme(`imageMode_${mode}`)}
             </button>
           );
         })}
@@ -360,7 +361,7 @@ function ImagePanel({
         <AssetGrid
           items={IMAGES}
           activeId={imageUrl}
-          onPick={onPickKey}
+          onPick={onPick}
           cols={3}
         />
       </div>
