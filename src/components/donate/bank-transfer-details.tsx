@@ -67,7 +67,7 @@ export function BankTransferDetails({
   }
 
   const epcEligible =
-    account.beneficiary && isEpcEligible(currency, account.iban, amount);
+    !!account.beneficiary && isEpcEligible(currency, account.iban, amount);
   const epcPayload = epcEligible
     ? buildEpcPayload({
         beneficiary: account.beneficiary,
