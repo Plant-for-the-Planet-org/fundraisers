@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface EpcQrCodeProps {
   payload: string;
@@ -10,7 +11,7 @@ interface EpcQrCodeProps {
 }
 
 export function EpcQrCode({ payload, alt, fallback }: EpcQrCodeProps) {
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [dataUrl, setDataUrl] = useState<string | 'loading' | null>('loading');
 
   useEffect(() => {
     let cancelled = false;
@@ -32,7 +33,11 @@ export function EpcQrCode({ payload, alt, fallback }: EpcQrCodeProps) {
     };
   }, [payload]);
 
-  if (!dataUrl) {
+  if (dataUrl === 'loading') {
+    return <Skeleton className='aspect-square w-full max-w-[160px]' />;
+  }
+
+  if (dataUrl === null) {
     return (
       <div className='flex aspect-square w-full max-w-[160px] items-center justify-center rounded-md border border-border bg-muted/50 px-3'>
         <p className='text-center text-xs text-muted-foreground'>{fallback}</p>
@@ -41,7 +46,6 @@ export function EpcQrCode({ payload, alt, fallback }: EpcQrCodeProps) {
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={dataUrl}
       alt={alt}
