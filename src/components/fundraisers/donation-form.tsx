@@ -1,6 +1,11 @@
 'use client';
 
 import type { SentInvitationGift } from '@planet-sdk/common';
+import type {
+  DonationGiftErrorCode,
+  DonationGiftErrors,
+  DonationGiftValues,
+} from '@/lib/donation/gift-validation';
 import type { DonationFrequency } from '@/lib/types/donation';
 import type {
   ContributionModuleSettings,
@@ -10,8 +15,9 @@ import type {
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  type DonationGiftErrors,
-  type DonationGiftValues,
+  GIFT_MESSAGE_MAX_LENGTH,
+  RECIPIENT_EMAIL_MAX_LENGTH,
+  RECIPIENT_NAME_MAX_LENGTH,
   validateDonationGift,
 } from '@/lib/donation/gift-validation';
 import {
@@ -124,22 +130,56 @@ export function DonationForm({
     setGiftErrors({});
   };
 
+  const giftErrorMessages: Record<DonationGiftErrorCode, string> = {
+    'recipientName.required': t('gift.errors.recipientName.required'),
+    'recipientName.tooLong': t('gift.errors.recipientName.tooLong'),
+    'recipientEmail.invalid': t('gift.errors.recipientEmail.invalid'),
+    'recipientEmail.tooLong': t('gift.errors.recipientEmail.tooLong'),
+    'recipientEmail.requiredWithMessage': t(
+      'gift.errors.recipientEmail.requiredWithMessage'
+    ),
+    'message.tooLong': t('gift.errors.message.tooLong'),
+  };
+
   const handleGiftFieldChange = (
     field: keyof DonationGiftValues,
     value: string
   ) => {
     setGiftValues(prev => ({ ...prev, [field]: value }));
 
-    if (field === 'recipientName' && giftErrors.recipientName) {
-      setGiftErrors(prev => ({ ...prev, recipientName: undefined }));
+    if (field === 'recipientName') {
+      const tooLong = value.trim().length > RECIPIENT_NAME_MAX_LENGTH;
+      setGiftErrors(prev => ({
+        ...prev,
+        recipientName: tooLong
+          ? giftErrorMessages['recipientName.tooLong']
+          : undefined,
+      }));
       return;
     }
 
-    if (
-      (field === 'recipientEmail' || field === 'message') &&
-      giftErrors.recipientEmail
-    ) {
-      setGiftErrors(prev => ({ ...prev, recipientEmail: undefined }));
+    if (field === 'message') {
+      const tooLong = value.trim().length > GIFT_MESSAGE_MAX_LENGTH;
+      setGiftErrors(prev => ({
+        ...prev,
+        message: tooLong ? giftErrorMessages['message.tooLong'] : undefined,
+        ...(prev.recipientEmail ===
+        giftErrorMessages['recipientEmail.requiredWithMessage']
+          ? { recipientEmail: undefined }
+          : {}),
+      }));
+      return;
+    }
+
+    if (field === 'recipientEmail') {
+      const tooLong = value.trim().length > RECIPIENT_EMAIL_MAX_LENGTH;
+      setGiftErrors(prev => ({
+        ...prev,
+        recipientEmail: tooLong
+          ? giftErrorMessages['recipientEmail.tooLong']
+          : undefined,
+      }));
+      return;
     }
   };
 
@@ -148,24 +188,18 @@ export function DonationForm({
       const validationResult = validateDonationGift(giftValues);
 
       if (!validationResult.success) {
-        const errors: DonationGiftErrors = {};
-
-        if (validationResult.errorCodes.recipientName) {
-          errors.recipientName = t('gift.errors.recipientName.required');
-        }
-
-        if (validationResult.errorCodes.recipientEmail) {
-          if (
-            validationResult.errorCodes.recipientEmail ===
-            'recipientEmail.requiredWithMessage'
-          ) {
-            errors.recipientEmail = t(
-              'gift.errors.recipientEmail.requiredWithMessage'
-            );
-          } else {
-            errors.recipientEmail = t('gift.errors.recipientEmail.invalid');
-          }
-        }
+        const { errorCodes } = validationResult;
+        const errors: DonationGiftErrors = {
+          ...(errorCodes.recipientName && {
+            recipientName: giftErrorMessages[errorCodes.recipientName],
+          }),
+          ...(errorCodes.recipientEmail && {
+            recipientEmail: giftErrorMessages[errorCodes.recipientEmail],
+          }),
+          ...(errorCodes.message && {
+            message: giftErrorMessages[errorCodes.message],
+          }),
+        };
 
         setGiftErrors(errors);
         return;

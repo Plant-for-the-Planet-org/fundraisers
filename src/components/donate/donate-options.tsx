@@ -2,50 +2,38 @@
 
 import type { DonationFormValues } from './donation-form-context';
 
-import { useEffect, useMemo } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useDonationForm } from './donation-form-context';
+import { useProcessingFeeInfo } from './use-processing-fee-info';
 
 export function DonateOptions() {
   const { control, setValue } = useFormContext<DonationFormValues>();
-  const selectedPaymentMethod = useWatch({
-    control,
-    name: 'selectedPaymentMethod',
-  });
-  const makeMonthly = useWatch({ control, name: 'makeMonthly' });
-  const { fundraiser, paymentOptions, donationData } = useDonationForm();
+  const { paymentOptions, donationData } = useDonationForm();
+  const {
+    feeCollectionEnabled,
+    hasProcessingFee,
+    processingFeeCents,
+    paymentProviderName,
+  } = useProcessingFeeInfo();
   const t = useTranslations('Fundraisers');
 
-  const { feeCollectionEnabled, hasProcessingFee, processingFeeCents } =
-    useMemo(() => {
-      return getDonationProcessingFeeInfo({
-        paymentOptions,
-        donationAmountCents: donationData.amountCents,
-        donationCurrency: donationData.currency,
-        workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod,
-      });
-    }, [
-      donationData.amountCents,
-      donationData.currency,
-      fundraiser.workspace?.country,
-      paymentOptions,
-      selectedPaymentMethod,
-    ]);
-
-  const isOneTime = donationData.frequency === 'once' && !makeMonthly;
-  const showCoverFees = feeCollectionEnabled && hasProcessingFee && isOneTime;
+  const isInitiallyOneTime = donationData.frequency === 'once';
+  const showCoverFees =
+    feeCollectionEnabled &&
+    hasProcessingFee &&
+    isInitiallyOneTime &&
+    !!paymentProviderName;
   const showMakeMonthly =
-    paymentOptions.recurrency.supported && donationData.frequency === 'once';
+    paymentOptions.recurrency.supported && isInitiallyOneTime;
 
   useEffect(() => {
-    if (!isOneTime) setValue('willAbsorbFee', false);
-  }, [isOneTime, setValue]);
+    if (!isInitiallyOneTime) setValue('willAbsorbFee', false);
+  }, [isInitiallyOneTime, setValue]);
 
   if (!showCoverFees && !showMakeMonthly) return null;
 
@@ -75,10 +63,13 @@ export function DonateOptions() {
                   processingFeeCents,
                   donationData.currency
                 ),
+                providerName: paymentProviderName,
               })}
             </label>
             <InfoTooltip
-              content={t('donate.options.coverFeesTooltip')}
+              content={t('donate.options.coverFeesTooltip', {
+                providerName: paymentProviderName,
+              })}
               triggerLabel={t('donate.options.coverFeesTooltipTriggerLabel')}
               className='mt-0.5'
             />

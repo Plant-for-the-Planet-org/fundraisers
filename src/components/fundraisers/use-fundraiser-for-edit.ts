@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
-import { isFundraiserOwner } from '@/lib/utils/fundraiser';
+import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 
 export type FundraiserEditStatus =
@@ -49,7 +49,7 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
 
         if (shouldIgnore) return;
 
-        if (!isFundraiserOwner(fundraiser, userId)) {
+        if (!isFundraiserOwnerOrAdmin(fundraiser, userId)) {
           setState({
             status: 'unauthorized',
             fundraiser: null,
@@ -89,11 +89,11 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
           }
         }
 
-        const message = error instanceof Error ? error.message : t('loadError');
+        console.error('Failed to load fundraiser for edit:', error);
         setState({
           status: 'error',
           fundraiser: null,
-          errorMessage: message,
+          errorMessage: t('loadError'),
         });
       }
     })();

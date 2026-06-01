@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
 
-import { useLocale } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
@@ -18,8 +17,6 @@ export function DonationThankYou({
   thankYouState,
   fundraiserSlug,
 }: DonationThankYouProps) {
-  const locale = useLocale();
-
   let card: ReactNode;
   switch (thankYouState.status) {
     case 'bankTransferPending':
@@ -29,8 +26,7 @@ export function DonationThankYou({
           frequency={thankYouState.frequency}
           formattedAmount={formatCurrencyFromDecimal(
             thankYouState.amount,
-            thankYouState.currency,
-            locale
+            thankYouState.currency
           )}
         >
           <TransferDetailsList
@@ -38,8 +34,7 @@ export function DonationThankYou({
             formattedAmount={formatCurrencyFromDecimal(
               thankYouState.amount,
               thankYouState.currency,
-              locale,
-              'code'
+              { currencyDisplay: 'code' }
             )}
             amount={thankYouState.amount}
             currency={thankYouState.currency}

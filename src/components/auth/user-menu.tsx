@@ -4,12 +4,15 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, CreditCard, Plus, UserCog } from 'lucide-react';
+import { ChevronDown, Compass, CreditCard, Plus, UserCog } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
+import { ImpersonationModal } from '@/components/auth/impersonation-modal';
+import { SignInButton } from '@/components/auth/sign-in-button';
+import { SignOutButton } from '@/components/auth/sign-out-button';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,10 +20,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/drop-down-menu';
-import { ImpersonationModal } from './impersonation-modal';
-import { SignInButton } from './sign-in-button';
-import { SignOutButton } from './sign-out-button';
+} from '@/components/ui/drop-down-menu';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 
 const IMPERSONATION_DOMAIN = '@plant-for-the-planet.org';
 
@@ -31,6 +32,8 @@ export function UserMenu() {
 
   const tDashboard = useTranslations('Dashboard');
   const tFundraiser = useTranslations('Fundraisers');
+  const tHeaderLinks = useTranslations('Common.headerLinks');
+  const tAuth = useTranslations('Auth');
 
   const pathname = usePathname();
   // store: state
@@ -61,21 +64,20 @@ export function UserMenu() {
 
   return (
     <>
-      <DropdownMenu onOpenChange={setIsOpen}>
+      <DropdownMenu onOpenChange={setIsOpen} modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
             variant='ghost'
-            className='h-8 w-auto rounded-full p-0 pr-1 flex items-center gap-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
+            aria-label={tAuth('userMenuLabel')}
+            className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
           >
             <Avatar className='h-8 w-8'>
               {profileImageUrl && (
-                <AvatarImage
-                  src={profileImageUrl}
-                  alt='Profile'
-                  loading='lazy'
-                />
+                <AvatarImage src={profileImageUrl} alt='' loading='lazy' />
               )}
-              <AvatarFallback className='bg-linear-to-br from-blue-500 to-purple-600' />
+              <FallbackAvatar
+                seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
+              />
             </Avatar>
             <ChevronDown
               className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -83,26 +85,33 @@ export function UserMenu() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className='w-66  rounded-xl shadow-lg bg-white border-0'
+          className='w-66 rounded-xl border border-border bg-background/95 backdrop-blur shadow-xl'
           align='end'
           forceMount
         >
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
               <span className='text-sm font-medium leading-normal truncate max-w-full'>
-                {displayName || 'User'}
+                {displayName || tAuth('impersonation.userDefault')}
               </span>
               <span className='text-xs leading-normal text-muted-foreground truncate max-w-full'>
                 {userEmail}
               </span>
-              {profile?.type && (
-                <span className='text-xs leading-normal text-muted-foreground capitalize'>
-                  {profile.type}
-                </span>
-              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
+            <Link href='/explore' className='flex items-center'>
+              <Compass className='mr-2 h-4 w-4' />
+              <span>{tHeaderLinks('explore')}</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
+            <Link href='/fundraisers/create' className='flex items-center'>
+              <Plus className='mr-2 h-4 w-4' />
+              <span>{tFundraiser('startFundraiser')}</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
               <CreditCard className='mr-2 h-4 w-4' />
@@ -119,16 +128,12 @@ export function UserMenu() {
             >
               <UserCog className='mr-2 h-4 w-4' />
               <span>
-                {isImpersonating ? 'Switch impersonation' : 'Impersonate user'}
+                {isImpersonating
+                  ? tAuth('impersonation.switch')
+                  : tAuth('impersonation.title')}
               </span>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem asChild className='cursor-pointer'>
-            <Link href='/fundraisers/create' className='flex items-center'>
-              <Plus className='mr-2 h-4 w-4' />
-              <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <SignOutButton />

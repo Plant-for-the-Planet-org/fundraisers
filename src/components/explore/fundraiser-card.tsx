@@ -2,8 +2,8 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { HandCoins, UsersRound } from 'lucide-react';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { UsersRound } from 'lucide-react';
+import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
@@ -56,14 +56,13 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
           </div>
 
           <div className='fundraiser-content flex-1 min-w-0'>
-            <h3 className='fundraiser-title font-medium text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2'>
+            <h3 className='fundraiser-title font-medium text-foreground group-hover:text-primary transition-colors mb-1 line-clamp-2'>
               {fundraiser.title}
             </h3>
 
             <div className='space-y-1'>
               <div className='fundraiser-stats text-sm text-muted-foreground flex items-center gap-3'>
                 <div className='amount-raised flex items-center gap-1'>
-                  <HandCoins className='w-3 h-3' />
                   <dt className='sr-only'>
                     {tFundraisers('amountRaisedLabel')}
                   </dt>
@@ -71,7 +70,8 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                     {tFundraisers('amountRaised', {
                       formattedAmountWithCurrency: formatCurrencyFromDecimal(
                         fundraiser.totalRaised,
-                        fundraiser.currency
+                        fundraiser.currency,
+                        { compact: true, locale }
                       ),
                     })}
                   </dd>
@@ -84,7 +84,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   <dd>
                     {tFundraisers('donationCount', {
                       count: fundraiser.donationCount,
-                      formattedCount: getLocalizedAbbreviatedCount(
+                      formattedCount: formatCompactNumber(
                         fundraiser.donationCount,
                         locale
                       ),

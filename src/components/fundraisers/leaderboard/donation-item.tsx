@@ -1,11 +1,12 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarColor } from './avatar-utils';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 
 interface DonationItemProps {
   donation: LeaderboardDonation;
@@ -22,13 +23,14 @@ export function DonationItem({
   showAvatar,
   showDate = true,
 }: DonationItemProps) {
+  const t = useTranslations('Leaderboard.view');
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const avatarSrc =
     !isAnonymous && donation.avatarUrl
       ? getImageUrl('profile', 'thumb', donation.avatarUrl)
       : null;
   const displayName = isAnonymous
-    ? 'Anonymous'
+    ? t('donation.anonymous')
     : donation.donorName.length > 17
       ? `${donation.donorName.substring(0, 17)}...`
       : donation.donorName;
@@ -44,7 +46,7 @@ export function DonationItem({
               loading='lazy'
             />
           )}
-          <AvatarFallback className={getAvatarColor(donation.id)} />
+          <FallbackAvatar seed={donation.id} />
         </Avatar>
       )}
       <div className='flex flex-col justify-center items-start gap-0.5 min-w-0'>

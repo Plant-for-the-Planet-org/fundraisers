@@ -30,7 +30,6 @@ export type ImageUploadErrorCode =
 
 export interface ImageUploadError {
   code: ImageUploadErrorCode;
-  message: string;
 }
 
 export interface ImageValidationResult {

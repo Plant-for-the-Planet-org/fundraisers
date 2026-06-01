@@ -2,26 +2,26 @@
 
 import type { DonationFormValues } from './donation-form-context';
 
-import { useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useFormContext } from 'react-hook-form';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { useDonationForm } from './donation-form-context';
+import { useProcessingFeeInfo } from './use-processing-fee-info';
 
 export function DonationSummary() {
-  const { fundraiser, donationData, paymentOptions } = useDonationForm();
+  const { fundraiser, donationData } = useDonationForm();
   const { watch } = useFormContext<DonationFormValues>();
   const willAbsorbFee = watch('willAbsorbFee');
   const makeMonthly = watch('makeMonthly');
-  const selectedPaymentMethod = useWatch({
-    name: 'selectedPaymentMethod',
-  });
+  const { hasProcessingFee, processingFeeCents, paymentProviderName } =
+    useProcessingFeeInfo();
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const fundraiserImageUrl = getImageUrl(
     'fundraiser',
@@ -62,10 +62,12 @@ export function DonationSummary() {
     .filter(h => h.isPublic)
     .sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999));
 
-  const joinedNames = publicHosts
-    .map(h => h.displayName)
-    .filter(Boolean)
-    .join(' and ');
+  const joinedNames = new Intl.ListFormat(locale, {
+    style: 'long',
+    type: 'conjunction',
+  }).format(
+    publicHosts.map(h => h.displayName).filter((n): n is string => Boolean(n))
+  );
 
   const hostText = joinedNames
     ? t('hostedBy', { hostName: joinedNames })
@@ -75,7 +77,7 @@ export function DonationSummary() {
     if (publicHosts.length === 0) {
       return (
         <Avatar className='w-6 h-6'>
-          <AvatarFallback className='bg-neutral text-neutral-foreground' />
+          <FallbackAvatar seed='anonymous-host' />
         </Avatar>
       );
     }
@@ -87,9 +89,7 @@ export function DonationSummary() {
           className={cn('w-6 h-6 border-2 border-card', index > 0 && '-ml-1')}
         >
           {avatarUrl && <AvatarImage src={avatarUrl} alt='' loading='lazy' />}
-          <AvatarFallback className='bg-muted text-muted-foreground text-xs'>
-            {host.displayName?.charAt(0)?.toUpperCase()}
-          </AvatarFallback>
+          <FallbackAvatar seed={host.id ?? host.displayName ?? ''} />
         </Avatar>
       );
     });
@@ -97,22 +97,6 @@ export function DonationSummary() {
 
   const isMonthly = donationData.frequency === 'monthly' || makeMonthly;
   const isYearly = donationData.frequency === 'yearly';
-  const { hasProcessingFee, processingFeeCents } = useMemo(() => {
-    return getDonationProcessingFeeInfo({
-      paymentOptions,
-      donationAmountCents: donationData.amountCents,
-      donationCurrency: donationData.currency,
-      workspaceCountry: fundraiser.workspace?.country,
-      selectedPaymentMethod,
-    });
-  }, [
-    donationData.amountCents,
-    donationData.currency,
-    fundraiser.workspace?.country,
-    paymentOptions,
-    selectedPaymentMethod,
-  ]);
-
   const totalCents =
     donationData.amountCents +
     (willAbsorbFee && hasProcessingFee ? processingFeeCents : 0);
@@ -125,36 +109,42 @@ export function DonationSummary() {
   const renderBreakdown = () => (
     <dl
       aria-label={t('donate.summary.breakdown')}
-      className='space-y-1 border-t border-border pt-4'
+      className='border-t border-border'
     >
-      {fundraiser.projectAllocations.map((allocation, index) => (
-        <div key={index} className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {allocation.project.name}
-          </dt>
-          <dd className='text-foreground text-sm'>
-            {formatCurrency(
-              Math.round(
-                (allocation.percentage / 100) * donationData.amountCents
-              ),
-              donationData.currency
-            )}
-          </dd>
-        </div>
-      ))}
+      <div className='py-4'>
+        {fundraiser.projectAllocations.map((allocation, index) => (
+          <div
+            key={index}
+            className='flex justify-between items-baseline gap-2'
+          >
+            <dt className='text-muted-foreground text-sm'>
+              {allocation.project.name}
+            </dt>
+            <dd className='text-foreground text-sm'>
+              {formatCurrency(
+                Math.round(
+                  (allocation.percentage / 100) * donationData.amountCents
+                ),
+                donationData.currency
+              )}
+            </dd>
+          </div>
+        ))}
+        {willAbsorbFee && hasProcessingFee && paymentProviderName && (
+          <div className='flex justify-between items-baseline gap-2'>
+            <dt className='text-muted-foreground text-sm'>
+              {t('donate.summary.processingFee', {
+                providerName: paymentProviderName,
+              })}
+            </dt>
+            <dd className='text-foreground text-sm font-medium'>
+              {formatCurrency(processingFeeCents, donationData.currency)}
+            </dd>
+          </div>
+        )}
+      </div>
 
-      {willAbsorbFee && hasProcessingFee && (
-        <div className='flex justify-between items-baseline gap-2'>
-          <dt className='text-muted-foreground text-sm'>
-            {t('donate.summary.processingFee')}
-          </dt>
-          <dd className='text-foreground text-sm font-medium'>
-            {formatCurrency(processingFeeCents, donationData.currency)}
-          </dd>
-        </div>
-      )}
-
-      <div className='flex justify-between items-center gap-2 pt-3 border-t border-border'>
+      <div className='flex justify-between items-center gap-2 pt-4 border-t border-border'>
         <dt className='font-semibold text-foreground'>{totalLabel}</dt>
         <dd className='font-semibold text-lg text-foreground'>
           {formatCurrency(totalCents, donationData.currency)}

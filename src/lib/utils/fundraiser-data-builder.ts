@@ -26,6 +26,20 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(leaderboard).some(Boolean);
 }
 
+function isBundleDirty(dirty: UpdateDirtyFields): boolean {
+  const bundle = dirty.settings?.modules?.bundle;
+  if (!bundle) return false;
+  if (typeof bundle === 'boolean') return bundle;
+  return Object.values(bundle).some(Boolean);
+}
+
+function isStageDirty(dirty: UpdateDirtyFields): boolean {
+  const stage = dirty.settings?.modules?.stage;
+  if (!stage) return false;
+  if (typeof stage === 'boolean') return stage;
+  return true;
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -91,10 +105,19 @@ export function buildUpdateFundraiserRequest(
   if (isThemeDirty(dirtyFields)) {
     request.settings = { ...request.settings, theme: values.settings.theme };
   }
-  if (isLeaderboardDirty(dirtyFields)) {
+  // Each module's dirty check and value are kept together here.
+  // New modules: add an if-block below, nowhere else.
+  const dirtyModules: Partial<FundraiserSettings['modules']> = {};
+  if (isLeaderboardDirty(dirtyFields))
+    dirtyModules.leaderboard = values.settings.modules.leaderboard;
+  if (isStageDirty(dirtyFields))
+    dirtyModules.stage = values.settings.modules.stage;
+  if (isBundleDirty(dirtyFields))
+    dirtyModules.bundle = values.settings.modules.bundle;
+  if (Object.keys(dirtyModules).length > 0) {
     request.settings = {
       ...request.settings,
-      modules: { leaderboard: values.settings.modules.leaderboard },
+      modules: { ...request.settings?.modules, ...dirtyModules },
     };
   }
   if (imageFile) request.imageFile = imageFile;
@@ -120,6 +143,7 @@ export function buildCreateFundraiserRequest(
       modules: {
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
+        bundle: values.settings.modules.bundle,
       },
     },
     startDate: getTodayString(),

@@ -2,12 +2,14 @@
 
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DonationItem } from './donation-item';
 
+const SCROLL_SPEED = 30; // px per second
+
 interface ScrollingDonationListProps {
-  donations: LeaderboardDonation[];
+  initialDonations: LeaderboardDonation[];
   isActive: boolean;
   anonymize: boolean;
   showAmount: boolean;
@@ -16,7 +18,7 @@ interface ScrollingDonationListProps {
 }
 
 export function ScrollingDonationList({
-  donations,
+  initialDonations,
   isActive,
   anonymize,
   showAmount,
@@ -24,47 +26,96 @@ export function ScrollingDonationList({
   showDate = true,
 }: ScrollingDonationListProps) {
   const t = useTranslations('Leaderboard.view');
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  const startAutoScroll = useCallback((el: HTMLDivElement) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    let pos = 0;
-    intervalRef.current = setInterval(() => {
-      if (!el) return;
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth) {
-        pos = 0;
-        el.scrollLeft = 0;
-      } else {
-        pos += 0.5;
-        el.scrollLeft = pos;
-      }
-    }, 30);
-  }, []);
-
-  const stopAutoScroll = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const set1Ref = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const scrollPositionRef = useRef(0);
+  const setWidthRef = useRef(0);
+  const isActiveRef = useRef(isActive);
+  const hoverPausedRef = useRef(false);
+  const [shouldScroll, setShouldScroll] = useState(true);
+  const [numCopies, setNumCopies] = useState(2);
 
   useEffect(() => {
-    if (!isActive) {
-      stopAutoScroll();
+    isActiveRef.current = isActive;
+  }, [isActive]);
+
+  // The inner div holds numCopies identical sets side by side. Only the inner
+  // div moves (via translateX); the outer container clips it with overflow-hidden.
+  // When scrollPosition reaches one set's width, it wraps back to 0. Since all
+  // sets are identical, the reset is visually seamless — but only if the viewport
+  // is always covered by content. numCopies ensures that: we need enough copies
+  // so that (numCopies × setWidth) covers (containerWidth + setWidth).
+  // If all items already fit, scrolling is skipped entirely.
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const set1 = set1Ref.current;
+    if (!container || !set1) return;
+
+    const containerWidth = container.offsetWidth;
+    const setWidth = set1.offsetWidth;
+    if (setWidth <= 0) return;
+
+    setWidthRef.current = setWidth;
+
+    if (setWidth <= containerWidth) {
+      setShouldScroll(false);
+      setNumCopies(1);
+    } else {
+      setShouldScroll(true);
+      setNumCopies(Math.max(2, Math.floor(containerWidth / setWidth) + 2));
+    }
+  }, [initialDonations.length]);
+
+  // Animation loop: advances scrollPosition by SCROLL_SPEED px/s on each frame.
+  // Resets lastTime to null while paused so there's no position jump on resume.
+  useEffect(() => {
+    const inner = innerRef.current;
+    if (!inner) return;
+
+    if (!shouldScroll) {
+      inner.style.transform = 'translateX(0)';
       return;
     }
-    const el = scrollRef.current;
-    if (el) {
-      el.scrollLeft = 0;
-      setTimeout(() => startAutoScroll(el), 100);
+
+    // time: ms since page load, provided by requestAnimationFrame on each frame.
+    // lastTime: same value from the previous frame; the difference gives elapsed ms.
+    let lastTime: number | null = null;
+
+    function tick(time: number) {
+      const paused = !isActiveRef.current || hoverPausedRef.current;
+
+      if (!paused) {
+        if (lastTime !== null) {
+          const setWidth = setWidthRef.current;
+          if (setWidth > 0) {
+            scrollPositionRef.current +=
+              SCROLL_SPEED * ((time - lastTime) / 1000);
+            if (scrollPositionRef.current >= setWidth)
+              scrollPositionRef.current -= setWidth;
+            inner!.style.transform = `translateX(-${scrollPositionRef.current}px)`;
+          }
+        }
+        lastTime = time;
+      } else {
+        lastTime = null;
+      }
+
+      animationFrameRef.current = requestAnimationFrame(tick);
     }
-    return () => stopAutoScroll();
-  }, [isActive, donations, startAutoScroll, stopAutoScroll]);
 
-  useEffect(() => () => stopAutoScroll(), [stopAutoScroll]);
+    scrollPositionRef.current = 0;
+    inner.style.transform = 'translateX(0)';
+    animationFrameRef.current = requestAnimationFrame(tick);
 
-  if (donations.length === 0) {
+    return () => {
+      if (animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, [initialDonations.length, numCopies, shouldScroll]);
+
+  if (initialDonations.length === 0) {
     return (
       <div className='scrolling-donation-list flex items-center justify-center py-4'>
         <p className='text-sm text-muted-foreground'>{t('emptyState')}</p>
@@ -72,27 +123,46 @@ export function ScrollingDonationList({
     );
   }
 
+  const donationItemSet = initialDonations.map(donation => (
+    <DonationItem
+      key={donation.id}
+      donation={donation}
+      anonymize={anonymize}
+      showAmount={showAmount}
+      showAvatar={showAvatar}
+      showDate={showDate}
+    />
+  ));
+
   return (
     <div
-      ref={scrollRef}
-      className='scrolling-donation-list flex items-center gap-4 overflow-hidden py-2'
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      onMouseEnter={stopAutoScroll}
+      ref={containerRef}
+      className='scrolling-donation-list overflow-hidden py-2'
+      onMouseEnter={() => {
+        hoverPausedRef.current = true;
+      }}
       onMouseLeave={() => {
-        const el = scrollRef.current;
-        if (el) setTimeout(() => startAutoScroll(el), 100);
+        hoverPausedRef.current = false;
       }}
     >
-      {donations.map(donation => (
-        <DonationItem
-          key={donation.id}
-          donation={donation}
-          anonymize={anonymize}
-          showAmount={showAmount}
-          showAvatar={showAvatar}
-          showDate={showDate}
-        />
-      ))}
+      <div
+        ref={innerRef}
+        className='flex'
+        style={{ width: 'max-content', willChange: 'transform' }}
+      >
+        <div
+          ref={set1Ref}
+          className={`flex items-center gap-4${shouldScroll ? ' pr-4' : ''}`}
+        >
+          {donationItemSet}
+        </div>
+        {shouldScroll &&
+          Array.from({ length: numCopies - 1 }, (_, i) => (
+            <div key={i} aria-hidden className='flex items-center gap-4 pr-4'>
+              {donationItemSet}
+            </div>
+          ))}
+      </div>
     </div>
   );
 }

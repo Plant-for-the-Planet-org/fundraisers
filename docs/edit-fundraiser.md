@@ -105,9 +105,9 @@ Client component. The file is intentionally thin:
 1. Unwraps the route `params` promise with `React.use`
 2. Wraps the body in `AuthGuard` so the page is never rendered for anonymous users
 3. `EditFundraiserBody` maps the `useFundraiserForEdit` state to the five UI branches above
-4. `EditFundraiserContent` is split out so the `useMemo` for `initialExtraProjects` only runs once the fundraiser is known
+4. `EditFundraiserContent` renders the form layout once the fundraiser is known
 
-`extractInitialExtraProjects` filters out the workspace's default cause (resolved via `getDefaultCauseId(workspaceCountry)`) because that allocation is treated implicitly by `ProjectSelection` and should not appear in the "extra projects" UI.
+The bundle UI (`<BundleTabs mode="edit" />`) reads `projectAllocations` directly from form state via `useWatch`; no extra projects need to be threaded through the page. Matching bundles open on their first tab; non-matches open on the Custom tab where the user can edit the existing selection.
 
 The three non-happy branches (`not-found`, `unauthorized`, `error`) all render the same layout — a centered title, description, and a "back to dashboard" link. That layout lives in a single `StatusMessage` component in the same file so the three branches only differ by the translation keys they pass in. The `error` branch also handles the `!state.fundraiser` defensive case with the same component, using `state.errorMessage ?? t('errorDescription')` so a missing or non-`Error` failure still shows a localized description.
 
@@ -171,7 +171,7 @@ Noteworthy schema details:
 
 ### `src/components/fundraisers/fundraiser-form-body.tsx`
 
-Shared layout for the create and edit forms. Takes a `mode: 'create' | 'edit'` and a `submitButton` ReactNode, plus optional `initialExtraProjects` / `initialAllocations` used to seed `ProjectSelection` on edit and optional `totalRaised` / `endDate` forwarded to `GoalPreview` on edit.
+Shared layout for the create and edit forms. Takes a `mode: 'create' | 'edit'` and a `submitButton` ReactNode, plus optional `totalRaised` / `endDate` forwarded to `GoalPreview` on edit. The `mode` is forwarded to `<BundleTabs />` to drive its initial-tab fallback (Custom in edit, Staff Picks in create).
 
 Three edit-specific branches via `const isEditMode = mode === 'edit'`:
 
@@ -179,7 +179,7 @@ Three edit-specific branches via `const isEditMode = mode === 'edit'`:
 - `WorkspaceSelector disabled={isEditMode}` — the workspace (and therefore country/currency) is immutable after creation
 - `GoalPreview isEditMode totalRaised endDate` — the sidebar preview is hydrated from server data in edit mode; on create it falls back to a stubbed preview derived from the watched goal amount (see `goal-preview.tsx` below)
 
-All other sections (`Title`, `ContributionSettings`, `DescriptionInput`, `GoalInput`, `WorkspaceInfo`, `ProjectSelection`, `ThemeSettings`, `Options`, `DonorsPreview`) are mode-agnostic and read from the form context.
+All other sections (`Title`, `ContributionSettings`, `DescriptionInput`, `GoalInput`, `WorkspaceInfo`, `BundleTabs`, `ThemeSettings`, `Options`, `DonorsPreview`) are mode-agnostic and read from the form context.
 
 ---
 
