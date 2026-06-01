@@ -258,6 +258,7 @@
         "qrBadge": "SEPA-Überweisungscode",
         "qrHint": "Banking-App öffnen zum Scannen",
         "qrCameraWarning": "Die Kamera-App deines Handys funktioniert nicht. Nutze den QR-Scanner in Deutsche Bank, Sparkasse, Revolut und den meisten EU-Banking-Apps.",
+        "qrFallback": "QR-Code nicht verfügbar, bitte den Tab „Details“ verwenden.",
         "error": "Überweisungsdetails nicht gefunden, bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
       },
       "copy": {

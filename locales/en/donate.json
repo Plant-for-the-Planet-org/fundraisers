@@ -258,6 +258,7 @@
         "qrBadge": "SEPA Transfer Code",
         "qrHint": "Open your banking app to scan",
         "qrCameraWarning": "Your phone's camera app won't work. Use the QR scanner inside Deutsche Bank, Sparkasse, Revolut, and most EU banking apps.",
+        "qrFallback": "QR code unavailable, please use the Details tab.",
         "error": "Transfer details not found, please reach out to <link>support@plant-for-the-planet.org</link> for help."
       },
       "copy": {

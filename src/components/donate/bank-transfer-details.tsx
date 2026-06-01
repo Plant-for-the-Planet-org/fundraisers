@@ -3,12 +3,12 @@ import type { BankAccountDetails } from '@/lib/types/payment';
 
 import { useTranslations } from 'next-intl';
 import { Info, QrCode } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { buildEpcPayload, isEpcEligible } from '@/lib/utils/epc-qr';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CopyFieldRow } from './copy-field-row';
 import { EpcQrCode } from './epc-qr-code';
 
-interface TransferDetailsListProps {
+interface BankTransferDetailsProps {
   account: BankAccountDetails;
   formattedAmount: string;
   amount: number;
@@ -19,20 +19,21 @@ interface TransferDetailsListProps {
 interface FieldDef {
   label: string;
   value: string | undefined | null;
+  emphasize?: boolean;
 }
 
-export function TransferDetailsList({
+export function BankTransferDetails({
   account,
   formattedAmount,
   amount,
   currency,
   uid,
-}: TransferDetailsListProps) {
+}: BankTransferDetailsProps) {
   const t = useTranslations('Donate.thankYou.transfer');
 
   const topRow: FieldDef[] = [
     { label: t('amount'), value: formattedAmount },
-    { label: t('reference'), value: uid },
+    { label: t('reference'), value: uid, emphasize: true },
   ];
   const stackedFields: FieldDef[] = [
     { label: t('beneficiary'), value: account.beneficiary },
@@ -84,14 +85,23 @@ export function TransferDetailsList({
         <div className='grid grid-cols-2 divide-x divide-border border-b border-border px-1'>
           {visibleTop.map(f => (
             <div key={f.label} className='px-3 [&>div]:border-b-0'>
-              <CopyFieldRow label={f.label} value={f.value} />
+              <CopyFieldRow
+                label={f.label}
+                value={f.value}
+                emphasize={f.emphasize}
+              />
             </div>
           ))}
         </div>
       )}
       <div className='px-4'>
         {visibleStacked.map(f => (
-          <CopyFieldRow key={f.label} label={f.label} value={f.value} />
+          <CopyFieldRow
+            key={f.label}
+            label={f.label}
+            value={f.value}
+            emphasize={false}
+          />
         ))}
       </div>
     </div>
@@ -113,7 +123,11 @@ export function TransferDetailsList({
                   <QrCode className='size-3.5' />
                   {t('qrBadge')}
                 </div>
-                <EpcQrCode payload={epcPayload} alt={t('qrAlt')} />
+                <EpcQrCode
+                  payload={epcPayload}
+                  alt={t('qrAlt')}
+                  fallback={t('qrFallback')}
+                />
                 <p className='max-w-xs text-center text-sm font-semibold text-foreground'>
                   {t('qrHint')}
                 </p>

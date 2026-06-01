@@ -6,13 +6,15 @@ import QRCode from 'qrcode';
 interface EpcQrCodeProps {
   payload: string;
   alt: string;
+  fallback: string;
 }
 
-export function EpcQrCode({ payload, alt }: EpcQrCodeProps) {
+export function EpcQrCode({ payload, alt, fallback }: EpcQrCodeProps) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+
     QRCode.toDataURL(payload, {
       errorCorrectionLevel: 'M',
       margin: 1,
@@ -31,7 +33,11 @@ export function EpcQrCode({ payload, alt }: EpcQrCodeProps) {
   }, [payload]);
 
   if (!dataUrl) {
-    return <div className='aspect-square w-full max-w-[160px]' aria-hidden />;
+    return (
+      <div className='flex aspect-square w-full max-w-[160px] items-center justify-center rounded-md border border-border bg-muted/50 px-3'>
+        <p className='text-center text-xs text-muted-foreground'>{fallback}</p>
+      </div>
+    );
   }
 
   return (
