@@ -49,7 +49,7 @@ export function BankTransferDetails({
     (f): f is FieldDef & { value: string } => !!f.value
   );
 
-  if (visibleTop.length === 0 && visibleStacked.length === 0) {
+  if (visibleTop.length === 0 || visibleStacked.length === 0) {
     return (
       <p className='text-sm text-muted-foreground'>
         {t.rich('error', {
