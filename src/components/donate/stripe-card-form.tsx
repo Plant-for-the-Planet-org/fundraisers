@@ -49,6 +49,11 @@ export interface StripeCardFormHandle {
     clientSecret: string,
     paymentMethod?: string
   ): Promise<{ error?: string }>;
+  /**
+   * Focuses the card number field.
+   * If the Stripe element is not ready yet, focus is applied when it mounts.
+   */
+  focus?(): void;
 }
 
 const CARD_ELEMENT_OPTIONS = {
@@ -88,6 +93,11 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
       string | null
     >(null);
     const cardholderNameEditedRef = useRef(false);
+
+    // The Stripe card field cannot be focused until it finishes mounting.
+    // If focus is requested before then, it is applied when `onReady` fires.
+    const cardNumberReadyRef = useRef(false);
+    const focusPendingRef = useRef(false);
     const [useDonorAddress, setUseDonorAddress] = useState(true);
     const [billingAddress, setBillingAddress] = useState('');
     const [billingAddressError, setBillingAddressError] = useState<
@@ -213,7 +223,24 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
         );
         return { error: error?.message };
       },
+
+      focus() {
+        const cardNumberElement = elements?.getElement(CardNumberElement);
+        if (cardNumberElement && cardNumberReadyRef.current) {
+          cardNumberElement.focus();
+        } else {
+          focusPendingRef.current = true;
+        }
+      },
     }));
+
+    const handleCardNumberReady = () => {
+      cardNumberReadyRef.current = true;
+      if (focusPendingRef.current) {
+        focusPendingRef.current = false;
+        elements?.getElement(CardNumberElement)?.focus();
+      }
+    };
 
     const handleCardNumberChange = (
       event: StripeCardNumberElementChangeEvent
@@ -252,6 +279,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             <CardNumberElement
               options={CARD_ELEMENT_OPTIONS}
               onChange={handleCardNumberChange}
+              onReady={handleCardNumberReady}
             />
           </div>
         </FormField>
