@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
+import {
+  getDaysLeft,
+  getFundraiserUrl,
+  getTotalRaisedByCurrency,
+} from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus, getHostNames } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
@@ -40,11 +44,18 @@ export function FundraiserListItem({
           type: 'conjunction',
         }).format(hostNames);
 
-  const raised = formatCurrencyFromDecimal(
-    fundraiser.totalRaised,
-    fundraiser.currency,
-    { compact: true }
+  const totalRaisedByCurrency = getTotalRaisedByCurrency(
+    fundraiser.totalRaised
   );
+  const isMultiCurrency = totalRaisedByCurrency.length > 1;
+  const formattedTotalRaised =
+    totalRaisedByCurrency.length > 0
+      ? totalRaisedByCurrency
+          .map(({ currency, amount }) =>
+            formatCurrencyFromDecimal(amount, currency, { compact: true })
+          )
+          .join(' · ')
+      : formatCurrencyFromDecimal(0, fundraiser.currency, { compact: true });
   const goal = formatCurrencyFromDecimal(
     fundraiser.goalAmount,
     fundraiser.currency,
@@ -98,13 +109,21 @@ export function FundraiserListItem({
 
         <div className='mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground'>
           <span>
-            {t.rich('goalProgress', {
-              achievedAmount: raised,
-              goal,
-              b: chunks => (
-                <span className='font-semibold text-foreground'>{chunks}</span>
-              ),
-            })}
+            {isMultiCurrency ? (
+              <span className='font-semibold text-foreground'>
+                {formattedTotalRaised}
+              </span>
+            ) : (
+              t.rich('goalProgress', {
+                achievedAmount: formattedTotalRaised,
+                goal,
+                b: chunks => (
+                  <span className='font-semibold text-foreground'>
+                    {chunks}
+                  </span>
+                ),
+              })
+            )}
           </span>
           <span className='inline-flex items-center gap-1'>
             <Users className='h-3.5 w-3.5' aria-hidden='true' />

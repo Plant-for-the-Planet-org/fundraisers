@@ -24,7 +24,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
             existingSettings={fundraiser.settings}
           />
         }
-        totalRaised={fundraiser.totalRaised}
+        totalRaised={fundraiser.totalRaised[fundraiser.currency] ?? 0}
         endDate={fundraiser.endDate}
       />
     </EditFundraiserFormProvider>

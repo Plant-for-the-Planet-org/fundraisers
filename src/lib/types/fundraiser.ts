@@ -144,7 +144,7 @@ export interface Fundraiser {
   description: Nullable<string>;
   image: Nullable<string>;
   goalAmount: number; // Integer, not in cents
-  totalRaised: number; // in decimals
+  totalRaised: Record<string, number>; // currency-keyed, e.g. { EUR: 2052.85 }
   donationCount: number;
   currency: string;
   workspace: Nullable<FundraiserWorkspace>;
