@@ -5,7 +5,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { UsersRound } from 'lucide-react';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getFundraiserUrl } from '@/lib/utils/fundraiser';
+import {
+  getFundraiserUrl,
+  getTotalRaisedByCurrency,
+} from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { FundraiserCardImage } from './fundraiser-card-image';
 
@@ -18,6 +21,25 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
   const locale = useLocale();
 
   const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
+
+  const totalRaisedByCurrency = getTotalRaisedByCurrency(
+    fundraiser.totalRaised
+  );
+  // Multi-currency: join all amounts with · separator. Zero-donation: show 0 in the fundraiser's primary currency.
+  const formattedTotalRaised =
+    totalRaisedByCurrency.length > 0
+      ? totalRaisedByCurrency
+          .map(({ currency, amount }) =>
+            formatCurrencyFromDecimal(amount, currency, {
+              compact: true,
+              locale,
+            })
+          )
+          .join(' · ')
+      : formatCurrencyFromDecimal(0, fundraiser.currency, {
+          compact: true,
+          locale,
+        });
 
   const hostDisplay = (() => {
     const hosts = fundraiser.hosts;
@@ -68,11 +90,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   </dt>
                   <dd>
                     {tFundraisers('amountRaised', {
-                      formattedAmountWithCurrency: formatCurrencyFromDecimal(
-                        fundraiser.totalRaised,
-                        fundraiser.currency,
-                        { compact: true, locale }
-                      ),
+                      formattedAmountWithCurrency: formattedTotalRaised,
                     })}
                   </dd>
                 </div>
