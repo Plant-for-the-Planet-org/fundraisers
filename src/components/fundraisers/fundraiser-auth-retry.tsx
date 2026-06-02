@@ -50,6 +50,7 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
       fundraiser={fundraiser}
       paymentOptions={paymentOptions}
       paymentOptionsAreAuthenticated={accessToken !== null}
+      leaderboardFetchStrategy='client'
     />
   );
 }

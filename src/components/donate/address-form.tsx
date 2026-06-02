@@ -71,11 +71,8 @@ export const AddressForm = () => {
       // Select the newly created address and exit new address mode
       setValue('selectedAddressId', createdAddress.id);
     } catch (err) {
-      const message =
-        err instanceof Error && err.message
-          ? err.message
-          : tDonate('saveAddressError');
-      setSaveAddressError(message);
+      console.error('Failed to save address:', err);
+      setSaveAddressError(tDonate('saveAddressError'));
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,8 @@
 {
   "Fundraisers": {
     "startFundraiser": "Start Fundraiser",
-    "donationCount": "{count, plural, =0 {0 Donations} one {1 Donation} other {{formattedCount} Donations}}",
+    "donationCount": "{count, plural, =0 {0 donations} one {1 donation} other {{formattedCount} donations}}",
+    "donorsAndOthers": "{names} and {count, plural, one {# other} other {# others}}",
     "amountRaised": "{formattedAmountWithCurrency} raised",
     "hostedBy": "by {hostName}",
     "hostedByWithOthers": "by {hostName} and {othersCount, plural, one {1 other} other {# others}}",
@@ -12,11 +13,18 @@
     "donationCountLabel": "Donation count",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
+    "hostsStripNames": "{names}{remaining, plural, =0 {} one { and # other} other { and # others}}",
     "error": {
       "title": "Something went wrong",
       "description": "This fundraiser could not be loaded. Please try again, or browse other fundraisers.",
       "retry": "Try again",
       "browse": "Browse fundraisers"
+    },
+    "notFound": {
+      "title": "Fundraiser Not Found",
+      "description": "The fundraiser you're looking for doesn't exist or may have been removed.",
+      "browseCta": "Browse Fundraisers",
+      "homeCta": "Go Home"
     },
     "metadata": {
       "fallbackTitle": "Fundraiser"
@@ -31,7 +39,7 @@
     },
     "donate": {
       "summary": {
-        "processingFee": "Processing fee",
+        "processingFee": "Cover {providerName} fees",
         "breakdown": "Breakdown",
         "total": "Total",
         "totalMonthly": "Total every month",
@@ -44,6 +52,16 @@
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
         "bankTransferRemark": "Please set up a standing order with your bank.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand} card ending in {last4}",
+          "sepaLabelAria": "Bank account ending in {last4}",
+          "expiringSoon": "Expires soon",
+          "expiringSoonRecurringHint": "This card expires soon. it may not work for a future monthly donation.",
+          "newCard": "Use a new card",
+          "newSepa": "Use a new bank account"
+        },
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
@@ -68,7 +86,7 @@
           "noFee": "No fee",
           "feeAmount": "{amount} fee",
           "alternatives": {
-            "eu": "Open Banking or Bank Transfer",
+            "eu": "Bank Transfer",
             "default": "Bank Transfer"
           },
           "tooltip": {
@@ -77,21 +95,21 @@
         }
       },
       "options": {
-        "coverFeesLabel": "Add {feeAmount} to cover payment processing fees.",
-        "coverFeesTooltip": "Payment processing fees are distributed to the causes supported by this fundraiser.",
+        "coverFeesLabel": "Add {feeAmount} to cover {providerName} fees.",
+        "coverFeesTooltip": "{providerName} fees are distributed to the causes supported by this fundraiser.",
         "coverFeesTooltipTriggerLabel": "More information about payment processing fees",
         "makeMonthly": "Make my donation monthly"
       }
+    },
+    "createPage": {
+      "title": "Create your fundraiser",
+      "subtitle": "Give people something to feel. Then give them a way to give."
     },
     "form": {
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
-        "daysLeft": "{days, plural, one {# day left} other {# days left}}"
-      },
-      "donorsPreview": {
-        "donorCount": "{count, plural, one {# Donor} other {# Donors}}",
-        "others": " and {count, plural, one {# other} other {# others}}"
+        "daysLeft": "{days, number}d left"
       },
       "theme": {
         "sectionHeading": "Theme",
@@ -128,8 +146,9 @@
         "imageMode_repeat": "Repeat"
       },
       "title": {
-        "label": "Fundraiser name",
-        "placeholder": "Fundraiser Name",
+        "label": "Fundraiser title",
+        "placeholder": "e.g. Turn my birthday into a forest",
+        "helper": "This appears on share previews, emails, and the top of your page. Keep it specific.",
         "errors": {
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max, number} characters."
@@ -163,14 +182,13 @@
         },
         "overlay": {
           "title": "Select an image",
+          "subtitle": "Or choose from <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Drag and drop or click to upload",
-          "uploadSubtitle": "Or choose an image from Unsplash below",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },
         "attribution": {
-          "photoBy": "Photo by",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Photo by <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Image must be {maxMb}MB or smaller.",
@@ -217,51 +235,10 @@
         }
       },
       "projectSelection": {
-        "sectionHeading": "Causes Supported by this Fundraiser",
         "viewModeSectionHeading": "Projects Supported by this Fundraiser",
-        "addCause": "Add Cause",
-        "removeCause": "Remove Cause",
-        "allocationLabel": "{percentage, number}% allocation",
         "projectImageAlt": "Image for {name}",
         "expandDescription": "Read more",
-        "collapseDescription": "Read less",
-        "defaultCause": {
-          "name": "Empower Young People and Bring Back Forests",
-          "description": "Support Plant-for-the-Planet's mission to empower young people worldwide to take climate action. We restore forests, educate communities, and advocate for climate justice to create a sustainable future for all."
-        },
-        "aria": {
-          "closeModal": "Close cause selection",
-          "selectCause": "Add cause {name}"
-        },
-        "modal": {
-          "title": "Add a Cause",
-          "subtitle": "Choose additional causes to support",
-          "searchPlaceholder": "Search causes...",
-          "searchAriaLabel": "Search causes",
-          "tabs": {
-            "top": "Top Projects",
-            "all": "All Projects"
-          },
-          "resultsCount": "{count, plural, one {# result} other {# results}}",
-          "loading": "Loading projects...",
-          "errorTitle": "Failed to load projects",
-          "errorMessage": "Unable to load projects. Please try again.",
-          "retry": "Try Again",
-          "byOrganization": "by {organization}",
-          "tags": {
-            "topProject": "Top Project",
-            "restoration": "Restoration",
-            "conservation": "Conservation",
-            "learnMore": "Learn More",
-            "restOfWorld": "Rest of the World"
-          },
-          "add": "Add",
-          "emptySearchTitle": "No projects found",
-          "emptySearchDescription": "No projects match \"{query}\"",
-          "clearSearch": "Clear search",
-          "emptyAllTitle": "All projects added",
-          "emptyAllDescription": "You've added all available projects to your fundraiser"
-        }
+        "collapseDescription": "Read less"
       },
       "options": {
         "sectionHeading": "Fundraiser Options",
@@ -272,10 +249,47 @@
         "visibility": {
           "label": "Make the fundraiser discoverable",
           "description": "Allow people to find this fundraiser in search and browse"
+        },
+        "addModule": "Add a module",
+        "stage": {
+          "title": "Stage Mode",
+          "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
+          "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
+          "collapse": "Collapse",
+          "expand": "Expand",
+          "remove": "Remove Stage Mode",
+          "toggleEnabled": "Toggle Stage Mode",
+          "slideCountOne": "1 slide",
+          "slideCountMany": "{count} slides",
+          "stageTitle": "Stage title",
+          "stageTitlePlaceholder": "Leave blank to use fundraiser title",
+          "stageDescription": "Stage description",
+          "stageDescriptionPlaceholder": "Short tagline shown beneath the title on the stage screen",
+          "locale": "Stage language",
+          "partnerLogo": "Logo URL",
+          "optional": "optional",
+          "slides": "Slides",
+          "addSlide": "Add slide",
+          "noSlides": "No slides yet. Add one to start your rotation.",
+          "slideTitlePlaceholder": "Slide title",
+          "slideDescriptionPlaceholder": "Slide description",
+          "slideImagePlaceholder": "Image URL (https://…)",
+          "duration": "Duration",
+          "seconds": "seconds",
+          "moveUp": "Move up",
+          "moveDown": "Move down",
+          "removeSlide": "Remove slide",
+          "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
+          "maxSlidesReached": "Maximum {max} slides reached"
         }
       },
       "contributionSettings": {
         "sectionHeading": "Contribution Settings",
+        "preview": {
+          "title": "Preview Mode",
+          "description": "{isDedicated, select, true {Would donate {amount} {frequency} (dedicated)} other {Would donate {amount} {frequency}}}",
+          "frequencyLabel": "{frequency, select, once {once} monthly {monthly} yearly {yearly} other {{frequency}}}"
+        },
         "cardHeader": "Contribution",
         "giftTitle": "Dedicate this donation",
         "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
@@ -307,11 +321,16 @@
           },
           "errors": {
             "recipientName": {
-              "required": "Recipient name is required"
+              "required": "Recipient name is required",
+              "tooLong": "Recipient Name must be 35 characters or less"
             },
             "recipientEmail": {
               "invalid": "Please enter a valid email address",
+              "tooLong": "Email must be 254 characters or less",
               "requiredWithMessage": "Email is required when a message is added"
+            },
+            "message": {
+              "tooLong": "Personal message cannot exceed 250 characters"
             }
           }
         }
@@ -322,7 +341,8 @@
         "buttonProcessing": "Creating Fundraiser...",
         "buttonSubmit": "Create Fundraiser",
         "successMessage": "Fundraiser created!",
-        "errorMessage": "Error"
+        "errorMessage": "Error",
+        "errorDescription": "Your fundraiser could not be created. Please check your details and try again."
       }
     },
     "edit": {
@@ -340,7 +360,8 @@
         "buttonProcessing": "Updating fundraiser...",
         "buttonSubmit": "Update fundraiser",
         "successMessage": "Fundraiser updated!",
-        "errorMessage": "Update failed"
+        "errorMessage": "Update failed",
+        "errorDescription": "Your changes could not be saved. Please try again."
       }
     },
     "copyLinkButton": {

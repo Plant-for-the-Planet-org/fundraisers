@@ -18,7 +18,10 @@ import {
   pauseFundraiser,
   resumeFundraiser,
 } from '@/lib/api/fundraiser-service';
-import { getFundraiserUrl, isFundraiserOwner } from '@/lib/utils/fundraiser';
+import {
+  getFundraiserUrl,
+  isFundraiserOwnerOrAdmin,
+} from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import {
@@ -60,7 +63,7 @@ function getAvailableActions(
   fundraiser: Fundraiser,
   currentUserId: string | null
 ): ActionVisibility {
-  if (!isFundraiserOwner(fundraiser, currentUserId)) {
+  if (!isFundraiserOwnerOrAdmin(fundraiser, currentUserId)) {
     return NON_OWNER_ACTIONS;
   }
   return OWNER_ACTIONS_BY_STATUS[fundraiser.status];
@@ -133,7 +136,7 @@ export function FundraiserActionMenu({
         <Button
           variant='ghost'
           size='icon'
-          className='h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground'
+          className='h-4 w-4 rounded-full shrink-0 text-muted-foreground hover:text-foreground'
           aria-label={t('menuLabel')}
           disabled={isMutating}
         >

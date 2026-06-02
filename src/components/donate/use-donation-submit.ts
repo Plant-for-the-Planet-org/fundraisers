@@ -136,7 +136,12 @@ export function useDonationSubmit(
             thankYouState,
           }));
         } else {
-          if (values.selectedPaymentMethod === 'sepa_debit') {
+          if (values.selectedSavedMethodId) {
+            // Reusing a saved card/SEPA method: the Stripe payment method
+            // already exists, so skip creation and pass its id straight through
+            // as the donation source.
+            paymentDetails = { paymentMethodId: values.selectedSavedMethodId };
+          } else if (values.selectedPaymentMethod === 'sepa_debit') {
             const donor = formData.type === 'guest' ? formData.donor : null;
             const sepaResult = await sepaFormRef.current?.createPaymentMethod({
               email: donor?.email ?? donorProfile?.email ?? '',
@@ -157,9 +162,7 @@ export function useDonationSubmit(
             }
 
             paymentDetails = { paymentMethodId: sepaResult.paymentMethodId };
-          }
-
-          if (values.selectedPaymentMethod === 'card') {
+          } else if (values.selectedPaymentMethod === 'card') {
             const donor = formData.type === 'guest' ? formData.donor : null;
             const cardResult = await cardFormRef.current?.createPaymentMethod({
               email: donor?.email ?? donorProfile?.email ?? '',

@@ -21,3 +21,14 @@ export function getImageUrl(
 
   return `${CDN_BASE_URL}/${type}/${size}/${filename}`;
 }
+
+/**
+ * Resolves a project's image field to a renderable URL. Accepts either a
+ * full http(s) URL (returned as-is) or a CDN filename (resolved via
+ * `getImageUrl('project', 'small', …)`). Returns `null` for empty input.
+ */
+export function resolveProjectImageSource(image?: string): string | null {
+  if (!image) return null;
+  if (/^https?:\/\//i.test(image)) return image;
+  return getImageUrl('project', 'small', image);
+}

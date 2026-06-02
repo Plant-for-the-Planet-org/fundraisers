@@ -26,6 +26,20 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(leaderboard).some(Boolean);
 }
 
+function isBundleDirty(dirty: UpdateDirtyFields): boolean {
+  const bundle = dirty.settings?.modules?.bundle;
+  if (!bundle) return false;
+  if (typeof bundle === 'boolean') return bundle;
+  return Object.values(bundle).some(Boolean);
+}
+
+function isStageDirty(dirty: UpdateDirtyFields): boolean {
+  const stage = dirty.settings?.modules?.stage;
+  if (!stage) return false;
+  if (typeof stage === 'boolean') return stage;
+  return true;
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -76,7 +90,8 @@ function getDateOffsetString(days: number): string {
 export function buildUpdateFundraiserRequest(
   values: FundraiserFormValues,
   dirtyFields: UpdateDirtyFields,
-  imageFile?: string
+  imageFile?: string,
+  existingSettings?: FundraiserSettings | null
 ): UpdateFundraiserRequest {
   const request: UpdateFundraiserRequest = {};
 
@@ -88,15 +103,28 @@ export function buildUpdateFundraiserRequest(
   if (isProjectAllocationsDirty(dirtyFields)) {
     request.projectAllocations = values.projectAllocations;
   }
-  if (isThemeDirty(dirtyFields)) {
-    request.settings = { ...request.settings, theme: values.settings.theme };
-  }
-  if (isLeaderboardDirty(dirtyFields)) {
+
+  const isSettingsDirty =
+    isThemeDirty(dirtyFields) ||
+    isLeaderboardDirty(dirtyFields) ||
+    isStageDirty(dirtyFields) ||
+    isBundleDirty(dirtyFields);
+
+  if (isSettingsDirty) {
     request.settings = {
-      ...request.settings,
-      modules: { leaderboard: values.settings.modules.leaderboard },
+      theme: values.settings.theme,
+      modules: {
+        // Spread server modules first to preserve non-form keys
+        // (contribution, donor_score, projects_supported, custom_fields).
+        // Form-managed keys follow and override.
+        ...existingSettings?.modules,
+        leaderboard: values.settings.modules.leaderboard,
+        bundle: values.settings.modules.bundle,
+        stage: values.settings.modules.stage,
+      },
     };
   }
+
   if (imageFile) request.imageFile = imageFile;
 
   return request;
@@ -120,6 +148,7 @@ export function buildCreateFundraiserRequest(
       modules: {
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
+        bundle: values.settings.modules.bundle,
       },
     },
     startDate: getTodayString(),

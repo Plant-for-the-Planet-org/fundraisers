@@ -5,6 +5,15 @@ import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { Plus } from 'lucide-react';
+import { StageMenuItem, StageSection } from '@/components/stage/stage-settings';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { SectionHeader } from './typography';
 
@@ -54,6 +63,32 @@ function SwitchField<TName extends FieldPath<FormValues>>({
   );
 }
 
+function AddModuleMenu() {
+  const t = useTranslations('Fundraisers.form.options');
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type='button'
+          variant='outline'
+          size='icon'
+          className='size-7 border-dashed'
+          aria-label={t('addModule')}
+        >
+          <Plus size={14} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end' className='w-72'>
+        <DropdownMenuLabel className='text-xs font-bold uppercase tracking-wide text-muted-foreground'>
+          {t('addModule')}
+        </DropdownMenuLabel>
+        <StageMenuItem />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function Options() {
   const { control } = useFormContext<FormValues>();
   const t = useTranslations('Fundraisers.form.options');
@@ -64,7 +99,12 @@ export function Options() {
       aria-label={t('sectionHeading')}
       className='options flex flex-col gap-3'
     >
-      <SectionHeader>{t('sectionHeading')}</SectionHeader>
+      <SectionHeader
+        className='flex-row items-center justify-between mb-1'
+        actionSlot={<AddModuleMenu />}
+      >
+        {t('sectionHeading')}
+      </SectionHeader>
 
       <SwitchField
         control={control}
@@ -85,6 +125,8 @@ export function Options() {
         onValue='public'
         offValue='unlisted'
       />
+
+      <StageSection />
     </div>
   );
 }

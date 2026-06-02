@@ -1,0 +1,24 @@
+{
+  "Stage": {
+    "live": "Live",
+    "offline": "Offline",
+    "recentGifts": "Recent gifts",
+    "scanToDonate": "Scan to donate",
+    "topDonors": "Top donors",
+    "contribution": "contribution",
+    "waitingForDonations": "Waiting for donations...",
+    "raisedSoFar": "Raised so far",
+    "ofGoal": "of {goal} goal",
+    "donors": "donors",
+    "trees": "trees",
+    "daysLeft": "days left",
+    "notEnabled": "Stage Mode is not enabled for this fundraiser.",
+    "notEnabledHint": "Update it on fundraiser settings or ask the Host.",
+    "fundraiserNotFound": "Fundraiser not found.",
+    "anonymous": "Anonymous",
+    "topBar": {
+      "brandAlt": "Plant-for-the-Planet logo",
+      "partnerAlt": "Partner logo"
+    }
+  }
+}

@@ -6,7 +6,8 @@
     "acceptNecessaryBtn": "Reject optional",
     "showPreferencesBtn": "Manage preferences",
     "closeIconLabel": "Reject all and close",
-    "footer": "<a href=\"https://www.plant-for-the-planet.org/imprint\">Imprint</a><a href=\"https://www.plant-for-the-planet.org/privacy-terms/\">Privacy Policy</a><a href=\"https://www.plant-for-the-planet.org/terms-and-conditions\">Terms and Conditions</a>"
+    "footer": "<a href=\"https://www.plant-for-the-planet.org/imprint\">Imprint</a><a href=\"https://www.plant-for-the-planet.org/privacy-terms/\">Privacy Policy</a><a href=\"https://www.plant-for-the-planet.org/terms-and-conditions\">Terms and Conditions</a>",
+    "_footer.comment": "The format here is different from the usual next-intl format, and this is intentional. Both links and other text in here can be freely edited. "
   },
   "preferencesModal": {
     "title": "Consent preferences center",

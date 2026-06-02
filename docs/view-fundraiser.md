@@ -21,7 +21,7 @@ Documents the implementation, data flow, and architecture of the fundraiser deta
 - **Host info** — lists public hosts with avatar and name; needs design polish and handling for teams vs. individual hosts
 - **Title and description** — title is a plain `<h1>`; description rendered via `dangerouslySetInnerHTML`; both need final design treatment
 - **DonationForm** — reused from the create flow; `onDonate` is a no-op (donation submission not yet implemented); contribution `options` use default presets (`Fundraiser.settings.modules.contribution.options` uses `unit`, not `amount_cent` as `ContributionModuleSettings` expects)
-- **Projects and allocations** — static card list; needs design refinement
+- **Projects and allocations** — rendered by `ProjectsSupportedDisplay` (extended in [bundle-feature.md — Step 7](./bundle-feature.md#step-7--public-view-bundle-header--per-row-metadata-shipped-partial)): bundle header (icon + label + tagline) when a bundle slug is persisted, plus `country · NN% of fundraiser` meta on each row
 
 **Future features (not in current scope):** leaderboard (`GET /fundraisers/:slug/leaderboard`) and all-time stats (`GET /fundraisers/:slug/alltime-stats`).
 
@@ -168,7 +168,7 @@ The `FundraiserView` render is **outside** the try/catch to satisfy the ESLint r
 - Title — `<h1>` using `--theme-title-font`
 - `DonationForm` — reused as-is; `allow_dedication` and `allow_recurrency` are passed from `fundraiser.settings.modules.contribution`; `onDonate` is a no-op (donation flow deferred); contribution `options` are not mapped (see deferred items)
 - Description — `fundraiser.description` rendered via `dangerouslySetInnerHTML` (HTML from the Tiptap editor — trusted source; `RichTextEditor` has no read-only mode); styled to match the editor output
-- Project allocations — static card list from `fundraiser.projectAllocations`
+- Project allocations — `<ProjectsSupportedDisplay projectAllocations={...} workspaceCountry={...} bundleSlug={...} />`. When `bundleSlug` resolves to a configured bundle the component renders a bundle header (bold label + em-dashed italic tagline, no icon) above the list, with label / tagline pulled from `Bundles.entries.<slug>.*`. Each `ProjectItem` shows the project country (localised via `useCountryLabel`, enriched from `useBundleProjects(workspaceCountry)`) and the allocation percentage. See [bundle-feature.md — Step 7](./bundle-feature.md#step-7--public-view-bundle-header--per-row-metadata-shipped-partial) for the full rationale and the bits deliberately omitted
 
 ---
 
@@ -235,9 +235,11 @@ Rendered when `notFound()` is called — either from `FundraiserAuthRetry` (auth
 image, fundraiser stats, host info, title and description, DonationForm, projects and allocations.
 
 **Pending implementation:**
+
 - **Real donation handler** — wire up `onDonate` in `FundraiserView` to the donation API
 - **Contribution options** — map `Fundraiser.settings.modules.contribution.options[].unit` → `ContributionOption.amount_cent` so `DonationForm` shows the fundraiser's configured preset amounts
 
 **Future features (not in current scope):**
+
 - **Leaderboard** — `GET /fundraisers/:slug/leaderboard`; should use `React.cache()` and live in `fundraiser-service.ts`
 - **All-time stats** — `GET /fundraisers/:slug/alltime-stats`; same pattern

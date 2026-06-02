@@ -15,8 +15,11 @@
     "noopener",
     "noreferrer",
     "planetcash",
+    "qrcode",
     "Recurrency",
-    "sepa"
+    "renderable",
+    "sepa",
+    "subline"
   ],
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.

@@ -1,4 +1,6 @@
+import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
+import type { Locale } from '@/i18n/routing';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 
@@ -59,26 +61,33 @@ export interface LeaderboardModuleSettings {
   aggregate_top_by_donor: boolean;
 }
 
+export interface StageSlide {
+  position: number;
+  title: string;
+  description: string;
+  image: string;
+  duration: number;
+}
+
+export interface StageModuleSettings {
+  enabled: boolean;
+  locale: Locale;
+  title: string;
+  description: string;
+  partner_logo_url: string;
+  slides: StageSlide[];
+  show_impact?: boolean;
+  show_progress_bar?: boolean;
+}
+
 export interface FundraiserSettings {
-  theme: {
-    base_id?: string;
-    mode?: 'light' | 'dark';
-    accent?: string;
-    body_font?: string;
-    title_font?: string;
-    bg?: {
-      gradient?: string;
-      decoration?: string;
-      pattern_id?: string | null;
-      image_url?: string | null;
-      image_mode?: string;
-      logo_id?: string | null;
-      opacity?: number;
-      animation?: string;
-    };
-  };
+  theme: FundraiserThemeSettings;
   modules: {
     leaderboard?: LeaderboardModuleSettings;
+    bundle?: {
+      slug: string | null;
+    };
+    stage?: StageModuleSettings | null;
     contribution?: {
       options: Array<{
         unit?: number;
@@ -135,7 +144,7 @@ export interface Fundraiser {
   description: Nullable<string>;
   image: Nullable<string>;
   goalAmount: number; // Integer, not in cents
-  totalRaised: number; // in decimals
+  totalRaised: Record<string, number>; // currency-keyed, e.g. { EUR: 2052.85 }
   donationCount: number;
   currency: string;
   workspace: Nullable<FundraiserWorkspace>;
@@ -161,10 +170,9 @@ export interface UpdateFundraiserRequest {
     percentage: number;
     project_id: string;
   }>;
-  // Expand modules as new module settings are added
   settings?: {
-    theme?: FundraiserSettings['theme'];
-    modules?: { leaderboard?: LeaderboardModuleSettings };
+    theme: FundraiserSettings['theme'];
+    modules: FundraiserSettings['modules'];
   };
   imageFile?: string; // base64 encoded, only sent when image changed
 }

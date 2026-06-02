@@ -23,12 +23,14 @@ export type AccentColor =
 
 export type FontId = 'open-sans' | 'inter' | 'poppins' | 'playfair' | 'roboto';
 
-export type AnimationType =
-  | 'none'
-  | 'snow'
-  | 'confetti'
-  | 'hearts'
-  | 'fireworks';
+export const ANIMATION_TYPES = [
+  'none',
+  'snow',
+  'confetti',
+  'hearts',
+  'fireworks',
+] as const;
+export type AnimationType = (typeof ANIMATION_TYPES)[number];
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -87,6 +89,8 @@ export interface FundraiserThemeSettings {
   mode?: string;
   body_font?: string;
   title_font?: string;
+  /** @deprecated Phase 1 field — moved to bg.animation in Phase 2. Read by buildBg/fundraiserToFormValues for back-compat migration. */
+  animation?: string;
   bg?: {
     gradient?: string;
     decoration?: string;

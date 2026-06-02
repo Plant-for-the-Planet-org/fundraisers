@@ -51,7 +51,8 @@ src/
     theme/
       types.ts                      ← all theme TypeScript types
       themes.ts                     ← 11 predefined themes registry + DEFAULT_THEME
-      backgrounds.ts                ← BG_LIBRARY (patterns + image illustrations + video placeholders), resolveBgImage, validators
+      backgrounds.ts                ← BG_LIBRARY, LOGO_LIBRARY, DEFAULT_BG, defineBg, resolveBgAsset, validators
+      validators.ts                 ← isValidMode (future home for all theme validators)
       font-utils.ts                 ← FontId → CSS variable font-family string
       accent-utils.ts               ← AccentColor → Tailwind class sets + hex value
       build-theme.ts                ← FundraiserThemeSettings (DB) → validated Theme
@@ -150,11 +151,11 @@ No flash, no layout shift. After hydration, `ThemeShell` has the same `activeThe
 
 `theme.mode` (`"light"` or `"dark"`) appears in three places:
 
-| Location                                           | Element                            | When it updates                                          |
-| -------------------------------------------------- | ---------------------------------- | -------------------------------------------------------- |
-| [layout.tsx:62](../src/app/layout.tsx#L62) (root)  | `<html>`                           | Server-rendered once; never changes after hydration      |
-| `ThemeShell` div                                   | outermost theme div                | Updates reactively on every `activeTheme` change         |
-| `ThemeShell` `useEffect`                           | `<html>` via `document.documentElement` | Syncs on every `activeTheme.mode` change            |
+| Location                                          | Element                                 | When it updates                                     |
+| ------------------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| [layout.tsx:62](../src/app/layout.tsx#L62) (root) | `<html>`                                | Server-rendered once; never changes after hydration |
+| `ThemeShell` div                                  | outermost theme div                     | Updates reactively on every `activeTheme` change    |
+| `ThemeShell` `useEffect`                          | `<html>` via `document.documentElement` | Syncs on every `activeTheme.mode` change            |
 
 **Why both the div and `<html>` need the mode class:**
 
@@ -180,6 +181,19 @@ Defines all TypeScript types. Nothing imported from outside the `theme/` directo
 - `Theme` — the complete theme object used throughout the app
 - `FundraiserThemeSettings` — shape stored in `fundraiser.settings.theme` in the DB; uses snake_case and looser string types to match the DB record format; `base_id` references a predefined theme as the base for field-level overrides; background customization is nested under `bg: { gradient, decoration, pattern_id, image_url, image_mode, opacity }`
 - `BgSettings`, `BgDecoration`, `BgImageMode` — the validated runtime shape and its enums, produced by `buildTheme`
+
+---
+
+### `src/lib/theme/backgrounds.ts`
+
+Background asset registries, the `resolveBgAsset` resolver, and enum validators.
+
+- `DEFAULT_BG` — default values for a fresh `bg` block (all fields except `gradient`). Used by `defineBg`.
+- `defineBg(gradient, overrides?)` — builds a `BgSettings` from a gradient class plus optional overrides of `DEFAULT_BG`. Used in theme presets to keep them terse.
+- `BG_LIBRARY: BackgroundAsset[]` — 13 background assets (patterns, image illustrations, video loop placeholders). All currently use inline SVG data URIs for both `thumb` (picker) and `src` (render); real file-based assets are deferred.
+- `LOGO_LIBRARY: LogoAsset[]` — 12 partner logos served from `public/theme-logos/*.svg`.
+- `resolveBgAsset(bgAsset)` — resolves a stored `pattern_id` or `image_url` to a `ResolvedBgAsset` (`library` or `external`). Logos are excluded; they resolve separately via `LOGO_LIBRARY.find`.
+- `isValidDecoration`, `isValidImageMode`, `isValidAnimation` — enum guards used by `buildBg` and `fundraiserToFormValues`; derived from `BG_DECORATIONS`, `BG_IMAGE_MODES`, and `ANIMATION_TYPES` respectively.
 
 ---
 
@@ -328,14 +342,14 @@ Only one **decoration** is active at a time (`none | pattern | image`), but the 
 
 Per-fundraiser background customization lives under `settings.theme.bg`:
 
-| Field         | Type                                  | Notes                                                          |
-| ------------- | ------------------------------------- | -------------------------------------------------------------- |
-| `gradient`    | `string`                              | Tailwind class string; `''` means no gradient layer.           |
-| `decoration`  | `'none' \| 'pattern' \| 'image'`      | Which decoration sits above the gradient.                      |
-| `pattern_id`  | `string \| null`                       | Library key (e.g. `bg-dots-warm`) when `decoration='pattern'`. |
-| `image_url`   | `string \| null`                       | Library key OR external `https://…` URL.                        |
-| `image_mode`  | `'cover' \| 'repeat'`                  | How the image sits — full-bleed or tiled.                      |
-| `opacity`     | `number` (0.05–1)                     | Applies to pattern + image decorations. Gradient alpha is baked into its class. |
+| Field        | Type                             | Notes                                                                           |
+| ------------ | -------------------------------- | ------------------------------------------------------------------------------- |
+| `gradient`   | `string`                         | Tailwind class string; `''` means no gradient layer.                            |
+| `decoration` | `'none' \| 'pattern' \| 'image'` | Which decoration sits above the gradient.                                       |
+| `pattern_id` | `string \| null`                 | Library key (e.g. `bg-dots-warm`) when `decoration='pattern'`.                  |
+| `image_url`  | `string \| null`                 | Library key OR external `https://…` URL.                                        |
+| `image_mode` | `'cover' \| 'repeat'`            | How the image sits — full-bleed or tiled.                                       |
+| `opacity`    | `number` (0.05–1)                | Applies to pattern + image decorations. Gradient alpha is baked into its class. |
 
 ---
 
@@ -360,7 +374,7 @@ interface ThemeOverrideState {
 
 **Header** — three controls always present: a Sun/Moon button that toggles `mode` between light and dark, a Shuffle button that randomizes among featured themes, and a Browse/Customize button that flips between the theme list and the customize view.
 
-**Theme tab** — opens on a 2-column **Browse** grid of every theme. Picking one applies its preset (gradient, accent, fonts, animation, mode). *Customize* flips to a configuration view: accent color swatches, title/body font chips, and animation chips.
+**Theme tab** — opens on a 2-column **Browse** grid of every theme. Picking one applies its preset (gradient, accent, fonts, animation, mode). _Customize_ flips to a configuration view: accent color swatches, title/body font chips, and animation chips.
 
 **Background tab** — two always-visible rows:
 
@@ -369,7 +383,7 @@ interface ThemeOverrideState {
    - **Pattern**: opacity slider + 4-column tile grid of patterns.
    - **Image**: cover/repeat toggle + opacity slider + 3-column tile grid of images.
 
-Every change writes to the react-hook-form value *and* mirrors into `useThemeStore.setSelectedTheme(…)` so `ThemeShell` updates the live preview in the same React render.
+Every change writes to the react-hook-form value _and_ mirrors into `useThemeStore.setSelectedTheme(…)` so `ThemeShell` updates the live preview in the same React render.
 
 ---
 

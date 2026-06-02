@@ -1,8 +1,11 @@
-import type {
-  AnimationType,
-  BgDecoration,
-  BgImageMode,
-  BgSettings,
+import {
+  ANIMATION_TYPES,
+  type AnimationType,
+  BG_DECORATIONS,
+  BG_IMAGE_MODES,
+  type BgDecoration,
+  type BgImageMode,
+  type BgSettings,
 } from './types';
 
 // Defaults for a fresh bg block (everything except the gradient).
@@ -28,7 +31,7 @@ export function defineBg(
 export type BackgroundAssetType = 'pattern' | 'image' | 'video';
 
 export interface BackgroundAsset {
-  id: string; // Library key — what we persist in settings.theme.bg_image.
+  id: string; // Library key — currently persisted in settings.theme.bg.pattern_id or settings.theme.bg.image_url.
   label: string;
   type: BackgroundAssetType;
   thumb: string; // Picker thumbnail (data URI today, real assets later).
@@ -100,7 +103,6 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     thumb: svgThumb('wash', ['#fef2f2', '#fbcfe8']),
     src: svgThumb('wash', ['#fef2f2', '#fbcfe8']),
   },
-  // Images
   {
     id: 'bg-leaves',
     label: 'Leaves',
@@ -122,6 +124,21 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     thumb: svgThumb('balloons', ['#fff7ed', '#fdba74']),
     src: svgThumb('balloons', ['#fff7ed', '#fdba74']),
   },
+  {
+    id: 'bg-petals',
+    label: 'Petals',
+    type: 'pattern',
+    thumb: svgThumb('petals', ['#fdf4ff', '#f9a8d4']),
+    src: svgThumb('petals', ['#fdf4ff', '#f9a8d4']),
+  },
+  {
+    id: 'bg-stars',
+    label: 'Stars',
+    type: 'pattern',
+    thumb: svgThumb('stars', ['#0f172a', '#a855f7']),
+    src: svgThumb('stars', ['#0f172a', '#a855f7']),
+  },
+  // Images
   {
     id: 'bg-candle',
     label: 'Candle',
@@ -145,20 +162,6 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     src: svgThumb('meadow', ['#ecfdf5', '#86efac']),
   },
   {
-    id: 'bg-petals',
-    label: 'Petals',
-    type: 'pattern',
-    thumb: svgThumb('petals', ['#fdf4ff', '#f9a8d4']),
-    src: svgThumb('petals', ['#fdf4ff', '#f9a8d4']),
-  },
-  {
-    id: 'bg-stars',
-    label: 'Stars',
-    type: 'pattern',
-    thumb: svgThumb('stars', ['#0f172a', '#a855f7']),
-    src: svgThumb('stars', ['#0f172a', '#a855f7']),
-  },
-  {
     id: 'bg-clouds-loop',
     label: 'Clouds loop',
     type: 'video',
@@ -169,26 +172,19 @@ export const BG_LIBRARY: BackgroundAsset[] = [
 
 const BG_BY_ID = new Map(BG_LIBRARY.map(b => [b.id, b]));
 
-export type ResolvedBackground =
+export type ResolvedBgAsset =
   | { kind: 'library'; asset: BackgroundAsset }
   | { kind: 'external'; src: string };
 
-export function resolveBgImage(
-  bgImage: string | null | undefined
-): ResolvedBackground | null {
-  if (!bgImage) return null;
-  if (/^https?:\/\//i.test(bgImage)) return { kind: 'external', src: bgImage };
-  const asset = BG_BY_ID.get(bgImage);
+// Resolves a stored pattern_id or image_url to a renderable asset.
+// Logos are excluded — they resolve separately via LOGO_LIBRARY.find.
+export function resolveBgAsset(
+  bgAsset: string | null | undefined
+): ResolvedBgAsset | null {
+  if (!bgAsset) return null;
+  if (/^https?:\/\//i.test(bgAsset)) return { kind: 'external', src: bgAsset };
+  const asset = BG_BY_ID.get(bgAsset);
   return asset ? { kind: 'library', asset } : null;
-}
-
-export function isValidDecoration(value: unknown): value is BgDecoration {
-  return (
-    typeof value === 'string' &&
-    (['none', 'pattern', 'image', 'logo'] as const).includes(
-      value as BgDecoration
-    )
-  );
 }
 
 // ─── Partner logos ──────────────────────────────────────────────────────
@@ -223,18 +219,22 @@ export const LOGO_LIBRARY: LogoAsset[] = [
   { id: 'youtube', label: 'YouTube', src: logoSrc('youtube') },
 ];
 
+// Validators
+export function isValidDecoration(value: unknown): value is BgDecoration {
+  return (
+    typeof value === 'string' && BG_DECORATIONS.includes(value as BgDecoration)
+  );
+}
+
 export function isValidImageMode(value: unknown): value is BgImageMode {
   return (
-    typeof value === 'string' &&
-    (['cover', 'repeat'] as const).includes(value as BgImageMode)
+    typeof value === 'string' && BG_IMAGE_MODES.includes(value as BgImageMode)
   );
 }
 
 export function isValidAnimation(value: unknown): value is AnimationType {
   return (
     typeof value === 'string' &&
-    (['none', 'snow', 'confetti', 'hearts', 'fireworks'] as const).includes(
-      value as AnimationType
-    )
+    ANIMATION_TYPES.includes(value as AnimationType)
   );
 }

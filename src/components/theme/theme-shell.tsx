@@ -14,11 +14,21 @@ import { getAccentColor } from '@/lib/theme/accent-utils';
 import {
   DEFAULT_PATTERN_TILE,
   LOGO_LIBRARY,
-  resolveBgImage,
+  resolveBgAsset,
 } from '@/lib/theme/backgrounds';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
+
+/**
+ * Guard against CSS injection via url("...") interpolation.
+ * A URL containing `"` or `)` could break out of the CSS literal.
+ * Library assets are data URIs (safe); this primarily protects external https URLs.
+ */
+function safeCssUrl(src: string): string | null {
+  if (src.includes('"') || src.includes(')') || /[\r\n]/.test(src)) return null;
+  return src;
+}
 
 export function ThemeShell({
   children,
@@ -38,6 +48,7 @@ export function ThemeShell({
     }
   }, [pathname, setSelectedTheme]);
 
+  // Clear on unmount so selectedTheme doesn't bleed into a new ThemeShell instance when navigating between route groups (each group has its own ThemeShell).
   useEffect(() => {
     return () => {
       setSelectedTheme(null);
@@ -69,7 +80,7 @@ export function ThemeShell({
         } as React.CSSProperties
       }
     >
-      {/* Layer stack, back → front: image · gradient · pattern · content */}
+      {/* Layer stack, back → front: image · gradient · pattern · logo · content */}
       {bg.decoration === 'image' && bg.image_url && (
         <ImageLayer
           imageUrl={bg.image_url}
@@ -109,16 +120,23 @@ function ImageLayer({
   mode: BgSettings['image_mode'];
   opacity: number;
 }) {
-  const resolved = resolveBgImage(imageUrl);
+  const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
-  const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const rawSrc =
+    resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const src = safeCssUrl(rawSrc);
+  if (!src) return null;
+  const tileSize =
+    resolved.kind === 'library'
+      ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
+      : DEFAULT_PATTERN_TILE;
   return (
     <div
       className='fixed inset-0 pointer-events-none transition-opacity duration-300'
       style={{
         backgroundImage: `url("${src}")`,
         backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
-        backgroundSize: mode === 'repeat' ? '115px 77px' : 'cover',
+        backgroundSize: mode === 'repeat' ? tileSize : 'cover',
         backgroundPosition: 'center',
         opacity,
       }}
@@ -134,7 +152,7 @@ function PatternLayer({
   patternId: string;
   opacity: number;
 }) {
-  const resolved = resolveBgImage(patternId);
+  const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
   const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
   const tileSize =
@@ -160,8 +178,10 @@ const logoTileCache = new Map<string, Promise<string>>();
 
 async function buildLogoTile(src: string): Promise<string> {
   const resp = await fetch(src);
+  if (!resp.ok) throw new Error(`Failed to fetch logo: ${resp.status}`);
   const text = await resp.text();
-  const viewBox = text.match(/viewBox\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? '0 0 24 24';
+  const viewBox =
+    text.match(/viewBox\s*=\s*['"]([^'"]+)['"]/)?.[1] ?? '0 0 24 24';
   const inner = text
     .replace(/^[\s\S]*?<svg[^>]*>/, '')
     .replace(/<\/svg>\s*$/, '');
@@ -169,18 +189,25 @@ async function buildLogoTile(src: string): Promise<string> {
   return `data:image/svg+xml;utf8,${encodeURIComponent(wrapper)}`;
 }
 
-function useLogoTile(src: string): string | null {
+function useLogoTile(src: string | null): string | null {
   const [tile, setTile] = useState<string | null>(null);
   useEffect(() => {
+    // Skip empty src — avoids fetching the current page URL when logo is unknown.
+    if (!src) return;
     let cancelled = false;
     let promise = logoTileCache.get(src);
     if (!promise) {
       promise = buildLogoTile(src);
       logoTileCache.set(src, promise);
     }
-    promise.then(t => {
-      if (!cancelled) setTile(t);
-    });
+    promise
+      .then(t => {
+        if (!cancelled) setTile(t);
+      })
+      .catch(() => {
+        // On failure evict the cache entry so a later mount can retry.
+        logoTileCache.delete(src);
+      });
     return () => {
       cancelled = true;
     };
@@ -198,7 +225,8 @@ function LogoLayer({
   mode: 'light' | 'dark';
 }) {
   const logo = LOGO_LIBRARY.find(l => l.id === logoId);
-  const tile = useLogoTile(logo?.src ?? '');
+  // Pass null when logo is unknown to skip the fetch entirely.
+  const tile = useLogoTile(logo?.src ?? null);
   if (!logo || !tile) return null;
   return (
     <div
