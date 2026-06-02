@@ -38,6 +38,23 @@ export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   return `/raise/${encodeURIComponent(identifier)}`;
 }
 
+export interface SingleCurrencyTotalRaised {
+  currency: string;
+  amount: number;
+}
+
+/**
+ * Returns raised amounts as a sorted array (highest first), filtering out zero or non-finite values. Currency keys are normalized to uppercase.
+ */
+export function getTotalRaisedByCurrency(
+  totalRaised: Record<string, number>
+): SingleCurrencyTotalRaised[] {
+  return Object.entries(totalRaised)
+    .filter(([_currency, amount]) => Number.isFinite(amount) && amount > 0)
+    .map(([currency, amount]) => ({ currency: currency.toUpperCase(), amount }))
+    .sort((a, b) => b.amount - a.amount);
+}
+
 /**
  * Days remaining until `endDate`, rounded up, never negative.
  */
