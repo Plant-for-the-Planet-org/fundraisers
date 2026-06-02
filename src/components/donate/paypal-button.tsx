@@ -72,6 +72,8 @@ function PayPalButtonsInner({
   const validationAbortedRef = useRef(false);
 
   const createOrder: PayPalButtonsComponentProps['createOrder'] = async () => {
+    // Reset on every attempt so a previous run cannot leave this stale.
+    validationAbortedRef.current = false;
     const isValid = await trigger();
     if (!isValid) {
       validationAbortedRef.current = true;

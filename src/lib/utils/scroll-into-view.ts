@@ -30,10 +30,14 @@ export function scrollElementIntoView(el: HTMLElement): void {
  * Finds the first errored field in DOM order and scrolls to it. Returns the
  * field so the caller can also focus it. Returns `null` when nothing is in
  * error (e.g. the failure was not field-level).
+ *
+ * Searches inside the first `[data-scroll-container]` in the document so the
+ * lookup is bounded to the active overlay and never picks up stray invalid
+ * inputs elsewhere on the page.
  */
-export function scrollToFirstError(
-  root: ParentNode = document
-): HTMLElement | null {
+export function scrollToFirstError(): HTMLElement | null {
+  const root =
+    document.querySelector<HTMLElement>('[data-scroll-container]') ?? document;
   const field = root.querySelector<HTMLElement>(ERROR_FIELD_SELECTOR);
   if (!field) return null;
   scrollElementIntoView(field);
