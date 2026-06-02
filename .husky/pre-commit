@@ -3,3 +3,6 @@
 
 # Validate the branch name
 npx validate-branch-name
+
+# Format and sort imports on staged files
+npx lint-staged
