@@ -1,9 +1,11 @@
-let currentRequestLocale = 'en';
+import { cache } from 'react';
+
+const getLocaleStore = cache(() => ({ locale: 'de' }));
 
 export function setRequestLocale(locale: string) {
-  currentRequestLocale = locale;
+  getLocaleStore().locale = locale;
 }
 
 export function getRequestLocale(): string {
-  return currentRequestLocale;
+  return getLocaleStore().locale;
 }
