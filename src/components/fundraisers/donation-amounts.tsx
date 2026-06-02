@@ -3,7 +3,7 @@
 import type { ContributionOption } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { formatCurrency, getCurrencySymbol } from '@/lib/utils/currency';
@@ -28,6 +28,7 @@ export function DonationAmounts({
   customOption,
 }: DonationAmountsProps) {
   const t = useTranslations('Fundraisers.form.contributionSettings');
+  const locale = useLocale();
   const [isCustomInputSelected, setIsCustomInputSelected] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
@@ -69,7 +70,7 @@ export function DonationAmounts({
               )}
             </div>
             <div className='text-foreground text-base font-semibold'>
-              {formatCurrency(amount, currency)}
+              {formatCurrency(amount, currency, locale)}
             </div>
           </Button>
         ))}

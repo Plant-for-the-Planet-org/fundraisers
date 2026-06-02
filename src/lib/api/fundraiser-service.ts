@@ -2,25 +2,9 @@ import type {
   Fundraiser,
   UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
-import type { RawTotalRaised } from '@/lib/utils/number';
 
 import { cache } from 'react';
-import { normalizeTotalRaised } from '@/lib/utils/number';
 import { platformFetch } from './platform-fetch';
-
-type RawFundraiser = Omit<Fundraiser, 'totalRaised'> & {
-  totalRaised: RawTotalRaised;
-};
-
-function normalizeFundraiser(fundraiser: RawFundraiser): Fundraiser {
-  return {
-    ...fundraiser,
-    totalRaised: normalizeTotalRaised(
-      fundraiser.totalRaised,
-      fundraiser.currency
-    ),
-  };
-}
 
 function fundraiserPath(slug: string, locale?: string): string {
   const path = `/fundraisers/${encodeURIComponent(slug)}`;
@@ -35,21 +19,16 @@ export async function getFundraiser(
   slug: string,
   locale?: string
 ): Promise<Fundraiser> {
-  const fundraiser = await platformFetch<RawFundraiser>(
-    fundraiserPath(slug, locale)
-  );
-  return normalizeFundraiser(fundraiser);
+  return platformFetch<Fundraiser>(fundraiserPath(slug, locale));
 }
 
 export async function getFundraiserAuthenticated(
   slug: string,
   token: string
 ): Promise<Fundraiser> {
-  const fundraiser = await platformFetch<RawFundraiser>(
-    `/fundraisers/${encodeURIComponent(slug)}`,
-    { token }
-  );
-  return normalizeFundraiser(fundraiser);
+  return platformFetch<Fundraiser>(`/fundraisers/${encodeURIComponent(slug)}`, {
+    token,
+  });
 }
 
 export const getCachedFundraiser = cache(
@@ -63,12 +42,11 @@ export async function updateFundraiser(
   data: UpdateFundraiserRequest,
   token: string
 ): Promise<Fundraiser> {
-  const fundraiser = await platformFetch<RawFundraiser>(`/fundraisers/${id}`, {
+  return platformFetch<Fundraiser>(`/fundraisers/${id}`, {
     method: 'PUT',
     body: data,
     token,
   });
-  return normalizeFundraiser(fundraiser);
 }
 
 export function pauseFundraiser(

@@ -22,54 +22,59 @@ function normalizeNumber(value: number): number {
 }
 
 function getCompactSuffix(locale: string, suffix: string): string {
-  const safeLocale = normalizeLocale(locale);
-
-  if (safeLocale.startsWith('de')) {
-    return GERMAN_COMPACT_SUFFIXES[suffix] ?? suffix;
-  }
-
-  return suffix;
+  return normalizeLocale(locale).startsWith('de')
+    ? (GERMAN_COMPACT_SUFFIXES[suffix] ?? suffix)
+    : suffix;
 }
 
 /**
- * Format a number with locale-aware decimal rules.
+ * Format a number with locale-aware decimals.
  *
- * - German: always 2 decimals unless both are zero.
- * - English (and others): up to 2 decimals, trailing zeros dropped.
+ * One rule for every locale: 2 decimals unless the rounded value is whole,
+ * in which case no decimals are shown.
+ * - `3.2`  → `3.20` (en) / `3,20` (de)
+ * - `3.67` → `3.67` / `3,67`
+ * - `3`    → `3`
  *
- * Uses Math.round for the isWhole check; Intl.NumberFormat handles
- * the actual rounding via maximumFractionDigits.
+ * Math.round is used only for the isWhole check; Intl.NumberFormat handles the
+ * actual rounding via maximumFractionDigits.
  */
 function formatLocalizedNumber(value: number, locale: string): string {
   const safeLocale = normalizeLocale(locale);
   const numericValue = normalizeNumber(value);
-  const rounded = Math.round(numericValue * 100) / 100;
-  const isWhole = rounded % 1 === 0;
-  const isGerman = safeLocale.startsWith('de');
-
-  if (isGerman) {
-    return new Intl.NumberFormat(safeLocale, {
-      minimumFractionDigits: isWhole ? 0 : 2,
-      maximumFractionDigits: isWhole ? 0 : 2,
-    }).format(numericValue);
-  }
+  const isWhole = (Math.round(numericValue * 100) / 100) % 1 === 0;
 
   return new Intl.NumberFormat(safeLocale, {
-    minimumFractionDigits: 0,
+    minimumFractionDigits: isWhole ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(numericValue);
 }
 
-/** Format a number in compact notation (e.g. 1200 → "1.2 K"). */
+/**
+ * Format a number in compact notation with a localized suffix.
+ * - `1200`    → `1.20 K` (en) / `1,20 Tsd.` (de)
+ * - `1200000` → `1.20 M` / `1,20 Mio.`
+ */
 function formatCompactNumber(value: number, locale: string): string {
   const numericValue = normalizeNumber(value);
   const abs = Math.abs(numericValue);
 
-  for (const { threshold, divisor, suffix } of COMPACT_SCALES) {
-    if (abs >= threshold) {
-      const localizedSuffix = getCompactSuffix(locale, suffix);
-      return `${formatLocalizedNumber(numericValue / divisor, locale)} ${localizedSuffix}`;
+  for (let i = 0; i < COMPACT_SCALES.length; i++) {
+    const { threshold } = COMPACT_SCALES[i];
+    if (abs < threshold) continue;
+
+    let { divisor, suffix } = COMPACT_SCALES[i];
+    let scaled = numericValue / divisor;
+
+    // Rounding the mantissa to 2 decimals can push it to >= 1000
+    // (e.g. 999_999 / 1000 = 999.999 → "1,000 K"). Promote to the
+    // next-larger scale so it renders "1 M" instead.
+    if (i > 0 && Math.round(Math.abs(scaled) * 100) / 100 >= 1000) {
+      ({ divisor, suffix } = COMPACT_SCALES[i - 1]);
+      scaled = numericValue / divisor;
     }
+
+    return `${formatLocalizedNumber(scaled, locale)} ${getCompactSuffix(locale, suffix)}`;
   }
 
   return formatLocalizedNumber(numericValue, locale);

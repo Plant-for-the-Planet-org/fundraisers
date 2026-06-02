@@ -58,13 +58,15 @@ export function StageCounter({
           color: 'var(--accent-color)',
         }}
       >
-        {formatCurrencyFromDecimal(raised, currency, { compact: true })}
+        {formatCurrencyFromDecimal(raised, currency, locale, { compact: true })}
       </div>
 
       <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
         <span>
           {t('ofGoal', {
-            goal: formatCurrencyFromDecimal(goal, currency, { compact: true }),
+            goal: formatCurrencyFromDecimal(goal, currency, locale, {
+              compact: true,
+            }),
           })}
         </span>
         <span>{pct}%</span>

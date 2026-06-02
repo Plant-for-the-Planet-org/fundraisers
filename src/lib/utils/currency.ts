@@ -3,7 +3,6 @@
  */
 
 import { formatCompactNumber, formatLocalizedNumber } from './formatting';
-import { getRequestLocale } from './request-locale';
 
 // Map of major currencies to their symbols
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -36,7 +35,6 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 };
 
 interface FormatCurrencyOptions {
-  locale?: string;
   compact?: boolean;
 }
 
@@ -44,22 +42,11 @@ interface FormatCurrencyFromDecimalOptions extends FormatCurrencyOptions {
   currencyDisplay?: 'symbol' | 'code';
 }
 
-/**
- * Resolve locale from the app's html lang attribute (set by next-intl),
- * an explicit override, or fall back to 'en'.
- */
-function resolveLocale(locale?: string): string {
-  if (locale) return locale;
-  if (typeof document !== 'undefined') {
-    return document.documentElement.lang || 'en';
-  }
-  return getRequestLocale();
-}
-
 /** Format a number with the given locale, respecting compact mode. */
 function formatAmount(value: number, locale: string, compact: boolean): string {
-  if (compact) return formatCompactNumber(value, locale);
-  return formatLocalizedNumber(value, locale);
+  return compact
+    ? formatCompactNumber(value, locale)
+    : formatLocalizedNumber(value, locale);
 }
 
 /** Attach the currency symbol (or code) to a formatted number string. */
@@ -81,19 +68,21 @@ function attachSymbol(formattedAmount: string, currencyUpper: string): string {
 /**
  * Format currency amount from cents with appropriate symbol or code.
  *
- * Locale is auto-detected from the app. Exact notation by default;
- * pass { compact: true } for abbreviated display (e.g. $12.3K).
+ * Locale must be supplied by the caller (next-intl `useLocale()` /
+ * `getLocale()`). Exact notation by default; pass { compact: true } for
+ * abbreviated display (e.g. $12.30 K, or 12,30 Tsd. in German).
  *
  * @param amountInCents - The amount in cents from API (e.g., 1234 = $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
- * @param options - Optional: locale override, compact toggle
+ * @param locale - Active locale (e.g. 'de', 'en')
+ * @param options - Optional: compact toggle
  */
 export function formatCurrency(
   amountInCents: number,
   currency: string,
+  locale: string,
   options?: FormatCurrencyOptions
 ): string {
-  const locale = resolveLocale(options?.locale);
   const compact = options?.compact ?? false;
   const currencyUpper = currency.toUpperCase();
   const amount = amountInCents / 100;
@@ -104,19 +93,21 @@ export function formatCurrency(
 /**
  * Format currency amount from decimal value.
  *
- * Locale is auto-detected from the app. Exact notation by default;
- * pass { compact: true } for abbreviated display (e.g. €18.7K).
+ * Locale must be supplied by the caller (next-intl `useLocale()` /
+ * `getLocale()`). Exact notation by default; pass { compact: true } for
+ * abbreviated display (e.g. €18.70 K, or 18,70 Tsd. in German).
  *
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
- * @param options - Optional: locale override, currencyDisplay, compact toggle
+ * @param locale - Active locale (e.g. 'de', 'en')
+ * @param options - Optional: currencyDisplay, compact toggle
  */
 export function formatCurrencyFromDecimal(
   amount: number,
   currency: string,
+  locale: string,
   options?: FormatCurrencyFromDecimalOptions
 ): string {
-  const locale = resolveLocale(options?.locale);
   const compact = options?.compact ?? false;
   const currencyDisplay = options?.currencyDisplay ?? 'symbol';
   const currencyUpper = currency.toUpperCase();

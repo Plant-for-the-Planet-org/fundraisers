@@ -5,17 +5,11 @@
 
 import type { Category } from '@/lib/types/category';
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { RawTotalRaised } from '@/lib/utils/number';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
-import { normalizeTotalRaised } from '@/lib/utils/number';
 
-export interface ApiFundraiser extends Omit<
-  Fundraiser,
-  'workspace' | 'totalRaised'
-> {
+export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
   workspace: Fundraiser['workspace'] | [];
-  totalRaised: RawTotalRaised;
 }
 
 interface RawCategoryFundraisersResponse {
@@ -52,10 +46,6 @@ export interface CategoryOptions {
 function normalizeFundraiser(fundraiser: ApiFundraiser): Fundraiser {
   return {
     ...fundraiser,
-    totalRaised: normalizeTotalRaised(
-      fundraiser.totalRaised,
-      fundraiser.currency
-    ),
     workspace: Array.isArray(fundraiser.workspace)
       ? null
       : fundraiser.workspace,

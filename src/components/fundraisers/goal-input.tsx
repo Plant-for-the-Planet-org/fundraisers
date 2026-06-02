@@ -84,7 +84,8 @@ export function GoalInput() {
             ? t('errors.minAmount', {
                 formattedAmount: formatCurrencyFromDecimal(
                   GOAL_AMOUNT_MIN,
-                  currency
+                  currency,
+                  locale
                 ),
               })
             : t('errors.required')}

@@ -20,7 +20,7 @@ export function ContributionSettings() {
         onDonate={(amount, isDedicated, frequency) => {
           toast.message(t('preview.title'), {
             description: t('preview.description', {
-              amount: formatCurrency(amount, currency, { locale }),
+              amount: formatCurrency(amount, currency, locale),
               frequency: t('preview.frequencyLabel', { frequency }),
               isDedicated: String(isDedicated),
             }),
