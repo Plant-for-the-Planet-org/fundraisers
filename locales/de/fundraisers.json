@@ -3,7 +3,7 @@
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
-    "amountRaised": "{formattedAmountWithCurrency} gesammelt",
+    "amountRaised": "{formattedAmountWithCurrency}",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
@@ -107,7 +107,7 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount}",
+        "raised": "{amount} gesammelt",
         "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
