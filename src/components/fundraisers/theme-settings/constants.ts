@@ -64,7 +64,7 @@ export const ANIMATION_OPTIONS: Array<{
   { id: 'confetti', icon: PartyPopper },
   { id: 'snow', icon: Snowflake },
   { id: 'hearts', icon: Heart },
-  { id: 'particles', icon: Sparkles },
+  { id: 'fireworks', icon: Sparkles },
 ];
 
 export const DECORATIONS: Array<{ id: BgDecoration; icon: LucideIcon }> = [

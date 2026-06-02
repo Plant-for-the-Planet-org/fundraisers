@@ -86,7 +86,7 @@ export const fundraiserFormSchema = z.object({
         image_mode: z.enum(['cover', 'repeat']),
         logo_id: z.string().nullable(),
         opacity: z.number().min(0.05).max(1),
-        animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'particles']),
+        animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'fireworks']),
       }),
     }),
     modules: z.object({

@@ -233,7 +233,7 @@ export function isValidImageMode(value: unknown): value is BgImageMode {
 export function isValidAnimation(value: unknown): value is AnimationType {
   return (
     typeof value === 'string' &&
-    (['none', 'snow', 'confetti', 'hearts', 'particles'] as const).includes(
+    (['none', 'snow', 'confetti', 'hearts', 'fireworks'] as const).includes(
       value as AnimationType
     )
   );

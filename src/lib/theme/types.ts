@@ -28,7 +28,7 @@ export type AnimationType =
   | 'snow'
   | 'confetti'
   | 'hearts'
-  | 'particles';
+  | 'fireworks';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -57,7 +57,7 @@ export interface BgSettings {
   image_mode: BgImageMode;
   logo_id: string | null; // library key for partner logo decoration
   opacity: number; // applies to pattern + image layers, 0.05–1
-  animation: AnimationType; // overlay particles (snow, confetti, hearts…)
+  animation: AnimationType; // overlay animation (snow, confetti, hearts, fireworks)
 }
 
 export interface Theme {
