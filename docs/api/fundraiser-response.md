@@ -43,7 +43,8 @@ The response shape is identical across all three endpoints:
                 "id": "proj_bFH0BU0Qw02RuetpQlLOMVYX",
                 "name": "Support Plant-for-the-Planet",
                 "description": "...",
-                "image": "6852bd2495cde981886580.png"
+                "image": "6852bd2495cde981886580.png",
+                "allowDonations": true
             },
             "percentage": 100
         }
@@ -127,7 +128,8 @@ Same shape as POST response. Example with a different workspace and two project 
                 "id": "proj_bFH0BU0Qw02RuetpQlLOMVYX",
                 "name": "Support Plant-for-the-Planet",
                 "description": "...",
-                "image": "6852bd2495cde981886580.png"
+                "image": "6852bd2495cde981886580.png",
+                "allowDonations": true
             },
             "percentage": 50
         },
@@ -136,7 +138,8 @@ Same shape as POST response. Example with a different workspace and two project 
                 "id": "proj_fsj4WiG71hgjnSKe0PqBdthJ",
                 "name": "Agroforestry for rural livelihoods improvements in Kenya",
                 "description": "...",
-                "image": "6792310bc8d5f543214453.jpg"
+                "image": "6792310bc8d5f543214453.jpg",
+                "allowDonations": true
             },
             "percentage": 50
         }
@@ -231,3 +234,4 @@ Individual items have the same shape as above. Some fields can be `null` when no
 - `workspace`, `settings`, `image`, and `metadata` can all be `null`
 - `hosts` is `[{}]` in current test data — full host objects expected in production
 - `contribution.options` is returned as an array (even when empty)
+- `projectAllocations[].project.allowDonations` is a boolean flag — `true` when the project can still receive donations. Use it to gate donation actions per project.

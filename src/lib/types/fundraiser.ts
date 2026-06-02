@@ -123,6 +123,7 @@ export interface ProjectAllocation {
     name: string;
     description: string;
     image: string;
+    allowDonations: boolean;
   };
   percentage: number;
 }
