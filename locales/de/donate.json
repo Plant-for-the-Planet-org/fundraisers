@@ -255,7 +255,7 @@
         "detailsTab": "Details",
         "qrTab": "QR-Code",
         "qrAlt": "EPC QR-Code für SEPA-Überweisung",
-        "qrBadge": "SEPA-Übertragungscode",
+        "qrBadge": "SEPA-Überweisungscode",
         "qrHint": "Öffne deine Banking-App zum Scannen",
         "qrCameraWarning": "Die Kamera-App deines Telefons wird nicht funktionieren. Verwende den QR-Scanner der Deutschen Bank, Sparkasse, Revolut und der meisten EU-Banking-Apps.",
         "qrFallback": "QR-Code nicht verfügbar, verwende bitte die Registerkarte Details.",
