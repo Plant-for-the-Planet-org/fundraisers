@@ -5,13 +5,17 @@
 
 import type { Category } from '@/lib/types/category';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { RawTotalRaised } from '@/lib/utils/number';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
+import { normalizeTotalRaised } from '@/lib/utils/number';
 
-export interface ApiFundraiser
-  extends Omit<Fundraiser, 'workspace' | 'totalRaised'> {
+export interface ApiFundraiser extends Omit<
+  Fundraiser,
+  'workspace' | 'totalRaised'
+> {
   workspace: Fundraiser['workspace'] | [];
-  totalRaised: number | Record<string, unknown> | null;
+  totalRaised: RawTotalRaised;
 }
 
 interface RawCategoryFundraisersResponse {
@@ -45,52 +49,13 @@ export interface CategoryOptions {
   sort_by?: FundraiserSortOptions;
 }
 
-function coerceNumber(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return null;
-}
-
-function normalizeTotalRaised(
-  totalRaised: ApiFundraiser['totalRaised'],
-  currency: string
-): number {
-  const direct = coerceNumber(totalRaised);
-  if (direct !== null) {
-    return direct;
-  }
-
-  if (!totalRaised || typeof totalRaised !== 'object') {
-    return 0;
-  }
-
-  const byCurrency = totalRaised as Record<string, unknown>;
-  const normalizedCurrency = currency.trim().toUpperCase();
-  for (const [key, value] of Object.entries(byCurrency)) {
-    if (key.trim().toUpperCase() === normalizedCurrency) {
-      const amount = coerceNumber(value);
-      if (amount !== null) {
-        return amount;
-      }
-    }
-  }
-
-  return 0;
-}
-
 function normalizeFundraiser(fundraiser: ApiFundraiser): Fundraiser {
   return {
     ...fundraiser,
-    totalRaised: normalizeTotalRaised(fundraiser.totalRaised, fundraiser.currency),
+    totalRaised: normalizeTotalRaised(
+      fundraiser.totalRaised,
+      fundraiser.currency
+    ),
     workspace: Array.isArray(fundraiser.workspace)
       ? null
       : fundraiser.workspace,

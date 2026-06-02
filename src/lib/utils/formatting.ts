@@ -5,6 +5,13 @@ const COMPACT_SCALES = [
   { threshold: 1_000, divisor: 1_000, suffix: 'K' },
 ] as const;
 
+const GERMAN_COMPACT_SUFFIXES: Record<string, string> = {
+  K: 'Tsd.',
+  M: 'Mio.',
+  B: 'Mrd.',
+  T: 'Bio.',
+};
+
 function normalizeLocale(locale: string): string {
   return typeof locale === 'string' && locale.length > 0 ? locale : 'en';
 }
@@ -14,22 +21,11 @@ function normalizeNumber(value: number): number {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
-function roundToTwoDecimals(value: number): number {
-  return Number(Math.round(Number(`${value}e2`)) + 'e-2');
-}
-
 function getCompactSuffix(locale: string, suffix: string): string {
   const safeLocale = normalizeLocale(locale);
 
   if (safeLocale.startsWith('de')) {
-    const germanSuffixMap: Record<string, string> = {
-      K: 'Tsd.',
-      M: 'Mio.',
-      B: 'Mrd.',
-      T: 'Bio.',
-    };
-
-    return germanSuffixMap[suffix] ?? suffix;
+    return GERMAN_COMPACT_SUFFIXES[suffix] ?? suffix;
   }
 
   return suffix;
@@ -38,14 +34,16 @@ function getCompactSuffix(locale: string, suffix: string): string {
 /**
  * Format a number with locale-aware decimal rules.
  *
- * - Rounds to 2 decimal places first.
  * - German: always 2 decimals unless both are zero.
  * - English (and others): up to 2 decimals, trailing zeros dropped.
+ *
+ * Uses Math.round for the isWhole check; Intl.NumberFormat handles
+ * the actual rounding via maximumFractionDigits.
  */
 function formatLocalizedNumber(value: number, locale: string): string {
   const safeLocale = normalizeLocale(locale);
   const numericValue = normalizeNumber(value);
-  const rounded = roundToTwoDecimals(numericValue);
+  const rounded = Math.round(numericValue * 100) / 100;
   const isWhole = rounded % 1 === 0;
   const isGerman = safeLocale.startsWith('de');
 
@@ -53,13 +51,13 @@ function formatLocalizedNumber(value: number, locale: string): string {
     return new Intl.NumberFormat(safeLocale, {
       minimumFractionDigits: isWhole ? 0 : 2,
       maximumFractionDigits: isWhole ? 0 : 2,
-    }).format(rounded);
+    }).format(numericValue);
   }
 
   return new Intl.NumberFormat(safeLocale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(rounded);
+  }).format(numericValue);
 }
 
 /** Format a number in compact notation (e.g. 1200 → "1.2 K"). */
