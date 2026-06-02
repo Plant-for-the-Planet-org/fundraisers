@@ -18,8 +18,13 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
     <EditFundraiserFormProvider fundraiser={fundraiser}>
       <FundraiserFormBody
         mode='edit'
-        submitButton={<UpdateFundraiserButton fundraiserId={fundraiser.id} />}
-        totalRaised={fundraiser.totalRaised}
+        submitButton={
+          <UpdateFundraiserButton
+            fundraiserId={fundraiser.id}
+            existingSettings={fundraiser.settings}
+          />
+        }
+        totalRaised={fundraiser.totalRaised[fundraiser.currency] ?? 0}
         endDate={fundraiser.endDate}
       />
     </EditFundraiserFormProvider>

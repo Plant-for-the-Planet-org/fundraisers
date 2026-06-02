@@ -39,7 +39,7 @@
     },
     "donate": {
       "summary": {
-        "processingFee": "Processing fee",
+        "processingFee": "Cover {providerName} fees",
         "breakdown": "Breakdown",
         "total": "Total",
         "totalMonthly": "Total every month",
@@ -52,6 +52,16 @@
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
         "bankTransferRemark": "Please set up a standing order with your bank.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand} card ending in {last4}",
+          "sepaLabelAria": "Bank account ending in {last4}",
+          "expiringSoon": "Expires soon",
+          "expiringSoonRecurringHint": "This card expires soon. it may not work for a future monthly donation.",
+          "newCard": "Use a new card",
+          "newSepa": "Use a new bank account"
+        },
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
@@ -76,7 +86,7 @@
           "noFee": "No fee",
           "feeAmount": "{amount} fee",
           "alternatives": {
-            "eu": "Open Banking or Bank Transfer",
+            "eu": "Bank Transfer",
             "default": "Bank Transfer"
           },
           "tooltip": {
@@ -85,8 +95,8 @@
         }
       },
       "options": {
-        "coverFeesLabel": "Add {feeAmount} to cover payment processing fees.",
-        "coverFeesTooltip": "Payment processing fees are distributed to the causes supported by this fundraiser.",
+        "coverFeesLabel": "Add {feeAmount} to cover {providerName} fees.",
+        "coverFeesTooltip": "{providerName} fees are distributed to the causes supported by this fundraiser.",
         "coverFeesTooltipTriggerLabel": "More information about payment processing fees",
         "makeMonthly": "Make my donation monthly"
       }
@@ -104,7 +114,36 @@
       "theme": {
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
-        "selectAccent": "Select {accent} accent color"
+        "selectAccent": "Select {accent} accent color",
+        "tabTheme": "Theme",
+        "tabBackground": "Background",
+        "browse": "Browse",
+        "done": "Customize",
+        "shuffle": "Shuffle",
+        "switchToDark": "Switch to dark mode",
+        "switchToLight": "Switch to light mode",
+        "labelGradient": "Gradient",
+        "labelTitleFont": "Title font",
+        "labelBodyFont": "Body font",
+        "labelAnimation": "Animation",
+        "labelDecoration": "Decoration",
+        "labelPattern": "Pattern",
+        "labelImage": "Image",
+        "labelImageMode": "Image fit",
+        "labelLogo": "Partner logo",
+        "logoContact": "Want to add your logo here? <mail>contact info@plant-for-the-planet.org</mail>",
+        "labelOpacity": "Opacity",
+        "animation_none": "None",
+        "animation_confetti": "Confetti",
+        "animation_snow": "Snow",
+        "animation_hearts": "Hearts",
+        "animation_particles": "Particles",
+        "decoration_none": "None",
+        "decoration_pattern": "Pattern",
+        "decoration_image": "Image",
+        "decoration_logo": "Logo",
+        "imageMode_cover": "Cover",
+        "imageMode_repeat": "Repeat"
       },
       "title": {
         "label": "Fundraiser title",
@@ -144,14 +183,13 @@
         },
         "overlay": {
           "title": "Select an image",
+          "subtitle": "Or choose from <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Drag and drop or click to upload",
-          "uploadSubtitle": "Or choose an image from Unsplash below",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },
         "attribution": {
-          "photoBy": "Photo by",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Photo by <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Image must be {maxMb}MB or smaller.",
@@ -297,11 +335,16 @@
           },
           "errors": {
             "recipientName": {
-              "required": "Recipient name is required"
+              "required": "Recipient name is required",
+              "tooLong": "Recipient Name must be 35 characters or less"
             },
             "recipientEmail": {
               "invalid": "Please enter a valid email address",
+              "tooLong": "Email must be 254 characters or less",
               "requiredWithMessage": "Email is required when a message is added"
+            },
+            "message": {
+              "tooLong": "Personal message cannot exceed 250 characters"
             }
           }
         }

@@ -7,21 +7,23 @@
 ## Tech stack
 
 <!-- Framework, language, key libraries, package manager, node version. -->
+
 @AGENTS.md
+
 ## Commands
 
 Requires a `.env.local` file in the project root before running locally.
 
 Node 24 is required (Next.js needs ≥20.9). The dev server may already be running on port 3000 — check first. If not, `nvm use 24` then `npm run dev`. The `.claude/launch.json` `fundraisers-dev` preset handles this automatically via `bash -lc`.
 
-| Command | When to use |
-|---|---|
-| `npm run dev` | Start the local dev server |
-| `npm run build` | Production build — run before pushing to catch type/build errors |
-| `npm run lint` | ESLint checks |
-| `npm run type-check` | TypeScript checks without emitting files |
-| `npm run format` | Auto-format code style issues |
-| `npm run imports:sort` | Sort import order |
+| Command                | When to use                                                      |
+| ---------------------- | ---------------------------------------------------------------- |
+| `npm run dev`          | Start the local dev server                                       |
+| `npm run build`        | Production build — run before pushing to catch type/build errors |
+| `npm run lint`         | ESLint checks                                                    |
+| `npm run type-check`   | TypeScript checks without emitting files                         |
+| `npm run format`       | Auto-format code style issues                                    |
+| `npm run imports:sort` | Sort import order                                                |
 
 ## Project structure
 
@@ -43,6 +45,31 @@ Domain concerns (response shaping, field-level error mapping, retries) belong in
 
 <!-- Code style notes, naming, file layout patterns, comment policy. -->
 
+### next-intl: use `t.rich` for inline elements
+
+When a translation string contains an inline element (link, bold, etc.), use `t.rich` — never split it into `{t('key')} <a>...</a>`.
+
+```tsx
+// Bad
+{
+  t('attribution.photoBy');
+}
+{
+  (' ');
+}
+<a href={url}>{photo.user.name}</a>;
+
+// Good — embed the tag in the translation string and use t.rich
+{
+  t.rich('attribution.photoBy', {
+    name: photo.user.name,
+    photographerLink: chunks => <a href={url}>{chunks}</a>,
+  });
+}
+```
+
+Translation key: `"photoBy": "Photo by <photographerLink>{name}</photographerLink>"`
+
 ## Auth
 
 <!-- Auth0 setup, token flow, how to test authenticated paths locally. -->
@@ -50,6 +77,8 @@ Domain concerns (response shaping, field-level error mapping, retries) belong in
 ## Testing
 
 <!-- Test runner, where tests live, what to run before pushing. -->
+
+Do not start a dev server or verify changes in the browser. A dev session is usually already running; rely on `npm run type-check` and `npm run lint` for correctness, then let the reviewer check the UI and report back.
 
 ## Gotchas
 

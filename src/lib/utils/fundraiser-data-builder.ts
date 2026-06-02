@@ -97,7 +97,8 @@ function getDateOffsetString(days: number): string {
 export function buildUpdateFundraiserRequest(
   values: FundraiserFormValues,
   dirtyFields: UpdateDirtyFields,
-  imageFile?: string
+  imageFile?: string,
+  existingSettings?: FundraiserSettings | null
 ): UpdateFundraiserRequest {
   const request: UpdateFundraiserRequest = {};
 
@@ -109,26 +110,30 @@ export function buildUpdateFundraiserRequest(
   if (isProjectAllocationsDirty(dirtyFields)) {
     request.projectAllocations = values.projectAllocations;
   }
-  if (isThemeDirty(dirtyFields)) {
-    request.settings = { ...request.settings, theme: values.settings.theme };
-  }
-  // Each module's dirty check and value are kept together here.
-  // New modules: add an if-block below, nowhere else.
-  const dirtyModules: Partial<FundraiserSettings['modules']> = {};
-  if (isLeaderboardDirty(dirtyFields))
-    dirtyModules.leaderboard = values.settings.modules.leaderboard;
-  if (isStageDirty(dirtyFields))
-    dirtyModules.stage = values.settings.modules.stage;
-  if (isThankYouNoteDirty(dirtyFields))
-    dirtyModules.thankYouNote = values.settings.modules.thankYouNote;
-  if (isBundleDirty(dirtyFields))
-    dirtyModules.bundle = values.settings.modules.bundle;
-  if (Object.keys(dirtyModules).length > 0) {
+
+  const isSettingsDirty =
+    isThemeDirty(dirtyFields) ||
+    isLeaderboardDirty(dirtyFields) ||
+    isStageDirty(dirtyFields) ||
+    isThankYouNoteDirty(dirtyFields) ||
+    isBundleDirty(dirtyFields);
+
+  if (isSettingsDirty) {
     request.settings = {
-      ...request.settings,
-      modules: { ...request.settings?.modules, ...dirtyModules },
+      theme: values.settings.theme,
+      modules: {
+        // Spread server modules first to preserve non-form keys
+        // (contribution, donor_score, projects_supported, custom_fields).
+        // Form-managed keys follow and override.
+        ...existingSettings?.modules,
+        leaderboard: values.settings.modules.leaderboard,
+        bundle: values.settings.modules.bundle,
+        stage: values.settings.modules.stage,
+        thankYouNote: values.settings.modules.thankYouNote,
+      },
     };
   }
+
   if (imageFile) request.imageFile = imageFile;
 
   return request;

@@ -23,12 +23,14 @@ export type AccentColor =
 
 export type FontId = 'open-sans' | 'inter' | 'poppins' | 'playfair' | 'roboto';
 
-export type AnimationType =
-  | 'none'
-  | 'snow'
-  | 'confetti'
-  | 'hearts'
-  | 'particles';
+export const ANIMATION_TYPES = [
+  'none',
+  'snow',
+  'confetti',
+  'hearts',
+  'particles',
+] as const;
+export type AnimationType = (typeof ANIMATION_TYPES)[number];
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -40,35 +42,63 @@ export type ThemeCategory =
   | 'business'
   | 'system'
   | 'seasonal'
-  | 'corporate'
   | 'simple'
   | 'dark';
+
+export const BG_DECORATIONS = ['none', 'pattern', 'image', 'logo'] as const;
+export type BgDecoration = (typeof BG_DECORATIONS)[number];
+
+export const BG_IMAGE_MODES = ['cover', 'repeat'] as const;
+export type BgImageMode = (typeof BG_IMAGE_MODES)[number];
+
+export interface BgSettings {
+  gradient: string; // tailwind class string, '' = no gradient layer
+  decoration: BgDecoration;
+  pattern_id: string | null;
+  image_url: string | null; // library key OR https URL
+  image_mode: BgImageMode;
+  logo_id: string | null; // library key for partner logo decoration
+  opacity: number; // applies to pattern + image layers, 0.05–1
+  animation: AnimationType; // overlay particles (snow, confetti, hearts…)
+}
 
 export interface Theme {
   id: string;
   name: string;
   category: ThemeCategory;
-  background: string; // Tailwind gradient classes or solid color
-  accent: AccentColor; // Tailwind color name (e.g., 'emerald', 'blue')
-  mode: ThemeMode; // Defines if theme is light or dark for text/UI colors
+  accent: AccentColor;
+  mode: ThemeMode;
   bodyFont: FontId;
   titleFont: FontId;
-  animation?: AnimationType;
   logo?: string; // URL for corporate themes
   colorOptions: AccentColor[];
   isPlain?: boolean;
-  featured?: boolean; // To make available for selection in the ThemeSettings while creating a fundraiser. Not all themes need to be featured.
+  featured?: boolean; // Visible in the ThemeBrowseGrid customize picker.
+  curatedBgs?: string[]; // Background library keys suggested in the picker.
+  bg: BgSettings; // Full background config: gradient + decoration + opacity.
 }
 
 // The shape stored in fundraiser.settings.theme (raw DB record).
 // base_id references a predefined theme from THEMES and serves as the base
-// for field-level overrides. Used in Phase 2 (buildTheme).
+// for field-level overrides. Used in Phase 2 (buildTheme). Field types are
+// intentionally loose since raw DB data may not match enum constraints —
+// buildTheme/buildBg validate and coerce them.
 export interface FundraiserThemeSettings {
   base_id?: string;
-  background?: string;
   accent?: string;
   mode?: string;
   body_font?: string;
   title_font?: string;
+  /** @deprecated Phase 1 field — moved to bg.animation in Phase 2. Read by buildBg/fundraiserToFormValues for back-compat migration. */
   animation?: string;
+  bg?: {
+    gradient?: string;
+    decoration?: string;
+    pattern_id?: string | null;
+    image_url?: string | null;
+    image_mode?: string;
+    logo_id?: string | null;
+    opacity?: number;
+    animation?: string;
+  };
 }

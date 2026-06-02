@@ -3,13 +3,13 @@ import { cookieConsent } from '@/lib/cookie-consent';
 import { Button } from '@/components/ui/button';
 
 interface CookieSettingsButtonProps {
-  variant?: 'default' | 'ghost' | 'link';
+  variant?: 'default' | 'ghost' | 'link' | 'text';
   size?: 'default' | 'sm' | 'lg';
   className?: string;
 }
 
 export function CookieSettingsButton({
-  variant = 'ghost',
+  variant = 'text',
   size = 'sm',
   className,
 }: CookieSettingsButtonProps) {

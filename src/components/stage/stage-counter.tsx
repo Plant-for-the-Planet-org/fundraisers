@@ -23,7 +23,10 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const raised = data?.stats.raised.total ?? fundraiser.totalRaised;
+  const raised =
+    data?.stats.raised.total ??
+    fundraiser.totalRaised[fundraiser.currency] ??
+    0;
   const currency = data?.stats.raised.currency ?? fundraiser.currency;
   const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
   const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;

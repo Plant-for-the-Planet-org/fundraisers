@@ -23,7 +23,7 @@
     "notFound": {
       "title": "Spendenaufruf nicht gefunden",
       "description": "Der gesuchte Spendenaufruf existiert nicht oder wurde möglicherweise entfernt.",
-      "browseCta": "Spendenaufrufe durchstöbern",
+      "browseCta": "Spendenaufrufe entdecken",
       "homeCta": "Zur Startseite"
     },
     "metadata": {
@@ -39,7 +39,7 @@
     },
     "donate": {
       "summary": {
-        "processingFee": "Zahlungsgebühr",
+        "processingFee": "{providerName} Gebühren decken",
         "breakdown": "Aufschlüsselung",
         "total": "Gesamt",
         "totalMonthly": "Jeden Monat insgesamt",
@@ -52,6 +52,16 @@
         "empty": "Es sind derzeit keine Zahlungsarten verfügbar.",
         "lastUsed": "Zuletzt benutzt",
         "bankTransferRemark": "Bitte richte einen Dauerauftrag bei deiner Bank ein.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand}-Karte endend auf {last4}",
+          "sepaLabelAria": "Bankkonto endend auf {last4}",
+          "expiringSoon": "Läuft bald ab",
+          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. sie funktioniert möglicherweise nicht für eine zukünftige monatliche Spende.",
+          "newCard": "Neue Karte verwenden",
+          "newSepa": "Neues Bankkonto verwenden"
+        },
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
           "bankTransfer": "Überweisung",
@@ -76,7 +86,7 @@
           "noFee": "Keine Gebühren",
           "feeAmount": "{amount} Gebühren",
           "alternatives": {
-            "eu": "Open Banking oder Überweisung",
+            "eu": "Überweisung",
             "default": "Überweisung"
           },
           "tooltip": {
@@ -85,8 +95,8 @@
         }
       },
       "options": {
-        "coverFeesLabel": "Spende {feeAmount} mehr, um die Gebühren für die Zahlungsabwicklung aufzufangen. (freiwillig)",
-        "coverFeesTooltip": "Die Gebühren für die Zahlungsabwicklung werden unter den von diesem Spendenaufruf unterstützten Projekten aufgeteilt.",
+        "coverFeesLabel": "Spende {feeAmount} mehr, um die {providerName} Gebühren zu decken. (freiwillig)",
+        "coverFeesTooltip": "Die {providerName} Gebühren für die Abwicklung werden unter den von diesem Aufruf unterstützten Projekten aufgeteilt.",
         "coverFeesTooltipTriggerLabel": "Weitere Informationen über Zahlungsgebühren",
         "makeMonthly": "Meine Spende monatlich durchführen"
       }
@@ -104,7 +114,36 @@
       "theme": {
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
-        "selectAccent": "Wähle {accent} als Akzentfarbe"
+        "selectAccent": "Wähle {accent} als Akzentfarbe",
+        "tabTheme": "Thema",
+        "tabBackground": "Hintergrund",
+        "browse": "Stöbern",
+        "done": "Anpassen",
+        "shuffle": "Mischen",
+        "switchToDark": "In dunkelen Modus wechseln",
+        "switchToLight": "In hellen Modus wechseln",
+        "labelGradient": "Verlauf",
+        "labelTitleFont": "Titel Schriftart",
+        "labelBodyFont": "Schriftart",
+        "labelAnimation": "Animation",
+        "labelDecoration": "Dekoration",
+        "labelPattern": "Muster",
+        "labelImage": "Bild",
+        "labelImageMode": "Bild Größe",
+        "labelLogo": "Partner-Logo",
+        "logoContact": "Möchtest du dein Logo hier hinzufügen? <mail>Kontakt info@plant-for-the-planet.org</mail>",
+        "labelOpacity": "Deckkraft",
+        "animation_none": "Keine",
+        "animation_confetti": "Konfetti",
+        "animation_snow": "Schnee",
+        "animation_hearts": "Herzen",
+        "animation_particles": "Partikel",
+        "decoration_none": "Keine",
+        "decoration_pattern": "Muster",
+        "decoration_image": "Bild",
+        "decoration_logo": "Logo",
+        "imageMode_cover": "Cover",
+        "imageMode_repeat": "Wiederholen"
       },
       "title": {
         "label": "Name des Spendenaufrufs",
@@ -144,14 +183,13 @@
         },
         "overlay": {
           "title": "Wähle ein Bild aus",
+          "subtitle": "Oder wähle auf <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
-          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash aus",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
         },
         "attribution": {
-          "photoBy": "Foto von",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Foto von <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Das Bild darf maximal {maxMb}MB groß sein.",
@@ -262,8 +300,8 @@
       "contributionSettings": {
         "sectionHeading": "Spendeneinstellungen",
         "preview": {
-          "title": "Vorschaumodus",
-          "description": "{isDedicated, select, true {Würde {amount} {frequency} spenden (gewidmet)} other {Würde {amount} {frequency} spenden}}",
+          "title": "Vorschau-Modus",
+          "description": "{isDedicated, select, true {Würde {frequency} {amount} spenden (gewidmet)} other {Würde {frequency} {amount} spenden}}",
           "frequencyLabel": "{frequency, select, once {einmalig} monthly {monatlich} yearly {jährlich} other {{frequency}}}"
         },
         "cardHeader": "Spende",
@@ -297,11 +335,16 @@
           },
           "errors": {
             "recipientName": {
-              "required": "Name des/der Beschenkten ist erforderlich"
+              "required": "Name des/der Beschenkten ist erforderlich",
+              "tooLong": "Empfängername darf höchstens 35 Zeichen lang sein"
             },
             "recipientEmail": {
               "invalid": "Bitte gib eine gültige E-Mail ein",
+              "tooLong": "E-Mail darf höchstens 254 Zeichen lang sein",
               "requiredWithMessage": "E-Mail ist erforderlich, wenn eine persönliche Nachricht eingegeben wurde"
+            },
+            "message": {
+              "tooLong": "Persönliche Nachricht darf max. 250 Zeichen haben."
             }
           }
         }
@@ -313,7 +356,7 @@
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler",
-        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Bitte überprüfe deine Angaben und versuche es nochmal."
+        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut."
       }
     },
     "edit": {
@@ -332,7 +375,7 @@
         "buttonSubmit": "Spendenaufruf aktualisieren",
         "successMessage": "Spendenaufruf aktualisiert!",
         "errorMessage": "Aktualisierung fehlgeschlagen",
-        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Bitte versuche es nochmal."
+        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
     },
     "copyLinkButton": {

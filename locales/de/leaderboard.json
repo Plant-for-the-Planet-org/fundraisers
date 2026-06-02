@@ -1,7 +1,7 @@
 {
   "Leaderboard": {
     "form": {
-      "sectionHeading": "Bestenlisten-Einstellungen",
+      "sectionHeading": "Bestenliste",
       "labels": {
         "enableLeaderboard": "Bestenliste aktivieren",
         "openSettings": "Einstellungen für die Bestenliste",

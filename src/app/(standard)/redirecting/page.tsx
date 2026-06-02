@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { clearOAuthState, getStoredOAuthState } from '@/lib/auth/oauth-state';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { cleanUrl, getSafeRedirectPath } from '@/lib/utils/auth';
+import { useAuthStore } from '@/stores/auth-store';
 import { Loader } from '@/components/ui/loader';
 
 /**
@@ -29,9 +30,14 @@ export default function RedirectingPage() {
   const logoutSuccess = searchParams.get('logoutSuccess');
   const safeRedirectPath = getSafeRedirectPath(redirectPath);
   const nonce = searchParams.get('state');
+  const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
   useEffect(() => {
     if (nonce) {
+      // Wait until auth finishes, so the destination loads ready instead of
+      // briefly showing AuthGuard's "Redirecting you..." loader.
+      if (isAuthInitializing) return;
+
       cleanUrl(['state']);
       const redirectTo = getStoredOAuthState(nonce) ?? DEFAULT_REDIRECT_PATH;
 
@@ -44,7 +50,13 @@ export default function RedirectingPage() {
     if (logoutSuccess === 'true') {
       router.replace(safeRedirectPath);
     }
-  }, [logoutSuccess, router, safeRedirectPath, nonce]);
+  }, [logoutSuccess, router, safeRedirectPath, nonce, isAuthInitializing]);
 
-  return <Loader text={tAuth('redirecting')} />;
+  const getLoaderKey = () => {
+    if (nonce) return 'signingIn';
+    if (logoutSuccess === 'true') return 'signingOut';
+    return 'redirecting';
+  };
+
+  return <Loader text={tAuth(getLoaderKey())} />;
 }
