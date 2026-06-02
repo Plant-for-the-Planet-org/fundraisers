@@ -43,6 +43,24 @@ Domain concerns (response shaping, field-level error mapping, retries) belong in
 
 <!-- Code style notes, naming, file layout patterns, comment policy. -->
 
+### next-intl: use `t.rich` for inline elements
+
+When a translation string contains an inline element (link, bold, etc.), use `t.rich` — never split it into `{t('key')} <a>...</a>`.
+
+```tsx
+// Bad
+{t('attribution.photoBy')}{' '}
+<a href={url}>{photo.user.name}</a>
+
+// Good — embed the tag in the translation string and use t.rich
+{t.rich('attribution.photoBy', {
+  name: photo.user.name,
+  photographerLink: chunks => <a href={url}>{chunks}</a>,
+})}
+```
+
+Translation key: `"photoBy": "Photo by <photographerLink>{name}</photographerLink>"`
+
 ## Auth
 
 <!-- Auth0 setup, token flow, how to test authenticated paths locally. -->
