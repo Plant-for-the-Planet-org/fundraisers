@@ -20,9 +20,8 @@ import {
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
-import { STAGE_LIMITS } from '@/modules/stage';
-
 import { routing } from '@/i18n/routing';
+import { STAGE_LIMITS } from '@/modules/stage';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,

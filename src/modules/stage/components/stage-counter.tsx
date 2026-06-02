@@ -1,12 +1,12 @@
 'use client';
 
-import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { HighlightImpactUnit } from '@/lib/types/alltime-stats';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
-import { useAlltimeStats } from '../hooks/use-alltime-stats';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { useAlltimeStats } from '../hooks/use-alltime-stats';
 import { GlassPanel } from './glass-panel';
 
 interface StageCounterProps {
@@ -62,7 +62,10 @@ export function StageCounter({
         return {
           value: raised,
           label: t('raisedSoFar'),
-          display: formatCurrencyFromDecimal(raised, currency, { locale, compact: true }),
+          display: formatCurrencyFromDecimal(raised, currency, {
+            locale,
+            compact: true,
+          }),
         };
     }
   }
@@ -99,7 +102,10 @@ export function StageCounter({
         <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
           <span>
             {t('ofGoal', {
-              goal: formatCurrencyFromDecimal(goal, currency, { locale, compact: true }),
+              goal: formatCurrencyFromDecimal(goal, currency, {
+                locale,
+                compact: true,
+              }),
             })}
           </span>
           <span>{pct}%</span>
@@ -162,7 +168,10 @@ export function StageCounter({
               className='text-[22px] font-bold'
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              {formatCurrencyFromDecimal(raised, currency, { locale, compact: true })}
+              {formatCurrencyFromDecimal(raised, currency, {
+                locale,
+                compact: true,
+              })}
             </span>
             <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
               {t('raised')}

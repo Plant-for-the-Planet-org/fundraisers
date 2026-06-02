@@ -19,7 +19,9 @@ export function useAlltimeStats(slug: string) {
 
     async function poll() {
       try {
-        const result = await getAlltimeStats(slug, { cacheBuster: stageHash() });
+        const result = await getAlltimeStats(slug, {
+          cacheBuster: stageHash(),
+        });
         if (!cancelled) {
           setData(result);
           setOffline(false);

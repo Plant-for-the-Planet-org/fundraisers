@@ -20,9 +20,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { STAGE_LIMITS } from '../constants';
-
 import { routing } from '@/i18n/routing';
+import { STAGE_LIMITS } from '../constants';
 
 const LOCALE_OPTIONS: Record<string, string> = {
   en: '🇬🇧 English',
