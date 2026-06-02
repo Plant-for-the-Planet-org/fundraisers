@@ -143,14 +143,13 @@
         },
         "overlay": {
           "title": "Select an image",
-          "subtitle": "Or choose from",
+          "subtitle": "Or choose from <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Drag and drop or click to upload",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },
         "attribution": {
-          "photoBy": "Photo by",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Photo by <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Image must be {maxMb}MB or smaller.",

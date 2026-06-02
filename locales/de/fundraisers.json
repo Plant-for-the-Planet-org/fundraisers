@@ -143,14 +143,13 @@
         },
         "overlay": {
           "title": "Wähle ein Bild aus",
-          "subtitle": "Oder wähle auf",
+          "subtitle": "Oder wähle auf <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
         },
         "attribution": {
-          "photoBy": "Foto von",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Foto von <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Das Bild darf maximal {maxMb}MB groß sein.",

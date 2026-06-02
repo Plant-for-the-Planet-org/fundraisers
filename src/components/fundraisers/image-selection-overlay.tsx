@@ -253,15 +253,18 @@ export function ImageSelectionOverlay({
                 {t('overlay.title')}
               </h2>
               <p className='text-sm text-gray-500 dark:text-zinc-400'>
-                {t('overlay.subtitle')}{' '}
-                <a
-                  href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
-                >
-                  {t('attribution.unsplashLink')}
-                </a>
+                {t.rich('overlay.subtitle', {
+                  unsplashLink: chunks => (
+                    <a
+                      href='https://unsplash.com/?utm_source=plant-for-the-planet&utm_medium=referral'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-600 hover:text-blue-800 underline dark:text-blue-400 dark:hover:text-blue-300'
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                })}
               </p>
             </div>
             <button
@@ -420,18 +423,22 @@ export function ImageSelectionOverlay({
 
                       <div className='absolute inset-0 bg-black/50 flex items-end p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-lg'>
                         <div className='text-white text-xs pointer-events-auto'>
-                          {t('attribution.photoBy')}{' '}
-                          <a
-                            href={`${photo.user.links.html}?utm_source=plant-for-the-planet&utm_medium=referral`}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='underline hover:no-underline'
-                            onClick={event => {
-                              event.stopPropagation();
-                            }}
-                          >
-                            {photo.user.name}
-                          </a>
+                          {t.rich('attribution.photoBy', {
+                            name: photo.user.name,
+                            photographerLink: chunks => (
+                              <a
+                                href={`${photo.user.links.html}?utm_source=plant-for-the-planet&utm_medium=referral`}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='underline hover:no-underline'
+                                onClick={event => {
+                                  event.stopPropagation();
+                                }}
+                              >
+                                {chunks}
+                              </a>
+                            ),
+                          })}
                         </div>
                       </div>
                     </div>
