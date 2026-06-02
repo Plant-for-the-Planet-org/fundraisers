@@ -1,11 +1,11 @@
 'use client';
 
 import type { Bundle, BundleWorkspace } from '@/lib/types/bundle';
-import type { ProjectData } from '@/lib/types/project-selection';
+import type { GetProject } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
 import { Check, Eye } from 'lucide-react';
-import { getBundleProjectIds } from '@/lib/utils/bundle';
+import { getDonatableBundleProjectIds } from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 
@@ -13,7 +13,7 @@ interface BundleCardProps {
   bundle: Bundle;
   bundleWorkspace: BundleWorkspace;
   isSelected: boolean;
-  getProject: (id: string) => ProjectData;
+  getProject: GetProject;
   onSelect: () => void;
   onOpen: () => void;
 }
@@ -29,7 +29,11 @@ export function BundleCard({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-  const projectIds = getBundleProjectIds(bundle, bundleWorkspace);
+  const projectIds = getDonatableBundleProjectIds(
+    bundle,
+    bundleWorkspace,
+    getProject
+  );
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;

@@ -32,6 +32,12 @@ export interface ProjectData {
   };
 }
 
+/**
+ * Resolves a project by ID, returning a renderable record even for unknown
+ * IDs (callers get a fallback rather than `undefined`). See `useBundleProjects`.
+ */
+export type GetProject = (id: string) => ProjectData;
+
 export interface SelectedProject {
   id: string;
   name: string;

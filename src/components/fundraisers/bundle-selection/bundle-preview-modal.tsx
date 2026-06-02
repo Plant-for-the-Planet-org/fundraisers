@@ -1,14 +1,17 @@
 'use client';
 
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
-import type { ProjectData } from '@/lib/types/project-selection';
+import type { GetProject } from '@/lib/types/project-selection';
 
 import { useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
-import { getBundleProjectIds, getSupportProjectId } from '@/lib/utils/bundle';
+import {
+  getDonatableBundleProjectIds,
+  getSupportProjectId,
+} from '@/lib/utils/bundle';
 import { calculateProjectAllocations } from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
 import { SelectedProjectRow } from './selected-project-row';
@@ -18,7 +21,7 @@ interface BundlePreviewModalProps {
   bundleWorkspace: BundleWorkspace;
   activeTab: Exclude<BundleTabId, 'custom'>;
   isOpen: boolean;
-  getProject: (id: string) => ProjectData;
+  getProject: GetProject;
   onClose: () => void;
   onUseBundle: (bundle: Bundle) => void;
 }
@@ -40,8 +43,8 @@ export function BundlePreviewModal({
   useModalDialog({ isOpen, onClose, dialogRef });
 
   const projectIds = useMemo(
-    () => getBundleProjectIds(bundle, bundleWorkspace),
-    [bundle, bundleWorkspace]
+    () => getDonatableBundleProjectIds(bundle, bundleWorkspace, getProject),
+    [bundle, bundleWorkspace, getProject]
   );
   const supportProjectId = getSupportProjectId(bundleWorkspace);
 

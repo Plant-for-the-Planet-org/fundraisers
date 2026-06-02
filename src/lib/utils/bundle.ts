@@ -1,4 +1,5 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type { GetProject } from '@/lib/types/project-selection';
 
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
@@ -45,6 +46,19 @@ export function getBundleProjectIds(
   workspace: BundleWorkspace
 ): string[] {
   return [getSupportProjectId(workspace), ...bundle.projectIds];
+}
+/**
+ * Bundle project IDs with non-donatable projects removed.
+ * Used to hide projects that no longer accept donations.
+ */
+export function getDonatableBundleProjectIds(
+  bundle: Bundle,
+  workspace: BundleWorkspace,
+  getProject: GetProject
+): string[] {
+  return getBundleProjectIds(bundle, workspace).filter(
+    id => getProject(id).allowDonations
+  );
 }
 
 /**

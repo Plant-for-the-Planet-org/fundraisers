@@ -1,6 +1,6 @@
 'use client';
 
-import type { ProjectData } from '@/lib/types/project-selection';
+import type { GetProject, ProjectData } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,7 +22,7 @@ interface UseBundleProjectsResult {
    * (the country's default cause gets the canonical fallback name/image;
    * other unknown IDs get a minimal placeholder).
    */
-  getProject: (id: string) => ProjectData;
+  getProject: GetProject;
 }
 
 /**
@@ -89,12 +89,14 @@ export function useBundleProjects(
         };
       }
 
+      // Unknown projects are treated as non-donatable so they are hidden
+      // from bundle views.
       return {
         id,
         name: t('unknownProject'),
         description: '',
         country: '',
-        allowDonations: true,
+        allowDonations: false,
         isTopProject: false,
       };
     },
