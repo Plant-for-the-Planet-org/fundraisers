@@ -107,8 +107,8 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} gesammelt",
-        "goalLine": "von {amount} gesammelt",
+        "raised": "{amount}",
+        "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
       "theme": {
