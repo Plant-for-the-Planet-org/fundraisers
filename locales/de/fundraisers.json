@@ -55,12 +55,12 @@
         "saved": {
           "cardLabel": "{brand} •••• {last4}",
           "sepaLabel": "•••• {last4}",
-          "cardLabelAria": "{brand}-Karte endend auf {last4}",
-          "sepaLabelAria": "Bankkonto endend auf {last4}",
+          "cardLabelAria": "{brand} Karte endet mit {last4}",
+          "sepaLabelAria": "Bankkonto endet mit {last4}",
           "expiringSoon": "Läuft bald ab",
-          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. sie funktioniert möglicherweise nicht für eine zukünftige monatliche Spende.",
-          "newCard": "Neue Karte verwenden",
-          "newSepa": "Neues Bankkonto verwenden"
+          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. Es kann sein, dass sie für eine zukünftige monatliche Spende nicht mehr funktioniert.",
+          "newCard": "Verwende eine neue Karte",
+          "newSepa": "Verwende ein neues Bankkonto"
         },
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
@@ -107,8 +107,8 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} ",
-        "goalLine": "von {amount} gesammelt",
+        "raised": "{amount} gesammelt",
+        "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
       "theme": {
@@ -182,7 +182,7 @@
         },
         "overlay": {
           "title": "Wähle ein Bild aus",
-          "subtitle": "Oder wähle auf <unsplashLink>Unsplash</unsplashLink>",
+          "subtitle": "Oder wähle von <unsplashLink>Unsplash</unsplashLink> aus",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
