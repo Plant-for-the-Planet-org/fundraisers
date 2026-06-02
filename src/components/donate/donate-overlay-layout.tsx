@@ -16,6 +16,7 @@ export function DonateOverlayLayout({
   return (
     <div
       className='light fixed inset-0 z-50 bg-gray-50 text-foreground overflow-auto'
+      data-scroll-container
       role='dialog'
       aria-modal='true'
       aria-label={tDonate('overlay.aria.label')}

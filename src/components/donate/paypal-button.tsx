@@ -7,9 +7,10 @@ import type {
 } from '@paypal/react-paypal-js';
 import type { DonationFormValues } from './donation-form-context';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { scrollToFirstError } from '@/lib/utils/scroll-into-view';
 import { useDonationForm } from './donation-form-context';
 
 interface PayPalButtonProps {
@@ -66,9 +67,17 @@ function PayPalButtonsInner({
   const [isProcessing, setIsProcessing] = useState(false);
   const { trigger, getValues } = useFormContext<DonationFormValues>();
 
+  // Distinguishes a form-validation abort (handled inline by scrolling to the
+  // bad field) from a genuine PayPal payment error (which shows the banner).
+  const validationAbortedRef = useRef(false);
+
   const createOrder: PayPalButtonsComponentProps['createOrder'] = async () => {
     const isValid = await trigger();
     if (!isValid) {
+      validationAbortedRef.current = true;
+      requestAnimationFrame(() => {
+        scrollToFirstError()?.focus?.();
+      });
       throw new Error('Form validation failed');
     }
     return onPayPalCreateOrder(getValues());
@@ -84,6 +93,12 @@ function PayPalButtonsInner({
   };
 
   const onError: PayPalButtonsComponentProps['onError'] = () => {
+    // A failed `trigger()` rejects createOrder, which PayPal surfaces here.
+    // That is not a payment error — the field scroll already handled it.
+    if (validationAbortedRef.current) {
+      validationAbortedRef.current = false;
+      return;
+    }
     onPayPalError();
   };
 
