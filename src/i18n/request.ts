@@ -35,10 +35,12 @@ export default getRequestConfig(async () => {
     .filter((ns): ns is string => Boolean(ns));
 
   const namespaces = [...CORE_NAMESPACES, ...moduleNamespaces];
-  const loaded = await Promise.all(namespaces.map(ns => loadNamespace(locale, ns)));
+  const loadedMessages = await Promise.all(
+    namespaces.map(ns => loadNamespace(locale, ns))
+  );
 
   return {
     locale,
-    messages: Object.assign({}, ...loaded),
+    messages: Object.assign({}, ...loadedMessages),
   };
 });
