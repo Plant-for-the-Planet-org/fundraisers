@@ -3,7 +3,7 @@
     "startFundraiser": "Spendenaufruf erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
-    "amountRaised": "{formattedAmountWithCurrency}",
+    "amountRaised": "{formattedAmountWithCurrency} gesammelt",
     "hostedBy": "von {hostName}",
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
@@ -55,12 +55,12 @@
         "saved": {
           "cardLabel": "{brand} •••• {last4}",
           "sepaLabel": "•••• {last4}",
-          "cardLabelAria": "{brand}-Karte endend auf {last4}",
-          "sepaLabelAria": "Bankkonto endend auf {last4}",
+          "cardLabelAria": "{brand} Karte endet mit {last4}",
+          "sepaLabelAria": "Bankkonto endet mit {last4}",
           "expiringSoon": "Läuft bald ab",
-          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. sie funktioniert möglicherweise nicht für eine zukünftige monatliche Spende.",
-          "newCard": "Neue Karte verwenden",
-          "newSepa": "Neues Bankkonto verwenden"
+          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. Es kann sein, dass sie für eine zukünftige monatliche Spende nicht mehr funktioniert.",
+          "newCard": "Verwende eine neue Karte",
+          "newSepa": "Verwende ein neues Bankkonto"
         },
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
@@ -107,7 +107,7 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} ",
+        "raised": "{amount} gesammelt",
         "goalLine": "von {amount} gesammelt",
         "daysLeft": "{days, number}T übrig"
       },
@@ -182,7 +182,7 @@
         },
         "overlay": {
           "title": "Wähle ein Bild aus",
-          "subtitle": "Oder wähle auf <unsplashLink>Unsplash</unsplashLink>",
+          "subtitle": "Oder wähle von <unsplashLink>Unsplash</unsplashLink> aus",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
