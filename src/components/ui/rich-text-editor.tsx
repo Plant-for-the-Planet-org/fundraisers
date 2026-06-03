@@ -25,6 +25,8 @@ interface RichTextEditorProps {
   onBlur?: () => void;
   placeholder?: string;
   className?: string;
+  /** Extra classes applied to the editable area (`contenteditable` div) where the user types (e.g. `pr-10` to reserve space for an character counter). */
+  editableAreaClassName?: string;
   ariaInvalid?: boolean;
   ariaDescribedBy?: string;
   /** Optional actions rendered right-aligned in the toolbar (e.g. a suggestions button). */
@@ -81,6 +83,7 @@ export function RichTextEditor({
   onBlur,
   placeholder = 'Tell your story...',
   className,
+  editableAreaClassName,
   ariaInvalid = false,
   ariaDescribedBy,
   extraToolbarActions,
@@ -112,8 +115,10 @@ export function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class:
+        class: cn(
           'min-h-[120px] p-3 text-sm text-foreground leading-[1.625] focus:outline-none',
+          editableAreaClassName
+        ),
         ...(ariaInvalid ? { 'aria-invalid': 'true' } : {}),
         ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
       },

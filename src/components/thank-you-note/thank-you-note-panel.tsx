@@ -80,6 +80,7 @@ export function ThankYouNotePanel() {
               onBlur={messageField.onBlur}
               placeholder={t('editorPlaceholder')}
               aria-label={t('messageLabel')}
+              editableAreaClassName='pr-10'
               extraToolbarActions={
                 <button
                   type='button'

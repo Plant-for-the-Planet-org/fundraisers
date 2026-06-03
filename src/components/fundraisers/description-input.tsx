@@ -42,6 +42,7 @@ export default function DescriptionInput() {
               className={cn(
                 hasDescriptionError && 'border-b border-destructive'
               )}
+              editableAreaClassName='pr-10'
               value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}
