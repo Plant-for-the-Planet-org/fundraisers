@@ -156,7 +156,7 @@ export function ThemeSettings() {
           onClick={toggleBrowse}
           className={cn(
             'inline-flex items-center px-2.5 h-8 rounded-md border border-border text-xs font-semibold',
-            isCustomizing ? 'bg-muted/40' : 'bg-transparent hover:bg-muted/20'
+            isCustomizing ? 'bg-muted/40' : 'bg-background hover:bg-muted/20'
           )}
         >
           {isCustomizing ? tTheme('browse') : tTheme('done')}
@@ -233,7 +233,7 @@ function IconButton({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className='inline-flex items-center justify-center w-8 h-8 rounded-md border border-border bg-transparent hover:bg-muted/30 text-foreground'
+      className='inline-flex items-center justify-center w-8 h-8 rounded-md border border-border bg-background hover:bg-muted/30 text-foreground'
       {...rest}
     >
       {children}

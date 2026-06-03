@@ -106,7 +106,7 @@ function AnimationRow({
             onClick={() => onChange(id)}
             aria-pressed={active}
             className={cn(
-              'inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-semibold',
+              'inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-semibold bg-background',
               active
                 ? 'border-foreground'
                 : 'border-border hover:border-foreground/40'
@@ -206,9 +206,9 @@ function DecorationRow({
               key={id}
               onClick={() => onChange(id)}
               className={cn(
-                'inline-flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-md border text-[11px] font-semibold',
+                'inline-flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-md border text-[11px] font-semibold bg-background',
                 active
-                  ? 'border-foreground bg-muted/30'
+                  ? 'border-foreground bg-muted'
                   : 'border-border hover:border-foreground/40'
               )}
               aria-pressed={active}
@@ -341,7 +341,7 @@ function ImagePanel({
               key={mode}
               onClick={() => onMode(mode)}
               className={cn(
-                'px-2 py-1 rounded-md border text-xs font-semibold',
+                'px-2 py-1 rounded-md border text-xs font-semibold bg-background',
                 active
                   ? 'border-foreground'
                   : 'border-border hover:border-foreground/40'
