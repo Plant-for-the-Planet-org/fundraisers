@@ -7,6 +7,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { StageMenuItem, StageSection } from '@/components/stage/stage-settings';
+import { ThankYouNotePanel } from '@/components/thank-you-note/thank-you-note-panel';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -125,6 +126,8 @@ export function Options() {
         onValue='public'
         offValue='unlisted'
       />
+
+      <ThankYouNotePanel />
 
       <StageSection />
     </div>

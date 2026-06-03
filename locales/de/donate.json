@@ -206,6 +206,8 @@
       "success": "Spende erfolgreich"
     },
     "thankYou": {
+      "hostMessageHeading": "{count, plural, one {Nachricht von der Gastgeber*in} other {Nachricht von den Gastgeber*innen}}",
+      "hostMessageSignature": "– {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",
         "bankTransferPending": "Danke, dass du deine Spende überweisen möchtest",
@@ -254,12 +256,12 @@
         "bank": "Bank",
         "detailsTab": "Details",
         "qrTab": "QR-Code",
-        "qrAlt": "EPC-QR-Code für SEPA-Überweisung",
+        "qrAlt": "EPC QR-Code für SEPA-Überweisung",
         "qrBadge": "SEPA-Überweisungscode",
-        "qrHint": "Banking-App öffnen zum Scannen",
-        "qrCameraWarning": "Die Kamera-App deines Handys funktioniert nicht. Nutze den QR-Scanner in Deutsche Bank, Sparkasse, Revolut und den meisten EU-Banking-Apps.",
-        "qrFallback": "QR-Code nicht verfügbar, bitte den Tab „Details“ verwenden.",
-        "error": "Überweisungsdetails nicht gefunden, bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
+        "qrHint": "Öffne deine Banking-App zum Scannen",
+        "qrCameraWarning": "Die Kamera-App deines Telefons wird nicht funktionieren. Verwende den QR-Scanner der Deutschen Bank, Sparkasse, Revolut und der meisten EU-Banking-Apps.",
+        "qrFallback": "QR-Code nicht verfügbar, verwende bitte die Registerkarte Details.",
+        "error": "Überweisungsdetails nicht gefunden, bitte wende dich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
       },
       "copy": {
         "label": "Kopieren {field}",

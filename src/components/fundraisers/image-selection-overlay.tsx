@@ -306,7 +306,6 @@ export function ImageSelectionOverlay({
               <div className='text-sm font-medium text-zinc-900 dark:text-zinc-100'>
                 {t('overlay.uploadTitle')}
               </div>
-
             </div>
           </div>
 
