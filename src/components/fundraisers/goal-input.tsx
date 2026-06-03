@@ -46,7 +46,11 @@ export function GoalInput() {
 
   return (
     <div className='goal-input flex flex-col gap-2'>
-      <label className='text-sm font-medium' htmlFor='form-goal-amount'>
+      <label
+        className='text-sm font-medium'
+        htmlFor='form-goal-amount'
+        style={{ fontFamily: 'var(--theme-title-font)' }}
+      >
         {t('label')}
       </label>
       <div className='relative'>
