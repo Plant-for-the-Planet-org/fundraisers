@@ -30,6 +30,32 @@ function toSafeHtml(html: string): SafeHtml {
   return html as SafeHtml;
 }
 
+const THANK_YOU_ALLOWED_TAGS = [
+  'p',
+  'strong',
+  'b',
+  'em',
+  'u',
+  's',
+  'ul',
+  'ol',
+  'li',
+  'hr',
+  'br',
+  'span',
+  'blockquote',
+];
+
+export function sanitizeThankYouHtml(dirty: string): SafeHtml {
+  const clean = sanitizeHtml(dirty, {
+    allowedTags: THANK_YOU_ALLOWED_TAGS,
+    allowedAttributes: {},
+    allowedSchemes: [],
+    allowProtocolRelative: false,
+  });
+  return toSafeHtml(clean);
+}
+
 export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: DESCRIPTION_ALLOWED_TAGS,

@@ -40,6 +40,13 @@ function isStageDirty(dirty: UpdateDirtyFields): boolean {
   return true;
 }
 
+function isThankYouNoteDirty(dirty: UpdateDirtyFields): boolean {
+  const thankYouNote = dirty.settings?.modules?.thankYouNote;
+  if (!thankYouNote) return false;
+  if (typeof thankYouNote === 'boolean') return thankYouNote;
+  return true;
+}
+
 function isProjectAllocationsDirty(dirty: UpdateDirtyFields): boolean {
   const allocations = dirty.projectAllocations;
   if (!allocations) return false;
@@ -108,6 +115,7 @@ export function buildUpdateFundraiserRequest(
     isThemeDirty(dirtyFields) ||
     isLeaderboardDirty(dirtyFields) ||
     isStageDirty(dirtyFields) ||
+    isThankYouNoteDirty(dirtyFields) ||
     isBundleDirty(dirtyFields);
 
   if (isSettingsDirty) {
@@ -121,6 +129,7 @@ export function buildUpdateFundraiserRequest(
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
         stage: values.settings.modules.stage,
+        thankYouNote: values.settings.modules.thankYouNote,
       },
     };
   }
@@ -149,6 +158,7 @@ export function buildCreateFundraiserRequest(
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
+        thankYouNote: values.settings.modules.thankYouNote,
       },
     },
     startDate: getTodayString(),

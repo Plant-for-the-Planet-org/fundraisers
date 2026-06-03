@@ -80,6 +80,11 @@ export interface StageModuleSettings {
   show_progress_bar?: boolean;
 }
 
+export interface ThankYouNoteModuleSettings {
+  enabled: boolean;
+  message: string;
+}
+
 export interface FundraiserSettings {
   theme: FundraiserThemeSettings;
   modules: {
@@ -88,6 +93,7 @@ export interface FundraiserSettings {
       slug: string | null;
     };
     stage?: StageModuleSettings | null;
+    thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
       options: Array<{
         unit?: number;

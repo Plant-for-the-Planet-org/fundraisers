@@ -8,7 +8,7 @@
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
     "unknownHost": "Unbekannt",
-    "anonymousHost": "Anonymer Gastgeber*in",
+    "anonymousHost": "{count, plural, one {Anonymer Gastgeber*in} other {Anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
@@ -158,7 +158,8 @@
         "label": "Beschreibung",
         "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
         "errors": {
-          "required": "Gib eine Beschreibung für den Spendenaufruf ein."
+          "required": "Gib eine Beschreibung für den Spendenaufruf ein.",
+          "tooLong": "Die Beschreibung darf höchstens {max} Zeichen lang sein."
         }
       },
       "image": {
@@ -281,6 +282,19 @@
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
           "maxSlidesReached": "Maximum von {max} Folien erreicht"
+        },
+        "thankYouNote": {
+          "title": "Dankesnachricht",
+          "subtitle": "Wird nach der Spende und in der E-Mail an deine Spender angezeigt",
+          "toggleEnabled": "Dankesnachricht umschalten",
+          "messageLabel": "Nachricht verfassen",
+          "editorPlaceholder": "Schreibe deine Dankesnachricht...",
+          "suggestionsButton": "Vorschläge",
+          "suggestionsTitle": "Nachrichtenvorschläge",
+          "suggestionsSubtitle": "Wähle eine fertige Nachricht und passe sie an.",
+          "suggestionsHeading": "Vorschläge",
+          "moreTemplates": "Andere Vorlagen",
+          "allTemplates": "Vorlagen"
         }
       },
       "contributionSettings": {
