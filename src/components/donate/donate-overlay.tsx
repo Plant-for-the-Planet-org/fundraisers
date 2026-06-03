@@ -7,7 +7,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
@@ -132,10 +132,13 @@ function DonateOverlayInner({
   }, [error?.code]);
 
   const thankYouModule = fundraiser.settings?.modules?.thankYouNote;
-  const customThankYouMessage =
-    thankYouModule?.enabled && thankYouModule?.message
-      ? sanitizeThankYouHtml(thankYouModule.message)
-      : null;
+  const customThankYouMessage = useMemo(
+    () =>
+      thankYouModule?.enabled && thankYouModule?.message
+        ? sanitizeThankYouHtml(thankYouModule.message)
+        : null,
+    [thankYouModule]
+  );
 
   const leftColumn = thankYouState ? (
     <DonationThankYou
