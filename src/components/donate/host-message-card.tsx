@@ -24,13 +24,10 @@ export function HostMessageCard({
   // consider showing initials or a customisable anonymous label per host.
   const isAnonymous = publicHosts.length === 0;
   const names: string[] = isAnonymous
-    ? [
-        hosts.length > 1
-          ? tFundraisers('anonymousHost') + 's'
-          : tFundraisers('anonymousHost'),
-      ]
+    ? [tFundraisers('anonymousHost', { count: hosts.length })]
     : publicHosts.map(
-        host => host.displayName ?? host.user?.name ?? tFundraisers('unknownHost')
+        host =>
+          host.displayName ?? host.user?.name ?? tFundraisers('unknownHost')
       );
 
   const displayNames = names.slice(0, MAX_NAMED_HOSTS);
@@ -50,7 +47,7 @@ export function HostMessageCard({
     <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white'>
       <div className='px-6 py-5'>
         <h3 className='mb-2 text-sm font-semibold text-gray-900'>
-          {t('hostMessageHeading', { count: names.length })}
+          {t('hostMessageHeading', { count: hosts.length })}
         </h3>
         <div
           className='text-sm leading-relaxed text-gray-600 [&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_blockquote]:my-1.5 [&_blockquote]:border-l-2 [&_blockquote]:border-l-gray-200 [&_blockquote]:pl-3 [&_blockquote]:italic'

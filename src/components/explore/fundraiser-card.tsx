@@ -43,7 +43,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
 
   const hostDisplay = (() => {
     const hosts = fundraiser.hosts;
-    if (hosts.length === 0) return tFundraisers('anonymousHost');
+    if (hosts.length === 0) return tFundraisers('anonymousHost', { count: 1 });
 
     const firstHost = hosts[0];
     // Although we expect user to be always present, keeping a fallback to avoid runtime errors in case of unexpected data

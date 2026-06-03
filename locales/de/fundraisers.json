@@ -8,7 +8,7 @@
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
     "unknownHost": "Unbekannt",
-    "anonymousHost": "Anonymer Gastgeber*in",
+    "anonymousHost": "{count, plural, one {Anonymer Gastgeber*in} other {Anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
     "amountRaisedLabel": "Gesammelter Betrag",
