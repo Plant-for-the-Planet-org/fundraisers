@@ -3,7 +3,12 @@
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import {
+  Controller,
+  useController,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Sparkles } from 'lucide-react';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
@@ -19,22 +24,27 @@ export function ThankYouNotePanel() {
 
   const { control, setValue } = useFormContext<FundraiserFormValues>();
 
-  const [enabled, messageVal, title, bundleSlug] = useWatch({
+  const { field: messageField } = useController({
+    control,
+    name: 'settings.modules.thankYouNote.message',
+  });
+
+  const [enabled, title, bundleSlug] = useWatch({
     control,
     name: [
       'settings.modules.thankYouNote.enabled',
-      'settings.modules.thankYouNote.message',
       'title',
       'settings.modules.bundle.slug',
     ],
   });
 
-  const textLength = getRichTextTextContent(messageVal ?? '').length;
+  const textLength = getRichTextTextContent(messageField.value ?? '').length;
   const recommendedOccasionId = inferThankYouOccasionId(title, bundleSlug);
 
   const fillMessage = (html: string) => {
     setValue('settings.modules.thankYouNote.message', html, {
       shouldDirty: true,
+      shouldValidate: true,
     });
   };
 
@@ -64,32 +74,26 @@ export function ThankYouNotePanel() {
         <div className='mt-3 rounded-lg bg-white dark:bg-background p-4'>
           {/* Rich text editor */}
           <div className='relative'>
-            <Controller
-              control={control}
-              name='settings.modules.thankYouNote.message'
-              render={({ field }) => (
-                <RichTextEditor
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  placeholder={t('editorPlaceholder')}
-                  aria-label={t('messageLabel')}
-                  extraToolbarActions={
-                    <button
-                      type='button'
-                      onClick={() => setSuggestionsOpen(true)}
-                      title={t('suggestionsTitle')}
-                      aria-label={t('suggestionsTitle')}
-                      className='h-8 inline-flex items-center gap-1.5 rounded-md px-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                    >
-                      <Sparkles className='h-4 w-4' />
-                      <span className='hidden sm:inline'>
-                        {t('suggestionsButton')}
-                      </span>
-                    </button>
-                  }
-                />
-              )}
+            <RichTextEditor
+              value={messageField.value}
+              onChange={messageField.onChange}
+              onBlur={messageField.onBlur}
+              placeholder={t('editorPlaceholder')}
+              aria-label={t('messageLabel')}
+              extraToolbarActions={
+                <button
+                  type='button'
+                  onClick={() => setSuggestionsOpen(true)}
+                  title={t('suggestionsTitle')}
+                  aria-label={t('suggestionsTitle')}
+                  className='h-8 inline-flex items-center gap-1.5 rounded-md px-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                >
+                  <Sparkles className='h-4 w-4' />
+                  <span className='hidden sm:inline'>
+                    {t('suggestionsButton')}
+                  </span>
+                </button>
+              }
             />
             <div className='pointer-events-none absolute bottom-2 right-3'>
               <CharCount
