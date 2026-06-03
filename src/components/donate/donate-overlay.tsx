@@ -132,20 +132,19 @@ function DonateOverlayInner({
   }, [error?.code]);
 
   const thankYouModule = fundraiser.settings?.modules?.thankYouNote;
-  const customThankYouMessage = useMemo(
-    () =>
+  const hostMessageConfig = useMemo(() => {
+    const message =
       thankYouModule?.enabled && thankYouModule?.message
         ? sanitizeThankYouHtml(thankYouModule.message)
-        : null,
-    [thankYouModule]
-  );
+        : null;
+    return message ? { message, hosts: fundraiser.hosts ?? [] } : null;
+  }, [thankYouModule, fundraiser.hosts]);
 
   const leftColumn = thankYouState ? (
     <DonationThankYou
       thankYouState={thankYouState}
       fundraiserSlug={fundraiser.slug}
-      hosts={fundraiser.hosts ?? []}
-      customThankYouMessage={customThankYouMessage}
+      hostMessageConfig={hostMessageConfig}
     />
   ) : (
     <>

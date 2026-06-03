@@ -11,18 +11,21 @@ import { HostMessageCard } from './host-message-card';
 import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
 
+interface HostMessageConfig {
+  message: SafeHtml;
+  hosts: FundraiserHost[];
+}
+
 interface DonationThankYouProps {
   thankYouState: ThankYouState;
   fundraiserSlug: string;
-  hosts: FundraiserHost[];
-  customThankYouMessage?: SafeHtml | null;
+  hostMessageConfig: HostMessageConfig | null;
 }
 
 export function DonationThankYou({
   thankYouState,
   fundraiserSlug,
-  hosts,
-  customThankYouMessage,
+  hostMessageConfig,
 }: DonationThankYouProps) {
   let card: ReactNode;
   let hostMessageCard: ReactNode = null;
@@ -61,9 +64,12 @@ export function DonationThankYou({
       break;
     default:
       card = <ThankYouCard variant='completed' />;
-      if (customThankYouMessage) {
+      if (hostMessageConfig) {
         hostMessageCard = (
-          <HostMessageCard hosts={hosts} message={customThankYouMessage} />
+          <HostMessageCard
+            hosts={hostMessageConfig.hosts}
+            message={hostMessageConfig.message}
+          />
         );
       }
   }
