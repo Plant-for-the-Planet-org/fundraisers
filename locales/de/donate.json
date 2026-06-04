@@ -206,8 +206,8 @@
       "success": "Spende erfolgreich"
     },
     "thankYou": {
-      "hostMessageHeading": "{count, plural, one {Nachricht von der Gastgeber*in} other {Nachricht von den Gastgeber*innen}}",
-      "hostMessageSignature": "– {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
+      "hostMessageHeading": "{count, plural, one {Nachricht vom Gastgeber*in} other {Nachricht der Gastgeber*innen}}",
+      "hostMessageSignature": "- {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",
         "bankTransferPending": "Danke, dass du deine Spende überweisen möchtest",
