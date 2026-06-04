@@ -96,7 +96,8 @@ export function useBundleProjects(
       if (fromEdit) return fromEdit;
 
       // Unknown projects are treated as non-donatable so they are hidden
-      // from bundle views.
+      // from bundle views. `isUnknown` lets callers drop them entirely (e.g.
+      // the pre-selected bundle preview, which otherwise shows all IDs).
       return {
         id,
         name: t('unknownProject'),
@@ -104,6 +105,7 @@ export function useBundleProjects(
         country: '',
         allowDonations: false,
         isTopProject: false,
+        isUnknown: true,
       };
     },
     [projectsById, defaultCauseId, country, t, editProjectDetails]

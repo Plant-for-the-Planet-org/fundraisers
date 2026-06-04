@@ -45,10 +45,13 @@ export function BundleCard({
     getProject
   );
   // The pre-selected bundle keeps non-donatable projects visible (with an
-  // indicator); every other bundle hides them.
-  const projectIds = isPreSelected ? allProjectIds : donatableProjectIds;
+  // indicator) but drops unresolvable "unknown" placeholders for bundle-config
+  // IDs missing from the fundraiser's allocations; every other bundle hides all
+  // non-donatable projects.
+  const knownProjectIds = allProjectIds.filter(id => !getProject(id).isUnknown);
+  const projectIds = isPreSelected ? knownProjectIds : donatableProjectIds;
   const hasNonDonatable =
-    isPreSelected && donatableProjectIds.length < allProjectIds.length;
+    isPreSelected && donatableProjectIds.length < knownProjectIds.length;
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;

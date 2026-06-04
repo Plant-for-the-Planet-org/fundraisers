@@ -49,21 +49,19 @@ export function BundlePreviewModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalDialog({ isOpen, onClose, dialogRef });
 
-  // The initial bundle shows all projects. Other bundles filter out
-  // non-donatable projects and display how many were removed.
+  // The initial bundle shows its saved projects (donatable and non-donatable
+  // alike), but never the unresolvable "unknown" placeholders for bundle-config
+  // IDs missing from the fundraiser's allocations. Other bundles filter out all
+  // non-donatable projects. Either way, anything dropped from the full bundle is
+  // surfaced via `removedCount` so the modal explains why fewer than 5 render.
   const { projectIds, removedCount } = useMemo(() => {
     const allIds = getBundleProjectIds(bundle, bundleWorkspace);
-    if (isPreSelected) {
-      return { projectIds: allIds, removedCount: 0 };
-    }
-    const donatableIds = getDonatableBundleProjectIds(
-      bundle,
-      bundleWorkspace,
-      getProject
-    );
+    const visibleIds = isPreSelected
+      ? allIds.filter(id => !getProject(id).isUnknown)
+      : getDonatableBundleProjectIds(bundle, bundleWorkspace, getProject);
     return {
-      projectIds: donatableIds,
-      removedCount: allIds.length - donatableIds.length,
+      projectIds: visibleIds,
+      removedCount: allIds.length - visibleIds.length,
     };
   }, [isPreSelected, bundle, bundleWorkspace, getProject]);
   const supportProjectId = getSupportProjectId(bundleWorkspace);

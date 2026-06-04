@@ -30,6 +30,13 @@ export interface ProjectData {
     name: string;
     image?: string;
   };
+  /**
+   * True only for the synthetic placeholder `getProject` returns when an ID
+   * cannot be resolved (not in the cause-selectable API, not the default cause,
+   * and not in the edited fundraiser's allocations). Callers use it to skip
+   * rendering unresolvable bundle-config projects. See `useBundleProjects`.
+   */
+  isUnknown?: boolean;
 }
 
 /**
