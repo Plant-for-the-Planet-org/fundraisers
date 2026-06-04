@@ -53,7 +53,11 @@ export function WorkspaceSelector({
 
   return (
     <div className='workspace-selector flex flex-col gap-2'>
-      <label className='text-sm font-medium' htmlFor='form-country'>
+      <label
+        className='text-sm font-medium'
+        htmlFor='form-country'
+        style={{ fontFamily: 'var(--theme-title-font)' }}
+      >
         {t('label')}
       </label>
       <Select

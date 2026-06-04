@@ -77,7 +77,11 @@ function TitleInput({
   return (
     <div className='flex flex-col gap-2'>
       <div className='flex items-baseline justify-between gap-2'>
-        <label htmlFor={inputId} className='text-sm font-medium'>
+        <label
+          htmlFor={inputId}
+          className='text-sm font-medium'
+          style={{ fontFamily: 'var(--theme-title-font)' }}
+        >
           {label}
           <span aria-hidden='true' className='text-destructive ml-0.5'>
             *
