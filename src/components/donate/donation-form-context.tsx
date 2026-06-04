@@ -222,6 +222,9 @@ export function DonationFormProvider({
     reValidateMode: 'onChange',
   });
 
+  // Registers fields that are controlled programmatically so they appear in RHF DevTools.
+  // No cleanup: plain `unregister` removes field values, causing RHF to recompute `isValid` — required fields fail Zod and the wallet button becomes disabled (visible immediately in React StrictMode).
+  // Use `unregister(name, { keepValue: true })` if cleanup is ever added.
   useEffect(() => {
     methods.register('country');
     methods.register('selectedPaymentMethod');

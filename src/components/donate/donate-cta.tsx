@@ -42,6 +42,8 @@ export function DonateCTA({
   onWalletCancel,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
+  // TODO: onSubmit comes from DonationFormContext; wallet/PayPal callbacks come via props.
+  // Consider moving all submission handlers to context for consistency.
   const { donationData, onSubmit } = useDonationForm();
   const { handleSubmit } = useFormContext<DonationFormValues>();
 
