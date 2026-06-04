@@ -62,42 +62,65 @@ export function getDonatableBundleProjectIds(
 }
 
 /**
- * Allocations with a 25% floor on the support project (always index 0).
- * 5-project bundle → support 28%, others 18% each.
+ * Allocations with a 25% minimum for the support project (index 0).
+ * Example: a 5-project bundle gets 28% for support and 18% for each other project.
+ *
+ * When `getProject` is provided, non-donatable projects are excluded from the
+ * allocation and their share is redistributed among donatable projects, then
+ * added back with `percentage: 0` so the API receives the full bundle list.
+ * These 0% entries are ignored by donation flows and hidden in the UI. Both the
+ * create and edit forms pass `getProject` for this reason.
  */
 export function bundleToAllocations(
   bundle: Bundle,
-  workspace: BundleWorkspace
+  workspace: BundleWorkspace,
+  getProject?: GetProject
 ): Array<{ project_id: string; percentage: number }> {
   // `getBundleProjectIds` always returns at least the support project,
   // so `supportId` is guaranteed to be a string.
-  const ids = getBundleProjectIds(bundle, workspace);
+  const ids = getProject
+    ? getDonatableBundleProjectIds(bundle, workspace, getProject)
+    : getBundleProjectIds(bundle, workspace);
   const [supportId, ...otherIds] = ids as [string, ...string[]];
 
   const equalShare = Math.floor(100 / ids.length);
 
-  // Path 1 — equal split is already generous enough for the support project.
+  let allocations: Array<{ project_id: string; percentage: number }>;
+
   if (equalShare >= MIN_DEFAULT_CAUSE_PERCENT) {
+    // Path 1 — equal split is already generous enough for the support project.
     const remainder = 100 - equalShare * ids.length;
-    return ids.map((project_id, index) => ({
+    allocations = ids.map((project_id, index) => ({
       project_id,
       percentage: equalShare + (index === 0 ? remainder : 0),
     }));
+  } else {
+    // Path 2 — boost the support project to the 25% floor.
+    const remainingPercent = 100 - MIN_DEFAULT_CAUSE_PERCENT;
+    const otherShare = Math.floor(remainingPercent / otherIds.length);
+    const remainder = remainingPercent - otherShare * otherIds.length;
+
+    allocations = [
+      {
+        project_id: supportId,
+        percentage: MIN_DEFAULT_CAUSE_PERCENT + remainder,
+      },
+      ...otherIds.map(project_id => ({
+        project_id,
+        percentage: otherShare,
+      })),
+    ];
   }
 
-  // Path 2 — boost the support project to the 25% floor.
-  const remainingPercent = 100 - MIN_DEFAULT_CAUSE_PERCENT;
-  const otherShare = Math.floor(remainingPercent / otherIds.length);
-  const remainder = remainingPercent - otherShare * otherIds.length;
+  // Non-donatable projects remain in the payload with 0% allocation instead of
+  // being dropped, so the API receives the full bundle list.
+  if (getProject) {
+    const donatable = new Set(ids);
+    const zeroAllocations = getBundleProjectIds(bundle, workspace)
+      .filter(id => !donatable.has(id))
+      .map(project_id => ({ project_id, percentage: 0 }));
+    return [...allocations, ...zeroAllocations];
+  }
 
-  return [
-    {
-      project_id: supportId,
-      percentage: MIN_DEFAULT_CAUSE_PERCENT + remainder,
-    },
-    ...otherIds.map(project_id => ({
-      project_id,
-      percentage: otherShare,
-    })),
-  ];
+  return allocations;
 }

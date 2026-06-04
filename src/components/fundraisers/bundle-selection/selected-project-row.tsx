@@ -4,7 +4,7 @@ import type { ProjectData } from '@/lib/types/project-selection';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Target, X } from 'lucide-react';
+import { Info, Target, X } from 'lucide-react';
 import { buildProjectUrl } from '@/lib/utils/bundle';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 import { useCountryLabel } from './use-country-label';
@@ -14,6 +14,7 @@ interface SelectedProjectRowProps {
   percentage: number;
   isDefaultCause?: boolean;
   readOnly?: boolean;
+  notAcceptingDonations?: boolean;
   onRemove: () => void;
 }
 
@@ -22,6 +23,7 @@ export function SelectedProjectRow({
   percentage,
   isDefaultCause = false,
   readOnly = false,
+  notAcceptingDonations = false,
   onRemove,
 }: SelectedProjectRowProps) {
   const t = useTranslations('Bundles');
@@ -31,6 +33,15 @@ export function SelectedProjectRow({
   const imageSource = resolveProjectImageSource(project.image);
   const [imageFailed, setImageFailed] = useState(false);
   const countryLabel = project.country ? getCountryLabel(project.country) : '';
+
+  // Non-donatable projects show a badge instead of a percentage. Hide the
+  // meta line when no country is available.
+  const metaLine = [
+    isDefaultCause ? tCustom('globalLabel') : countryLabel,
+    notAcceptingDonations ? null : tCustom('allocationLabel', { percentage }),
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   const showTrailingIcon = !isDefaultCause && !readOnly;
 
@@ -58,14 +69,15 @@ export function SelectedProjectRow({
         <p className='line-clamp-2 text-sm font-semibold text-foreground'>
           {project.name}
         </p>
-        <p className='truncate text-xs text-muted-foreground'>
-          {[
-            isDefaultCause ? tCustom('globalLabel') : countryLabel,
-            tCustom('allocationLabel', { percentage }),
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
+        {metaLine && (
+          <p className='truncate text-xs text-muted-foreground'>{metaLine}</p>
+        )}
+        {notAcceptingDonations && (
+          <span className='mt-1 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'>
+            <Info className='h-3 w-3 shrink-0' aria-hidden='true' />
+            {t('notAcceptingDonations')}
+          </span>
+        )}
         {isDefaultCause ? (
           <>
             <p className='mt-0.5 line-clamp-2 text-xs text-muted-foreground'>

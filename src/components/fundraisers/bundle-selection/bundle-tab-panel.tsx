@@ -16,6 +16,7 @@ interface BundleTabPanelProps {
   activeTab: BundleTabId;
   bundleWorkspace: BundleWorkspace;
   selectedBundleSlug: BundleSlug | undefined;
+  preSelectedBundleSlug: BundleSlug | null;
   getProject: GetProject;
   onSelectBundle: (bundle: Bundle) => void;
   onOpenBundle: (bundle: Bundle) => void;
@@ -25,6 +26,7 @@ export function BundleTabPanel({
   activeTab,
   bundleWorkspace,
   selectedBundleSlug,
+  preSelectedBundleSlug,
   getProject,
   onSelectBundle,
   onOpenBundle,
@@ -40,6 +42,7 @@ export function BundleTabPanel({
             bundle={bundle}
             bundleWorkspace={bundleWorkspace}
             isSelected={selectedBundleSlug === bundle.slug}
+            isPreSelected={preSelectedBundleSlug === bundle.slug}
             getProject={getProject}
             onSelect={() => onSelectBundle(bundle)}
             onOpen={() => onOpenBundle(bundle)}

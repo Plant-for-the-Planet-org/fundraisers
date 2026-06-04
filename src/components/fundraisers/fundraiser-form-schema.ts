@@ -60,7 +60,10 @@ const selectedImageSchema = z.object({
 
 const projectAllocationSchema = z.object({
   project_id: z.string().trim().min(1),
-  percentage: z.number().int().min(1).max(100),
+  // 0 is allowed so the create and edit forms can keep non-donatable bundle
+  // projects in the payload at 0% (see `bundleToAllocations`); donatable
+  // projects still sum to 100.
+  percentage: z.number().int().min(0).max(100),
 });
 
 // Trusted hostnames for stage images. Prevents javascript:/data: injection and SSRF.

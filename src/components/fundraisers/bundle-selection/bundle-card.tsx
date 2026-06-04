@@ -4,8 +4,11 @@ import type { Bundle, BundleWorkspace } from '@/lib/types/bundle';
 import type { GetProject } from '@/lib/types/project-selection';
 
 import { useTranslations } from 'next-intl';
-import { Check, Eye } from 'lucide-react';
-import { getDonatableBundleProjectIds } from '@/lib/utils/bundle';
+import { Check, Eye, Info } from 'lucide-react';
+import {
+  getBundleProjectIds,
+  getDonatableBundleProjectIds,
+} from '@/lib/utils/bundle';
 import { cn } from '@/lib/utils/cn';
 import { resolveProjectImageSource } from '@/lib/utils/images';
 
@@ -13,6 +16,11 @@ interface BundleCardProps {
   bundle: Bundle;
   bundleWorkspace: BundleWorkspace;
   isSelected: boolean;
+  /**
+   * True for the initially selected bundle. Non-donatable projects remain visible;
+   * other bundles filter them out.
+   */
+  isPreSelected: boolean;
   getProject: GetProject;
   onSelect: () => void;
   onOpen: () => void;
@@ -22,6 +30,7 @@ export function BundleCard({
   bundle,
   bundleWorkspace,
   isSelected,
+  isPreSelected,
   getProject,
   onSelect,
   onOpen,
@@ -29,11 +38,17 @@ export function BundleCard({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-  const projectIds = getDonatableBundleProjectIds(
+  const allProjectIds = getBundleProjectIds(bundle, bundleWorkspace);
+  const donatableProjectIds = getDonatableBundleProjectIds(
     bundle,
     bundleWorkspace,
     getProject
   );
+  // The pre-selected bundle keeps non-donatable projects visible (with an
+  // indicator); every other bundle hides them.
+  const projectIds = isPreSelected ? allProjectIds : donatableProjectIds;
+  const hasNonDonatable =
+    isPreSelected && donatableProjectIds.length < allProjectIds.length;
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;
@@ -105,8 +120,17 @@ export function BundleCard({
       </div>
 
       <div className='flex items-center justify-between text-xs'>
-        <span className='font-medium tracking-wide text-muted-foreground'>
+        <span className='flex items-center gap-1.5 font-medium tracking-wide text-muted-foreground'>
           {t('card.projectCount', { count: projectIds.length })}
+          {hasNonDonatable && (
+            <span
+              title={t('card.containsNonDonatable')}
+              className='inline-flex items-center text-amber-600 dark:text-amber-400'
+            >
+              <Info className='h-3.5 w-3.5' aria-hidden='true' />
+              <span className='sr-only'>{t('card.containsNonDonatable')}</span>
+            </span>
+          )}
         </span>
         <button
           type='button'

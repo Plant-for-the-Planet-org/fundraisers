@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
 import {
+  getBundleProjectIds,
   getDonatableBundleProjectIds,
   getSupportProjectId,
 } from '@/lib/utils/bundle';
@@ -24,6 +25,11 @@ interface BundlePreviewModalProps {
   getProject: GetProject;
   onClose: () => void;
   onUseBundle: (bundle: Bundle) => void;
+  /**
+   * True for the initially selected bundle. Non-donatable projects remain visible;
+   * other bundles filter them out.
+   */
+  isPreSelected: boolean;
 }
 
 export function BundlePreviewModal({
@@ -34,6 +40,7 @@ export function BundlePreviewModal({
   getProject,
   onClose,
   onUseBundle,
+  isPreSelected,
 }: BundlePreviewModalProps) {
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
@@ -42,15 +49,34 @@ export function BundlePreviewModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalDialog({ isOpen, onClose, dialogRef });
 
-  const projectIds = useMemo(
-    () => getDonatableBundleProjectIds(bundle, bundleWorkspace, getProject),
-    [bundle, bundleWorkspace, getProject]
-  );
+  // The initial bundle shows all projects. Other bundles filter out
+  // non-donatable projects and display how many were removed.
+  const { projectIds, removedCount } = useMemo(() => {
+    const allIds = getBundleProjectIds(bundle, bundleWorkspace);
+    if (isPreSelected) {
+      return { projectIds: allIds, removedCount: 0 };
+    }
+    const donatableIds = getDonatableBundleProjectIds(
+      bundle,
+      bundleWorkspace,
+      getProject
+    );
+    return {
+      projectIds: donatableIds,
+      removedCount: allIds.length - donatableIds.length,
+    };
+  }, [isPreSelected, bundle, bundleWorkspace, getProject]);
   const supportProjectId = getSupportProjectId(bundleWorkspace);
-
-  const allocations = useMemo(() => {
-    const projects = projectIds.map(id => getProject(id));
-    return calculateProjectAllocations(projects, supportProjectId);
+  // Only donatable projects are used for allocation, so percentages remain unchanged.
+  const percentageById = useMemo(() => {
+    const donatableProjects = projectIds
+      .map(id => getProject(id))
+      .filter(project => project.allowDonations);
+    const allocations = calculateProjectAllocations(
+      donatableProjects,
+      supportProjectId
+    );
+    return Object.fromEntries(allocations.map(a => [a.id, a.percentage]));
   }, [projectIds, supportProjectId, getProject]);
 
   if (!isOpen || typeof document === 'undefined') return null;
@@ -105,17 +131,27 @@ export function BundlePreviewModal({
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
 
+          {removedCount > 0 && (
+            <p className='mb-3 text-xs text-amber-600 dark:text-amber-400'>
+              {t('modal.projectsRemoved', { count: removedCount })}
+            </p>
+          )}
+
           <ul className='columns-1 gap-2 min-[600px]:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
-            {allocations.map(({ id, percentage }) => (
-              <SelectedProjectRow
-                key={id}
-                project={getProject(id)}
-                percentage={percentage}
-                isDefaultCause={id === supportProjectId}
-                readOnly={true}
-                onRemove={() => {}}
-              />
-            ))}
+            {projectIds.map(id => {
+              const percentage = percentageById[id];
+              return (
+                <SelectedProjectRow
+                  key={id}
+                  project={getProject(id)}
+                  percentage={percentage ?? 0}
+                  notAcceptingDonations={percentage === undefined}
+                  isDefaultCause={id === supportProjectId}
+                  readOnly={true}
+                  onRemove={() => {}}
+                />
+              );
+            })}
           </ul>
         </div>
       </div>
