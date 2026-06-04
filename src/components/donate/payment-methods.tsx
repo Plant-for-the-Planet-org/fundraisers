@@ -9,7 +9,7 @@ import type { DonationFormValues } from '@/components/donate/donation-form-conte
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { TriangleAlert } from 'lucide-react';
 import { SUPPORTED_METHOD_IDS } from '@/lib/types/payment-methods';
 import { formatCurrency } from '@/lib/utils/currency';
@@ -42,6 +42,7 @@ import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-me
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
+  const locale = useLocale();
   const translateError = useFieldError();
 
   const {
@@ -105,10 +106,10 @@ export function PaymentMethods() {
       }
 
       return t('fees.feeAmount', {
-        amount: formatCurrency(method.feeAmountCents, donationCurrency),
+        amount: formatCurrency(method.feeAmountCents, donationCurrency, locale),
       });
     },
-    [t]
+    [locale, t]
   );
 
   const getFeeTooltip = useCallback(
@@ -124,11 +125,11 @@ export function PaymentMethods() {
 
       return t('fees.tooltip.withFee', {
         provider: getProviderLabel(method.provider),
-        amount: formatCurrency(method.feeAmountCents, donationCurrency),
+        amount: formatCurrency(method.feeAmountCents, donationCurrency, locale),
         alternatives,
       });
     },
-    [getProviderLabel, t]
+    [getProviderLabel, locale, t]
   );
 
   const availableMethods = useMemo(() => {
@@ -247,7 +248,7 @@ export function PaymentMethods() {
             const available = pcGateway?.available ?? 0;
             const isDisabled = available < donationData.amountCents;
             const balanceText = t('planetCash.availableBalance', {
-              amount: formatCurrency(available, donationData.currency),
+              amount: formatCurrency(available, donationData.currency, locale),
             });
             return {
               id: method.id,
@@ -295,6 +296,7 @@ export function PaymentMethods() {
       isAuthenticated,
       isSubscription,
       lastUsedMethodId,
+      locale,
       paymentOptions.gateways,
       t,
     ]

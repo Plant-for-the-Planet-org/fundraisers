@@ -48,9 +48,14 @@ export function DashboardSummary({
   const extraCurrencies = totalRaised.length - 1;
 
   const totalRaisedValue = dominant
-    ? formatCurrencyFromDecimal(dominant.totalRaised, dominant.currency, {
-        compact: true,
-      })
+    ? formatCurrencyFromDecimal(
+        dominant.totalRaised,
+        dominant.currency,
+        locale,
+        {
+          compact: true,
+        }
+      )
     : t('totalRaised.empty');
 
   const totalRaisedHelper =

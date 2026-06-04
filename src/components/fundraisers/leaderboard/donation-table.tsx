@@ -1,6 +1,6 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
@@ -30,6 +30,7 @@ function DonationRow({
   showDate?: boolean;
 }) {
   const t = useTranslations('Leaderboard.view');
+  const locale = useLocale();
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const avatarSrc =
     !isAnonymous && donation.avatarUrl
@@ -76,7 +77,11 @@ function DonationRow({
       </td>
       {showAmount && (
         <td className='py-3 px-4 text-right text-sm font-semibold text-foreground whitespace-nowrap'>
-          {formatCurrencyFromDecimal(donation.amount, donation.currency)}
+          {formatCurrencyFromDecimal(
+            donation.amount,
+            donation.currency,
+            locale
+          )}
         </td>
       )}
     </tr>

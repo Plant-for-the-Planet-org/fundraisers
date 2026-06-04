@@ -13,7 +13,7 @@ import type {
 } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   GIFT_MESSAGE_MAX_LENGTH,
   RECIPIENT_EMAIL_MAX_LENGTH,
@@ -65,6 +65,7 @@ export function DonationForm({
   onDonate,
 }: DonationFormProps) {
   const t = useTranslations('Fundraisers.form.contributionSettings');
+  const locale = useLocale();
 
   const settings = getContributionSettings(contributionSettings);
   const availableRecurrencyOptions =
@@ -111,7 +112,7 @@ export function DonationForm({
   const getDonateButtonText = () => {
     const amount = customAmount || selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
-      ? `${formatCurrency(amount, currency)} • `
+      ? `${formatCurrency(amount, currency, locale)} • `
       : '';
 
     switch (selectedFrequency.value) {

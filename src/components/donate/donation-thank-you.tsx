@@ -5,6 +5,7 @@ import type { ThankYouState } from '@/lib/types/donation-submit';
 import type { FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
+import { useLocale } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { BankTransferDetails } from './bank-transfer-details';
 import { HostMessageCard } from './host-message-card';
@@ -27,6 +28,7 @@ export function DonationThankYou({
   fundraiserSlug,
   hostMessageConfig,
 }: DonationThankYouProps) {
+  const locale = useLocale();
   let card: ReactNode;
   let hostMessageCard: ReactNode = null;
   switch (thankYouState.status) {
@@ -37,7 +39,8 @@ export function DonationThankYou({
           frequency={thankYouState.frequency}
           formattedAmount={formatCurrencyFromDecimal(
             thankYouState.amount,
-            thankYouState.currency
+            thankYouState.currency,
+            locale
           )}
         >
           <BankTransferDetails
@@ -45,6 +48,7 @@ export function DonationThankYou({
             formattedAmount={formatCurrencyFromDecimal(
               thankYouState.amount,
               thankYouState.currency,
+              locale,
               { currencyDisplay: 'code' }
             )}
             amount={thankYouState.amount}
