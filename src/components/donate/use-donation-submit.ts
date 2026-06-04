@@ -678,6 +678,14 @@ export function useDonationSubmit(
               }));
               return;
             }
+          } else {
+            // Unknown action_required type — payment status indeterminate.
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: { code: 'unexpected' },
+            }));
+            return;
           }
 
           const thankYouState = await resolveThankYouStateFromDonation(
