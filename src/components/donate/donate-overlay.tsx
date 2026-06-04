@@ -171,6 +171,7 @@ function DonateOverlayInner({
           <DonateCTA
             isLoading={isLoading}
             isSuccess={false}
+            stripePromise={stripePromise}
             onPayPalCreateOrder={onPayPalCreateOrder}
             onPayPalApproved={onPayPalApproved}
             onPayPalError={onPayPalError}

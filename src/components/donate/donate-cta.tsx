@@ -18,6 +18,7 @@ import { WalletButton } from './wallet-button';
 interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
+  stripePromise?: Promise<Stripe | null> | null;
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
@@ -34,6 +35,7 @@ interface DonateCTAProps {
 export function DonateCTA({
   isLoading,
   isSuccess,
+  stripePromise,
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
@@ -79,6 +81,7 @@ export function DonateCTA({
     return (
       <WalletButton
         wallet={selectedPaymentMethod}
+        stripePromise={stripePromise ?? null}
         onWalletConfirm={onWalletConfirm}
         onWalletError={onWalletError}
         onWalletCancel={onWalletCancel}

@@ -10,7 +10,7 @@ import type { DonationFormValues } from './donation-form-context';
 
 import { useCallback, useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import {
   Elements,
   ExpressCheckoutElement,
@@ -18,7 +18,6 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
-import { getStripe } from '@/lib/utils/get-stripe';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDonationForm } from './donation-form-context';
 
@@ -34,6 +33,7 @@ const STRIPE_WALLET_KEY = {
 
 export interface WalletButtonProps {
   wallet: WalletKind;
+  stripePromise: Promise<Stripe | null> | null;
   onWalletConfirm: (
     wallet: WalletKind,
     values: DonationFormValues,
@@ -44,7 +44,10 @@ export interface WalletButtonProps {
   onWalletCancel: () => void;
 }
 
-interface WalletButtonInnerProps extends WalletButtonProps {
+interface WalletButtonInnerProps extends Omit<
+  WalletButtonProps,
+  'stripePromise'
+> {
   onAttemptComplete: () => void;
 }
 
@@ -58,11 +61,11 @@ interface WalletButtonInnerProps extends WalletButtonProps {
  */
 export function WalletButton({
   wallet,
+  stripePromise,
   onWalletConfirm,
   onWalletError,
   onWalletCancel,
 }: WalletButtonProps) {
-  const locale = useLocale();
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
 
   const willAbsorbFee = useWatch<DonationFormValues, 'willAbsorbFee'>({
@@ -86,15 +89,6 @@ export function WalletButton({
   // false. Including `wallet` in the key remounts <Elements> on wallet
   // change so each wallet gets a fresh availability check.
   const elementsKey = `${wallet}-${attemptKey}`;
-
-  const stripeConfig = paymentOptions.gateways.stripe;
-  const stripePromise = useMemo(
-    () =>
-      stripeConfig
-        ? getStripe(stripeConfig.authorization.stripePublishableKey, locale)
-        : null,
-    [stripeConfig, locale]
-  );
 
   const totalAmount = useMemo(() => {
     const { hasProcessingFee, processingFeeCents } =
