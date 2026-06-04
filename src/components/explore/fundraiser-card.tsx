@@ -2,10 +2,13 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { HandCoins, UsersRound } from 'lucide-react';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils';
+import { UsersRound } from 'lucide-react';
+import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getFundraiserUrl } from '@/lib/utils/fundraiser';
+import {
+  getFundraiserUrl,
+  getTotalRaisedByCurrency,
+} from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { FundraiserCardImage } from './fundraiser-card-image';
 
@@ -19,9 +22,28 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
 
   const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
 
+  const totalRaisedByCurrency = getTotalRaisedByCurrency(
+    fundraiser.totalRaised
+  );
+  // Multi-currency: join all amounts with · separator. Zero-donation: show 0 in the fundraiser's primary currency.
+  const formattedTotalRaised =
+    totalRaisedByCurrency.length > 0
+      ? totalRaisedByCurrency
+          .map(({ currency, amount }) =>
+            formatCurrencyFromDecimal(amount, currency, {
+              compact: true,
+              locale,
+            })
+          )
+          .join(' · ')
+      : formatCurrencyFromDecimal(0, fundraiser.currency, {
+          compact: true,
+          locale,
+        });
+
   const hostDisplay = (() => {
     const hosts = fundraiser.hosts;
-    if (hosts.length === 0) return tFundraisers('anonymousHost');
+    if (hosts.length === 0) return tFundraisers('anonymousHost', { count: 1 });
 
     const firstHost = hosts[0];
     // Although we expect user to be always present, keeping a fallback to avoid runtime errors in case of unexpected data
@@ -56,23 +78,19 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
           </div>
 
           <div className='fundraiser-content flex-1 min-w-0'>
-            <h3 className='fundraiser-title font-medium text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2'>
+            <h3 className='fundraiser-title font-medium text-foreground group-hover:text-primary transition-colors mb-1 line-clamp-2'>
               {fundraiser.title}
             </h3>
 
             <div className='space-y-1'>
               <div className='fundraiser-stats text-sm text-muted-foreground flex items-center gap-3'>
                 <div className='amount-raised flex items-center gap-1'>
-                  <HandCoins className='w-3 h-3' />
                   <dt className='sr-only'>
                     {tFundraisers('amountRaisedLabel')}
                   </dt>
                   <dd>
                     {tFundraisers('amountRaised', {
-                      formattedAmountWithCurrency: formatCurrencyFromDecimal(
-                        fundraiser.totalRaised,
-                        fundraiser.currency
-                      ),
+                      formattedAmountWithCurrency: formattedTotalRaised,
                     })}
                   </dd>
                 </div>
@@ -84,7 +102,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   <dd>
                     {tFundraisers('donationCount', {
                       count: fundraiser.donationCount,
-                      formattedCount: getLocalizedAbbreviatedCount(
+                      formattedCount: formatCompactNumber(
                         fundraiser.donationCount,
                         locale
                       ),

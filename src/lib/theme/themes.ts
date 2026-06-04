@@ -1,17 +1,16 @@
 import type { Theme } from './types';
 
+import { defineBg } from './backgrounds';
+
 export const THEMES: Record<string, Theme> = {
   spring: {
     id: 'spring',
     name: 'Spring Vibes',
     category: 'nature',
-    background:
-      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20',
     accent: 'emerald',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'emerald',
@@ -23,65 +22,20 @@ export const THEMES: Record<string, Theme> = {
       'blue',
       'indigo',
     ],
-  },
-  clean: {
-    id: 'clean',
-    name: 'Clean White',
-    category: 'minimal',
-    background: 'bg-white',
-    accent: 'blue',
-    mode: 'light',
-    bodyFont: 'open-sans',
-    titleFont: 'poppins',
-    animation: 'none',
-    isPlain: true,
-    featured: false,
-    colorOptions: [
-      'blue',
-      'emerald',
-      'purple',
-      'indigo',
-      'teal',
-      'cyan',
-      'slate',
-      'gray',
-    ],
-  },
-  dashboard: {
-    id: 'dashboard',
-    name: 'Dashboard',
-    category: 'business',
-    background: 'bg-gray-50',
-    accent: 'blue',
-    mode: 'light',
-    bodyFont: 'open-sans',
-    titleFont: 'poppins',
-    animation: 'none',
-    isPlain: true,
-    featured: true,
-    colorOptions: [
-      'blue',
-      'indigo',
-      'slate',
-      'gray',
-      'emerald',
-      'teal',
-      'cyan',
-      'purple',
-    ],
+    curatedBgs: ['bg-leaves', 'bg-meadow-loop', 'bg-botanic', 'bg-watercolor'],
+    bg: defineBg(
+      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20'
+    ),
   },
   birthday: {
     id: 'birthday',
     name: 'Birthday Party',
     category: 'celebration',
-    background:
-      'bg-gradient-to-br from-orange-300/25 via-red-200/20 to-pink-300/20',
     accent: 'orange',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'confetti',
-    featured: false,
+    featured: true,
     colorOptions: [
       'blue',
       'pink',
@@ -92,18 +46,20 @@ export const THEMES: Record<string, Theme> = {
       'red',
       'indigo',
     ],
+    curatedBgs: ['bg-candle', 'bg-balloons', 'bg-cake-loop'],
+    bg: defineBg(
+      'bg-gradient-to-br from-orange-300/25 via-red-200/20 to-pink-300/20',
+      { animation: 'confetti' }
+    ),
   },
   wedding: {
     id: 'wedding',
     name: 'Wedding Elegance',
     category: 'celebration',
-    background:
-      'bg-gradient-to-br from-rose-300/50 via-pink-200/45 to-purple-100/40',
     accent: 'rose',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'playfair',
-    animation: 'hearts',
     featured: true,
     colorOptions: [
       'rose',
@@ -115,41 +71,25 @@ export const THEMES: Record<string, Theme> = {
       'violet',
       'fuchsia',
     ],
-  },
-  corporate: {
-    id: 'corporate',
-    name: 'Corporate',
-    category: 'business',
-    background:
-      'bg-gradient-to-br from-blue-100/30 via-slate-50/20 to-blue-200/25',
-    accent: 'blue',
-    mode: 'light',
-    bodyFont: 'open-sans',
-    titleFont: 'poppins',
-    animation: 'none',
-    featured: true,
-    colorOptions: [
-      'blue',
-      'indigo',
-      'slate',
-      'gray',
-      'emerald',
-      'teal',
-      'cyan',
-      'purple',
-    ],
+    curatedBgs: ['bg-botanic', 'bg-petals', 'bg-paper', 'bg-watercolor'],
+    bg: defineBg(
+      'bg-gradient-to-br from-rose-300/50 via-pink-200/45 to-purple-100/40',
+      {
+        decoration: 'pattern',
+        pattern_id: 'bg-petals',
+        opacity: 0.35,
+        animation: 'hearts',
+      }
+    ),
   },
   stratospheric: {
     id: 'stratospheric',
     name: 'Polar Stratospheric Clouds',
     category: 'atmospheric',
-    background:
-      'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30',
     accent: 'amber',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'yellow',
@@ -161,18 +101,19 @@ export const THEMES: Record<string, Theme> = {
       'indigo',
       'blue',
     ],
+    curatedBgs: ['bg-clouds-loop', 'bg-watercolor', 'bg-paper'],
+    bg: defineBg(
+      'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30'
+    ),
   },
   sunset: {
     id: 'sunset',
     name: 'Sunset',
     category: 'nature',
-    background:
-      'bg-gradient-to-br from-amber-200/35 via-orange-200/30 to-blue-300/25',
     accent: 'orange',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'orange',
@@ -184,17 +125,19 @@ export const THEMES: Record<string, Theme> = {
       'red',
       'yellow',
     ],
+    curatedBgs: ['bg-clouds-loop', 'bg-watercolor', 'bg-waves'],
+    bg: defineBg(
+      'bg-gradient-to-br from-amber-200/35 via-orange-200/30 to-blue-300/25'
+    ),
   },
   'dark-ocean': {
     id: 'dark-ocean',
     name: 'Dark Ocean',
     category: 'nature',
-    background: 'bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-900',
     accent: 'blue',
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'blue',
@@ -206,17 +149,17 @@ export const THEMES: Record<string, Theme> = {
       'emerald',
       'gray',
     ],
+    curatedBgs: ['bg-stars', 'bg-clouds-loop', 'bg-grid', 'bg-waves'],
+    bg: defineBg('bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-900'),
   },
   'lush-forest': {
     id: 'lush-forest',
     name: 'Lush Forest',
     category: 'nature',
-    background: 'bg-gradient-to-br from-green-800 via-emerald-700 to-teal-800',
     accent: 'emerald',
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'snow',
     featured: true,
     colorOptions: [
       'emerald',
@@ -228,17 +171,20 @@ export const THEMES: Record<string, Theme> = {
       'indigo',
       'slate',
     ],
+    curatedBgs: ['bg-leaves', 'bg-meadow-loop', 'bg-botanic', 'bg-watercolor'],
+    bg: defineBg(
+      'bg-gradient-to-br from-green-800 via-emerald-700 to-teal-800',
+      { animation: 'snow' }
+    ),
   },
   volcanic: {
     id: 'volcanic',
     name: 'Volcanic',
     category: 'nature',
-    background: 'bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700',
     accent: 'orange',
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'orange',
@@ -250,17 +196,16 @@ export const THEMES: Record<string, Theme> = {
       'rose',
       'indigo',
     ],
+    bg: defineBg('bg-gradient-to-br from-red-900 via-orange-800 to-yellow-700'),
   },
   midnight: {
     id: 'midnight',
     name: 'Midnight',
     category: 'minimal',
-    background: 'bg-gradient-to-br from-gray-900 via-slate-800 to-zinc-900',
     accent: 'slate',
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     featured: true,
     colorOptions: [
       'slate',
@@ -272,17 +217,16 @@ export const THEMES: Record<string, Theme> = {
       'cyan',
       'teal',
     ],
+    bg: defineBg('bg-gradient-to-br from-gray-900 via-slate-800 to-zinc-900'),
   },
   dark: {
     id: 'dark',
     name: 'Professional Dark',
     category: 'business',
-    background: 'bg-gray-900',
     accent: 'blue',
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     isPlain: true,
     featured: true,
     colorOptions: [
@@ -295,19 +239,18 @@ export const THEMES: Record<string, Theme> = {
       'indigo',
       'cyan',
     ],
+    bg: defineBg('bg-gray-900'),
   },
   minimal: {
     id: 'minimal',
     name: 'Minimal',
     category: 'minimal',
-    background: 'bg-gray-50',
     accent: 'gray',
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    animation: 'none',
     isPlain: true,
-    featured: false,
+    featured: true,
     colorOptions: [
       'gray',
       'slate',
@@ -318,6 +261,8 @@ export const THEMES: Record<string, Theme> = {
       'indigo',
       'purple',
     ],
+    curatedBgs: ['bg-grid', 'bg-paper', 'bg-waves'],
+    bg: defineBg('bg-gray-50'),
   },
 };
 

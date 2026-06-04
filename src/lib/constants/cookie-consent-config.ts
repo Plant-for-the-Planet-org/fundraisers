@@ -8,9 +8,9 @@ export const COOKIE_CATEGORIES = {
   ANALYTICS: 'analytics',
 } as const;
 
-type CookieTranslation = typeof enRaw;
+type PreferencesModalTranslation = Pick<typeof enRaw, 'preferencesModal'>;
 
-function buildSections(t: CookieTranslation) {
+function buildSections(t: PreferencesModalTranslation) {
   const sections = t.preferencesModal.sections;
   return [
     {

@@ -3,7 +3,7 @@ import type { Category } from '@/lib/types/category';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { categoriesService } from '@/lib/api/categories-service';
-import { getLocalizedAbbreviatedCount } from '@/lib/utils/formatting';
+import { formatCompactNumber } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdaptedCategory extends Category {
@@ -53,7 +53,7 @@ export async function FundraiserCities() {
       .slice(0, 8)
       .map(city => {
         const count = city.stats?.fundraiserCount ?? 0;
-        const formattedCount = getLocalizedAbbreviatedCount(count, locale);
+        const formattedCount = formatCompactNumber(count, locale);
         return {
           ...city,
           displayCount: tFundraiserCities('fundraiserCount', {

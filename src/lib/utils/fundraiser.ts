@@ -14,13 +14,15 @@ export interface FundraiserUrlData {
  * True when `userId` matches a host on `fundraiser` whose role is `owner`.
  * Returns false when `userId` is missing.
  */
-export function isFundraiserOwner(
+export function isFundraiserOwnerOrAdmin(
   fundraiser: Fundraiser,
   userId: string | null | undefined
 ): boolean {
   if (!userId) return false;
   return fundraiser.hosts.some(
-    host => host.user?.id === userId && host.role === 'owner'
+    host =>
+      host.user?.id === userId &&
+      (host.role === 'owner' || host.role === 'admin')
   );
 }
 
@@ -33,7 +35,24 @@ export function isFundraiserOwner(
  */
 export function getFundraiserUrl(fundraiser: FundraiserUrlData): string {
   const identifier = fundraiser.slug || fundraiser.id;
-  return `/fundraisers/${encodeURIComponent(identifier)}`;
+  return `/raise/${encodeURIComponent(identifier)}`;
+}
+
+export interface SingleCurrencyTotalRaised {
+  currency: string;
+  amount: number;
+}
+
+/**
+ * Returns raised amounts as a sorted array (highest first), filtering out zero or non-finite values. Currency keys are normalized to uppercase.
+ */
+export function getTotalRaisedByCurrency(
+  totalRaised: Record<string, number>
+): SingleCurrencyTotalRaised[] {
+  return Object.entries(totalRaised)
+    .filter(([_currency, amount]) => Number.isFinite(amount) && amount > 0)
+    .map(([currency, amount]) => ({ currency: currency.toUpperCase(), amount }))
+    .sort((a, b) => b.amount - a.amount);
 }
 
 /**

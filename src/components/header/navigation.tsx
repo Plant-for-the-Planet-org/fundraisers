@@ -4,13 +4,14 @@ import { HEADER_LINKS } from './config';
 
 export function Navigation() {
   const tHeaderLinks = useTranslations('Common.headerLinks');
+  const tAria = useTranslations('Common.aria');
 
   return (
     <nav
-      className='navigation hidden md:flex items-center gap-6'
-      aria-label='Primary navigation'
+      className='navigation hidden xs:flex items-center gap-4'
+      aria-label={tAria('primaryNavigation')}
     >
-      <ul className='flex items-center gap-6 list-none p-0 m-0'>
+      <ul className='flex items-center gap-4 list-none p-0 m-0'>
         {HEADER_LINKS.map(link => (
           <li key={link.labelKey}>
             <Link

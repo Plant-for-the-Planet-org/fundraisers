@@ -6,16 +6,32 @@ import type { SelectedImage } from '@/lib/types/image-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { z } from 'zod';
-import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
+import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
+import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
+import {
+  DESCRIPTION_MAX_LENGTH,
+  GOAL_AMOUNT_MIN,
+} from '@/lib/constants/fundraiser-creation';
+import {
+  isValidAnimation,
+  isValidDecoration,
+  isValidImageMode,
+} from '@/lib/theme/backgrounds';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { isValidMode } from '@/lib/theme/validators';
+import { BUNDLE_SLUGS } from '@/lib/types/bundle';
+import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
   ALLOWED_COUNTRIES,
   getCurrencyForCountry,
   SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
 import { getImageUrl } from '@/lib/utils/images';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import { STAGE_LIMITS } from '@/components/stage/constants';
+import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
+import { routing } from '@/i18n/routing';
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,
@@ -51,11 +67,70 @@ const projectAllocationSchema = z.object({
   percentage: z.number().int().min(1).max(100),
 });
 
+// Trusted hostnames for stage images. Prevents javascript:/data: injection and SSRF.
+const ALLOWED_IMAGE_HOSTNAME_SUFFIXES = [
+  'plant-for-the-planet.org',
+  'unsplash.com',
+  'cloudinary.com',
+  'amazonaws.com',
+  'imgix.net',
+  'googleusercontent.com',
+] as const;
+
+function isAllowedImageUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:') return false;
+    const host = url.hostname.toLowerCase();
+    return ALLOWED_IMAGE_HOSTNAME_SUFFIXES.some(
+      suffix => host === suffix || host.endsWith(`.${suffix}`)
+    );
+  } catch {
+    return false;
+  }
+}
+
+const stageImageUrlSchema = z
+  .string()
+  .refine(isAllowedImageUrl, { message: 'imageUrlNotAllowed' });
+
+const stageSlideSchema = z.object({
+  position: z.number().int().min(1),
+  title: z.string().max(STAGE_LIMITS.slideTitle),
+  description: z.string().max(STAGE_LIMITS.slideDescription),
+  image: stageImageUrlSchema,
+  duration: z.number().int().min(1).max(60),
+});
+
+export const thankYouNoteSchema = z.object({
+  enabled: z.boolean(),
+  message: z
+    .string()
+    .refine(
+      val =>
+        getRichTextTextContent(val).length <= THANK_YOU_NOTE_LIMITS.message,
+      { message: 'maxLength' }
+    ),
+});
+
+export const stageModeSchema = z.object({
+  enabled: z.boolean(),
+  locale: z.enum(routing.locales),
+  title: z.string().max(STAGE_LIMITS.stageTitle),
+  description: z.string().max(STAGE_LIMITS.stageDescription),
+  partner_logo_url: stageImageUrlSchema,
+  slides: z.array(stageSlideSchema).max(STAGE_LIMITS.maxSlides),
+});
+
 export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
     .string()
-    .refine(value => getRichTextTextContent(value).length > 0),
+    .refine(value => getRichTextTextContent(value).length > 0)
+    .refine(
+      value => getRichTextTextContent(value).length <= DESCRIPTION_MAX_LENGTH
+    ),
   image: selectedImageSchema.nullable(),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
@@ -71,10 +146,31 @@ export const fundraiserFormSchema = z.object({
       base_id: z.string(),
       mode: z.enum(['light', 'dark']),
       accent: z.string(),
-      background: z.string(),
       body_font: z.string(),
       title_font: z.string(),
-      animation: z.string(),
+      bg: z.object({
+        gradient: z.string(),
+        decoration: z.enum(['none', 'pattern', 'image', 'logo']),
+        pattern_id: z.string().nullable(),
+        // External URLs must use https and be from an allowed host (same list
+        // as stage images). Library keys (no https:// prefix) are passed
+        // through and validated at render time via resolveBgAsset.
+        image_url: z
+          .string()
+          .nullable()
+          .refine(
+            value => {
+              if (value === null) return true;
+              if (/^https?:\/\//i.test(value)) return isAllowedImageUrl(value);
+              return true;
+            },
+            { message: 'imageUrlNotAllowed' }
+          ),
+        image_mode: z.enum(['cover', 'repeat']),
+        logo_id: z.string().nullable(),
+        opacity: z.number().min(0.05).max(1),
+        animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'particles']),
+      }),
     }),
     modules: z.object({
       leaderboard: z.object({
@@ -88,6 +184,11 @@ export const fundraiserFormSchema = z.object({
         show_avatar: z.boolean(),
         aggregate_top_by_donor: z.boolean(),
       }),
+      bundle: z.object({
+        slug: z.enum(BUNDLE_SLUGS).nullable(),
+      }),
+      stage: stageModeSchema.nullable(),
+      thankYouNote: thankYouNoteSchema,
     }),
   }),
 });
@@ -104,6 +205,15 @@ export function buildDefaultCreateValues(
   const initialTheme = getThemeForPath(pathname);
   const defaultCountry: AllowedCountry = 'DE';
 
+  const workspace = getWorkspaceForCountry(defaultCountry);
+  const defaultBundle = workspace
+    ? getBundlesForTab(BUNDLE_CONFIG.meta.defaultTab)[0]
+    : undefined;
+  const projectAllocations =
+    workspace && defaultBundle
+      ? bundleToAllocations(defaultBundle, workspace)
+      : [{ project_id: getDefaultCauseId(defaultCountry), percentage: 100 }];
+
   return {
     title: '',
     description: '',
@@ -113,24 +223,21 @@ export function buildDefaultCreateValues(
     goalAmount: undefined as unknown as number,
     visibility: 'public',
     status: 'draft',
-    projectAllocations: [
-      {
-        project_id: getDefaultCauseId(defaultCountry),
-        percentage: 100,
-      },
-    ],
+    projectAllocations,
     settings: {
       theme: {
         base_id: initialTheme.id,
         mode: initialTheme.mode,
         accent: initialTheme.accent,
-        background: initialTheme.background,
         body_font: initialTheme.bodyFont,
         title_font: initialTheme.titleFont,
-        animation: initialTheme.animation ?? 'none',
+        bg: initialTheme.bg,
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
+        bundle: { slug: defaultBundle?.slug ?? null },
+        stage: null,
+        thankYouNote: { enabled: false, message: '' },
       },
     },
   };
@@ -172,6 +279,13 @@ export function fundraiserToFormValues(
     ? rawCountry
     : 'ROW';
 
+  const storedBundleSlug = fundraiser.settings?.modules?.bundle?.slug;
+  const bundleSlug = (BUNDLE_SLUGS as readonly string[]).includes(
+    storedBundleSlug ?? ''
+  )
+    ? (storedBundleSlug as (typeof BUNDLE_SLUGS)[number])
+    : null;
+
   return {
     title: fundraiser.title,
     description: fundraiser.description ?? '',
@@ -188,17 +302,53 @@ export function fundraiserToFormValues(
     settings: {
       theme: {
         base_id: theme.base_id ?? fallbackTheme.id,
-        mode: theme.mode ?? fallbackTheme.mode,
+        mode: isValidMode(theme.mode) ? theme.mode : fallbackTheme.mode,
         accent: theme.accent ?? fallbackTheme.accent,
-        background: theme.background ?? fallbackTheme.background,
         body_font: theme.body_font ?? fallbackTheme.bodyFont,
         title_font: theme.title_font ?? fallbackTheme.titleFont,
-        animation: theme.animation ?? fallbackTheme.animation ?? 'none',
+        bg: {
+          gradient: theme.bg?.gradient ?? fallbackTheme.bg.gradient,
+          decoration: isValidDecoration(theme.bg?.decoration)
+            ? theme.bg.decoration
+            : fallbackTheme.bg.decoration,
+          pattern_id:
+            theme.bg?.pattern_id !== undefined
+              ? theme.bg.pattern_id
+              : fallbackTheme.bg.pattern_id,
+          image_url:
+            theme.bg?.image_url !== undefined
+              ? theme.bg.image_url
+              : fallbackTheme.bg.image_url,
+          image_mode: isValidImageMode(theme.bg?.image_mode)
+            ? theme.bg.image_mode
+            : fallbackTheme.bg.image_mode,
+          logo_id:
+            theme.bg?.logo_id !== undefined
+              ? theme.bg.logo_id
+              : fallbackTheme.bg.logo_id,
+          opacity:
+            typeof theme.bg?.opacity === 'number'
+              ? Math.min(1, Math.max(0.05, theme.bg.opacity))
+              : fallbackTheme.bg.opacity,
+          // Phase 1 records stored animation at the top level (theme.animation).
+          // Phase 2 moved it into bg.animation. Read both for back-compat.
+          animation: isValidAnimation(theme.bg?.animation)
+            ? theme.bg.animation
+            : isValidAnimation(theme.animation)
+              ? theme.animation
+              : fallbackTheme.bg.animation,
+        },
       },
       modules: {
         leaderboard: {
           ...DEFAULT_LEADERBOARD,
           ...fundraiser.settings?.modules?.leaderboard,
+        },
+        bundle: { slug: bundleSlug },
+        stage: fundraiser.settings?.modules?.stage ?? null,
+        thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
+          enabled: false,
+          message: '',
         },
       },
     },

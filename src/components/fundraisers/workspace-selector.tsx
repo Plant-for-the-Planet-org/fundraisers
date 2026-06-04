@@ -9,6 +9,7 @@ import {
   getAllowedCountries,
   getCurrencyForCountry,
 } from '@/lib/utils/country-currency';
+import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { CountryFlag } from '@/components/ui/country-flag';
 import {
   Select,
@@ -36,6 +37,11 @@ export function WorkspaceSelector({
   const handleCountryChange = (country: string) => {
     field.onChange(country);
     setValue('currency', getCurrencyForCountry(country as AllowedCountry));
+    setValue(
+      'projectAllocations',
+      [{ project_id: getDefaultCauseId(country), percentage: 100 }],
+      { shouldDirty: true, shouldValidate: true }
+    );
   };
 
   // Intentionally uses restricted workspace countries with currency metadata; separate from donate country source.
@@ -47,7 +53,11 @@ export function WorkspaceSelector({
 
   return (
     <div className='workspace-selector flex flex-col gap-2'>
-      <label className='text-sm font-medium' htmlFor='form-country'>
+      <label
+        className='text-sm font-medium'
+        htmlFor='form-country'
+        style={{ fontFamily: 'var(--theme-title-font)' }}
+      >
         {t('label')}
       </label>
       <Select

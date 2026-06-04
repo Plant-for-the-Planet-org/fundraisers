@@ -2,12 +2,17 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionHeader } from './typography';
+
+const MAX_STRIP_AVATARS = 5;
+const MAX_STRIP_NAMED = 3;
 
 type HostProps =
   | { mode: 'preview' }
@@ -24,15 +29,17 @@ export function Hosts(props: HostProps) {
 function SingleHost({
   name,
   avatarUrl,
+  seed,
 }: {
   name: string;
   avatarUrl: string | null;
+  seed: string;
 }) {
   return (
     <div className='flex flex-row items-center gap-2.5'>
       <Avatar className='h-6 w-6'>
         {avatarUrl && <AvatarImage src={avatarUrl} alt={name} loading='lazy' />}
-        <AvatarFallback className='bg-linear-to-br from-blue-500 to-purple-600' />
+        <FallbackAvatar seed={seed} />
       </Avatar>
       <div className='text-zinc-800 dark:text-gray-100 text-base font-medium leading-tight'>
         {name}
@@ -41,7 +48,7 @@ function SingleHost({
   );
 }
 
-function HostsDisplay({
+function HostsListDisplay({
   hosts,
   loading = false,
 }: {
@@ -65,13 +72,60 @@ function HostsDisplay({
           </div>
         ) : (
           hosts.map((host, i) => (
+            // Seed falls back to name when id is missing; two hosts sharing a
+            // name (without ids) will get the same tree icon.
             <SingleHost
               key={host.id ?? i}
               name={host.name}
               avatarUrl={host.avatarUrl}
+              seed={host.id ?? host.name}
             />
           ))
         )}
+      </div>
+    </div>
+  );
+}
+
+function HostsStripDisplay({
+  hosts,
+}: {
+  hosts: Array<{ id?: string; name: string; avatarUrl: string | null }>;
+}) {
+  const t = useTranslations('Fundraisers');
+  const format = useFormatter();
+
+  if (hosts.length === 0) return null;
+
+  const avatarHosts = hosts.slice(0, MAX_STRIP_AVATARS);
+  const displayNames = hosts.slice(0, MAX_STRIP_NAMED).map(h => h.name);
+  const remaining = Math.max(0, hosts.length - displayNames.length);
+
+  const namesText = t('hostsStripNames', {
+    names: format.list(displayNames, {
+      type: remaining > 0 ? 'unit' : 'conjunction',
+    }),
+    remaining,
+  });
+
+  return (
+    <div className='flex gap-2.5 items-center'>
+      <div className='flex items-center shrink-0'>
+        {avatarHosts.map((host, index) => (
+          <Avatar
+            key={host.id ?? index}
+            className={cn('w-6 h-6 border-2 border-card', index > 0 && '-ml-2')}
+            title={host.name}
+          >
+            {host.avatarUrl && (
+              <AvatarImage src={host.avatarUrl} alt='' loading='lazy' />
+            )}
+            <FallbackAvatar seed={host.id ?? host.name} />
+          </Avatar>
+        ))}
+      </div>
+      <div className='text-foreground text-sm font-semibold leading-tight'>
+        {t('hostedByLabel')} {namesText}
       </div>
     </div>
   );
@@ -91,7 +145,16 @@ function FundraiserHosts({ fundraiser }: { fundraiser: Fundraiser }) {
       : null,
   }));
 
-  return <HostsDisplay hosts={hosts} />;
+  return (
+    <>
+      <div className='md:hidden'>
+        <HostsStripDisplay hosts={hosts} />
+      </div>
+      <div className='hidden md:block'>
+        <HostsListDisplay hosts={hosts} />
+      </div>
+    </>
+  );
 }
 
 function HostsPreview() {
@@ -102,7 +165,7 @@ function HostsPreview() {
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
   if (isAuthInitializing) {
-    return <HostsDisplay hosts={[]} loading />;
+    return <HostsListDisplay hosts={[]} loading />;
   }
 
   if (!isAuthenticated || !user) {
@@ -117,5 +180,16 @@ function HostsPreview() {
     profile?.image || user.picture
   );
 
-  return <HostsDisplay hosts={[{ name, avatarUrl }]} />;
+  const hosts = [{ name, avatarUrl }];
+
+  return (
+    <>
+      <div className='md:hidden'>
+        <HostsStripDisplay hosts={hosts} />
+      </div>
+      <div className='hidden md:block'>
+        <HostsListDisplay hosts={hosts} />
+      </div>
+    </>
+  );
 }

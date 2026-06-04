@@ -1,12 +1,10 @@
 'use client';
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { SelectedProject } from '@/lib/types/project-selection';
 
-import { use, useMemo } from 'react';
+import { use } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { getDefaultCauseId } from '@/lib/utils/project-selection';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { EditFundraiserFormProvider } from '@/components/fundraisers/edit-fundraiser-form-context';
 import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
@@ -15,35 +13,18 @@ import { useFundraiserForEdit } from '@/components/fundraisers/use-fundraiser-fo
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
 
-function extractNonDefaultInitialProjects(
-  fundraiser: Fundraiser
-): SelectedProject[] {
-  const workspaceCountry = fundraiser.workspace?.country ?? 'DE';
-  const defaultCauseId = getDefaultCauseId(workspaceCountry);
-
-  return fundraiser.projectAllocations
-    .filter(allocation => allocation.project.id !== defaultCauseId)
-    .map(allocation => ({
-      id: allocation.project.id,
-      name: allocation.project.name,
-      description: allocation.project.description,
-      image: allocation.project.image,
-    }));
-}
-
 function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
-  const nonDefaultInitialProjects = useMemo(
-    () => extractNonDefaultInitialProjects(fundraiser),
-    [fundraiser]
-  );
-
   return (
     <EditFundraiserFormProvider fundraiser={fundraiser}>
       <FundraiserFormBody
         mode='edit'
-        submitButton={<UpdateFundraiserButton fundraiserId={fundraiser.id} />}
-        nonDefaultInitialProjects={nonDefaultInitialProjects}
-        totalRaised={fundraiser.totalRaised}
+        submitButton={
+          <UpdateFundraiserButton
+            fundraiserId={fundraiser.id}
+            existingSettings={fundraiser.settings}
+          />
+        }
+        totalRaised={fundraiser.totalRaised[fundraiser.currency] ?? 0}
         endDate={fundraiser.endDate}
       />
     </EditFundraiserFormProvider>

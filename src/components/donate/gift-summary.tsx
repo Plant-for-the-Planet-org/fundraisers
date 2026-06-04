@@ -18,7 +18,9 @@ export function GiftSummary() {
 function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
   const t = useTranslations('Donate.gift');
 
-  const emailNoticeKey = gift.message ? 'emailNotice' : 'emailNoticeNoMessage';
+  const recipientEmailNoticeKey = gift.message
+    ? 'emailNotice'
+    : 'emailNoticeNoMessage';
 
   return (
     <Card className='gift-summary border border-card'>
@@ -29,21 +31,28 @@ function GiftSummaryInner({ gift }: { gift: SentInvitationGift }) {
             aria-hidden='true'
           />
 
-          <h3 className='font-semibold leading-tight text-foreground wrap-anywhere pr-8'>
+          <h3 className='font-semibold leading-tight text-foreground wrap-break-word pr-8'>
             {t('dedicatedTo', { recipientName: gift.recipientName })}
           </h3>
 
           {gift.message !== undefined && (
-            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm'>
+            <blockquote className='border-l-2 border-muted pl-3 text-muted-foreground text-sm wrap-break-word'>
               &ldquo;{gift.message}&rdquo;
             </blockquote>
           )}
 
-          {gift.recipientEmail !== undefined && (
-            <p className='text-muted-foreground text-sm'>
-              {t(emailNoticeKey, { recipientEmail: gift.recipientEmail })}
-            </p>
-          )}
+          <p className='text-muted-foreground text-sm wrap-break-word'>
+            {gift.recipientEmail !== undefined
+              ? t.rich(recipientEmailNoticeKey, {
+                  recipientEmail: gift.recipientEmail,
+                  highlight: chunks => (
+                    <span className='font-semibold text-foreground'>
+                      {chunks}
+                    </span>
+                  ),
+                })
+              : t('emailNoticeNoEmail')}
+          </p>
         </div>
       </CardContent>
     </Card>

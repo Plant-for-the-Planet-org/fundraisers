@@ -12,8 +12,7 @@
       "loading": "Loading summary stat...",
       "fundraisers": {
         "label": "Fundraisers",
-        "activeSuffix": "active",
-        "noActive": "No active fundraisers"
+        "activeStatus": "{count, plural, =0 {No active fundraisers} other {<bold>{count, number}</bold> active}}"
       },
       "totalRaised": {
         "label": "Total Raised",
@@ -34,6 +33,7 @@
     },
     "toolbar": {
       "searchPlaceholder": "Name or Host...",
+      "searchAria": "Search fundraisers by name or host",
       "resultCount": "Showing <bold>{visible}</bold> of {total}"
     },
     "statusFilter": {
@@ -86,7 +86,7 @@
         "byHost": "by {host}",
         "goalProgress": "<b>{achievedAmount}</b> of {goal}",
         "donations": "{count, plural, =0 {0 donations} one {1 donation} other {# donations}}",
-        "daysLeft": "{count, plural, one {1 day left} other {# days left}}",
+        "daysLeft": "{count, number}d left",
         "ended": "Ended"
       },
       "empty": {

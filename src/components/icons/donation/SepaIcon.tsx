@@ -7,8 +7,7 @@ function SepaIcon(): ReactElement {
       width='40'
       height='24'
       viewBox='0 0 32 20'
-      role='img'
-      aria-label='SEPA Direct Debit'
+      aria-hidden='true'
     >
       <g data-name='Group 1483'>
         <path fill='none' d='M0 0H32V20H0z' data-name='Rectangle 878' />

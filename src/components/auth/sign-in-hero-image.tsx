@@ -1,13 +1,15 @@
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function SignInHeroImage() {
+  const tAuth = useTranslations('Auth');
   return (
     <section className='hidden lg:flex flex-1 relative'>
       <Image
-        src='/bird_on_a_tree.jpg'
-        alt='Bird on a tree'
+        src='/sign-in-hero.jpg'
+        alt={tAuth('heroImageAlt')}
         fill
-        className='object-cover object-center rounded-none lg:rounded-3xl'
+        className='object-cover rounded-3xl'
         priority
       />
       {/* Dark Overlay */}

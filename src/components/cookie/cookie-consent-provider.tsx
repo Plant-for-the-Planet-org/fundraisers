@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { COOKIE_CONSENT_CONFIG } from '@/lib/constants/cookie-consent-config';
 
 /**
@@ -9,7 +10,10 @@ import { COOKIE_CONSENT_CONFIG } from '@/lib/constants/cookie-consent-config';
  * Place once near the root of your app (e.g. in _app.tsx or a layout).
  */
 export function CookieConsentProvider(): null {
+  const pathname = usePathname();
+
   useEffect(() => {
+    if (pathname.endsWith('/stage')) return;
     import('vanilla-cookieconsent')
       .then(cc => {
         cc.run({

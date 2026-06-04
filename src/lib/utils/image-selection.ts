@@ -17,23 +17,11 @@ export const ALLOWED_IMAGE_TYPES = [
 
 export function validateImageFile(file: File): ImageValidationResult {
   if (file.size === 0) {
-    return {
-      isValid: false,
-      error: {
-        code: 'EMPTY_FILE',
-        message: 'Selected file is empty.',
-      },
-    };
+    return { isValid: false, error: { code: 'EMPTY_FILE' } };
   }
 
   if (file.size > MAX_IMAGE_FILE_SIZE) {
-    return {
-      isValid: false,
-      error: {
-        code: 'FILE_TOO_LARGE',
-        message: `Image must be ${MAX_IMAGE_FILE_SIZE_MB}MB or smaller.`,
-      },
-    };
+    return { isValid: false, error: { code: 'FILE_TOO_LARGE' } };
   }
 
   if (
@@ -41,13 +29,7 @@ export function validateImageFile(file: File): ImageValidationResult {
       file.type as (typeof ALLOWED_IMAGE_TYPES)[number]
     )
   ) {
-    return {
-      isValid: false,
-      error: {
-        code: 'INVALID_FILE_TYPE',
-        message: 'Please upload a JPG, PNG, WEBP, or GIF image.',
-      },
-    };
+    return { isValid: false, error: { code: 'INVALID_FILE_TYPE' } };
   }
 
   return { isValid: true };

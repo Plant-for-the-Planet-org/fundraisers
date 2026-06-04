@@ -51,6 +51,10 @@ const donationFormFields = z.object({
     ],
     { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
   ),
+  // When set, the donor picked a saved card/SEPA method — holds its Stripe
+  // payment method id (`pm_...`) to reuse as the donation source. Empty when
+  // entering new payment details.
+  selectedSavedMethodId: z.string().optional(),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
   tin: z.string().trim().optional(),
@@ -212,6 +216,7 @@ export function DonationFormProvider({
       makeMonthly: false,
       willAbsorbFee: false,
       addressType: 'primary',
+      selectedSavedMethodId: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -220,6 +225,7 @@ export function DonationFormProvider({
   useEffect(() => {
     methods.register('country');
     methods.register('selectedPaymentMethod');
+    methods.register('selectedSavedMethodId');
     methods.register('willAbsorbFee');
     methods.register('makeMonthly');
   }, [methods]);

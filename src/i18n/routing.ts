@@ -6,3 +6,5 @@ export const routing = defineRouting({
   localePrefix: 'never', // No /en or /de in URL
   localeDetection: false, // Don't use browser Accept-Language
 });
+
+export type Locale = (typeof routing.locales)[number];

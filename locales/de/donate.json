@@ -1,8 +1,14 @@
 {
   "Donate": {
+    "overlay": {
+      "aria": {
+        "label": "Spendendetails",
+        "close": "Spendenfenster schließen"
+      }
+    },
     "preferences": {
       "anonymousDonationLabel": "Anonymisiere meine Spende.",
-      "anonymousDonationDescription": "Dein Name wird nicht öffentlich auf der Seite des Spendenaufrufs gezeigt."
+      "anonymousDonationDescription": "Dein Name erscheint nicht öffentlich auf der Seite des Spendenaufrufs."
     },
     "yourInfo": "Deine Informationen",
     "organization": "(Firma/Organisation)",
@@ -15,8 +21,8 @@
         "placeholder": "Firmen-/Organisationsnamen eingeben"
       },
       "email": {
-        "label": "E-Mail Adresse *",
-        "placeholder": "E-Mail Adresse eingeben"
+        "label": "E-Mail *",
+        "placeholder": "E-Mail eingeben"
       },
       "firstName": {
         "label": "Vorname *",
@@ -40,7 +46,7 @@
         "label": "Land *",
         "placeholder": "Land auswählen",
         "searchPlaceholder": "Länder werden durchsucht...",
-        "noResults": "Keine Länder gefunden",
+        "noResults": "Keine Land gefunden",
         "selectCountry": "Land auswählen"
       },
       "zipCode": {
@@ -71,52 +77,60 @@
       },
       "savingAddressLoader": "Adresse wird gespeichert...",
       "saveAddress": "Adresse speichern",
-      "saveAddressError": "Die Adresse konnte nicht gespeichert werden",
+      "saveAddressError": "Adresse konnte nicht gespeichert werden",
       "addNewAddress": "+ Neue Adresse hinzufügen"
     },
     "gift": {
-      "dedicatedTo": "Gewidmet an {recipientName}",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an {recipientEmail} geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an {recipientEmail} geschickt."
+      "dedicatedTo": "{recipientName} gewidmet",
+      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
+      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
     },
     "errors": {
       "zipCode": {
-        "required": "Die Postleitzahl ist erforderlich"
+        "required": "Postleitzahl ist erforderlich"
       },
       "address": {
-        "required": "Die Adresse ist erforderlich"
+        "required": "Adresse ist erforderlich"
       },
       "city": {
-        "required": "Die Stadt ist erforderlich"
+        "required": "Stadt ist erforderlich"
       },
       "country": {
-        "required": "Das Land ist erforderlich"
+        "required": "Land ist erforderlich"
       },
       "firstName": {
-        "required": "Der Vorname ist erforderlich"
+        "required": "Vorname ist erforderlich"
       },
       "lastName": {
-        "required": "Der Nachname ist erforderlich"
+        "required": "Nachname ist erforderlich"
       },
       "companyName": {
-        "required": "Der Firmen-/Organisationsname ist erforderlich"
+        "required": "Firmen-/Organisationsname ist erforderlich"
       },
       "email": {
-        "required": "Die E-Mail Adresse ist erforderlich",
-        "invalid": "Bitte gib eine gültige E-Mail Adresse ein"
+        "required": "E-Mail ist erforderlich",
+        "invalid": "Bitte gib eine gültige E-Mail Adresse an"
       },
       "tin": {
-        "required": "Die TIN ist erforderlich"
+        "required": "TIN ist erforderlich"
       },
       "paymentMethod": {
-        "required": "Bitte wähle eine Zahlmethode aus"
+        "required": "Bitte wähle eine Zahlungsart aus"
       }
     },
     "sepa": {
       "ibanLabel": "IBAN",
-      "ibanRequired": "Die IBAN ist erforderlich",
+      "ibanRequired": "IBAN ist erforderlich",
       "accountHolderName": "Name des Kontoinhabers",
-      "accountHolderNameRequired": "Der Name des Kontoinhabers ist erforderlich",
+      "accountHolderNamePlaceholder": "Erika Mustermann",
+      "accountHolderNameRequired": "Name des Kontoinhabers ist erforderlich",
+      "errors": {
+        "validationFailed": "Validierung fehlgeschlagen",
+        "stripeNotInitialized": "Stripe nicht initialisiert",
+        "ibanElementNotFound": "IBAN-Element nicht gefunden",
+        "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
+      },
       "mandateTitle": "SEPA-Lastschriftmandat",
       "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
       "creditor": "Gläubiger",
@@ -135,12 +149,12 @@
       "cvcRequired": "CVC ist erforderlich",
       "cardholderNameLabel": "Name des Karteninhabers *",
       "cardholderNamePlaceholder": "Name des Karteninhabers eingeben",
-      "cardholderNameRequired": "Der Name des Karteninhabers ist erforderlich",
+      "cardholderNameRequired": "Name des Karteninhabers ist erforderlich",
       "useDonorAddressLabel": "Rechnungsadresse aus meinen Spenderdaten verwenden",
       "address": {
         "label": "Adresse *",
         "placeholder": "Adresse eingeben",
-        "required": "Die Adresse ist erforderlich"
+        "required": "Adresse ist erforderlich"
       },
       "address2": {
         "label": "Adresse Zeile 2",
@@ -148,16 +162,24 @@
       },
       "cityLabel": "Stadt *",
       "cityPlaceholder": "Stadt eingeben",
-      "cityRequired": "Die Stadt ist erforderlich",
+      "cityRequired": "Stadt ist erforderlich",
       "stateLabel": "Bundesland/Kanton",
       "statePlaceholder": "Bundesland oder Kanton eingeben",
       "billingZipCodeLabel": "Postleitzahl *",
       "billingZipCodePlaceholder": "Postleitzahl eingeben",
-      "billingZipCodeRequired": "Die Postleitzahl ist erforderlich",
+      "billingZipCodeRequired": "Postleitzahl ist erforderlich",
       "countryLabel": "Land *",
-      "countryRequired": "Das Land ist erforderlich",
+      "countryRequired": "Land ist erforderlich",
       "countryPlaceholder": "Land auswählen",
-      "countryNoResults": "Keine Länder gefunden"
+      "countryNoResults": "Kein Land gefunden",
+      "errors": {
+        "validationFailed": "Validierung fehlgeschlagen",
+        "stripeNotInitialized": "Stripe nicht initialisiert",
+        "cardElementNotFound": "Kartenelement nicht gefunden",
+        "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen",
+        "cardActionFailed": "Kartenaktion fehlgeschlagen",
+        "paymentIntentNotReturned": "Zahlungsabsicht nicht zurückgegeben"
+      }
     },
     "applePay": {
       "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche es mit Safari auf macOS oder iOS, oder scanne den QR-Code mit deinem iPhone.",
@@ -168,47 +190,49 @@
       "processing": "Google-Pay-Spende wird verarbeitet…"
     },
     "submissionErrors": {
-      "authRequired": "Bitte melde dich an, um mit deiner Spende fortzufahren.",
-      "network": "Netzwerkfehler. Bitte überprüfe deine Internetverbindung und versuche es nochmal.",
-      "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
-      "server": "Server-Fehler. Bitte versuche es in ein paar Minuten nochmal.",
-      "rateLimit": "Es gibt zu viele Anfragen. Bitte warte einen Moment und versuche es nochmal.",
-      "donationCreation": "Die Spende konnte nicht durchgeführt werden. Bitte versuche es nochmal.",
-      "validation": "Bitte überprüfe deine Angaben und versuche es nochmal.",
+      "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",
+      "network": "Netzwerkfehler. Überprüfe deine Internetverbindung und versuche es erneut.",
+      "timeout": "Die Anfrage hat zu lange gedauert. Versuche es erneut.",
+      "server": "Server-Fehler. Versuche es in ein paar Minuten erneut.",
+      "rateLimit": "Es gibt zu viele Anfragen. Warte einen Moment und versuche es erneut.",
+      "donationCreation": "Die Spende konnte nicht durchgeführt werden. Bitte versuche es erneut.",
+      "validation": "Bitte überprüfe deine Angaben und versuche es erneut.",
       "accessDenied": "Du hast nicht die Berechtigung, um diese Aktion durchzuführen.",
-      "businessLogic": "Die Spendendaten sind ungültig. Bitte überprüfe die Daten und versuche es nochmal.",
-      "threeDsMissingSecret": "Die Zahlungsauthentifizierung ist fehlgeschlagen. Bitte versuche es nochmal.",
-      "paypalOrderCreationError": "Die PayPal-Spende konnte nicht durchgeführt werden. Bitte versuche es nochmal.",
-      "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es nochmal.",
-      "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es nochmal.",
-      "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es nochmal.",
-      "unexpected": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuche es nochmal."
+      "businessLogic": "Die Spendendaten sind ungültig. Bitte überprüfe die Daten und versuche es erneut.",
+      "threeDsMissingSecret": "Die Zahlungsauthentifizierung ist fehlgeschlagen. Bitte versuche es erneut.",
+      "paypalOrderCreationError": "Die PayPal-Spende konnte nicht durchgeführt werden. Bitte versuche es erneut.",
+      "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+      "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
+      "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {
       "donateNow": "Jetzt spenden",
       "donateMonthly": "Monatlich spenden",
       "donateYearly": "Jährlich spenden",
-      "processing": "Verarbeitung läuft...",
-      "success": "Spende abgeschlossen"
+      "processing": "Abwicklung läuft...",
+      "success": "Spende erfolgreich"
     },
     "thankYou": {
+      "hostMessageHeading": "{count, plural, one {Nachricht vom Gastgeber*in} other {Nachricht der Gastgeber*innen}}",
+      "hostMessageSignature": "- {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",
         "bankTransferPending": "Danke, dass du deine Spende überweisen möchtest",
         "paymentProcessing": {
-          "processing": "Die Zahlung wird bearbeitet",
-          "failed": "Die Zahlung ist fehlgeschlagen",
-          "refunded": "Die Zahlung wurde erstattet",
-          "disputed": "Die Zahlung wird geprüft",
+          "processing": "Zahlung wird abgewickelt",
+          "failed": "Zahlung ist fehlgeschlagen",
+          "refunded": "Zahlung wurde erstattet",
+          "disputed": "Zahlung wird geprüft",
           "error": "Etwas ist schief gelaufen"
         }
       },
       "status": {
         "label": "Status:",
-        "completed": "Abgeschlossen",
-        "bankTransferPending": "Die Banküberweisung steht aus",
+        "completed": "Erfolgreich",
+        "bankTransferPending": "Überweisung steht aus",
         "paymentProcessing": {
-          "processing": "Wird verarbeitet",
+          "processing": "Abwicklung",
           "failed": "Fehlgeschlagen",
           "refunded": "Erstattet",
           "disputed": "Wird überprüft",
@@ -218,11 +242,11 @@
       "message": {
         "completed": "Wir haben dir eine Bestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst du eine steuerlich absetzbare Zuwendungsbescheinigung über pp.eco/profile herunterladen.",
         "paymentProcessing": {
-          "processing": "Deine Zahlung wird gerade bearbeitet. Du bekommst eine E-Mail, sobald sie bestätigt ist.",
-          "failed": "Leider ist deine Zahlung fehlgeschlagen. Bitte versuche es nochmal oder wähle eine andere Zahlungsweise aus.",
+          "processing": "Deine Zahlung wird gerade abgewickelt. Du erhälst eine E-Mail, sobald sie bestätigt ist.",
+          "failed": "Deine Zahlung ist leider fehlgeschlagen. Versuche es erneut oder wähle eine andere Zahlungsart aus.",
           "refunded": "Deine Zahlung wurde zurückerstattet.",
           "disputed": "Deine Zahlung wird derzeit geprüft. Bitte kontaktiere den Support, wenn Du Hilfe brauchst.",
-          "error": "Bei deiner Zahlung ist ein Fehler aufgetreten. Bitte kontaktiere support@plant-for-the-planet.org mit Angaben zur Spende."
+          "error": "Bei deiner Zahlung ist ein Problem aufgetreten. Bitte kontaktiere support@plant-for-the-planet.org mit Angaben zur Spende."
         },
         "bankTransferPending": {
           "monthly": "Deine monatliche Spende von {amount} wurde angelegt. Um deine Spende abzuschließen, richte bitte einen entsprechenden Dauerauftrag bei deiner Bank auf das unten angegebene Konto ein. Diese Informationen wurden dir ebenfalls per E-Mail zugeschickt.",
@@ -238,16 +262,22 @@
         "iban": "IBAN",
         "bic": "BIC",
         "bank": "Bank",
-        "transactionId": "Transaktions-ID {id}",
-        "error": "Überweisungsdetails nicht gefunden, bitte wenden Sie sich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
+        "detailsTab": "Details",
+        "qrTab": "QR-Code",
+        "qrAlt": "EPC QR-Code für SEPA-Überweisung",
+        "qrBadge": "SEPA-Überweisungscode",
+        "qrHint": "Öffne deine Banking-App zum Scannen",
+        "qrCameraWarning": "Die Kamera-App deines Telefons wird nicht funktionieren. Verwende den QR-Scanner der Deutschen Bank, Sparkasse, Revolut und der meisten EU-Banking-Apps.",
+        "qrFallback": "QR-Code nicht verfügbar, verwende bitte die Registerkarte Details.",
+        "error": "Überweisungsdetails nicht gefunden, bitte wende dich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
       },
       "copy": {
         "label": "Kopieren {field}",
         "success": "Kopiert!",
-        "error": "Das Kopieren ist fehlgeschlagen"
+        "error": "Kopieren ist fehlgeschlagen"
       },
       "share": {
-        "title": "Diesen Spendenaufruf teilen",
+        "title": "Spendenaufruf teilen",
         "description": "Jeder Beitrag inspiriert mehr Menschen zum Handeln."
       }
     }

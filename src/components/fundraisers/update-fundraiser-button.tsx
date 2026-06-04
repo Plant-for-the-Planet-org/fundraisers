@@ -1,5 +1,6 @@
 'use client';
 
+import type { FundraiserSettings } from '@/lib/types/fundraiser';
 import type { SelectedImage } from '@/lib/types/image-selection';
 import type { UpdateDirtyFields } from '@/lib/utils/fundraiser-data-builder';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
@@ -18,10 +19,12 @@ import { Button } from '@/components/ui/button';
 
 interface UpdateFundraiserButtonProps {
   fundraiserId: string;
+  existingSettings: FundraiserSettings | null;
 }
 
 export function UpdateFundraiserButton({
   fundraiserId,
+  existingSettings,
 }: UpdateFundraiserButtonProps) {
   const t = useTranslations('Fundraisers.edit.formSubmission');
   const { control, handleSubmit, reset } =
@@ -61,7 +64,8 @@ export function UpdateFundraiserButton({
       const request = buildUpdateFundraiserRequest(
         values,
         dirtyFields as UpdateDirtyFields,
-        imageFile
+        imageFile,
+        existingSettings
       );
 
       if (Object.keys(request).length === 0) return;
@@ -76,9 +80,8 @@ export function UpdateFundraiserButton({
       toast.success(t('successMessage'));
       return updated;
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to update fundraiser';
-      toast.error(t('errorMessage'), { description: message });
+      console.error('Failed to update fundraiser:', err);
+      toast.error(t('errorMessage'), { description: t('errorDescription') });
     } finally {
       setIsSubmitting(false);
     }

@@ -54,7 +54,7 @@ export function getDashboardSummary(
   let activeFundraiserCount = 0;
   let donationsCount = 0;
 
-  const byCurrency = new Map<string, DashboardRaisedSummary>();
+  const raisedByCurrency = new Map<string, DashboardRaisedSummary>();
 
   for (const fundraiser of fundraisers) {
     if (fundraiser.status === 'active') {
@@ -65,34 +65,43 @@ export function getDashboardSummary(
       donationsCount += fundraiser.donationCount;
     }
 
-    if (typeof fundraiser.currency !== 'string' || fundraiser.currency === '') {
-      continue;
+    // Distribute raised amounts across currency buckets
+    for (const [currencyKey, amount] of Object.entries(
+      fundraiser.totalRaised
+    )) {
+      if (!currencyKey) continue;
+      const safeAmount = Number.isFinite(amount) ? amount : 0;
+      const currency = currencyKey.toUpperCase();
+      const existing = raisedByCurrency.get(currency);
+      if (existing) {
+        existing.totalRaised += safeAmount;
+      } else {
+        raisedByCurrency.set(currency, {
+          currency,
+          totalRaised: safeAmount,
+          fundraiserCount: 0,
+        });
+      }
     }
 
-    const currency = fundraiser.currency.toUpperCase();
-    const existing = byCurrency.get(currency);
-    const safeTotalRaised = Number.isFinite(fundraiser.totalRaised)
-      ? fundraiser.totalRaised
-      : 0;
-
-    if (existing) {
-      existing.totalRaised += safeTotalRaised;
-      existing.fundraiserCount += 1;
-      continue;
-    }
-
-    byCurrency.set(currency, {
-      currency,
-      totalRaised: safeTotalRaised,
-      fundraiserCount: 1,
-    });
+    // Count each fundraiser once in its primary currency bucket
+    const primaryCurrency = fundraiser.currency.toUpperCase();
+    const primaryEntry = raisedByCurrency.get(primaryCurrency) ?? {
+      currency: primaryCurrency,
+      totalRaised: 0,
+      fundraiserCount: 0,
+    };
+    primaryEntry.fundraiserCount += 1;
+    raisedByCurrency.set(primaryCurrency, primaryEntry);
   }
 
-  const totalRaisedByCurrency = Array.from(byCurrency.values()).sort((a, b) => {
-    return (
-      b.totalRaised - a.totalRaised || a.currency.localeCompare(b.currency)
-    );
-  });
+  const totalRaisedByCurrency = Array.from(raisedByCurrency.values()).sort(
+    (a, b) => {
+      return (
+        b.totalRaised - a.totalRaised || a.currency.localeCompare(b.currency)
+      );
+    }
+  );
 
   return {
     totalFundraiserCount: fundraisers.length,

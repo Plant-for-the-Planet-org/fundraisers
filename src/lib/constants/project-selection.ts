@@ -1,6 +1,6 @@
 import type { DefaultCauseIdByCountry } from '@/lib/types/project-selection';
 
-export const MIN_DEFAULT_CAUSE_PERCENT = 25;
+export const MIN_DEFAULT_CAUSE_PERCENT = 20;
 
 export const DEFAULT_NON_EARMARKED_CAUSE_ID = 'proj_bFH0BU0Qw02RuetpQlLOMVYX';
 

@@ -7,8 +7,7 @@ function CreditCard(): ReactElement {
       width='25'
       height='20'
       viewBox='0 0 20 16'
-      role='img'
-      aria-label='Credit Card'
+      aria-hidden='true'
     >
       <path
         fill='#4d5153'
