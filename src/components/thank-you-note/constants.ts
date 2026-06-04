@@ -10,6 +10,7 @@ export interface ThankYouPresetMessage {
 
 export const DEFAULT_THANK_YOU_OCCASION_ID = 'general';
 
+// cspell:disable
 export const THANK_YOU_PRESET_MESSAGES: Record<
   string,
   Record<'en' | 'de', ThankYouPresetMessage[]>
@@ -535,6 +536,7 @@ const OCCASION_KEYWORDS: { id: string; keywords: string[] }[] = [
     ],
   },
 ];
+// cspell:enable
 
 /**
  * Best-effort guess of the most fitting occasion from free text (typically the
