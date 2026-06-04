@@ -32,6 +32,7 @@ function getGatewayForPaymentMethod(
     case 'bank_transfer':
       return 'offline';
     default:
+      // planet_cash is handled by submitPrepaidDonation and never reaches here.
       throw new PaymentOptionsError(
         `Unknown payment method: ${paymentMethod}`,
         'UNKNOWN_PAYMENT_METHOD',
@@ -43,6 +44,7 @@ function getGatewayForPaymentMethod(
 // Wallets ride on top of `card` over the wire (Stripe SDK requirement), but we
 // keep the per-wallet id for the allowlist check so card can be enabled without
 // also enabling Apple Pay / Google Pay.
+// Only called inside `case 'stripe':` in buildPaymentRequest — non-Stripe methods never reach it.
 function getStripeMethodName(
   paymentMethod: PaymentMethod
 ): 'card' | 'sepa_debit' {
