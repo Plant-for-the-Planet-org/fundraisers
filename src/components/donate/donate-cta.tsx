@@ -70,14 +70,16 @@ export function DonateCTA({
   if (
     (selectedPaymentMethod === 'apple_pay' ||
       selectedPaymentMethod === 'google_pay') &&
-    onWalletConfirm
+    onWalletConfirm &&
+    onWalletError &&
+    onWalletCancel
   ) {
     return (
       <WalletButton
         wallet={selectedPaymentMethod}
         onWalletConfirm={onWalletConfirm}
-        onWalletError={onWalletError ?? (() => undefined)}
-        onWalletCancel={onWalletCancel ?? (() => undefined)}
+        onWalletError={onWalletError}
+        onWalletCancel={onWalletCancel}
       />
     );
   }
