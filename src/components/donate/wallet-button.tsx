@@ -41,6 +41,7 @@ export interface WalletButtonProps {
     stripe: Stripe
   ) => Promise<void>;
   onWalletError: () => void;
+  onWalletCancel: () => void;
 }
 
 interface WalletButtonInnerProps extends WalletButtonProps {
@@ -59,6 +60,7 @@ export function WalletButton({
   wallet,
   onWalletConfirm,
   onWalletError,
+  onWalletCancel,
 }: WalletButtonProps) {
   const locale = useLocale();
   const { fundraiser, paymentOptions, donationData } = useDonationForm();
@@ -139,6 +141,7 @@ export function WalletButton({
         wallet={wallet}
         onWalletConfirm={onWalletConfirm}
         onWalletError={onWalletError}
+        onWalletCancel={onWalletCancel}
         onAttemptComplete={bumpAttempt}
       />
     </Elements>
@@ -149,6 +152,7 @@ function WalletButtonInner({
   wallet,
   onWalletConfirm,
   onWalletError,
+  onWalletCancel,
   onAttemptComplete,
 }: WalletButtonInnerProps) {
   const stripe = useStripe();
@@ -186,15 +190,14 @@ function WalletButtonInner({
     []
   );
 
-  // Stripe treats wallet dismissal as a non-error (no onConfirm fires), but
-  // donors expect the same visible feedback as a server-side decline so they
-  // know the donation didn't go through. Route cancel through the shared
-  // error path and bump the attempt counter so the next try gets a fresh
-  // Elements instance.
+  // Stripe treats wallet dismissal as a non-error (no onConfirm fires).
+  // Route through onWalletCancel so donors see a neutral banner confirming
+  // the donation didn't go through. Bump the attempt counter so the next
+  // try gets a fresh Elements instance.
   const handleCancel = useCallback(() => {
-    onWalletError();
+    onWalletCancel();
     onAttemptComplete();
-  }, [onWalletError, onAttemptComplete]);
+  }, [onWalletCancel, onAttemptComplete]);
 
   const handleConfirm = useCallback(async () => {
     if (!stripe || !elements || isProcessing) return;

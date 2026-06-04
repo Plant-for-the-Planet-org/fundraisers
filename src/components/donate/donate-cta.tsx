@@ -28,6 +28,7 @@ interface DonateCTAProps {
     stripe: Stripe
   ) => Promise<void>;
   onWalletError?: () => void;
+  onWalletCancel?: () => void;
 }
 
 export function DonateCTA({
@@ -38,6 +39,7 @@ export function DonateCTA({
   onPayPalError,
   onWalletConfirm,
   onWalletError,
+  onWalletCancel,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
   const { donationData, onSubmit } = useDonationForm();
@@ -75,6 +77,7 @@ export function DonateCTA({
         wallet={selectedPaymentMethod}
         onWalletConfirm={onWalletConfirm}
         onWalletError={onWalletError ?? (() => undefined)}
+        onWalletCancel={onWalletCancel ?? (() => undefined)}
       />
     );
   }

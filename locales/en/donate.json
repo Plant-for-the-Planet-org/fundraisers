@@ -204,6 +204,7 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {

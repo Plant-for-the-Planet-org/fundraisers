@@ -721,15 +721,24 @@ export function useDonationSubmit(
     submittingRef.current = false;
   }, []);
 
-  // Surfaces client-side Stripe.js failures and wallet dismissal from the
-  // Apple Pay / Google Pay flow (elements.submit, createPaymentMethod, or
-  // sheet cancel). Server-side failures in the donation/payment APIs are
+  // Surfaces client-side Stripe.js failures (elements.submit or createPaymentMethod).
+  // Server-side failures in the donation/payment APIs are
   // already handled inside onWalletConfirm.
   const onWalletError = useCallback(() => {
     setDonationState(prev => ({
       ...prev,
       isLoading: false,
       error: { code: 'paymentFailed' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
+  // Handles donor-initiated dismissal of the Apple Pay / Google Pay sheet.
+  const onWalletCancel = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paymentCancelled' },
     }));
     submittingRef.current = false;
   }, []);
@@ -748,6 +757,7 @@ export function useDonationSubmit(
     onPayPalError,
     onWalletConfirm,
     onWalletError,
+    onWalletCancel,
     reset,
   };
 }

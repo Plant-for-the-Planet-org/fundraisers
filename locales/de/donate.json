@@ -204,6 +204,7 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "paymentCancelled": "Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {

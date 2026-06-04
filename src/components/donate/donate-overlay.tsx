@@ -114,6 +114,7 @@ function DonateOverlayInner({
     onPayPalError,
     onWalletConfirm,
     onWalletError,
+    onWalletCancel,
   } = useDonationSubmit(
     donationData,
     fundraiser,
@@ -175,6 +176,7 @@ function DonateOverlayInner({
             onPayPalError={onPayPalError}
             onWalletConfirm={onWalletConfirm}
             onWalletError={onWalletError}
+            onWalletCancel={onWalletCancel}
           />
         </>
       )}
