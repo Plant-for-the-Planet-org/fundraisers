@@ -235,9 +235,11 @@ Rendered when `notFound()` is called — either from `FundraiserAuthRetry` (auth
 image, fundraiser stats, host info, title and description, DonationForm, projects and allocations.
 
 **Pending implementation:**
+
 - **Real donation handler** — wire up `onDonate` in `FundraiserView` to the donation API
 - **Contribution options** — map `Fundraiser.settings.modules.contribution.options[].unit` → `ContributionOption.amount_cent` so `DonationForm` shows the fundraiser's configured preset amounts
 
 **Future features (not in current scope):**
+
 - **Leaderboard** — `GET /fundraisers/:slug/leaderboard`; should use `React.cache()` and live in `fundraiser-service.ts`
 - **All-time stats** — `GET /fundraisers/:slug/alltime-stats`; same pattern

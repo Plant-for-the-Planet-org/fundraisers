@@ -45,13 +45,13 @@
 
 ## 1. Summary
 
-| Metric | Value |
-|---|---|
-| **Total issues found** | ~55 across 30+ files |
-| **Locales** | `en`, `de` (default: `de`) |
-| **i18n library** | `next-intl` |
-| **Locale detection** | Cookie (`ui-locale`); no URL prefix |
-| **EN/DE key parity** | ✅ All 9 namespaces have matching key counts |
+| Metric                 | Value                                        |
+| ---------------------- | -------------------------------------------- |
+| **Total issues found** | ~55 across 30+ files                         |
+| **Locales**            | `en`, `de` (default: `de`)                   |
+| **i18n library**       | `next-intl`                                  |
+| **Locale detection**   | Cookie (`ui-locale`); no URL prefix          |
+| **EN/DE key parity**   | ✅ All 9 namespaces have matching key counts |
 
 ### EN/DE Key Count Parity
 
@@ -74,21 +74,21 @@ stage.json        en: 18    de: 18    ✅
 
 Each row below is intended to land as a single commit. Pages are independent; utilities at the bottom can ripple through pages and should land first if you want page-level changes to absorb their benefits cleanly.
 
-| # | Commit | Scope | Section |
-|---|---|---|---|
-| 1 | ✅ `fix(i18n): localize fundraiser detail page` | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString` | [§3](#3-page-fundraiser-detail-raiseslug) |
-| 2 | ✅ `fix(i18n): localize donate overlay` | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay) |
-| 3 | ✅ `fix(i18n): localize explore page` | location-category-map placeholder, category-page-skeleton aria | [§5](#5-page-explore) |
-| 4 | ✅ `fix(i18n): tidy dashboard pluralization & search aria` | dashboard-summary plural form, fundraiser-search-input distinct aria | [§6](#6-page-dashboard) |
-| 5 | ✅ `fix(i18n): localize stage page` | stage-top-bar brand/partner alt text | [§7](#7-page-stage) |
-| 6 | ✅ `fix(i18n): localize shared chrome` | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt | [§9](#9-shared-chrome-header-footer-dialog-tooltip) |
-| 7 | ✅ `fix(i18n): localize app-level pages & metadata` | root layout metadata, home scaffold alt, sentry-test gating | [§10](#10-app-level-root-layout-home-sentry-test) |
-| U1 | `refactor(i18n): require locale in formatCurrency*` | utility change + migrate all call sites (or via `useFormatCurrency` hook) | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
-| U2 | `refactor(i18n): rewrite formatTimeAgo with Intl.RelativeTimeFormat` | utility change + migrate 3 call sites | [§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook) |
-| U3 | `refactor(i18n): add joinNames helper using Intl.ListFormat` | extract helper + replace `' and '` join | [§11.3](#113-joinnames-helper-via-intllistformat) |
-| U4 | `refactor(i18n): error-code → translation pattern for services` | generalize `donation-failure-banner` pattern across services | [§11.4](#114-error-code--translation-pattern-for-services) |
-| Z1 | `chore(i18n): load cookie.json or document separate dictionary` | request.ts + types.ts | [§13.1](#131-cookiejson-is-not-loaded-by-next-intl) |
-| Z2 | `ci(i18n): add EN/DE key-parity guardrail` | script + CI step | [§13.2](#132-no-automated-key-audit) |
+| #   | Commit                                                               | Scope                                                                                                                                     | Section                                                                     |
+| --- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 1   | ✅ `fix(i18n): localize fundraiser detail page`                      | not-found, contribution-settings preview alert, create/update toast descriptions, edit hook error, donor-preview `toLocaleString`         | [§3](#3-page-fundraiser-detail-raiseslug)                                   |
+| 2   | ✅ `fix(i18n): localize donate overlay`                              | overlay aria labels, stripe SEPA/card form errors+placeholder, address-form error, donation-summary host joiner, payment-method icon aria | [§4](#4-page-donate-overlay)                                                |
+| 3   | ✅ `fix(i18n): localize explore page`                                | location-category-map placeholder, category-page-skeleton aria                                                                            | [§5](#5-page-explore)                                                       |
+| 4   | ✅ `fix(i18n): tidy dashboard pluralization & search aria`           | dashboard-summary plural form, fundraiser-search-input distinct aria                                                                      | [§6](#6-page-dashboard)                                                     |
+| 5   | ✅ `fix(i18n): localize stage page`                                  | stage-top-bar brand/partner alt text                                                                                                      | [§7](#7-page-stage)                                                         |
+| 6   | ✅ `fix(i18n): localize shared chrome`                               | dialog Close, info-tooltip fallback, header/footer aria labels, footer logo alt                                                           | [§9](#9-shared-chrome-header-footer-dialog-tooltip)                         |
+| 7   | ✅ `fix(i18n): localize app-level pages & metadata`                  | root layout metadata, home scaffold alt, sentry-test gating                                                                               | [§10](#10-app-level-root-layout-home-sentry-test)                           |
+| U1  | `refactor(i18n): require locale in formatCurrency*`                  | utility change + migrate all call sites (or via `useFormatCurrency` hook)                                                                 | [§11.1](#111-formatcurrency--make-locale-mandatory--useformatcurrency-hook) |
+| U2  | `refactor(i18n): rewrite formatTimeAgo with Intl.RelativeTimeFormat` | utility change + migrate 3 call sites                                                                                                     | [§11.2](#112-formattimeago--intlrelativetimeformat--useformattimeago-hook)  |
+| U3  | `refactor(i18n): add joinNames helper using Intl.ListFormat`         | extract helper + replace `' and '` join                                                                                                   | [§11.3](#113-joinnames-helper-via-intllistformat)                           |
+| U4  | `refactor(i18n): error-code → translation pattern for services`      | generalize `donation-failure-banner` pattern across services                                                                              | [§11.4](#114-error-code--translation-pattern-for-services)                  |
+| Z1  | `chore(i18n): load cookie.json or document separate dictionary`      | request.ts + types.ts                                                                                                                     | [§13.1](#131-cookiejson-is-not-loaded-by-next-intl)                         |
+| Z2  | `ci(i18n): add EN/DE key-parity guardrail`                           | script + CI step                                                                                                                          | [§13.2](#132-no-automated-key-audit)                                        |
 
 **Recommended order:** utilities (U1–U4) first if you want page commits to be free of mixed concerns; otherwise pages 1–7 first, utilities after.
 
@@ -102,11 +102,11 @@ Components under `src/components/fundraisers/*` plus the route's own files. Sect
 
 Converted to async server component using `getTranslations` from `next-intl/server`; copy now reads from `Fundraisers.notFound.{title, description, browseCta, homeCta}`. Literal `'404'` kept as-is (numeric code).
 
-**File:** [src/app/(fundraiser)/raise/[slug]/not-found.tsx:8-19](../src/app/(fundraiser)/raise/[slug]/not-found.tsx#L8-L19)
+**File:** [src/app/(fundraiser)/raise/[slug]/not-found.tsx:8-19](<../src/app/(fundraiser)/raise/[slug]/not-found.tsx#L8-L19>)
 
 **Hardcoded:** `'404'`, `'Fundraiser Not Found'`, `"The fundraiser you're looking for doesn't exist or may have been removed."`, `'Browse Fundraisers'`, `'Go Home'`
 
-**Why:** The sibling [`error.tsx`](../src/app/(fundraiser)/raise/[slug]/error.tsx) already uses `Fundraisers.error.*` — the not-found page is inconsistent.
+**Why:** The sibling [`error.tsx`](<../src/app/(fundraiser)/raise/[slug]/error.tsx>) already uses `Fundraisers.error.*` — the not-found page is inconsistent.
 
 **Fix:** Add `Fundraisers.notFound.{title, description, browseCta, homeCta}`.
 
@@ -128,12 +128,12 @@ Both call sites now pass `useLocale()` to `toLocaleString(locale)`. Server compo
 
 ### 3.6 Missing Keys ✅ Added (2026-05-21)
 
-| Key | File | Purpose |
-|---|---|---|
-| ~~`Fundraisers.notFound.*`~~ | `fundraisers.json` | ✅ Added — `title`, `description`, `browseCta`, `homeCta` |
-| ~~`Fundraisers.form.contributionSettings.preview.*`~~ | `fundraisers.json` | ✅ Added — `title`, `description`, `frequencyLabel` |
-| ~~`Fundraisers.create.formSubmission.errorDescription`~~ | `fundraisers.json` | ✅ Added (new key, not in original plan) |
-| ~~`Fundraisers.edit.formSubmission.errorDescription`~~ | `fundraisers.json` | ✅ Added (new key, not in original plan) |
+| Key                                                      | File               | Purpose                                                   |
+| -------------------------------------------------------- | ------------------ | --------------------------------------------------------- |
+| ~~`Fundraisers.notFound.*`~~                             | `fundraisers.json` | ✅ Added — `title`, `description`, `browseCta`, `homeCta` |
+| ~~`Fundraisers.form.contributionSettings.preview.*`~~    | `fundraisers.json` | ✅ Added — `title`, `description`, `frequencyLabel`       |
+| ~~`Fundraisers.create.formSubmission.errorDescription`~~ | `fundraisers.json` | ✅ Added (new key, not in original plan)                  |
+| ~~`Fundraisers.edit.formSubmission.errorDescription`~~   | `fundraisers.json` | ✅ Added (new key, not in original plan)                  |
 
 ### 3.7 Notes — Currency call sites on this page
 
@@ -178,10 +178,10 @@ These icons are only rendered inside `<PaymentMethodOption>` next to a visible t
 
 ### 4.7 Missing Keys ✅ Added (2026-05-22)
 
-| Key | File | Status |
-|---|---|---|
-| ~~`Donate.overlay.aria.{label, close}`~~ | `donate.json` | ✅ Added in §4.1 |
-| ~~`Donate.sepa.{accountHolderNamePlaceholder, errors.*}`~~ | `donate.json` | ✅ Added in §4.2 |
+| Key                                                              | File          | Status           |
+| ---------------------------------------------------------------- | ------------- | ---------------- |
+| ~~`Donate.overlay.aria.{label, close}`~~                         | `donate.json` | ✅ Added in §4.1 |
+| ~~`Donate.sepa.{accountHolderNamePlaceholder, errors.*}`~~       | `donate.json` | ✅ Added in §4.2 |
 | ~~`Donate.card.errors.{paymentMethodFailed, cardActionFailed}`~~ | `donate.json` | ✅ Added in §4.3 |
 
 ### 4.8 Notes — Currency call sites on this page
@@ -209,10 +209,10 @@ Converted to async server component using `getTranslations`; both lines now read
 
 ### 5.3 Missing Keys ✅ Added (2026-05-22)
 
-| Key | File | Status |
-|---|---|---|
+| Key                                           | File           | Status   |
+| --------------------------------------------- | -------------- | -------- |
 | ~~`Explore.locationMap.{title, comingSoon}`~~ | `explore.json` | ✅ Added |
-| ~~`Explore.categoryPage.loadingAria`~~ | `explore.json` | ✅ Added |
+| ~~`Explore.categoryPage.loadingAria`~~        | `explore.json` | ✅ Added |
 
 ### 5.4 Notes — Currency call site on this page
 
@@ -256,8 +256,8 @@ Both `<img alt>` attributes now read from `Stage.topBar.{brandAlt, partnerAlt}`.
 
 ### 7.2 Missing Keys ✅ Added (2026-05-22)
 
-| Key | File | Status |
-|---|---|---|
+| Key                                       | File         | Status   |
+| ----------------------------------------- | ------------ | -------- |
 | ~~`Stage.topBar.{brandAlt, partnerAlt}`~~ | `stage.json` | ✅ Added |
 
 ### 7.3 Notes — `formatTimeAgo` on the public stage ticker
@@ -333,13 +333,13 @@ Dropped the unused `message` field from `ImageUploadError`. The UI was already r
 
 ### 9.6 Missing Keys ✅ Added (2026-05-22)
 
-| Key | File | Status |
-|---|---|---|
-| ~~`Common.actions.close`~~ | `common.json` | ✅ Added |
-| ~~`Common.aria.{primaryNavigation, legalLinks, moreInformation}`~~ | `common.json` | ✅ Added |
-| ~~`Common.partners.{plantForThePlanetAlt, unepAlt}`~~ | `common.json` | ✅ Added |
-| ~~`Common.brand.name`~~ | `common.json` | ✅ Added |
-| `Common.aria.loading` | `common.json` | Deferred — no current consumer (§5.2 used a scoped key) |
+| Key                                                                | File          | Status                                                  |
+| ------------------------------------------------------------------ | ------------- | ------------------------------------------------------- |
+| ~~`Common.actions.close`~~                                         | `common.json` | ✅ Added                                                |
+| ~~`Common.aria.{primaryNavigation, legalLinks, moreInformation}`~~ | `common.json` | ✅ Added                                                |
+| ~~`Common.partners.{plantForThePlanetAlt, unepAlt}`~~              | `common.json` | ✅ Added                                                |
+| ~~`Common.brand.name`~~                                            | `common.json` | ✅ Added                                                |
+| `Common.aria.loading`                                              | `common.json` | Deferred — no current consumer (§5.2 used a scoped key) |
 
 ---
 
@@ -361,8 +361,8 @@ Gated behind `NODE_ENV !== 'production'` rather than localizing. The page is a d
 
 ### 10.4 Missing Keys ✅ Added (2026-05-22)
 
-| Key | File | Status |
-|---|---|---|
+| Key                                        | File          | Status   |
+| ------------------------------------------ | ------------- | -------- |
 | ~~`Common.metadata.{title, description}`~~ | `common.json` | ✅ Added |
 
 ---
@@ -378,8 +378,16 @@ Each subsection is its own commit. Landing these first lets per-page commits (§
 **Status update:** The original recommendation here (make `locale` mandatory + introduce a `useFormatCurrency` hook) was superseded by a `develop` refactor (PR #118, `feature/consistent-formatting-numbers`) that landed in this branch via the latest merge. The new signature is:
 
 ```ts
-export function formatCurrency(amountInCents, currency, options?: { locale?, compact? })
-export function formatCurrencyFromDecimal(amount, currency, options?: { locale?, compact?, currencyDisplay? })
+export function formatCurrency(
+  amountInCents,
+  currency,
+  options?: { locale?; compact? }
+);
+export function formatCurrencyFromDecimal(
+  amount,
+  currency,
+  options?: { locale?; compact?; currencyDisplay? }
+);
 ```
 
 Locale is auto-detected via:
@@ -387,7 +395,8 @@ Locale is auto-detected via:
 ```ts
 function resolveLocale(locale?: string): string {
   if (locale) return locale;
-  if (typeof document !== 'undefined') return document.documentElement.lang || 'en';
+  if (typeof document !== 'undefined')
+    return document.documentElement.lang || 'en';
   return 'en';
 }
 ```
@@ -406,20 +415,20 @@ Since next-intl writes the active locale to `<html lang>`, client components now
 
 **Call sites to audit for SSR vs. client (no longer "broken", just worth confirming):**
 
-| File | Line | Page |
-|---|---|---|
-| [donate/donate-options.tsx](../src/components/donate/donate-options.tsx#L74) | 74 | Donate |
-| [fundraisers/donation-form.tsx](../src/components/fundraisers/donation-form.tsx) | 108 | Fundraiser |
-| [fundraisers/donation-amounts.tsx](../src/components/fundraisers/donation-amounts.tsx) | 72 | Fundraiser |
-| [fundraisers/leaderboard/donation-table.tsx](../src/components/fundraisers/leaderboard/donation-table.tsx#L79) | 79 | Fundraiser |
-| [fundraisers/leaderboard/donation-item.tsx](../src/components/fundraisers/leaderboard/donation-item.tsx#L65) | 65 | Fundraiser |
-| [fundraisers/goal-progress-display.tsx](../src/components/fundraisers/goal-progress-display.tsx) | 25, 41 | Fundraiser |
-| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L142) | 142, 157, 166 | Donate |
-| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332) | 332, 351, 398 | Donate |
-| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx#L27) | 27, 34 | Donate |
-| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L71) | 71 | Explore |
-| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50) | 43-48 | Dashboard |
-| [fundraisers/goal-input.tsx](../src/components/fundraisers/goal-input.tsx#L85) | 85 | Fundraiser |
+| File                                                                                                           | Line          | Page       |
+| -------------------------------------------------------------------------------------------------------------- | ------------- | ---------- |
+| [donate/donate-options.tsx](../src/components/donate/donate-options.tsx#L74)                                   | 74            | Donate     |
+| [fundraisers/donation-form.tsx](../src/components/fundraisers/donation-form.tsx)                               | 108           | Fundraiser |
+| [fundraisers/donation-amounts.tsx](../src/components/fundraisers/donation-amounts.tsx)                         | 72            | Fundraiser |
+| [fundraisers/leaderboard/donation-table.tsx](../src/components/fundraisers/leaderboard/donation-table.tsx#L79) | 79            | Fundraiser |
+| [fundraisers/leaderboard/donation-item.tsx](../src/components/fundraisers/leaderboard/donation-item.tsx#L65)   | 65            | Fundraiser |
+| [fundraisers/goal-progress-display.tsx](../src/components/fundraisers/goal-progress-display.tsx)               | 25, 41        | Fundraiser |
+| [donate/donation-summary.tsx](../src/components/donate/donation-summary.tsx#L142)                              | 142, 157, 166 | Donate     |
+| [donate/payment-methods.tsx](../src/components/donate/payment-methods.tsx#L332)                                | 332, 351, 398 | Donate     |
+| [donate/donation-thank-you.tsx](../src/components/donate/donation-thank-you.tsx#L27)                           | 27, 34        | Donate     |
+| [explore/fundraiser-card.tsx](../src/components/explore/fundraiser-card.tsx#L71)                               | 71            | Explore    |
+| [dashboard/fundraiser-list-item.tsx](../src/components/dashboard/fundraiser-list-item.tsx#L43-L50)             | 43-48         | Dashboard  |
+| [fundraisers/goal-input.tsx](../src/components/fundraisers/goal-input.tsx#L85)                                 | 85            | Fundraiser |
 
 Already passes explicit `{ locale }` (kept for reference):
 
@@ -457,7 +466,10 @@ export function formatTimeAgo(timestamp: string | Date): string {
 
 ```ts
 export function formatTimeAgo(ts: string | Date, locale: string): string {
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
+  const rtf = new Intl.RelativeTimeFormat(locale, {
+    numeric: 'auto',
+    style: 'short',
+  });
   // pick best unit based on diff
   return rtf.format(-diff, unit);
 }
@@ -542,13 +554,22 @@ No tooling currently detects orphan keys, and no build-time check guarantees EN/
 
 ```ts
 const cookieLocale = cookieStore.get('ui-locale')?.value;
-const locale = hasLocale(routing.locales, cookieLocale) ? cookieLocale : routing.defaultLocale;
+const locale = hasLocale(routing.locales, cookieLocale)
+  ? cookieLocale
+  : routing.defaultLocale;
 
 return {
   locale,
   messages: {
-    ...common, ...explore, ...fundraisers, ...bundles, ...auth,
-    ...dashboard, ...donate, ...stage, ...leaderboard,
+    ...common,
+    ...explore,
+    ...fundraisers,
+    ...bundles,
+    ...auth,
+    ...dashboard,
+    ...donate,
+    ...stage,
+    ...leaderboard,
     // ⚠️ cookie.json is NOT loaded here
   },
 };
