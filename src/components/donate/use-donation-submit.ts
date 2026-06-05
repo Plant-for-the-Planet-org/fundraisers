@@ -52,7 +52,8 @@ export function useDonationSubmit(
   fundraiser: Fundraiser,
   paymentOptions: PaymentOptions,
   sepaFormRef: RefObject<StripeSepaFormHandle | null>,
-  cardFormRef: RefObject<StripeCardFormHandle | null>
+  cardFormRef: RefObject<StripeCardFormHandle | null>,
+  onPaymentValidationFailed?: () => void
 ) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const donorProfile = useAuthStore(state => state.user?.profile);
@@ -152,7 +153,20 @@ export function useDonationSubmit(
               ),
             });
 
-            if (!sepaResult || 'error' in sepaResult) {
+            if (!sepaResult) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+            if ('validationFailed' in sepaResult) {
+              setDonationState(prev => ({ ...prev, isLoading: false }));
+              onPaymentValidationFailed?.();
+              return;
+            }
+            if ('error' in sepaResult) {
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
@@ -173,7 +187,20 @@ export function useDonationSubmit(
               ),
             });
 
-            if (!cardResult || 'error' in cardResult) {
+            if (!cardResult) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+            if ('validationFailed' in cardResult) {
+              setDonationState(prev => ({ ...prev, isLoading: false }));
+              onPaymentValidationFailed?.();
+              return;
+            }
+            if ('error' in cardResult) {
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
@@ -386,6 +413,7 @@ export function useDonationSubmit(
       token,
       sepaFormRef,
       cardFormRef,
+      onPaymentValidationFailed,
     ]
   );
 

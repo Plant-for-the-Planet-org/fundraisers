@@ -9,7 +9,7 @@ type FormFieldProps = {
 
 export const FormField = ({ label, error, children }: FormFieldProps) => {
   return (
-    <div className='space-y-2'>
+    <div className='space-y-2' data-field-error={error ? 'true' : undefined}>
       <Label className='text-sm font-medium text-foreground'>{label}</Label>
 
       {children}
