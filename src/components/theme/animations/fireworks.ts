@@ -1,4 +1,4 @@
-import { rand } from './base';
+import { MOBILE_BREAKPOINT, pickRandom, rand } from './base';
 
 // --- Burst size tiers ---
 type BurstSize = 's' | 'm' | 'l';
@@ -11,9 +11,27 @@ interface SizeTier {
 }
 
 const SIZE_TIERS: Record<BurstSize, SizeTier> = {
-  s: { fragments: 12, speed: 2.2, fadeFrames: 60, trailWidth: 1.5, glowRadius: 4 },
-  m: { fragments: 18, speed: 2.6, fadeFrames: 120, trailWidth: 2, glowRadius: 5 },
-  l: { fragments: 24, speed: 3.0, fadeFrames: 180, trailWidth: 2.5, glowRadius: 6 },
+  s: {
+    fragments: 12,
+    speed: 2.2,
+    fadeFrames: 60,
+    trailWidth: 1.5,
+    glowRadius: 4,
+  },
+  m: {
+    fragments: 18,
+    speed: 2.6,
+    fadeFrames: 120,
+    trailWidth: 2,
+    glowRadius: 5,
+  },
+  l: {
+    fragments: 24,
+    speed: 3.0,
+    fadeFrames: 180,
+    trailWidth: 2.5,
+    glowRadius: 6,
+  },
 };
 
 const BURST_SIZES: BurstSize[] = ['s', 'm', 'l'];
@@ -62,10 +80,8 @@ export interface FireworkState {
   bursts: Burst[];
   spawnTimer: number;
   nextSpawnAt: number;
-}
-
-function pickRandom<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)] as T;
+  maxBursts: number;
+  fragmentScale: number;
 }
 
 // Parse hex color to "r,g,b" string for use in rgba(). Cached per color.
@@ -79,16 +95,17 @@ function hexToRgb(hex: string): string {
   return cached;
 }
 
-function createBurst(w: number, h: number): Burst {
+function createBurst(w: number, h: number, fragmentScale: number): Burst {
   const size = pickRandom(BURST_SIZES);
   const tier = SIZE_TIERS[size];
   const color = pickRandom(FIREWORK_COLORS);
   const cx = rand(w * 0.15, w * 0.85);
   const cy = rand(h * 0.1, h * 0.7);
 
+  const fragmentCount = Math.max(4, Math.round(tier.fragments * fragmentScale));
   const fragments: Fragment[] = [];
-  for (let i = 0; i < tier.fragments; i++) {
-    const angle = (Math.PI * 2 * i) / tier.fragments + rand(-0.15, 0.15);
+  for (let i = 0; i < fragmentCount; i++) {
+    const angle = (Math.PI * 2 * i) / fragmentCount + rand(-0.15, 0.15);
     const speed = rand(0.6, 1.0) * tier.speed;
     fragments.push({
       x: cx,
@@ -123,16 +140,18 @@ export interface FireworkConfig {
   draw: (ctx: CanvasRenderingContext2D, state: FireworkState) => void;
 }
 
-const MAX_BURSTS = 10;
 const SPAWN_INTERVAL_MIN = 30;
 const SPAWN_INTERVAL_MAX = 90;
 
 export const fireworkConfig: FireworkConfig = {
-  init() {
+  init(w) {
+    const isMobile = w < MOBILE_BREAKPOINT;
     return {
       bursts: [],
       spawnTimer: 0,
       nextSpawnAt: Math.floor(rand(10, 40)),
+      maxBursts: isMobile ? 6 : 10,
+      fragmentScale: isMobile ? 0.6 : 1,
     };
   },
 
@@ -140,12 +159,12 @@ export const fireworkConfig: FireworkConfig = {
     state.spawnTimer++;
     if (
       state.spawnTimer >= state.nextSpawnAt &&
-      state.bursts.length < MAX_BURSTS
+      state.bursts.length < state.maxBursts
     ) {
-      state.bursts.push(createBurst(w, h));
+      state.bursts.push(createBurst(w, h, state.fragmentScale));
       state.spawnTimer = 0;
       state.nextSpawnAt = Math.floor(
-        rand(SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX),
+        rand(SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX)
       );
     }
 
@@ -195,13 +214,9 @@ export const fireworkConfig: FireworkConfig = {
         for (const f of burst.fragments) {
           if (f.trailFill < 2) continue;
 
-          const oldest =
-            f.trailFill < TRAIL_LENGTH ? 0 : f.trailIdx;
+          const oldest = f.trailFill < TRAIL_LENGTH ? 0 : f.trailIdx;
           const bandStart = band * bandSize;
-          const bandEnd = Math.min(
-            (band + 1) * bandSize,
-            f.trailFill - 1,
-          );
+          const bandEnd = Math.min((band + 1) * bandSize, f.trailFill - 1);
 
           for (let j = bandStart; j < bandEnd; j++) {
             if (j >= f.trailFill - 1) break;

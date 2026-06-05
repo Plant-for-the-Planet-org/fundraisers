@@ -5,8 +5,8 @@ import type { Particle, ParticleConfig } from './animations/base';
 import type { FireworkConfig, FireworkState } from './animations/fireworks';
 
 import { useEffect, useRef } from 'react';
+import { MOBILE_BREAKPOINT } from './animations/base';
 
-const MOBILE_BREAKPOINT = 768;
 const RESIZE_DEBOUNCE = 200;
 
 // Animations above content (z-20), below overlays (z-50)
@@ -15,15 +15,15 @@ const ABOVE_CONTENT: ReadonlySet<AnimationType> = new Set([
   'fireworks',
 ]);
 
+type LoadedConfig =
+  | { kind: 'particle'; config: ParticleConfig }
+  | { kind: 'firework'; config: FireworkConfig };
+
 // Lazy-load per-animation config. Only the selected animation's code is fetched.
 async function loadConfig(
   type: AnimationType,
-  mode: ThemeMode,
-): Promise<
-  | { kind: 'particle'; config: ParticleConfig }
-  | { kind: 'firework'; config: FireworkConfig }
-  | null
-> {
+  mode: ThemeMode
+): Promise<LoadedConfig | null> {
   switch (type) {
     case 'snow': {
       const mod = await import('./animations/snow');
@@ -60,15 +60,13 @@ export default function AnimationOverlay({
     const canvas: HTMLCanvasElement = canvasRef.current;
 
     const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
+      '(prefers-reduced-motion: reduce)'
     ).matches;
 
     let particles: Particle[] = [];
     let fireworkState: FireworkState | null = null;
-    let loadedConfig:
-      | { kind: 'particle'; config: ParticleConfig }
-      | { kind: 'firework'; config: FireworkConfig }
-      | null = null;
+    let loadedConfig: LoadedConfig | null = null;
+    let ctx: CanvasRenderingContext2D | null = null;
     let w = 0;
     let h = 0;
     let rafId = 0;
@@ -83,7 +81,8 @@ export default function AnimationOverlay({
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
-      const ctx = canvas.getContext('2d');
+      // Cache the 2D context once; reused every frame in loop().
+      ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
@@ -95,17 +94,8 @@ export default function AnimationOverlay({
 
       particles = [];
       for (let i = 0; i < count; i++) {
-        const p: Particle = {
-          x: 0,
-          y: 0,
-          speed: 0,
-          size: 0,
-          drift: 0,
-          opacity: 0,
-          rotation: 0,
-          color: '',
-          phase: 0,
-        };
+        // config.init() -> initBase() fully populates every Particle field.
+        const p = {} as Particle;
         config.init(p, w, h);
         particles.push(p);
       }
@@ -129,7 +119,6 @@ export default function AnimationOverlay({
         return;
       }
 
-      const ctx = canvas.getContext('2d');
       if (!ctx || !loadedConfig) {
         rafId = requestAnimationFrame(loop);
         return;

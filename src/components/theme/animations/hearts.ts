@@ -12,9 +12,7 @@ export function createHeartsConfig(mode: ThemeMode): ParticleConfig {
     sizeRange: [6, 12],
     driftRange: [-0.2, 0.2],
     opacityRange: isDark ? [0.2, 0.7] : [0.3, 0.6],
-    colors: isDark
-      ? ['#ffffff']
-      : ['#fb7185', '#f43f5e', '#e11d48', '#fda4af'],
+    colors: isDark ? ['#ffffff'] : ['#fb7185', '#f43f5e', '#e11d48', '#fda4af'],
     init(p, w, h) {
       initBase(p, this, w, h);
     },
@@ -41,7 +39,7 @@ export function createHeartsConfig(mode: ThemeMode): ParticleConfig {
         p.x - s,
         p.y - s * 0.1,
         p.x - s,
-        p.y + s * 0.35,
+        p.y + s * 0.35
       );
       ctx.bezierCurveTo(
         p.x - s,
@@ -49,7 +47,7 @@ export function createHeartsConfig(mode: ThemeMode): ParticleConfig {
         p.x - s * 0.3,
         p.y + h * 0.7,
         p.x,
-        p.y + h,
+        p.y + h
       );
       ctx.bezierCurveTo(
         p.x + s * 0.3,
@@ -57,16 +55,9 @@ export function createHeartsConfig(mode: ThemeMode): ParticleConfig {
         p.x + s,
         p.y + s * 0.8,
         p.x + s,
-        p.y + s * 0.35,
+        p.y + s * 0.35
       );
-      ctx.bezierCurveTo(
-        p.x + s,
-        p.y - s * 0.1,
-        p.x,
-        p.y,
-        p.x,
-        p.y + s * 0.35,
-      );
+      ctx.bezierCurveTo(p.x + s, p.y - s * 0.1, p.x, p.y, p.x, p.y + s * 0.35);
       ctx.fill();
     },
   };

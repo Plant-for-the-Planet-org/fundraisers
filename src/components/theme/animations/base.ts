@@ -22,15 +22,23 @@ export interface ParticleConfig {
   draw: (ctx: CanvasRenderingContext2D, p: Particle) => void;
 }
 
+// Viewport width below which animations reduce particle/burst counts.
+export const MOBILE_BREAKPOINT = 768;
+
 export function rand(min: number, max: number) {
   return Math.random() * (max - min) + min;
+}
+
+export function pickRandom<T>(arr: readonly T[]): T {
+  if (arr.length === 0) throw new Error('pickRandom called with empty array');
+  return arr[Math.floor(Math.random() * arr.length)] as T;
 }
 
 export function initBase(
   p: Particle,
   cfg: ParticleConfig,
   w: number,
-  h: number,
+  h: number
 ) {
   p.x = Math.random() * w;
   p.y = Math.random() * h;

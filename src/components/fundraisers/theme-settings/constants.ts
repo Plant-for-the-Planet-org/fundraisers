@@ -113,7 +113,4 @@ export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
 
-export const pickRandom = <T>(arr: readonly T[]): T => {
-  if (arr.length === 0) throw new Error('pickRandom called with empty array');
-  return arr[Math.floor(Math.random() * arr.length)];
-};
+export { pickRandom } from '@/components/theme/animations/base';

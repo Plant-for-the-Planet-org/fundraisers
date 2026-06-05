@@ -5,10 +5,6 @@ import type { BgSettings, Theme } from '@/lib/theme/types';
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-
-const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
-  ssr: false,
-});
 import { usePathname } from 'next/navigation';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import {
@@ -19,6 +15,10 @@ import {
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
+
+const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
+  ssr: false,
+});
 
 /**
  * Guard against CSS injection via url("...") interpolation.
