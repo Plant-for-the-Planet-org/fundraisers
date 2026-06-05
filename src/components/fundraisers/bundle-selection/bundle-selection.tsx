@@ -85,9 +85,9 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
     ? getBundleBySlug(bundleSlug)
     : undefined;
 
-  // Bundle selected when the fundraiser was saved. Only this bundle shows
+  // Bundle persisted when the fundraiser was saved. Only this bundle shows
   // non-donatable projects; other bundles filter them out. Null in create mode.
-  const [preSelectedBundleSlug] = useState(() =>
+  const [persistedBundleSlug] = useState(() =>
     mode === 'edit' ? (bundleSlug ?? null) : null
   );
 
@@ -152,8 +152,8 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
       setActiveTab={handleTabChange}
       previewBundle={previewBundle}
       setPreviewBundle={setPreviewBundle}
-      selectedBundleSlug={selectedBundle?.slug}
-      preSelectedBundleSlug={preSelectedBundleSlug}
+      currentBundleSlug={selectedBundle?.slug}
+      persistedBundleSlug={persistedBundleSlug}
       country={country}
       bundleWorkspace={bundleWorkspace}
       onUseBundle={handleUseBundle}
@@ -166,8 +166,8 @@ interface BundleSelectionContentProps {
   setActiveTab: (tab: BundleTabId) => void;
   previewBundle: Bundle | null;
   setPreviewBundle: (bundle: Bundle | null) => void;
-  selectedBundleSlug: BundleSlug | undefined;
-  preSelectedBundleSlug: BundleSlug | null;
+  currentBundleSlug: BundleSlug | undefined;
+  persistedBundleSlug: BundleSlug | null;
   country: AllowedCountry;
   bundleWorkspace: BundleWorkspace;
   onUseBundle: (bundle: Bundle, getProject: GetProject) => void;
@@ -182,8 +182,8 @@ function BundleSelectionContent({
   setActiveTab,
   previewBundle,
   setPreviewBundle,
-  selectedBundleSlug,
-  preSelectedBundleSlug,
+  currentBundleSlug,
+  persistedBundleSlug,
   country,
   bundleWorkspace,
   onUseBundle,
@@ -310,8 +310,8 @@ function BundleSelectionContent({
             <BundleTabPanel
               activeTab={activeTab}
               bundleWorkspace={bundleWorkspace}
-              selectedBundleSlug={selectedBundleSlug}
-              preSelectedBundleSlug={preSelectedBundleSlug}
+              currentBundleSlug={currentBundleSlug}
+              persistedBundleSlug={persistedBundleSlug}
               getProject={getProject}
               onSelectBundle={handleUseBundle}
               onOpenBundle={setPreviewBundle}
@@ -329,7 +329,7 @@ function BundleSelectionContent({
           getProject={getProject}
           onClose={() => setPreviewBundle(null)}
           onUseBundle={handleUseBundle}
-          isPreSelected={previewBundle.slug === preSelectedBundleSlug}
+          isPersisted={previewBundle.slug === persistedBundleSlug}
         />
       )}
     </div>

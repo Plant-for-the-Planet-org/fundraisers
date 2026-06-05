@@ -17,10 +17,10 @@ interface BundleCardProps {
   bundleWorkspace: BundleWorkspace;
   isSelected: boolean;
   /**
-   * True for the initially selected bundle. Non-donatable projects remain visible;
-   * other bundles filter them out.
+   * True for the bundle persisted when the fundraiser was saved. Non-donatable
+   * projects remain visible; other bundles filter them out.
    */
-  isPreSelected: boolean;
+  isPersisted: boolean;
   getProject: GetProject;
   onSelect: () => void;
   onOpen: () => void;
@@ -30,7 +30,7 @@ export function BundleCard({
   bundle,
   bundleWorkspace,
   isSelected,
-  isPreSelected,
+  isPersisted,
   getProject,
   onSelect,
   onOpen,
@@ -44,14 +44,14 @@ export function BundleCard({
     bundleWorkspace,
     getProject
   );
-  // The pre-selected bundle keeps non-donatable projects visible (with an
+  // The persisted bundle keeps non-donatable projects visible (with an
   // indicator) but drops unresolvable "unknown" placeholders for bundle-config
   // IDs missing from the fundraiser's allocations; every other bundle hides all
   // non-donatable projects.
   const knownProjectIds = allProjectIds.filter(id => !getProject(id).isUnknown);
-  const projectIds = isPreSelected ? knownProjectIds : donatableProjectIds;
+  const projectIds = isPersisted ? knownProjectIds : donatableProjectIds;
   const hasNonDonatable =
-    isPreSelected && donatableProjectIds.length < knownProjectIds.length;
+    isPersisted && donatableProjectIds.length < knownProjectIds.length;
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (event.target !== event.currentTarget) return;

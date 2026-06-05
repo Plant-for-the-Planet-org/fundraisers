@@ -26,10 +26,10 @@ interface BundlePreviewModalProps {
   onClose: () => void;
   onUseBundle: (bundle: Bundle) => void;
   /**
-   * True for the initially selected bundle. Non-donatable projects remain visible;
-   * other bundles filter them out.
+   * True for the bundle persisted when the fundraiser was saved. Non-donatable
+   * projects remain visible; other bundles filter them out.
    */
-  isPreSelected: boolean;
+  isPersisted: boolean;
 }
 
 export function BundlePreviewModal({
@@ -40,7 +40,7 @@ export function BundlePreviewModal({
   getProject,
   onClose,
   onUseBundle,
-  isPreSelected,
+  isPersisted,
 }: BundlePreviewModalProps) {
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
@@ -49,21 +49,21 @@ export function BundlePreviewModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalDialog({ isOpen, onClose, dialogRef });
 
-  // The initial bundle shows its saved projects (donatable and non-donatable
+  // The persisted bundle shows its saved projects (donatable and non-donatable
   // alike), but never the unresolvable "unknown" placeholders for bundle-config
   // IDs missing from the fundraiser's allocations. Other bundles filter out all
   // non-donatable projects. Either way, anything dropped from the full bundle is
   // surfaced via `removedCount` so the modal explains why fewer than 5 render.
   const { projectIds, removedCount } = useMemo(() => {
     const allIds = getBundleProjectIds(bundle, bundleWorkspace);
-    const visibleIds = isPreSelected
+    const visibleIds = isPersisted
       ? allIds.filter(id => !getProject(id).isUnknown)
       : getDonatableBundleProjectIds(bundle, bundleWorkspace, getProject);
     return {
       projectIds: visibleIds,
       removedCount: allIds.length - visibleIds.length,
     };
-  }, [isPreSelected, bundle, bundleWorkspace, getProject]);
+  }, [isPersisted, bundle, bundleWorkspace, getProject]);
   const supportProjectId = getSupportProjectId(bundleWorkspace);
   // Only donatable projects are used for allocation, so percentages remain unchanged.
   const percentageById = useMemo(() => {
