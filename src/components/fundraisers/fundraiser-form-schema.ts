@@ -64,6 +64,9 @@ const selectedImageSchema = z.object({
 
 const projectAllocationSchema = z.object({
   project_id: z.string().trim().min(1),
+  // Every allocation must carry a real share. Non-donatable projects are
+  // dropped from the payload rather than kept at 0% (see `bundleToAllocations`),
+  // so 0% entries should never reach the API.
   percentage: z.number().int().min(1).max(100),
 });
 
@@ -295,10 +298,15 @@ export function fundraiserToFormValues(
     goalAmount: fundraiser.goalAmount,
     visibility: fundraiser.visibility,
     status: fundraiser.canDonate ? 'active' : 'draft',
-    projectAllocations: fundraiser.projectAllocations.map(allocation => ({
-      project_id: allocation.project.id,
-      percentage: allocation.percentage,
-    })),
+    // Drop non-donatable projects so they are never carried back into the
+    // payload on save. Fundraisers saved under the earlier scheme stored these
+    // at 0%, so the remaining donatable shares still sum to 100.
+    projectAllocations: fundraiser.projectAllocations
+      .filter(allocation => allocation.project.allowDonations !== false)
+      .map(allocation => ({
+        project_id: allocation.project.id,
+        percentage: allocation.percentage,
+      })),
     settings: {
       theme: {
         base_id: theme.base_id ?? fallbackTheme.id,

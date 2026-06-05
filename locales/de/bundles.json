@@ -27,7 +27,8 @@
     "card": {
       "projectCount": "{count, plural, one {# Projekt} other {# Projekte}}",
       "seeInside": "Ansehen",
-      "selected": "Ausgewählt"
+      "selected": "Ausgewählt",
+      "containsNonDonatable": "Enthält ein Projekt, das derzeit keine Spenden annimmt"
     },
     "aria": {
       "openBundle": "Sehe dir das {name} Paket an",
@@ -38,6 +39,7 @@
     },
     "modal": {
       "projectsInside": "{count, plural, one {# Projekt} other {# Projekte}}",
+      "projectsRemoved": "{count, plural, one {# Projekt wurde entfernt, da es keine Spenden mehr annimmt.} other {# Projekte wurden entfernt, da sie keine Spenden mehr annehmen.}}",
       "useBundle": "Paket verwenden",
       "tag": {
         "rage": "WUT",
@@ -76,6 +78,7 @@
     },
     "projectImageAlt": "Bild für {name}",
     "unknownProject": "Unbekanntes Projekt",
+    "notAcceptingDonations": "Nimmt derzeit keine Spenden an",
     "entries": {
       "ancestral-lands": {
         "label": "Land der Vorfahren",

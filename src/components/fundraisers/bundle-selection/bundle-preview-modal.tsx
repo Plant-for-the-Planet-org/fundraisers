@@ -1,14 +1,18 @@
 'use client';
 
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
-import type { ProjectData } from '@/lib/types/project-selection';
+import type { GetProject } from '@/lib/types/project-selection';
 
 import { useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
 import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
-import { getBundleProjectIds, getSupportProjectId } from '@/lib/utils/bundle';
+import {
+  getBundleProjectIds,
+  getDonatableBundleProjectIds,
+  getSupportProjectId,
+} from '@/lib/utils/bundle';
 import { calculateProjectAllocations } from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
 import { SelectedProjectRow } from './selected-project-row';
@@ -18,9 +22,14 @@ interface BundlePreviewModalProps {
   bundleWorkspace: BundleWorkspace;
   activeTab: Exclude<BundleTabId, 'custom'>;
   isOpen: boolean;
-  getProject: (id: string) => ProjectData;
+  getProject: GetProject;
   onClose: () => void;
   onUseBundle: (bundle: Bundle) => void;
+  /**
+   * True for the bundle persisted when the fundraiser was saved. Non-donatable
+   * projects remain visible; other bundles filter them out.
+   */
+  isPersisted: boolean;
 }
 
 export function BundlePreviewModal({
@@ -31,6 +40,7 @@ export function BundlePreviewModal({
   getProject,
   onClose,
   onUseBundle,
+  isPersisted,
 }: BundlePreviewModalProps) {
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
@@ -39,15 +49,32 @@ export function BundlePreviewModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalDialog({ isOpen, onClose, dialogRef });
 
-  const projectIds = useMemo(
-    () => getBundleProjectIds(bundle, bundleWorkspace),
-    [bundle, bundleWorkspace]
-  );
+  // The persisted bundle shows its saved projects (donatable and non-donatable
+  // alike), but never the unresolvable "unknown" placeholders for bundle-config
+  // IDs missing from the fundraiser's allocations. Other bundles filter out all
+  // non-donatable projects. Either way, anything dropped from the full bundle is
+  // surfaced via `removedCount` so the modal explains why fewer than 5 render.
+  const { projectIds, removedCount } = useMemo(() => {
+    const allIds = getBundleProjectIds(bundle, bundleWorkspace);
+    const visibleIds = isPersisted
+      ? allIds.filter(id => !getProject(id).isUnknown)
+      : getDonatableBundleProjectIds(bundle, bundleWorkspace, getProject);
+    return {
+      projectIds: visibleIds,
+      removedCount: allIds.length - visibleIds.length,
+    };
+  }, [isPersisted, bundle, bundleWorkspace, getProject]);
   const supportProjectId = getSupportProjectId(bundleWorkspace);
-
-  const allocations = useMemo(() => {
-    const projects = projectIds.map(id => getProject(id));
-    return calculateProjectAllocations(projects, supportProjectId);
+  // Only donatable projects are used for allocation, so percentages remain unchanged.
+  const percentageById = useMemo(() => {
+    const donatableProjects = projectIds
+      .map(id => getProject(id))
+      .filter(project => project.allowDonations);
+    const allocations = calculateProjectAllocations(
+      donatableProjects,
+      supportProjectId
+    );
+    return Object.fromEntries(allocations.map(a => [a.id, a.percentage]));
   }, [projectIds, supportProjectId, getProject]);
 
   if (!isOpen || typeof document === 'undefined') return null;
@@ -102,17 +129,27 @@ export function BundlePreviewModal({
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
 
+          {removedCount > 0 && (
+            <p className='mb-3 text-xs text-amber-600 dark:text-amber-400'>
+              {t('modal.projectsRemoved', { count: removedCount })}
+            </p>
+          )}
+
           <ul className='columns-1 gap-2 min-[600px]:columns-2 [&>*]:mb-2 [&>*]:break-inside-avoid'>
-            {allocations.map(({ id, percentage }) => (
-              <SelectedProjectRow
-                key={id}
-                project={getProject(id)}
-                percentage={percentage}
-                isDefaultCause={id === supportProjectId}
-                readOnly={true}
-                onRemove={() => {}}
-              />
-            ))}
+            {projectIds.map(id => {
+              const percentage = percentageById[id];
+              return (
+                <SelectedProjectRow
+                  key={id}
+                  project={getProject(id)}
+                  percentage={percentage ?? 0}
+                  notAcceptingDonations={percentage === undefined}
+                  isDefaultCause={id === supportProjectId}
+                  readOnly={true}
+                  onRemove={() => {}}
+                />
+              );
+            })}
           </ul>
         </div>
       </div>

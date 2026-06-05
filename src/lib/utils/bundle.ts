@@ -1,4 +1,5 @@
 import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
+import type { GetProject } from '@/lib/types/project-selection';
 
 import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
@@ -46,24 +47,45 @@ export function getBundleProjectIds(
 ): string[] {
   return [getSupportProjectId(workspace), ...bundle.projectIds];
 }
+/**
+ * Bundle project IDs with non-donatable projects removed.
+ * Used to hide projects that no longer accept donations.
+ */
+export function getDonatableBundleProjectIds(
+  bundle: Bundle,
+  workspace: BundleWorkspace,
+  getProject: GetProject
+): string[] {
+  return getBundleProjectIds(bundle, workspace).filter(
+    id => getProject(id).allowDonations
+  );
+}
 
 /**
- * Allocations with a 25% floor on the support project (always index 0).
- * 5-project bundle → support 28%, others 18% each.
+ * Allocations with a 25% minimum for the support project (index 0).
+ * Example: a 5-project bundle gets 28% for support and 18% for each other project.
+ *
+ * When `getProject` is provided, non-donatable projects are excluded from the
+ * allocation entirely and their share is redistributed among the donatable
+ * projects, which still sum to 100. The excluded projects are not sent to the
+ * API. Both the create and edit forms pass `getProject` for this reason.
  */
 export function bundleToAllocations(
   bundle: Bundle,
-  workspace: BundleWorkspace
+  workspace: BundleWorkspace,
+  getProject?: GetProject
 ): Array<{ project_id: string; percentage: number }> {
   // `getBundleProjectIds` always returns at least the support project,
   // so `supportId` is guaranteed to be a string.
-  const ids = getBundleProjectIds(bundle, workspace);
+  const ids = getProject
+    ? getDonatableBundleProjectIds(bundle, workspace, getProject)
+    : getBundleProjectIds(bundle, workspace);
   const [supportId, ...otherIds] = ids as [string, ...string[]];
 
   const equalShare = Math.floor(100 / ids.length);
 
-  // Path 1 — equal split is already generous enough for the support project.
   if (equalShare >= MIN_DEFAULT_CAUSE_PERCENT) {
+    // Path 1 — equal split is already generous enough for the support project.
     const remainder = 100 - equalShare * ids.length;
     return ids.map((project_id, index) => ({
       project_id,
