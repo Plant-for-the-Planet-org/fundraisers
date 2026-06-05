@@ -132,11 +132,11 @@
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
       },
       "mandateTitle": "SEPA-Lastschriftmandat",
-      "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
+      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) Rocketship Inc. und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von [Name des Zahlungsempfängers] auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
       "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Gläubiger-ID",
-      "mandateRights": "Deine Rechte: Du hast Anspruch auf eine Erstattung durch deine Bank gemäß den Bedingungen deines Vertrags mit der Bank. Die Erstattung muss innerhalb von 8 Wochen ab dem Datum der Abbuchung vom Konto beantragt werden.",
+      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
       "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
       "mandateRequired": "Du musst das SEPA-Lastschriftmandat akzeptieren, um fortzufahren."
     },
