@@ -1,8 +1,9 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
+import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cn } from '@/lib/utils/cn';
 
 interface InfoTooltipProps {
@@ -12,6 +13,9 @@ interface InfoTooltipProps {
   iconClassName?: string;
 }
 
+// Uses Radix Popover so the tooltip automatically stays within the viewport.
+// Content is portaled to the body and repositions near screen edges.
+
 export function InfoTooltip({
   content,
   triggerLabel,
@@ -19,50 +23,61 @@ export function InfoTooltip({
   iconClassName,
 }: InfoTooltipProps) {
   const t = useTranslations('Common.aria');
-  const tooltipId = useId();
-  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+  const pointerType = useRef<string>('mouse');
 
   return (
-    <div className={cn('relative flex items-center', className)}>
-      <span
-        role='button'
-        tabIndex={0}
-        aria-describedby={visible ? `tooltip-${tooltipId}` : undefined}
-        className='cursor-help rounded text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1'
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          setVisible(prev => !prev);
-        }}
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
-        onFocus={() => setVisible(true)}
-        onBlur={() => setVisible(false)}
-        onKeyDown={event => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            event.stopPropagation();
-            setVisible(prev => !prev);
-          }
-        }}
-      >
-        <Info className={cn('h-4 w-4', iconClassName)} aria-hidden='true' />
-        <span className='sr-only'>{triggerLabel ?? t('moreInformation')}</span>
-      </span>
-
-      {visible && (
+    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Trigger asChild>
         <span
-          id={`tooltip-${tooltipId}`}
+          role='button'
+          tabIndex={0}
+          aria-label={triggerLabel ?? t('moreInformation')}
+          className={cn(
+            'inline-flex cursor-help items-center rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+            className
+          )}
+          onPointerDown={event => {
+            pointerType.current = event.pointerType;
+          }}
+          // Hover only for mouse; touch uses tap-to-toggle.
+          onPointerEnter={event => {
+            if (event.pointerType === 'mouse') setOpen(true);
+          }}
+          onPointerLeave={event => {
+            if (event.pointerType === 'mouse') setOpen(false);
+          }}
+          onClick={event => {
+            // Prevent clicks from triggering parent elements.
+            event.stopPropagation();
+            // Hover controls desktop behavior; allow Radix toggle on touch.
+            if (pointerType.current === 'mouse') event.preventDefault();
+          }}
+          onKeyDown={event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              event.stopPropagation();
+              setOpen(prev => !prev);
+            }
+          }}
+        >
+          <Info className={cn('h-4 w-4', iconClassName)} aria-hidden='true' />
+        </span>
+      </PopoverPrimitive.Trigger>
+      <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
           role='tooltip'
-          className='absolute bottom-full left-1/2 z-10 mb-2 w-56 max-w-[calc(100vw-1rem)] -translate-x-1/2 rounded-lg bg-foreground px-3 py-2 text-xs text-background'
+          side='top'
+          sideOffset={6}
+          collisionPadding={8}
+          // Keep focus on the trigger when opened.
+          onOpenAutoFocus={event => event.preventDefault()}
+          className='z-50 w-56 max-w-[calc(100vw-1rem)] rounded-lg bg-foreground px-3 py-2 text-xs text-background data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95'
         >
           {content}
-          <span
-            aria-hidden='true'
-            className='absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-foreground'
-          />
-        </span>
-      )}
-    </div>
+          <PopoverPrimitive.Arrow className='fill-foreground' />
+        </PopoverPrimitive.Content>
+      </PopoverPrimitive.Portal>
+    </PopoverPrimitive.Root>
   );
 }
