@@ -2,8 +2,7 @@
 
 import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Search, X } from 'lucide-react';
 import { unsplashClient } from '@/lib/api/unsplash-client';
@@ -18,6 +17,7 @@ import {
   MAX_IMAGE_FILE_SIZE_MB,
   validateImageFile,
 } from '@/lib/utils/image-selection';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 interface ImageSelectionOverlayProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ export function ImageSelectionOverlay({
   const [images, setImages] = useState<UnsplashPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const loadCategoryImages = useCallback(
     async (categoryId: string) => {
@@ -156,10 +156,6 @@ export function ImageSelectionOverlay({
   );
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
     if (categories.length === 0) {
       return;
     }
@@ -201,51 +197,25 @@ export function ImageSelectionOverlay({
     selectedCategory,
   ]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  if (!mounted || !isOpen) {
-    return null;
-  }
-
-  return createPortal(
-    <div
-      className='fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-start justify-center pt-[10vh] px-4'
-      onClick={event => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) onClose();
       }}
     >
-      <div className='w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl border border-gray-200/60 bg-white dark:bg-zinc-900 dark:border-zinc-700 animate-in fade-in-0 zoom-in-95 duration-200'>
+      <DialogContent
+        showCloseButton={false}
+        aria-label={t('overlay.title')}
+        onOpenAutoFocus={event => {
+          // Radix focuses first focusable (hidden file input) by default. Override
+          // to focus the search input, preserving original autoFocus behavior.
+          event.preventDefault();
+          searchInputRef.current?.focus();
+        }}
+        className='w-full max-w-4xl gap-0 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-900'
+      >
+        <DialogTitle className='sr-only'>{t('overlay.title')}</DialogTitle>
         <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-zinc-700'>
           <div className='flex items-center justify-between gap-4'>
             <div>
@@ -312,6 +282,7 @@ export function ImageSelectionOverlay({
           <div className='relative'>
             <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500' />
             <input
+              ref={searchInputRef}
               type='text'
               placeholder={t('overlay.searchPlaceholder')}
               value={searchQuery}
@@ -319,7 +290,6 @@ export function ImageSelectionOverlay({
                 setSearchQuery(event.target.value);
               }}
               className='w-full rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 pl-10 pr-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20'
-              autoFocus
             />
           </div>
 
@@ -447,8 +417,7 @@ export function ImageSelectionOverlay({
             </div>
           </div>
         </div>
-      </div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 }

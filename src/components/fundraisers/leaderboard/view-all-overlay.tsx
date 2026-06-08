@@ -3,11 +3,10 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { getLeaderboardByTab } from '@/lib/api/leaderboard-service';
-import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DonationTable } from './donation-table';
 import { OverlayHeader } from './overlay-header';
@@ -77,7 +76,6 @@ export function ViewAllOverlay({
     top: totalTopDonationCount > initialTopDonations.length,
   });
 
-  const dialogRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Render-time state sync (React 19 pattern). We sync `tab` from the parent's
@@ -100,9 +98,6 @@ export function ViewAllOverlay({
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
-
-  // Body scroll lock, Escape-to-close, and Tab focus trap inside the dialog.
-  useModalDialog({ isOpen, onClose: handleClose, dialogRef });
 
   // Flatten cached pages into a single list
   const donations = useMemo(() => {
@@ -206,25 +201,21 @@ export function ViewAllOverlay({
     return () => observer.disconnect();
   }, [isOpen, effectiveTab]);
 
-  if (!isOpen || !hasEnabledList) return null;
-
-  return createPortal(
-    <div
-      ref={dialogRef}
-      role='dialog'
-      aria-modal='true'
-      aria-labelledby='leaderboard-overlay-title'
-      // Focusable so useModalDialog's focus-on-open actually moves focus into
-      // the dialog (a plain div is not focusable; .focus() would be a no-op).
-      tabIndex={-1}
-      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center outline-none'
-      onMouseDown={event => {
-        if (event.target === event.currentTarget) {
-          handleClose();
-        }
+  return (
+    <Dialog
+      open={isOpen && hasEnabledList}
+      onOpenChange={open => {
+        if (!open) handleClose();
       }}
     >
-      <div className='w-full max-w-3xl mx-4 bg-background rounded-2xl shadow-2xl border border-border overflow-hidden'>
+      <DialogContent
+        showCloseButton={false}
+        aria-labelledby='leaderboard-overlay-title'
+        className='w-full max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
+      >
+        <DialogTitle className='sr-only'>
+          {t('viewAllOverlay.title')}
+        </DialogTitle>
         <OverlayHeader onClose={handleClose} />
 
         {/* Tabs + List */}
@@ -299,8 +290,7 @@ export function ViewAllOverlay({
             )}
           </div>
         </Tabs>
-      </div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 }

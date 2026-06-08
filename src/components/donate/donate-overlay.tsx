@@ -8,8 +8,7 @@ import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
@@ -17,6 +16,11 @@ import {
   scrollElementIntoView,
   scrollToFirstError,
 } from '@/lib/utils/scroll-into-view';
+import {
+  Dialog,
+  DialogContentFullScreen,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { DonateCTA } from './donate-cta';
 import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
@@ -56,29 +60,33 @@ export function DonateOverlay({
   paymentOptions,
   paymentOptionsReady,
 }: DonateOverlayProps) {
-  const isClient = typeof window !== 'undefined';
-
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  if (!isClient || !isOpen) return null;
-
-  // Show skeleton while donation data is still being fetched
-  if (!donationData) return <DonateOverlaySkeleton onClose={onClose} />;
+  const tDonate = useTranslations('Donate');
 
   return (
-    <DonateOverlayInner
-      donationData={donationData}
-      fundraiser={fundraiser}
-      paymentOptions={paymentOptions}
-      paymentOptionsReady={paymentOptionsReady}
-      onClose={onClose}
-      isOpen={isOpen}
-    />
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogContentFullScreen className='light bg-gray-50 text-foreground overflow-auto'>
+        <DialogTitle className='sr-only'>
+          {tDonate('overlay.aria.label')}
+        </DialogTitle>
+        {donationData ? (
+          <DonateOverlayInner
+            donationData={donationData}
+            fundraiser={fundraiser}
+            paymentOptions={paymentOptions}
+            paymentOptionsReady={paymentOptionsReady}
+            onClose={onClose}
+            isOpen={isOpen}
+          />
+        ) : (
+          <DonateOverlaySkeleton onClose={onClose} />
+        )}
+      </DialogContentFullScreen>
+    </Dialog>
   );
 }
 
@@ -201,7 +209,7 @@ function DonateOverlayInner({
     </>
   );
 
-  return createPortal(
+  return (
     <Elements stripe={stripePromise}>
       <DonationFormProvider
         fundraiser={fundraiser}
@@ -219,7 +227,6 @@ function DonateOverlayInner({
           rightColumn={rightColumn}
         />
       </DonationFormProvider>
-    </Elements>,
-    document.body
+    </Elements>
   );
 }
