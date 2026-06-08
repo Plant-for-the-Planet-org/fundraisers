@@ -83,6 +83,27 @@ function DialogContent({
   );
 }
 
+function DialogContentFullScreen({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  return (
+    <DialogPortal data-slot='dialog-portal'>
+      <DialogPrimitive.Content
+        data-slot='dialog-content-fullscreen'
+        className={cn(
+          'fixed inset-0 z-50 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  );
+}
+
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
@@ -152,6 +173,7 @@ export {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogContentFullScreen,
   DialogDescription,
   DialogFooter,
   DialogHeader,
