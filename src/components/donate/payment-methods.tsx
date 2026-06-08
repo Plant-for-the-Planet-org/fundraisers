@@ -1,5 +1,6 @@
 'use client';
 
+import type { SetValueConfig } from 'react-hook-form';
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
@@ -13,6 +14,14 @@ import { PaymentMethodsSkeleton } from '@/components/donate/payment-methods-skel
 import { SavedMethodGroup } from '@/components/donate/saved-method-group';
 import { useFieldError } from '@/components/donate/use-field-error';
 import { usePaymentMethodOptions } from '@/components/donate/use-payment-method-options';
+
+// Programmatic syncs (initial selection, stale-method cleanup) are not user
+// edits, so they must not mark the field dirty/touched or trigger validation.
+const SILENT_SYNC: SetValueConfig = {
+  shouldDirty: false,
+  shouldTouch: false,
+  shouldValidate: false,
+};
 
 export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
@@ -78,20 +87,12 @@ export function PaymentMethods() {
       ? lastUsedMethodId
       : candidates[0].id;
 
-    setValue('selectedPaymentMethod', initialMethodId, {
-      shouldDirty: false,
-      shouldTouch: false,
-      shouldValidate: false,
-    });
+    setValue('selectedPaymentMethod', initialMethodId, SILENT_SYNC);
 
     // Auto-select the preferred saved method (default or first available)
     // instead of defaulting to "use a new payment method".
     const preferredSaved = pickPreferredSaved(initialMethodId);
-    setValue('selectedSavedMethodId', preferredSaved?.id ?? '', {
-      shouldDirty: false,
-      shouldTouch: false,
-      shouldValidate: false,
-    });
+    setValue('selectedSavedMethodId', preferredSaved?.id ?? '', SILENT_SYNC);
   }, [
     visibleMethodOptions,
     selectedPaymentMethod,
@@ -114,11 +115,7 @@ export function PaymentMethods() {
     if (!savedMethodsReady) return;
     const match = savedMethodOptions.find(s => s.id === selectedSavedMethodId);
     if (!match || match.typeId !== selectedPaymentMethod) {
-      setValue('selectedSavedMethodId', '', {
-        shouldDirty: false,
-        shouldTouch: false,
-        shouldValidate: false,
-      });
+      setValue('selectedSavedMethodId', '', SILENT_SYNC);
     }
   }, [
     savedMethodOptions,

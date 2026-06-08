@@ -23,8 +23,8 @@ interface SavedMethodGroupProps {
   method: VisibleMethodOption;
   /** Saved instances of `method`, already filtered and shaped for rendering. */
   savedForMethod: SavedMethodOption[];
-  /** The currently selected saved-method id; '' or undefined when none. */
-  selectedSavedMethodId: string | undefined;
+  /** The currently selected saved-method id; '' when none is active. */
+  selectedSavedMethodId: string;
   /** The currently selected generic payment method id. */
   selectedPaymentMethod: PaymentMethodId;
   /** Whether this donation is recurring (drives the expiring-soon hint). */

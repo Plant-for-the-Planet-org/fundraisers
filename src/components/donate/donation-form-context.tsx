@@ -52,9 +52,10 @@ const donationFormFields = z.object({
     { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
   ),
   // When set, the donor picked a saved card/SEPA method — holds its Stripe
-  // payment method id (`pm_...`) to reuse as the donation source. Empty when
-  // entering new payment details.
-  selectedSavedMethodId: z.string().optional(),
+  // payment method id (`pm_...`) to reuse as the donation source. The empty
+  // string is the canonical "no saved method" sentinel (never undefined), so
+  // reads can rely on a plain truthiness check; defaults to '' below.
+  selectedSavedMethodId: z.string(),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
   tin: z.string().trim().optional(),
