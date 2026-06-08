@@ -16,11 +16,15 @@ import {
   ChevronUp,
   Clock,
   ImageIcon,
+  Info,
   Plus,
+  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { type StageSlideTemplate } from '@/components/stage/slide-templates';
+import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
 import { routing } from '@/i18n/routing';
 
 const LOCALE_OPTIONS: Record<string, string> = {
@@ -66,7 +70,8 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const t = useTranslations('Fundraisers.form.options.stage');
   const [expanded, setExpanded] = useState(true);
 
-  const { control, register } = useFormContext<FundraiserFormValues>();
+  const { control, register, getValues, setValue } =
+    useFormContext<FundraiserFormValues>();
 
   const { fields, append, remove, move } = useFieldArray({
     control,
@@ -75,6 +80,67 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
 
   const slideCount = fields.length;
   const atSlideLimit = slideCount >= STAGE_LIMITS.maxSlides;
+
+  // Template picker. `templateTarget` is the slide index to fill in place, or
+  // `null` when opened from the section button (fill first empty, else append).
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templateTarget, setTemplateTarget] = useState<number | null>(null);
+
+  const stageLocaleVal = useWatch({
+    control,
+    name: 'settings.modules.stage.locale' as any,
+  }) as string | undefined;
+  const templateLocale: 'en' | 'de' = stageLocaleVal === 'de' ? 'de' : 'en';
+
+  const openSectionTemplates = () => {
+    setTemplateTarget(null);
+    setTemplatesOpen(true);
+  };
+
+  const openRowTemplates = (idx: number) => {
+    setTemplateTarget(idx);
+    setTemplatesOpen(true);
+  };
+
+  const fillSlide = (idx: number, template: StageSlideTemplate) => {
+    const base = `settings.modules.stage.slides.${idx}` as const;
+    const opts = { shouldDirty: true, shouldValidate: true } as const;
+    setValue(`${base}.title` as any, template.title, opts);
+    setValue(`${base}.description` as any, template.description, opts);
+    setValue(`${base}.image` as any, template.image, opts);
+    setValue(`${base}.duration` as any, template.duration, opts);
+  };
+
+  const applyTemplate = (template: StageSlideTemplate) => {
+    // Per-row pick: fill that exact row.
+    if (templateTarget !== null) {
+      fillSlide(templateTarget, template);
+      return;
+    }
+    // Section pick: reuse the first empty row, else append a new slide.
+    const slides =
+      (getValues('settings.modules.stage.slides') as
+        | Array<{ title?: string; description?: string; image?: string }>
+        | undefined) ?? [];
+    const emptyIdx = slides.findIndex(
+      s => !s?.title && !s?.description && !s?.image
+    );
+    if (emptyIdx >= 0) {
+      fillSlide(emptyIdx, template);
+      return;
+    }
+    if (atSlideLimit) return;
+    append(
+      {
+        position: fields.length + 1,
+        title: template.title,
+        description: template.description,
+        image: template.image,
+        duration: template.duration,
+      },
+      { shouldFocus: false }
+    );
+  };
 
   const stageTitleVal =
     (useWatch({
@@ -222,26 +288,44 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between'>
               <Label className='text-xs font-semibold'>{t('slides')}</Label>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                className='h-7 gap-1 text-xs border-dashed'
-                disabled={atSlideLimit}
-                title={
-                  atSlideLimit
-                    ? t('maxSlidesReached', {
-                        max: String(STAGE_LIMITS.maxSlides),
-                      })
-                    : undefined
-                }
-                onClick={() =>
-                  append({ ...DEFAULT_SLIDE, position: fields.length + 1 })
-                }
-              >
-                <Plus size={12} />
-                {t('addSlide')}
-              </Button>
+              <div className='flex items-center gap-1.5'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  className='h-7 gap-1 text-xs'
+                  onClick={openSectionTemplates}
+                >
+                  <Sparkles size={12} />
+                  {t('browseTemplates')}
+                </Button>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  className='h-7 gap-1 text-xs border-dashed'
+                  disabled={atSlideLimit}
+                  title={
+                    atSlideLimit
+                      ? t('maxSlidesReached', {
+                          max: String(STAGE_LIMITS.maxSlides),
+                        })
+                      : undefined
+                  }
+                  onClick={() =>
+                    append({ ...DEFAULT_SLIDE, position: fields.length + 1 })
+                  }
+                >
+                  <Plus size={12} />
+                  {t('addSlide')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Image guidelines — matches the blue hint style in workspace-info.tsx */}
+            <div className='flex items-start gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20'>
+              <Info className='mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400' />
+              <p className='text-xs text-foreground'>{t('imageGuidelines')}</p>
             </div>
 
             {atSlideLimit && (
@@ -265,12 +349,20 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                   onMoveUp={() => move(idx, idx - 1)}
                   onMoveDown={() => move(idx, idx + 1)}
                   onRemove={() => remove(idx)}
+                  onUseTemplate={() => openRowTemplates(idx)}
                 />
               ))}
             </div>
           </div>
         </div>
       )}
+
+      <StageSlideTemplatesDialog
+        open={templatesOpen}
+        onOpenChange={setTemplatesOpen}
+        locale={templateLocale}
+        onSelect={applyTemplate}
+      />
     </div>
   );
 }
@@ -310,12 +402,14 @@ function SlideRow({
   onMoveUp,
   onMoveDown,
   onRemove,
+  onUseTemplate,
 }: {
   idx: number;
   total: number;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
+  onUseTemplate: () => void;
 }) {
   const t = useTranslations('Fundraisers.form.options.stage');
   const {
@@ -336,6 +430,8 @@ function SlideRow({
 
   const slideErrors = (errors.settings?.modules?.stage as any)?.slides?.[idx];
   const imageError = slideErrors?.image?.message as string | undefined;
+
+  const isEmpty = !titleVal && !descVal && !imageUrl;
 
   return (
     <div className='flex gap-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-background p-2.5'>
@@ -380,6 +476,20 @@ function SlideRow({
 
       {/* Fields */}
       <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
+        {isEmpty && (
+          <div className='flex justify-end'>
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              className='h-6 gap-1 px-2 text-[11px] text-primary hover:text-primary'
+              onClick={onUseTemplate}
+            >
+              <Sparkles size={11} />
+              {t('useTemplate')}
+            </Button>
+          </div>
+        )}
         <div>
           {}
           <Input

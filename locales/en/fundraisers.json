@@ -281,7 +281,12 @@
           "moveDown": "Move down",
           "removeSlide": "Remove slide",
           "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum {max} slides reached"
+          "maxSlidesReached": "Maximum {max} slides reached",
+          "browseTemplates": "Browse Slides",
+          "useTemplate": "Use a template",
+          "templatesTitle": "Slide templates",
+          "templatesSubtitle": "Pick a template to fill a slide, then edit the text and image.",
+          "imageGuidelines": "Keep slide images clear in the corners. Place key text or faces in the center. The stage screen shows donation totals, titles, and other live content over the edges, which can cover anything in the corners of your image."
         },
         "thankYouNote": {
           "title": "Thank-You Note",

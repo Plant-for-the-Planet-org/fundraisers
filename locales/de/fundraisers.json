@@ -281,7 +281,12 @@
           "moveDown": "Nach unten",
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum von {max} Folien erreicht"
+          "maxSlidesReached": "Maximum von {max} Folien erreicht",
+          "browseTemplates": "Folien ansehen",
+          "useTemplate": "Vorlage verwenden",
+          "templatesTitle": "Folien-Vorlagen",
+          "templatesSubtitle": "Wähle eine Vorlage, um eine Folie zu füllen, und bearbeite dann Text und Bild.",
+          "imageGuidelines": "Halte die Ecken der Folienbilder frei. Platziere wichtigen Text oder Gesichter in der Mitte. Der Bühnenbildschirm zeigt Spendensummen, Titel und andere Live-Inhalte über den Rändern an, die alles in den Ecken deines Bildes verdecken können."
         },
         "thankYouNote": {
           "title": "Dankesnachricht",
