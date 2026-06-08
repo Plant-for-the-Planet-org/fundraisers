@@ -12,6 +12,7 @@ import {
 import {
   STAGE_SLIDE_TEMPLATES,
   type StageSlideTemplate,
+  unsplashThumbnail,
 } from './slide-templates';
 
 interface StageSlideTemplatesDialogProps {
@@ -44,7 +45,7 @@ function TemplateCard({
       <div className='h-48 w-full shrink-0 overflow-hidden bg-muted sm:h-32'>
         {}
         <img
-          src={template.image}
+          src={unsplashThumbnail(template.image)}
           alt=''
           className='block h-full w-full object-cover'
           crossOrigin='anonymous'

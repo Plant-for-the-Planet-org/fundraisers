@@ -22,6 +22,23 @@ export interface StageSlideTemplate {
 const UNSPLASH = (photoId: string) =>
   `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=1600&q=80`;
 
+/**
+ * Return a lighter version of an Unsplash URL for thumbnail display.
+ * Replaces `w` and `q` query params with smaller values so the browser
+ * downloads ~10-20 KB instead of ~200+ KB. Falls back to the original URL
+ * for non-Unsplash images.
+ */
+export function unsplashThumbnail(
+  url: string,
+  width = 400,
+  quality = 60
+): string {
+  if (!url.includes('images.unsplash.com')) return url;
+  return url
+    .replace(/[?&]w=\d+/, `?w=${width}`)
+    .replace(/[?&]q=\d+/, `&q=${quality}`);
+}
+
 export const STAGE_SLIDE_TEMPLATES: Record<'en' | 'de', StageSlideTemplate[]> =
   {
     en: [
