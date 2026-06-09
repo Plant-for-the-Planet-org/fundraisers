@@ -101,7 +101,7 @@ export function ThankYouSuggestionsDialog({
           <DialogDescription>{t('suggestionsSubtitle')}</DialogDescription>
         </DialogHeader>
 
-        <div className='flex flex-col gap-4 max-h-[60vh] overflow-y-auto'>
+        <div className='-mr-6 flex max-h-[60vh] flex-col gap-4 overflow-y-auto pr-6'>
           {hasRecommended && (
             <section className='flex flex-col gap-2'>
               <span className='text-xs font-semibold tracking-wide text-muted-foreground'>

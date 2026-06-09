@@ -40,9 +40,9 @@ function TemplateCard({
           onSelect(template);
         }
       }}
-      className='group flex cursor-pointer flex-col overflow-hidden rounded-xl border-2 border-border bg-background transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      className='group flex cursor-pointer items-stretch overflow-hidden rounded-xl border-2 border-border bg-background transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
     >
-      <div className='h-48 w-full shrink-0 overflow-hidden bg-muted sm:h-32'>
+      <div className='h-auto w-24 shrink-0 overflow-hidden bg-muted'>
         {}
         <img
           src={unsplashThumbnail(template.image)}
@@ -51,7 +51,7 @@ function TemplateCard({
           crossOrigin='anonymous'
         />
       </div>
-      <div className='flex flex-col gap-1 p-3'>
+      <div className='flex flex-col justify-center gap-0.5 p-2.5'>
         <span className='text-sm font-semibold text-foreground'>
           {template.title}
         </span>
@@ -88,7 +88,7 @@ export function StageSlideTemplatesDialog({
           <DialogDescription>{t('templatesSubtitle')}</DialogDescription>
         </DialogHeader>
 
-        <DialogDescription className='scrollbar-hidden max-h-[75vh] overflow-y-scroll'>
+        <DialogDescription className='-mr-6 max-h-[75vh] overflow-y-auto pr-6'>
           <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
             {templates.map(template => (
               <TemplateCard
