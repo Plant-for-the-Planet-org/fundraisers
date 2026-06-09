@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Sparkles } from 'lucide-react';
+import { Check, Sparkles, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -19,28 +21,37 @@ interface StageSlideTemplatesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   locale: 'en' | 'de';
-  onSelect: (template: StageSlideTemplate) => void;
+  /** When true, allow picking several templates and confirm with the Add button. */
+  multiple?: boolean;
+  /** Cap on how many can be selected in multiple mode (remaining slide slots). */
+  maxSelectable?: number;
+  onConfirm: (templates: StageSlideTemplate[]) => void;
 }
 
 function TemplateCard({
   template,
-  onSelect,
+  selected,
+  onToggle,
 }: {
   template: StageSlideTemplate;
-  onSelect: (template: StageSlideTemplate) => void;
+  selected: boolean;
+  onToggle: (template: StageSlideTemplate) => void;
 }) {
   return (
     <div
       role='button'
       tabIndex={0}
-      onClick={() => onSelect(template)}
+      aria-pressed={selected}
+      onClick={() => onToggle(template)}
       onKeyDown={event => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          onSelect(template);
+          onToggle(template);
         }
       }}
-      className='group flex cursor-pointer items-stretch overflow-hidden rounded-xl border-2 border-border bg-background transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      className={`group relative flex cursor-pointer items-stretch overflow-hidden rounded-xl border-2 bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+        selected ? 'border-primary' : 'border-border hover:border-primary'
+      }`}
     >
       <div className='h-auto w-24 shrink-0 overflow-hidden bg-muted'>
         {}
@@ -59,6 +70,11 @@ function TemplateCard({
           {template.description}
         </span>
       </div>
+      {selected && (
+        <span className='absolute right-2 top-2 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground'>
+          <Check size={12} strokeWidth={3} />
+        </span>
+      )}
     </div>
   );
 }
@@ -67,25 +83,87 @@ export function StageSlideTemplatesDialog({
   open,
   onOpenChange,
   locale,
-  onSelect,
+  multiple = false,
+  maxSelectable,
+  onConfirm,
 }: StageSlideTemplatesDialogProps) {
   const t = useTranslations('Fundraisers.form.options.stage');
+  const tActions = useTranslations('Common.actions');
   const templates = STAGE_SLIDE_TEMPLATES[locale] ?? STAGE_SLIDE_TEMPLATES.en;
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const handleSelect = (template: StageSlideTemplate) => {
-    onSelect(template);
-    onOpenChange(false);
+  // Clear the selection on close so the next open starts fresh.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) setSelectedIds([]);
+    onOpenChange(next);
+  };
+
+  const atCap =
+    typeof maxSelectable === 'number' && selectedIds.length >= maxSelectable;
+
+  const toggle = (template: StageSlideTemplate) => {
+    if (!multiple) {
+      onConfirm([template]);
+      handleOpenChange(false);
+      return;
+    }
+    setSelectedIds(prev => {
+      if (prev.includes(template.id)) {
+        return prev.filter(id => id !== template.id);
+      }
+      return atCap ? prev : [...prev, template.id];
+    });
+  };
+
+  const handleAdd = () => {
+    const chosen = templates.filter(tpl => selectedIds.includes(tpl.id));
+    if (chosen.length === 0) return;
+    onConfirm(chosen);
+    handleOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='border-border sm:max-w-2xl'>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className='border-border sm:max-w-2xl'
+        showCloseButton={!multiple}
+      >
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-base'>
-            <Sparkles size={16} className='text-primary' />
-            {t('templatesTitle')}
-          </DialogTitle>
-          <DialogDescription>{t('templatesSubtitle')}</DialogDescription>
+          <div className='flex items-start justify-between gap-3'>
+            <div className='flex flex-col gap-2'>
+              <DialogTitle className='flex items-center gap-2 text-base'>
+                <Sparkles size={16} className='text-primary' />
+                {t('templatesTitle')}
+              </DialogTitle>
+              <DialogDescription>
+                {multiple
+                  ? t('templatesSubtitleMulti')
+                  : t('templatesSubtitle')}
+              </DialogDescription>
+            </div>
+            {multiple && (
+              <div className='flex shrink-0 items-center gap-2'>
+                <Button
+                  type='button'
+                  size='sm'
+                  onClick={handleAdd}
+                  disabled={selectedIds.length === 0}
+                >
+                  {t('addSelected', { count: selectedIds.length })}
+                </Button>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  className='size-8'
+                  onClick={() => handleOpenChange(false)}
+                  aria-label={tActions('close')}
+                >
+                  <X size={16} />
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogHeader>
 
         <DialogDescription className='-mr-6 max-h-[75vh] overflow-y-auto pr-6'>
@@ -94,7 +172,8 @@ export function StageSlideTemplatesDialog({
               <TemplateCard
                 key={template.id}
                 template={template}
-                onSelect={handleSelect}
+                selected={selectedIds.includes(template.id)}
+                onToggle={toggle}
               />
             ))}
           </div>

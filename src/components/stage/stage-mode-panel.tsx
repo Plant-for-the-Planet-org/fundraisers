@@ -85,6 +85,8 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   // `null` when opened from the section button (fill first empty, else append).
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [templateTarget, setTemplateTarget] = useState<number | null>(null);
+  // Remaining slots when the picker opens in multi-select (section) mode.
+  const [sectionCapacity, setSectionCapacity] = useState(0);
 
   const stageLocaleVal = useWatch({
     control,
@@ -92,7 +94,28 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   }) as string | undefined;
   const templateLocale: 'en' | 'de' = stageLocaleVal === 'de' ? 'de' : 'en';
 
+  type SlideValue = {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
+  const isEmptySlide = (s?: SlideValue) =>
+    !s?.title && !s?.description && !s?.image;
+
+  const getSlides = (): SlideValue[] =>
+    (getValues('settings.modules.stage.slides') as SlideValue[] | undefined) ??
+    [];
+
+  // How many templates can still be added: empty rows we can reuse, plus
+  // appendable rows up to the slide limit.
+  const remainingCapacity = () => {
+    const slides = getSlides();
+    const emptyCount = slides.filter(isEmptySlide).length;
+    return emptyCount + Math.max(0, STAGE_LIMITS.maxSlides - slides.length);
+  };
+
   const openSectionTemplates = () => {
+    setSectionCapacity(remainingCapacity());
     setTemplateTarget(null);
     setTemplatesOpen(true);
   };
@@ -111,35 +134,50 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
     setValue(`${base}.duration` as any, template.duration, opts);
   };
 
-  const applyTemplate = (template: StageSlideTemplate) => {
-    // Per-row pick: fill that exact row.
-    if (templateTarget !== null) {
-      fillSlide(templateTarget, template);
-      return;
-    }
-    // Section pick: reuse the first empty row, else append a new slide.
-    const slides =
-      (getValues('settings.modules.stage.slides') as
-        | Array<{ title?: string; description?: string; image?: string }>
-        | undefined) ?? [];
-    const emptyIdx = slides.findIndex(
-      s => !s?.title && !s?.description && !s?.image
-    );
-    if (emptyIdx >= 0) {
-      fillSlide(emptyIdx, template);
-      return;
-    }
-    if (atSlideLimit) return;
-    append(
-      {
-        position: fields.length + 1,
+  // Section pick: reuse empty rows first, then append the rest in one batch,
+  // stopping at the slide limit.
+  const applyTemplates = (selected: StageSlideTemplate[]) => {
+    const slides = getSlides();
+    const toAppend: Array<{
+      position: number;
+      title: string;
+      description: string;
+      image: string;
+      duration: number;
+    }> = [];
+    let projectedLen = slides.length;
+
+    for (const template of selected) {
+      const emptyIdx = slides.findIndex(isEmptySlide);
+      if (emptyIdx >= 0) {
+        fillSlide(emptyIdx, template);
+        slides[emptyIdx] = {
+          title: template.title,
+          description: template.description,
+          image: template.image,
+        };
+        continue;
+      }
+      if (projectedLen >= STAGE_LIMITS.maxSlides) break;
+      toAppend.push({
+        position: projectedLen + 1,
         title: template.title,
         description: template.description,
         image: template.image,
         duration: template.duration,
-      },
-      { shouldFocus: false }
-    );
+      });
+      projectedLen += 1;
+    }
+
+    if (toAppend.length) append(toAppend, { shouldFocus: false });
+  };
+
+  const handleTemplateConfirm = (selected: StageSlideTemplate[]) => {
+    if (templateTarget !== null) {
+      if (selected[0]) fillSlide(templateTarget, selected[0]);
+      return;
+    }
+    applyTemplates(selected);
   };
 
   const stageTitleVal =
@@ -361,7 +399,9 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
         open={templatesOpen}
         onOpenChange={setTemplatesOpen}
         locale={templateLocale}
-        onSelect={applyTemplate}
+        multiple={templateTarget === null}
+        maxSelectable={sectionCapacity}
+        onConfirm={handleTemplateConfirm}
       />
     </div>
   );
@@ -460,45 +500,45 @@ function SlideRow({
         </button>
       </div>
 
-      {/* Image preview */}
-      <div className='w-24 h-[60px] shrink-0 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center self-start mt-1'>
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt=''
-            className='w-full h-full object-cover'
-            crossOrigin='anonymous'
-          />
-        ) : (
-          <ImageIcon size={16} className='text-muted-foreground' />
+      {/* Image preview + template shortcut */}
+      <div className='flex w-24 shrink-0 flex-col gap-1 self-start mt-1'>
+        <div className='h-[60px] w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center'>
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt=''
+              className='w-full h-full object-cover'
+              crossOrigin='anonymous'
+            />
+          ) : (
+            <ImageIcon size={16} className='text-muted-foreground' />
+          )}
+        </div>
+        {isEmpty && (
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            className='h-6 w-full gap-1 px-1 text-[11px] text-primary hover:text-primary'
+            onClick={onUseTemplate}
+          >
+            <Sparkles size={11} />
+            {t('useTemplate')}
+          </Button>
         )}
       </div>
 
       {/* Fields */}
       <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
-        {isEmpty && (
-          <div className='flex justify-end'>
-            <Button
-              type='button'
-              variant='ghost'
-              size='sm'
-              className='h-6 gap-1 px-2 text-[11px] text-primary hover:text-primary'
-              onClick={onUseTemplate}
-            >
-              <Sparkles size={11} />
-              {t('useTemplate')}
-            </Button>
-          </div>
-        )}
-        <div>
+        <div className='relative'>
           {}
           <Input
             {...register(`${base}.title` as any)}
             placeholder={t('slideTitlePlaceholder')}
             maxLength={STAGE_LIMITS.slideTitle}
-            className='text-sm font-medium h-8'
+            className='text-sm font-medium h-8 pr-12'
           />
-          <div className='flex justify-end mt-0.5'>
+          <div className='pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2'>
             <CharCount
               current={titleVal.length}
               max={STAGE_LIMITS.slideTitle}
@@ -506,16 +546,16 @@ function SlideRow({
           </div>
         </div>
 
-        <div>
+        <div className='relative'>
           {}
           <Textarea
             {...register(`${base}.description` as any)}
             placeholder={t('slideDescriptionPlaceholder')}
             maxLength={STAGE_LIMITS.slideDescription}
             rows={1}
-            className='text-sm min-h-8 field-sizing-content resize-none py-1.5'
+            className='text-sm min-h-8 field-sizing-content resize-none py-1.5 pr-12'
           />
-          <div className='flex justify-end mt-0.5'>
+          <div className='pointer-events-none absolute right-2.5 bottom-1.5'>
             <CharCount
               current={descVal.length}
               max={STAGE_LIMITS.slideDescription}
