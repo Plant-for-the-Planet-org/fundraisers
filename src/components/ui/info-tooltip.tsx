@@ -12,10 +12,9 @@ interface InfoTooltipProps {
   className?: string;
   iconClassName?: string;
 }
-
-// Uses Radix Popover for automatic viewport collision handling.
-// The tooltip is portaled and repositioned automatically, preventing
-// it from being clipped near screen edges on mobile and desktop.
+// Uses Radix Popover to automatically handle viewport collisions and positioning.
+// Tooltip content is rendered in a portal and repositions when space is limited,
+// preventing clipping near screen edges on both mobile and desktop devices.
 export function InfoTooltip({
   content,
   triggerLabel,
