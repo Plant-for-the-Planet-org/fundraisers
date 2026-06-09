@@ -55,6 +55,39 @@ export function getTotalRaisedByCurrency(
     .sort((a, b) => b.amount - a.amount);
 }
 
+// TODO: Replace with real exchange rates from the API.
+// 1 EUR = 1.2 CHF = 1.25 USD
+const TEMP_RATES_TO_EUR: Record<string, number> = {
+  EUR: 1,
+  CHF: 1 / 1.2,
+  USD: 1 / 1.25,
+};
+const TEMP_RATES_FROM_EUR: Record<string, number> = {
+  EUR: 1,
+  CHF: 1.2,
+  USD: 1.25,
+};
+
+/**
+ * Converts a multi-currency totalRaised record to a single amount in
+ * `targetCurrency` using hardcoded exchange rates (temp until API rates exist).
+ * Unknown currencies are treated as 1:1 with EUR.
+ */
+export function convertTotalRaisedToSingleCurrency(
+  totalRaised: Record<string, number>,
+  targetCurrency: string
+): number {
+  const target = targetCurrency.toUpperCase();
+  const fromEUR = TEMP_RATES_FROM_EUR[target] ?? 1;
+  const totalInEUR = Object.entries(totalRaised)
+    .filter(([, amount]) => Number.isFinite(amount) && amount > 0)
+    .reduce((sum, [currency, amount]) => {
+      const toEUR = TEMP_RATES_TO_EUR[currency.toUpperCase()] ?? 1;
+      return sum + amount * toEUR;
+    }, 0);
+  return totalInEUR * fromEUR;
+}
+
 /**
  * Days remaining until `endDate`, rounded up, never negative.
  */
