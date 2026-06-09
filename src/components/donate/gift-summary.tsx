@@ -14,6 +14,10 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Card, CardContent } from '@/components/ui/card';
 import { useDonationForm } from './donation-form-context';
 
+/**
+ * Summary card shown on the payment page when the donation is dedicated as a
+ * gift. Renders only when a gift is present (`dedicated` + `gift`).
+ */
 export function GiftSummary() {
   const { donationData, fundraiser } = useDonationForm();
 
@@ -61,6 +65,14 @@ function useDonorIdentity(): { donorName: string; senderName: string } {
   };
 }
 
+/**
+ * When the gift has a recipient email, shows a `To:` line that expands into a
+ * preview of the dedication email the recipient will receive (the message
+ * attribution and quote are omitted when no message was written). Keep this
+ * copy in sync with the actual email the backend sends. When there is no
+ * recipient email, shows a notice that the certificate link goes to the
+ * donor's own confirmation email instead.
+ */
 function GiftSummaryInner({
   gift,
   donationData,
@@ -107,26 +119,24 @@ function GiftSummaryInner({
 
           {gift.recipientEmail !== undefined ? (
             <div className='space-y-2 text-sm'>
-              {hasMessage ? (
-                <button
-                  type='button'
-                  onClick={() => setExpanded(value => !value)}
-                  aria-expanded={expanded}
-                  className='flex w-full items-start gap-2 text-left'
-                >
-                  <ChevronDown
-                    className={`mt-px h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform ${
-                      expanded ? 'rotate-180' : ''
-                    }`}
-                    aria-hidden='true'
-                  />
-                  {recipientLine}
-                </button>
-              ) : (
-                <div className='flex items-start gap-2'>{recipientLine}</div>
-              )}
+              <button
+                type='button'
+                onClick={() => setExpanded(value => !value)}
+                aria-expanded={expanded}
+                className='flex w-full items-start gap-2 text-left'
+              >
+                <ChevronDown
+                  className={`mt-px h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform ${
+                    expanded ? 'rotate-180' : ''
+                  }`}
+                  aria-hidden='true'
+                />
+                {recipientLine}
+              </button>
 
-              {hasMessage && expanded && (
+              {expanded && (
+                // pl-[1.375rem] aligns the body under the `To:` text, past the
+                // hanging chevron (icon w-3.5 + gap-2).
                 <div className='space-y-1.5 border-t border-muted pt-1.5 text-xs text-muted-foreground leading-snug wrap-break-word'>
                   <p className='border-b border-muted pb-1.5 pl-[1.375rem]'>
                     <span className='text-muted-foreground'>
@@ -150,12 +160,18 @@ function GiftSummaryInner({
                       })}{' '}
                       {t('emailPreview.certificate')}
                     </p>
-                    <p>
-                      {t('emailPreview.messageFrom', { sender: senderName })}
-                    </p>
-                    <blockquote className='border-l-2 border-muted pl-2 text-foreground whitespace-pre-line'>
-                      {gift.message}
-                    </blockquote>
+                    {hasMessage && (
+                      <>
+                        <p>
+                          {t('emailPreview.messageFrom', {
+                            sender: senderName,
+                          })}
+                        </p>
+                        <blockquote className='border-l-2 border-muted pl-2 text-foreground whitespace-pre-line'>
+                          {gift.message}
+                        </blockquote>
+                      </>
+                    )}
                     <p className='whitespace-pre-line'>
                       {t('emailPreview.signature')}
                     </p>

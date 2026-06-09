@@ -84,11 +84,11 @@
       "dedicatedTo": "{recipientName} gewidmet",
       "sentTo": "An:",
       "sentFrom": "Von:",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailNoticeNoEmail": "Der Link zur Widmungsurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
       "emailPreview": {
         "greeting": "Liebe/r {recipientName},",
         "intro": "In deinem Namen hat {donor} {amount} an die Spendenaktion „{fundraiser}“ gespendet.",
-        "certificate": "Eine Geschenkurkunde findest du im Anhang.",
+        "certificate": "Eine Widmungsurkunde findest du im Anhang.",
         "messageFrom": "Hier ist eine Nachricht von {sender}:",
         "signature": "Beste Grüße,\nPlant-for-the-Planet",
         "donorFallback": "der Spender"

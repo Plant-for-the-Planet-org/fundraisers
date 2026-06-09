@@ -84,11 +84,11 @@
       "dedicatedTo": "Dedicated to {recipientName}",
       "sentTo": "To:",
       "sentFrom": "From:",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate",
+      "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
       "emailPreview": {
         "greeting": "Dear {recipientName},",
         "intro": "In your name, {donor} has donated {amount} to the fundraiser \"{fundraiser}\".",
-        "certificate": "A certificate is attached for you.",
+        "certificate": "A dedication certificate is attached for you.",
         "messageFrom": "Here's a message from {sender}:",
         "signature": "Best,\nPlant-for-the-Planet",
         "donorFallback": "the donor"
