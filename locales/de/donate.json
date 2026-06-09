@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
+      "sentTo": "An:",
+      "sentFrom": "Von:",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailPreview": {
+        "greeting": "Liebe/r {recipientName},",
+        "intro": "In deinem Namen hat {donor} {amount} an die Spendenaktion „{fundraiser}“ gespendet.",
+        "certificate": "Eine Geschenkurkunde findest du im Anhang.",
+        "messageFrom": "Hier ist eine Nachricht von {sender}:",
+        "signature": "Beste Grüße,\nPlant-for-the-Planet",
+        "donorFallback": "der Spender"
+      }
     },
     "errors": {
       "zipCode": {

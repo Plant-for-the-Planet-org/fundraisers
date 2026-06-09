@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate"
+      "sentTo": "To:",
+      "sentFrom": "From:",
+      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate",
+      "emailPreview": {
+        "greeting": "Dear {recipientName},",
+        "intro": "In your name, {donor} has donated {amount} to the fundraiser \"{fundraiser}\".",
+        "certificate": "A certificate is attached for you.",
+        "messageFrom": "Here's a message from {sender}:",
+        "signature": "Best,\nPlant-for-the-Planet",
+        "donorFallback": "the donor"
+      }
     },
     "errors": {
       "zipCode": {
