@@ -55,37 +55,57 @@ export function getTotalRaisedByCurrency(
     .sort((a, b) => b.amount - a.amount);
 }
 
-// TODO: Replace with real exchange rates from the API.
-// 1 EUR = 1.2 CHF = 1.25 USD
-const TEMP_RATES_TO_EUR: Record<string, number> = {
-  EUR: 1,
-  CHF: 1 / 1.2,
-  USD: 1 / 1.25,
-};
-const TEMP_RATES_FROM_EUR: Record<string, number> = {
-  EUR: 1,
-  CHF: 1.2,
-  USD: 1.25,
+// Hardcoded floor exchange rates, one row per workspace (base) currency.
+// Every workspace currency needs a row here.
+//
+// Each value is "base per 1 unit of foreign" — multiply each foreign bucket by
+// it, sum, round down. The bias is deliberate: the shown total leans at or
+// below the true amount raised.
+//
+// The table is NOT reciprocal, on purpose — both directions must lose value, so
+// EUR-per-CHF is not 1/(CHF-per-EUR). A fundraiser reads only its own row and
+// never composes two. Do not "fix" this into a consistent matrix.
+//
+// Guarantees differ by row:
+//   - EUR/CHF/USD crosses sit below the multi-year low → never over-report.
+//   - BRL/CZK crosses are ~p25 of the trailing 2 years → lean low, but can
+//     slightly over-report on the bottom quarter of days.
+//
+// TODO: temporary. The durable fix is to freeze the realized rate into
+// fundraiser metadata at close, so a closed number never needs a guessed rate.
+const FLOOR_RATES: Record<string, Record<string, number>> = {
+  EUR: { EUR: 1, CHF: 0.83, USD: 0.8, BRL: 0.15, CZK: 0.04 },
+  CHF: { CHF: 1, EUR: 0.85, USD: 0.74, BRL: 0.14, CZK: 0.036 },
+  USD: { USD: 1, EUR: 0.93, CHF: 0.93, BRL: 0.18, CZK: 0.046 },
+  BRL: { BRL: 1, EUR: 5.9, CHF: 6.4, USD: 5.0, CZK: 0.24 },
+  CZK: { CZK: 1, EUR: 24.0, CHF: 26.0, USD: 20.4, BRL: 3.7 },
 };
 
 /**
  * Converts a multi-currency totalRaised record to a single amount in
- * `targetCurrency` using hardcoded exchange rates (temp until API rates exist).
- * Unknown currencies are treated as 1:1 with EUR.
+ * `targetCurrency` using hardcoded floor rates (temp until API rates exist).
+ *
+ * Reads the target currency's row from {@link FLOOR_RATES}, multiplies each
+ * currency bucket by its floor factor, sums, then rounds the total down so the
+ * result never exceeds the true amount raised.
+ *
+ * Foreign currencies absent from the row contribute 0 (rather than 1:1) to
+ * preserve the never-over-report invariant. A target currency with no row
+ * falls back to counting only same-currency donations.
  */
 export function convertTotalRaisedToSingleCurrency(
   totalRaised: Record<string, number>,
   targetCurrency: string
 ): number {
   const target = targetCurrency.toUpperCase();
-  const fromEUR = TEMP_RATES_FROM_EUR[target] ?? 1;
-  const totalInEUR = Object.entries(totalRaised)
+  const row = FLOOR_RATES[target] ?? { [target]: 1 };
+  const total = Object.entries(totalRaised)
     .filter(([, amount]) => Number.isFinite(amount) && amount > 0)
     .reduce((sum, [currency, amount]) => {
-      const toEUR = TEMP_RATES_TO_EUR[currency.toUpperCase()] ?? 1;
-      return sum + amount * toEUR;
+      const factor = row[currency.toUpperCase()];
+      return factor === undefined ? sum : sum + amount * factor;
     }, 0);
-  return totalInEUR * fromEUR;
+  return Math.floor(total);
 }
 
 /**
