@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
@@ -22,6 +22,7 @@ export function InfoTooltip({
   iconClassName,
 }: InfoTooltipProps) {
   const t = useTranslations('Common.aria');
+  const tooltipId = useId();
   const [open, setOpen] = useState(false);
   const pointerType = useRef<string>('mouse');
 
@@ -32,6 +33,7 @@ export function InfoTooltip({
           role='button'
           tabIndex={0}
           aria-label={triggerLabel ?? t('moreInformation')}
+          aria-describedby={open ? tooltipId : undefined}
           className={cn(
             'inline-flex cursor-help items-center rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
             className
@@ -46,6 +48,8 @@ export function InfoTooltip({
           onPointerLeave={event => {
             if (event.pointerType === 'mouse') setOpen(false);
           }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setOpen(false)}
           onClick={event => {
             // Prevent clicks from triggering parent elements.
             event.stopPropagation();
@@ -65,6 +69,7 @@ export function InfoTooltip({
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
+          id={tooltipId}
           role='tooltip'
           side='top'
           sideOffset={6}
