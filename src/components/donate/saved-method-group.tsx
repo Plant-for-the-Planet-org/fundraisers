@@ -1,10 +1,8 @@
 'use client';
 
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
-import type {
-  SavedMethodOption,
-  VisibleMethodOption,
-} from '@/components/donate/use-payment-method-options';
+import type { SavedMethodViewModel } from '@/components/donate/saved-method-view-model';
+import type { VisibleMethodOption } from '@/components/donate/use-payment-method-options';
 
 import { useTranslations } from 'next-intl';
 import { TriangleAlert } from 'lucide-react';
@@ -22,7 +20,7 @@ interface SavedMethodGroupProps {
   /** The generic payment method this group is built around (card / SEPA). */
   method: VisibleMethodOption;
   /** Saved instances of `method`, already filtered and shaped for rendering. */
-  savedForMethod: SavedMethodOption[];
+  savedForMethod: SavedMethodViewModel[];
   /** The currently selected saved-method id; '' when none is active. */
   selectedSavedMethodId: string;
   /** The currently selected generic payment method id. */

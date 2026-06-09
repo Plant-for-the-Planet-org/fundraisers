@@ -1,11 +1,11 @@
 'use client';
 
-import type { ProfilePaymentMethod } from '@/lib/api/user-service';
 import type {
   DerivedPaymentMethod,
   PaymentMethodId,
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
+import type { SavedMethodViewModel } from '@/components/donate/saved-method-view-model';
 
 import { useCallback, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -18,29 +18,12 @@ import { derivePaymentMethods } from '@/lib/utils/payment-methods';
 import { useAuthStore } from '@/stores/auth-store';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import {
-  capitalize,
-  getExpiryInfo,
   METHOD_LOGOS,
   METHOD_TRANSLATION_KEYS,
   PROVIDER_TRANSLATION_KEYS,
 } from '@/components/donate/payment-methods-helpers';
+import { buildSavedMethodViewModels } from '@/components/donate/saved-method-view-model';
 import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-methods';
-
-/**
- * A saved card/SEPA method shaped for rendering and pre-selection.
- */
-export interface SavedMethodOption {
-  id: string;
-  typeId: 'card' | 'sepa_debit';
-  brand: string | null;
-  last4: string;
-  expiryDate: string | null;
-  isExpired: boolean;
-  isExpiringSoon: boolean;
-  ariaLabel: string;
-  isDefault: boolean;
-  expiringSoonLabel: string | undefined;
-}
 
 /**
  * A generic payment method option shaped for rendering.
@@ -60,13 +43,13 @@ export interface UsePaymentMethodOptionsResult {
   /** Generic methods (card, SEPA, PayPal, …) shaped for rendering. */
   visibleMethodOptions: VisibleMethodOption[];
   /** Flat list of usable saved methods (expired ones removed). */
-  savedMethodOptions: SavedMethodOption[];
+  savedMethodOptions: SavedMethodViewModel[];
   /** Saved methods grouped under their parent type id. */
-  savedByType: Map<PaymentMethodId, SavedMethodOption[]>;
+  savedByType: Map<PaymentMethodId, SavedMethodViewModel[]>;
   /** Returns the saved method to auto-select for a given method id. */
   pickPreferredSaved: (
     methodId: PaymentMethodId
-  ) => SavedMethodOption | undefined;
+  ) => SavedMethodViewModel | undefined;
   /** The donor's last-used method, when it is supported. */
   lastUsedMethodId: PaymentMethodId | null;
   /** Whether the saved-methods fetch has settled. */
@@ -181,50 +164,19 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
     [availableMethods]
   );
 
-  const savedMethodOptions = useMemo<SavedMethodOption[]>(
+  const savedMethodOptions = useMemo(
     () =>
-      savedMethods
-        .filter(
-          (m): m is ProfilePaymentMethod & { type: 'card' | 'sepa_debit' } =>
-            (m.type === 'card' || m.type === 'sepa_debit') &&
-            availableMethodIds.has(m.type)
-        )
-        .map(m => {
-          const expiry =
-            m.type === 'card'
-              ? getExpiryInfo(m.expires)
-              : { date: null, isExpired: false, isExpiringSoon: false };
-          return {
-            id: m.id,
-            typeId: m.type,
-            brand: m.type === 'card' ? (m.brand ?? null) : null,
-            last4: m.last4,
-            expiryDate: expiry.date,
-            isExpired: expiry.isExpired,
-            isExpiringSoon: expiry.isExpiringSoon,
-            ariaLabel:
-              m.type === 'card'
-                ? t('saved.cardLabelAria', {
-                    brand: m.brand ? capitalize(m.brand) : t('methods.card'),
-                    last4: m.last4,
-                  })
-                : t('saved.sepaLabelAria', { last4: m.last4 }),
-            isDefault: m.isDefault,
-            expiringSoonLabel: expiry.isExpiringSoon
-              ? t('saved.expiringSoon')
-              : undefined,
-          };
-        })
-        // Expired cards can't be charged — hide them entirely rather than
-        // showing a disabled, unusable row.
-        .filter(m => !m.isExpired),
+      buildSavedMethodViewModels(savedMethods, {
+        isTypeAvailable: type => availableMethodIds.has(type),
+        t,
+      }),
     [savedMethods, availableMethodIds, t]
   );
 
   // Group saved methods under their parent type so each generic method (card /
   // SEPA) can render its saved methods nested beneath it as a subsection.
   const savedByType = useMemo(() => {
-    const map = new Map<PaymentMethodId, SavedMethodOption[]>();
+    const map = new Map<PaymentMethodId, SavedMethodViewModel[]>();
     for (const saved of savedMethodOptions) {
       const list = map.get(saved.typeId) ?? [];
       list.push(saved);
