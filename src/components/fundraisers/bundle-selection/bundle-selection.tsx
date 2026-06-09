@@ -6,6 +6,7 @@ import type {
   BundleTabId,
   BundleWorkspace,
 } from '@/lib/types/bundle';
+import type { GetProject } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
@@ -84,16 +85,22 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
     ? getBundleBySlug(bundleSlug)
     : undefined;
 
+  // Bundle persisted when the fundraiser was saved. Only this bundle shows
+  // non-donatable projects; other bundles filter them out. Null in create mode.
+  const [persistedBundleSlug] = useState(() =>
+    mode === 'edit' ? (bundleSlug ?? null) : null
+  );
+
   const [activeTab, setActiveTab] = useState<BundleTabId>(() =>
     getInitialActiveTab({ bundleWorkspace, selectedBundle, mode })
   );
   const [previewBundle, setPreviewBundle] = useState<Bundle | null>(null);
 
-  function handleUseBundle(bundle: Bundle) {
+  function handleUseBundle(bundle: Bundle, getProject: GetProject) {
     if (!bundleWorkspace) return;
     setValue(
       'projectAllocations',
-      bundleToAllocations(bundle, bundleWorkspace),
+      bundleToAllocations(bundle, bundleWorkspace, getProject),
       {
         shouldDirty: true,
         shouldValidate: true,
@@ -145,7 +152,8 @@ export function BundleSelection({ mode }: BundleSelectionProps) {
       setActiveTab={handleTabChange}
       previewBundle={previewBundle}
       setPreviewBundle={setPreviewBundle}
-      selectedBundleSlug={selectedBundle?.slug}
+      currentBundleSlug={selectedBundle?.slug}
+      persistedBundleSlug={persistedBundleSlug}
       country={country}
       bundleWorkspace={bundleWorkspace}
       onUseBundle={handleUseBundle}
@@ -158,10 +166,11 @@ interface BundleSelectionContentProps {
   setActiveTab: (tab: BundleTabId) => void;
   previewBundle: Bundle | null;
   setPreviewBundle: (bundle: Bundle | null) => void;
-  selectedBundleSlug: BundleSlug | undefined;
+  currentBundleSlug: BundleSlug | undefined;
+  persistedBundleSlug: BundleSlug | null;
   country: AllowedCountry;
   bundleWorkspace: BundleWorkspace;
-  onUseBundle: (bundle: Bundle) => void;
+  onUseBundle: (bundle: Bundle, getProject: GetProject) => void;
 }
 
 /**
@@ -173,7 +182,8 @@ function BundleSelectionContent({
   setActiveTab,
   previewBundle,
   setPreviewBundle,
-  selectedBundleSlug,
+  currentBundleSlug,
+  persistedBundleSlug,
   country,
   bundleWorkspace,
   onUseBundle,
@@ -182,6 +192,12 @@ function BundleSelectionContent({
   const { getProject } = useBundleProjects(country);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
+
+  // Used to filter non-donatable projects before updating form allocations.
+  const handleUseBundle = useCallback(
+    (bundle: Bundle) => onUseBundle(bundle, getProject),
+    [onUseBundle, getProject]
+  );
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -294,9 +310,10 @@ function BundleSelectionContent({
             <BundleTabPanel
               activeTab={activeTab}
               bundleWorkspace={bundleWorkspace}
-              selectedBundleSlug={selectedBundleSlug}
+              currentBundleSlug={currentBundleSlug}
+              persistedBundleSlug={persistedBundleSlug}
               getProject={getProject}
-              onSelectBundle={onUseBundle}
+              onSelectBundle={handleUseBundle}
               onOpenBundle={setPreviewBundle}
             />
           )}
@@ -311,7 +328,8 @@ function BundleSelectionContent({
           isOpen
           getProject={getProject}
           onClose={() => setPreviewBundle(null)}
-          onUseBundle={onUseBundle}
+          onUseBundle={handleUseBundle}
+          isPersisted={previewBundle.slug === persistedBundleSlug}
         />
       )}
     </div>

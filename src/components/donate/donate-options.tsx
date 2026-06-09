@@ -4,7 +4,7 @@ import type { DonationFormValues } from './donation-form-context';
 
 import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrency } from '@/lib/utils/currency';
 import { Checkbox } from '@/components/ui/checkbox';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -21,6 +21,7 @@ export function DonateOptions() {
     paymentProviderName,
   } = useProcessingFeeInfo();
   const t = useTranslations('Fundraisers');
+  const locale = useLocale();
 
   const isInitiallyOneTime = donationData.frequency === 'once';
   const showCoverFees =
@@ -61,7 +62,8 @@ export function DonateOptions() {
               {t('donate.options.coverFeesLabel', {
                 feeAmount: formatCurrency(
                   processingFeeCents,
-                  donationData.currency
+                  donationData.currency,
+                  locale
                 ),
                 providerName: paymentProviderName,
               })}

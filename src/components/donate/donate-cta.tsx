@@ -6,8 +6,10 @@ import type { Stripe } from '@stripe/stripe-js';
 import type { DonationFormValues } from './donation-form-context';
 import type { WalletKind } from './wallet-button';
 
+import { useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { scrollToFirstError } from '@/lib/utils/scroll-into-view';
 import { Button } from '../ui/button';
 import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
@@ -19,6 +21,7 @@ interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
   stripePromise?: Promise<Stripe | null> | null;
+  resetError: () => void;
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
@@ -36,6 +39,7 @@ export function DonateCTA({
   isLoading,
   isSuccess,
   stripePromise,
+  resetError,
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
@@ -59,6 +63,18 @@ export function DonateCTA({
   const makeMonthly = useWatch<DonationFormValues, 'makeMonthly'>({
     name: 'makeMonthly',
   });
+
+  // Clear submission error when user switches payment method
+  const prevMethodRef = useRef(selectedPaymentMethod);
+  useEffect(() => {
+    if (
+      prevMethodRef.current !== undefined &&
+      prevMethodRef.current !== selectedPaymentMethod
+    ) {
+      resetError();
+    }
+    prevMethodRef.current = selectedPaymentMethod;
+  }, [selectedPaymentMethod, resetError]);
 
   if (selectedPaymentMethod === 'paypal') {
     return (
@@ -117,11 +133,19 @@ export function DonateCTA({
     buttonContent = <span className='font-semibold'>{buttonText}</span>;
   }
 
+  const handleClick = () => {
+    handleSubmit(onSubmit, () => {
+      requestAnimationFrame(() => {
+        scrollToFirstError()?.focus?.();
+      });
+    })();
+  };
+
   return (
     <div className='space-y-6'>
       <Button
         className='w-full h-12 bg-gray-900 hover:bg-gray-700 text-white font-medium disabled:opacity-50'
-        onClick={handleSubmit(onSubmit)}
+        onClick={handleClick}
         disabled={isLoading || isSuccess}
       >
         <div className='flex items-center gap-2'>{buttonContent}</div>

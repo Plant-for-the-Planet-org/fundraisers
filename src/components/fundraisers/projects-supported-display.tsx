@@ -103,7 +103,11 @@ export function ProjectsSupportedDisplay({
 
   const bundle = getBundleBySlug(bundleSlug);
 
-  if (!projectAllocations?.length) return null;
+  const donationEnabledAllocations = projectAllocations?.filter(
+    ({ project }) => project.allowDonations !== false
+  );
+
+  if (!donationEnabledAllocations?.length) return null;
 
   return (
     <div className='project-supported-display flex flex-col gap-3'>
@@ -120,7 +124,7 @@ export function ProjectsSupportedDisplay({
         {t('viewModeSectionHeading')}
       </SectionHeader>
       <ul className='space-y-4'>
-        {projectAllocations.map(({ project }) => (
+        {donationEnabledAllocations.map(({ project }) => (
           <ProjectItem key={project.id} project={project} />
         ))}
       </ul>

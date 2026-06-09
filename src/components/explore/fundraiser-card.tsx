@@ -30,15 +30,13 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
     totalRaisedByCurrency.length > 0
       ? totalRaisedByCurrency
           .map(({ currency, amount }) =>
-            formatCurrencyFromDecimal(amount, currency, {
+            formatCurrencyFromDecimal(amount, currency, locale, {
               compact: true,
-              locale,
             })
           )
           .join(' · ')
-      : formatCurrencyFromDecimal(0, fundraiser.currency, {
+      : formatCurrencyFromDecimal(0, fundraiser.currency, locale, {
           compact: true,
-          locale,
         });
 
   const hostDisplay = (() => {

@@ -7,12 +7,16 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
+import {
+  scrollElementIntoView,
+  scrollToFirstError,
+} from '@/lib/utils/scroll-into-view';
 import { DonateCTA } from './donate-cta';
 import { DonateOptions } from './donate-options';
 import { DonateOverlayLayout } from './donate-overlay-layout';
@@ -105,6 +109,15 @@ function DonateOverlayInner({
     ? getStripe(stripeConfig.authorization.stripePublishableKey, locale)
     : null;
 
+  // Stripe card/SEPA fields set their inline errors synchronously, then signal
+  // validation failure. Defer to the next frame so those error markers are in
+  // the DOM before we scroll to the first one.
+  const handlePaymentValidationFailed = useCallback(() => {
+    requestAnimationFrame(() => {
+      scrollToFirstError()?.focus?.();
+    });
+  }, []);
+
   const {
     onSubmit,
     donationState,
@@ -120,17 +133,20 @@ function DonateOverlayInner({
     fundraiser,
     paymentOptions,
     sepaFormRef,
-    cardFormRef
+    cardFormRef,
+    handlePaymentValidationFailed
   );
   const { thankYouState, error, isLoading } = donationState;
 
+  // Reset donation state (backend errors) when overlay closes
+  useEffect(() => {
+    if (!isOpen) reset();
+  }, [isOpen, reset]);
+
   const errorBannerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (error?.code) {
-      errorBannerRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+    if (error?.code && errorBannerRef.current) {
+      scrollElementIntoView(errorBannerRef.current);
     }
   }, [error?.code]);
 
@@ -151,11 +167,6 @@ function DonateOverlayInner({
     />
   ) : (
     <>
-      {error?.code && (
-        <div ref={errorBannerRef}>
-          <DonationFailureBanner errorCode={error.code} reset={reset} />
-        </div>
-      )}
       <DonorInfo />
       <PaymentMethods />
     </>
@@ -172,6 +183,7 @@ function DonateOverlayInner({
             isLoading={isLoading}
             isSuccess={false}
             stripePromise={stripePromise}
+            resetError={reset}
             onPayPalCreateOrder={onPayPalCreateOrder}
             onPayPalApproved={onPayPalApproved}
             onPayPalError={onPayPalError}
@@ -179,6 +191,11 @@ function DonateOverlayInner({
             onWalletError={onWalletError}
             onWalletCancel={onWalletCancel}
           />
+          {error?.code && (
+            <div ref={errorBannerRef}>
+              <DonationFailureBanner errorCode={error.code} reset={reset} />
+            </div>
+          )}
         </>
       )}
     </>

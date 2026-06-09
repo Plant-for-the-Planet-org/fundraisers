@@ -1,6 +1,6 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getImageUrl } from '@/lib/utils/images';
@@ -24,6 +24,7 @@ export function DonationItem({
   showDate = true,
 }: DonationItemProps) {
   const t = useTranslations('Leaderboard.view');
+  const locale = useLocale();
   const isAnonymous = anonymize || donation.isAnonymous || false;
   const avatarSrc =
     !isAnonymous && donation.avatarUrl
@@ -62,7 +63,11 @@ export function DonationItem({
         </div>
         <div className='text-zinc-600 dark:text-gray-300 text-xs font-medium leading-tight whitespace-nowrap'>
           {showAmount &&
-            formatCurrencyFromDecimal(donation.amount, donation.currency)}
+            formatCurrencyFromDecimal(
+              donation.amount,
+              donation.currency,
+              locale
+            )}
           {showAmount && showDate && ' • '}
           {showDate && formatTimeAgo(donation.created)}
         </div>

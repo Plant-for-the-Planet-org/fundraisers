@@ -174,7 +174,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
                     color: 'var(--accent-color)',
                   }}
                 >
-                  {formatCurrencyFromDecimal(d.amount, d.currency, {
+                  {formatCurrencyFromDecimal(d.amount, d.currency, locale, {
                     compact: true,
                   })}
                 </span>

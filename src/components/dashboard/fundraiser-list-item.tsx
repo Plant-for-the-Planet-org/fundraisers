@@ -52,13 +52,18 @@ export function FundraiserListItem({
     totalRaisedByCurrency.length > 0
       ? totalRaisedByCurrency
           .map(({ currency, amount }) =>
-            formatCurrencyFromDecimal(amount, currency, { compact: true })
+            formatCurrencyFromDecimal(amount, currency, locale, {
+              compact: true,
+            })
           )
           .join(' · ')
-      : formatCurrencyFromDecimal(0, fundraiser.currency, { compact: true });
+      : formatCurrencyFromDecimal(0, fundraiser.currency, locale, {
+          compact: true,
+        });
   const goal = formatCurrencyFromDecimal(
     fundraiser.goalAmount,
     fundraiser.currency,
+    locale,
     { compact: true }
   );
 

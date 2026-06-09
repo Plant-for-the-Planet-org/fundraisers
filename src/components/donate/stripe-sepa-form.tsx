@@ -21,7 +21,9 @@ export interface StripeSepaFormHandle {
       zipCode: string;
       country: string;
     };
-  }): Promise<{ paymentMethodId: string } | { error: string }>;
+  }): Promise<
+    { paymentMethodId: string } | { error: string } | { validationFailed: true }
+  >;
   confirmSepaDebitPayment(clientSecret: string): Promise<{ error?: string }>;
   /**
    * Focuses the IBAN field.
@@ -80,7 +82,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           setMandateError(t('mandateRequired'));
           hasError = true;
         }
-        if (hasError) return { error: t('errors.validationFailed') };
+        if (hasError) return { validationFailed: true as const };
 
         if (!stripe || !elements)
           return { error: t('errors.stripeNotInitialized') };

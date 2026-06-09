@@ -64,7 +64,7 @@ export const ANIMATION_OPTIONS: Array<{
   { id: 'confetti', icon: PartyPopper },
   { id: 'snow', icon: Snowflake },
   { id: 'hearts', icon: Heart },
-  { id: 'particles', icon: Sparkles },
+  { id: 'fireworks', icon: Sparkles },
 ];
 
 export const DECORATIONS: Array<{ id: BgDecoration; icon: LucideIcon }> = [
@@ -113,7 +113,4 @@ export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
 
-export const pickRandom = <T>(arr: readonly T[]): T => {
-  if (arr.length === 0) throw new Error('pickRandom called with empty array');
-  return arr[Math.floor(Math.random() * arr.length)];
-};
+export { pickRandom } from '@/components/theme/animations/base';

@@ -16,11 +16,11 @@ export const DonationFailureBanner = ({
 }) => {
   const t = useTranslations('Donate.submissionErrors');
   return (
-    <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+    <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4'>
       <div className='flex items-start gap-3'>
-        <div className='flex-shrink-0'>
+        <div className='shrink-0'>
           <svg
-            className='w-5 h-5 text-red-400'
+            className='w-5 h-5 text-destructive/70'
             viewBox='0 0 20 20'
             fill='currentColor'
           >
@@ -32,11 +32,11 @@ export const DonationFailureBanner = ({
           </svg>
         </div>
         <div className='flex-1'>
-          <h3 className='text-sm font-medium text-red-800'>{t(errorCode)}</h3>
+          <p className='text-sm font-medium text-destructive'>{t(errorCode)}</p>
         </div>
         <button
           onClick={reset}
-          className='flex-shrink-0 text-red-400 hover:text-red-600'
+          className='shrink-0 text-destructive/60 hover:text-destructive'
         >
           <X className='w-4 h-4' />
         </button>

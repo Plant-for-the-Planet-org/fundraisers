@@ -41,7 +41,9 @@ export interface StripeCardFormHandle {
       zipCode: string;
       country: string;
     };
-  }): Promise<{ paymentMethodId: string } | { error: string }>;
+  }): Promise<
+    { paymentMethodId: string } | { error: string } | { validationFailed: true }
+  >;
   handleCardAction(
     clientSecret: string
   ): Promise<{ paymentIntentId: string } | { error: string }>;
@@ -163,7 +165,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             hasError = true;
           }
         }
-        if (hasError) return { error: t('errors.validationFailed') };
+        if (hasError) return { validationFailed: true as const };
 
         if (!stripe || !elements)
           return { error: t('errors.stripeNotInitialized') };

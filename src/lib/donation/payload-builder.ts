@@ -13,6 +13,7 @@ import type {
 import type { Fundraiser } from '../types/fundraiser';
 import type { PaymentMethodId } from '../types/payment-methods';
 
+import { getDefaultCauseId } from '../utils/project-allocation';
 import { calculateLineItems } from './line-item-calculator';
 
 export function calculateFrequency(
@@ -207,7 +208,8 @@ export function buildDonationPayload(
 
   const lineItems = calculateLineItems(
     formData.amountCents,
-    fundraiser.projectAllocations
+    fundraiser.projectAllocations,
+    getDefaultCauseId(fundraiser.workspace?.country ?? '')
   );
   const metadata = buildDonationMetadata(
     formData,

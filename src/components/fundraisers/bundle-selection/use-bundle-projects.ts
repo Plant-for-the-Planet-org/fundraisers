@@ -1,6 +1,6 @@
 'use client';
 
-import type { ProjectData } from '@/lib/types/project-selection';
+import type { GetProject, ProjectData } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { projectsService } from '@/lib/api/projects-service';
 import { DEFAULT_NON_EARMARKED_CAUSE_FALLBACK } from '@/lib/constants/project-selection';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
+import { useEditProjectDetails } from './edit-project-details-context';
 
 type ProjectsById = Record<string, ProjectData>;
 
@@ -22,7 +23,7 @@ interface UseBundleProjectsResult {
    * (the country's default cause gets the canonical fallback name/image;
    * other unknown IDs get a minimal placeholder).
    */
-  getProject: (id: string) => ProjectData;
+  getProject: GetProject;
 }
 
 /**
@@ -35,6 +36,7 @@ export function useBundleProjects(
 ): UseBundleProjectsResult {
   const locale = useLocale();
   const t = useTranslations('Bundles');
+  const editProjectDetails = useEditProjectDetails();
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -88,17 +90,25 @@ export function useBundleProjects(
           isTopProject: false,
         };
       }
+      // In edit mode, use project details from fundraiser allocations when the
+      // project is no longer selectable, instead of showing an unknown-project placeholder.
+      const fromEdit = editProjectDetails[id];
+      if (fromEdit) return fromEdit;
 
+      // Unknown projects are treated as non-donatable so they are hidden
+      // from bundle views. `isUnknown` lets callers drop them entirely (e.g.
+      // the pre-selected bundle preview, which otherwise shows all IDs).
       return {
         id,
         name: t('unknownProject'),
         description: '',
         country: '',
-        allowDonations: true,
+        allowDonations: false,
         isTopProject: false,
+        isUnknown: true,
       };
     },
-    [projectsById, defaultCauseId, country, t]
+    [projectsById, defaultCauseId, country, t, editProjectDetails]
   );
 
   return {
