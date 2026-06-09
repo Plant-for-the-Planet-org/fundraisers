@@ -33,6 +33,8 @@ interface SavedMethodGroupProps {
   onSavedMethodSelect: (savedMethodId: string, typeId: PaymentMethodId) => void;
   /** Called when the "use a new …" row is chosen. */
   onNewMethodSelect: (methodId: PaymentMethodId) => void;
+  /** Called when the group header/container is chosen, selecting the preferred saved method. */
+  onSavedGroupSelect: (methodId: PaymentMethodId) => void;
 }
 
 /**
@@ -49,6 +51,7 @@ export function SavedMethodGroup({
   feeCollectionEnabled,
   onSavedMethodSelect,
   onNewMethodSelect,
+  onSavedGroupSelect,
 }: SavedMethodGroupProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
 
@@ -56,6 +59,16 @@ export function SavedMethodGroup({
   // saved card and the generic card share the same id.
   const isGenericSelected =
     selectedPaymentMethod === method.id && !selectedSavedMethodId;
+
+  // Clicking the header selects the preferred saved method.
+  // If a saved method is already selected, preserve that choice.
+  const hasSelectedSavedInGroup = savedForMethod.some(
+    s => s.id === selectedSavedMethodId
+  );
+  const handleHeaderSelect = () => {
+    if (hasSelectedSavedInGroup) return;
+    onSavedGroupSelect(method.id);
+  };
 
   const HeaderLogo = method.logo;
   const newMethodTranslationKey = NEW_METHOD_TRANSLATION_KEYS[method.id];
@@ -70,11 +83,16 @@ export function SavedMethodGroup({
 
   return (
     <div className='rounded-lg border border-border bg-muted/40'>
-      {/* Header is a label for the type, not a selectable option —
-          the saved instances and the "use a new …" row below are.
-          The radio dot mirrors whichever nested option is active. */}
+      {/* Clicking the header selects the type's preferred saved method.
+          The saved instances and the "use a new …" row below select a
+          specific option; the radio dot mirrors whichever is active. */}
       <div className='flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'>
-        <div className='flex flex-1 items-center gap-3'>
+        <button
+          type='button'
+          onClick={handleHeaderSelect}
+          aria-pressed={selectedPaymentMethod === method.id}
+          className='flex flex-1 items-center gap-3 text-left'
+        >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
           {HeaderLogo && (
             <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
@@ -89,7 +107,7 @@ export function SavedMethodGroup({
               </span>
             )}
           </div>
-        </div>
+        </button>
         {feeCollectionEnabled && method.feeText && (
           <MethodFeeDetails
             feeText={method.feeText}
