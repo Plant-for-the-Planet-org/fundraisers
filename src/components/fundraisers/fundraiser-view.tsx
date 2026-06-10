@@ -79,7 +79,7 @@ export function FundraiserView({
           goalAmount={fundraiser.goalAmount}
           currency={fundraiser.currency}
           progressPercentage={progressPercentage}
-          daysLeft={daysLeft}
+          daysLeft={fundraiser.canDonate ? daysLeft : undefined}
         />
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
