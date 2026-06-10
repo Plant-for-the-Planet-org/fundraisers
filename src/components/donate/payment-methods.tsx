@@ -518,8 +518,8 @@ export function PaymentMethods() {
                       isSelected={selectedPaymentMethod === method.id}
                     />
                     {HeaderLogo && (
-                      <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
-                        <HeaderLogo textColor='#4d5153' />
+                      <div className='flex h-4 w-12 shrink-0 items-center justify-center text-muted-foreground'>
+                        <HeaderLogo textColor='currentColor' />
                       </div>
                     )}
                     <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
