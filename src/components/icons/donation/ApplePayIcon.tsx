@@ -8,8 +8,8 @@ function AppleIcon({ textColor }: Props): ReactElement {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      width='100%'
-      height='100%'
+      width='38'
+      height='16'
       viewBox='0 0 120.377 51.064'
       aria-hidden='true'
     >
