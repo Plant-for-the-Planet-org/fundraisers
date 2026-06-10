@@ -125,6 +125,9 @@ function DonateOverlayInner({
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
+    onWalletConfirm,
+    onWalletError,
+    onWalletCancel,
   } = useDonationSubmit(
     donationData,
     fundraiser,
@@ -179,10 +182,14 @@ function DonateOverlayInner({
           <DonateCTA
             isLoading={isLoading}
             isSuccess={false}
+            stripePromise={stripePromise}
             resetError={reset}
             onPayPalCreateOrder={onPayPalCreateOrder}
             onPayPalApproved={onPayPalApproved}
             onPayPalError={onPayPalError}
+            onWalletConfirm={onWalletConfirm}
+            onWalletError={onWalletError}
+            onWalletCancel={onWalletCancel}
           />
           {error?.code && (
             <div ref={errorBannerRef}>

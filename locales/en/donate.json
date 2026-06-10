@@ -181,6 +181,14 @@
         "paymentIntentNotReturned": "Payment intent not returned"
       }
     },
+    "applePay": {
+      "unavailable": "Apple Pay is not available in this browser. Try Safari on macOS or iOS, or scan the QR code prompt with your iPhone.",
+      "processing": "Processing Apple Pay donation…"
+    },
+    "googlePay": {
+      "unavailable": "Google Pay is not available in this browser. Try Chrome on Android, or choose a different payment method.",
+      "processing": "Processing Google Pay donation…"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
@@ -196,6 +204,7 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {
