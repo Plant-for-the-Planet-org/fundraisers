@@ -56,7 +56,7 @@ function CharCount({ current, max }: { current: number; max: number }) {
   const color =
     current > max
       ? 'text-destructive'
-      : current > max * 0.85
+      : current > max * 0.92
         ? 'text-orange-500'
         : 'text-muted-foreground';
   return (
@@ -504,12 +504,7 @@ function SlideRow({
       <div className='flex w-24 shrink-0 flex-col gap-1 self-start mt-1'>
         <div className='h-[60px] w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center'>
           {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt=''
-              className='w-full h-full object-cover'
-              crossOrigin='anonymous'
-            />
+            <img src={imageUrl} alt='' className='w-full h-full object-cover' />
           ) : (
             <ImageIcon size={16} className='text-muted-foreground' />
           )}

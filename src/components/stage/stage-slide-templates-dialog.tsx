@@ -59,7 +59,6 @@ function TemplateCard({
           src={unsplashThumbnail(template.image)}
           alt=''
           className='block h-full w-full object-cover'
-          crossOrigin='anonymous'
         />
       </div>
       <div className='flex flex-col justify-center gap-0.5 p-2.5'>
