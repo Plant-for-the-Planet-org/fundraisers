@@ -553,16 +553,18 @@ function SlideRow({
             {t('useTemplate')}
           </Button>
         )}
-        <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          onClick={onPreview}
-          className='h-6 w-full gap-1 px-1 text-[11px] text-muted-foreground hover:text-foreground'
-        >
-          <Eye size={11} />
-          {t('previewSlide')}
-        </Button>
+        {!isEmpty && (
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            onClick={onPreview}
+            className='h-6 w-full gap-1 px-1 text-[11px] text-muted-foreground hover:text-foreground'
+          >
+            <Eye size={11} />
+            {t('previewSlide')}
+          </Button>
+        )}
       </div>
 
       {/* Fields */}

@@ -69,7 +69,7 @@ export function StagePreview({
             '--accent-color': accentColor,
           } as React.CSSProperties
         }
-        className='absolute top-0 left-0 isolate overflow-hidden bg-[#0b1220]'
+        className='absolute top-0 left-0 isolate overflow-hidden'
       >
         {/* Background slide (single → no pager) */}
         <StageSlidePanel slides={[slide]} />
