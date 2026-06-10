@@ -82,8 +82,8 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "sentTo": "To:",
-      "sentFrom": "From:",
+      "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet</sender>",
       "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
       "emailPreview": {
         "greeting": "Dear {recipientName},",

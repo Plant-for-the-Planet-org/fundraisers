@@ -95,15 +95,6 @@ function GiftSummaryInner({
 
   const hasMessage = gift.message !== undefined;
 
-  const recipientLine = (
-    <span className='flex-1 wrap-break-word text-xs'>
-      <span className='text-muted-foreground'>{t('sentTo')} </span>
-      <span className='text-foreground'>
-        {gift.recipientName} &lt;{gift.recipientEmail}&gt;
-      </span>
-    </span>
-  );
-
   return (
     <Card className='gift-summary border border-card py-4'>
       <CardContent className='px-4'>
@@ -113,7 +104,7 @@ function GiftSummaryInner({
             aria-hidden='true'
           />
 
-          <h3 className='font-semibold leading-tight text-foreground wrap-break-word pr-8'>
+          <h3 className='dedication-title font-semibold leading-tight text-foreground wrap-break-word pr-8'>
             {t('dedicatedTo', { recipientName: gift.recipientName })}
           </h3>
 
@@ -131,20 +122,27 @@ function GiftSummaryInner({
                   }`}
                   aria-hidden='true'
                 />
-                {recipientLine}
+                <span className='recipient flex-1 wrap-break-word text-xs text-muted-foreground'>
+                  {t.rich('sentTo', {
+                    recipientName: gift.recipientName,
+                    recipientEmail: gift.recipientEmail,
+                    recipient: chunks => (
+                      <span className='text-foreground'>{chunks}</span>
+                    ),
+                  })}
+                </span>
               </button>
 
               {expanded && (
                 // pl-[1.375rem] aligns the body under the `To:` text, past the
                 // hanging chevron (icon w-3.5 + gap-2).
-                <div className='space-y-1.5 border-t border-muted pt-1.5 text-xs text-muted-foreground leading-snug wrap-break-word'>
-                  <p className='border-b border-muted pb-1.5 pl-[1.375rem]'>
-                    <span className='text-muted-foreground'>
-                      {t('sentFrom')}{' '}
-                    </span>
-                    <span className='text-foreground'>
-                      Plant-for-the-Planet
-                    </span>
+                <div className='email-preview space-y-1.5 border-t border-muted pt-1.5 text-xs text-muted-foreground leading-snug wrap-break-word'>
+                  <p className='sender border-b border-muted pb-1.5 pl-[1.375rem]'>
+                    {t.rich('sentFrom', {
+                      sender: chunks => (
+                        <span className='text-foreground'>{chunks}</span>
+                      ),
+                    })}
                   </p>
                   <div className='space-y-1.5 pl-[1.375rem]'>
                     <p>

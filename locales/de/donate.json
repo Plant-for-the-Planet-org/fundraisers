@@ -82,8 +82,8 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "sentTo": "An:",
-      "sentFrom": "Von:",
+      "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet</sender>",
       "emailNoticeNoEmail": "Der Link zur Widmungsurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
       "emailPreview": {
         "greeting": "Liebe/r {recipientName},",
