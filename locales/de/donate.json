@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
+      "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Der Link zur Widmungsurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailPreview": {
+        "greeting": "Hallo {recipientName},",
+        "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
+        "certificate": "Lade deine Urkunde hier herunter.",
+        "messageFrom": "Hier ist eine Nachricht von {sender}:",
+        "signature": "Alles Gute,\nDein Plant-for-the-Planet Team",
+        "donorFallback": "der Spender"
+      }
     },
     "errors": {
       "zipCode": {

@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate"
+      "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
+      "emailPreview": {
+        "greeting": "Dear {recipientName},",
+        "intro": "{donor} has gifted their contribution of {amount} to you.",
+        "certificate": "Download your personal certificate.",
+        "messageFrom": "Here's a message from {sender}:",
+        "signature": "All the best,\nYour Plant-for-the-Planet team",
+        "donorFallback": "the donor"
+      }
     },
     "errors": {
       "zipCode": {
