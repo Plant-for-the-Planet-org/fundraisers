@@ -45,20 +45,35 @@ export function GiftSummary() {
 function useDonorIdentity(): { donorName: string; senderName: string } {
   const t = useTranslations('Donate.gift');
   const { watch } = useFormContext<DonationFormValues>();
+  const [isCompany, formCompany, formFirst, formLast] = watch([
+    'isCompany',
+    'companyName',
+    'firstname',
+    'lastname',
+  ]);
 
-  const isCompany = watch('isCompany');
-  const companyName = watch('companyName')?.trim();
-
+  const profileType = useAuthStore(s => s.user?.profile?.type);
+  const profileName = useAuthStore(s => s.user?.profile?.name);
   const profileFirst = useAuthStore(s => s.user?.profile?.firstname);
   const profileLast = useAuthStore(s => s.user?.profile?.lastname);
-  const firstName = (watch('firstname') || profileFirst || '').trim();
-  const lastName = (watch('lastname') || profileLast || '').trim();
+
+  const companyName = formCompany?.trim();
+  const firstName = (formFirst || profileFirst || '').trim();
+  const lastName = (formLast || profileLast || '').trim();
   const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
+  const fallback = t('emailPreview.donorFallback');
+
+  // Form checkbox takes precedence, then profile org/company type.
   if (isCompany && companyName) {
     return { donorName: companyName, senderName: companyName };
   }
-  const fallback = t('emailPreview.donorFallback');
+  const isCompanyProfile =
+    (profileType === 'organization' || profileType === 'company') &&
+    !!profileName;
+  if (isCompanyProfile) {
+    return { donorName: profileName, senderName: profileName };
+  }
   return {
     donorName: fullName || fallback,
     senderName: firstName || fallback,
