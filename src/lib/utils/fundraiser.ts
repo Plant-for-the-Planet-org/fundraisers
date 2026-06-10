@@ -98,11 +98,11 @@ export function convertTotalRaisedToSingleCurrency(
   targetCurrency: string
 ): number {
   const target = targetCurrency.toUpperCase();
-  const row = FLOOR_RATES[target] ?? { [target]: 1 };
+  const targetRates = FLOOR_RATES[target] ?? { [target]: 1 };
   const total = Object.entries(totalRaised)
     .filter(([, amount]) => Number.isFinite(amount) && amount > 0)
     .reduce((sum, [currency, amount]) => {
-      const factor = row[currency.toUpperCase()];
+      const factor = targetRates[currency.toUpperCase()];
       return factor === undefined ? sum : sum + amount * factor;
     }, 0);
   return Math.floor(total);
