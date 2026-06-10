@@ -150,13 +150,6 @@ export function DonateCTA({
       >
         <div className='flex items-center gap-2'>{buttonContent}</div>
       </Button>
-      {/* Native Payments - for future implementation */}
-      {/* <Button
-        variant='outline'
-        className='w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium flex items-center gap-2'
-      >
-        Pay with Google
-      </Button> */}
     </div>
   );
 }
