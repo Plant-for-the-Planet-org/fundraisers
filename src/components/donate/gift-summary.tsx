@@ -1,7 +1,6 @@
 'use client';
 
 import type { SentInvitationGift } from '@planet-sdk/common';
-import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { DonationData } from './donate-overlay';
 import type { DonationFormValues } from './donation-form-context';
 
@@ -19,16 +18,12 @@ import { useDonationForm } from './donation-form-context';
  * gift. Renders only when a gift is present (`dedicated` + `gift`).
  */
 export function GiftSummary() {
-  const { donationData, fundraiser } = useDonationForm();
+  const { donationData } = useDonationForm();
 
   if (!donationData.dedicated || !donationData.gift) return null;
 
   return (
-    <GiftSummaryInner
-      gift={donationData.gift}
-      donationData={donationData}
-      fundraiser={fundraiser}
-    />
+    <GiftSummaryInner gift={donationData.gift} donationData={donationData} />
   );
 }
 
@@ -91,11 +86,9 @@ function useDonorIdentity(): { donorName: string; senderName: string } {
 function GiftSummaryInner({
   gift,
   donationData,
-  fundraiser,
 }: {
   gift: SentInvitationGift;
   donationData: DonationData;
-  fundraiser: Fundraiser;
 }) {
   const t = useTranslations('Donate.gift');
   const locale = useLocale();
@@ -169,9 +162,7 @@ function GiftSummaryInner({
                       {t('emailPreview.intro', {
                         donor: donorName,
                         amount,
-                        fundraiser: fundraiser.title,
-                      })}{' '}
-                      {t('emailPreview.certificate')}
+                      })}
                     </p>
                     {hasMessage && (
                       <>
@@ -185,6 +176,7 @@ function GiftSummaryInner({
                         </blockquote>
                       </>
                     )}
+                    <p>{t('emailPreview.certificate')}</p>
                     <p className='whitespace-pre-line'>
                       {t('emailPreview.signature')}
                     </p>

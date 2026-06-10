@@ -83,14 +83,14 @@
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
       "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
-      "sentFrom": "Von: <sender>Plant-for-the-Planet</sender>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
       "emailNoticeNoEmail": "Der Link zur Widmungsurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
       "emailPreview": {
-        "greeting": "Liebe/r {recipientName},",
-        "intro": "In deinem Namen hat {donor} {amount} an die Spendenaktion „{fundraiser}“ gespendet.",
-        "certificate": "Eine Widmungsurkunde findest du im Anhang.",
+        "greeting": "Hallo {recipientName},",
+        "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
+        "certificate": "Lade deine Urkunde hier herunter.",
         "messageFrom": "Hier ist eine Nachricht von {sender}:",
-        "signature": "Beste Grüße,\nPlant-for-the-Planet",
+        "signature": "Alles Gute,\nDein Plant-for-the-Planet Team",
         "donorFallback": "der Spender"
       }
     },

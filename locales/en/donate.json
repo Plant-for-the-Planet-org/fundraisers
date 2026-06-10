@@ -83,14 +83,14 @@
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
       "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
-      "sentFrom": "From: <sender>Plant-for-the-Planet</sender>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
       "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
       "emailPreview": {
         "greeting": "Dear {recipientName},",
-        "intro": "In your name, {donor} has donated {amount} to the fundraiser \"{fundraiser}\".",
-        "certificate": "A dedication certificate is attached for you.",
+        "intro": "{donor} has gifted their contribution of {amount} to you.",
+        "certificate": "Download your personal certificate.",
         "messageFrom": "Here's a message from {sender}:",
-        "signature": "Best,\nPlant-for-the-Planet",
+        "signature": "All the best,\nYour Plant-for-the-Planet team",
         "donorFallback": "the donor"
       }
     },
