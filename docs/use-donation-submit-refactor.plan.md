@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: build-payload-helper
     content: Extract buildPayloadFor (assembleFormData -> getDonationProcessingFeeInfo -> buildDonationPayload) returning both formData and payload, used by onSubmit, onPayPalCreateOrder, and onWalletConfirm.
-    status: pending
+    status: completed
   - id: collapse-create-method-branches
     content: Optional/Medium risk - factor the shared 3-way result-classification ladder for the SEPA and card createPaymentMethod branches in onSubmit, preserving early-return semantics.
     status: pending

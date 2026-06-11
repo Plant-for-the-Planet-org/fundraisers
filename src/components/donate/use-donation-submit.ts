@@ -10,6 +10,7 @@ import type {
   PaymentData,
   StripeCardActionConfirmRequest,
 } from '@/lib/types/payment';
+import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type {
   ServiceErrorCode,
@@ -140,14 +141,9 @@ export function useDonationSubmit(
     []
   );
 
-  const onSubmit = useCallback(
-    async (values: DonationFormValues) => {
-      if (submittingRef.current) return;
-      submittingRef.current = true;
-
-      // Reset stale success state on new submit
-      setDonationState(beginSubmission);
-
+  // Assembles form data and the donation payload for a given payment method.
+  const buildPayloadFor = useCallback(
+    (values: DonationFormValues, paymentMethod: PaymentMethodId) => {
       const formData = assembleFormData(
         donationData,
         fundraiser,
@@ -160,16 +156,34 @@ export function useDonationSubmit(
         donationAmountCents: donationData.amountCents,
         donationCurrency: donationData.currency,
         workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod: values.selectedPaymentMethod,
+        selectedPaymentMethod: paymentMethod,
       });
 
       const payload = buildDonationPayload(
         formData,
         fundraiser,
         donorProfile,
-        values.selectedPaymentMethod,
+        paymentMethod,
         values.willAbsorbFee,
         processingFeeCents
+      );
+
+      return { formData, payload };
+    },
+    [donationData, fundraiser, paymentOptions, isAuthenticated, donorProfile]
+  );
+
+  const onSubmit = useCallback(
+    async (values: DonationFormValues) => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+
+      // Reset stale success state on new submit
+      setDonationState(beginSubmission);
+
+      const { formData, payload } = buildPayloadFor(
+        values,
+        values.selectedPaymentMethod
       );
 
       let paymentDetails: PaymentData['paymentDetails'] = {};
@@ -389,10 +403,7 @@ export function useDonationSubmit(
       }
     },
     [
-      donationData,
-      fundraiser,
       paymentOptions,
-      isAuthenticated,
       donorProfile,
       token,
       sepaFormRef,
@@ -400,6 +411,7 @@ export function useDonationSubmit(
       onPaymentValidationFailed,
       rotateIdempotencyKeys,
       finalizeFromDonation,
+      buildPayloadFor,
     ]
   );
 
@@ -412,30 +424,7 @@ export function useDonationSubmit(
 
       setDonationState(beginSubmission);
 
-      const formData = assembleFormData(
-        donationData,
-        fundraiser,
-        values,
-        isAuthenticated
-      );
-
-      const { processingFeeCents: paypalProcessingFeeCents } =
-        getDonationProcessingFeeInfo({
-          paymentOptions,
-          donationAmountCents: donationData.amountCents,
-          donationCurrency: donationData.currency,
-          workspaceCountry: fundraiser.workspace?.country,
-          selectedPaymentMethod: values.selectedPaymentMethod,
-        });
-
-      const payload = buildDonationPayload(
-        formData,
-        fundraiser,
-        donorProfile,
-        values.selectedPaymentMethod,
-        values.willAbsorbFee,
-        paypalProcessingFeeCents
-      );
+      const { payload } = buildPayloadFor(values, values.selectedPaymentMethod);
 
       try {
         const donationResponse = await donationService.createDonation(
@@ -471,14 +460,7 @@ export function useDonationSubmit(
         submittingRef.current = false;
       }
     },
-    [
-      donationData,
-      fundraiser,
-      paymentOptions,
-      isAuthenticated,
-      donorProfile,
-      token,
-    ]
+    [paymentOptions, token, buildPayloadFor]
   );
 
   const onPayPalApproved = useCallback(
@@ -546,30 +528,7 @@ export function useDonationSubmit(
 
       setDonationState(beginSubmission);
 
-      const formData = assembleFormData(
-        donationData,
-        fundraiser,
-        values,
-        isAuthenticated
-      );
-
-      const { processingFeeCents: walletProcessingFeeCents } =
-        getDonationProcessingFeeInfo({
-          paymentOptions,
-          donationAmountCents: donationData.amountCents,
-          donationCurrency: donationData.currency,
-          workspaceCountry: fundraiser.workspace?.country,
-          selectedPaymentMethod: wallet,
-        });
-
-      const payload = buildDonationPayload(
-        formData,
-        fundraiser,
-        donorProfile,
-        wallet,
-        values.willAbsorbFee,
-        walletProcessingFeeCents
-      );
+      const { payload } = buildPayloadFor(values, wallet);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
@@ -658,14 +617,11 @@ export function useDonationSubmit(
       }
     },
     [
-      donationData,
-      fundraiser,
       paymentOptions,
-      isAuthenticated,
-      donorProfile,
       token,
       rotateIdempotencyKeys,
       finalizeFromDonation,
+      buildPayloadFor,
     ]
   );
 
