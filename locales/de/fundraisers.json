@@ -11,6 +11,7 @@
     "anonymousHost": "{count, plural, one {anonymer Gastgeber*in} other {anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
+    "demoData": "*Demodaten - nur zur Vorschau",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Erstellt von",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { und # anderer} other { und # andere}}",

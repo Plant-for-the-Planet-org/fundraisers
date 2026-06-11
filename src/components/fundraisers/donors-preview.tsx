@@ -18,7 +18,12 @@ export function DonorsPreview() {
 
   return (
     <div className='flex flex-col gap-3'>
-      <SectionHeader>
+      <SectionHeader
+        className='flex-row items-center justify-between'
+        actionSlot={
+          <span className='text-xs text-muted-foreground'>{t('demoData')}</span>
+        }
+      >
         {t('donationCount', {
           count: recent.length,
           formattedCount: recent.length.toLocaleString(locale),
