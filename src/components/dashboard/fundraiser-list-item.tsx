@@ -31,7 +31,7 @@ export function FundraiserListItem({
   const tFundraisers = useTranslations('Fundraisers');
   const locale = useLocale();
 
-  const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
+  const imageUrl = getImageUrl('fundraiser', 'small', fundraiser.image);
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const displayStatus = deriveDisplayStatus(fundraiser);
 
