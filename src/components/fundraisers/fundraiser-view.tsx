@@ -60,6 +60,10 @@ export function FundraiserView({
   const canShowLeaderboard =
     leaderboardSettings?.enabled &&
     (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
+  const canReceiveDonations =
+    fundraiser.canDonate &&
+    paymentOptions !== undefined &&
+    fundraiser.workspace !== null;
 
   return (
     <FundraiserLayout>
@@ -79,7 +83,7 @@ export function FundraiserView({
           goalAmount={fundraiser.goalAmount}
           currency={fundraiser.currency}
           progressPercentage={progressPercentage}
-          daysLeft={fundraiser.canDonate ? daysLeft : undefined}
+          daysLeft={canReceiveDonations ? daysLeft : undefined}
         />
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
@@ -137,7 +141,7 @@ export function FundraiserView({
           ))}
 
         {/* Donation form + overlay */}
-        {fundraiser.canDonate && paymentOptions && fundraiser.workspace ? (
+        {canReceiveDonations ? (
           <>
             <DonationSection
               fundraiser={fundraiser}
