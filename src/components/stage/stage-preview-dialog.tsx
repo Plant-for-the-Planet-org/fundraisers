@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { slidePath, stageField } from './field-paths';
 import { StagePreview } from './stage-preview';
 
 const DEFAULT_ACCENT = '#16a34a';
@@ -46,23 +47,19 @@ export function StagePreviewDialog({
     | string
     | undefined;
   const stageTitleVal =
-    (useWatch({ control, name: 'settings.modules.stage.title' as any }) as
-      | string
-      | undefined) ?? '';
+    (useWatch({ control, name: stageField('title') }) as string | undefined) ??
+    '';
   const stageDescription = useWatch({
     control,
-    name: 'settings.modules.stage.description' as any,
+    name: stageField('description'),
   }) as string | undefined;
   const logoUrl = useWatch({
     control,
-    name: 'settings.modules.stage.partner_logo_url' as any,
+    name: stageField('partner_logo_url'),
   }) as string | undefined;
   const slide = useWatch({
     control,
-    name:
-      slideIndex === null
-        ? ('settings.modules.stage.slides.0' as any)
-        : (`settings.modules.stage.slides.${slideIndex}` as any),
+    name: slidePath(slideIndex ?? 0),
   }) as StageSlide | undefined;
 
   if (slideIndex === null || !slide) return null;

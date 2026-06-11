@@ -1,7 +1,7 @@
 'use client';
 
-import type { FieldPath } from 'react-hook-form';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
+import type { StageModeValues } from '@/components/stage/field-paths';
 import type { StageSlideTemplate } from '@/components/stage/slide-templates';
 
 import { useState } from 'react';
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { slideField, stageField } from '@/components/stage/field-paths';
 import { StagePreviewDialog } from '@/components/stage/stage-preview-dialog';
 import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
 import { routing } from '@/i18n/routing';
@@ -55,27 +56,6 @@ const DEFAULT_SLIDE = {
   image: '',
   duration: 8,
 };
-
-// `stage` is nullable in the form schema, so RHF cannot generate child field
-// paths through it. These helpers keep the key argument literal-checked while
-// localizing the unavoidable `FieldPath` cast to a single place, instead of
-// scattering `as any` across every useWatch/setValue/register call.
-type StageModeValues = NonNullable<
-  FundraiserFormValues['settings']['modules']['stage']
->;
-type StageScalarKey = 'title' | 'description' | 'locale' | 'partner_logo_url';
-type StageSlideKey = keyof StageModeValues['slides'][number];
-
-const STAGE_BASE = 'settings.modules.stage';
-
-const stageField = (key: StageScalarKey): FieldPath<FundraiserFormValues> =>
-  `${STAGE_BASE}.${key}` as FieldPath<FundraiserFormValues>;
-
-const slideField = (
-  idx: number,
-  key: StageSlideKey
-): FieldPath<FundraiserFormValues> =>
-  `${STAGE_BASE}.slides.${idx}.${key}` as FieldPath<FundraiserFormValues>;
 
 // The subset of a slide we inspect when deciding whether a row is empty.
 // Derived from the schema-backed form type so it tracks any new slide fields.
@@ -423,6 +403,32 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                   isDesktop={isDesktop}
                 />
               ))}
+            </div>
+
+            <div className='flex justify-end'>
+              {/* Bottom add button — saves scrolling back up on long lists. */}
+              {fields.length > 0 && (
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  className='h-7 gap-1 self-start text-xs border-dashed'
+                  disabled={atSlideLimit}
+                  title={
+                    atSlideLimit
+                      ? t('maxSlidesReached', {
+                          max: String(STAGE_LIMITS.maxSlides),
+                        })
+                      : undefined
+                  }
+                  onClick={() =>
+                    append({ ...DEFAULT_SLIDE, position: fields.length + 1 })
+                  }
+                >
+                  <Plus size={12} />
+                  {t('addSlide')}
+                </Button>
+              )}
             </div>
           </div>
         </div>
