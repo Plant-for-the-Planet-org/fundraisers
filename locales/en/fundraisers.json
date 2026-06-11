@@ -288,7 +288,12 @@
           "templatesSubtitle": "Pick a template to fill a slide, then edit the text and image.",
           "templatesSubtitleMulti": "Select one or more templates, then add them as slides.",
           "addSelected": "{count, plural, =0 {Add slides} one {Add # slide} other {Add # slides}}",
-          "imageGuidelines": "Keep slide images clear in the corners. Place key text or faces in the center. The stage screen shows donation totals, titles, and other live content over the edges, which can cover anything in the corners of your image."
+          "imageGuidelines": "Keep slide images clear in the corners. Place key text or faces in the center. The stage screen shows donation totals, titles, and other live content over the edges, which can cover anything in the corners of your image.",
+          "previewSlide": "Preview",
+          "previewClose": "Close preview",
+          "previewRaisedLabel": "Raised so far",
+          "previewQrLabel": "Scan to donate",
+          "previewTickerLabel": "Recent donations appear here"
         },
         "thankYouNote": {
           "title": "Thank-You Note",

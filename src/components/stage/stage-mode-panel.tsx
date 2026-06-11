@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ChevronUp,
   Clock,
+  Eye,
   ImageIcon,
   Info,
   Plus,
@@ -25,6 +26,7 @@ import {
   X,
 } from 'lucide-react';
 import { STAGE_LIMITS } from '@/components/stage/constants';
+import { StagePreviewDialog } from '@/components/stage/stage-preview-dialog';
 import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
 import { routing } from '@/i18n/routing';
 
@@ -116,6 +118,9 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const [templateTarget, setTemplateTarget] = useState<number | null>(null);
   // Remaining slots when the picker opens in multi-select (section) mode.
   const [sectionCapacity, setSectionCapacity] = useState(0);
+
+  // Slide preview popup. `previewIndex` is the slide to preview, or `null` when closed.
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const stageLocaleVal = useWatch({ control, name: stageField('locale') }) as
     | string
@@ -406,6 +411,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                   onMoveDown={() => move(idx, idx + 1)}
                   onRemove={() => remove(idx)}
                   onUseTemplate={() => openRowTemplates(idx)}
+                  onPreview={() => setPreviewIndex(idx)}
                 />
               ))}
             </div>
@@ -420,6 +426,12 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
         multiple={templateTarget === null}
         maxSelectable={sectionCapacity}
         onConfirm={handleTemplateConfirm}
+      />
+
+      <StagePreviewDialog
+        open={previewIndex !== null}
+        onOpenChange={o => !o && setPreviewIndex(null)}
+        slideIndex={previewIndex}
       />
     </div>
   );
@@ -462,6 +474,7 @@ function SlideRow({
   onMoveDown,
   onRemove,
   onUseTemplate,
+  onPreview,
 }: {
   idx: number;
   total: number;
@@ -469,6 +482,7 @@ function SlideRow({
   onMoveDown: () => void;
   onRemove: () => void;
   onUseTemplate: () => void;
+  onPreview: () => void;
 }) {
   const t = useTranslations('Fundraisers.form.options.stage');
   const {
@@ -518,7 +532,7 @@ function SlideRow({
         </button>
       </div>
 
-      {/* Image preview + template shortcut */}
+      {/* Image preview + template shortcut + preview-popup trigger */}
       <div className='flex w-24 shrink-0 flex-col gap-1 self-start mt-1'>
         <div className='h-[60px] w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center'>
           {imageUrl ? (
@@ -537,6 +551,18 @@ function SlideRow({
           >
             <Sparkles size={11} />
             {t('useTemplate')}
+          </Button>
+        )}
+        {!isEmpty && (
+          <Button
+            type='button'
+            variant='ghost'
+            size='sm'
+            onClick={onPreview}
+            className='h-6 w-full gap-1 px-1 text-[11px] text-muted-foreground hover:text-foreground'
+          >
+            <Eye size={11} />
+            {t('previewSlide')}
           </Button>
         )}
       </div>

@@ -288,7 +288,12 @@
           "templatesSubtitle": "Wähle eine Vorlage, um eine Folie zu füllen, und bearbeite dann Text und Bild.",
           "templatesSubtitleMulti": "Wähle eine oder mehrere Vorlagen aus und füge sie als Folien hinzu.",
           "addSelected": "{count, plural, =0 {Folien hinzufügen} one {# Folie hinzufügen} other {# Folien hinzufügen}}",
-          "imageGuidelines": "Halte die Ecken der Folienbilder frei. Platziere wichtigen Text oder Gesichter in der Mitte. Der Bühnenbildschirm zeigt Spendensummen, Titel und andere Live-Inhalte über den Rändern an, die alles in den Ecken deines Bildes verdecken können."
+          "imageGuidelines": "Halte die Ecken der Folienbilder frei. Platziere wichtigen Text oder Gesichter in der Mitte. Der Bühnenbildschirm zeigt Spendensummen, Titel und andere Live-Inhalte über den Rändern an, die alles in den Ecken deines Bildes verdecken können.",
+          "previewSlide": "Vorschau",
+          "previewClose": "Vorschau schließen",
+          "previewRaisedLabel": "Bisher gesammelt",
+          "previewQrLabel": "Zum Spenden scannen",
+          "previewTickerLabel": "Aktuelle Spenden erscheinen hier"
         },
         "thankYouNote": {
           "title": "Dankesnachricht",
