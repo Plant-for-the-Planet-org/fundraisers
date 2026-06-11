@@ -4,7 +4,7 @@ overview: Behavior-preserving readability refactor of the useDonationSubmit hook
 todos:
   - id: state-updater-helpers
     content: Extract pure module-level state-updater factories (beginSubmission, withError, withSuccess, stopLoading) and replace the ~30 repeated setDonationState object literals.
-    status: pending
+    status: completed
   - id: map-payment-error-code
     content: Extract mapPaymentErrorCode helper to replace the triple-nested errorCode ternary repeated in onSubmit, onPayPalApproved, and onWalletConfirm.
     status: pending
