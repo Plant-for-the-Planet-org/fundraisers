@@ -53,7 +53,7 @@ function TemplateCard({
         selected ? 'border-primary' : 'border-border hover:border-primary'
       }`}
     >
-      <div className='h-auto w-24 shrink-0 overflow-hidden bg-muted'>
+      <div className='h-auto w-32 shrink-0 overflow-hidden bg-muted'>
         {}
         <img
           src={unsplashThumbnail(template.image)}
@@ -124,21 +124,16 @@ export function StageSlideTemplatesDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className='border-border sm:max-w-2xl'
+        className='border-border sm:max-w-4xl'
         showCloseButton={!multiple}
       >
         <DialogHeader>
-          <div className='flex items-start justify-between gap-3'>
-            <div className='flex flex-col gap-2'>
-              <DialogTitle className='flex items-center gap-2 text-base'>
-                <Sparkles size={16} className='text-primary' />
-                {t('templatesTitle')}
+          <div className='flex items-centre justify-between gap-3'>
+            <div className='flex items-center gap-2'>
+              <Sparkles className='w-4 h-4 text-primary' />
+              <DialogTitle className='text-base font-semibold'>
+                <span>{t('templatesTitle')}</span>
               </DialogTitle>
-              <DialogDescription>
-                {multiple
-                  ? t('templatesSubtitleMulti')
-                  : t('templatesSubtitle')}
-              </DialogDescription>
             </div>
             {multiple && (
               <div className='flex shrink-0 items-center gap-2'>
@@ -163,6 +158,9 @@ export function StageSlideTemplatesDialog({
               </div>
             )}
           </div>
+          <DialogDescription className='text-left'>
+            {multiple ? t('templatesSubtitleMulti') : t('templatesSubtitle')}
+          </DialogDescription>
         </DialogHeader>
 
         <DialogDescription className='-mr-6 max-h-[75vh] overflow-y-auto pr-6'>

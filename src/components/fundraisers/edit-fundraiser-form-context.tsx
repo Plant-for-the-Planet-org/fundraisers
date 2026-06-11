@@ -75,9 +75,9 @@ export function EditFundraiserFormProvider({
       <EditProjectDetailsProvider allocations={fundraiser.projectAllocations}>
         {children}
       </EditProjectDetailsProvider>
-      {DevTool !== null && (
+      {/* {DevTool !== null && (
         <DevTool control={methods.control as unknown as Control} />
-      )}
+      )} */}
     </FormProvider>
   );
 }
