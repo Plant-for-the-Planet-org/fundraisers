@@ -123,6 +123,23 @@ export function useDonationSubmit(
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
+  // Resolves the thank-you state for a settled donation and applies it as success.
+  const finalizeFromDonation = useCallback(
+    async (
+      donationId: string,
+      token?: string,
+      fallbackThankYouState?: ThankYouState
+    ) => {
+      const thankYouState = await resolveThankYouStateFromDonation(
+        donationId,
+        token,
+        fallbackThankYouState
+      );
+      setDonationState(withSuccess(thankYouState));
+    },
+    []
+  );
+
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
       if (submittingRef.current) return;
@@ -171,11 +188,7 @@ export function useDonationSubmit(
             token,
             donationAttemptKey
           );
-          const thankYouState = await resolveThankYouStateFromDonation(
-            donationResponse.donationId,
-            token
-          );
-          setDonationState(withSuccess(thankYouState));
+          await finalizeFromDonation(donationResponse.donationId, token);
         } else {
           if (values.selectedSavedMethodId) {
             // Reusing a saved card/SEPA method: the Stripe payment method
@@ -261,21 +274,19 @@ export function useDonationSubmit(
             );
 
             if (initialThankYouState?.status === 'bankTransferPending') {
-              const thankYouState = await resolveThankYouStateFromDonation(
+              await finalizeFromDonation(
                 donationResponse.donationId,
                 token ?? undefined,
                 initialThankYouState
               );
-              setDonationState(withSuccess(thankYouState));
               return;
             }
 
             if (initialThankYouState?.status === 'completed') {
-              const thankYouState = await resolveThankYouStateFromDonation(
+              await finalizeFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
-              setDonationState(withSuccess(thankYouState));
               return;
             }
           }
@@ -316,11 +327,10 @@ export function useDonationSubmit(
                 return;
               }
 
-              const thankYouState = await resolveThankYouStateFromDonation(
+              await finalizeFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
-              setDonationState(withSuccess(thankYouState));
               return;
             }
 
@@ -339,11 +349,10 @@ export function useDonationSubmit(
                 return;
               }
 
-              const thankYouState = await resolveThankYouStateFromDonation(
+              await finalizeFromDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
-              setDonationState(withSuccess(thankYouState));
               return;
             }
 
@@ -356,11 +365,10 @@ export function useDonationSubmit(
               if (sepaResult.error) {
                 setDonationState(withError('paymentFailed'));
               } else {
-                const thankYouState = await resolveThankYouStateFromDonation(
+                await finalizeFromDonation(
                   donationResponse.donationId,
                   token ?? undefined
                 );
-                setDonationState(withSuccess(thankYouState));
               }
               return;
             }
@@ -391,6 +399,7 @@ export function useDonationSubmit(
       cardFormRef,
       onPaymentValidationFailed,
       rotateIdempotencyKeys,
+      finalizeFromDonation,
     ]
   );
 
@@ -511,11 +520,7 @@ export function useDonationSubmit(
 
         rotateIdempotencyKeys();
 
-        const thankYouState = await resolveThankYouStateFromDonation(
-          donationId,
-          token ?? undefined
-        );
-        setDonationState(withSuccess(thankYouState));
+        await finalizeFromDonation(donationId, token ?? undefined);
       } catch (error) {
         setDonationState(prev => ({
           ...prev,
@@ -526,7 +531,7 @@ export function useDonationSubmit(
         submittingRef.current = false;
       }
     },
-    [paymentOptions, token, rotateIdempotencyKeys]
+    [paymentOptions, token, rotateIdempotencyKeys, finalizeFromDonation]
   );
 
   const onWalletConfirm = useCallback(
@@ -589,11 +594,10 @@ export function useDonationSubmit(
         }
 
         if (paymentResponse.status === 'success') {
-          const thankYouState = await resolveThankYouStateFromDonation(
+          await finalizeFromDonation(
             donationResponse.donationId,
             token ?? undefined
           );
-          setDonationState(withSuccess(thankYouState));
           return;
         }
 
@@ -637,11 +641,10 @@ export function useDonationSubmit(
             return;
           }
 
-          const thankYouState = await resolveThankYouStateFromDonation(
+          await finalizeFromDonation(
             donationResponse.donationId,
             token ?? undefined
           );
-          setDonationState(withSuccess(thankYouState));
         }
       } catch (error) {
         setDonationState(prev => ({
@@ -662,6 +665,7 @@ export function useDonationSubmit(
       donorProfile,
       token,
       rotateIdempotencyKeys,
+      finalizeFromDonation,
     ]
   );
 

@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: finalize-from-donation
     content: Extract a helper that resolves the thank-you state from a donation and applies the success update, covering the optional initialThankYouState variant.
-    status: pending
+    status: completed
   - id: build-payload-helper
     content: Extract buildPayloadFor (assembleFormData -> getDonationProcessingFeeInfo -> buildDonationPayload) returning both formData and payload, used by onSubmit, onPayPalCreateOrder, and onWalletConfirm.
     status: pending
