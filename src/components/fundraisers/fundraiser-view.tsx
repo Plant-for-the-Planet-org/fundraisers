@@ -170,7 +170,6 @@ export function FundraiserView({
         {/* Project allocations */}
         <ProjectsSupportedDisplay
           projectAllocations={fundraiser.projectAllocations}
-          bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
         />
       </MainPanel>
     </FundraiserLayout>
