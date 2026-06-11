@@ -23,6 +23,12 @@ todos:
   - id: factor-card-action-confirm
     content: Optional/Medium risk - factor the StripeCardActionConfirmRequest + processPayment confirm step shared by onSubmit and onWalletConfirm.
     status: completed
+  - id: with-submit-error-updater
+    content: Low risk - extract a withSubmitError(error) state-updater factory for the three identical catch blocks (onSubmit, onPayPalApproved, onWalletConfirm). Leave onPayPalCreateOrder's catch alone since it deliberately omits isLoading.
+    status: completed
+  - id: fail-submission-helper
+    content: Low risk - extract a failSubmission(code) helper for the withError + submittingRef reset shared by onPayPalError, onWalletError, onWalletCancel, and the onPayPalApproved early return.
+    status: completed
 isProject: false
 ---
 
@@ -97,6 +103,20 @@ Factor only the shared 3-way result ladder (`!result` -> paymentFailed, `validat
 
 Share only the `StripeCardActionConfirmRequest` construction + `processPayment` + failed-check, not the action call itself (callers obtain `paymentIntentId` differently).
 
+### 8) withSubmitError updater factory (Low risk)
+
+**Problem.** The catch-block updater `{ ...prev, isLoading: false, error: toSubmitError(error) }` repeats verbatim in `onSubmit`, `onPayPalApproved`, and `onWalletConfirm`.
+
+**Refactor.** A module-level `withSubmitError(error)` factory in the step-1 updater family. Each of the three catches becomes `setDonationState(withSubmitError(error))`.
+
+**Watch-out.** `onPayPalCreateOrder`'s catch deliberately omits `isLoading: false` (its `finally` runs `stopLoading`). Leave it untouched so the render sequence is unchanged.
+
+### 9) failSubmission helper (Low risk)
+
+**Problem.** `setDonationState(withError(code)); submittingRef.current = false;` repeats in `onPayPalError`, `onWalletError`, `onWalletCancel`, and the `onPayPalApproved` early return.
+
+**Refactor.** A stable `useCallback` `failSubmission(code)` (deps `[]`) wrapping both lines. Added to the dep array of `onPayPalApproved` (the only consumer that is not itself trivially stable).
+
 ## Execution protocol
 
 For each step:
@@ -106,4 +126,4 @@ For each step:
 3. Confirm the diff introduces no behavior change.
 4. Mark the todo `completed` and move to the next.
 
-Steps 1–4 are the low-risk batch. Step 5 follows. Steps 6–7 are optional follow-ups, each gated on a clean type-check + lint.
+Steps 1–4 are the low-risk batch. Step 5 follows. Steps 6–7 are optional follow-ups, each gated on a clean type-check + lint. Steps 8–9 are a later low-risk pass extending the step-1 updater family, also gated on clean type-check + lint.

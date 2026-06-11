@@ -87,6 +87,15 @@ const withSuccess =
     thankYouState,
   });
 
+/** Leave loading and surface a thrown error, normalized via toSubmitError. */
+const withSubmitError =
+  (error: unknown): DonationStateUpdater =>
+  prev => ({
+    ...prev,
+    isLoading: false,
+    error: toSubmitError(error),
+  });
+
 /** Map a service-layer payment error code to a submission error key. */
 const mapPaymentErrorCode = (errorCode?: string | null): SubmissionErrorKey =>
   errorCode
@@ -128,6 +137,12 @@ export function useDonationSubmit(
   const rotateIdempotencyKeys = useCallback(() => {
     donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+  }, []);
+
+  // Surfaces an error and clears the in-flight guard so the donor can retry.
+  const failSubmission = useCallback((code: SubmissionErrorKey) => {
+    setDonationState(withError(code));
+    submittingRef.current = false;
   }, []);
 
   // Resolves the thank-you state for a settled donation and applies it as success.
@@ -420,11 +435,7 @@ export function useDonationSubmit(
           setDonationState(stopLoading);
         }
       } catch (error) {
-        setDonationState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: toSubmitError(error),
-        }));
+        setDonationState(withSubmitError(error));
       } finally {
         // Rotate keys once per completed submit attempt.
         rotateIdempotencyKeys();
@@ -497,8 +508,7 @@ export function useDonationSubmit(
     async (data: OnApproveData): Promise<void> => {
       const donationId = paypalDonationIdRef.current;
       if (!donationId) {
-        setDonationState(withError('unexpected'));
-        submittingRef.current = false;
+        failSubmission('unexpected');
         return;
       }
 
@@ -534,22 +544,23 @@ export function useDonationSubmit(
 
         await finalizeFromDonation(donationId, token ?? undefined);
       } catch (error) {
-        setDonationState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: toSubmitError(error),
-        }));
+        setDonationState(withSubmitError(error));
       } finally {
         submittingRef.current = false;
       }
     },
-    [paymentOptions, token, rotateIdempotencyKeys, finalizeFromDonation]
+    [
+      paymentOptions,
+      token,
+      rotateIdempotencyKeys,
+      finalizeFromDonation,
+      failSubmission,
+    ]
   );
 
   const onPayPalError = useCallback(() => {
-    setDonationState(withError('paypalPaymentError'));
-    submittingRef.current = false;
-  }, []);
+    failSubmission('paypalPaymentError');
+  }, [failSubmission]);
 
   const onWalletConfirm = useCallback(
     async (
@@ -634,11 +645,7 @@ export function useDonationSubmit(
           );
         }
       } catch (error) {
-        setDonationState(prev => ({
-          ...prev,
-          isLoading: false,
-          error: toSubmitError(error),
-        }));
+        setDonationState(withSubmitError(error));
       } finally {
         rotateIdempotencyKeys();
         submittingRef.current = false;
@@ -657,15 +664,13 @@ export function useDonationSubmit(
   // Server-side failures in the donation/payment APIs are
   // already handled inside onWalletConfirm.
   const onWalletError = useCallback(() => {
-    setDonationState(withError('paymentFailed'));
-    submittingRef.current = false;
-  }, []);
+    failSubmission('paymentFailed');
+  }, [failSubmission]);
 
   // Handles donor-initiated dismissal of the Apple Pay / Google Pay sheet.
   const onWalletCancel = useCallback(() => {
-    setDonationState(withError('paymentCancelled'));
-    submittingRef.current = false;
-  }, []);
+    failSubmission('paymentCancelled');
+  }, [failSubmission]);
 
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
