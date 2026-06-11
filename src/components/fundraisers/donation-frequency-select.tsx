@@ -7,6 +7,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 
 interface FrequencyOption {
@@ -36,9 +37,9 @@ export function DonationFrequencySelect({
     <Select value={selectedOption.value} onValueChange={handleValueChange}>
       <SelectTrigger
         data-component='donation-frequency-select'
-        className='h-auto w-fit gap-2.5 rounded-none border-0 bg-transparent px-0 py-0 text-sm font-semibold text-foreground shadow-none transition-opacity hover:opacity-70 focus-visible:ring-0 data-[size=default]:h-auto data-[state=open]:ring-0 dark:bg-transparent dark:hover:bg-transparent [&_svg]:text-foreground! [&_svg]:opacity-100'
+        className='h-auto w-fit gap-2.5 rounded-none border-0 bg-transparent px-0 py-0 text-sm font-semibold text-foreground shadow-none transition-opacity hover:opacity-70 data-[size=default]:h-auto data-[state=open]:ring-0 dark:bg-transparent dark:hover:bg-transparent [&_svg]:text-foreground! [&_svg]:opacity-100'
       >
-        {selectedOption.label}
+        <SelectValue>{selectedOption.label}</SelectValue>
       </SelectTrigger>
       <SelectContent
         position='popper'
