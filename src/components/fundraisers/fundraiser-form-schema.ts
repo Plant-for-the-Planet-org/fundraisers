@@ -370,8 +370,9 @@ export function fundraiserToFormValues(
               description: slide.description ?? '',
               image: slide.image ?? '',
               duration:
-                typeof slide.duration === 'number' && slide.duration >= 1
-                  ? slide.duration
+                typeof slide.duration === 'number' &&
+                Number.isFinite(slide.duration)
+                  ? Math.min(60, Math.max(1, Math.round(slide.duration)))
                   : 8,
             })),
           };

@@ -137,7 +137,10 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   // Section pick: reuse empty rows first, then append the rest in one batch,
   // stopping at the slide limit.
   const applyTemplates = (selected: StageSlideTemplate[]) => {
-    const slides = getSlides();
+    // Copy before mutating: getValues() returns RHF's live internal values by
+    // reference, so assigning into it directly would clobber the row objects
+    // fillSlide just wrote (wiping position/duration).
+    const slides = [...getSlides()];
     const toAppend: Array<{
       position: number;
       title: string;

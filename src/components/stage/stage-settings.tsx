@@ -28,11 +28,18 @@ export function StageMenuItem() {
       name: 'settings.modules.stage',
     }) !== null;
 
+  // Clone the default: RHF stores the object by reference and mutates form
+  // values in place, so reusing the module-level object would resurrect
+  // edited slide data when the module is removed and re-added.
   const addStage = () =>
     startTransition(() =>
-      setValue('settings.modules.stage', DEFAULT_STAGE_CONFIG, {
-        shouldDirty: true,
-      })
+      setValue(
+        'settings.modules.stage',
+        structuredClone(DEFAULT_STAGE_CONFIG),
+        {
+          shouldDirty: true,
+        }
+      )
     );
 
   return (
