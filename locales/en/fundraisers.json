@@ -11,6 +11,7 @@
     "anonymousHost": "{count, plural, one {Anonymous host} other {Anonymous hosts}}",
     "coverImageAlt": "Cover image for {title}",
     "donationCountLabel": "Donation count",
+    "demoData": "*Demo data - only for preview",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { and # other} other { and # others}}",
