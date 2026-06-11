@@ -80,6 +80,12 @@ const withSuccess =
     thankYouState,
   });
 
+/** Map a service-layer payment error code to a submission error key. */
+const mapPaymentErrorCode = (errorCode?: string | null): SubmissionErrorKey =>
+  errorCode
+    ? (SUBMISSION_ERROR_CODES[errorCode as ServiceErrorCode] ?? 'paymentFailed')
+    : 'paymentFailed';
+
 /**
  * Encapsulates the full donation submission flow:
  * assembles form data, builds the payload, submits via the appropriate
@@ -237,13 +243,7 @@ export function useDonationSubmit(
 
           if (paymentResponse.status === 'failed') {
             setDonationState(
-              withError(
-                paymentResponse.errorCode
-                  ? (SUBMISSION_ERROR_CODES[
-                      paymentResponse.errorCode as ServiceErrorCode
-                    ] ?? 'paymentFailed')
-                  : 'paymentFailed'
-              )
+              withError(mapPaymentErrorCode(paymentResponse.errorCode))
             );
             return;
           }
@@ -498,13 +498,7 @@ export function useDonationSubmit(
 
         if (paymentResponse.status === 'failed') {
           setDonationState(
-            withError(
-              paymentResponse.errorCode
-                ? (SUBMISSION_ERROR_CODES[
-                    paymentResponse.errorCode as ServiceErrorCode
-                  ] ?? 'paymentFailed')
-                : 'paymentFailed'
-            )
+            withError(mapPaymentErrorCode(paymentResponse.errorCode))
           );
           return;
         }
@@ -584,13 +578,7 @@ export function useDonationSubmit(
 
         if (paymentResponse.status === 'failed') {
           setDonationState(
-            withError(
-              paymentResponse.errorCode
-                ? (SUBMISSION_ERROR_CODES[
-                    paymentResponse.errorCode as ServiceErrorCode
-                  ] ?? 'paymentFailed')
-                : 'paymentFailed'
-            )
+            withError(mapPaymentErrorCode(paymentResponse.errorCode))
           );
           return;
         }

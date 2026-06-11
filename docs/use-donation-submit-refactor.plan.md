@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: map-payment-error-code
     content: Extract mapPaymentErrorCode helper to replace the triple-nested errorCode ternary repeated in onSubmit, onPayPalApproved, and onWalletConfirm.
-    status: pending
+    status: completed
   - id: rotate-idempotency-keys
     content: Extract rotateIdempotencyKeys helper for the donation/payment key-regeneration pair repeated in two finally blocks, onPayPalApproved, and reset.
     status: pending
