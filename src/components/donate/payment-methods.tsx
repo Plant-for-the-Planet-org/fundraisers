@@ -78,6 +78,8 @@ export function PaymentMethods() {
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+  const showMethodFees =
+    feeCollectionEnabled && donationData.frequency === 'once';
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
     // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
@@ -480,7 +482,7 @@ export function PaymentMethods() {
                   methodLabel={method.label}
                   methodLogo={method.logo}
                   isSelected={isGenericSelected}
-                  showFeeDetails={feeCollectionEnabled}
+                  showFeeDetails={showMethodFees}
                   methodFeeText={method.feeText}
                   methodFeeTooltip={method.feeTooltip}
                   lastUsedLabel={method.lastUsedLabel}
@@ -533,7 +535,7 @@ export function PaymentMethods() {
                       )}
                     </div>
                   </div>
-                  {feeCollectionEnabled && method.feeText && (
+                  {showMethodFees && method.feeText && (
                     <MethodFeeDetails
                       feeText={method.feeText}
                       feeTooltip={method.feeTooltip}
