@@ -1,16 +1,17 @@
-import type { ReactElement } from 'react';
+import { type ReactElement } from 'react';
 
 interface Props {
   textColor?: string;
 }
 
-function PlanetCashIcon({ textColor = '#4d5153' }: Props): ReactElement {
+function PlanetCashIcon({ textColor = 'currentColor' }: Props): ReactElement {
   return (
     <svg
-      width='28'
-      height='20'
+      width='100%'
+      height='100%'
       viewBox='0 0 20 14'
       xmlns='http://www.w3.org/2000/svg'
+      aria-hidden='true'
     >
       <path
         opacity='0.4'
