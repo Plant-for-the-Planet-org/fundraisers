@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: factor-card-action-confirm
     content: Optional/Medium risk - factor the StripeCardActionConfirmRequest + processPayment confirm step shared by onSubmit and onWalletConfirm.
-    status: pending
+    status: completed
 isProject: false
 ---
 

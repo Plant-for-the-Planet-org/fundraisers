@@ -204,6 +204,39 @@ export function useDonationSubmit(
     [onPaymentValidationFailed]
   );
 
+  // Confirms a Stripe cardAction payment intent with the platform: builds the
+  // confirm request, processes it, and surfaces failure. Returns true when the
+  // confirm succeeded (caller proceeds to finalize), false when it failed
+  // (state already set; caller should stop). The cardAction call itself stays
+  // with the caller since each obtains the paymentIntentId differently.
+  const confirmCardActionPayment = useCallback(
+    async (params: {
+      donationId: string;
+      account: string;
+      paymentIntentId: string;
+      token?: string;
+      paymentIdempotencyKey: string;
+    }): Promise<boolean> => {
+      const confirmRequest: StripeCardActionConfirmRequest = {
+        gateway: 'stripe',
+        account: params.account,
+        source: { id: params.paymentIntentId, object: 'payment_intent' },
+      };
+      const finalResponse = await paymentService.processPayment(
+        params.donationId,
+        confirmRequest,
+        params.token,
+        params.paymentIdempotencyKey
+      );
+      if (finalResponse.status === 'failed') {
+        setDonationState(withError('paymentFailed'));
+        return false;
+      }
+      return true;
+    },
+    []
+  );
+
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
       if (submittingRef.current) return;
@@ -328,25 +361,14 @@ export function useDonationSubmit(
                 return;
               }
 
-              const confirmRequest: StripeCardActionConfirmRequest = {
-                gateway: 'stripe',
+              const confirmed = await confirmCardActionPayment({
+                donationId: donationResponse.donationId,
                 account: paymentResponse.response.account,
-                source: {
-                  id: actionResult.paymentIntentId,
-                  object: 'payment_intent',
-                },
-              };
-              const finalResponse = await paymentService.processPayment(
-                donationResponse.donationId,
-                confirmRequest,
-                token || undefined,
-                paymentAttemptKey
-              );
-
-              if (finalResponse.status === 'failed') {
-                setDonationState(withError('paymentFailed'));
-                return;
-              }
+                paymentIntentId: actionResult.paymentIntentId,
+                token: token || undefined,
+                paymentIdempotencyKey: paymentAttemptKey,
+              });
+              if (!confirmed) return;
 
               await finalizeFromDonation(
                 donationResponse.donationId,
@@ -416,6 +438,7 @@ export function useDonationSubmit(
       sepaFormRef,
       cardFormRef,
       resolveCreatedPaymentMethod,
+      confirmCardActionPayment,
       rotateIdempotencyKeys,
       finalizeFromDonation,
       buildPayloadFor,
@@ -577,21 +600,14 @@ export function useDonationSubmit(
               return;
             }
 
-            const confirmRequest: StripeCardActionConfirmRequest = {
-              gateway: 'stripe',
+            const confirmed = await confirmCardActionPayment({
+              donationId: donationResponse.donationId,
               account: paymentResponse.response.account,
-              source: { id: paymentIntent.id, object: 'payment_intent' },
-            };
-            const finalResponse = await paymentService.processPayment(
-              donationResponse.donationId,
-              confirmRequest,
-              token || undefined,
-              paymentAttemptKey
-            );
-            if (finalResponse.status === 'failed') {
-              setDonationState(withError('paymentFailed'));
-              return;
-            }
+              paymentIntentId: paymentIntent.id,
+              token: token || undefined,
+              paymentIdempotencyKey: paymentAttemptKey,
+            });
+            if (!confirmed) return;
           } else if (paymentResponse.response.type === 'cardPayment') {
             const { error } = await stripe.confirmCardPayment(
               paymentResponse.response.payment_intent_client_secret,
@@ -629,6 +645,7 @@ export function useDonationSubmit(
       rotateIdempotencyKeys,
       finalizeFromDonation,
       buildPayloadFor,
+      confirmCardActionPayment,
     ]
   );
 
