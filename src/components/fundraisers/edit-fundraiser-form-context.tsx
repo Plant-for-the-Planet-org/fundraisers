@@ -16,7 +16,6 @@ import {
   fundraiserFormSchema,
   fundraiserToFormValues,
 } from './fundraiser-form-schema';
-import { EditLeaderboardProvider } from './leaderboard/edit-leaderboard-context';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -74,9 +73,7 @@ export function EditFundraiserFormProvider({
   return (
     <FormProvider {...methods}>
       <EditProjectDetailsProvider allocations={fundraiser.projectAllocations}>
-        <EditLeaderboardProvider idOrSlug={fundraiser.slug}>
-          {children}
-        </EditLeaderboardProvider>
+        {children}
       </EditProjectDetailsProvider>
       {DevTool !== null && (
         <DevTool control={methods.control as unknown as Control} />
