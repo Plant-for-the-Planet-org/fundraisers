@@ -546,6 +546,11 @@ export function useDonationSubmit(
     [paymentOptions, token, rotateIdempotencyKeys, finalizeFromDonation]
   );
 
+  const onPayPalError = useCallback(() => {
+    setDonationState(withError('paypalPaymentError'));
+    submittingRef.current = false;
+  }, []);
+
   const onWalletConfirm = useCallback(
     async (
       wallet: 'apple_pay' | 'google_pay',
@@ -648,12 +653,6 @@ export function useDonationSubmit(
       confirmCardActionPayment,
     ]
   );
-
-  const onPayPalError = useCallback(() => {
-    setDonationState(withError('paypalPaymentError'));
-    submittingRef.current = false;
-  }, []);
-
   // Surfaces client-side Stripe.js failures (elements.submit or createPaymentMethod).
   // Server-side failures in the donation/payment APIs are
   // already handled inside onWalletConfirm.
