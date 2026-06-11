@@ -49,6 +49,12 @@ import { useAuthStore } from '@/stores/auth-store';
 
 type DonationStateUpdater = (prev: DonationSubmitState) => DonationSubmitState;
 
+/** Result shape shared by the SEPA and card `createPaymentMethod` handles. */
+type StripePaymentMethodResult =
+  | { paymentMethodId: string }
+  | { error: string }
+  | { validationFailed: true };
+
 /** Start a fresh submission: enter loading, clear any prior success/error. */
 const beginSubmission: DonationStateUpdater = prev => ({
   ...prev,
@@ -173,6 +179,31 @@ export function useDonationSubmit(
     [donationData, fundraiser, paymentOptions, isAuthenticated, donorProfile]
   );
 
+  // Classifies a Stripe createPaymentMethod result, applying the matching UI
+  // side effect. Returns the paymentDetails to continue with, or null when the
+  // result was handled (error/validation) and the caller should stop.
+  const resolveCreatedPaymentMethod = useCallback(
+    (
+      result: StripePaymentMethodResult | undefined
+    ): { paymentMethodId: string } | null => {
+      if (!result) {
+        setDonationState(withError('paymentFailed'));
+        return null;
+      }
+      if ('validationFailed' in result) {
+        setDonationState(stopLoading);
+        onPaymentValidationFailed?.();
+        return null;
+      }
+      if ('error' in result) {
+        setDonationState(withError('paymentFailed'));
+        return null;
+      }
+      return { paymentMethodId: result.paymentMethodId };
+    },
+    [onPaymentValidationFailed]
+  );
+
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
       if (submittingRef.current) return;
@@ -220,21 +251,9 @@ export function useDonationSubmit(
               ),
             });
 
-            if (!sepaResult) {
-              setDonationState(withError('paymentFailed'));
-              return;
-            }
-            if ('validationFailed' in sepaResult) {
-              setDonationState(stopLoading);
-              onPaymentValidationFailed?.();
-              return;
-            }
-            if ('error' in sepaResult) {
-              setDonationState(withError('paymentFailed'));
-              return;
-            }
-
-            paymentDetails = { paymentMethodId: sepaResult.paymentMethodId };
+            const resolved = resolveCreatedPaymentMethod(sepaResult);
+            if (!resolved) return;
+            paymentDetails = resolved;
           } else if (values.selectedPaymentMethod === 'card') {
             const donor = formData.type === 'guest' ? formData.donor : null;
             const cardResult = await cardFormRef.current?.createPaymentMethod({
@@ -246,21 +265,9 @@ export function useDonationSubmit(
               ),
             });
 
-            if (!cardResult) {
-              setDonationState(withError('paymentFailed'));
-              return;
-            }
-            if ('validationFailed' in cardResult) {
-              setDonationState(stopLoading);
-              onPaymentValidationFailed?.();
-              return;
-            }
-            if ('error' in cardResult) {
-              setDonationState(withError('paymentFailed'));
-              return;
-            }
-
-            paymentDetails = { paymentMethodId: cardResult.paymentMethodId };
+            const resolved = resolveCreatedPaymentMethod(cardResult);
+            if (!resolved) return;
+            paymentDetails = resolved;
           }
 
           const { donationResponse, paymentResponse } =
@@ -408,7 +415,7 @@ export function useDonationSubmit(
       token,
       sepaFormRef,
       cardFormRef,
-      onPaymentValidationFailed,
+      resolveCreatedPaymentMethod,
       rotateIdempotencyKeys,
       finalizeFromDonation,
       buildPayloadFor,

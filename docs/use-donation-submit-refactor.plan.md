@@ -19,7 +19,7 @@ todos:
     status: completed
   - id: collapse-create-method-branches
     content: Optional/Medium risk - factor the shared 3-way result-classification ladder for the SEPA and card createPaymentMethod branches in onSubmit, preserving early-return semantics.
-    status: pending
+    status: completed
   - id: factor-card-action-confirm
     content: Optional/Medium risk - factor the StripeCardActionConfirmRequest + processPayment confirm step shared by onSubmit and onWalletConfirm.
     status: pending
