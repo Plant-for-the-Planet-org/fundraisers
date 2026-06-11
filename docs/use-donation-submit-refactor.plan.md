@@ -29,6 +29,9 @@ todos:
   - id: fail-submission-helper
     content: Low risk - extract a failSubmission(code) helper for the withError + submittingRef reset shared by onPayPalError, onWalletError, onWalletCancel, and the onPayPalApproved early return.
     status: completed
+  - id: extract-pure-state-helpers-file
+    content: Low risk (Tier 1 size reduction) - move the pure types and state helpers (DonationStateUpdater, StripePaymentMethodResult, beginSubmission, stopLoading, withError, withSuccess, withSubmitError, mapPaymentErrorCode) to src/lib/donation/donation-submit-state.ts. Pure relocation, no behavior change. Cut the hook from 691 to 641 lines. The larger per-gateway sub-hook split is its own plan - see use-donation-submit-flow-split.plan.md.
+    status: completed
 isProject: false
 ---
 
@@ -116,6 +119,16 @@ Share only the `StripeCardActionConfirmRequest` construction + `processPayment` 
 **Problem.** `setDonationState(withError(code)); submittingRef.current = false;` repeats in `onPayPalError`, `onWalletError`, `onWalletCancel`, and the `onPayPalApproved` early return.
 
 **Refactor.** A stable `useCallback` `failSubmission(code)` (deps `[]`) wrapping both lines. Added to the dep array of `onPayPalApproved` (the only consumer that is not itself trivially stable).
+
+### 10) Move pure state helpers to a sibling module (Low risk, Tier 1 size reduction)
+
+**Problem.** The hook had grown to 691 lines. The top ~50 lines were pure, stateless helpers that did not need to live in the hook file.
+
+**Refactor.** Move the `DonationStateUpdater` / `StripePaymentMethodResult` types, the five updater factories (`beginSubmission`, `stopLoading`, `withError`, `withSuccess`, `withSubmitError`), and `mapPaymentErrorCode` to [src/lib/donation/donation-submit-state.ts](../src/lib/donation/donation-submit-state.ts). Pure relocation — no React, no hook state, no behavior change. The hook imports them back. This also moves the `SUBMISSION_ERROR_CODES` and `ServiceErrorCode` imports out of the hook.
+
+**Benefit.** Hook drops from 691 to 641 lines; pure state-shaping logic is now unit-testable in isolation.
+
+**Out of scope here.** Splitting the three payment flows into per-gateway sub-hooks (the real structural reduction) is tracked separately in [use-donation-submit-flow-split.plan.md](./use-donation-submit-flow-split.plan.md).
 
 ## Execution protocol
 
