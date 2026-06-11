@@ -188,3 +188,12 @@ h6 {
     cursor: pointer;
   }
 }
+
+/* Scrollable but no visible scrollbar — cross-browser */
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
