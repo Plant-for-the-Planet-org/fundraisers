@@ -117,6 +117,12 @@ export function useDonationSubmit(
   // Shares donationId between the two PayPal callbacks
   const paypalDonationIdRef = useRef<string | null>(null);
 
+  // Issues a fresh idempotency key for the next donation/payment attempt.
+  const rotateIdempotencyKeys = useCallback(() => {
+    donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
+    paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+  }, []);
+
   const onSubmit = useCallback(
     async (values: DonationFormValues) => {
       if (submittingRef.current) return;
@@ -370,8 +376,7 @@ export function useDonationSubmit(
         }));
       } finally {
         // Rotate keys once per completed submit attempt.
-        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+        rotateIdempotencyKeys();
         submittingRef.current = false;
       }
     },
@@ -385,6 +390,7 @@ export function useDonationSubmit(
       sepaFormRef,
       cardFormRef,
       onPaymentValidationFailed,
+      rotateIdempotencyKeys,
     ]
   );
 
@@ -503,8 +509,7 @@ export function useDonationSubmit(
           return;
         }
 
-        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+        rotateIdempotencyKeys();
 
         const thankYouState = await resolveThankYouStateFromDonation(
           donationId,
@@ -521,7 +526,7 @@ export function useDonationSubmit(
         submittingRef.current = false;
       }
     },
-    [paymentOptions, token]
+    [paymentOptions, token, rotateIdempotencyKeys]
   );
 
   const onWalletConfirm = useCallback(
@@ -645,8 +650,7 @@ export function useDonationSubmit(
           error: toSubmitError(error),
         }));
       } finally {
-        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+        rotateIdempotencyKeys();
         submittingRef.current = false;
       }
     },
@@ -657,6 +661,7 @@ export function useDonationSubmit(
       isAuthenticated,
       donorProfile,
       token,
+      rotateIdempotencyKeys,
     ]
   );
 
@@ -681,9 +686,8 @@ export function useDonationSubmit(
 
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
-    donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-    paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
-  }, []);
+    rotateIdempotencyKeys();
+  }, [rotateIdempotencyKeys]);
 
   return {
     donationState,

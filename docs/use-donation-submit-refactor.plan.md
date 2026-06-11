@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: rotate-idempotency-keys
     content: Extract rotateIdempotencyKeys helper for the donation/payment key-regeneration pair repeated in two finally blocks, onPayPalApproved, and reset.
-    status: pending
+    status: completed
   - id: finalize-from-donation
     content: Extract a helper that resolves the thank-you state from a donation and applies the success update, covering the optional initialThankYouState variant.
     status: pending
