@@ -14,7 +14,6 @@ import {
 import {
   STAGE_SLIDE_TEMPLATES,
   type StageSlideTemplate,
-  unsplashThumbnail,
 } from './slide-templates';
 
 interface StageSlideTemplatesDialogProps {
@@ -56,7 +55,7 @@ function TemplateCard({
       <div className='h-auto w-32 shrink-0 overflow-hidden bg-muted'>
         {}
         <img
-          src={unsplashThumbnail(template.image)}
+          src={template.image}
           alt=''
           className='block h-full w-full object-cover'
         />
@@ -128,7 +127,7 @@ export function StageSlideTemplatesDialog({
         showCloseButton={!multiple}
       >
         <DialogHeader>
-          <div className='flex items-centre justify-between gap-3'>
+          <div className='flex items-center justify-between gap-3'>
             <div className='flex items-center gap-2'>
               <Sparkles className='w-4 h-4 text-primary' />
               <DialogTitle className='text-base font-semibold'>
@@ -163,7 +162,7 @@ export function StageSlideTemplatesDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <DialogDescription className='-mr-6 max-h-[75vh] overflow-y-auto pr-6'>
+        <div className='-mr-6 max-h-[75vh] overflow-y-auto pr-6'>
           <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
             {templates.map(template => (
               <TemplateCard
@@ -174,7 +173,7 @@ export function StageSlideTemplatesDialog({
               />
             ))}
           </div>
-        </DialogDescription>
+        </div>
       </DialogContent>
     </Dialog>
   );

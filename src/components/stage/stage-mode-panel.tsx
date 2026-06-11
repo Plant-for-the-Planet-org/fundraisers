@@ -1,6 +1,8 @@
 'use client';
 
+import type { FieldPath } from 'react-hook-form';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
+import type { StageSlideTemplate } from '@/components/stage/slide-templates';
 
 import { useState } from 'react';
 import {
@@ -23,7 +25,6 @@ import {
   X,
 } from 'lucide-react';
 import { STAGE_LIMITS } from '@/components/stage/constants';
-import { type StageSlideTemplate } from '@/components/stage/slide-templates';
 import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
 import { routing } from '@/i18n/routing';
 
@@ -51,6 +52,34 @@ const DEFAULT_SLIDE = {
   image: '',
   duration: 8,
 };
+
+// `stage` is nullable in the form schema, so RHF cannot generate child field
+// paths through it. These helpers keep the key argument literal-checked while
+// localizing the unavoidable `FieldPath` cast to a single place, instead of
+// scattering `as any` across every useWatch/setValue/register call.
+type StageModeValues = NonNullable<
+  FundraiserFormValues['settings']['modules']['stage']
+>;
+type StageScalarKey = 'title' | 'description' | 'locale' | 'partner_logo_url';
+type StageSlideKey = keyof StageModeValues['slides'][number];
+
+const STAGE_BASE = 'settings.modules.stage';
+
+const stageField = (key: StageScalarKey): FieldPath<FundraiserFormValues> =>
+  `${STAGE_BASE}.${key}` as FieldPath<FundraiserFormValues>;
+
+const slideField = (
+  idx: number,
+  key: StageSlideKey
+): FieldPath<FundraiserFormValues> =>
+  `${STAGE_BASE}.slides.${idx}.${key}` as FieldPath<FundraiserFormValues>;
+
+// The subset of a slide we inspect when deciding whether a row is empty.
+// Derived from the schema-backed form type so it tracks any new slide fields.
+type SlideValue = Pick<
+  StageModeValues['slides'][number],
+  'title' | 'description' | 'image'
+>;
 
 function CharCount({ current, max }: { current: number; max: number }) {
   const color =
@@ -88,23 +117,16 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   // Remaining slots when the picker opens in multi-select (section) mode.
   const [sectionCapacity, setSectionCapacity] = useState(0);
 
-  const stageLocaleVal = useWatch({
-    control,
-    name: 'settings.modules.stage.locale' as any,
-  }) as string | undefined;
+  const stageLocaleVal = useWatch({ control, name: stageField('locale') }) as
+    | string
+    | undefined;
   const templateLocale: 'en' | 'de' = stageLocaleVal === 'de' ? 'de' : 'en';
 
-  type SlideValue = {
-    title?: string;
-    description?: string;
-    image?: string;
-  };
-  const isEmptySlide = (s?: SlideValue) =>
+  const isEmptySlide = (s?: Partial<SlideValue>) =>
     !s?.title && !s?.description && !s?.image;
 
   const getSlides = (): SlideValue[] =>
-    (getValues('settings.modules.stage.slides') as SlideValue[] | undefined) ??
-    [];
+    getValues('settings.modules.stage.slides') ?? [];
 
   // How many templates can still be added: empty rows we can reuse, plus
   // appendable rows up to the slide limit.
@@ -126,12 +148,11 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   };
 
   const fillSlide = (idx: number, template: StageSlideTemplate) => {
-    const base = `settings.modules.stage.slides.${idx}` as const;
     const opts = { shouldDirty: true, shouldValidate: true } as const;
-    setValue(`${base}.title` as any, template.title, opts);
-    setValue(`${base}.description` as any, template.description, opts);
-    setValue(`${base}.image` as any, template.image, opts);
-    setValue(`${base}.duration` as any, template.duration, opts);
+    setValue(slideField(idx, 'title'), template.title, opts);
+    setValue(slideField(idx, 'description'), template.description, opts);
+    setValue(slideField(idx, 'image'), template.image, opts);
+    setValue(slideField(idx, 'duration'), template.duration, opts);
   };
 
   // Section pick: reuse empty rows first, then append the rest in one batch,
@@ -184,16 +205,10 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   };
 
   const stageTitleVal =
-    (useWatch({
-      control,
-      name: 'settings.modules.stage.title' as any,
-    }) as string) ?? '';
+    (useWatch({ control, name: stageField('title') }) as string) ?? '';
 
   const stageDescVal =
-    (useWatch({
-      control,
-      name: 'settings.modules.stage.description' as any,
-    }) as string) ?? '';
+    (useWatch({ control, name: stageField('description') }) as string) ?? '';
 
   return (
     <div>
@@ -263,7 +278,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
               />
             </div>
             <Input
-              {...register('settings.modules.stage.title')}
+              {...register(stageField('title'))}
               placeholder={t('stageTitlePlaceholder')}
               maxLength={STAGE_LIMITS.stageTitle}
               className='text-sm'
@@ -282,7 +297,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
               />
             </div>
             <Textarea
-              {...register('settings.modules.stage.description')}
+              {...register(stageField('description'))}
               placeholder={t('stageDescriptionPlaceholder')}
               rows={2}
               maxLength={STAGE_LIMITS.stageDescription}
@@ -421,13 +436,14 @@ function PartnerLogoField({
     formState: { errors },
   } = useFormContext<FundraiserFormValues>();
 
-  const error = (errors.settings?.modules?.stage as any)?.partner_logo_url
-    ?.message as string | undefined;
+  const error = errors.settings?.modules?.stage?.partner_logo_url?.message as
+    | string
+    | undefined;
 
   return (
     <div className='flex flex-col gap-1'>
       <Input
-        {...register('settings.modules.stage.partner_logo_url')}
+        {...register(stageField('partner_logo_url'))}
         type='url'
         placeholder='https://…'
         className='text-sm'
@@ -460,18 +476,17 @@ function SlideRow({
     register,
     formState: { errors },
   } = useFormContext<FundraiserFormValues>();
-  const base = `settings.modules.stage.slides.${idx}` as const;
-
   const imageUrl =
-    (useWatch({ control, name: `${base}.image` as any }) as string) ?? '';
+    (useWatch({ control, name: slideField(idx, 'image') }) as string) ?? '';
 
   const titleVal =
-    (useWatch({ control, name: `${base}.title` as any }) as string) ?? '';
+    (useWatch({ control, name: slideField(idx, 'title') }) as string) ?? '';
 
   const descVal =
-    (useWatch({ control, name: `${base}.description` as any }) as string) ?? '';
+    (useWatch({ control, name: slideField(idx, 'description') }) as string) ??
+    '';
 
-  const slideErrors = (errors.settings?.modules?.stage as any)?.slides?.[idx];
+  const slideErrors = errors.settings?.modules?.stage?.slides?.[idx];
   const imageError = slideErrors?.image?.message as string | undefined;
 
   const isEmpty = !titleVal && !descVal && !imageUrl;
@@ -531,7 +546,7 @@ function SlideRow({
         <div className='relative'>
           {}
           <Input
-            {...register(`${base}.title` as any)}
+            {...register(slideField(idx, 'title'))}
             placeholder={t('slideTitlePlaceholder')}
             maxLength={STAGE_LIMITS.slideTitle}
             className='text-sm font-medium h-8 pr-12'
@@ -547,7 +562,7 @@ function SlideRow({
         <div className='relative'>
           {}
           <Textarea
-            {...register(`${base}.description` as any)}
+            {...register(slideField(idx, 'description'))}
             placeholder={t('slideDescriptionPlaceholder')}
             maxLength={STAGE_LIMITS.slideDescription}
             rows={1}
@@ -564,7 +579,7 @@ function SlideRow({
         <div>
           {}
           <Input
-            {...register(`${base}.image` as any)}
+            {...register(slideField(idx, 'image'))}
             type='url'
             placeholder={t('slideImagePlaceholder')}
             className='text-xs text-muted-foreground h-8'
@@ -581,7 +596,7 @@ function SlideRow({
           <span className='text-xs text-muted-foreground'>{t('duration')}</span>
           {}
           <Input
-            {...register(`${base}.duration` as any, { valueAsNumber: true })}
+            {...register(slideField(idx, 'duration'), { valueAsNumber: true })}
             type='number'
             min={1}
             max={60}
