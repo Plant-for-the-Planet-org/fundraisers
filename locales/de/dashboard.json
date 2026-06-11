@@ -17,7 +17,6 @@
       "totalRaised": {
         "label": "Insgesamt gesammelt",
         "helper": "über die ganze Zeit",
-        "moreCurrencies": "+{count, plural, one {# weitere Währung} other {# weitere Währungen}}",
         "empty": "Noch keine Gelder gesammelt"
       },
       "donations": {

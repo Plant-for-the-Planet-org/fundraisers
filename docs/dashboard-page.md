@@ -266,7 +266,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
   - `success` → 3× `SummaryStatCard`.
 - Tiles (label / value / helper):
   1. `t('summary.fundraisers.label')` / `summary.totalCount` / `t('summary.fundraisers.activeHelper', { count: summary.activeCount })`
-  2. `t('summary.totalRaised.label')` / formatted total / `t('summary.totalRaised.helper')` (or per‑currency note when multiple).
+  2. `t('summary.totalRaised.label')` / consolidated total in dominant currency / `t('summary.totalRaised.helper')`.
   3. `t('summary.donations.label')` / `summary.donationsCount` / `t('summary.donations.helper')`.
 
 ### `SummaryStatCard`
@@ -391,7 +391,7 @@ export interface DashboardSummaryStats {
   totalCount: number;          // every fundraiser owned by user (all statuses)
   activeCount: number;         // status === 'active'
   donationsCount: number;      // sum of donationCount across user's fundraisers
-  totalRaisedByCurrency: DashboardRaisedSummary[];
+  consolidatedTotalRaised: { amount: number; currency: string } | null;
 }
 
 export function getDashboardSummary(fundraisers: Fundraiser[]): DashboardSummaryStats { … }
@@ -540,7 +540,6 @@ Proposed key shape (English; German mirrors structure):
       "totalRaised": {
         "label": "Total Raised",
         "helper": "across all time",
-        "moreCurrencies": "+{count, plural, one {# more currency} other {# more currencies}}",
         "empty": "No funds raised yet"
       },
       "donations": {
@@ -624,7 +623,7 @@ Proposed key shape (English; German mirrors structure):
 | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | User has zero fundraisers                                      | Hide toolbar, show `FundraiserListEmpty` with CTA. Summary tiles still render with zeros.                                                                                                                                                                        |
 | User has fundraisers, but filter/search returns none           | Show `FundraiserListNoResults` with "Clear filters" button. Toolbar stays visible.                                                                                                                                                                               |
-| Multiple currencies in total raised                            | Stat tile shows the dominant currency total + helper "+N more currencies"; tooltip or clicking expands the per‑currency list. (Decision: cap at 1 line in tile to preserve layout.)                                                                              |
+| Multiple currencies in total raised                            | Stat tile shows a single consolidated amount in the dominant currency (most fundraisers by primary currency; tiebreak EUR > USD > CHF > BRL > CZK). Amounts in other currencies are converted using floor exchange rates via `convertTotalRaisedToSingleCurrency`. |
 | Fundraiser with `endDate` passed but API `status === 'active'` | Stays in **Active** filter — API `status` is the source of truth. Badge shows `ending-soon` only while `daysLeft > 0`; once past, badge falls back to `active` (no special "expired but active" state). Backend is responsible for transitioning to `completed`. |
 | `endDate` ≤ 7 days away and API `status === 'active'`          | `ending-soon` badge (amber). Counted under **Active** filter (`ending-soon` is a visual subset of active, not a separate bucket).                                                                                                                                |
 | `status === 'completed'` or `'cancelled'`                      | **Ended** filter. Read‑only — action menu shows **Copy link only** (no Edit, no Pause/Resume).                                                                                                                                                                   |
@@ -687,7 +686,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 1. **URL‑sync filters?** Persist `?status=active&sort=most-raised&q=plan` in the query string? _Still open after PR 3 — implementation keeps filters in local component state only._
 2. **Pagination** — list is unpaginated for v1. Confirm this is acceptable for users with > 50 fundraisers.
-3. **Multi‑currency tile** — single dominant total + "+N more" vs. always show all currencies stacked (current legacy behavior). Picking dominant keeps the tile height stable.
+3. **Multi‑currency tile** — resolved: single consolidated total in the dominant currency (by fundraiser count, tiebreak EUR > USD > CHF > BRL > CZK), converted via floor exchange rates. Keeps the tile height stable and matches fundraiser‑level display behavior.
 
 **Resolved:**
 
@@ -710,7 +709,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 
 - [x] Delete legacy components: `card-base.tsx`, `my-fundraisers-card.tsx`, `total-raised-card.tsx`, `donations-card.tsx`, `dashboard-stat-card-skeleton.tsx`.
 - [x] Add `dashboard-header.tsx`, `dashboard-summary.tsx`, `summary-stat-card.tsx`, `summary-stat-card-skeleton.tsx`; update `src/components/dashboard/index.ts`.
-- [x] Replace `getDashboardFundraiserStats` with slim `getDashboardSummary` (`{ totalCount, activeCount, donationsCount, totalRaisedByCurrency }`).
+- [x] Replace `getDashboardFundraiserStats` with slim `getDashboardSummary` (`{ totalCount, activeCount, donationsCount, consolidatedTotalRaised }`).
 - [x] Rewrite `src/app/(standard)/dashboard/page.tsx`: `AuthGuard` → breadcrumb → header → summary.
 - [x] Update locale files (`breadcrumb.*`, `manageFundraisers.*`, `summary.*`, `statsError.*` only).
 - [x] Update `src/components/auth/user-menu.tsx` to use `breadcrumb.dashboard` (legacy `dashboard` key dropped).

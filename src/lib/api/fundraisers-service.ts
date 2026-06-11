@@ -1,6 +1,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
+import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 
 interface FundraisersApiEnvelope {
   fundraisers?: unknown;
@@ -12,13 +13,7 @@ export interface DashboardSummaryStats {
   totalFundraiserCount: number;
   activeFundraiserCount: number;
   donationsCount: number;
-  totalRaisedByCurrency: DashboardRaisedSummary[];
-}
-
-export interface DashboardRaisedSummary {
-  currency: string;
-  totalRaised: number;
-  fundraiserCount: number;
+  consolidatedTotalRaised: { amount: number; currency: string } | null;
 }
 
 function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
@@ -54,7 +49,18 @@ export function getDashboardSummary(
   let activeFundraiserCount = 0;
   let donationsCount = 0;
 
-  const raisedByCurrency = new Map<string, DashboardRaisedSummary>();
+  const CURRENCY_PRIORITY: Record<string, number> = {
+    EUR: 0,
+    USD: 1,
+    CHF: 2,
+    BRL: 3,
+    CZK: 4,
+  };
+
+  const raisedByCurrency = new Map<
+    string,
+    { currency: string; totalRaised: number; fundraiserCount: number }
+  >();
 
   for (const fundraiser of fundraisers) {
     if (fundraiser.status === 'active') {
@@ -84,7 +90,7 @@ export function getDashboardSummary(
       }
     }
 
-    // Count each fundraiser once in its primary currency bucket
+    // Count each fundraiser once against its primary currency
     const primaryCurrency = fundraiser.currency.toUpperCase();
     const primaryEntry = raisedByCurrency.get(primaryCurrency) ?? {
       currency: primaryCurrency,
@@ -95,18 +101,36 @@ export function getDashboardSummary(
     raisedByCurrency.set(primaryCurrency, primaryEntry);
   }
 
-  const totalRaisedByCurrency = Array.from(raisedByCurrency.values()).sort(
+  const sortedRaisedByCurrency = Array.from(raisedByCurrency.values()).sort(
     (a, b) => {
-      return (
-        b.totalRaised - a.totalRaised || a.currency.localeCompare(b.currency)
-      );
+      const byCount = b.fundraiserCount - a.fundraiserCount;
+      if (byCount !== 0) return byCount;
+      const priorityA = CURRENCY_PRIORITY[a.currency] ?? Infinity;
+      const priorityB = CURRENCY_PRIORITY[b.currency] ?? Infinity;
+      return priorityA - priorityB || a.currency.localeCompare(b.currency);
     }
   );
+
+  const dominant = sortedRaisedByCurrency[0] ?? null;
+  const consolidatedTotalRaised = dominant
+    ? {
+        amount: convertTotalRaisedToSingleCurrency(
+          Object.fromEntries(
+            sortedRaisedByCurrency.map(({ currency, totalRaised }) => [
+              currency,
+              totalRaised,
+            ])
+          ),
+          dominant.currency
+        ),
+        currency: dominant.currency,
+      }
+    : null;
 
   return {
     totalFundraiserCount: fundraisers.length,
     activeFundraiserCount,
     donationsCount,
-    totalRaisedByCurrency,
+    consolidatedTotalRaised,
   };
 }
