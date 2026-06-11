@@ -25,6 +25,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { STAGE_LIMITS } from '@/components/stage/constants';
 import { StagePreviewDialog } from '@/components/stage/stage-preview-dialog';
 import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
@@ -111,6 +112,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
 
   const slideCount = fields.length;
   const atSlideLimit = slideCount >= STAGE_LIMITS.maxSlides;
+
+  // lg breakpoint. Computed once here and passed to every row so each slide
+  // renders the same layout without spinning up its own matchMedia listener.
+  // Each row renders one of two layouts so each RHF field path registers a
+  // single ref — CSS-hidden duplicates would double-register and break
+  // validation focus.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   // Template picker. `templateTarget` is the slide index to fill in place, or
   // `null` when opened from the section button (fill first empty, else append).
@@ -412,6 +420,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                   onRemove={() => remove(idx)}
                   onUseTemplate={() => openRowTemplates(idx)}
                   onPreview={() => setPreviewIndex(idx)}
+                  isDesktop={isDesktop}
                 />
               ))}
             </div>
@@ -475,6 +484,7 @@ function SlideRow({
   onRemove,
   onUseTemplate,
   onPreview,
+  isDesktop,
 }: {
   idx: number;
   total: number;
@@ -483,6 +493,7 @@ function SlideRow({
   onRemove: () => void;
   onUseTemplate: () => void;
   onPreview: () => void;
+  isDesktop: boolean;
 }) {
   const t = useTranslations('Fundraisers.form.options.stage');
   const {
@@ -490,6 +501,7 @@ function SlideRow({
     register,
     formState: { errors },
   } = useFormContext<FundraiserFormValues>();
+
   const imageUrl =
     (useWatch({ control, name: slideField(idx, 'image') }) as string) ?? '';
 
@@ -505,139 +517,206 @@ function SlideRow({
 
   const isEmpty = !titleVal && !descVal && !imageUrl;
 
+  // Shared field fragments — identical registration across both layouts.
+  const imageThumb = (
+    <div className='h-[60px] w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center'>
+      {imageUrl ? (
+        <img src={imageUrl} alt='' className='w-full h-full object-cover' />
+      ) : (
+        <ImageIcon size={16} className='text-muted-foreground' />
+      )}
+    </div>
+  );
+
+  const templateButton = isEmpty ? (
+    <Button
+      type='button'
+      variant='ghost'
+      size='sm'
+      className='h-6 w-full gap-1 px-1 text-[11px] text-primary hover:text-primary'
+      onClick={onUseTemplate}
+    >
+      <Sparkles size={11} />
+      {t('useTemplate')}
+    </Button>
+  ) : null;
+
+  // Preview the slide in the stage layout — only once it has some content.
+  const previewButton = !isEmpty ? (
+    <Button
+      type='button'
+      variant='ghost'
+      size='sm'
+      onClick={onPreview}
+      className='h-6 w-full gap-1 px-1 text-[11px] text-muted-foreground hover:text-foreground'
+    >
+      <Eye size={11} />
+      {t('previewSlide')}
+    </Button>
+  ) : null;
+
+  const titleField = (
+    <div className='relative'>
+      <Input
+        {...register(slideField(idx, 'title'))}
+        placeholder={t('slideTitlePlaceholder')}
+        maxLength={STAGE_LIMITS.slideTitle}
+        className='text-sm font-medium h-8 pr-12'
+      />
+      <div className='pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2'>
+        <CharCount current={titleVal.length} max={STAGE_LIMITS.slideTitle} />
+      </div>
+    </div>
+  );
+
+  const descriptionField = (
+    <div className='relative'>
+      <Textarea
+        {...register(slideField(idx, 'description'))}
+        placeholder={t('slideDescriptionPlaceholder')}
+        maxLength={STAGE_LIMITS.slideDescription}
+        rows={1}
+        className='text-sm min-h-8 field-sizing-content resize-none py-1.5 pr-12'
+      />
+      <div className='pointer-events-none absolute right-2.5 bottom-1.5'>
+        <CharCount
+          current={descVal.length}
+          max={STAGE_LIMITS.slideDescription}
+        />
+      </div>
+    </div>
+  );
+
+  const urlField = (
+    <Input
+      {...register(slideField(idx, 'image'))}
+      type='url'
+      placeholder={t('slideImagePlaceholder')}
+      className='text-xs text-muted-foreground h-8'
+    />
+  );
+
+  const imageErrorMsg = imageError ? (
+    <p className='text-xs text-destructive mt-0.5'>{t('imageUrlError')}</p>
+  ) : null;
+
+  const durationInput = (
+    <Input
+      {...register(slideField(idx, 'duration'), { valueAsNumber: true })}
+      type='number'
+      min={1}
+      max={60}
+      className='w-14 text-xs h-7 px-2'
+    />
+  );
+
+  const removeButton = (
+    <button
+      type='button'
+      onClick={onRemove}
+      aria-label={t('removeSlide')}
+      className='text-muted-foreground hover:text-destructive transition-colors'
+    >
+      <Trash2 size={13} />
+    </button>
+  );
+
+  const reorderControls = (
+    <>
+      <button
+        type='button'
+        onClick={onMoveUp}
+        disabled={idx === 0}
+        aria-label={t('moveUp')}
+        className='text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed'
+      >
+        <ChevronUp size={14} />
+      </button>
+      <div className='size-5 rounded bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center'>
+        {idx + 1}
+      </div>
+      <button
+        type='button'
+        onClick={onMoveDown}
+        disabled={idx === total - 1}
+        aria-label={t('moveDown')}
+        className='text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed'
+      >
+        <ChevronDown size={14} />
+      </button>
+    </>
+  );
+
+  // Mobile: stacked. Title + description full width, then image thumbnail on
+  // the left with URL and duration stacked beside it. Reorder + position sit
+  // in a slim top strip.
+  if (!isDesktop) {
+    return (
+      <div className='flex flex-col gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-background p-2.5'>
+        <div className='flex items-center gap-2'>
+          {reorderControls}
+          <div className='flex-1' />
+          {removeButton}
+        </div>
+
+        {titleField}
+        {descriptionField}
+
+        <div className='flex gap-2'>
+          <div className='w-24 shrink-0'>{imageThumb}</div>
+          <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
+            {urlField}
+            {imageErrorMsg}
+            <div className='flex items-center gap-2'>
+              <Clock size={11} className='text-muted-foreground shrink-0' />
+              <span className='text-xs text-muted-foreground'>
+                {t('duration')}
+              </span>
+              {durationInput}
+              <span className='text-xs text-muted-foreground'>
+                {t('seconds')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {templateButton}
+        {previewButton}
+      </div>
+    );
+  }
+
+  // Desktop: unchanged three-column row.
   return (
     <div className='flex gap-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-background p-2.5'>
       {/* Reorder + position number */}
       <div className='flex flex-col items-center gap-1 pt-1 shrink-0'>
-        <button
-          type='button'
-          onClick={onMoveUp}
-          disabled={idx === 0}
-          aria-label={t('moveUp')}
-          className='text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed'
-        >
-          <ChevronUp size={14} />
-        </button>
-        <div className='size-5 rounded bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center'>
-          {idx + 1}
-        </div>
-        <button
-          type='button'
-          onClick={onMoveDown}
-          disabled={idx === total - 1}
-          aria-label={t('moveDown')}
-          className='text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed'
-        >
-          <ChevronDown size={14} />
-        </button>
+        {reorderControls}
       </div>
 
       {/* Image preview + template shortcut + preview-popup trigger */}
       <div className='flex w-24 shrink-0 flex-col gap-1 self-start mt-1'>
-        <div className='h-[60px] w-full rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden bg-muted flex items-center justify-center'>
-          {imageUrl ? (
-            <img src={imageUrl} alt='' className='w-full h-full object-cover' />
-          ) : (
-            <ImageIcon size={16} className='text-muted-foreground' />
-          )}
-        </div>
-        {isEmpty && (
-          <Button
-            type='button'
-            variant='ghost'
-            size='sm'
-            className='h-6 w-full gap-1 px-1 text-[11px] text-primary hover:text-primary'
-            onClick={onUseTemplate}
-          >
-            <Sparkles size={11} />
-            {t('useTemplate')}
-          </Button>
-        )}
-        {!isEmpty && (
-          <Button
-            type='button'
-            variant='ghost'
-            size='sm'
-            onClick={onPreview}
-            className='h-6 w-full gap-1 px-1 text-[11px] text-muted-foreground hover:text-foreground'
-          >
-            <Eye size={11} />
-            {t('previewSlide')}
-          </Button>
-        )}
+        {imageThumb}
+        {templateButton}
+        {previewButton}
       </div>
 
       {/* Fields */}
       <div className='flex-1 min-w-0 flex flex-col gap-1.5'>
-        <div className='relative'>
-          {}
-          <Input
-            {...register(slideField(idx, 'title'))}
-            placeholder={t('slideTitlePlaceholder')}
-            maxLength={STAGE_LIMITS.slideTitle}
-            className='text-sm font-medium h-8 pr-12'
-          />
-          <div className='pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2'>
-            <CharCount
-              current={titleVal.length}
-              max={STAGE_LIMITS.slideTitle}
-            />
-          </div>
-        </div>
-
-        <div className='relative'>
-          {}
-          <Textarea
-            {...register(slideField(idx, 'description'))}
-            placeholder={t('slideDescriptionPlaceholder')}
-            maxLength={STAGE_LIMITS.slideDescription}
-            rows={1}
-            className='text-sm min-h-8 field-sizing-content resize-none py-1.5 pr-12'
-          />
-          <div className='pointer-events-none absolute right-2.5 bottom-1.5'>
-            <CharCount
-              current={descVal.length}
-              max={STAGE_LIMITS.slideDescription}
-            />
-          </div>
-        </div>
-
+        {titleField}
+        {descriptionField}
         <div>
-          {}
-          <Input
-            {...register(slideField(idx, 'image'))}
-            type='url'
-            placeholder={t('slideImagePlaceholder')}
-            className='text-xs text-muted-foreground h-8'
-          />
-          {imageError && (
-            <p className='text-xs text-destructive mt-0.5'>
-              {t('imageUrlError')}
-            </p>
-          )}
+          {urlField}
+          {imageErrorMsg}
         </div>
 
         <div className='flex items-center gap-2 mt-0.5'>
           <Clock size={11} className='text-muted-foreground shrink-0' />
           <span className='text-xs text-muted-foreground'>{t('duration')}</span>
-          {}
-          <Input
-            {...register(slideField(idx, 'duration'), { valueAsNumber: true })}
-            type='number'
-            min={1}
-            max={60}
-            className='w-14 text-xs h-7 px-2'
-          />
+          {durationInput}
           <span className='text-xs text-muted-foreground'>{t('seconds')}</span>
           <div className='flex-1' />
-          <button
-            type='button'
-            onClick={onRemove}
-            aria-label={t('removeSlide')}
-            className='text-muted-foreground hover:text-destructive transition-colors'
-          >
-            <Trash2 size={13} />
-          </button>
+          {removeButton}
         </div>
       </div>
     </div>
