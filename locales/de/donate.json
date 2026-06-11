@@ -84,7 +84,7 @@
       "dedicatedTo": "{recipientName} gewidmet",
       "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
       "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
-      "emailNoticeNoEmail": "Der Link zur Widmungsurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
       "emailPreview": {
         "greeting": "Hallo {recipientName},",
         "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
@@ -190,12 +190,12 @@
       }
     },
     "applePay": {
-      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche es mit Safari auf macOS oder iOS, oder scanne den QR-Code mit deinem iPhone.",
-      "processing": "Apple-Pay-Spende wird verarbeitet…"
+      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche Safari auf macOS oder iOS oder scanne den QR-Code mit deinem iPhone.",
+      "processing": "Verarbeitung der Spende mit Apple Pay..."
     },
     "googlePay": {
-      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche es mit Chrome auf Android, oder wähle eine andere Zahlungsmethode.",
-      "processing": "Google-Pay-Spende wird verarbeitet…"
+      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche Chrome auf Android oder wähle eine andere Zahlungsmethode.",
+      "processing": "Verarbeitung der Spende mit Google Pay..."
     },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",
@@ -212,7 +212,7 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
-      "paymentCancelled": "Zahlung wurde abgebrochen.",
+      "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {
