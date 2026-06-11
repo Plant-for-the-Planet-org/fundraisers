@@ -1,6 +1,6 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Spendenaufruf erstellen",
+    "startFundraiser": "Erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
     "amountRaised": "{formattedAmountWithCurrency}",
