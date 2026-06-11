@@ -113,6 +113,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const slideCount = fields.length;
   const atSlideLimit = slideCount >= STAGE_LIMITS.maxSlides;
 
+  // lg breakpoint. Computed once here and passed to every row so each slide
+  // renders the same layout without spinning up its own matchMedia listener.
+  // Each row renders one of two layouts so each RHF field path registers a
+  // single ref — CSS-hidden duplicates would double-register and break
+  // validation focus.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+
   // Template picker. `templateTarget` is the slide index to fill in place, or
   // `null` when opened from the section button (fill first empty, else append).
   const [templatesOpen, setTemplatesOpen] = useState(false);
@@ -413,6 +420,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
                   onRemove={() => remove(idx)}
                   onUseTemplate={() => openRowTemplates(idx)}
                   onPreview={() => setPreviewIndex(idx)}
+                  isDesktop={isDesktop}
                 />
               ))}
             </div>
@@ -476,6 +484,7 @@ function SlideRow({
   onRemove,
   onUseTemplate,
   onPreview,
+  isDesktop,
 }: {
   idx: number;
   total: number;
@@ -484,6 +493,7 @@ function SlideRow({
   onRemove: () => void;
   onUseTemplate: () => void;
   onPreview: () => void;
+  isDesktop: boolean;
 }) {
   const t = useTranslations('Fundraisers.form.options.stage');
   const {
@@ -491,11 +501,6 @@ function SlideRow({
     register,
     formState: { errors },
   } = useFormContext<FundraiserFormValues>();
-
-  // md breakpoint. Renders exactly one of two layouts so each RHF field path
-  // registers a single ref — CSS-hidden duplicates would double-register and
-  // break validation focus.
-  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   const imageUrl =
     (useWatch({ control, name: slideField(idx, 'image') }) as string) ?? '';
