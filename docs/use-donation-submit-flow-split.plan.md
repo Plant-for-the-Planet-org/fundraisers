@@ -19,10 +19,10 @@ todos:
     status: completed
   - id: rewire-orchestrator
     content: Reduce useDonationSubmit to wiring - call useSubmissionCore, pass it to the three flow hooks, and return the same object shape (donationState, onSubmit, onPayPal*, onWallet*, reset). reset stays on the orchestrator/core.
-    status: pending
+    status: completed
   - id: verify-no-behavior-change
     content: Confirm type-check + lint pass and the returned API is byte-for-byte the same shape; spot-check that submittingRef and the key refs are single shared instances across all flows.
-    status: pending
+    status: completed
 isProject: false
 ---
 
