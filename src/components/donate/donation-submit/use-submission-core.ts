@@ -31,7 +31,8 @@ import { useAuthStore } from '@/stores/auth-store';
  * Owns the state and helpers shared across every donation gateway flow.
  *
  * Created once per `useDonationSubmit` render and handed to each per-gateway
- * flow hook (`useCardFlow`, `usePayPalFlow`, `useWalletFlow`). The refs it
+ * flow hook (`useStripeFlow`, `usePlanetCashFlow`, `usePayPalFlow`,
+ * `useWalletFlow`). The refs it
  * returns (`submittingRef`, `donationKeyRef`, `paymentKeyRef`) are single
  * shared instances: cross-flow mutual exclusion and idempotency depend on every
  * flow reading and writing the same objects, so they must NOT be re-created

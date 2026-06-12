@@ -14,7 +14,7 @@ import type { StripeSepaFormHandle } from '../stripe-sepa-form';
 
 /**
  * Shared contract between `useSubmissionCore` and the per-gateway flow hooks
- * (`useCardFlow`, `usePayPalFlow`, `useWalletFlow`).
+ * (`useStripeFlow`, `usePlanetCashFlow`, `usePayPalFlow`, `useWalletFlow`).
  *
  * Defining this explicitly - rather than relying on `ReturnType<typeof
  * useSubmissionCore>` - makes the core's surface reviewable and pins down what
@@ -89,14 +89,15 @@ export interface ConfirmCardActionPaymentParams {
 }
 
 /**
- * Card-flow-only dependencies passed to `useCardFlow` alongside the core.
+ * Stripe-flow-only dependencies passed to `useStripeFlow` alongside the core.
  *
  * These are NOT part of the shared core: the two Stripe form refs and
- * `onPaymentValidationFailed` are consumed solely by the card `onSubmit` path
- * (the latter via `resolveCreatedPaymentMethod`, which also lives in the card
- * flow).
+ * `onPaymentValidationFailed` are consumed solely by the Stripe `onSubmit` path
+ * (card + SEPA, including saved Stripe methods), the latter via
+ * `resolveCreatedPaymentMethod`, which lives in `useStripeFlow` because both the
+ * card and SEPA `createPaymentMethod` results flow through it.
  */
-export interface CardFlowDeps {
+export interface StripeFlowDeps {
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
   onPaymentValidationFailed?: () => void;
