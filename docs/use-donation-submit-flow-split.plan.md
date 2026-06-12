@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: extract-wallet-flow
     content: Move onWalletConfirm, onWalletError, onWalletCancel into useWalletFlow(core), returning the three callbacks. Preserve dep arrays.
-    status: pending
+    status: completed
   - id: rewire-orchestrator
     content: Reduce useDonationSubmit to wiring - call useSubmissionCore, pass it to the three flow hooks, and return the same object shape (donationState, onSubmit, onPayPal*, onWallet*, reset). reset stays on the orchestrator/core.
     status: pending
