@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: extract-paypal-flow
     content: Move onPayPalCreateOrder, onPayPalApproved, onPayPalError AND paypalDonationIdRef into usePayPalFlow(core), returning the three callbacks. paypalDonationIdRef is PayPal-only (written in createOrder, read in approved), so it is created here. Preserve dep arrays.
-    status: pending
+    status: completed
   - id: extract-wallet-flow
     content: Move onWalletConfirm, onWalletError, onWalletCancel into useWalletFlow(core), returning the three callbacks. Preserve dep arrays.
     status: pending

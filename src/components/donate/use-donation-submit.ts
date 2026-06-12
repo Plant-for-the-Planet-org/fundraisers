@@ -1,33 +1,23 @@
 import type { RefObject } from 'react';
-import type { OnApproveData } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { PaymentData } from '@/lib/types/payment';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from './donate-overlay';
 import type { DonationFormValues } from './donation-form-context';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useCallback, useRef } from 'react';
-import { donationService } from '@/lib/api/donation-service';
-import { paymentService } from '@/lib/api/payment-service';
-import {
-  createPaypalOrder,
-  PaypalOrderError,
-} from '@/lib/api/paypal-order-service';
+import { useCallback } from 'react';
 import { submitStandardPostpaidDonation } from '@/lib/donation/donation-submission';
-import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   beginSubmission,
   mapPaymentErrorCode,
-  stopLoading,
   withError,
   withSubmitError,
 } from '@/lib/donation/donation-submit-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
-import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
 import { useBankTransferFlow } from './donation-submit/use-bank-transfer-flow';
+import { usePayPalFlow } from './donation-submit/use-paypal-flow';
 import { usePlanetCashFlow } from './donation-submit/use-planet-cash-flow';
 import { useStripeFlow } from './donation-submit/use-stripe-flow';
 import { useSubmissionCore } from './donation-submit/use-submission-core';
@@ -63,9 +53,6 @@ export function useDonationSubmit(
     token,
   } = core;
 
-  // Shares donationId between the two PayPal callbacks
-  const paypalDonationIdRef = useRef<string | null>(null);
-
   const { onSubmit: onStripeSubmit } = useStripeFlow(core, {
     sepaFormRef,
     cardFormRef,
@@ -73,6 +60,8 @@ export function useDonationSubmit(
   });
   const { onSubmit: onPlanetCashSubmit } = usePlanetCashFlow(core);
   const { onSubmit: onBankTransferSubmit } = useBankTransferFlow(core);
+  const { onPayPalCreateOrder, onPayPalApproved, onPayPalError } =
+    usePayPalFlow(core);
 
   // Single form submit handler: dispatches by selected method to the prepaid
   // PlanetCash path, the offline bank-transfer path, or the Stripe path
@@ -90,122 +79,6 @@ export function useDonationSubmit(
     },
     [onPlanetCashSubmit, onBankTransferSubmit, onStripeSubmit]
   );
-
-  // TODO: PayPal callbacks share submittingRef, donationKeyRef, paymentKeyRef, and the other hook deps with onSubmit. When adding Stripe, consider extracting usePayPalFlow / useStripeFlow as internal composables that receive shared refs/state as arguments, keeping useDonationSubmit as the orchestrator.
-  const onPayPalCreateOrder = useCallback(
-    async (values: DonationFormValues): Promise<string> => {
-      if (submittingRef.current)
-        throw new Error('Submission already in progress');
-      submittingRef.current = true;
-
-      setDonationState(beginSubmission);
-
-      const { payload } = buildPayloadFor(values, values.selectedPaymentMethod);
-
-      try {
-        const donationResponse = await donationService.createDonation(
-          payload,
-          token || undefined,
-          donationKeyRef.current
-        );
-        paypalDonationIdRef.current = donationResponse.donationId;
-
-        const paypalAccount = paymentOptions.gateways.paypal?.account;
-        if (!paypalAccount) {
-          throw new PaypalOrderError(
-            'Missing PayPal account configuration',
-            'api',
-            'PAYPAL_ACCOUNT_MISSING'
-          );
-        }
-        const orderId = await createPaypalOrder(
-          donationResponse.donationId,
-          paypalAccount,
-          token || undefined
-        );
-
-        return orderId;
-      } catch (error) {
-        setDonationState(prev => ({
-          ...prev,
-          error: toSubmitError(error),
-        }));
-        throw error;
-      } finally {
-        setDonationState(stopLoading);
-        submittingRef.current = false;
-      }
-    },
-    [
-      paymentOptions,
-      token,
-      buildPayloadFor,
-      submittingRef,
-      setDonationState,
-      donationKeyRef,
-    ]
-  );
-
-  const onPayPalApproved = useCallback(
-    async (data: OnApproveData): Promise<void> => {
-      const donationId = paypalDonationIdRef.current;
-      if (!donationId) {
-        failSubmission('unexpected');
-        return;
-      }
-
-      const paymentData: PaymentData = {
-        donationId,
-        paymentMethod: 'paypal',
-        paymentDetails: {
-          orderID: data.orderID,
-          payerID: data.payerID ?? undefined,
-          paymentID: data.paymentID ?? undefined,
-          billingToken: data.billingToken ?? undefined,
-          facilitatorAccessToken: data.facilitatorAccessToken ?? undefined,
-        },
-      };
-
-      try {
-        const paymentRequest = buildPaymentRequest(paymentData, paymentOptions);
-        const paymentResponse = await paymentService.processPayment(
-          donationId,
-          paymentRequest,
-          token || undefined,
-          paymentKeyRef.current
-        );
-
-        if (paymentResponse.status === 'failed') {
-          setDonationState(
-            withError(mapPaymentErrorCode(paymentResponse.errorCode))
-          );
-          return;
-        }
-
-        rotateIdempotencyKeys();
-
-        await finalizeFromDonation(donationId, token ?? undefined);
-      } catch (error) {
-        setDonationState(withSubmitError(error));
-      } finally {
-        submittingRef.current = false;
-      }
-    },
-    [
-      paymentOptions,
-      token,
-      rotateIdempotencyKeys,
-      finalizeFromDonation,
-      failSubmission,
-      submittingRef,
-      setDonationState,
-      paymentKeyRef,
-    ]
-  );
-
-  const onPayPalError = useCallback(() => {
-    failSubmission('paypalPaymentError');
-  }, [failSubmission]);
 
   const onWalletConfirm = useCallback(
     async (
