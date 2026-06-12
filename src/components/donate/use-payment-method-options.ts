@@ -54,8 +54,8 @@ export interface UsePaymentMethodOptionsResult {
   lastUsedMethodId: PaymentMethodId | null;
   /** Whether the saved-methods fetch has settled. */
   savedMethodsReady: boolean;
-  /** Whether processing-fee details should be shown. */
-  feeCollectionEnabled: boolean;
+  /** Whether processing-fee details should be shown (fee collection enabled and one-time donation). */
+  showMethodFees: boolean;
   /** Whether this donation is recurring (frequency or "make monthly"). */
   isSubscription: boolean;
 }
@@ -87,6 +87,8 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+  const showMethodFees =
+    feeCollectionEnabled && donationData.frequency === 'once';
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
     // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
@@ -287,7 +289,7 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
     pickPreferredSaved,
     lastUsedMethodId,
     savedMethodsReady,
-    feeCollectionEnabled,
+    showMethodFees,
     isSubscription,
   };
 }
