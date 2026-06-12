@@ -5,7 +5,10 @@ import { Suspense } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
-import { getDaysLeft, getTotalRaisedByCurrency } from '@/lib/utils/fundraiser';
+import {
+  convertTotalRaisedToSingleCurrency,
+  getDaysLeft,
+} from '@/lib/utils/fundraiser';
 import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
@@ -14,7 +17,6 @@ import { DonorsSummary } from '@/components/fundraisers/donors-summary';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
-import { MultiCurrencyRaisedDisplay } from '@/components/fundraisers/multi-currency-raised-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import TitleDisplay from '@/components/fundraisers/title-display';
@@ -45,22 +47,23 @@ export function FundraiserView({
   const workspaceCountry = fundraiser.workspace?.country ?? '';
   const isTaxDeductible =
     getTaxDeductibilityInfo(workspaceCountry).isDeductible;
-  const totalRaisedByCurrency = getTotalRaisedByCurrency(
-    fundraiser.totalRaised
+  const totalRaisedAmount = convertTotalRaisedToSingleCurrency(
+    fundraiser.totalRaised,
+    fundraiser.currency
   );
-  const isMultiCurrency = totalRaisedByCurrency.length > 1;
-  const singleRaisedAmount = !isMultiCurrency
-    ? (totalRaisedByCurrency[0]?.amount ?? 0)
-    : 0;
   const progressPercentage =
-    !isMultiCurrency && fundraiser.goalAmount > 0
-      ? Math.min(100, (singleRaisedAmount / fundraiser.goalAmount) * 100)
+    fundraiser.goalAmount > 0
+      ? Math.min(100, (totalRaisedAmount / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const leaderboardSettings = fundraiser.settings?.modules?.leaderboard;
   const canShowLeaderboard =
     leaderboardSettings?.enabled &&
     (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
+  const canReceiveDonations =
+    fundraiser.canDonate &&
+    paymentOptions !== undefined &&
+    fundraiser.workspace !== null;
 
   return (
     <FundraiserLayout>
@@ -75,19 +78,13 @@ export function FundraiserView({
         <TitleDisplay className='md:hidden' value={fundraiser.title} />
 
         {/* Goal progress */}
-        {isMultiCurrency ? (
-          <MultiCurrencyRaisedDisplay
-            totalRaisedEntries={totalRaisedByCurrency}
-          />
-        ) : (
-          <GoalProgressDisplay
-            raisedAmount={singleRaisedAmount}
-            goalAmount={fundraiser.goalAmount}
-            currency={fundraiser.currency}
-            progressPercentage={progressPercentage}
-            daysLeft={daysLeft}
-          />
-        )}
+        <GoalProgressDisplay
+          raisedAmount={totalRaisedAmount}
+          goalAmount={fundraiser.goalAmount}
+          currency={fundraiser.currency}
+          progressPercentage={progressPercentage}
+          daysLeft={canReceiveDonations ? daysLeft : undefined}
+        />
 
         {/* Donation count + donor avatars (only when leaderboard module is on) */}
         {canShowLeaderboard && (
@@ -144,7 +141,7 @@ export function FundraiserView({
           ))}
 
         {/* Donation form + overlay */}
-        {fundraiser.canDonate && paymentOptions && fundraiser.workspace ? (
+        {canReceiveDonations ? (
           <>
             <DonationSection
               fundraiser={fundraiser}
@@ -173,7 +170,6 @@ export function FundraiserView({
         {/* Project allocations */}
         <ProjectsSupportedDisplay
           projectAllocations={fundraiser.projectAllocations}
-          bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
         />
       </MainPanel>
     </FundraiserLayout>

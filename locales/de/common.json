@@ -29,8 +29,8 @@
     },
     "cookieSettings": "Cookie-Einstellungen",
     "headerLinks": {
-      "explore": "Spendenaufrufe entdecken",
-      "startFundraiser": "Spendenaufruf erstellen"
+      "explore": "Entdecken",
+      "startFundraiser": "Erstellen"
     }
   }
 }

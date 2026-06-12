@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
+import type { Stripe } from '@stripe/stripe-js';
 import type { DonationSubmitState } from '@/lib/types/donation-submit';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type {
@@ -574,11 +575,206 @@ export function useDonationSubmit(
     [paymentOptions, token]
   );
 
+  const onWalletConfirm = useCallback(
+    async (
+      wallet: 'apple_pay' | 'google_pay',
+      values: DonationFormValues,
+      paymentMethodId: string,
+      stripe: Stripe
+    ): Promise<void> => {
+      if (submittingRef.current) return;
+      submittingRef.current = true;
+
+      setDonationState(prev => ({
+        ...prev,
+        isLoading: true,
+        thankYouState: null,
+        error: null,
+      }));
+
+      const formData = assembleFormData(
+        donationData,
+        fundraiser,
+        values,
+        isAuthenticated
+      );
+
+      const { processingFeeCents: walletProcessingFeeCents } =
+        getDonationProcessingFeeInfo({
+          paymentOptions,
+          donationAmountCents: donationData.amountCents,
+          donationCurrency: donationData.currency,
+          workspaceCountry: fundraiser.workspace?.country,
+          selectedPaymentMethod: wallet,
+        });
+
+      const payload = buildDonationPayload(
+        formData,
+        fundraiser,
+        donorProfile,
+        wallet,
+        values.willAbsorbFee,
+        walletProcessingFeeCents
+      );
+
+      const donationAttemptKey = donationKeyRef.current;
+      const paymentAttemptKey = paymentKeyRef.current;
+
+      try {
+        const { donationResponse, paymentResponse } =
+          await submitStandardPostpaidDonation({
+            payload,
+            token: token || undefined,
+            donationIdempotencyKey: donationAttemptKey,
+            paymentIdempotencyKey: paymentAttemptKey,
+            selectedPaymentMethod: wallet,
+            paymentOptions,
+            paymentDetails: { paymentMethodId },
+          });
+
+        if (paymentResponse.status === 'failed') {
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: {
+              code: paymentResponse.errorCode
+                ? (SUBMISSION_ERROR_CODES[
+                    paymentResponse.errorCode as ServiceErrorCode
+                  ] ?? 'paymentFailed')
+                : 'paymentFailed',
+            },
+          }));
+          return;
+        }
+
+        if (paymentResponse.status === 'success') {
+          const thankYouState = await resolveThankYouStateFromDonation(
+            donationResponse.donationId,
+            token ?? undefined
+          );
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            thankYouState,
+          }));
+          return;
+        }
+
+        if (paymentResponse.status === 'action_required') {
+          if (paymentResponse.response.type === 'cardAction') {
+            const { paymentIntent, error } = await stripe.handleCardAction(
+              paymentResponse.response.payment_intent_client_secret
+            );
+            if (error || !paymentIntent) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+
+            const confirmRequest: StripeCardActionConfirmRequest = {
+              gateway: 'stripe',
+              account: paymentResponse.response.account,
+              source: { id: paymentIntent.id, object: 'payment_intent' },
+            };
+            const finalResponse = await paymentService.processPayment(
+              donationResponse.donationId,
+              confirmRequest,
+              token || undefined,
+              paymentAttemptKey
+            );
+            if (finalResponse.status === 'failed') {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+          } else if (paymentResponse.response.type === 'cardPayment') {
+            const { error } = await stripe.confirmCardPayment(
+              paymentResponse.response.payment_intent_client_secret,
+              { payment_method: paymentResponse.response.payment_method }
+            );
+            if (error) {
+              setDonationState(prev => ({
+                ...prev,
+                isLoading: false,
+                error: { code: 'paymentFailed' },
+              }));
+              return;
+            }
+          } else {
+            // Unknown action_required type — payment status indeterminate.
+            setDonationState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: { code: 'unexpected' },
+            }));
+            return;
+          }
+
+          const thankYouState = await resolveThankYouStateFromDonation(
+            donationResponse.donationId,
+            token ?? undefined
+          );
+          setDonationState(prev => ({
+            ...prev,
+            isLoading: false,
+            thankYouState,
+          }));
+        }
+      } catch (error) {
+        setDonationState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: toSubmitError(error),
+        }));
+      } finally {
+        donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
+        paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
+        submittingRef.current = false;
+      }
+    },
+    [
+      donationData,
+      fundraiser,
+      paymentOptions,
+      isAuthenticated,
+      donorProfile,
+      token,
+    ]
+  );
+
   const onPayPalError = useCallback(() => {
     setDonationState(prev => ({
       ...prev,
       isLoading: false,
       error: { code: 'paypalPaymentError' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
+  // Surfaces client-side Stripe.js failures (elements.submit or createPaymentMethod).
+  // Server-side failures in the donation/payment APIs are
+  // already handled inside onWalletConfirm.
+  const onWalletError = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paymentFailed' },
+    }));
+    submittingRef.current = false;
+  }, []);
+
+  // Handles donor-initiated dismissal of the Apple Pay / Google Pay sheet.
+  const onWalletCancel = useCallback(() => {
+    setDonationState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: { code: 'paymentCancelled' },
     }));
     submittingRef.current = false;
   }, []);
@@ -595,6 +791,9 @@ export function useDonationSubmit(
     onPayPalCreateOrder,
     onPayPalApproved,
     onPayPalError,
+    onWalletConfirm,
+    onWalletError,
+    onWalletCancel,
     reset,
   };
 }

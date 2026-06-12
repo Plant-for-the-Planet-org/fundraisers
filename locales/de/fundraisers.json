@@ -1,6 +1,6 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Spendenaufruf erstellen",
+    "startFundraiser": "Erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
     "amountRaised": "{formattedAmountWithCurrency}",
@@ -11,6 +11,7 @@
     "anonymousHost": "{count, plural, one {anonymer Gastgeber*in} other {anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
+    "demoData": "*Demodaten - nur zur Vorschau",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Erstellt von",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { und # anderer} other { und # andere}}",
@@ -281,7 +282,19 @@
           "moveDown": "Nach unten",
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum von {max} Folien erreicht"
+          "maxSlidesReached": "Maximum von {max} Folien erreicht",
+          "browseTemplates": "Vorlagen ansehen",
+          "useTemplate": "Vorlage nutzen",
+          "templatesTitle": "Folien-Vorlagen",
+          "templatesSubtitle": "Wähle eine Vorlage, um eine Folie zu füllen, und bearbeite dann Text und Bild.",
+          "templatesSubtitleMulti": "Wähle eine oder mehrere Vorlagen aus und füge sie als Folien hinzu.",
+          "addSelected": "{count, plural, =0 {Folien hinzufügen} one {# Folie hinzufügen} other {# Folien hinzufügen}}",
+          "imageGuidelines": "Halte die Ecken der Folienbilder frei. Platziere wichtigen Text oder Gesichter in der Mitte. Der Bühnenbildschirm zeigt Spendensummen, Titel und andere Live-Inhalte über den Rändern an, die alles in den Ecken deines Bildes verdecken können.",
+          "previewSlide": "Vorschau",
+          "previewClose": "Vorschau schließen",
+          "previewRaisedLabel": "Bisher gesammelt",
+          "previewQrLabel": "Zum Spenden scannen",
+          "previewTickerLabel": "Aktuelle Spenden erscheinen hier"
         },
         "thankYouNote": {
           "title": "Dankesnachricht",

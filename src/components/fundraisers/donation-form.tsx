@@ -31,7 +31,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DonationAmounts } from './donation-amounts';
-import { DonationFrequencyDropdown } from './donation-frequency-dropdown';
+import { DonationFrequencySelect } from './donation-frequency-select';
 import { DonationGiftSection } from './donation-gift-section';
 
 interface DonationFormProps {
@@ -241,7 +241,7 @@ export function DonationForm({
           {t('cardHeader')}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
-          <DonationFrequencyDropdown
+          <DonationFrequencySelect
             options={frequencyOptions}
             selectedOption={selectedFrequency}
             onOptionChange={setSelectedFrequency}

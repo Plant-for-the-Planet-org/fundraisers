@@ -91,7 +91,9 @@ export function UpdateFundraiserButton({
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
       disabled={isSubmitting || !isDirty}
-      onClick={handleSubmit(onSubmit)}
+      onClick={handleSubmit(onSubmit, errors =>
+        console.error('Update blocked by validation errors:', errors)
+      )}
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}

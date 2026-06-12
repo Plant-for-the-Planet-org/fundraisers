@@ -27,7 +27,8 @@ export function PaymentMethods() {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const translateError = useFieldError();
 
-  const { paymentOptionsReady, cardFormRef, sepaFormRef } = useDonationForm();
+  const { paymentOptionsReady, cardFormRef, sepaFormRef, donationData } =
+    useDonationForm();
   const { control, setValue } = useFormContext<DonationFormValues>();
   const { errors } = useFormState({ control, name: 'selectedPaymentMethod' });
   const paymentMethodError = translateError(
@@ -52,6 +53,9 @@ export function PaymentMethods() {
     feeCollectionEnabled,
     isSubscription,
   } = usePaymentMethodOptions();
+
+  const showMethodFees =
+    feeCollectionEnabled && donationData.frequency === 'once';
 
   useEffect(() => {
     if (visibleMethodOptions.length === 0) return;
@@ -219,7 +223,7 @@ export function PaymentMethods() {
                   methodLabel={method.label}
                   methodLogo={method.logo}
                   isSelected={isGenericSelected}
-                  showFeeDetails={feeCollectionEnabled}
+                  showFeeDetails={showMethodFees}
                   methodFeeText={method.feeText}
                   methodFeeTooltip={method.feeTooltip}
                   lastUsedLabel={method.lastUsedLabel}

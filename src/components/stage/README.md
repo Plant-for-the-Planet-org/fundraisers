@@ -98,7 +98,7 @@ Toast notifications overlay top-right when a new donation lands.
 | Partner logo                                   | `modules.stage.partner_logo_url`                           | Top bar                     |
 | Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=`         | Counter                     |
 | Donation feed + leaderboard                    | Leaderboard module endpoint (polled every 15s)             | Ticker, toasts, leaderboard |
-| QR code                                        | `https://qr.pp.eco/?url={origin}/raise/{id}?utm_*`         | QR panel                    |
+| QR code                                        | `https://qr.pp.eco/?{origin}/raise/{id}?utm_*`             | QR panel                    |
 | Short URL display                              | `stage.pp.eco/{id}`                                        | QR panel label              |
 | Slide content                                  | `modules.stage.slides`                                     | Story panel                 |
 | Theme, fonts, accent                           | `fundraiser.settings.theme`                                | All styling                 |

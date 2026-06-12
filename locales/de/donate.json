@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
+      "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailPreview": {
+        "greeting": "Hallo {recipientName},",
+        "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
+        "certificate": "Lade deine Urkunde hier herunter.",
+        "messageFrom": "Hier ist eine Nachricht von {sender}:",
+        "signature": "Alles Gute,\nDein Plant-for-the-Planet Team",
+        "donorFallback": "der Spender"
+      }
     },
     "errors": {
       "zipCode": {
@@ -181,6 +189,14 @@
         "paymentIntentNotReturned": "Zahlungsabsicht nicht zurückgegeben"
       }
     },
+    "applePay": {
+      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche Safari auf macOS oder iOS oder scanne den QR-Code mit deinem iPhone.",
+      "processing": "Verarbeitung der Spende mit Apple Pay..."
+    },
+    "googlePay": {
+      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche Chrome auf Android oder wähle eine andere Zahlungsmethode.",
+      "processing": "Verarbeitung der Spende mit Google Pay..."
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",
       "network": "Netzwerkfehler. Überprüfe deine Internetverbindung und versuche es erneut.",
@@ -196,6 +212,7 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {

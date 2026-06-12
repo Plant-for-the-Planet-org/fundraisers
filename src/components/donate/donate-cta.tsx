@@ -2,7 +2,9 @@
 
 import type { ReactNode } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
+import type { Stripe } from '@stripe/stripe-js';
 import type { DonationFormValues } from './donation-form-context';
+import type { WalletKind } from './wallet-button';
 
 import { useEffect, useRef } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -13,25 +15,41 @@ import { CheckIcon } from '../ui/check-icon';
 import { Spinner } from '../ui/spinner';
 import { useDonationForm } from './donation-form-context';
 import { PayPalButton } from './paypal-button';
+import { WalletButton } from './wallet-button';
 
 interface DonateCTAProps {
   isLoading: boolean;
   isSuccess: boolean;
+  stripePromise?: Promise<Stripe | null> | null;
   resetError: () => void;
   onPayPalCreateOrder?: (values: DonationFormValues) => Promise<string>;
   onPayPalApproved?: (data: OnApproveData) => Promise<void>;
   onPayPalError?: () => void;
+  onWalletConfirm?: (
+    wallet: WalletKind,
+    values: DonationFormValues,
+    paymentMethodId: string,
+    stripe: Stripe
+  ) => Promise<void>;
+  onWalletError?: () => void;
+  onWalletCancel?: () => void;
 }
 
 export function DonateCTA({
   isLoading,
   isSuccess,
+  stripePromise,
   resetError,
   onPayPalCreateOrder,
   onPayPalApproved,
   onPayPalError,
+  onWalletConfirm,
+  onWalletError,
+  onWalletCancel,
 }: DonateCTAProps) {
   const t = useTranslations('Donate');
+  // TODO: onSubmit comes from DonationFormContext; wallet/PayPal callbacks come via props.
+  // Consider moving all submission handlers to context for consistency.
   const { donationData, onSubmit } = useDonationForm();
   const { handleSubmit } = useFormContext<DonationFormValues>();
 
@@ -65,6 +83,24 @@ export function DonateCTA({
         onPayPalCreateOrder={onPayPalCreateOrder ?? (() => Promise.resolve(''))}
         onPayPalApproved={onPayPalApproved ?? (() => Promise.resolve())}
         onPayPalError={onPayPalError ?? (() => undefined)}
+      />
+    );
+  }
+
+  if (
+    (selectedPaymentMethod === 'apple_pay' ||
+      selectedPaymentMethod === 'google_pay') &&
+    onWalletConfirm &&
+    onWalletError &&
+    onWalletCancel
+  ) {
+    return (
+      <WalletButton
+        wallet={selectedPaymentMethod}
+        stripePromise={stripePromise ?? null}
+        onWalletConfirm={onWalletConfirm}
+        onWalletError={onWalletError}
+        onWalletCancel={onWalletCancel}
       />
     );
   }
@@ -114,13 +150,6 @@ export function DonateCTA({
       >
         <div className='flex items-center gap-2'>{buttonContent}</div>
       </Button>
-      {/* Native Payments - for future implementation */}
-      {/* <Button
-        variant='outline'
-        className='w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium flex items-center gap-2'
-      >
-        Pay with Google
-      </Button> */}
     </div>
   );
 }
