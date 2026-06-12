@@ -4,7 +4,7 @@ overview: Structural refactor that splits the useDonationSubmit hook into per-ga
 todos:
   - id: define-core-contract
     content: Define the SubmissionCore return type (donation-submit-flow-types.ts) and resolve the two open decisions before any code moves - (a) the home of resolveCreatedPaymentMethod (decision below = useCardFlow) and (b) which auth/config values the core must expose (token, donorProfile, paymentOptions). No code move in this step.
-    status: pending
+    status: completed
   - id: extract-submission-core
     content: Extract a useSubmissionCore hook that owns the shared state and helpers (donationState/setDonationState, submittingRef, donationKeyRef, paymentKeyRef, rotateIdempotencyKeys, failSubmission, finalizeFromDonation, buildPayloadFor, confirmCardActionPayment) AND re-exposes the values the flows read directly (token, donorProfile, paymentOptions; isAuthenticated stays internal to buildPayloadFor). Do NOT put paypalDonationIdRef or resolveCreatedPaymentMethod here. Return everything as one object for the flow hooks to consume.
     status: pending
