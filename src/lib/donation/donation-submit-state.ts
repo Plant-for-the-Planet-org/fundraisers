@@ -13,7 +13,7 @@ import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 /**
  * Pure state-shaping helpers for the donation submission flow.
  *
- * These are extracted from `useDonationSubmit` so the hook reads as
+ * These are extracted from `useDonationSubmission` so the hook reads as
  * orchestration rather than state-object plumbing. Everything here is a plain
  * function with no React or hook-state dependency, so it is safe to call from
  * any `setDonationState(...)` updater.

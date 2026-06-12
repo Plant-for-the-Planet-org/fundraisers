@@ -30,7 +30,7 @@ import { useAuthStore } from '@/stores/auth-store';
 /**
  * Owns the state and helpers shared across every donation gateway flow.
  *
- * Created once per `useDonationSubmit` render and handed to each per-gateway
+ * Created once per `useDonationSubmission` render and handed to each per-gateway
  * flow hook (`useStripeFlow`, `usePlanetCashFlow`, `usePayPalFlow`,
  * `useWalletFlow`). The refs it
  * returns (`submittingRef`, `donationKeyRef`, `paymentKeyRef`) are single
@@ -40,7 +40,7 @@ import { useAuthStore } from '@/stores/auth-store';
  *
  * Reads `useAuthStore` once and re-exposes the auth/config values the flows read
  * directly (`token`, `donorProfile`, `paymentOptions`). `isAuthenticated` stays
- * internal — only `buildPayloadFor` consumes it.
+ * internal — only `buildPayload` consumes it.
  *
  * Intentionally does NOT own `paypalDonationIdRef` (PayPal-only) or
  * `resolveCreatedPaymentMethod` (card-only); those live in their owning flows.
@@ -76,7 +76,7 @@ export function useSubmissionCore(
   }, []);
 
   // Resolves the thank-you state for a settled donation and applies it as success.
-  const finalizeFromDonation = useCallback(
+  const finalizeDonation = useCallback(
     async (
       donationId: string,
       token?: string,
@@ -93,7 +93,7 @@ export function useSubmissionCore(
   );
 
   // Assembles form data and the donation payload for a given payment method.
-  const buildPayloadFor = useCallback(
+  const buildPayload = useCallback(
     (values: DonationFormValues, paymentMethod: PaymentMethodId) => {
       const formData = assembleFormData(
         donationData,
@@ -159,8 +159,8 @@ export function useSubmissionCore(
     paymentKeyRef,
     rotateIdempotencyKeys,
     failSubmission,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     confirmCardActionPayment,
     token,
     donorProfile,

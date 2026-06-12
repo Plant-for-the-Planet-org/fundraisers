@@ -40,8 +40,8 @@ export function useStripeFlow(
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     confirmCardActionPayment,
     token,
     donorProfile,
@@ -91,7 +91,7 @@ export function useStripeFlow(
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { formData, payload } = buildPayloadFor(
+      const { formData, payload } = buildPayload(
         values,
         values.selectedPaymentMethod
       );
@@ -164,7 +164,7 @@ export function useStripeFlow(
           );
 
           if (initialThankYouState?.status === 'completed') {
-            await finalizeFromDonation(
+            await finalizeDonation(
               donationResponse.donationId,
               token ?? undefined
             );
@@ -197,7 +197,7 @@ export function useStripeFlow(
             });
             if (!confirmed) return;
 
-            await finalizeFromDonation(
+            await finalizeDonation(
               donationResponse.donationId,
               token ?? undefined
             );
@@ -219,7 +219,7 @@ export function useStripeFlow(
               return;
             }
 
-            await finalizeFromDonation(
+            await finalizeDonation(
               donationResponse.donationId,
               token ?? undefined
             );
@@ -235,7 +235,7 @@ export function useStripeFlow(
             if (sepaResult.error) {
               setDonationState(withError('paymentFailed'));
             } else {
-              await finalizeFromDonation(
+              await finalizeDonation(
                 donationResponse.donationId,
                 token ?? undefined
               );
@@ -262,8 +262,8 @@ export function useStripeFlow(
       resolveCreatedPaymentMethod,
       confirmCardActionPayment,
       rotateIdempotencyKeys,
-      finalizeFromDonation,
-      buildPayloadFor,
+      finalizeDonation,
+      buildPayload,
       submittingRef,
       setDonationState,
       donationKeyRef,

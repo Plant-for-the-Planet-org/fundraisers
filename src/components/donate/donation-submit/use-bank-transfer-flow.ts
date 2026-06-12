@@ -33,8 +33,8 @@ export function useBankTransferFlow(core: SubmissionCore) {
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     token,
     paymentOptions,
   } = core;
@@ -47,7 +47,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayloadFor(values, values.selectedPaymentMethod);
+      const { payload } = buildPayload(values, values.selectedPaymentMethod);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
@@ -78,7 +78,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
           );
 
           if (initialThankYouState?.status === 'bankTransferPending') {
-            await finalizeFromDonation(
+            await finalizeDonation(
               donationResponse.donationId,
               token ?? undefined,
               initialThankYouState
@@ -87,7 +87,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
           }
 
           if (initialThankYouState?.status === 'completed') {
-            await finalizeFromDonation(
+            await finalizeDonation(
               donationResponse.donationId,
               token ?? undefined
             );
@@ -108,8 +108,8 @@ export function useBankTransferFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeFromDonation,
-      buildPayloadFor,
+      finalizeDonation,
+      buildPayload,
       submittingRef,
       setDonationState,
       donationKeyRef,

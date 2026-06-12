@@ -27,8 +27,8 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     submittingRef,
     donationKeyRef,
     rotateIdempotencyKeys,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     token,
   } = core;
 
@@ -40,7 +40,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayloadFor(values, values.selectedPaymentMethod);
+      const { payload } = buildPayload(values, values.selectedPaymentMethod);
 
       const donationAttemptKey = donationKeyRef.current;
 
@@ -55,7 +55,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
           token,
           donationAttemptKey
         );
-        await finalizeFromDonation(donationResponse.donationId, token);
+        await finalizeDonation(donationResponse.donationId, token);
       } catch (error) {
         setDonationState(withSubmitError(error));
       } finally {
@@ -67,8 +67,8 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     [
       token,
       rotateIdempotencyKeys,
-      finalizeFromDonation,
-      buildPayloadFor,
+      finalizeDonation,
+      buildPayload,
       submittingRef,
       setDonationState,
       donationKeyRef,

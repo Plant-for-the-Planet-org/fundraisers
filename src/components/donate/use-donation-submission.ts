@@ -16,14 +16,19 @@ import { useSubmissionCore } from './donation-submit/use-submission-core';
 import { useWalletFlow } from './donation-submit/use-wallet-flow';
 
 /**
- * Encapsulates the full donation submission flow:
- * assembles form data, builds the payload, submits via the appropriate
- * strategy (PlanetCash vs. standard two-step), and classifies the
- * payment response into a UI action.
+ * Orchestrates the full donation submission flow: assembles form data, builds
+ * the payload, submits via the appropriate strategy (PlanetCash prepaid vs.
+ * standard two-step), and classifies the payment response into a UI action.
  *
- * Returns `{ state, onSubmit, reset }`.
+ * Wires `useSubmissionCore` to the per-gateway flow hooks and merges their
+ * callbacks. Returns:
+ * - `donationState` — current submission state for the UI.
+ * - `onSubmit` — single form submit handler, dispatched by payment method.
+ * - `onPayPalCreateOrder` / `onPayPalApproved` / `onPayPalError` — PayPal SDK callbacks.
+ * - `onWalletConfirm` / `onWalletError` / `onWalletCancel` — Apple/Google Pay callbacks.
+ * - `reset` — clears state and rotates idempotency keys for a fresh attempt.
  */
-export function useDonationSubmit(
+export function useDonationSubmission(
   donationData: DonationData,
   fundraiser: Fundraiser,
   paymentOptions: PaymentOptions,

@@ -48,8 +48,8 @@ export function usePayPalFlow(core: SubmissionCore) {
     paymentKeyRef,
     rotateIdempotencyKeys,
     failSubmission,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     token,
     paymentOptions,
   } = core;
@@ -65,7 +65,7 @@ export function usePayPalFlow(core: SubmissionCore) {
 
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayloadFor(values, values.selectedPaymentMethod);
+      const { payload } = buildPayload(values, values.selectedPaymentMethod);
 
       try {
         const donationResponse = await donationService.createDonation(
@@ -104,7 +104,7 @@ export function usePayPalFlow(core: SubmissionCore) {
     [
       paymentOptions,
       token,
-      buildPayloadFor,
+      buildPayload,
       submittingRef,
       setDonationState,
       donationKeyRef,
@@ -149,7 +149,7 @@ export function usePayPalFlow(core: SubmissionCore) {
 
         rotateIdempotencyKeys();
 
-        await finalizeFromDonation(donationId, token ?? undefined);
+        await finalizeDonation(donationId, token ?? undefined);
       } catch (error) {
         setDonationState(withSubmitError(error));
       } finally {
@@ -160,7 +160,7 @@ export function usePayPalFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeFromDonation,
+      finalizeDonation,
       failSubmission,
       submittingRef,
       setDonationState,

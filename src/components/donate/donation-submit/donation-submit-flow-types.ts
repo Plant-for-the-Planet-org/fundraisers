@@ -31,7 +31,7 @@ import type { StripeSepaFormHandle } from '../stripe-sepa-form';
  *    same value identity in its dependency arrays.
  *
  * `isAuthenticated` is intentionally absent: it is only consumed by
- * `buildPayloadFor` inside the core and is not exposed.
+ * `buildPayload` inside the core and is not exposed.
  */
 export interface SubmissionCore {
   // --- Lifecycle state -----------------------------------------------------
@@ -52,13 +52,13 @@ export interface SubmissionCore {
   /** Surfaces an error and clears the in-flight guard so the donor can retry. */
   failSubmission: (code: SubmissionErrorKey) => void;
   /** Resolves the thank-you state for a settled donation and applies success. */
-  finalizeFromDonation: (
+  finalizeDonation: (
     donationId: string,
     token?: string,
     fallbackThankYouState?: ThankYouState
   ) => Promise<void>;
   /** Assembles form data and the donation payload for a given payment method. */
-  buildPayloadFor: (
+  buildPayload: (
     values: DonationFormValues,
     paymentMethod: PaymentMethodId
   ) => BuiltDonationPayload;
@@ -73,7 +73,7 @@ export interface SubmissionCore {
   paymentOptions: PaymentOptions;
 }
 
-/** Return shape of `buildPayloadFor`. */
+/** Return shape of `buildPayload`. */
 export interface BuiltDonationPayload {
   formData: DonationFormData;
   payload: DonationPayload;

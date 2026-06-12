@@ -28,7 +28,7 @@ import { DonationThankYou } from './donation-thank-you';
 import { DonorInfo } from './donor-info';
 import { GiftSummary } from './gift-summary';
 import { PaymentMethods } from './payment-methods';
-import { useDonationSubmit } from './use-donation-submit';
+import { useDonationSubmission } from './use-donation-submission';
 
 export interface DonationData {
   amountCents: number;
@@ -128,7 +128,7 @@ function DonateOverlayInner({
     onWalletConfirm,
     onWalletError,
     onWalletCancel,
-  } = useDonationSubmit(
+  } = useDonationSubmission(
     donationData,
     fundraiser,
     paymentOptions,

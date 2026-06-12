@@ -33,8 +33,8 @@ export function useWalletFlow(core: SubmissionCore) {
     paymentKeyRef,
     rotateIdempotencyKeys,
     failSubmission,
-    finalizeFromDonation,
-    buildPayloadFor,
+    finalizeDonation,
+    buildPayload,
     confirmCardActionPayment,
     token,
     paymentOptions,
@@ -52,7 +52,7 @@ export function useWalletFlow(core: SubmissionCore) {
 
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayloadFor(values, wallet);
+      const { payload } = buildPayload(values, wallet);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
@@ -77,7 +77,7 @@ export function useWalletFlow(core: SubmissionCore) {
         }
 
         if (paymentResponse.status === 'success') {
-          await finalizeFromDonation(
+          await finalizeDonation(
             donationResponse.donationId,
             token ?? undefined
           );
@@ -117,7 +117,7 @@ export function useWalletFlow(core: SubmissionCore) {
             return;
           }
 
-          await finalizeFromDonation(
+          await finalizeDonation(
             donationResponse.donationId,
             token ?? undefined
           );
@@ -133,8 +133,8 @@ export function useWalletFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeFromDonation,
-      buildPayloadFor,
+      finalizeDonation,
+      buildPayload,
       confirmCardActionPayment,
       submittingRef,
       setDonationState,
