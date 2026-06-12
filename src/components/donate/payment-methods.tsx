@@ -53,6 +53,9 @@ export function PaymentMethods() {
     isSubscription,
   } = usePaymentMethodOptions();
 
+  // Reference to the form section so we can scroll to it.
+  const formSectionRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (visibleMethodOptions.length === 0) return;
 
@@ -149,9 +152,6 @@ export function PaymentMethods() {
     },
     [setValue]
   );
-
-  // Reference to the form section so we can scroll to it.
-  const formSectionRef = useRef<HTMLDivElement>(null);
 
   // When the user selects a new payment method, show the form, scroll to it,
   // and move focus into its first field.

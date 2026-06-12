@@ -87,6 +87,7 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+  // Tied to the initially selected frequency, not isSubscription — fees stay visible when makeMonthly is toggled so the donor can still choose to cover them.
   const showMethodFees =
     feeCollectionEnabled && donationData.frequency === 'once';
 
