@@ -15,6 +15,7 @@ import { Hosts } from './hosts';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
+import { SlugField } from './slug-field';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
 import { WorkspaceInfo } from './workspace-info';
@@ -27,6 +28,8 @@ interface FundraiserFormBodyProps {
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
   endDate?: string;
+  /** Currently saved slug. Drives the inline link editor in edit mode. */
+  savedSlug?: string;
 }
 
 export function FundraiserFormBody({
@@ -34,6 +37,7 @@ export function FundraiserFormBody({
   submitButton,
   totalRaised,
   endDate,
+  savedSlug,
 }: FundraiserFormBodyProps) {
   const isEditMode = mode === 'edit';
 
@@ -52,6 +56,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
+        {isEditMode && savedSlug && <SlugField savedSlug={savedSlug} />}
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />

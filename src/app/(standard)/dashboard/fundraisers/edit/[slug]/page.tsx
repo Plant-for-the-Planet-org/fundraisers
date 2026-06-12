@@ -26,6 +26,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
         }
         totalRaised={fundraiser.totalRaised[fundraiser.currency] ?? 0}
         endDate={fundraiser.endDate}
+        savedSlug={fundraiser.slug}
       />
     </EditFundraiserFormProvider>
   );

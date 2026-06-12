@@ -155,6 +155,17 @@
           "maxLength": "Der Name des Aufrufs darf nicht länger als {max, number} Zeichen lang sein."
         }
       },
+      "slug": {
+        "label": "Link des Spendenaufrufs",
+        "viewPage": "Vorschau",
+        "edit": "Link bearbeiten",
+        "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
+        "errors": {
+          "required": "Bitte gib einen Link ein.",
+          "maxLength": "Der Link darf nicht länger als {max, number} Zeichen sein.",
+          "invalid": "Verwende nur Kleinbuchstaben, Zahlen und Bindestriche."
+        }
+      },
       "description": {
         "label": "Beschreibung",
         "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
@@ -396,6 +407,10 @@
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+    },
+    "hostBanner": {
+      "hostLabel": "Du bist Gastgeber",
+      "editButton": "Spendenaufruf bearbeiten"
     }
   }
 }
