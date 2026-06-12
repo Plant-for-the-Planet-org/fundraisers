@@ -242,7 +242,7 @@ export function PaymentMethods() {
                 selectedSavedMethodId={selectedSavedMethodId}
                 selectedPaymentMethod={selectedPaymentMethod}
                 isSubscription={isSubscription}
-                feeCollectionEnabled={feeCollectionEnabled}
+                showFeeDetails={showMethodFees}
                 onSavedMethodSelect={handleSavedMethodSelect}
                 onNewMethodSelect={handleNewMethodSelect}
               />

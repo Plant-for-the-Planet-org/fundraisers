@@ -27,8 +27,8 @@ interface SavedMethodGroupProps {
   selectedPaymentMethod: PaymentMethodId;
   /** Whether this donation is recurring (drives the expiring-soon hint). */
   isSubscription: boolean;
-  /** Whether processing-fee details should be shown. */
-  feeCollectionEnabled: boolean;
+  /** Whether processing-fee details should be shown for this donation. */
+  showFeeDetails: boolean;
   /** Called when a saved method row is chosen. */
   onSavedMethodSelect: (savedMethodId: string, typeId: PaymentMethodId) => void;
   /** Called when the "use a new …" row is chosen. */
@@ -46,7 +46,7 @@ export function SavedMethodGroup({
   selectedSavedMethodId,
   selectedPaymentMethod,
   isSubscription,
-  feeCollectionEnabled,
+  showFeeDetails,
   onSavedMethodSelect,
   onNewMethodSelect,
 }: SavedMethodGroupProps) {
@@ -77,8 +77,8 @@ export function SavedMethodGroup({
         <div className='flex flex-1 items-center gap-3'>
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
           {HeaderLogo && (
-            <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
-              <HeaderLogo textColor='#4d5153' />
+            <div className='flex h-4 w-12 shrink-0 items-center justify-center text-muted-foreground'>
+              <HeaderLogo textColor='currentColor' />
             </div>
           )}
           <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
@@ -90,7 +90,7 @@ export function SavedMethodGroup({
             )}
           </div>
         </div>
-        {feeCollectionEnabled && method.feeText && (
+        {showFeeDetails && method.feeText && (
           <MethodFeeDetails
             feeText={method.feeText}
             feeTooltip={method.feeTooltip}
