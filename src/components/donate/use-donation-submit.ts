@@ -2,24 +2,15 @@ import type { RefObject } from 'react';
 import type { OnApproveData } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { StripePaymentMethodResult } from '@/lib/donation/donation-submit-state';
-import type {
-  DonationSubmitState,
-  ThankYouState,
-} from '@/lib/types/donation-submit';
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type {
-  PaymentData,
-  StripeCardActionConfirmRequest,
-} from '@/lib/types/payment';
-import type { PaymentMethodId } from '@/lib/types/payment-methods';
+import type { PaymentData } from '@/lib/types/payment';
 import type { PaymentOptions } from '@/lib/types/payment-options';
-import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 import type { DonationData } from './donate-overlay';
 import type { DonationFormValues } from './donation-form-context';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { donationService } from '@/lib/api/donation-service';
 import { paymentService } from '@/lib/api/payment-service';
 import {
@@ -38,19 +29,11 @@ import {
   stopLoading,
   withError,
   withSubmitError,
-  withSuccess,
 } from '@/lib/donation/donation-submit-state';
-import {
-  assembleFormData,
-  buildDonationPayload,
-} from '@/lib/donation/payload-builder';
-import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
-import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
-import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
-import { useAuthStore } from '@/stores/auth-store';
+import { useSubmissionCore } from './donation-submit/use-submission-core';
 
 /**
  * Encapsulates the full donation submission flow:
@@ -68,81 +51,24 @@ export function useDonationSubmit(
   cardFormRef: RefObject<StripeCardFormHandle | null>,
   onPaymentValidationFailed?: () => void
 ) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const donorProfile = useAuthStore(state => state.user?.profile);
-  const token = useAuthStore(state => state.accessToken);
+  const core = useSubmissionCore(donationData, fundraiser, paymentOptions);
+  const {
+    donationState,
+    setDonationState,
+    submittingRef,
+    donationKeyRef,
+    paymentKeyRef,
+    rotateIdempotencyKeys,
+    failSubmission,
+    finalizeFromDonation,
+    buildPayloadFor,
+    confirmCardActionPayment,
+    token,
+    donorProfile,
+  } = core;
 
-  const [donationState, setDonationState] = useState<DonationSubmitState>(
-    INITIAL_DONATION_STATE
-  );
-
-  const submittingRef = useRef(false);
-  // Stable idempotency keys across retries
-  const donationKeyRef = useRef(generateIdempotencyKeyWithPrefix('donation'));
-  const paymentKeyRef = useRef(generateIdempotencyKeyWithPrefix('payment'));
   // Shares donationId between the two PayPal callbacks
   const paypalDonationIdRef = useRef<string | null>(null);
-
-  // Issues a fresh idempotency key for the next donation/payment attempt.
-  const rotateIdempotencyKeys = useCallback(() => {
-    donationKeyRef.current = generateIdempotencyKeyWithPrefix('donation');
-    paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
-  }, []);
-
-  // Surfaces an error and clears the in-flight guard so the donor can retry.
-  const failSubmission = useCallback((code: SubmissionErrorKey) => {
-    setDonationState(withError(code));
-    submittingRef.current = false;
-  }, []);
-
-  // Resolves the thank-you state for a settled donation and applies it as success.
-  const finalizeFromDonation = useCallback(
-    async (
-      donationId: string,
-      token?: string,
-      fallbackThankYouState?: ThankYouState
-    ) => {
-      const thankYouState = await resolveThankYouStateFromDonation(
-        donationId,
-        token,
-        fallbackThankYouState
-      );
-      setDonationState(withSuccess(thankYouState));
-    },
-    []
-  );
-
-  // Assembles form data and the donation payload for a given payment method.
-  const buildPayloadFor = useCallback(
-    (values: DonationFormValues, paymentMethod: PaymentMethodId) => {
-      const formData = assembleFormData(
-        donationData,
-        fundraiser,
-        values,
-        isAuthenticated
-      );
-
-      const { processingFeeCents } = getDonationProcessingFeeInfo({
-        paymentOptions,
-        donationAmountCents: donationData.amountCents,
-        donationCurrency: donationData.currency,
-        workspaceCountry: fundraiser.workspace?.country,
-        selectedPaymentMethod: paymentMethod,
-      });
-
-      const payload = buildDonationPayload(
-        formData,
-        fundraiser,
-        donorProfile,
-        paymentMethod,
-        values.willAbsorbFee,
-        processingFeeCents
-      );
-
-      return { formData, payload };
-    },
-    [donationData, fundraiser, paymentOptions, isAuthenticated, donorProfile]
-  );
 
   // Classifies a Stripe createPaymentMethod result, applying the matching UI
   // side effect. Returns the paymentDetails to continue with, or null when the
@@ -166,40 +92,7 @@ export function useDonationSubmit(
       }
       return { paymentMethodId: result.paymentMethodId };
     },
-    [onPaymentValidationFailed]
-  );
-
-  // Confirms a Stripe cardAction payment intent with the platform: builds the
-  // confirm request, processes it, and surfaces failure. Returns true when the
-  // confirm succeeded (caller proceeds to finalize), false when it failed
-  // (state already set; caller should stop). The cardAction call itself stays
-  // with the caller since each obtains the paymentIntentId differently.
-  const confirmCardActionPayment = useCallback(
-    async (params: {
-      donationId: string;
-      account: string;
-      paymentIntentId: string;
-      token?: string;
-      paymentIdempotencyKey: string;
-    }): Promise<boolean> => {
-      const confirmRequest: StripeCardActionConfirmRequest = {
-        gateway: 'stripe',
-        account: params.account,
-        source: { id: params.paymentIntentId, object: 'payment_intent' },
-      };
-      const finalResponse = await paymentService.processPayment(
-        params.donationId,
-        confirmRequest,
-        params.token,
-        params.paymentIdempotencyKey
-      );
-      if (finalResponse.status === 'failed') {
-        setDonationState(withError('paymentFailed'));
-        return false;
-      }
-      return true;
-    },
-    []
+    [onPaymentValidationFailed, setDonationState]
   );
 
   const onSubmit = useCallback(
@@ -403,6 +296,10 @@ export function useDonationSubmit(
       rotateIdempotencyKeys,
       finalizeFromDonation,
       buildPayloadFor,
+      submittingRef,
+      setDonationState,
+      donationKeyRef,
+      paymentKeyRef,
     ]
   );
 
@@ -451,7 +348,14 @@ export function useDonationSubmit(
         submittingRef.current = false;
       }
     },
-    [paymentOptions, token, buildPayloadFor]
+    [
+      paymentOptions,
+      token,
+      buildPayloadFor,
+      submittingRef,
+      setDonationState,
+      donationKeyRef,
+    ]
   );
 
   const onPayPalApproved = useCallback(
@@ -505,6 +409,9 @@ export function useDonationSubmit(
       rotateIdempotencyKeys,
       finalizeFromDonation,
       failSubmission,
+      submittingRef,
+      setDonationState,
+      paymentKeyRef,
     ]
   );
 
@@ -608,6 +515,10 @@ export function useDonationSubmit(
       finalizeFromDonation,
       buildPayloadFor,
       confirmCardActionPayment,
+      submittingRef,
+      setDonationState,
+      donationKeyRef,
+      paymentKeyRef,
     ]
   );
   // Surfaces client-side Stripe.js failures (elements.submit or createPaymentMethod).
@@ -625,7 +536,7 @@ export function useDonationSubmit(
   const reset = useCallback(() => {
     setDonationState(INITIAL_DONATION_STATE);
     rotateIdempotencyKeys();
-  }, [rotateIdempotencyKeys]);
+  }, [rotateIdempotencyKeys, setDonationState]);
 
   return {
     donationState,

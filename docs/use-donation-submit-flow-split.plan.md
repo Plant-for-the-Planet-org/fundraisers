@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: extract-submission-core
     content: Extract a useSubmissionCore hook that owns the shared state and helpers (donationState/setDonationState, submittingRef, donationKeyRef, paymentKeyRef, rotateIdempotencyKeys, failSubmission, finalizeFromDonation, buildPayloadFor, confirmCardActionPayment) AND re-exposes the values the flows read directly (token, donorProfile, paymentOptions; isAuthenticated stays internal to buildPayloadFor). Do NOT put paypalDonationIdRef or resolveCreatedPaymentMethod here. Return everything as one object for the flow hooks to consume.
-    status: pending
+    status: completed
   - id: extract-card-flow
     content: Move the onSubmit callback and resolveCreatedPaymentMethod into useCardFlow(core, { sepaFormRef, cardFormRef, onPaymentValidationFailed }), returning { onSubmit }. resolveCreatedPaymentMethod is card-only and its sole dep onPaymentValidationFailed is a card concern, so it lives here, not in the core. Preserve both dep arrays exactly.
     status: pending
@@ -57,7 +57,8 @@ Tier 1 moved pure, stateless functions — relocation could not change behavior.
 - **Asymmetric key rotation is load-bearing — copy each `finally`/rotation block verbatim.** Three different policies exist today and must be preserved exactly: `onPayPalCreateOrder` never rotates (only clears the guard + `stopLoading`), so its donation key survives into the approve step; `onPayPalApproved` rotates mid-flow, only after a non-failed payment, with no rotation in its `finally`; `onSubmit` and `onWalletConfirm` rotate in `finally` on every attempt. Do not normalize these.
 - **`onPayPalCreateOrder` has a bespoke catch.** It sets `setDonationState(prev => ({ ...prev, error: toSubmitError(error) }))` and re-throws (the PayPal SDK needs the throw), unlike the other catches that use `withSubmitError`. Preserve the throw and the manual state shape.
 - **`token || undefined` vs `token ?? undefined`.** Unchanged from Tier 1 — pass `token` through verbatim per call site; do not unify the operator.
-- **Dep-array parity.** When a callback moves into a flow hook, its dependency array must list the exact same dependencies (now sourced from the `core` object). Destructure `core` at the top of each flow hook so the dep arrays reference stable identities. **Never put the `core` object itself in a dependency array** — it is a fresh object literal each render, so depending on it would re-create every flow callback on every render. Depend on the destructured members.
+- **Dep-array parity.** When a callback moves into a flow hook, its dependency array must list the same logical dependencies (now sourced from the `core` object). Destructure `core` at the top of each flow hook so the dep arrays reference stable identities. **Never put the `core` object itself in a dependency array** — it is a fresh object literal each render, so depending on it would re-create every flow callback on every render. Depend on the destructured members.
+  - **Stable core members must be listed explicitly (policy set in step 1).** Once `submittingRef`/`donationKeyRef`/`paymentKeyRef`/`setDonationState` come from `core` instead of a direct `useRef`/`useState` in the same hook, `react-hooks/exhaustive-deps` can no longer prove they are stable and flags them. They ARE stable (ref objects and the state setter never change identity), so add them to the dep arrays where flagged: this is behavior-identical (no memoization drift) and keeps lint clean. This is NOT the "memoization is drifting" stop-condition — it is the expected, benign consequence of the extraction. Do the same in every subsequent flow-extraction step.
 
 ## Suggested shape
 
