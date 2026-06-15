@@ -203,10 +203,10 @@ export function PaymentMethods() {
       <div className='border border-border rounded-lg'>
         <div className='space-y-3 p-4'>
           {visibleMethodOptions.map(method => {
-            const savedForMethod = savedByType.get(method.id);
+            const savedInstancesForMethod = savedByType.get(method.id);
 
             // No saved methods for this type — render the option on its own.
-            if (!savedForMethod) {
+            if (!savedInstancesForMethod) {
               // A generic option is only "selected" when no saved method is
               // active — a saved card and the generic card share the same id.
               const isGenericSelected =
@@ -234,7 +234,7 @@ export function PaymentMethods() {
               <SavedMethodGroup
                 key={method.id}
                 method={method}
-                savedForMethod={savedForMethod}
+                savedInstancesForMethod={savedInstancesForMethod}
                 selectedSavedMethodId={selectedSavedMethodId}
                 selectedPaymentMethod={selectedPaymentMethod}
                 isSubscription={isSubscription}

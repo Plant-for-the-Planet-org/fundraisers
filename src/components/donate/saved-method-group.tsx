@@ -1,7 +1,7 @@
 'use client';
 
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
-import type { SavedMethodViewModel } from '@/components/donate/saved-method-view-model';
+import type { SavedMethodOption } from '@/components/donate/saved-method-option';
 import type { VisibleMethodOption } from '@/components/donate/use-payment-method-options';
 
 import { useTranslations } from 'next-intl';
@@ -20,7 +20,7 @@ interface SavedMethodGroupProps {
   /** The generic payment method this group is built around (card / SEPA). */
   method: VisibleMethodOption;
   /** Saved instances of `method`, already filtered and shaped for rendering. */
-  savedForMethod: SavedMethodViewModel[];
+  savedInstancesForMethod: SavedMethodOption[];
   /** The currently selected saved-method id; '' when none is active. */
   selectedSavedMethodId: string;
   /** The currently selected generic payment method id. */
@@ -42,7 +42,7 @@ interface SavedMethodGroupProps {
  */
 export function SavedMethodGroup({
   method,
-  savedForMethod,
+  savedInstancesForMethod,
   selectedSavedMethodId,
   selectedPaymentMethod,
   isSubscription,
@@ -99,7 +99,7 @@ export function SavedMethodGroup({
       </div>
       <div className='space-y-2 p-3'>
         <div className='space-y-2 pl-6'>
-          {savedForMethod.map(saved => {
+          {savedInstancesForMethod.map(saved => {
             // Warn right under the card it refers to — but only when
             // it's selected for a recurring donation, where a later
             // charge could fail once the card lapses.
