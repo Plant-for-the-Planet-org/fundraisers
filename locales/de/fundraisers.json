@@ -401,7 +401,15 @@
       "label": "Teilen",
       "title": "Diesen Spendenaufruf teilen",
       "description": "Hilf mit, ihn bekannt zu machen",
+      "via": "Teilen über",
+      "linkLabel": "Link zum Spendenaufruf",
       "goalText": "Hilf, {goal} zu erreichen",
+      "apps": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "qrCode": "QR-Code"
+      },
       "targets": {}
     }
   }

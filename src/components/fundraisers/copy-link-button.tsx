@@ -28,11 +28,7 @@ export function CopyLinkButton({ url }: CopyLinkButtonProps) {
   };
 
   return (
-    <Button
-      variant='outline'
-      onClick={handleCopy}
-      className='w-max border-border bg-white hover:bg-gray-50'
-    >
+    <Button variant='outline' onClick={handleCopy} className='w-max'>
       {copied ? (
         <Check className='text-green-600' aria-hidden='true' />
       ) : (

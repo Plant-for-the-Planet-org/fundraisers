@@ -401,7 +401,15 @@
       "label": "Share",
       "title": "Share this fundraiser",
       "description": "Help spread the word",
+      "via": "Share via",
+      "linkLabel": "Fundraiser link",
       "goalText": "Help reach {goal}",
+      "apps": {
+        "whatsapp": "WhatsApp",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn",
+        "qrCode": "QR Code"
+      },
       "targets": {}
     }
   }
