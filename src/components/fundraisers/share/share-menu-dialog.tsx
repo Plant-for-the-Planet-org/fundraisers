@@ -5,6 +5,7 @@ import type { ShareData } from '@/lib/share/build-share-data';
 
 import { useTranslations } from 'next-intl';
 import { Instagram, Linkedin, MessageCircle, QrCode } from 'lucide-react';
+import { SHARE_TARGETS } from '@/lib/share/targets';
 import { CopyLinkButton } from '@/components/fundraisers/copy-link-button';
 import {
   Dialog,
@@ -34,10 +35,10 @@ interface PlaceholderApp {
 }
 
 /**
- * Dummy app row. Glyphs + behavior are placeholders this branch — real brand
- * icons and per-target sharing land on the platform branches (WhatsApp,
- * Instagram, LinkedIn). QR generation is a separate follow-up.
- * TODO: wire each entry to a real share target.
+ * Visual app row. Each slot is wired to a real {@link SHARE_TARGETS} entry when
+ * one exists (matched by `id`) — WhatsApp is live; the rest stay inert dummies
+ * with placeholder glyphs until their platform branches land. QR generation is
+ * a separate follow-up.
  */
 const PLACEHOLDER_APPS: PlaceholderApp[] = [
   {
@@ -84,6 +85,8 @@ export function ShareMenuDialog({
   const t = useTranslations('Fundraisers.share');
   const tApps = useTranslations('Fundraisers.share.apps');
 
+  const targetById = new Map(SHARE_TARGETS.map(target => [target.id, target]));
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-sm'>
@@ -96,17 +99,29 @@ export function ShareMenuDialog({
 
         <div className='flex items-center justify-center gap-4'>
           {PLACEHOLDER_APPS.map(app => {
-            const { Icon } = app;
+            const target = targetById.get(app.id);
+            // Real brand glyph for wired slots; lucide dummy otherwise.
+            const Icon = target?.icon ?? app.Icon;
             return (
               <button
                 key={app.id}
                 type='button'
                 aria-label={tApps(app.labelKey)}
+                onClick={() => {
+                  // Inert until the slot's platform branch lands a target.
+                  if (!target) return;
+                  void target.run(data);
+                  onOpenChange(false);
+                }}
                 className='rounded-full p-[2px] transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none'
                 style={{ background: app.ring }}
               >
-                <span className='flex size-11 items-center justify-center rounded-full bg-background'>
-                  <Icon className='size-5' style={{ color: app.fg }} />
+                {/* Color on the span; both lucide and brand glyphs use currentColor. */}
+                <span
+                  className='flex size-11 items-center justify-center rounded-full bg-background'
+                  style={{ color: app.fg }}
+                >
+                  <Icon className='size-5' />
                 </span>
               </button>
             );
