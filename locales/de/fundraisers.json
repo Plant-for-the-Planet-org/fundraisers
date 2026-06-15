@@ -410,7 +410,9 @@
         "linkedin": "LinkedIn",
         "qrCode": "QR-Code"
       },
-      "targets": {}
+      "targets": {
+        "whatsapp": "WhatsApp"
+      }
     }
   }
 }

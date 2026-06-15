@@ -1,13 +1,14 @@
 import type { ComponentType } from 'react';
 import type { ShareData } from '@/lib/share/build-share-data';
 
+import { whatsappTarget } from '@/lib/share/targets/whatsapp';
+
 /**
  * Keys under `Fundraisers.share.targets`. Kept as an explicit union so target
- * labels stay type-checked against the message catalog. Platform branches widen
- * this union (e.g. `'whatsapp' | 'linkedin'`) and add the matching locale key;
- * the base groundwork ships no targets, so it is `never`.
+ * labels stay type-checked against the message catalog. Add a key here (and to
+ * the locale files) when adding a platform target.
  */
-export type ShareTargetLabelKey = never;
+export type ShareTargetLabelKey = 'whatsapp';
 
 /**
  * A share destination shown in the in-app share menu — the fallback surface
@@ -28,4 +29,4 @@ export interface ShareTarget {
   run: (data: ShareData) => void | Promise<void>;
 }
 
-export const SHARE_TARGETS: ShareTarget[] = [];
+export const SHARE_TARGETS: ShareTarget[] = [whatsappTarget];
