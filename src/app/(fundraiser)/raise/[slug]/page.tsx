@@ -5,42 +5,18 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
+import {
+  buildShareText,
+  getShareDescription,
+  SHARE_TEXT_SOURCE,
+} from '@/lib/share/share-text';
+import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
-import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
-const MAX_METADATA_DESCRIPTION_LENGTH = 200;
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
-
-function getMetadataDescription(
-  description: string | null | undefined
-): string | undefined {
-  if (!description) {
-    return undefined;
-  }
-
-  const plainTextDescription = getRichTextTextContent(description);
-  if (!plainTextDescription) {
-    return undefined;
-  }
-
-  if (plainTextDescription.length <= MAX_METADATA_DESCRIPTION_LENGTH) {
-    return plainTextDescription;
-  }
-
-  const truncatedDescription = plainTextDescription
-    .slice(0, MAX_METADATA_DESCRIPTION_LENGTH - 3)
-    .trimEnd();
-  const lastWordBoundary = truncatedDescription.lastIndexOf(' ');
-  const readableDescription =
-    lastWordBoundary > 0
-      ? truncatedDescription.slice(0, lastWordBoundary)
-      : truncatedDescription;
-
-  return `${readableDescription}...`;
-}
 
 function getFundraiserMetadataImage(image: string | null | undefined): string {
   if (!image) {
@@ -65,6 +41,10 @@ export async function generateMetadata({
     locale,
     namespace: 'Fundraisers.metadata',
   });
+  const tShare = await getTranslations({
+    locale,
+    namespace: 'Fundraisers.share',
+  });
 
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
@@ -76,7 +56,26 @@ export async function generateMetadata({
       };
     }
 
-    const description = getMetadataDescription(fundraiser.description);
+    // SEO meta description stays the fundraiser's own description; the
+    // share/link-preview text is driven by SHARE_TEXT_SOURCE so the OG card and
+    // the native share sheet always say the same thing.
+    const description = getShareDescription(fundraiser.description);
+    const goalText =
+      fundraiser.goalAmount > 0
+        ? tShare('goalText', {
+            goal: formatCurrencyFromDecimal(
+              fundraiser.goalAmount,
+              fundraiser.currency,
+              locale
+            ),
+          })
+        : undefined;
+    const shareText =
+      buildShareText({
+        source: SHARE_TEXT_SOURCE,
+        description: fundraiser.description,
+        goalText,
+      }) ?? fundraiser.title;
     const canonicalUrl = getFundraiserUrl({
       id: fundraiser.id,
       slug: fundraiser.slug || fundraiser.hid,
@@ -91,7 +90,7 @@ export async function generateMetadata({
       },
       openGraph: {
         title: fundraiser.title,
-        description,
+        description: shareText,
         type: 'website',
         url: canonicalUrl,
         images: [
@@ -106,7 +105,7 @@ export async function generateMetadata({
       twitter: {
         card: 'summary_large_image',
         title: fundraiser.title,
-        description,
+        description: shareText,
         images: [imageUrl],
       },
     };

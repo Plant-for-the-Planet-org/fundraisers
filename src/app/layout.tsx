@@ -10,6 +10,7 @@ import {
 import { headers } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
+import { SITE_URL } from '@/lib/constants/app-config';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
@@ -48,6 +49,12 @@ const roboto = Roboto({
 });
 
 async function getMetadataBase(): Promise<URL> {
+  // Prefer an explicit public origin so OG/canonical URLs are correct in prod
+  // regardless of proxy header config; fall back to request headers, then local.
+  if (SITE_URL) {
+    return new URL(SITE_URL);
+  }
+
   const headersList = await headers();
   const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
   const protocol =

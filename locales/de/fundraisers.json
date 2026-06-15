@@ -396,6 +396,13 @@
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+    },
+    "share": {
+      "label": "Teilen",
+      "title": "Diesen Spendenaufruf teilen",
+      "description": "Hilf mit, ihn bekannt zu machen",
+      "goalText": "Hilf, {goal} zu erreichen",
+      "targets": {}
     }
   }
 }

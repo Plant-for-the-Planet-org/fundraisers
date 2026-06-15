@@ -396,6 +396,13 @@
       "copiedLabel": "Copied!",
       "successToast": "Link copied!",
       "errorToast": "Could not copy link. Please copy the URL manually."
+    },
+    "share": {
+      "label": "Share",
+      "title": "Share this fundraiser",
+      "description": "Help spread the word",
+      "goalText": "Help reach {goal}",
+      "targets": {}
     }
   }
 }

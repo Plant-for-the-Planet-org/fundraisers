@@ -24,10 +24,10 @@ import { SectionHeader } from '@/components/fundraisers/typography';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { CopyLinkButton } from './copy-link-button';
 import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
 import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
 import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
+import { ShareButton } from './share/share-button';
 
 export function FundraiserView({
   fundraiser,
@@ -105,17 +105,19 @@ export function FundraiserView({
         )}
 
         <div className='md:hidden flex flex-col'>
-          {/** Copy link */}
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+          {/** Share */}
+          {fundraiser.visibility === 'public' && (
+            <ShareButton fundraiser={fundraiser} />
+          )}
         </div>
 
         {/* Hosts */}
         <Hosts mode='display' fundraiser={fundraiser} />
 
-        {/** Copy link */}
+        {/** Share */}
         {fundraiser.visibility === 'public' && (
           <div className='hidden md:block mt-3'>
-            <CopyLinkButton />
+            <ShareButton fundraiser={fundraiser} />
           </div>
         )}
       </SidebarPanel>
