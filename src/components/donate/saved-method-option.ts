@@ -11,6 +11,9 @@ type PaymentMethodsTranslator = ReturnType<
   typeof useTranslations<'Fundraisers.donate.paymentMethods'>
 >;
 
+/** Saved-method types that can be reused as a donation source. */
+type ReusableMethodType = 'card' | 'sepa_debit';
+
 /**
  * A saved card/SEPA method translated from the platform API into a
  * presentation-ready option the donate UI renders and pre-selects.
@@ -21,7 +24,7 @@ type PaymentMethodsTranslator = ReturnType<
  */
 export interface SavedMethodOption {
   id: string;
-  typeId: 'card' | 'sepa_debit';
+  typeId: ReusableMethodType;
   brand: string | null;
   last4: string;
   expiryDate: string | null;
@@ -35,7 +38,7 @@ export interface SavedMethodOption {
 // Only card and SEPA saved methods can be reused as a donation source, so the
 // option is built from this narrowed shape.
 type ReusableSavedMethod = ProfilePaymentMethod & {
-  type: 'card' | 'sepa_debit';
+  type: ReusableMethodType;
 };
 
 function toOption(
@@ -80,7 +83,7 @@ function toOption(
 export function buildSavedMethodOptions(
   methods: ProfilePaymentMethod[],
   options: {
-    isTypeAvailable: (type: 'card' | 'sepa_debit') => boolean;
+    isTypeAvailable: (type: ReusableMethodType) => boolean;
     t: PaymentMethodsTranslator;
   }
 ): SavedMethodOption[] {
