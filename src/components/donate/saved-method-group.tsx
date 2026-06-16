@@ -65,7 +65,7 @@ export function SavedMethodGroup({
   // the generic method label keeps the option labelled even if a new reusable
   // type is added before its copy lands.
   const newMethodLabel = newMethodTranslationKey
-    ? t(newMethodTranslationKey as never)
+    ? t(newMethodTranslationKey)
     : method.label;
 
   return (
