@@ -49,9 +49,12 @@ export function PaymentMethods() {
     pickPreferredSaved,
     lastUsedMethodId,
     savedMethodsReady,
-    feeCollectionEnabled,
+    showMethodFees,
     isSubscription,
   } = usePaymentMethodOptions();
+
+  // Reference to the form section so we can scroll to it.
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (visibleMethodOptions.length === 0) return;
@@ -165,9 +168,6 @@ export function PaymentMethods() {
     [pickPreferredSaved, handleMethodSelect, handleSavedMethodSelect]
   );
 
-  // Reference to the form section so we can scroll to it.
-  const formSectionRef = useRef<HTMLDivElement>(null);
-
   // When the user selects a new payment method, show the form, scroll to it,
   // and move focus into its first field.
   const handleNewMethodSelect = useCallback(
@@ -218,10 +218,10 @@ export function PaymentMethods() {
       <div className='border border-border rounded-lg'>
         <div className='space-y-3 p-4'>
           {visibleMethodOptions.map(method => {
-            const savedForMethod = savedByType.get(method.id);
+            const savedInstancesForMethod = savedByType.get(method.id);
 
             // No saved methods for this type — render the option on its own.
-            if (!savedForMethod) {
+            if (!savedInstancesForMethod) {
               // A generic option is only "selected" when no saved method is
               // active — a saved card and the generic card share the same id.
               const isGenericSelected =
@@ -234,7 +234,7 @@ export function PaymentMethods() {
                   methodLabel={method.label}
                   methodLogo={method.logo}
                   isSelected={isGenericSelected}
-                  showFeeDetails={feeCollectionEnabled}
+                  showFeeDetails={showMethodFees}
                   methodFeeText={method.feeText}
                   methodFeeTooltip={method.feeTooltip}
                   lastUsedLabel={method.lastUsedLabel}
@@ -249,11 +249,11 @@ export function PaymentMethods() {
               <SavedMethodGroup
                 key={method.id}
                 method={method}
-                savedForMethod={savedForMethod}
+                savedInstancesForMethod={savedInstancesForMethod}
                 selectedSavedMethodId={selectedSavedMethodId}
                 selectedPaymentMethod={selectedPaymentMethod}
                 isSubscription={isSubscription}
-                feeCollectionEnabled={feeCollectionEnabled}
+                showFeeDetails={showMethodFees}
                 onSavedMethodSelect={handleSavedMethodSelect}
                 onNewMethodSelect={handleNewMethodSelect}
                 onSavedGroupSelect={handleSavedGroupSelect}

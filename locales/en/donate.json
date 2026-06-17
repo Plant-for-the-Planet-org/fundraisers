@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate"
+      "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
+      "emailPreview": {
+        "greeting": "Dear {recipientName},",
+        "intro": "{donor} has gifted their contribution of {amount} to you.",
+        "certificate": "Download your personal certificate.",
+        "messageFrom": "Here's a message from {sender}:",
+        "signature": "All the best,\nYour Plant-for-the-Planet team",
+        "donorFallback": "the donor"
+      }
     },
     "errors": {
       "zipCode": {
@@ -181,6 +189,14 @@
         "paymentIntentNotReturned": "Payment intent not returned"
       }
     },
+    "applePay": {
+      "unavailable": "Apple Pay is not available in this browser. Try Safari on macOS or iOS, or scan the QR code prompt with your iPhone.",
+      "processing": "Processing Apple Pay donation…"
+    },
+    "googlePay": {
+      "unavailable": "Google Pay is not available in this browser. Try Chrome on Android, or choose a different payment method.",
+      "processing": "Processing Google Pay donation…"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
@@ -196,6 +212,7 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {

@@ -58,17 +58,16 @@ export type PaymentSource =
   | PayPalPaymentSource
   | OfflinePaymentSource;
 
-export type StripePaymentMethod =
-  | 'card'
-  | 'sepa_debit'
-  | 'apple_pay'
-  | 'google_pay';
+export type StripePaymentMethod = 'card' | 'sepa_debit';
+
+export type StripeWallet = 'apple_pay' | 'google_pay';
 
 // Payment request structure sent to API — discriminated union on `gateway`
 interface StripePaymentRequest {
   gateway: 'stripe';
   account: string;
   method: StripePaymentMethod;
+  wallet?: StripeWallet;
   source: StripePaymentSource;
   savedMethod?: string; // TODO: confirm saved payment method structure with backend
 }

@@ -256,7 +256,9 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_blockquote]:my-4
+          [&_.ProseMirror_blockquote]:my-3
+          [&_.ProseMirror_blockquote]:py-2
+          [&_.ProseMirror_blockquote]:ml-4
           [&_.ProseMirror_blockquote]:pl-4
           [&_.ProseMirror_blockquote]:border-l-4
           [&_.ProseMirror_blockquote]:border-l-border

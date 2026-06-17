@@ -7,6 +7,7 @@
     "npm": "11.x"
   },
   "scripts": {
+    "dev-https": "next dev --experimental-https",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -86,8 +87,8 @@
     "src/**/*.{json,css,md}": "prettier --write"
   },
   "validate-branch-name": {
-    "pattern": "^(main|develop){1}$|^(feature|fix|hotfix|chore|docs)/[a-z0-9-_]+$",
-    "errorMsg": "Invalid branch name. \n 1.Branch names can contain lowercase characters, numbers, hyphen and underscore. \n 2.Except for 'main' and 'develop', branch names must begin with 'feature/', 'fix/', 'hotfix/', 'chore/', or 'docs/'"
+    "pattern": "^(main|develop){1}$|^(feature|fix|hotfix|chore|docs|refactor)/[a-z0-9-_]+$",
+    "errorMsg": "Invalid branch name. \n 1.Branch names can contain lowercase characters, numbers, hyphen and underscore. \n 2.Except for 'main' and 'develop', branch names must begin with 'feature/', 'fix/', 'hotfix/', 'chore/', 'docs/', or 'refactor/'"
   },
   "optionalDependencies": {
     "@parcel/watcher-linux-x64-glibc": "^2.5.6"

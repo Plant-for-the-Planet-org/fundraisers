@@ -33,6 +33,7 @@
         "topDonations": "Top-Spenden",
         "topDonors": "Top-Spender"
       },
+      "demoData": "(*Demodaten - nur zur Vorschau)",
       "viewAll": "Alle anzeigen",
       "emptyState": "Keine Spenden zum anzeigen",
       "viewAllOverlay": {

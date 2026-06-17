@@ -11,17 +11,20 @@ type PaymentMethodsTranslator = ReturnType<
   typeof useTranslations<'Fundraisers.donate.paymentMethods'>
 >;
 
+/** Saved-method types that can be reused as a donation source. */
+type ReusableMethodType = 'card' | 'sepa_debit';
+
 /**
  * A saved card/SEPA method translated from the platform API into a
- * presentation-ready shape the donate UI renders and pre-selects.
+ * presentation-ready option the donate UI renders and pre-selects.
  *
  * This is the donate feature's domain view of a saved payment method: it
  * carries display-ready fields (formatted expiry, derived expiry flags,
  * localized aria labels) rather than the raw `ProfilePaymentMethod` API shape.
  */
-export interface SavedMethodViewModel {
+export interface SavedMethodOption {
   id: string;
-  typeId: 'card' | 'sepa_debit';
+  typeId: ReusableMethodType;
   brand: string | null;
   last4: string;
   expiryDate: string | null;
@@ -33,15 +36,15 @@ export interface SavedMethodViewModel {
 }
 
 // Only card and SEPA saved methods can be reused as a donation source, so the
-// view model is built from this narrowed shape.
+// option is built from this narrowed shape.
 type ReusableSavedMethod = ProfilePaymentMethod & {
-  type: 'card' | 'sepa_debit';
+  type: ReusableMethodType;
 };
 
-function toViewModel(
+function toOption(
   method: ReusableSavedMethod,
   t: PaymentMethodsTranslator
-): SavedMethodViewModel {
+): SavedMethodOption {
   const expiry =
     method.type === 'card'
       ? getExpiryInfo(method.expires)
@@ -70,26 +73,26 @@ function toViewModel(
 }
 
 /**
- * Translates the platform's saved payment methods into view models for the
+ * Translates the platform's saved payment methods into options for the
  * donate UI.
  *
  * Keeps only reusable card/SEPA types that are available for this donation
  * (e.g. SEPA is dropped for non-EUR currencies), and drops expired cards —
  * they can't be charged, so showing a disabled, unusable row adds no value.
  */
-export function buildSavedMethodViewModels(
+export function buildSavedMethodOptions(
   methods: ProfilePaymentMethod[],
   options: {
-    isTypeAvailable: (type: 'card' | 'sepa_debit') => boolean;
+    isTypeAvailable: (type: ReusableMethodType) => boolean;
     t: PaymentMethodsTranslator;
   }
-): SavedMethodViewModel[] {
+): SavedMethodOption[] {
   return methods
     .filter(
       (m): m is ReusableSavedMethod =>
         (m.type === 'card' || m.type === 'sepa_debit') &&
         options.isTypeAvailable(m.type)
     )
-    .map(m => toViewModel(m, options.t))
-    .filter(vm => !vm.isExpired);
+    .map(m => toOption(m, options.t))
+    .filter(option => !option.isExpired);
 }

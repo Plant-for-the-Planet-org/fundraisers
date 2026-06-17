@@ -43,25 +43,16 @@ export function DashboardSummary({
     );
   }
 
-  const totalRaised = summary.totalRaisedByCurrency;
-  const dominant = totalRaised[0];
-  const extraCurrencies = totalRaised.length - 1;
+  const { consolidatedTotalRaised } = summary;
 
-  const totalRaisedValue = dominant
+  const totalRaisedValue = consolidatedTotalRaised
     ? formatCurrencyFromDecimal(
-        dominant.totalRaised,
-        dominant.currency,
+        consolidatedTotalRaised.amount,
+        consolidatedTotalRaised.currency,
         locale,
-        {
-          compact: true,
-        }
+        { compact: true }
       )
     : t('totalRaised.empty');
-
-  const totalRaisedHelper =
-    extraCurrencies > 0
-      ? t('totalRaised.moreCurrencies', { count: extraCurrencies })
-      : t('totalRaised.helper');
 
   const fundraisersHelper = t.rich('fundraisers.activeStatus', {
     count: summary.activeFundraiserCount,
@@ -82,7 +73,7 @@ export function DashboardSummary({
       <SummaryStatCard
         label={t('totalRaised.label')}
         value={totalRaisedValue}
-        helper={totalRaisedHelper}
+        helper={t('totalRaised.helper')}
       />
       <SummaryStatCard
         label={t('donations.label')}

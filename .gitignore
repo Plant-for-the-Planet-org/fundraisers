@@ -50,3 +50,5 @@ locales/**/*.d.json.ts
 # Claude Code
 .claude/settings.local.json
 .claude/worktrees/
+
+certificates

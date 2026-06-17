@@ -2,7 +2,7 @@ import type {
   PaymentData,
   PaymentMethod,
   PaymentRequest,
-  StripePaymentMethod,
+  StripeWallet,
 } from '../types/payment';
 import type { PaymentOptions } from '../types/payment-options';
 
@@ -32,11 +32,36 @@ function getGatewayForPaymentMethod(
     case 'bank_transfer':
       return 'offline';
     default:
+      // planet_cash is handled by submitPrepaidDonation and never reaches here.
       throw new PaymentOptionsError(
         `Unknown payment method: ${paymentMethod}`,
         'UNKNOWN_PAYMENT_METHOD',
         400
       );
+  }
+}
+
+// Wallets ride on top of `card` over the wire (Stripe SDK requirement), but we
+// keep the per-wallet id for the allowlist check so card can be enabled without
+// also enabling Apple Pay / Google Pay.
+// Only called inside `case 'stripe':` in buildPaymentRequest — non-Stripe methods never reach it.
+function getStripeMethodName(
+  paymentMethod: PaymentMethod
+): 'card' | 'sepa_debit' {
+  if (paymentMethod === 'apple_pay' || paymentMethod === 'google_pay') {
+    return 'card';
+  }
+  return paymentMethod as 'card' | 'sepa_debit';
+}
+
+function getWallet(paymentMethod: PaymentMethod): StripeWallet | undefined {
+  switch (paymentMethod) {
+    case 'apple_pay':
+      return 'apple_pay';
+    case 'google_pay':
+      return 'google_pay';
+    default:
+      return undefined;
   }
 }
 
@@ -62,7 +87,8 @@ export function buildPaymentRequest(
 
     if ('methods' in gatewayConfig) {
       // The offline gateway exposes its method as 'offline' (the gateway name),
-      // not 'bank_transfer'. Stripe and PayPal use the same id we do.
+      // not 'bank_transfer'. Stripe and PayPal use the same id we do — including
+      // 'apple_pay' / 'google_pay', which are gated independently of 'card'.
       const apiMethodName =
         paymentMethod === 'bank_transfer' ? 'offline' : paymentMethod;
       if (!gatewayConfig.methods.includes(apiMethodName)) {
@@ -92,12 +118,12 @@ export function buildPaymentRequest(
             400
           );
         }
+        const wallet = getWallet(paymentMethod);
         return {
           gateway: 'stripe',
           account,
-          // Internal ids align with `StripePaymentMethod` after the snake_case
-          // migration; no remapping needed.
-          method: paymentMethod as StripePaymentMethod,
+          method: getStripeMethodName(paymentMethod),
+          ...(wallet ? { wallet } : {}),
           source: { id: String(id), object: 'payment_method' },
         };
       }

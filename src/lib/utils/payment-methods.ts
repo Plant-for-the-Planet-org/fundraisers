@@ -10,6 +10,10 @@ import {
   normalizePaymentToken,
 } from '@/lib/utils/payment-method-normalizer';
 import { getProcessingFee } from '@/lib/utils/processing-fees';
+import {
+  isApplePayEnabled,
+  isGooglePayEnabled,
+} from '@/lib/utils/wallet-payment-flags';
 
 export const PROVIDER_DISPLAY_NAMES: Partial<
   Record<PaymentMethodProvider, string>
@@ -161,6 +165,12 @@ export function derivePaymentMethods(
     if (
       !isMethodAllowedForCurrency(resolvedMethod.methodId, context.currency)
     ) {
+      continue;
+    }
+    if (resolvedMethod.methodId === 'apple_pay' && !isApplePayEnabled()) {
+      continue;
+    }
+    if (resolvedMethod.methodId === 'google_pay' && !isGooglePayEnabled()) {
       continue;
     }
 

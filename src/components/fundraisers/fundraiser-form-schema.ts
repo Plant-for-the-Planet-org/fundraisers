@@ -353,7 +353,30 @@ export function fundraiserToFormValues(
           ...fundraiser.settings?.modules?.leaderboard,
         },
         bundle: { slug: bundleSlug },
-        stage: fundraiser.settings?.modules?.stage ?? null,
+        stage: (() => {
+          const raw = fundraiser.settings?.modules?.stage;
+          if (!raw) return null;
+          return {
+            enabled: raw.enabled ?? true,
+            locale: (['en', 'de'] as const).includes(raw.locale as 'en' | 'de')
+              ? (raw.locale as 'en' | 'de')
+              : ('en' as const),
+            title: raw.title ?? '',
+            description: raw.description ?? '',
+            partner_logo_url: raw.partner_logo_url ?? '',
+            slides: (raw.slides ?? []).map((slide, i) => ({
+              position: slide.position ?? i + 1,
+              title: slide.title ?? '',
+              description: slide.description ?? '',
+              image: slide.image ?? '',
+              duration:
+                typeof slide.duration === 'number' &&
+                Number.isFinite(slide.duration)
+                  ? Math.min(60, Math.max(1, Math.round(slide.duration)))
+                  : 8,
+            })),
+          };
+        })(),
         thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
           enabled: false,
           message: '',

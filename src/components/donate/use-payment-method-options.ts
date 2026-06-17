@@ -5,7 +5,7 @@ import type {
   PaymentMethodId,
 } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
-import type { SavedMethodViewModel } from '@/components/donate/saved-method-view-model';
+import type { SavedMethodOption } from '@/components/donate/saved-method-option';
 
 import { useCallback, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -22,7 +22,7 @@ import {
   METHOD_TRANSLATION_KEYS,
   PROVIDER_TRANSLATION_KEYS,
 } from '@/components/donate/payment-methods-helpers';
-import { buildSavedMethodViewModels } from '@/components/donate/saved-method-view-model';
+import { buildSavedMethodOptions } from '@/components/donate/saved-method-option';
 import { useSavedPaymentMethods } from '@/components/donate/use-saved-payment-methods';
 
 /**
@@ -43,19 +43,19 @@ export interface UsePaymentMethodOptionsResult {
   /** Generic methods (card, SEPA, PayPal, …) shaped for rendering. */
   visibleMethodOptions: VisibleMethodOption[];
   /** Flat list of usable saved methods (expired ones removed). */
-  savedMethodOptions: SavedMethodViewModel[];
+  savedMethodOptions: SavedMethodOption[];
   /** Saved methods grouped under their parent type id. */
-  savedByType: Map<PaymentMethodId, SavedMethodViewModel[]>;
+  savedByType: Map<PaymentMethodId, SavedMethodOption[]>;
   /** Returns the saved method to auto-select for a given method id. */
   pickPreferredSaved: (
     methodId: PaymentMethodId
-  ) => SavedMethodViewModel | undefined;
+  ) => SavedMethodOption | undefined;
   /** The donor's last-used method, when it is supported. */
   lastUsedMethodId: PaymentMethodId | null;
   /** Whether the saved-methods fetch has settled. */
   savedMethodsReady: boolean;
-  /** Whether processing-fee details should be shown. */
-  feeCollectionEnabled: boolean;
+  /** Whether processing-fee details should be shown (fee collection enabled and one-time donation). */
+  showMethodFees: boolean;
   /** Whether this donation is recurring (frequency or "make monthly"). */
   isSubscription: boolean;
 }
@@ -87,6 +87,9 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   const isSubscription = donationData.frequency !== 'once' || makeMonthly;
 
   const feeCollectionEnabled = isFeeCollectionEnabled();
+  // Tied to the initially selected frequency, not isSubscription — fees stay visible when makeMonthly is toggled so the donor can still choose to cover them.
+  const showMethodFees =
+    feeCollectionEnabled && donationData.frequency === 'once';
 
   const lastUsedMethodId = useMemo<PaymentMethodId | null>(() => {
     // The offline gateway returns "offline" as the method — the normalizer maps it to "bank_transfer".
@@ -166,7 +169,7 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
 
   const savedMethodOptions = useMemo(
     () =>
-      buildSavedMethodViewModels(savedMethods, {
+      buildSavedMethodOptions(savedMethods, {
         isTypeAvailable: type => availableMethodIds.has(type),
         t,
       }),
@@ -176,7 +179,7 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   // Group saved methods under their parent type so each generic method (card /
   // SEPA) can render its saved methods nested beneath it as a subsection.
   const savedByType = useMemo(() => {
-    const map = new Map<PaymentMethodId, SavedMethodViewModel[]>();
+    const map = new Map<PaymentMethodId, SavedMethodOption[]>();
     for (const saved of savedMethodOptions) {
       const list = map.get(saved.typeId) ?? [];
       list.push(saved);
@@ -287,7 +290,7 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
     pickPreferredSaved,
     lastUsedMethodId,
     savedMethodsReady,
-    feeCollectionEnabled,
+    showMethodFees,
     isSubscription,
   };
 }

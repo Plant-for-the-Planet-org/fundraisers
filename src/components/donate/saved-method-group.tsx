@@ -1,7 +1,7 @@
 'use client';
 
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
-import type { SavedMethodViewModel } from '@/components/donate/saved-method-view-model';
+import type { SavedMethodOption } from '@/components/donate/saved-method-option';
 import type { VisibleMethodOption } from '@/components/donate/use-payment-method-options';
 
 import { useTranslations } from 'next-intl';
@@ -20,15 +20,15 @@ interface SavedMethodGroupProps {
   /** The generic payment method this group is built around (card / SEPA). */
   method: VisibleMethodOption;
   /** Saved instances of `method`, already filtered and shaped for rendering. */
-  savedForMethod: SavedMethodViewModel[];
+  savedInstancesForMethod: SavedMethodOption[];
   /** The currently selected saved-method id; '' when none is active. */
   selectedSavedMethodId: string;
   /** The currently selected generic payment method id. */
   selectedPaymentMethod: PaymentMethodId;
   /** Whether this donation is recurring (drives the expiring-soon hint). */
   isSubscription: boolean;
-  /** Whether processing-fee details should be shown. */
-  feeCollectionEnabled: boolean;
+  /** Whether processing-fee details should be shown for this donation. */
+  showFeeDetails: boolean;
   /** Called when a saved method row is chosen. */
   onSavedMethodSelect: (savedMethodId: string, typeId: PaymentMethodId) => void;
   /** Called when the "use a new …" row is chosen. */
@@ -44,11 +44,11 @@ interface SavedMethodGroupProps {
  */
 export function SavedMethodGroup({
   method,
-  savedForMethod,
+  savedInstancesForMethod,
   selectedSavedMethodId,
   selectedPaymentMethod,
   isSubscription,
-  feeCollectionEnabled,
+  showFeeDetails,
   onSavedMethodSelect,
   onNewMethodSelect,
   onSavedGroupSelect,
@@ -62,7 +62,7 @@ export function SavedMethodGroup({
 
   // Clicking the header selects the preferred saved method.
   // If a saved method is already selected, preserve that choice.
-  const hasSelectedSavedInGroup = savedForMethod.some(
+  const hasSelectedSavedInGroup = savedInstancesForMethod.some(
     s => s.id === selectedSavedMethodId
   );
   const handleHeaderSelect = () => {
@@ -95,8 +95,8 @@ export function SavedMethodGroup({
         >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
           {HeaderLogo && (
-            <div className='flex h-5 w-12 shrink-0 items-center justify-center'>
-              <HeaderLogo textColor='#4d5153' />
+            <div className='flex h-4 w-12 shrink-0 items-center justify-center text-muted-foreground'>
+              <HeaderLogo textColor='currentColor' />
             </div>
           )}
           <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
@@ -108,7 +108,7 @@ export function SavedMethodGroup({
             )}
           </div>
         </button>
-        {feeCollectionEnabled && method.feeText && (
+        {showFeeDetails && method.feeText && (
           <MethodFeeDetails
             feeText={method.feeText}
             feeTooltip={method.feeTooltip}
@@ -117,7 +117,7 @@ export function SavedMethodGroup({
       </div>
       <div className='space-y-2 p-3'>
         <div className='space-y-2 pl-6'>
-          {savedForMethod.map(saved => {
+          {savedInstancesForMethod.map(saved => {
             // Warn right under the card it refers to — but only when
             // it's selected for a recurring donation, where a later
             // charge could fail once the card lapses.
