@@ -153,6 +153,21 @@ export function PaymentMethods() {
     [setValue]
   );
 
+  // Clicking the payment method group selects the preferred saved method.
+  // Expiring cards are skipped. If no valid saved method exists, users can
+  // enter new payment details.
+  const handleSavedGroupSelect = useCallback(
+    (methodId: PaymentMethodId) => {
+      const preferred = pickPreferredSaved(methodId);
+      if (!preferred) {
+        handleMethodSelect(methodId);
+        return;
+      }
+      handleSavedMethodSelect(preferred.id, methodId);
+    },
+    [pickPreferredSaved, handleMethodSelect, handleSavedMethodSelect]
+  );
+
   // When the user selects a new payment method, show the form, scroll to it,
   // and move focus into its first field.
   const handleNewMethodSelect = useCallback(
@@ -241,6 +256,7 @@ export function PaymentMethods() {
                 showFeeDetails={showMethodFees}
                 onSavedMethodSelect={handleSavedMethodSelect}
                 onNewMethodSelect={handleNewMethodSelect}
+                onSavedGroupSelect={handleSavedGroupSelect}
               />
             );
           })}
