@@ -18,7 +18,7 @@ export type PaymentLogoProps = {
   textColor?: string;
 };
 
-export const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
+export const METHOD_TRANSLATION_KEYS = {
   bank_transfer: 'methods.bankTransfer',
   paypal: 'methods.paypal',
   card: 'methods.card',
@@ -26,28 +26,25 @@ export const METHOD_TRANSLATION_KEYS: Record<PaymentMethodId, string> = {
   apple_pay: 'methods.applePay',
   google_pay: 'methods.googlePay',
   planet_cash: 'methods.planetCash',
-};
+} as const satisfies Record<PaymentMethodId, string>;
 
 // Translation keys for the "use a new ..." option shown under saved methods.
 //
 // Add a key when supporting a new reusable payment method type so the
 // correct label is shown for its nested "new method" option.
 export const NEW_METHOD_TRANSLATION_KEYS: Partial<
-  Record<PaymentMethodId, string>
+  Record<PaymentMethodId, 'saved.newCard' | 'saved.newSepa'>
 > = {
   card: 'saved.newCard',
   sepa_debit: 'saved.newSepa',
 };
 
-export const PROVIDER_TRANSLATION_KEYS: Record<
-  DerivedPaymentMethod['provider'],
-  string
-> = {
+export const PROVIDER_TRANSLATION_KEYS = {
   stripe: 'providers.stripe',
   paypal: 'providers.paypal',
   offline: 'providers.offline',
   planetcash: 'providers.planetcash',
-};
+} as const satisfies Record<DerivedPaymentMethod['provider'], string>;
 
 export const METHOD_LOGOS: Record<
   PaymentMethodId,

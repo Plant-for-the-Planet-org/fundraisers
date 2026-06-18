@@ -100,14 +100,13 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
-    (methodId: PaymentMethodId) =>
-      t(METHOD_TRANSLATION_KEYS[methodId] as never),
+    (methodId: PaymentMethodId) => t(METHOD_TRANSLATION_KEYS[methodId]),
     [t]
   );
 
   const getProviderLabel = useCallback(
     (provider: DerivedPaymentMethod['provider']) =>
-      t(PROVIDER_TRANSLATION_KEYS[provider] as never),
+      t(PROVIDER_TRANSLATION_KEYS[provider]),
     [t]
   );
 
