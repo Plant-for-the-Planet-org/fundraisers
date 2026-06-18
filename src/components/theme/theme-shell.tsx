@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { getAccentColor } from '@/lib/theme/accent-utils';
+import { shouldBlurForPathname } from '@/lib/theme/backdrop-blur-routes';
 import {
   DEFAULT_PATTERN_TILE,
   LOGO_LIBRARY,
@@ -33,9 +34,11 @@ function safeCssUrl(src: string): string | null {
 export function ThemeShell({
   children,
   initialTheme,
+  blurMainContentBackdrop = false,
 }: {
   children: ReactNode;
   initialTheme?: Theme;
+  blurMainContentBackdrop?: boolean;
 }) {
   const pathname = usePathname();
   const { selectedTheme, setSelectedTheme } = useThemeStore();
@@ -67,6 +70,8 @@ export function ThemeShell({
   const bg = activeTheme.bg;
   // Empty string = no gradient.
   const gradientClass = bg.gradient;
+  const shouldBlurMainContentBackdrop =
+    blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
   return (
     <div
@@ -106,8 +111,84 @@ export function ThemeShell({
       {bg.animation !== 'none' && (
         <AnimationOverlay animation={bg.animation} mode={activeTheme.mode} />
       )}
+      {shouldBlurMainContentBackdrop && <MainContentBackdropBlur />}
       <div className='relative z-10 flex flex-col min-h-screen'>{children}</div>
     </div>
+  );
+}
+
+function MainContentBackdropBlur() {
+  const layerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = document.querySelector<HTMLElement>(
+      '[data-main-content-surface]'
+    );
+    const layer = layerRef.current;
+    if (!target || !layer) return;
+
+    const targetElement: HTMLElement = target;
+    const blurLayer: HTMLDivElement = layer;
+    let frameId = 0;
+
+    function updateClipPath() {
+      frameId = 0;
+
+      const rect = targetElement.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const isVisible =
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.top < viewportHeight &&
+        rect.left < viewportWidth;
+
+      if (!isVisible) {
+        blurLayer.style.clipPath = 'inset(100% 0 0 0)';
+        return;
+      }
+
+      const top = Math.max(0, Math.min(viewportHeight, rect.top));
+      const right = Math.max(
+        0,
+        viewportWidth - Math.min(viewportWidth, rect.right)
+      );
+      const bottom = Math.max(
+        0,
+        viewportHeight - Math.min(viewportHeight, rect.bottom)
+      );
+      const left = Math.max(0, Math.min(viewportWidth, rect.left));
+
+      blurLayer.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round 1rem)`;
+    }
+
+    function scheduleUpdate() {
+      if (frameId === 0) {
+        frameId = requestAnimationFrame(updateClipPath);
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(targetElement);
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    updateClipPath();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={layerRef}
+      className='fixed inset-0 z-[6] pointer-events-none backdrop-blur-[10px]'
+      style={{ clipPath: 'inset(100% 0 0 0)' }}
+      aria-hidden
+    />
   );
 }
 
