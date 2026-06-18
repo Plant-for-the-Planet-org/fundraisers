@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import type { BgSettings, Theme } from '@/lib/theme/types';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { getAccentColor } from '@/lib/theme/accent-utils';
@@ -20,6 +20,9 @@ import { useThemeStore } from '@/stores/theme-store';
 const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
   ssr: false,
 });
+
+const INITIAL_MAIN_CONTENT_CLIP_PATH =
+  'inset(6.5rem max(0px, calc((100vw - 60rem) / 2)) 0 round 1rem)';
 
 /**
  * Guard against CSS injection via url("...") interpolation.
@@ -120,7 +123,7 @@ export function ThemeShell({
 function MainContentBackdropBlur() {
   const layerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const target = document.querySelector<HTMLElement>(
       '[data-main-content-surface]'
     );
@@ -186,7 +189,7 @@ function MainContentBackdropBlur() {
     <div
       ref={layerRef}
       className='fixed inset-0 z-[6] pointer-events-none backdrop-blur-[10px]'
-      style={{ clipPath: 'inset(100% 0 0 0)' }}
+      style={{ clipPath: INITIAL_MAIN_CONTENT_CLIP_PATH }}
       aria-hidden
     />
   );
