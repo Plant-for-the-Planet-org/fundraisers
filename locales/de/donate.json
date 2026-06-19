@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
+      "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailPreview": {
+        "greeting": "Hallo {recipientName},",
+        "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
+        "certificate": "Lade deine Urkunde hier herunter.",
+        "messageFrom": "Hier ist eine Nachricht von {sender}:",
+        "signature": "Alles Gute,\nDein Plant-for-the-Planet Team",
+        "donorFallback": "der Spender"
+      }
     },
     "errors": {
       "zipCode": {
@@ -132,11 +140,11 @@
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
       },
       "mandateTitle": "SEPA-Lastschriftmandat",
-      "mandateIntro": "Mit der Unterschrift auf diesem Mandatsformular wird die Plant-for-the-Planet Foundation ermächtigt, deiner Bank die Anweisung zu geben, dein Konto gemäß den Weisungen der Plant-for-the-Planet Foundation zu belasten.",
+      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) Rocketship Inc. und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von Rocketship Inc. und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
       "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Gläubiger-ID",
-      "mandateRights": "Deine Rechte: Du hast Anspruch auf eine Erstattung durch deine Bank gemäß den Bedingungen deines Vertrags mit der Bank. Die Erstattung muss innerhalb von 8 Wochen ab dem Datum der Abbuchung vom Konto beantragt werden.",
+      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
       "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
       "mandateRequired": "Du musst das SEPA-Lastschriftmandat akzeptieren, um fortzufahren."
     },
@@ -181,6 +189,14 @@
         "paymentIntentNotReturned": "Zahlungsabsicht nicht zurückgegeben"
       }
     },
+    "applePay": {
+      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche Safari auf macOS oder iOS oder scanne den QR-Code mit deinem iPhone.",
+      "processing": "Verarbeitung der Spende mit Apple Pay..."
+    },
+    "googlePay": {
+      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche Chrome auf Android oder wähle eine andere Zahlungsmethode.",
+      "processing": "Verarbeitung der Spende mit Google Pay..."
+    },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",
       "network": "Netzwerkfehler. Überprüfe deine Internetverbindung und versuche es erneut.",
@@ -196,6 +212,7 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {
@@ -206,6 +223,8 @@
       "success": "Spende erfolgreich"
     },
     "thankYou": {
+      "hostMessageHeading": "{count, plural, one {Nachricht vom Gastgeber*in} other {Nachricht der Gastgeber*innen}}",
+      "hostMessageSignature": "- {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",
         "bankTransferPending": "Danke, dass du deine Spende überweisen möchtest",
@@ -252,7 +271,13 @@
         "iban": "IBAN",
         "bic": "BIC",
         "bank": "Bank",
-        "transactionId": "Transaktions-ID {id}",
+        "detailsTab": "Details",
+        "qrTab": "QR-Code",
+        "qrAlt": "EPC QR-Code für SEPA-Überweisung",
+        "qrBadge": "SEPA-Überweisungscode",
+        "qrHint": "Öffne deine Banking-App zum Scannen",
+        "qrCameraWarning": "Die Kamera-App deines Telefons wird nicht funktionieren. Verwende den QR-Scanner der Deutschen Bank, Sparkasse, Revolut und der meisten EU-Banking-Apps.",
+        "qrFallback": "QR-Code nicht verfügbar, verwende bitte die Registerkarte Details.",
         "error": "Überweisungsdetails nicht gefunden, bitte wende dich an <link>support@plant-for-the-planet.org</link> für weitere Unterstützung."
       },
       "copy": {

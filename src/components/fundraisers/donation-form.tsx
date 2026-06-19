@@ -13,7 +13,7 @@ import type {
 } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   GIFT_MESSAGE_MAX_LENGTH,
   RECIPIENT_EMAIL_MAX_LENGTH,
@@ -31,7 +31,7 @@ import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DonationAmounts } from './donation-amounts';
-import { DonationFrequencyDropdown } from './donation-frequency-dropdown';
+import { DonationFrequencySelect } from './donation-frequency-select';
 import { DonationGiftSection } from './donation-gift-section';
 
 interface DonationFormProps {
@@ -65,6 +65,7 @@ export function DonationForm({
   onDonate,
 }: DonationFormProps) {
   const t = useTranslations('Fundraisers.form.contributionSettings');
+  const locale = useLocale();
 
   const settings = getContributionSettings(contributionSettings);
   const availableRecurrencyOptions =
@@ -111,7 +112,7 @@ export function DonationForm({
   const getDonateButtonText = () => {
     const amount = customAmount || selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
-      ? `${formatCurrency(amount, currency)} • `
+      ? `${formatCurrency(amount, currency, locale)} • `
       : '';
 
     switch (selectedFrequency.value) {
@@ -240,7 +241,7 @@ export function DonationForm({
           {t('cardHeader')}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
-          <DonationFrequencyDropdown
+          <DonationFrequencySelect
             options={frequencyOptions}
             selectedOption={selectedFrequency}
             onOptionChange={setSelectedFrequency}

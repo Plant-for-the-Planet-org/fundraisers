@@ -50,9 +50,6 @@ export async function submitStandardPostpaidDonation({
     donationIdempotencyKey
   );
 
-  // TODO: When implementing Stripe/PayPal, populate paymentDetails from the
-  // respective payment element refs (e.g. paymentMethodId for Stripe, orderId for PayPal)
-  // and extend this branch as needed.
   const paymentData: PaymentData =
     selectedPaymentMethod === 'bank_transfer'
       ? {

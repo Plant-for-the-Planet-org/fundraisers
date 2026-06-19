@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useThemeStore } from '@/stores/theme-store';
+import { EditProjectDetailsProvider } from './bundle-selection/edit-project-details-context';
 import {
   fundraiserFormSchema,
   fundraiserToFormValues,
@@ -71,10 +72,12 @@ export function EditFundraiserFormProvider({
 
   return (
     <FormProvider {...methods}>
-      {children}
-      {DevTool !== null && (
+      <EditProjectDetailsProvider allocations={fundraiser.projectAllocations}>
+        {children}
+      </EditProjectDetailsProvider>
+      {/* {DevTool !== null && (
         <DevTool control={methods.control as unknown as Control} />
-      )}
+      )} */}
     </FormProvider>
   );
 }

@@ -24,7 +24,10 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const raised = data?.stats.raised.total ?? fundraiser.totalRaised;
+  const raised =
+    data?.stats.raised.total ??
+    fundraiser.totalRaised[fundraiser.currency] ??
+    0;
   const currency = data?.stats.raised.currency ?? fundraiser.currency;
   const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
   const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
@@ -62,8 +65,7 @@ export function StageCounter({
         return {
           value: raised,
           label: t('raisedSoFar'),
-          display: formatCurrencyFromDecimal(raised, currency, {
-            locale,
+          display: formatCurrencyFromDecimal(raised, currency, locale, {
             compact: true,
           }),
         };
@@ -102,8 +104,7 @@ export function StageCounter({
         <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
           <span>
             {t('ofGoal', {
-              goal: formatCurrencyFromDecimal(goal, currency, {
-                locale,
+              goal: formatCurrencyFromDecimal(goal, currency, locale, {
                 compact: true,
               }),
             })}
@@ -168,8 +169,7 @@ export function StageCounter({
               className='text-[22px] font-bold'
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              {formatCurrencyFromDecimal(raised, currency, {
-                locale,
+              {formatCurrencyFromDecimal(raised, currency, locale, {
                 compact: true,
               })}
             </span>

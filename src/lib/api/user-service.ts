@@ -88,6 +88,23 @@ export interface UserProfileResponse {
   };
 }
 
+export type ProfilePaymentMethodType =
+  | 'card'
+  | 'sepa_debit'
+  | 'paypal'
+  | 'apple_pay'
+  | 'google_pay'
+  | 'bank_transfer';
+
+export interface ProfilePaymentMethod {
+  id: string;
+  type: ProfilePaymentMethodType;
+  brand?: string | null;
+  expires?: string | null;
+  last4: string;
+  isDefault: boolean;
+}
+
 export class UserService {
   /**
    * Get user profile
@@ -96,6 +113,24 @@ export class UserService {
    */
   async getProfile(token: string): Promise<UserProfileResponse> {
     return platformFetch<UserProfileResponse>('/profile', { token });
+  }
+
+  /**
+   * Get the payment methods available to the authenticated user for a country.
+   * GET /profile/paymentMethods/{country}
+   *
+   * Always resolves to an array — the platform returns one, but we normalize
+   * defensively so callers never have to guard against a non-array body.
+   */
+  async getPaymentMethods(
+    token: string,
+    country: string
+  ): Promise<ProfilePaymentMethod[]> {
+    const methods = await platformFetch<ProfilePaymentMethod[]>(
+      `/profile/paymentMethods/${country}`,
+      { token }
+    );
+    return Array.isArray(methods) ? methods : [];
   }
 
   /**

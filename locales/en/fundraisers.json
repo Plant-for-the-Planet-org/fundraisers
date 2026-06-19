@@ -8,9 +8,10 @@
     "hostedByWithOthers": "by {hostName} and {othersCount, plural, one {1 other} other {# others}}",
     "hostedByAnonymous": "by an anonymous host",
     "unknownHost": "Unknown",
-    "anonymousHost": "Anonymous host",
+    "anonymousHost": "{count, plural, one {Anonymous host} other {Anonymous hosts}}",
     "coverImageAlt": "Cover image for {title}",
     "donationCountLabel": "Donation count",
+    "demoData": "*Demo data - only for preview",
     "amountRaisedLabel": "Amount raised",
     "hostedByLabel": "Hosted by",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { and # other} other { and # others}}",
@@ -52,6 +53,16 @@
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
         "bankTransferRemark": "Please set up a standing order with your bank.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand} card ending in {last4}",
+          "sepaLabelAria": "Bank account ending in {last4}",
+          "expiringSoon": "Expires soon",
+          "expiringSoonRecurringHint": "This card expires soon. it may not work for a future monthly donation.",
+          "newCard": "Use a new card",
+          "newSepa": "Use a new bank account"
+        },
         "methods": {
           "openBanking": "Pay with your Bank (Open Banking)",
           "bankTransfer": "Bank Transfer",
@@ -104,7 +115,36 @@
       "theme": {
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
-        "selectAccent": "Select {accent} accent color"
+        "selectAccent": "Select {accent} accent color",
+        "tabTheme": "Theme",
+        "tabBackground": "Background",
+        "browse": "Browse",
+        "done": "Customize",
+        "shuffle": "Shuffle",
+        "switchToDark": "Switch to dark mode",
+        "switchToLight": "Switch to light mode",
+        "labelGradient": "Gradient",
+        "labelTitleFont": "Title font",
+        "labelBodyFont": "Body font",
+        "labelAnimation": "Animation",
+        "labelDecoration": "Decoration",
+        "labelPattern": "Pattern",
+        "labelImage": "Image",
+        "labelImageMode": "Image fit",
+        "labelLogo": "Partner logo",
+        "logoContact": "Want to add your logo here? <mail>contact info@plant-for-the-planet.org</mail>",
+        "labelOpacity": "Opacity",
+        "animation_none": "None",
+        "animation_confetti": "Confetti",
+        "animation_snow": "Snow",
+        "animation_hearts": "Hearts",
+        "animation_fireworks": "Fireworks",
+        "decoration_none": "None",
+        "decoration_pattern": "Pattern",
+        "decoration_image": "Image",
+        "decoration_logo": "Logo",
+        "imageMode_cover": "Cover",
+        "imageMode_repeat": "Repeat"
       },
       "title": {
         "label": "Fundraiser title",
@@ -119,7 +159,8 @@
         "label": "Description",
         "placeholder": "Tell people about your fundraiser...",
         "errors": {
-          "required": "Please enter a fundraiser description."
+          "required": "Please enter a fundraiser description.",
+          "tooLong": "Description must be {max} characters or fewer."
         }
       },
       "image": {
@@ -143,14 +184,13 @@
         },
         "overlay": {
           "title": "Select an image",
+          "subtitle": "Or choose from <unsplashLink>Unsplash</unsplashLink>",
           "uploadTitle": "Drag and drop or click to upload",
-          "uploadSubtitle": "Or choose an image from Unsplash below",
           "searchPlaceholder": "Search images...",
           "uploadInputAria": "Upload image file"
         },
         "attribution": {
-          "photoBy": "Photo by",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Photo by <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Image must be {maxMb}MB or smaller.",
@@ -242,7 +282,32 @@
           "moveDown": "Move down",
           "removeSlide": "Remove slide",
           "imageUrlError": "Only images from trusted sources are allowed (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum {max} slides reached"
+          "maxSlidesReached": "Maximum {max} slides reached",
+          "browseTemplates": "View Templates",
+          "useTemplate": "Use template",
+          "templatesTitle": "Slide templates",
+          "templatesSubtitle": "Pick a template to fill a slide, then edit the text and image.",
+          "templatesSubtitleMulti": "Select one or more templates, then add them as slides.",
+          "addSelected": "{count, plural, =0 {Add slides} one {Add # slide} other {Add # slides}}",
+          "imageGuidelines": "Keep slide images clear in the corners. Place key text or faces in the center. The stage screen shows donation totals, titles, and other live content over the edges, which can cover anything in the corners of your image.",
+          "previewSlide": "Preview",
+          "previewClose": "Close preview",
+          "previewRaisedLabel": "Raised so far",
+          "previewQrLabel": "Scan to donate",
+          "previewTickerLabel": "Recent donations appear here"
+        },
+        "thankYouNote": {
+          "title": "Thank-You Note",
+          "subtitle": "Shown after donation and in the email sent to your donors",
+          "toggleEnabled": "Toggle Thank-You Note",
+          "messageLabel": "Write a note",
+          "editorPlaceholder": "Write your thank-you note...",
+          "suggestionsButton": "Suggestions",
+          "suggestionsTitle": "Message suggestions",
+          "suggestionsSubtitle": "Pick a ready-made message, then make it your own.",
+          "suggestionsHeading": "Suggestions",
+          "moreTemplates": "Other templates",
+          "allTemplates": "Templates"
         }
       },
       "contributionSettings": {

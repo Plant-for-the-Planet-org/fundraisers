@@ -18,6 +18,7 @@ interface LeaderboardViewProps {
   totalRecentDonationCount: number;
   totalTopDonationCount: number;
   settings: LeaderboardModuleSettings;
+  demo?: boolean;
 }
 
 export function LeaderboardView({
@@ -27,6 +28,7 @@ export function LeaderboardView({
   totalRecentDonationCount,
   totalTopDonationCount,
   settings,
+  demo = false,
 }: LeaderboardViewProps) {
   const {
     show_recent_list,
@@ -78,7 +80,14 @@ export function LeaderboardView({
             )
           }
         >
-          {sectionTitle}
+          <span className='flex items-center gap-2'>
+            {sectionTitle}
+            {demo && (
+              <span className='text-xs font-normal text-muted-foreground'>
+                {t('demoData')}
+              </span>
+            )}
+          </span>
         </SectionHeader>
 
         {show_recent_list && (

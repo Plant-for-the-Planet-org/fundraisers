@@ -69,7 +69,7 @@ export function ThankYouCard({
   return (
     <div className='overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm'>
       {/* Header band */}
-      <div className='bg-[#fdf8f0] px-6 pt-8 pb-6 text-center'>
+      <div className='bg-white px-6 pt-8 pb-6 text-center'>
         {variant === 'completed' && (
           <CircleCheckBig
             className='mx-auto mb-4 size-14 text-green-700'

@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate"
+      "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
+      "emailPreview": {
+        "greeting": "Dear {recipientName},",
+        "intro": "{donor} has gifted their contribution of {amount} to you.",
+        "certificate": "Download your personal certificate.",
+        "messageFrom": "Here's a message from {sender}:",
+        "signature": "All the best,\nYour Plant-for-the-Planet team",
+        "donorFallback": "the donor"
+      }
     },
     "errors": {
       "zipCode": {
@@ -132,11 +140,11 @@
         "paymentMethodFailed": "Payment method creation failed"
       },
       "mandateTitle": "SEPA Direct Debit Mandate",
-      "mandateIntro": "By signing this mandate form, you authorize Plant-for-the-Planet Foundation to send instructions to your bank to debit your account and your bank to debit your account in accordance with the instructions from Plant-for-the-Planet Foundation.",
+      "mandateIntro": "By providing your IBAN and confirming this payment, you authorise (A) Rocketship Inc. and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions.",
       "creditor": "Creditor",
       "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Creditor ID",
-      "mandateRights": "Your rights: You are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
+      "mandateRights": "Your rights: You’re entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
       "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
       "mandateRequired": "You must accept the SEPA Direct Debit mandate to continue"
     },
@@ -181,6 +189,14 @@
         "paymentIntentNotReturned": "Payment intent not returned"
       }
     },
+    "applePay": {
+      "unavailable": "Apple Pay is not available in this browser. Try Safari on macOS or iOS, or scan the QR code prompt with your iPhone.",
+      "processing": "Processing Apple Pay donation…"
+    },
+    "googlePay": {
+      "unavailable": "Google Pay is not available in this browser. Try Chrome on Android, or choose a different payment method.",
+      "processing": "Processing Google Pay donation…"
+    },
     "submissionErrors": {
       "authRequired": "Please log in to continue with your donation.",
       "network": "Network error. Please check your connection and try again.",
@@ -196,6 +212,7 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "cta": {
@@ -206,6 +223,8 @@
       "success": "Donation Complete"
     },
     "thankYou": {
+      "hostMessageHeading": "{count, plural, one {Message from Host} other {Message from Hosts}}",
+      "hostMessageSignature": "– {names}{remaining, plural, =0 {} one { and # other} other { and # others}}.",
       "title": {
         "completed": "Thank You for Your Donation!",
         "bankTransferPending": "Thank you for Initiating Your Donation",
@@ -252,7 +271,13 @@
         "iban": "IBAN",
         "bic": "BIC",
         "bank": "Bank",
-        "transactionId": "Transaction ID {id}",
+        "detailsTab": "Details",
+        "qrTab": "QR Code",
+        "qrAlt": "EPC QR code for SEPA bank transfer",
+        "qrBadge": "SEPA Transfer Code",
+        "qrHint": "Open your banking app to scan",
+        "qrCameraWarning": "Your phone's camera app won't work. Use the QR scanner inside Deutsche Bank, Sparkasse, Revolut, and most EU banking apps.",
+        "qrFallback": "QR code unavailable, please use the Details tab.",
         "error": "Transfer details not found, please reach out to <link>support@plant-for-the-planet.org</link> for help."
       },
       "copy": {

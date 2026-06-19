@@ -125,7 +125,8 @@ export function DonationSummary() {
                 Math.round(
                   (allocation.percentage / 100) * donationData.amountCents
                 ),
-                donationData.currency
+                donationData.currency,
+                locale
               )}
             </dd>
           </div>
@@ -138,7 +139,11 @@ export function DonationSummary() {
               })}
             </dt>
             <dd className='text-foreground text-sm font-medium'>
-              {formatCurrency(processingFeeCents, donationData.currency)}
+              {formatCurrency(
+                processingFeeCents,
+                donationData.currency,
+                locale
+              )}
             </dd>
           </div>
         )}
@@ -147,7 +152,7 @@ export function DonationSummary() {
       <div className='flex justify-between items-center gap-2 pt-4 border-t border-border'>
         <dt className='font-semibold text-foreground'>{totalLabel}</dt>
         <dd className='font-semibold text-lg text-foreground'>
-          {formatCurrency(totalCents, donationData.currency)}
+          {formatCurrency(totalCents, donationData.currency, locale)}
         </dd>
       </div>
     </dl>

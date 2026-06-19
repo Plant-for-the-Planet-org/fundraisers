@@ -5,7 +5,6 @@ import type { ProjectAllocation } from '@/lib/types/fundraiser';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { getBundleBySlug } from '@/lib/utils/bundle';
 import { getImageUrl } from '@/lib/utils/images';
 import { SectionHeader } from '@/components/fundraisers/typography';
 
@@ -72,7 +71,7 @@ function ProjectItem({ project }: ProjectItemProps) {
   );
 }
 
-interface BundleHeaderProps {
+/* interface BundleHeaderProps {
   label: string;
   tagline: string;
 }
@@ -87,40 +86,28 @@ function BundleHeader({ label, tagline }: BundleHeaderProps) {
       </span>
     </p>
   );
-}
+} */
 
 interface ProjectsSupportedDisplayProps {
   projectAllocations: ProjectAllocation[];
-  bundleSlug: string | null;
 }
 
 export function ProjectsSupportedDisplay({
   projectAllocations,
-  bundleSlug,
 }: ProjectsSupportedDisplayProps) {
   const t = useTranslations('Fundraisers.form.projectSelection');
-  const tBundles = useTranslations('Bundles');
 
-  const bundle = getBundleBySlug(bundleSlug);
+  const donationEnabledAllocations = projectAllocations?.filter(
+    ({ project }) => project.allowDonations !== false
+  );
 
-  if (!projectAllocations?.length) return null;
+  if (!donationEnabledAllocations?.length) return null;
 
   return (
     <div className='project-supported-display flex flex-col gap-3'>
-      <SectionHeader
-        actionSlot={
-          bundle && (
-            <BundleHeader
-              label={tBundles(`entries.${bundle.slug}.label`)}
-              tagline={tBundles(`entries.${bundle.slug}.tagline`)}
-            />
-          )
-        }
-      >
-        {t('viewModeSectionHeading')}
-      </SectionHeader>
+      <SectionHeader>{t('viewModeSectionHeading')}</SectionHeader>
       <ul className='space-y-4'>
-        {projectAllocations.map(({ project }) => (
+        {donationEnabledAllocations.map(({ project }) => (
           <ProjectItem key={project.id} project={project} />
         ))}
       </ul>

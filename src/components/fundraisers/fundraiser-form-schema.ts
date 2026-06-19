@@ -8,8 +8,17 @@ import type { AllowedCountry } from '@/lib/utils/country-currency';
 import { z } from 'zod';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
-import { GOAL_AMOUNT_MIN } from '@/lib/constants/fundraiser-creation';
+import {
+  DESCRIPTION_MAX_LENGTH,
+  GOAL_AMOUNT_MIN,
+} from '@/lib/constants/fundraiser-creation';
+import {
+  isValidAnimation,
+  isValidDecoration,
+  isValidImageMode,
+} from '@/lib/theme/backgrounds';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { isValidMode } from '@/lib/theme/validators';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
@@ -20,6 +29,7 @@ import {
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
 import { routing } from '@/i18n/routing';
 import { STAGE_LIMITS } from '@/modules/stage';
 
@@ -54,6 +64,9 @@ const selectedImageSchema = z.object({
 
 const projectAllocationSchema = z.object({
   project_id: z.string().trim().min(1),
+  // Every allocation must carry a real share. Non-donatable projects are
+  // dropped from the payload rather than kept at 0% (see `bundleToAllocations`),
+  // so 0% entries should never reach the API.
   percentage: z.number().int().min(1).max(100),
 });
 
@@ -93,6 +106,17 @@ const stageSlideSchema = z.object({
   duration: z.number().int().min(1).max(60),
 });
 
+export const thankYouNoteSchema = z.object({
+  enabled: z.boolean(),
+  message: z
+    .string()
+    .refine(
+      val =>
+        getRichTextTextContent(val).length <= THANK_YOU_NOTE_LIMITS.message,
+      { message: 'maxLength' }
+    ),
+});
+
 export const stageModeSchema = z.object({
   enabled: z.boolean(),
   locale: z.enum(routing.locales),
@@ -106,7 +130,10 @@ export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
   description: z
     .string()
-    .refine(value => getRichTextTextContent(value).length > 0),
+    .refine(value => getRichTextTextContent(value).length > 0)
+    .refine(
+      value => getRichTextTextContent(value).length <= DESCRIPTION_MAX_LENGTH
+    ),
   image: selectedImageSchema.nullable(),
   country: z.enum(ALLOWED_COUNTRIES),
   currency: z.enum(SUPPORTED_CURRENCIES),
@@ -122,10 +149,31 @@ export const fundraiserFormSchema = z.object({
       base_id: z.string(),
       mode: z.enum(['light', 'dark']),
       accent: z.string(),
-      background: z.string(),
       body_font: z.string(),
       title_font: z.string(),
-      animation: z.string(),
+      bg: z.object({
+        gradient: z.string(),
+        decoration: z.enum(['none', 'pattern', 'image', 'logo']),
+        pattern_id: z.string().nullable(),
+        // External URLs must use https and be from an allowed host (same list
+        // as stage images). Library keys (no https:// prefix) are passed
+        // through and validated at render time via resolveBgAsset.
+        image_url: z
+          .string()
+          .nullable()
+          .refine(
+            value => {
+              if (value === null) return true;
+              if (/^https?:\/\//i.test(value)) return isAllowedImageUrl(value);
+              return true;
+            },
+            { message: 'imageUrlNotAllowed' }
+          ),
+        image_mode: z.enum(['cover', 'repeat']),
+        logo_id: z.string().nullable(),
+        opacity: z.number().min(0.05).max(1),
+        animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'fireworks']),
+      }),
     }),
     modules: z.object({
       leaderboard: z.object({
@@ -143,6 +191,7 @@ export const fundraiserFormSchema = z.object({
         slug: z.enum(BUNDLE_SLUGS).nullable(),
       }),
       stage: stageModeSchema.nullable(),
+      thankYouNote: thankYouNoteSchema,
     }),
   }),
 });
@@ -183,15 +232,15 @@ export function buildDefaultCreateValues(
         base_id: initialTheme.id,
         mode: initialTheme.mode,
         accent: initialTheme.accent,
-        background: initialTheme.background,
         body_font: initialTheme.bodyFont,
         title_font: initialTheme.titleFont,
-        animation: initialTheme.animation ?? 'none',
+        bg: initialTheme.bg,
       },
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
+        thankYouNote: { enabled: false, message: '' },
       },
     },
   };
@@ -249,19 +298,54 @@ export function fundraiserToFormValues(
     goalAmount: fundraiser.goalAmount,
     visibility: fundraiser.visibility,
     status: fundraiser.canDonate ? 'active' : 'draft',
-    projectAllocations: fundraiser.projectAllocations.map(allocation => ({
-      project_id: allocation.project.id,
-      percentage: allocation.percentage,
-    })),
+    // Drop non-donatable projects so they are never carried back into the
+    // payload on save. Fundraisers saved under the earlier scheme stored these
+    // at 0%, so the remaining donatable shares still sum to 100.
+    projectAllocations: fundraiser.projectAllocations
+      .filter(allocation => allocation.project.allowDonations !== false)
+      .map(allocation => ({
+        project_id: allocation.project.id,
+        percentage: allocation.percentage,
+      })),
     settings: {
       theme: {
         base_id: theme.base_id ?? fallbackTheme.id,
-        mode: theme.mode ?? fallbackTheme.mode,
+        mode: isValidMode(theme.mode) ? theme.mode : fallbackTheme.mode,
         accent: theme.accent ?? fallbackTheme.accent,
-        background: theme.background ?? fallbackTheme.background,
         body_font: theme.body_font ?? fallbackTheme.bodyFont,
         title_font: theme.title_font ?? fallbackTheme.titleFont,
-        animation: theme.animation ?? fallbackTheme.animation ?? 'none',
+        bg: {
+          gradient: theme.bg?.gradient ?? fallbackTheme.bg.gradient,
+          decoration: isValidDecoration(theme.bg?.decoration)
+            ? theme.bg.decoration
+            : fallbackTheme.bg.decoration,
+          pattern_id:
+            theme.bg?.pattern_id !== undefined
+              ? theme.bg.pattern_id
+              : fallbackTheme.bg.pattern_id,
+          image_url:
+            theme.bg?.image_url !== undefined
+              ? theme.bg.image_url
+              : fallbackTheme.bg.image_url,
+          image_mode: isValidImageMode(theme.bg?.image_mode)
+            ? theme.bg.image_mode
+            : fallbackTheme.bg.image_mode,
+          logo_id:
+            theme.bg?.logo_id !== undefined
+              ? theme.bg.logo_id
+              : fallbackTheme.bg.logo_id,
+          opacity:
+            typeof theme.bg?.opacity === 'number'
+              ? Math.min(1, Math.max(0.05, theme.bg.opacity))
+              : fallbackTheme.bg.opacity,
+          // Phase 1 records stored animation at the top level (theme.animation).
+          // Phase 2 moved it into bg.animation. Read both for back-compat.
+          animation: isValidAnimation(theme.bg?.animation)
+            ? theme.bg.animation
+            : isValidAnimation(theme.animation)
+              ? theme.animation
+              : fallbackTheme.bg.animation,
+        },
       },
       modules: {
         leaderboard: {
@@ -269,7 +353,34 @@ export function fundraiserToFormValues(
           ...fundraiser.settings?.modules?.leaderboard,
         },
         bundle: { slug: bundleSlug },
-        stage: fundraiser.settings?.modules?.stage ?? null,
+        stage: (() => {
+          const raw = fundraiser.settings?.modules?.stage;
+          if (!raw) return null;
+          return {
+            enabled: raw.enabled ?? true,
+            locale: (['en', 'de'] as const).includes(raw.locale as 'en' | 'de')
+              ? (raw.locale as 'en' | 'de')
+              : ('en' as const),
+            title: raw.title ?? '',
+            description: raw.description ?? '',
+            partner_logo_url: raw.partner_logo_url ?? '',
+            slides: (raw.slides ?? []).map((slide, i) => ({
+              position: slide.position ?? i + 1,
+              title: slide.title ?? '',
+              description: slide.description ?? '',
+              image: slide.image ?? '',
+              duration:
+                typeof slide.duration === 'number' &&
+                Number.isFinite(slide.duration)
+                  ? Math.min(60, Math.max(1, Math.round(slide.duration)))
+                  : 8,
+            })),
+          };
+        })(),
+        thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
+          enabled: false,
+          message: '',
+        },
       },
     },
   };

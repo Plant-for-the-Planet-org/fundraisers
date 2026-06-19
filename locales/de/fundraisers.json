@@ -1,6 +1,6 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Spendenaufruf erstellen",
+    "startFundraiser": "Erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
     "amountRaised": "{formattedAmountWithCurrency}",
@@ -8,9 +8,10 @@
     "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einem anonymen Gastgeber*in",
     "unknownHost": "Unbekannt",
-    "anonymousHost": "Anonymer Gastgeber*in",
+    "anonymousHost": "{count, plural, one {anonymer Gastgeber*in} other {anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
+    "demoData": "*Demo-Daten - nur zur Vorschau",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Erstellt von",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { und # anderer} other { und # andere}}",
@@ -52,6 +53,16 @@
         "empty": "Es sind derzeit keine Zahlungsarten verfügbar.",
         "lastUsed": "Zuletzt benutzt",
         "bankTransferRemark": "Bitte richte einen Dauerauftrag bei deiner Bank ein.",
+        "saved": {
+          "cardLabel": "{brand} •••• {last4}",
+          "sepaLabel": "•••• {last4}",
+          "cardLabelAria": "{brand} Karte endet mit {last4}",
+          "sepaLabelAria": "Bankkonto endet mit {last4}",
+          "expiringSoon": "Läuft bald ab",
+          "expiringSoonRecurringHint": "Diese Karte läuft bald ab. Es kann sein, dass sie für eine zukünftige monatliche Spende nicht mehr funktioniert.",
+          "newCard": "Verwende eine neue Karte",
+          "newSepa": "Verwende ein neues Bankkonto"
+        },
         "methods": {
           "openBanking": "Bezahle mit deiner Bank (Open Banking)",
           "bankTransfer": "Überweisung",
@@ -97,14 +108,43 @@
     },
     "form": {
       "goalPreview": {
-        "raised": "{amount} ",
-        "goalLine": "von {amount} gesammelt",
+        "raised": "{amount} gesammelt",
+        "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
       "theme": {
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
-        "selectAccent": "Wähle {accent} als Akzentfarbe"
+        "selectAccent": "Wähle {accent} als Akzentfarbe",
+        "tabTheme": "Thema",
+        "tabBackground": "Hintergrund",
+        "browse": "Stöbern",
+        "done": "Anpassen",
+        "shuffle": "Mischen",
+        "switchToDark": "In dunkelen Modus wechseln",
+        "switchToLight": "In hellen Modus wechseln",
+        "labelGradient": "Verlauf",
+        "labelTitleFont": "Titel Schriftart",
+        "labelBodyFont": "Schriftart",
+        "labelAnimation": "Animation",
+        "labelDecoration": "Dekoration",
+        "labelPattern": "Muster",
+        "labelImage": "Bild",
+        "labelImageMode": "Bild Größe",
+        "labelLogo": "Partner-Logo",
+        "logoContact": "Möchtest du dein Logo hier hinzufügen? <mail>Kontakt info@plant-for-the-planet.org</mail>",
+        "labelOpacity": "Deckkraft",
+        "animation_none": "Keine",
+        "animation_confetti": "Konfetti",
+        "animation_snow": "Schnee",
+        "animation_hearts": "Herzen",
+        "animation_fireworks": "Feuerwerk",
+        "decoration_none": "Keine",
+        "decoration_pattern": "Muster",
+        "decoration_image": "Bild",
+        "decoration_logo": "Logo",
+        "imageMode_cover": "Cover",
+        "imageMode_repeat": "Wiederholen"
       },
       "title": {
         "label": "Name des Spendenaufrufs",
@@ -119,7 +159,8 @@
         "label": "Beschreibung",
         "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
         "errors": {
-          "required": "Gib eine Beschreibung für den Spendenaufruf ein."
+          "required": "Gib eine Beschreibung für den Spendenaufruf ein.",
+          "tooLong": "Beschreibung darf höchstens {max} Zeichen lang sein."
         }
       },
       "image": {
@@ -143,14 +184,13 @@
         },
         "overlay": {
           "title": "Wähle ein Bild aus",
+          "subtitle": "Oder wähle von <unsplashLink>Unsplash</unsplashLink> aus",
           "uploadTitle": "Zum Hochladen Ziehen und Ablegen oder Klicken",
-          "uploadSubtitle": "Oder wähle unten ein Bild von Unsplash aus",
           "searchPlaceholder": "Bilder suchen...",
           "uploadInputAria": "Bild hochladen"
         },
         "attribution": {
-          "photoBy": "Foto von",
-          "unsplashLink": "Unsplash"
+          "photoBy": "Foto von <photographerLink>{name}</photographerLink>"
         },
         "errors": {
           "fileTooLarge": "Das Bild darf maximal {maxMb}MB groß sein.",
@@ -242,7 +282,32 @@
           "moveDown": "Nach unten",
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum von {max} Folien erreicht"
+          "maxSlidesReached": "Maximum von {max} Folien erreicht",
+          "browseTemplates": "Vorlagen anzeigen",
+          "useTemplate": "Vorlage verwenden",
+          "templatesTitle": "Folienvorlagen",
+          "templatesSubtitle": "Wähle eine Vorlage für eine Folie aus und bearbeite anschließend Text und Bild.",
+          "templatesSubtitleMulti": "Wähle eine oder mehrere Vorlagen aus und füge diese dann als Folien ein.",
+          "addSelected": "{count, plural, =0 {Folien hinzüfügen} one {# Folie hinzufügen} other {Füge # Folien hinzu}}",
+          "imageGuidelines": "Achte darauf, dass keine Bilder in den Ecken der Folien sind. Platziere wichtige Texte oder Gesichter in der Mitte. Auf der Leinwand werden Spendensummen, Titel und andere Live-Inhalte über die Ränder hinaus angezeigt, weshalb Inhalte an den Ecken verdeckt werden können.",
+          "previewSlide": "Vorschau",
+          "previewClose": "Vorschau schließen",
+          "previewRaisedLabel": "Bisher gesammelt",
+          "previewQrLabel": "Scannen und spenden",
+          "previewTickerLabel": "Die neuesten Spenden werden hier angezeigt"
+        },
+        "thankYouNote": {
+          "title": "Dankesnachricht",
+          "subtitle": "Wird nach der Spende und in der E-Mail an die Spender angezeigt",
+          "toggleEnabled": "Dankesnachricht aktivieren",
+          "messageLabel": "Schreibe eine Nachricht",
+          "editorPlaceholder": "Schreibe deine Dankesnachricht...",
+          "suggestionsButton": "Vorschläge",
+          "suggestionsTitle": "Nachrichtenvorschläge",
+          "suggestionsSubtitle": "Wähle eine fertige Nachricht, dann passe sie an.",
+          "suggestionsHeading": "Vorschläge",
+          "moreTemplates": "Andere Vorlagen",
+          "allTemplates": "Vorlagen"
         }
       },
       "contributionSettings": {

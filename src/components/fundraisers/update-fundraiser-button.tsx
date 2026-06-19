@@ -1,5 +1,6 @@
 'use client';
 
+import type { FundraiserSettings } from '@/lib/types/fundraiser';
 import type { SelectedImage } from '@/lib/types/image-selection';
 import type { UpdateDirtyFields } from '@/lib/utils/fundraiser-data-builder';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
@@ -18,10 +19,12 @@ import { Button } from '@/components/ui/button';
 
 interface UpdateFundraiserButtonProps {
   fundraiserId: string;
+  existingSettings: FundraiserSettings | null;
 }
 
 export function UpdateFundraiserButton({
   fundraiserId,
+  existingSettings,
 }: UpdateFundraiserButtonProps) {
   const t = useTranslations('Fundraisers.edit.formSubmission');
   const { control, handleSubmit, reset } =
@@ -61,7 +64,8 @@ export function UpdateFundraiserButton({
       const request = buildUpdateFundraiserRequest(
         values,
         dirtyFields as UpdateDirtyFields,
-        imageFile
+        imageFile,
+        existingSettings
       );
 
       if (Object.keys(request).length === 0) return;
@@ -87,7 +91,9 @@ export function UpdateFundraiserButton({
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
       disabled={isSubmitting || !isDirty}
-      onClick={handleSubmit(onSubmit)}
+      onClick={handleSubmit(onSubmit, errors =>
+        console.error('Update blocked by validation errors:', errors)
+      )}
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}

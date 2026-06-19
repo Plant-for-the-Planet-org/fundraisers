@@ -66,6 +66,11 @@ export interface LeaderboardModuleSettings {
   aggregate_top_by_donor: boolean;
 }
 
+export interface ThankYouNoteModuleSettings {
+  enabled: boolean;
+  message: string;
+}
+
 export interface FundraiserSettings {
   theme: {
     base_id?: string;
@@ -84,6 +89,7 @@ export interface FundraiserSettings {
     bundle?: {
       slug: string | null;
     };
+    thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
       options: Array<{
         unit?: number;
@@ -119,6 +125,7 @@ export interface ProjectAllocation {
     name: string;
     description: string;
     image: string;
+    allowDonations: boolean;
   };
   percentage: number;
 }
@@ -140,7 +147,7 @@ export interface Fundraiser {
   description: Nullable<string>;
   image: Nullable<string>;
   goalAmount: number; // Integer, not in cents
-  totalRaised: number; // in decimals
+  totalRaised: Record<string, number>; // currency-keyed, e.g. { EUR: 2052.85 }
   donationCount: number;
   currency: string;
   workspace: Nullable<FundraiserWorkspace>;
@@ -166,14 +173,9 @@ export interface UpdateFundraiserRequest {
     percentage: number;
     project_id: string;
   }>;
-  // Expand modules as new module settings are added
   settings?: {
-    theme?: FundraiserSettings['theme'];
-    modules?: {
-      leaderboard?: LeaderboardModuleSettings;
-      bundle?: { slug: string | null };
-      stage?: Nullable<StageModuleSettings>;
-    };
+    theme: FundraiserSettings['theme'];
+    modules: FundraiserSettings['modules'];
   };
   imageFile?: string; // base64 encoded, only sent when image changed
 }

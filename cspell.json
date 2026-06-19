@@ -8,6 +8,7 @@
   "words": [
     "applepay",
     "bic",
+    "cookieconsent",
     "firstname",
     "googlepay",
     "iban",
@@ -15,7 +16,9 @@
     "noopener",
     "noreferrer",
     "planetcash",
+    "qrcode",
     "Recurrency",
+    "renderable",
     "sepa",
     "subline"
   ],

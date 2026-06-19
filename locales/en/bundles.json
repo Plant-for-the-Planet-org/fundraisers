@@ -27,7 +27,8 @@
     "card": {
       "projectCount": "{count, plural, one {# project} other {# projects}}",
       "seeInside": "See inside",
-      "selected": "Selected"
+      "selected": "Selected",
+      "containsNonDonatable": "Contains a project that is currently not accepting donations"
     },
     "aria": {
       "openBundle": "See inside the {name} bundle",
@@ -38,6 +39,7 @@
     },
     "modal": {
       "projectsInside": "{count, plural, one {# project inside} other {# projects inside}}",
+      "projectsRemoved": "{count, plural, one {# project was removed because it is no longer accepting donations.} other {# projects were removed because they are no longer accepting donations.}}",
       "useBundle": "Use this bundle",
       "tag": {
         "rage": "RAGE",
@@ -76,6 +78,7 @@
     },
     "projectImageAlt": "Image for {name}",
     "unknownProject": "Unknown project",
+    "notAcceptingDonations": "Currently not accepting donations",
     "entries": {
       "ancestral-lands": {
         "label": "Ancestral Lands",

@@ -6,7 +6,11 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Clock, Users } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
+import {
+  convertTotalRaisedToSingleCurrency,
+  getDaysLeft,
+  getFundraiserUrl,
+} from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus, getHostNames } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
@@ -27,7 +31,7 @@ export function FundraiserListItem({
   const tFundraisers = useTranslations('Fundraisers');
   const locale = useLocale();
 
-  const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
+  const imageUrl = getImageUrl('fundraiser', 'small', fundraiser.image);
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const displayStatus = deriveDisplayStatus(fundraiser);
 
@@ -40,14 +44,20 @@ export function FundraiserListItem({
           type: 'conjunction',
         }).format(hostNames);
 
-  const raised = formatCurrencyFromDecimal(
+  const totalRaised = convertTotalRaisedToSingleCurrency(
     fundraiser.totalRaised,
+    fundraiser.currency
+  );
+  const formattedTotalRaised = formatCurrencyFromDecimal(
+    totalRaised,
     fundraiser.currency,
+    locale,
     { compact: true }
   );
   const goal = formatCurrencyFromDecimal(
     fundraiser.goalAmount,
     fundraiser.currency,
+    locale,
     { compact: true }
   );
 
@@ -99,7 +109,7 @@ export function FundraiserListItem({
         <div className='mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground'>
           <span>
             {t.rich('goalProgress', {
-              achievedAmount: raised,
+              achievedAmount: formattedTotalRaised,
               goal,
               b: chunks => (
                 <span className='font-semibold text-foreground'>{chunks}</span>

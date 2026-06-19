@@ -5,7 +5,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { UsersRound } from 'lucide-react';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { getFundraiserUrl } from '@/lib/utils/fundraiser';
+import {
+  convertTotalRaisedToSingleCurrency,
+  getFundraiserUrl,
+} from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { FundraiserCardImage } from './fundraiser-card-image';
 
@@ -17,11 +20,22 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
   const tFundraisers = useTranslations('Fundraisers');
   const locale = useLocale();
 
-  const imageUrl = getImageUrl('fundraiser', 'thumb', fundraiser.image);
+  const imageUrl = getImageUrl('fundraiser', 'small', fundraiser.image);
+
+  const totalRaised = convertTotalRaisedToSingleCurrency(
+    fundraiser.totalRaised,
+    fundraiser.currency
+  );
+  const formattedTotalRaised = formatCurrencyFromDecimal(
+    totalRaised,
+    fundraiser.currency,
+    locale,
+    { compact: true }
+  );
 
   const hostDisplay = (() => {
     const hosts = fundraiser.hosts;
-    if (hosts.length === 0) return tFundraisers('anonymousHost');
+    if (hosts.length === 0) return tFundraisers('anonymousHost', { count: 1 });
 
     const firstHost = hosts[0];
     // Although we expect user to be always present, keeping a fallback to avoid runtime errors in case of unexpected data
@@ -68,11 +82,7 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                   </dt>
                   <dd>
                     {tFundraisers('amountRaised', {
-                      formattedAmountWithCurrency: formatCurrencyFromDecimal(
-                        fundraiser.totalRaised,
-                        fundraiser.currency,
-                        { compact: true, locale }
-                      ),
+                      formattedAmountWithCurrency: formattedTotalRaised,
                     })}
                   </dd>
                 </div>

@@ -72,6 +72,7 @@ export function LeaderboardSettings() {
             totalRecentDonationCount={mockRecent.length}
             totalTopDonationCount={mockTop.length}
             settings={settings}
+            demo
           />
         ) : (
           <NoTabsWarning />

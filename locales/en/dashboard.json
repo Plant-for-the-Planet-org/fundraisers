@@ -17,7 +17,6 @@
       "totalRaised": {
         "label": "Total Raised",
         "helper": "across all time",
-        "moreCurrencies": "+{count, plural, one {# more currency} other {# more currencies}}",
         "empty": "No funds raised yet"
       },
       "donations": {

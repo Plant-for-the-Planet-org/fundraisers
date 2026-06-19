@@ -51,6 +51,11 @@ const donationFormFields = z.object({
     ],
     { message: DONATION_FORM_ERRORS['paymentMethod.required'] }
   ),
+  // When set, the donor picked a saved card/SEPA method — holds its Stripe
+  // payment method id (`pm_...`) to reuse as the donation source. The empty
+  // string is the canonical "no saved method" sentinel (never undefined), so
+  // reads can rely on a plain truthiness check; defaults to '' below.
+  selectedSavedMethodId: z.string(),
   isCompany: z.boolean(),
   companyName: z.string().trim().optional(),
   tin: z.string().trim().optional(),
@@ -212,13 +217,22 @@ export function DonationFormProvider({
       makeMonthly: false,
       willAbsorbFee: false,
       addressType: 'primary',
+      selectedSavedMethodId: '',
     },
     mode: 'onBlur',
     reValidateMode: 'onChange',
   });
 
-  methods.register('country');
-  methods.register('selectedPaymentMethod');
+  // Registers fields that are controlled programmatically so they appear in RHF DevTools.
+  // No cleanup: plain `unregister` removes field values, causing RHF to recompute `isValid` — required fields fail Zod and the wallet button becomes disabled (visible immediately in React StrictMode).
+  // Use `unregister(name, { keepValue: true })` if cleanup is ever added.
+  useEffect(() => {
+    methods.register('country');
+    methods.register('selectedPaymentMethod');
+    methods.register('selectedSavedMethodId');
+    methods.register('willAbsorbFee');
+    methods.register('makeMonthly');
+  }, [methods]);
 
   useEffect(() => {
     if (!isOpen) methods.reset();

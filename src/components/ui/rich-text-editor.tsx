@@ -25,8 +25,12 @@ interface RichTextEditorProps {
   onBlur?: () => void;
   placeholder?: string;
   className?: string;
+  /** Extra classes applied to the editable area (`contenteditable` div) where the user types (e.g. `pr-10` to reserve space for an character counter). */
+  editableAreaClassName?: string;
   ariaInvalid?: boolean;
   ariaDescribedBy?: string;
+  /** Optional actions rendered right-aligned in the toolbar (e.g. a suggestions button). */
+  extraToolbarActions?: ReactNode;
 }
 
 interface ToolbarButtonProps {
@@ -79,8 +83,10 @@ export function RichTextEditor({
   onBlur,
   placeholder = 'Tell your story...',
   className,
+  editableAreaClassName,
   ariaInvalid = false,
   ariaDescribedBy,
+  extraToolbarActions,
 }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -109,8 +115,10 @@ export function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class:
+        class: cn(
           'min-h-[120px] p-3 text-sm text-foreground leading-[1.625] focus:outline-none',
+          editableAreaClassName
+        ),
         ...(ariaInvalid ? { 'aria-invalid': 'true' } : {}),
         ...(ariaDescribedBy ? { 'aria-describedby': ariaDescribedBy } : {}),
       },
@@ -217,6 +225,12 @@ export function RichTextEditor({
         >
           <Minus className='h-4 w-4' />
         </ToolbarButton>
+
+        {extraToolbarActions && (
+          <div className='ml-auto flex items-center gap-1'>
+            {extraToolbarActions}
+          </div>
+        )}
       </div>
 
       <EditorContent
@@ -242,7 +256,9 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_blockquote]:my-4
+          [&_.ProseMirror_blockquote]:my-3
+          [&_.ProseMirror_blockquote]:py-2
+          [&_.ProseMirror_blockquote]:ml-4
           [&_.ProseMirror_blockquote]:pl-4
           [&_.ProseMirror_blockquote]:border-l-4
           [&_.ProseMirror_blockquote]:border-l-border

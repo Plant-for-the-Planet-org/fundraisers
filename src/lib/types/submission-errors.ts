@@ -51,4 +51,5 @@ export type ServiceErrorCode = keyof typeof SUBMISSION_ERROR_CODES;
 
 export type SubmissionErrorKey =
   | (typeof SUBMISSION_ERROR_CODES)[ServiceErrorCode]
+  | 'paymentCancelled'
   | 'unexpected';

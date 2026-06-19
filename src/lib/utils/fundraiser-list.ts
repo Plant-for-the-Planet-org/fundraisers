@@ -115,6 +115,16 @@ export function filterFundraisers(
   );
 }
 
+// Sums all currency amounts as a best-effort sort key for multi-currency fundraisers.
+function sumTotalRaised(totalRaised: Record<string, number>): number {
+  return Object.values(totalRaised).reduce(
+    (sum, amountForSingleCurrency) =>
+      sum +
+      (Number.isFinite(amountForSingleCurrency) ? amountForSingleCurrency : 0),
+    0
+  );
+}
+
 function compareNumbersDesc(a: number, b: number): number {
   return b - a;
 }
@@ -141,7 +151,10 @@ export function sortFundraisers(
       return sorted.sort((a, b) => compareDatesAsc(a.startDate, b.startDate));
     case 'most-raised':
       return sorted.sort((a, b) => {
-        const diff = compareNumbersDesc(a.totalRaised, b.totalRaised);
+        const diff = compareNumbersDesc(
+          sumTotalRaised(a.totalRaised),
+          sumTotalRaised(b.totalRaised)
+        );
         if (diff !== 0) return diff;
         return a.currency.localeCompare(b.currency);
       });

@@ -1,6 +1,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
+import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 
 interface FundraisersApiEnvelope {
   fundraisers?: unknown;
@@ -12,13 +13,7 @@ export interface DashboardSummaryStats {
   totalFundraiserCount: number;
   activeFundraiserCount: number;
   donationsCount: number;
-  totalRaisedByCurrency: DashboardRaisedSummary[];
-}
-
-export interface DashboardRaisedSummary {
-  currency: string;
-  totalRaised: number;
-  fundraiserCount: number;
+  consolidatedTotalRaised: { amount: number; currency: string } | null;
 }
 
 function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
@@ -54,7 +49,18 @@ export function getDashboardSummary(
   let activeFundraiserCount = 0;
   let donationsCount = 0;
 
-  const byCurrency = new Map<string, DashboardRaisedSummary>();
+  const CURRENCY_PRIORITY: Record<string, number> = {
+    EUR: 0,
+    USD: 1,
+    CHF: 2,
+    BRL: 3,
+    CZK: 4,
+  };
+
+  const raisedByCurrency = new Map<
+    string,
+    { currency: string; totalRaised: number; fundraiserCount: number }
+  >();
 
   for (const fundraiser of fundraisers) {
     if (fundraiser.status === 'active') {
@@ -65,39 +71,66 @@ export function getDashboardSummary(
       donationsCount += fundraiser.donationCount;
     }
 
-    if (typeof fundraiser.currency !== 'string' || fundraiser.currency === '') {
-      continue;
+    // Distribute raised amounts across currency buckets
+    for (const [currencyKey, amount] of Object.entries(
+      fundraiser.totalRaised
+    )) {
+      if (!currencyKey) continue;
+      const safeAmount = Number.isFinite(amount) ? amount : 0;
+      const currency = currencyKey.toUpperCase();
+      const existing = raisedByCurrency.get(currency);
+      if (existing) {
+        existing.totalRaised += safeAmount;
+      } else {
+        raisedByCurrency.set(currency, {
+          currency,
+          totalRaised: safeAmount,
+          fundraiserCount: 0,
+        });
+      }
     }
 
-    const currency = fundraiser.currency.toUpperCase();
-    const existing = byCurrency.get(currency);
-    const safeTotalRaised = Number.isFinite(fundraiser.totalRaised)
-      ? fundraiser.totalRaised
-      : 0;
-
-    if (existing) {
-      existing.totalRaised += safeTotalRaised;
-      existing.fundraiserCount += 1;
-      continue;
-    }
-
-    byCurrency.set(currency, {
-      currency,
-      totalRaised: safeTotalRaised,
-      fundraiserCount: 1,
-    });
+    // Count each fundraiser once against its primary currency
+    const primaryCurrency = fundraiser.currency.toUpperCase();
+    const primaryEntry = raisedByCurrency.get(primaryCurrency) ?? {
+      currency: primaryCurrency,
+      totalRaised: 0,
+      fundraiserCount: 0,
+    };
+    primaryEntry.fundraiserCount += 1;
+    raisedByCurrency.set(primaryCurrency, primaryEntry);
   }
 
-  const totalRaisedByCurrency = Array.from(byCurrency.values()).sort((a, b) => {
-    return (
-      b.totalRaised - a.totalRaised || a.currency.localeCompare(b.currency)
-    );
-  });
+  const sortedRaisedByCurrency = Array.from(raisedByCurrency.values()).sort(
+    (a, b) => {
+      const byCount = b.fundraiserCount - a.fundraiserCount;
+      if (byCount !== 0) return byCount;
+      const priorityA = CURRENCY_PRIORITY[a.currency] ?? Infinity;
+      const priorityB = CURRENCY_PRIORITY[b.currency] ?? Infinity;
+      return priorityA - priorityB || a.currency.localeCompare(b.currency);
+    }
+  );
+
+  const dominant = sortedRaisedByCurrency[0] ?? null;
+  const consolidatedTotalRaised = dominant
+    ? {
+        amount: convertTotalRaisedToSingleCurrency(
+          Object.fromEntries(
+            sortedRaisedByCurrency.map(({ currency, totalRaised }) => [
+              currency,
+              totalRaised,
+            ])
+          ),
+          dominant.currency
+        ),
+        currency: dominant.currency,
+      }
+    : null;
 
   return {
     totalFundraiserCount: fundraisers.length,
     activeFundraiserCount,
     donationsCount,
-    totalRaisedByCurrency,
+    consolidatedTotalRaised,
   };
 }
