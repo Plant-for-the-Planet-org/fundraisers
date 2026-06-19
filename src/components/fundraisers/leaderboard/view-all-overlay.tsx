@@ -210,7 +210,6 @@ export function ViewAllOverlay({
     >
       <DialogContent
         showCloseButton={false}
-        aria-labelledby='leaderboard-overlay-title'
         className='w-full max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
       >
         <DialogTitle className='sr-only'>

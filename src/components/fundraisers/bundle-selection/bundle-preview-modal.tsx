@@ -83,7 +83,6 @@ export function BundlePreviewModal({
     >
       <DialogContent
         showCloseButton={false}
-        aria-label={label}
         onOpenAutoFocus={event => {
           // Avoid focusing the "Use Bundle" CTA on open (Enter would trigger it).
           // Focus the close button instead — non-destructive default.

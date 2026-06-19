@@ -206,7 +206,6 @@ export function ImageSelectionOverlay({
     >
       <DialogContent
         showCloseButton={false}
-        aria-label={t('overlay.title')}
         onOpenAutoFocus={event => {
           // Radix focuses first focusable (hidden file input) by default. Override
           // to focus the search input, preserving original autoFocus behavior.
