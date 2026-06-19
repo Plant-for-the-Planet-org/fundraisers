@@ -3,4 +3,7 @@ export { StageMenuItem, StageSection } from './components/stage-settings';
 export { StageView } from './components/stage-view';
 export { STAGE_LIMITS } from './constants';
 export { STAGE_MODULE_ID, stageDefaultSettings, stageModule } from './module';
+export { parseStageFormValue } from './parse';
+export type { StageFormValue } from './schema';
+export { stageModeSchema } from './schema';
 export type { StageModuleSettings, StageSlide } from './settings';

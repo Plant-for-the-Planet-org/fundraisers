@@ -1,4 +1,4 @@
-import type { HighlightImpactUnit } from '@/lib/types/alltime-stats';
+import type { HighlightImpactUnit } from './alltime-stats';
 import type { Locale } from '@/i18n/routing';
 
 export interface StageSlide {

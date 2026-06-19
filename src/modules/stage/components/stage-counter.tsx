@@ -1,7 +1,7 @@
 'use client';
 
-import type { HighlightImpactUnit } from '@/lib/types/alltime-stats';
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { HighlightImpactUnit } from '../alltime-stats';
 
 import { useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';

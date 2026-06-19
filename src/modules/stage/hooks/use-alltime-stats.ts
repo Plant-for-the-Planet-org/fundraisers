@@ -1,9 +1,9 @@
 'use client';
 
-import type { AlltimeStats } from '@/lib/types/alltime-stats';
+import type { AlltimeStats } from '../alltime-stats';
 
 import { useEffect, useState } from 'react';
-import { getAlltimeStats } from '@/lib/api/fundraiser-service';
+import { getAlltimeStats } from '../alltime-stats';
 import {
   msUntilNextBucket,
   STAGE_POLL_INTERVAL_MS,

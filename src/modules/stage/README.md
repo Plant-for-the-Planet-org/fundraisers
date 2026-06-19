@@ -115,7 +115,7 @@ Toast notifications overlay top-right when a new donation lands.
 | Event name                                     | `fundraiser.title` or `modules.stage.title`                | Top bar                     |
 | Planet logo                                    | `https://cdn.plant-for-the-planet.org/logo/svg/planet.svg` | Top bar                     |
 | Partner logo                                   | `modules.stage.partner_logo_url`                           | Top bar                     |
-| Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=` via `useAlltimeStats` (polls 15s; uses [`getAlltimeStats`](../../lib/api/fundraiser-service.ts) under the hood) | Counter |
+| Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=` via `useAlltimeStats` (polls 15s; uses [`getAlltimeStats`](./alltime-stats.ts) under the hood) | Counter |
 | Donation feed + leaderboard                    | Leaderboard module endpoint (polled every 15s)             | Ticker, toasts, leaderboard |
 | QR code                                        | `https://qr.pp.eco/?{origin}/raise/{id}?utm_*`             | QR panel                    |
 | Short URL display                              | `stage.pp.eco/{id}`                                        | QR panel label              |
@@ -133,7 +133,7 @@ Stage is the only surface that polls live data. `?stagehash=Math.floor(Date.now(
 | `GET /fundraisers/{slug}/alltime-stats` | 15s      | Wired  |
 | `GET /fundraisers/{slug}/leaderboard`   | 15s      | Wired  |
 
-**Non-stage consumers** of the same endpoints (e.g. the public fundraiser sidebar) use the service-layer one-shot call ([`getAlltimeStats`](../../lib/api/fundraiser-service.ts)) without the stagehash param — single fetch on page load, no polling, no bucket coupling.
+The `alltime-stats` type and fetch are stage-owned, in [`alltime-stats.ts`](./alltime-stats.ts). They stay inside the module until a non-stage consumer needs them, at which point the type + service move to `src/lib/` per the "wait for a second consumer" rule.
 
 ---
 

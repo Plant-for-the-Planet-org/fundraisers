@@ -1,4 +1,3 @@
-import type { AlltimeStats } from '@/lib/types/alltime-stats';
 import type {
   Fundraiser,
   UpdateFundraiserRequest,
@@ -62,16 +61,4 @@ export function resumeFundraiser(
   token: string
 ): Promise<Fundraiser> {
   return updateFundraiser(id, { status: 'active' }, token);
-}
-
-export async function getAlltimeStats(
-  slug: string,
-  options: { cacheBuster?: string | number } = {}
-): Promise<AlltimeStats> {
-  const path = `/fundraisers/${encodeURIComponent(slug)}/alltime-stats`;
-  const url =
-    options.cacheBuster !== undefined
-      ? `${path}?stagehash=${options.cacheBuster}`
-      : path;
-  return platformFetch<AlltimeStats>(url);
 }
