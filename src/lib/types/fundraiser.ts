@@ -1,3 +1,4 @@
+import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
 import type {
   FundraiserModules,
@@ -72,15 +73,7 @@ export interface ThankYouNoteModuleSettings {
 }
 
 export interface FundraiserSettings {
-  theme: {
-    base_id?: string;
-    mode?: 'light' | 'dark';
-    accent?: string;
-    background?: string;
-    body_font?: string;
-    title_font?: string;
-    animation?: string;
-  };
+  theme: FundraiserThemeSettings;
   modules: FundraiserModules & {
     // Modules below have not yet migrated into `src/modules/`. Their settings
     // shapes live inline here. As each module migrates, move its slot into
