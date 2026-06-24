@@ -1,4 +1,4 @@
-import { countryCodeToFlag } from './country';
+import { countryCodeToFlag, getCountry } from './country';
 import { getCurrencySymbol } from './currency';
 
 /**
@@ -105,8 +105,6 @@ export function getAllowedCountries(locale: string = 'en'): Array<{
   flag: string;
   currency: SupportedCurrency;
 }> {
-  const displayNames = new Intl.DisplayNames([locale], { type: 'region' });
-
   return ALLOWED_COUNTRIES.map(code => {
     if (code === 'ROW') {
       return {
@@ -118,7 +116,7 @@ export function getAllowedCountries(locale: string = 'en'): Array<{
     }
     return {
       code,
-      name: displayNames.of(code) ?? code,
+      name: getCountry(code, locale),
       flag: countryCodeToFlag(code),
       currency: COUNTRY_CURRENCY_MAP[code],
     };
@@ -146,18 +144,9 @@ export function getTaxDeductibilityInfo(
 } {
   const code = toAllowedCountry(countryCode);
   const resolvedCode = code === 'ROW' ? 'DE' : code; // ROW uses DE as the default workspace country
-  let countryName: string;
-  try {
-    countryName =
-      new Intl.DisplayNames([locale], { type: 'region' }).of(resolvedCode) ??
-      resolvedCode;
-  } catch {
-    // Intl.DisplayNames.of throws RangeError on invalid region codes — fall back to the raw code
-    countryName = resolvedCode;
-  }
   return {
     isDeductible: TAX_DEDUCTIBLE_COUNTRIES.has(resolvedCode),
-    countryName,
+    countryName: getCountry(resolvedCode, locale),
   };
 }
 
