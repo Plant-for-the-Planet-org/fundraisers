@@ -3,33 +3,34 @@
 import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useWatch } from 'react-hook-form';
-import { useLocale, useTranslations } from 'next-intl';
-import { DonorsStrip } from './donors-strip';
+import { DonorsSummaryPanel } from './donors-summary-panel';
 import { getMockLeaderboardDonations } from './leaderboard/mock-data';
-import { SectionHeader } from './typography';
 
 export function DonorsPreview() {
-  const t = useTranslations('Fundraisers');
-  const locale = useLocale();
   const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
-  const { recent } = getMockLeaderboardDonations(currency);
+  const settings = useWatch<
+    FundraiserFormValues,
+    'settings.modules.leaderboard'
+  >({ name: 'settings.modules.leaderboard' });
+
+  const { recent, top } = getMockLeaderboardDonations(currency);
+  const donations = settings.show_top_list && top.length > 0 ? top : recent;
 
   return (
-    <div className='flex flex-col gap-3'>
-      <SectionHeader
-        className='flex-row items-center justify-between'
-        actionSlot={
-          <span className='text-xs text-muted-foreground'>{t('demoData')}</span>
-        }
-      >
-        {t('donationCount', {
-          count: recent.length,
-          formattedCount: recent.length.toLocaleString(locale),
-        })}
-      </SectionHeader>
-      <DonorsStrip donations={recent} donationCount={recent.length} />
-    </div>
+    <DonorsSummaryPanel
+      donations={donations}
+      donationCount={recent.length}
+      settings={settings}
+      // Empty idOrSlug + totals equal to the mock lengths keep the overlay's
+      // pagination from hitting the network in the demo preview.
+      idOrSlug=''
+      initialRecentDonations={recent}
+      initialTopDonations={top}
+      totalRecentDonationCount={recent.length}
+      totalTopDonationCount={top.length}
+      demo
+    />
   );
 }

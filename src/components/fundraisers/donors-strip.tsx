@@ -71,10 +71,7 @@ export function DonorsStrip({ donations, donationCount }: DonorsStripProps) {
       {namedDonors.length > 0 && (
         <div className='text-zinc-800 dark:text-gray-100 text-sm font-normal leading-tight'>
           {remainingCount > 0
-            ? t('donorsAndOthers', {
-                names: namesText,
-                count: remainingCount,
-              })
+            ? t('donorsAndOthers', { names: namesText, count: remainingCount })
             : namesText}
         </div>
       )}

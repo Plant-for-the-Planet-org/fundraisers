@@ -215,7 +215,10 @@ export function ViewAllOverlay({
       role='dialog'
       aria-modal='true'
       aria-labelledby='leaderboard-overlay-title'
-      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center'
+      // Focusable so useModalDialog's focus-on-open actually moves focus into
+      // the dialog (a plain div is not focusable; .focus() would be a no-op).
+      tabIndex={-1}
+      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center outline-none'
       onMouseDown={event => {
         if (event.target === event.currentTarget) {
           handleClose();
