@@ -126,7 +126,7 @@ export const stageModeSchema = z.object({
   slides: z.array(stageSlideSchema).max(STAGE_LIMITS.maxSlides),
 });
 
-export const SLUG_MAX_LENGTH = 16;
+export const SLUG_MAX_LENGTH = 32;
 // Lowercase letters, numbers and single hyphens between segments.
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
