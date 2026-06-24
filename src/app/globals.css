@@ -184,6 +184,15 @@ h6 {
 }
 
 @layer base {
+  /* Tailwind v4 defaults bare `border` utilities to currentColor (near-black),
+     which makes shadcn surfaces (Select, Dialog, DropdownMenu, cards) look
+     heavy. Default every element's border color to the --border token (and the
+     focus outline to --ring) — the canonical shadcn-v4 base layer. Explicit
+     `border-<color>` utilities still override per element. */
+  * {
+    @apply border-border outline-ring/50;
+  }
+
   button:not(:disabled) {
     cursor: pointer;
   }
