@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 import { NextResponse } from 'next/server';
+import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { EMAIL_VERIFICATION_PENDING_COOKIE } from '@/lib/constants/auth';
 
 // Maps an auth error_description to a dedicated page. All other errors fall through to the generic auth_failed path.
@@ -33,19 +34,27 @@ export async function GET(request: NextRequest) {
     console.error('Auth0 callback error:', errorDesc);
 
     const destination = USER_ACTIONABLE_ERRORS[errorDesc];
-    if (destination) {
-      const response = NextResponse.redirect(new URL(destination, base));
-      if (destination === '/verify-email') {
-        // Gate the page to users who actually hit this denial.
-        response.cookies.set(EMAIL_VERIFICATION_PENDING_COOKIE, '1', {
-          maxAge: 600,
-          path: '/verify-email',
-          httpOnly: true,
-          sameSite: 'lax',
-          secure: base.protocol === 'https:',
-        });
-      }
+    if (destination === '/verify-email') {
+      // Clear the Auth0 SSO session before showing the page.
+      // The credentials were valid, so a session exists; leaving it alive means the next sign-in/sign-up silently reuses it and re-hits this denial (a loop).
+      // Auth0 returns the user to /verify-email after logout
+      const logoutUrl = new URL(`https://${AUTH0_CONFIG.domain}/v2/logout`);
+      logoutUrl.searchParams.set('client_id', AUTH0_CONFIG.clientId);
+      logoutUrl.searchParams.set('returnTo', `${base.origin}/verify-email`);
+
+      const response = NextResponse.redirect(logoutUrl);
+      // Gate the page to users who actually hit this denial. The cookie is set for our domain, so it survives the logout round-trip to Auth0 and back.
+      response.cookies.set(EMAIL_VERIFICATION_PENDING_COOKIE, '1', {
+        maxAge: 600,
+        path: '/verify-email',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: base.protocol === 'https:',
+      });
       return response;
+    }
+    if (destination) {
+      return NextResponse.redirect(new URL(destination, base));
     }
 
     const errUrl = new URL('/', base);
