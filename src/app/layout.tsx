@@ -10,6 +10,7 @@ import {
 import { headers } from 'next/headers';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
+import { Toaster } from 'sonner';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
@@ -91,6 +92,9 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <LocaleInitializer initialLocale={locale} />
+          {/* Mounted before AuthInitializer so its toast subscription is ready
+              when AuthInitializer fires a sign-in-error toast during mount. */}
+          <Toaster richColors />
           <AuthInitializer />
           <CookieConsentProvider />
           <ImpersonationBanner />
