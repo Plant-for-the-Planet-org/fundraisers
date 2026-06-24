@@ -31,6 +31,12 @@
     "headerLinks": {
       "explore": "Entdecken",
       "startFundraiser": "Erstellen"
+    },
+    "videoEmbed": {
+      "gatedDescription": "Um dieses Video abzuspielen, benötigen wir deine Zustimmung zum Setzen von Cookies durch YouTube.",
+      "allowButton": "Video-Cookies erlauben",
+      "watchOnYoutube": "Auf YouTube ansehen",
+      "playerTitle": "Eingebettetes Video"
     }
   }
 }

@@ -30,6 +30,11 @@
         "description": "Diese Cookies helfen uns zu verstehen, wie Besucher*innen mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.",
         "linkedCategory": "Analyse"
       },
+      "externalMedia": {
+        "title": "Cookies für externe Videos",
+        "description": "Diese Cookies ermöglichen es uns, eingebettete Videos von externen Diensten wie YouTube anzuzeigen. Ohne deine Zustimmung zeigen wir nur einen Link zum Video.",
+        "linkedCategory": "Externe Medien"
+      },
       "moreInfo": {
         "title": "Mehr Informationen",
         "description": "Wenn du Fragen zu unseren Cookies und deinen Wahlmöglichkeiten hast, wende dich bitte an uns."

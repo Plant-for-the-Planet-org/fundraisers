@@ -31,6 +31,12 @@
     "headerLinks": {
       "explore": "Explore",
       "startFundraiser": "Start Fundraiser"
+    },
+    "videoEmbed": {
+      "gatedDescription": "To play this video we need your consent to set cookies from YouTube.",
+      "allowButton": "Allow video cookies",
+      "watchOnYoutube": "Watch on YouTube",
+      "playerTitle": "Embedded video"
     }
   }
 }

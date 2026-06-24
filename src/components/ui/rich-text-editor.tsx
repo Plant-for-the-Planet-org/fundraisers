@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Bold,
   Italic,
@@ -12,12 +12,15 @@ import {
   Quote,
   Strikethrough,
   Underline as UnderlineIcon,
+  Video,
 } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
+import { parseVideoUrl } from '@/lib/video/parse-video-url';
+import { VideoEmbedExtension } from '@/components/ui/video-embed-extension';
 
 interface RichTextEditorProps {
   value?: string;
@@ -105,6 +108,7 @@ export function RichTextEditor({
         placeholder,
       }),
       TextStyle,
+      VideoEmbedExtension,
     ],
     content: value,
     onUpdate: ({ editor: currentEditor }) => {
@@ -145,6 +149,30 @@ export function RichTextEditor({
     },
   });
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
+
+  const [videoInputOpen, setVideoInputOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoError, setVideoError] = useState(false);
+
+  const insertVideo = () => {
+    const parsed = parseVideoUrl(videoUrl);
+    if (!parsed || !editor) {
+      setVideoError(true);
+      return;
+    }
+    editor
+      .chain()
+      .focus()
+      .setVideoEmbed({
+        provider: parsed.provider,
+        videoId: parsed.id,
+        aspect: parsed.aspect,
+      })
+      .run();
+    setVideoUrl('');
+    setVideoError(false);
+    setVideoInputOpen(false);
+  };
 
   useEffect(() => {
     if (editor && !editor.isFocused && value !== editor.getHTML()) {
@@ -226,12 +254,66 @@ export function RichTextEditor({
           <Minus className='h-4 w-4' />
         </ToolbarButton>
 
+        <div className='w-px h-6 bg-border mx-1' />
+
+        <ToolbarButton
+          onClick={() => setVideoInputOpen(open => !open)}
+          isActive={videoInputOpen}
+          title='Embed video (YouTube, Cloudflare Stream)'
+        >
+          <Video className='h-4 w-4' />
+        </ToolbarButton>
+
         {extraToolbarActions && (
           <div className='ml-auto flex items-center gap-1'>
             {extraToolbarActions}
           </div>
         )}
       </div>
+
+      {videoInputOpen && (
+        <div className='flex flex-col gap-1 border-b border-input bg-muted/10 p-2'>
+          <div className='flex items-center gap-2'>
+            <input
+              type='url'
+              autoFocus
+              value={videoUrl}
+              onChange={event => {
+                setVideoUrl(event.target.value);
+                setVideoError(false);
+              }}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  insertVideo();
+                } else if (event.key === 'Escape') {
+                  setVideoInputOpen(false);
+                }
+              }}
+              placeholder='Paste a YouTube or Cloudflare Stream link'
+              className={cn(
+                'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
+                videoError ? 'border-destructive' : 'border-input'
+              )}
+            />
+            <button
+              type='button'
+              onMouseDown={event => {
+                event.preventDefault();
+                insertVideo();
+              }}
+              className='inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+            >
+              Add
+            </button>
+          </div>
+          {videoError && (
+            <span className='text-xs text-destructive'>
+              Enter a valid YouTube or Cloudflare Stream link.
+            </span>
+          )}
+        </div>
+      )}
 
       <EditorContent
         editor={editor}

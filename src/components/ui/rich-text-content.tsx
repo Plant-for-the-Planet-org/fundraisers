@@ -1,0 +1,89 @@
+import type { ReactNode } from 'react';
+import type { SafeHtml } from '@/lib/types/safe-html';
+
+import { cn } from '@/lib/utils/cn';
+import { VideoEmbed } from '@/components/ui/video-embed';
+
+interface RichTextContentProps {
+  /** Rich-text HTML. Pass a `sanitize` fn for raw input, or pre-sanitized SafeHtml. */
+  html: string | null | undefined;
+  /** Sanitizer to run on `html`. Omit when `html` is already SafeHtml. */
+  sanitize?: (dirty: string) => SafeHtml;
+  className?: string;
+}
+
+// Matches the inert marker the editor stores for a video. The marker is always
+// a top-level block (it sits between paragraphs), so splitting the string here
+// never breaks inline formatting.
+// Non-global so `.test()` never mutates a shared `lastIndex` between renders.
+const MARKER = /<video-embed\b[^>]*><\/video-embed>/i;
+const PROVIDER_ATTR = /data-video-provider="([^"]*)"/i;
+const ID_ATTR = /data-video-id="([^"]*)"/i;
+const ASPECT_ATTR = /data-video-aspect="([^"]*)"/i;
+
+/**
+ * Renders sanitized rich-text HTML, replacing each `<video-embed>` marker with
+ * a live `<VideoEmbed>` player. Text segments render via `dangerouslySetInnerHTML`
+ * so the markup is SSR-friendly (and so plain descriptions stay byte-identical
+ * to before this feature). The iframe is built by `VideoEmbed` from the
+ * re-validated id — never from stored HTML.
+ */
+export function RichTextContent({
+  html,
+  sanitize,
+  className,
+}: RichTextContentProps) {
+  if (!html) return null;
+
+  const safe = sanitize ? sanitize(html) : (html as string);
+
+  // Fast path: no video markers → render exactly as before.
+  if (!MARKER.test(safe)) {
+    return (
+      <div
+        className={className}
+        dangerouslySetInnerHTML={{ __html: safe as TrustedHTML }}
+      />
+    );
+  }
+
+  const parts: ReactNode[] = [];
+  const regex = new RegExp(MARKER.source, 'gi');
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  while ((match = regex.exec(safe)) !== null) {
+    const before = safe.slice(lastIndex, match.index);
+    if (before) {
+      parts.push(
+        <div
+          key={key++}
+          dangerouslySetInnerHTML={{ __html: before as TrustedHTML }}
+        />
+      );
+    }
+
+    const tag = match[0];
+    const provider = PROVIDER_ATTR.exec(tag)?.[1] ?? '';
+    const id = ID_ATTR.exec(tag)?.[1] ?? '';
+    const aspect = ASPECT_ATTR.exec(tag)?.[1] ?? '';
+    parts.push(
+      <VideoEmbed key={key++} provider={provider} id={id} aspect={aspect} />
+    );
+
+    lastIndex = regex.lastIndex;
+  }
+
+  const rest = safe.slice(lastIndex);
+  if (rest) {
+    parts.push(
+      <div
+        key={key++}
+        dangerouslySetInnerHTML={{ __html: rest as TrustedHTML }}
+      />
+    );
+  }
+
+  return <div className={cn(className)}>{parts}</div>;
+}
