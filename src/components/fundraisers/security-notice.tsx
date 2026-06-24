@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { getCountry } from '@/lib/utils/country';
 
 interface SecurityNoticeProps {
   organizationName: string;
@@ -16,9 +17,7 @@ export function SecurityNotice({
   const t = useTranslations('Fundraisers.securityNotice');
   const locale = useLocale();
 
-  const countryName =
-    new Intl.DisplayNames([locale], { type: 'region' }).of(countryCode) ??
-    countryCode;
+  const countryName = getCountry(countryCode, locale);
 
   const highlightedText = {
     organization: organizationName,
