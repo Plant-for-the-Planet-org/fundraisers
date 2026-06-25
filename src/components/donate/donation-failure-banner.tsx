@@ -5,7 +5,7 @@
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 
 import { useTranslations } from 'next-intl';
-import { X } from 'lucide-react';
+import { Info, X } from 'lucide-react';
 
 export const DonationFailureBanner = ({
   errorCode,
@@ -36,10 +36,10 @@ export const DonationFailureBanner = ({
         <div className='flex-1'>
           <p className='text-sm font-medium text-destructive'>{t(errorCode)}</p>
           {serverMessage && (
-            <>
-              <hr className='my-2 border-destructive/20' />
-              <p className='text-sm text-destructive/60'>{serverMessage}</p>
-            </>
+            <div className='mt-2 flex items-center gap-2 text-destructive'>
+              <Info className='w-3 h-3' />
+              <p className='text-xs '>{serverMessage}</p>
+            </div>
           )}
         </div>
         <button
