@@ -64,24 +64,24 @@ const YOUTUBE_HOSTS = [
 
 const CLOUDFLARE_HOSTS = ['cloudflarestream.com', 'videodelivery.net'] as const;
 
-const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
-const CLOUDFLARE_ID = /^[a-f0-9]{32}$/;
+const YOUTUBE_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
+const CLOUDFLARE_ID_PATTERN = /^[a-f0-9]{32}$/;
 
-function hostMatches(host: string, allowed: readonly string[]): boolean {
+function hostMatches(host: string, allowedHosts: readonly string[]): boolean {
   const h = host.toLowerCase();
-  return allowed.some(suffix => h === suffix || h.endsWith(`.${suffix}`));
+  return allowedHosts.some(suffix => h === suffix || h.endsWith(`.${suffix}`));
 }
 
 function extractYoutubeId(url: URL): string | null {
   // youtu.be/<id>
   if (url.hostname.toLowerCase().endsWith('youtu.be')) {
     const id = url.pathname.split('/').filter(Boolean)[0];
-    return id && YOUTUBE_ID.test(id) ? id : null;
+    return id && YOUTUBE_ID_PATTERN.test(id) ? id : null;
   }
 
   // youtube.com/watch?v=<id>
   const v = url.searchParams.get('v');
-  if (v && YOUTUBE_ID.test(v)) return v;
+  if (v && YOUTUBE_ID_PATTERN.test(v)) return v;
 
   // youtube.com/embed/<id>, /shorts/<id>, /live/<id>, /v/<id>
   const segments = url.pathname.split('/').filter(Boolean);
@@ -90,7 +90,7 @@ function extractYoutubeId(url: URL): string | null {
   );
   if (prefixIndex !== -1) {
     const id = segments[prefixIndex + 1];
-    if (id && YOUTUBE_ID.test(id)) return id;
+    if (id && YOUTUBE_ID_PATTERN.test(id)) return id;
   }
 
   return null;
@@ -103,7 +103,7 @@ function extractCloudflareId(url: URL): string | null {
   const segment = url.pathname
     .split('/')
     .filter(Boolean)
-    .find(s => CLOUDFLARE_ID.test(s));
+    .find(s => CLOUDFLARE_ID_PATTERN.test(s));
   return segment ?? null;
 }
 
@@ -148,8 +148,8 @@ export function isValidVideo(
   provider: string,
   id: string
 ): provider is VideoProvider {
-  if (provider === 'youtube') return YOUTUBE_ID.test(id);
-  if (provider === 'cloudflare') return CLOUDFLARE_ID.test(id);
+  if (provider === 'youtube') return YOUTUBE_ID_PATTERN.test(id);
+  if (provider === 'cloudflare') return CLOUDFLARE_ID_PATTERN.test(id);
   return false;
 }
 

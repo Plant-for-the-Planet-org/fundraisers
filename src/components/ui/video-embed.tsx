@@ -46,14 +46,14 @@ export function VideoEmbed({
   className,
 }: VideoEmbedProps) {
   const t = useTranslations('Common.videoEmbed');
-  const mediaConsented = useConsent(COOKIE_CATEGORIES.EXTERNAL_MEDIA);
+  const isMediaConsented = useConsent(COOKIE_CATEGORIES.EXTERNAL_MEDIA);
 
   // Re-validate at render time: a corrupt or hostile stored marker renders
   // nothing rather than reaching an embed URL.
   if (!isValidVideo(provider, id)) return null;
 
   const ratio = normalizeAspect(aspect);
-  const isGated = provider === 'youtube' && !mediaConsented;
+  const isGated = provider === 'youtube' && !isMediaConsented;
 
   if (isGated) {
     return (

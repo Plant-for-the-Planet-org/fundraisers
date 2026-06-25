@@ -16,10 +16,10 @@ interface RichTextContentProps {
 // a top-level block (it sits between paragraphs), so splitting the string here
 // never breaks inline formatting.
 // Non-global so `.test()` never mutates a shared `lastIndex` between renders.
-const MARKER = /<video-embed\b[^>]*><\/video-embed>/i;
-const PROVIDER_ATTR = /data-video-provider="([^"]*)"/i;
-const ID_ATTR = /data-video-id="([^"]*)"/i;
-const ASPECT_ATTR = /data-video-aspect="([^"]*)"/i;
+const VIDEO_MARKER_PATTERN = /<video-embed\b[^>]*><\/video-embed>/i;
+const PROVIDER_ATTR_PATTERN = /data-video-provider="([^"]*)"/i;
+const ID_ATTR_PATTERN = /data-video-id="([^"]*)"/i;
+const ASPECT_ATTR_PATTERN = /data-video-aspect="([^"]*)"/i;
 
 /**
  * Renders sanitized rich-text HTML, replacing each `<video-embed>` marker with
@@ -35,26 +35,26 @@ export function RichTextContent({
 }: RichTextContentProps) {
   if (!html) return null;
 
-  const safe = sanitize ? sanitize(html) : (html as string);
+  const safeHtml = sanitize ? sanitize(html) : (html as string);
 
   // Fast path: no video markers → render exactly as before.
-  if (!MARKER.test(safe)) {
+  if (!VIDEO_MARKER_PATTERN.test(safeHtml)) {
     return (
       <div
         className={className}
-        dangerouslySetInnerHTML={{ __html: safe as TrustedHTML }}
+        dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
       />
     );
   }
 
   const parts: ReactNode[] = [];
-  const regex = new RegExp(MARKER.source, 'gi');
+  const regex = new RegExp(VIDEO_MARKER_PATTERN.source, 'gi');
   let lastIndex = 0;
   let match: RegExpExecArray | null;
   let key = 0;
 
-  while ((match = regex.exec(safe)) !== null) {
-    const before = safe.slice(lastIndex, match.index);
+  while ((match = regex.exec(safeHtml)) !== null) {
+    const before = safeHtml.slice(lastIndex, match.index);
     if (before) {
       parts.push(
         <div
@@ -65,9 +65,9 @@ export function RichTextContent({
     }
 
     const tag = match[0];
-    const provider = PROVIDER_ATTR.exec(tag)?.[1] ?? '';
-    const id = ID_ATTR.exec(tag)?.[1] ?? '';
-    const aspect = ASPECT_ATTR.exec(tag)?.[1] ?? '';
+    const provider = PROVIDER_ATTR_PATTERN.exec(tag)?.[1] ?? '';
+    const id = ID_ATTR_PATTERN.exec(tag)?.[1] ?? '';
+    const aspect = ASPECT_ATTR_PATTERN.exec(tag)?.[1] ?? '';
     parts.push(
       <VideoEmbed key={key++} provider={provider} id={id} aspect={aspect} />
     );
@@ -75,7 +75,7 @@ export function RichTextContent({
     lastIndex = regex.lastIndex;
   }
 
-  const rest = safe.slice(lastIndex);
+  const rest = safeHtml.slice(lastIndex);
   if (rest) {
     parts.push(
       <div

@@ -20,7 +20,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
-import { VideoEmbedExtension } from '@/components/ui/video-embed-extension';
+import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
   value?: string;
@@ -108,7 +108,7 @@ export function RichTextEditor({
         placeholder,
       }),
       TextStyle,
-      VideoEmbedExtension,
+      VideoEmbedNode,
     ],
     content: value,
     onUpdate: ({ editor: currentEditor }) => {
@@ -150,14 +150,14 @@ export function RichTextEditor({
   });
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
-  const [videoInputOpen, setVideoInputOpen] = useState(false);
+  const [isVideoInputOpen, setIsVideoInputOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
-  const [videoError, setVideoError] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
 
   const insertVideo = () => {
     const parsed = parseVideoUrl(videoUrl);
     if (!parsed || !editor) {
-      setVideoError(true);
+      setHasVideoError(true);
       return;
     }
     editor
@@ -170,8 +170,8 @@ export function RichTextEditor({
       })
       .run();
     setVideoUrl('');
-    setVideoError(false);
-    setVideoInputOpen(false);
+    setHasVideoError(false);
+    setIsVideoInputOpen(false);
   };
 
   useEffect(() => {
@@ -257,8 +257,8 @@ export function RichTextEditor({
         <div className='w-px h-6 bg-border mx-1' />
 
         <ToolbarButton
-          onClick={() => setVideoInputOpen(open => !open)}
-          isActive={videoInputOpen}
+          onClick={() => setIsVideoInputOpen(open => !open)}
+          isActive={isVideoInputOpen}
           title='Embed video (YouTube, Cloudflare Stream)'
         >
           <Video className='h-4 w-4' />
@@ -271,7 +271,7 @@ export function RichTextEditor({
         )}
       </div>
 
-      {videoInputOpen && (
+      {isVideoInputOpen && (
         <div className='flex flex-col gap-1 border-b border-input bg-muted/10 p-2'>
           <div className='flex items-center gap-2'>
             <input
@@ -280,20 +280,20 @@ export function RichTextEditor({
               value={videoUrl}
               onChange={event => {
                 setVideoUrl(event.target.value);
-                setVideoError(false);
+                setHasVideoError(false);
               }}
               onKeyDown={event => {
                 if (event.key === 'Enter') {
                   event.preventDefault();
                   insertVideo();
                 } else if (event.key === 'Escape') {
-                  setVideoInputOpen(false);
+                  setIsVideoInputOpen(false);
                 }
               }}
               placeholder='Paste a YouTube or Cloudflare Stream link'
               className={cn(
                 'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
-                videoError ? 'border-destructive' : 'border-input'
+                hasVideoError ? 'border-destructive' : 'border-input'
               )}
             />
             <button
@@ -307,7 +307,7 @@ export function RichTextEditor({
               Add
             </button>
           </div>
-          {videoError && (
+          {hasVideoError && (
             <span className='text-xs text-destructive'>
               Enter a valid YouTube or Cloudflare Stream link.
             </span>

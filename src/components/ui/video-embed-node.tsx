@@ -61,7 +61,7 @@ function VideoEmbedNodeView({
 }: NodeViewProps) {
   const provider = node.attrs.provider as string;
   const videoId = node.attrs.videoId as string;
-  const aspect = normalizeAspect(node.attrs.aspect as string);
+  const aspectRatio = normalizeAspect(node.attrs.aspect as string);
   const valid = isValidVideo(provider, videoId);
 
   return (
@@ -69,8 +69,8 @@ function VideoEmbedNodeView({
       <div
         className={cn(
           'group relative w-full overflow-hidden rounded-xl border border-border bg-muted',
-          ASPECT_CLASS[aspect],
-          aspect !== '16:9' && 'mx-auto max-w-[360px]',
+          ASPECT_CLASS[aspectRatio],
+          aspectRatio !== '16:9' && 'mx-auto max-w-[360px]',
           'select-none'
         )}
       >
@@ -109,10 +109,10 @@ function VideoEmbedNodeView({
               onClick={() => updateAttributes({ aspect: value })}
               title={label}
               aria-label={label}
-              aria-pressed={aspect === value}
+              aria-pressed={aspectRatio === value}
               className={cn(
                 'flex h-6 w-6 items-center justify-center rounded text-white transition-colors',
-                aspect === value ? 'bg-white/30' : 'hover:bg-white/20'
+                aspectRatio === value ? 'bg-white/30' : 'hover:bg-white/20'
               )}
             >
               <Icon className='h-3.5 w-3.5' aria-hidden='true' />
@@ -141,7 +141,7 @@ function VideoEmbedNodeView({
  *   marker (never an iframe), which both sanitizers allow.
  * - Auto-converts a pasted YouTube/Cloudflare URL into the node.
  */
-export const VideoEmbedExtension = Node.create({
+export const VideoEmbedNode = Node.create({
   name: 'videoEmbed',
   group: 'block',
   atom: true,
