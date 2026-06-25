@@ -52,12 +52,11 @@ export interface ParsedVideo {
   aspect: VideoAspect;
 }
 
-// Exact hostnames we accept a link from, per provider. Suffix matching is done
-// against `.${suffix}` so `youtube.com.evil.com` can never match.
+// Accepted host suffixes per provider (subdomains included). Matching is done
+// against `.${suffix}` so `youtube.com.evil.com` can never match, while real
+// subdomains like `www.`/`m.`/`music.youtube.com` are covered by `youtube.com`.
 const YOUTUBE_HOSTS = [
   'youtube.com',
-  'm.youtube.com',
-  'music.youtube.com',
   'youtu.be',
   'youtube-nocookie.com',
 ] as const;
@@ -74,7 +73,8 @@ function hostMatches(host: string, allowedHosts: readonly string[]): boolean {
 
 function extractYoutubeId(url: URL): string | null {
   // youtu.be/<id>
-  if (url.hostname.toLowerCase().endsWith('youtu.be')) {
+  const host = url.hostname.toLowerCase();
+  if (host === 'youtu.be' || host.endsWith('.youtu.be')) {
     const id = url.pathname.split('/').filter(Boolean)[0];
     return id && YOUTUBE_ID_PATTERN.test(id) ? id : null;
   }
@@ -166,10 +166,11 @@ export function buildWatchUrl(provider: VideoProvider, id: string): string {
   if (provider === 'youtube') {
     return `https://www.youtube.com/watch?v=${id}`;
   }
+  // Only the youtube branch is used today (Cloudflare is never gated, so it has no fallback link). Kept for symmetry / future Cloudflare gating; verify this URL form before relying on it then.
   return `https://cloudflarestream.com/${id}`;
 }
 
-/** Thumbnail used for editor previews and the gated fallback panel. */
+/** Thumbnail used for editor previews. */
 export function buildThumbnailUrl(provider: VideoProvider, id: string): string {
   if (provider === 'youtube') {
     return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
