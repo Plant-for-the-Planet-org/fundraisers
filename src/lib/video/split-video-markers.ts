@@ -6,10 +6,13 @@ export type RichTextSegment =
   | { kind: 'html'; html: string }
   | { kind: 'video'; provider: string; id: string; aspect: string };
 
-// Matches the inert marker the editor stores for a video. The marker is always a
-// top-level block (it sits between paragraphs), so splitting on it never breaks
-// inline formatting.
-// Non-global so `.test()` never mutates a shared `lastIndex` between calls.
+// Matches one stored video marker, e.g.
+//   <video-embed data-video-provider="youtube" data-video-id="..."></video-embed>
+//
+// Three things to know about this pattern:
+// 1. It only matches the PAIRED form (`<video-embed ...></video-embed>`), not a self-closing `<video-embed/>`. The marker is written by the TipTap node's renderHTML and passed through sanitize-html unchanged; both emit the paired form today. If a TipTap or sanitize-html upgrade ever switches to self-closing, this stops matching and videos silently render as nothing — update the pattern here when upgrading either.
+// 2. `[^>]*` skips the attributes. The marker is always its own top-level block (it sits between paragraphs), so splitting the HTML on it can't break inline formatting.
+// 3. It is intentionally non-global: a `/g` regex keeps a `lastIndex` between `.test()` calls, making repeated checks flip-flop. `splitVideoMarkers` builds its own global copy for iteration instead.
 const VIDEO_MARKER_PATTERN = /<video-embed\b[^>]*><\/video-embed>/i;
 const PROVIDER_ATTR_PATTERN = /data-video-provider="([^"]*)"/i;
 const ID_ATTR_PATTERN = /data-video-id="([^"]*)"/i;

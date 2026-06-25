@@ -1,6 +1,5 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
-import { cn } from '@/lib/utils/cn';
 import {
   hasVideoMarker,
   splitVideoMarkers,
@@ -51,7 +50,7 @@ export function RichTextContent({
   }
 
   return (
-    <div className={cn(className)}>
+    <div className={className}>
       {splitVideoMarkers(safeHtml).map((segment, index) =>
         segment.kind === 'video' ? (
           <VideoEmbed

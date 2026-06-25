@@ -85,7 +85,7 @@ export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
         attribs: {
           ...attribs,
           target: '_blank',
-          rel: 'noopener noreferrer',
+          rel: 'nofollow ugc noopener noreferrer',
         },
       }),
     },
