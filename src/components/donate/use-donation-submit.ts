@@ -40,6 +40,14 @@ import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
 import { useAuthStore } from '@/stores/auth-store';
 
+/** Extracts the user-facing detail from a server payment message.
+ * Server format: "An unexpected error occurred... — Card payment failed: <detail>" */
+function extractServerMessage(message: string | undefined): string | undefined {
+  if (!message) return undefined;
+  const parts = message.split(' — ');
+  return parts.length > 1 ? parts.slice(1).join(' — ') : undefined;
+}
+
 /**
  * Encapsulates the full donation submission flow:
  * assembles form data, builds the payload, submits via the appropriate
@@ -225,6 +233,25 @@ export function useDonationSubmit(
             });
 
           if (paymentResponse.status === 'failed') {
+            // [DEBUG #180] Log raw server payment failure
+            console.group(
+              '[Payment Debug #180] status=failed (card/sepa/saved)'
+            );
+            console.log('paymentResponse:', paymentResponse);
+            console.log('errorCode:', paymentResponse.errorCode);
+            console.log(
+              'message:',
+              (paymentResponse as { message?: string }).message
+            );
+            console.log(
+              'mapped UI code:',
+              paymentResponse.errorCode
+                ? (SUBMISSION_ERROR_CODES[
+                    paymentResponse.errorCode as ServiceErrorCode
+                  ] ?? 'paymentFailed (unmapped)')
+                : 'paymentFailed (no errorCode)'
+            );
+            console.groupEnd();
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
@@ -234,6 +261,7 @@ export function useDonationSubmit(
                       paymentResponse.errorCode as ServiceErrorCode
                     ] ?? 'paymentFailed')
                   : 'paymentFailed',
+                serverMessage: extractServerMessage(paymentResponse.message),
               },
             }));
             return;
@@ -276,6 +304,12 @@ export function useDonationSubmit(
           // NOTE: Reuse attempt-scoped idempotency keys for action_required follow-up calls.
           // Keys are rotated after this submit attempt completes (in finally).
           if (paymentResponse.status === 'action_required') {
+            // [DEBUG #180] Log action_required response
+            console.group('[Payment Debug #180] status=action_required');
+            console.log('paymentResponse:', paymentResponse);
+            console.log('type:', paymentResponse.response.type);
+            console.groupEnd();
+
             if (
               paymentResponse.response.type === 'cardAction' &&
               values.selectedPaymentMethod === 'card'
@@ -285,6 +319,12 @@ export function useDonationSubmit(
               )) ?? { error: 'No card form available' };
 
               if ('error' in actionResult) {
+                // [DEBUG #180] Stripe handleCardAction failed
+                console.group(
+                  '[Payment Debug #180] cardAction handleCardAction failed'
+                );
+                console.log('actionResult:', actionResult);
+                console.groupEnd();
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
@@ -309,10 +349,29 @@ export function useDonationSubmit(
               );
 
               if (finalResponse.status === 'failed') {
+                // [DEBUG #180] 3DS confirm call failed
+                console.group(
+                  '[Payment Debug #180] cardAction confirm (PUT) failed'
+                );
+                console.log('finalResponse:', finalResponse);
+                console.log(
+                  'errorCode:',
+                  (finalResponse as { errorCode?: string }).errorCode
+                );
+                console.log(
+                  'message:',
+                  (finalResponse as { message?: string }).message
+                );
+                console.groupEnd();
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: {
+                    code: 'paymentFailed',
+                    serverMessage: extractServerMessage(
+                      (finalResponse as { message?: string }).message
+                    ),
+                  },
                 }));
                 return;
               }
@@ -340,6 +399,12 @@ export function useDonationSubmit(
                 )) ?? { error: 'No card form available' };
 
               if (confirmResult.error) {
+                // [DEBUG #180] Stripe confirmCardPayment failed
+                console.group(
+                  '[Payment Debug #180] cardPayment confirmCardPayment failed'
+                );
+                console.log('confirmResult:', confirmResult);
+                console.groupEnd();
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
@@ -367,6 +432,12 @@ export function useDonationSubmit(
                 )) ?? { error: 'No SEPA form available' };
 
               if (sepaResult.error) {
+                // [DEBUG #180] Stripe confirmSepaDebitPayment failed
+                console.group(
+                  '[Payment Debug #180] sepa_debit confirmSepaDebitPayment failed'
+                );
+                console.log('sepaResult:', sepaResult);
+                console.groupEnd();
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
@@ -393,6 +464,11 @@ export function useDonationSubmit(
           }));
         }
       } catch (error) {
+        // [DEBUG #180] Unexpected thrown error during submission
+        console.group('[Payment Debug #180] onSubmit catch');
+        console.log('error:', error);
+        console.log('mapped:', toSubmitError(error));
+        console.groupEnd();
         setDonationState(prev => ({
           ...prev,
           isLoading: false,
@@ -536,6 +612,25 @@ export function useDonationSubmit(
         );
 
         if (paymentResponse.status === 'failed') {
+          // [DEBUG #180] PayPal payment failed
+          console.group(
+            '[Payment Debug #180] status=failed (paypal onPayPalApproved)'
+          );
+          console.log('paymentResponse:', paymentResponse);
+          console.log('errorCode:', paymentResponse.errorCode);
+          console.log(
+            'message:',
+            (paymentResponse as { message?: string }).message
+          );
+          console.log(
+            'mapped UI code:',
+            paymentResponse.errorCode
+              ? (SUBMISSION_ERROR_CODES[
+                  paymentResponse.errorCode as ServiceErrorCode
+                ] ?? 'paymentFailed (unmapped)')
+              : 'paymentFailed (no errorCode)'
+          );
+          console.groupEnd();
           setDonationState(prev => ({
             ...prev,
             isLoading: false,
@@ -545,6 +640,7 @@ export function useDonationSubmit(
                     paymentResponse.errorCode as ServiceErrorCode
                   ] ?? 'paymentFailed')
                 : 'paymentFailed',
+              serverMessage: extractServerMessage(paymentResponse.message),
             },
           }));
           return;
@@ -563,6 +659,11 @@ export function useDonationSubmit(
           thankYouState,
         }));
       } catch (error) {
+        // [DEBUG #180] Unexpected thrown error during PayPal approval
+        console.group('[Payment Debug #180] onPayPalApproved catch');
+        console.log('error:', error);
+        console.log('mapped:', toSubmitError(error));
+        console.groupEnd();
         setDonationState(prev => ({
           ...prev,
           isLoading: false,
@@ -633,6 +734,26 @@ export function useDonationSubmit(
           });
 
         if (paymentResponse.status === 'failed') {
+          // [DEBUG #180] Wallet payment failed
+          console.group(
+            '[Payment Debug #180] status=failed (wallet onWalletConfirm)'
+          );
+          console.log('wallet:', wallet);
+          console.log('paymentResponse:', paymentResponse);
+          console.log('errorCode:', paymentResponse.errorCode);
+          console.log(
+            'message:',
+            (paymentResponse as { message?: string }).message
+          );
+          console.log(
+            'mapped UI code:',
+            paymentResponse.errorCode
+              ? (SUBMISSION_ERROR_CODES[
+                  paymentResponse.errorCode as ServiceErrorCode
+                ] ?? 'paymentFailed (unmapped)')
+              : 'paymentFailed (no errorCode)'
+          );
+          console.groupEnd();
           setDonationState(prev => ({
             ...prev,
             isLoading: false,
@@ -642,6 +763,7 @@ export function useDonationSubmit(
                     paymentResponse.errorCode as ServiceErrorCode
                   ] ?? 'paymentFailed')
                 : 'paymentFailed',
+              serverMessage: extractServerMessage(paymentResponse.message),
             },
           }));
           return;
@@ -661,11 +783,25 @@ export function useDonationSubmit(
         }
 
         if (paymentResponse.status === 'action_required') {
+          // [DEBUG #180] Wallet action_required
+          console.group('[Payment Debug #180] status=action_required (wallet)');
+          console.log('wallet:', wallet);
+          console.log('paymentResponse:', paymentResponse);
+          console.log('type:', paymentResponse.response.type);
+          console.groupEnd();
+
           if (paymentResponse.response.type === 'cardAction') {
             const { paymentIntent, error } = await stripe.handleCardAction(
               paymentResponse.response.payment_intent_client_secret
             );
             if (error || !paymentIntent) {
+              // [DEBUG #180] Wallet handleCardAction failed
+              console.group(
+                '[Payment Debug #180] wallet cardAction handleCardAction failed'
+              );
+              console.log('error:', error);
+              console.log('paymentIntent:', paymentIntent);
+              console.groupEnd();
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
@@ -686,10 +822,29 @@ export function useDonationSubmit(
               paymentAttemptKey
             );
             if (finalResponse.status === 'failed') {
+              // [DEBUG #180] Wallet 3DS confirm (PUT) failed
+              console.group(
+                '[Payment Debug #180] wallet cardAction confirm (PUT) failed'
+              );
+              console.log('finalResponse:', finalResponse);
+              console.log(
+                'errorCode:',
+                (finalResponse as { errorCode?: string }).errorCode
+              );
+              console.log(
+                'message:',
+                (finalResponse as { message?: string }).message
+              );
+              console.groupEnd();
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                error: {
+                  code: 'paymentFailed',
+                  serverMessage: extractServerMessage(
+                    (finalResponse as { message?: string }).message
+                  ),
+                },
               }));
               return;
             }
@@ -699,6 +854,12 @@ export function useDonationSubmit(
               { payment_method: paymentResponse.response.payment_method }
             );
             if (error) {
+              // [DEBUG #180] Wallet confirmCardPayment failed
+              console.group(
+                '[Payment Debug #180] wallet cardPayment confirmCardPayment failed'
+              );
+              console.log('error:', error);
+              console.groupEnd();
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
@@ -708,6 +869,12 @@ export function useDonationSubmit(
             }
           } else {
             // Unknown action_required type — payment status indeterminate.
+            // [DEBUG #180] Unknown action_required type
+            console.group(
+              '[Payment Debug #180] wallet unknown action_required type'
+            );
+            console.log('paymentResponse:', paymentResponse);
+            console.groupEnd();
             setDonationState(prev => ({
               ...prev,
               isLoading: false,
@@ -727,6 +894,12 @@ export function useDonationSubmit(
           }));
         }
       } catch (error) {
+        // [DEBUG #180] Unexpected thrown error during wallet confirm
+        console.group('[Payment Debug #180] onWalletConfirm catch');
+        console.log('wallet:', wallet);
+        console.log('error:', error);
+        console.log('mapped:', toSubmitError(error));
+        console.groupEnd();
         setDonationState(prev => ({
           ...prev,
           isLoading: false,

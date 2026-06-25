@@ -9,9 +9,11 @@ import { X } from 'lucide-react';
 
 export const DonationFailureBanner = ({
   errorCode,
+  serverMessage,
   reset,
 }: {
   errorCode: SubmissionErrorKey;
+  serverMessage?: string;
   reset: () => void;
 }) => {
   const t = useTranslations('Donate.submissionErrors');
@@ -33,6 +35,12 @@ export const DonationFailureBanner = ({
         </div>
         <div className='flex-1'>
           <p className='text-sm font-medium text-destructive'>{t(errorCode)}</p>
+          {serverMessage && (
+            <>
+              <hr className='my-2 border-destructive/20' />
+              <p className='text-sm text-destructive/60'>{serverMessage}</p>
+            </>
+          )}
         </div>
         <button
           onClick={reset}
