@@ -11,13 +11,14 @@ import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DonationTable } from './donation-table';
 import { OverlayHeader } from './overlay-header';
+import { resolveActiveTab } from './resolve-tab';
 
 const PAGE_SIZE = 10;
 
 interface ViewAllOverlayProps {
   idOrSlug: string;
   isOpen: boolean;
-  onClose: (activeTab: 'recent' | 'top') => void;
+  onClose: () => void;
   initialRecentDonations: LeaderboardDonation[];
   initialTopDonations: LeaderboardDonation[];
   totalRecentDonationCount: number;
@@ -91,16 +92,14 @@ export function ViewAllOverlay({
 
   const hasEnabledList = showRecentList || showTopList;
 
-  const effectiveTab =
-    tab === 'recent' && !showRecentList
-      ? 'top'
-      : tab === 'top' && !showTopList
-        ? 'recent'
-        : tab;
+  const effectiveTab = resolveActiveTab(tab, {
+    show_recent_list: showRecentList,
+    show_top_list: showTopList,
+  });
 
   const handleClose = useCallback(() => {
-    onClose(effectiveTab);
-  }, [onClose, effectiveTab]);
+    onClose();
+  }, [onClose]);
 
   // Body scroll lock, Escape-to-close, and Tab focus trap inside the dialog.
   useModalDialog({ isOpen, onClose: handleClose, dialogRef });
@@ -205,7 +204,7 @@ export function ViewAllOverlay({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [isOpen, effectiveTab, donations.length]);
+  }, [isOpen, effectiveTab]);
 
   if (!isOpen || !hasEnabledList) return null;
 

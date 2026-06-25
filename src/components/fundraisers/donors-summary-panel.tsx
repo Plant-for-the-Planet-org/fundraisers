@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { LayoutList } from 'lucide-react';
 import { formatCompactNumber } from '@/lib/utils';
 import { DonorsStrip } from './donors-strip';
+import { resolveActiveTab } from './leaderboard/resolve-tab';
 import { ViewAllOverlay } from './leaderboard/view-all-overlay';
 import { SectionHeader } from './typography';
 
@@ -51,14 +52,7 @@ export function DonorsSummaryPanel({
   const canViewAll =
     settings.view_all && (settings.show_recent_list || settings.show_top_list);
 
-  // Open the overlay on the configured default tab, clamped to an enabled list
-  // (mirrors LeaderboardView so both entry points land on the same tab).
-  const activeTab: 'recent' | 'top' =
-    settings.default_tab === 'recent' && !settings.show_recent_list
-      ? 'top'
-      : settings.default_tab === 'top' && !settings.show_top_list
-        ? 'recent'
-        : settings.default_tab;
+  const activeTab = resolveActiveTab(settings.default_tab, settings);
 
   return (
     <div className='flex flex-col gap-3'>

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { resolveActiveTab } from './resolve-tab';
 import { ScrollingDonationList } from './scrolling-donation-list';
 
 interface LeaderboardViewProps {
@@ -35,9 +36,7 @@ export function LeaderboardView({
   const t = useTranslations('Leaderboard.view');
   const [activeTab, setActiveTab] = useState<'recent' | 'top'>(default_tab);
 
-  let resolvedTab = activeTab;
-  if (activeTab === 'recent' && !show_recent_list) resolvedTab = 'top';
-  if (activeTab === 'top' && !show_top_list) resolvedTab = 'recent';
+  const resolvedTab = resolveActiveTab(activeTab, settings);
 
   const shouldShowTabs = show_recent_list && show_top_list;
 

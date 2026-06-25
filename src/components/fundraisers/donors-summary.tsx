@@ -45,7 +45,7 @@ export async function DonorsSummary({ fundraiser }: DonorsSummaryProps) {
     <DonorsSummaryPanel
       donations={donations}
       donationCount={data.donationCount}
-      settings={data.settings}
+      settings={fundraiser.settings?.modules?.leaderboard ?? data.settings}
       idOrSlug={fundraiser.slug}
       initialRecentDonations={data.recent}
       initialTopDonations={data.top}

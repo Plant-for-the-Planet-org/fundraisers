@@ -21,7 +21,7 @@ export function DonorsPreview() {
   return (
     <DonorsSummaryPanel
       donations={donations}
-      donationCount={recent.length}
+      donationCount={donations.length}
       settings={settings}
       // Empty idOrSlug + totals equal to the mock lengths keep the overlay's
       // pagination from hitting the network in the demo preview.
