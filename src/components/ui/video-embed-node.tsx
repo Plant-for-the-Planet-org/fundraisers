@@ -3,6 +3,7 @@
 import type { NodeViewProps } from '@tiptap/react';
 import type { VideoAspect, VideoProvider } from '@/lib/video/parse-video-url';
 
+import { useTranslations } from 'next-intl';
 import {
   Play,
   RectangleHorizontal,
@@ -29,12 +30,12 @@ const PROVIDER_LABELS: Record<VideoProvider, string> = {
 
 const ASPECT_OPTIONS: {
   value: VideoAspect;
-  label: string;
+  labelKey: 'aspectLandscape' | 'aspectPortrait' | 'aspectSquare';
   Icon: typeof Square;
 }[] = [
-  { value: '16:9', label: 'Landscape (16:9)', Icon: RectangleHorizontal },
-  { value: '9:16', label: 'Portrait (9:16)', Icon: RectangleVertical },
-  { value: '1:1', label: 'Square (1:1)', Icon: Square },
+  { value: '16:9', labelKey: 'aspectLandscape', Icon: RectangleHorizontal },
+  { value: '9:16', labelKey: 'aspectPortrait', Icon: RectangleVertical },
+  { value: '1:1', labelKey: 'aspectSquare', Icon: Square },
 ];
 
 declare module '@tiptap/core' {
@@ -59,6 +60,7 @@ function VideoEmbedNodeView({
   deleteNode,
   updateAttributes,
 }: NodeViewProps) {
+  const t = useTranslations('Common.videoEmbed.editor');
   const provider = node.attrs.provider as string;
   const videoId = node.attrs.videoId as string;
   const aspectRatio = normalizeAspect(node.attrs.aspect as string);
@@ -102,13 +104,13 @@ function VideoEmbedNodeView({
         {/* Aspect-ratio switcher — manual, because YouTube never exposes the
             true source aspect (only Shorts are reliably vertical). */}
         <div className='absolute bottom-2 right-2 flex items-center gap-0.5 rounded-md bg-black/60 p-0.5'>
-          {ASPECT_OPTIONS.map(({ value, label, Icon }) => (
+          {ASPECT_OPTIONS.map(({ value, labelKey, Icon }) => (
             <button
               key={value}
               type='button'
               onClick={() => updateAttributes({ aspect: value })}
-              title={label}
-              aria-label={label}
+              title={t(labelKey)}
+              aria-label={t(labelKey)}
               aria-pressed={aspectRatio === value}
               className={cn(
                 'flex h-6 w-6 items-center justify-center rounded text-white transition-colors',
@@ -123,8 +125,8 @@ function VideoEmbedNodeView({
         <button
           type='button'
           onClick={() => deleteNode()}
-          title='Remove video'
-          aria-label='Remove video'
+          title={t('removeVideo')}
+          aria-label={t('removeVideo')}
           className='absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/60 text-white opacity-0 transition-opacity hover:bg-black/80 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white group-hover:opacity-100'
         >
           <X className='h-4 w-4' aria-hidden='true' />

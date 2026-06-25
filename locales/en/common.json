@@ -36,7 +36,18 @@
       "gatedDescription": "To play this video we need your consent to set cookies from YouTube.",
       "allowButton": "Allow video cookies",
       "watchOnYoutube": "Watch on YouTube",
-      "playerTitle": "Embedded video"
+      "playerTitle": "Embedded video",
+      "editor": {
+        "toolbarButton": "Embed video (YouTube, Cloudflare Stream)",
+        "urlLabel": "Video URL",
+        "urlPlaceholder": "Paste a YouTube or Cloudflare Stream link",
+        "add": "Add",
+        "invalidUrl": "Enter a valid YouTube or Cloudflare Stream link.",
+        "aspectLandscape": "Landscape (16:9)",
+        "aspectPortrait": "Portrait (9:16)",
+        "aspectSquare": "Square (1:1)",
+        "removeVideo": "Remove video"
+      }
     }
   }
 }

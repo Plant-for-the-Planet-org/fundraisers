@@ -36,7 +36,18 @@
       "gatedDescription": "Um dieses Video abzuspielen, benötigen wir deine Zustimmung zum Setzen von Cookies durch YouTube.",
       "allowButton": "Video-Cookies erlauben",
       "watchOnYoutube": "Auf YouTube ansehen",
-      "playerTitle": "Eingebettetes Video"
+      "playerTitle": "Eingebettetes Video",
+      "editor": {
+        "toolbarButton": "Video einbetten (YouTube, Cloudflare Stream)",
+        "urlLabel": "Video-URL",
+        "urlPlaceholder": "YouTube- oder Cloudflare-Stream-Link einfügen",
+        "add": "Hinzufügen",
+        "invalidUrl": "Gib einen gültigen YouTube- oder Cloudflare-Stream-Link ein.",
+        "aspectLandscape": "Querformat (16:9)",
+        "aspectPortrait": "Hochformat (9:16)",
+        "aspectSquare": "Quadratisch (1:1)",
+        "removeVideo": "Video entfernen"
+      }
     }
   }
 }

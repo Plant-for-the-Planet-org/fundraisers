@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bold,
   Italic,
@@ -150,6 +151,8 @@ export function RichTextEditor({
   });
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
+  const t = useTranslations('Common.videoEmbed.editor');
+  const videoErrorId = useId();
   const [isVideoInputOpen, setIsVideoInputOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [hasVideoError, setHasVideoError] = useState(false);
@@ -259,7 +262,7 @@ export function RichTextEditor({
         <ToolbarButton
           onClick={() => setIsVideoInputOpen(open => !open)}
           isActive={isVideoInputOpen}
-          title='Embed video (YouTube, Cloudflare Stream)'
+          title={t('toolbarButton')}
         >
           <Video className='h-4 w-4' />
         </ToolbarButton>
@@ -290,7 +293,10 @@ export function RichTextEditor({
                   setIsVideoInputOpen(false);
                 }
               }}
-              placeholder='Paste a YouTube or Cloudflare Stream link'
+              placeholder={t('urlPlaceholder')}
+              aria-label={t('urlLabel')}
+              aria-invalid={hasVideoError}
+              aria-describedby={hasVideoError ? videoErrorId : undefined}
               className={cn(
                 'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
                 hasVideoError ? 'border-destructive' : 'border-input'
@@ -304,12 +310,12 @@ export function RichTextEditor({
               }}
               className='inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             >
-              Add
+              {t('add')}
             </button>
           </div>
           {hasVideoError && (
-            <span className='text-xs text-destructive'>
-              Enter a valid YouTube or Cloudflare Stream link.
+            <span id={videoErrorId} className='text-xs text-destructive'>
+              {t('invalidUrl')}
             </span>
           )}
         </div>
