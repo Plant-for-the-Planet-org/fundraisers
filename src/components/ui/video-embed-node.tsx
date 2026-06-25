@@ -17,6 +17,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import { cn } from '@/lib/utils/cn';
 import {
   ASPECT_CLASS,
+  ASPECT_CONTAINER,
   buildThumbnailUrl,
   isValidVideo,
   normalizeAspect,
@@ -72,7 +73,7 @@ function VideoEmbedNodeView({
         className={cn(
           'group relative w-full overflow-hidden rounded-xl border border-border bg-muted',
           ASPECT_CLASS[aspectRatio],
-          aspectRatio !== '16:9' && 'mx-auto max-w-[360px]',
+          ASPECT_CONTAINER[aspectRatio],
           'select-none'
         )}
       >

@@ -157,6 +157,12 @@ export function RichTextEditor({
   const [videoUrl, setVideoUrl] = useState('');
   const [hasVideoError, setHasVideoError] = useState(false);
 
+  const closeVideoInput = () => {
+    setVideoUrl('');
+    setHasVideoError(false);
+    setIsVideoInputOpen(false);
+  };
+
   const insertVideo = () => {
     const parsed = parseVideoUrl(videoUrl);
     if (!parsed || !editor) {
@@ -172,9 +178,7 @@ export function RichTextEditor({
         aspect: parsed.aspect,
       })
       .run();
-    setVideoUrl('');
-    setHasVideoError(false);
-    setIsVideoInputOpen(false);
+    closeVideoInput();
   };
 
   useEffect(() => {
@@ -260,7 +264,9 @@ export function RichTextEditor({
         <div className='w-px h-6 bg-border mx-1' />
 
         <ToolbarButton
-          onClick={() => setIsVideoInputOpen(open => !open)}
+          onClick={() =>
+            isVideoInputOpen ? closeVideoInput() : setIsVideoInputOpen(true)
+          }
           isActive={isVideoInputOpen}
           title={t('toolbarButton')}
         >
@@ -290,7 +296,7 @@ export function RichTextEditor({
                   event.preventDefault();
                   insertVideo();
                 } else if (event.key === 'Escape') {
-                  setIsVideoInputOpen(false);
+                  closeVideoInput();
                 }
               }}
               placeholder={t('urlPlaceholder')}
