@@ -21,11 +21,7 @@ export const BUNDLE_CONFIG: BundleConfig = {
     },
     {
       id: 'wonder',
-      bundleSlugs: [
-        'amazon-route',
-        'roof-of-the-world',
-        'blue-carbon-alliance',
-      ],
+      bundleSlugs: ['amazon-route', 'roof-of-the-world', 'close-to-the-sea'],
     },
     {
       id: 'rage',
@@ -152,7 +148,7 @@ export const BUNDLE_CONFIG: BundleConfig = {
       ],
     },
     {
-      slug: 'blue-carbon-alliance',
+      slug: 'close-to-the-sea',
       tabs: ['wonder'],
       projectIds: [
         'proj_h27ErrwYmhAGB5jp6nyLGEkN',
