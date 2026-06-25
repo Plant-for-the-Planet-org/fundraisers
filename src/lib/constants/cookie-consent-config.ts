@@ -6,6 +6,8 @@ import enRaw from '../../../locales/en/cookie.json';
 export const COOKIE_CATEGORIES = {
   NECESSARY: 'necessary',
   ANALYTICS: 'analytics',
+  // Gates third-party media embeds that set their own cookies (e.g. YouTube).
+  EXTERNAL_MEDIA: 'externalMedia',
 } as const;
 
 type PreferencesModalTranslation = Pick<typeof enRaw, 'preferencesModal'>;
@@ -26,6 +28,11 @@ function buildSections(t: PreferencesModalTranslation) {
       title: sections.analytics.title,
       description: sections.analytics.description,
       linkedCategory: 'analytics',
+    },
+    {
+      title: sections.externalMedia.title,
+      description: sections.externalMedia.description,
+      linkedCategory: 'externalMedia',
     },
     {
       title: sections.moreInfo.title,
@@ -78,6 +85,10 @@ export const COOKIE_CONSENT_CONFIG: CookieConsentConfig = {
     },
 
     [COOKIE_CATEGORIES.ANALYTICS]: {
+      enabled: false,
+    },
+
+    [COOKIE_CATEGORIES.EXTERNAL_MEDIA]: {
       enabled: false,
     },
   },
