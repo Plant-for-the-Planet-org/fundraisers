@@ -14,6 +14,7 @@ interface StageCounterProps {
   showImpact: boolean;
   showProgressBar: boolean;
   locale: string;
+  className?: string;
 }
 
 export function StageCounter({
@@ -21,6 +22,7 @@ export function StageCounter({
   showImpact,
   showProgressBar,
   locale,
+  className,
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
@@ -85,7 +87,7 @@ export function StageCounter({
   }
 
   return (
-    <GlassPanel className='absolute right-12 top-12 z-[18] w-[440px] p-6'>
+    <GlassPanel className={`p-6 ${className ?? ''}`}>
       <div className='text-[11px] font-bold uppercase tracking-[.18em] opacity-60'>
         {hero.label}
       </div>

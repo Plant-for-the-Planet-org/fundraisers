@@ -6,7 +6,10 @@ const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 
 function measure() {
-  const scale = Math.min(window.innerWidth / CANVAS_WIDTH, 1);
+  const scale = Math.min(
+    window.innerWidth / CANVAS_WIDTH,
+    window.innerHeight / CANVAS_HEIGHT
+  );
   return { scale };
 }
 

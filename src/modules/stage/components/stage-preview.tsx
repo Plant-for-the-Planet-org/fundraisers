@@ -88,6 +88,7 @@ export function StagePreview({
           title={stageTitle}
           description={stageDescription}
           logoUrl={logoUrl}
+          className='absolute left-12 right-12 top-12 z-20'
         />
 
         {/* Placeholder: Raised counter — top right */}

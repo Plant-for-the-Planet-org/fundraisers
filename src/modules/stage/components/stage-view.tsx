@@ -55,13 +55,14 @@ export function StageView({
             width: canvas.width,
             height: canvas.height,
             transform: `scale(${scale})`,
-            transformOrigin: 'top left',
+            transformOrigin: 'top center',
+            left: `calc(50% - ${canvas.width / 2}px)`,
             fontFamily: getFontStack(theme.bodyFont),
             '--theme-title-font': getFontStack(theme.titleFont),
             '--accent-color': getAccentColor(theme.accent),
           } as React.CSSProperties
         }
-        className='absolute top-0 left-0 overflow-hidden bg-[#0b1220] isolate'
+        className='absolute top-0 overflow-hidden bg-[#0b1220] isolate'
       >
         {/* Background slide panel */}
         <StageSlidePanel slides={slides} />
@@ -80,6 +81,7 @@ export function StageView({
           title={stageTitle}
           description={stageDescription}
           logoUrl={stageSettings?.partner_logo_url}
+          className='absolute left-12 right-12 top-12 z-20'
         />
 
         {/* Counter — top right */}
@@ -88,21 +90,31 @@ export function StageView({
           showImpact={showImpact}
           showProgressBar={showProgressBar}
           locale={locale}
+          className='absolute right-12 top-12 z-[18] w-[440px]'
         />
 
         {/* Leaderboard — below counter, optional */}
         {showLeaderboard && (
-          <StageLeaderboard top={leaderboardData?.top ?? []} locale={locale} />
+          <StageLeaderboard
+            top={leaderboardData?.top ?? []}
+            locale={locale}
+            className='absolute right-12 top-[350px] z-[17] w-[440px]'
+          />
         )}
 
         {/* QR panel — bottom left */}
-        <StageQRPanel fundraiserId={fundraiser.id} slug={slug} />
+        <StageQRPanel
+          fundraiserId={fundraiser.id}
+          slug={slug}
+          className='absolute bottom-[170px] left-12 z-[18] w-[300px]'
+        />
 
         {/* Ticker — bottom bar */}
         <StageTicker
           recent={leaderboardData?.recent ?? []}
           offline={offline}
           locale={locale}
+          className='absolute bottom-12 left-12 right-12 z-[19]'
         />
 
         {/* Toast stack */}
