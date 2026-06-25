@@ -4,13 +4,21 @@ import type { SafeHtml } from '@/lib/types/safe-html';
 import { cn } from '@/lib/utils/cn';
 import { VideoEmbed } from '@/components/ui/video-embed';
 
-interface RichTextContentProps {
-  /** Rich-text HTML. Pass a `sanitize` fn for raw input, or pre-sanitized SafeHtml. */
-  html: string | null | undefined;
-  /** Sanitizer to run on `html`. Omit when `html` is already SafeHtml. */
-  sanitize?: (dirty: string) => SafeHtml;
+// Discriminated for safety: a raw string without a `sanitize` fn is a compile error, not a silent XSS vulnerability
+type RichTextContentProps = {
   className?: string;
-}
+} & (
+  | {
+      /** Raw (untrusted) HTML. Requires `sanitize`. */
+      html: string | null | undefined;
+      sanitize: (dirty: string) => SafeHtml;
+    }
+  | {
+      /** Already-sanitized HTML. `sanitize` must be omitted. */
+      html: SafeHtml | null | undefined;
+      sanitize?: never;
+    }
+);
 
 // Matches the inert marker the editor stores for a video. The marker is always
 // a top-level block (it sits between paragraphs), so splitting the string here
