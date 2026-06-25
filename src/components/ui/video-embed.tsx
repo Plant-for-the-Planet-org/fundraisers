@@ -60,8 +60,6 @@ export function VideoEmbed({
       <div
         className={cn(
           'my-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-muted/30 px-6 py-10 text-center',
-          // Reserve the player's aspect box so granting consent doesn't reflow.
-          ASPECT_CLASS[ratio],
           ASPECT_CONTAINER[ratio],
           className
         )}
