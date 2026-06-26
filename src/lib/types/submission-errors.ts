@@ -55,10 +55,10 @@ export const SUBMISSION_ERROR_CODES = {
   stolen_card: 'cardRestricted',
   fraudulent: 'cardRestricted',
   expired_card: 'expiredCard',
-  incorrect_cvc: 'incorrectCvc',
-  incorrect_number: 'incorrectNumber',
+  incorrect_cvc: 'cardDeclined',
+  incorrect_number: 'cardDeclined',
   processing_error: 'processingError',
-  card_velocity_exceeded: 'cardVelocityExceeded',
+  card_velocity_exceeded: 'cardDeclined',
   authentication_required: 'authenticationFailed',
 } as const;
 

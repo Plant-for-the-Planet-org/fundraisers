@@ -216,10 +216,7 @@
       "cardRestricted": "Deine Karte konnte nicht verarbeitet werden. Bitte kontaktiere deine Bank.",
       "insufficientFunds": "Deine Karte hat kein ausreichendes Guthaben. Bitte versuche es mit einer anderen Karte.",
       "expiredCard": "Deine Karte ist abgelaufen. Bitte verwende eine andere Karte.",
-      "incorrectCvc": "Der Sicherheitscode deiner Karte ist falsch. Bitte überprüfe ihn und versuche es erneut.",
-      "incorrectNumber": "Deine Kartennummer ist falsch. Bitte überprüfe sie und versuche es erneut.",
       "processingError": "Bei der Verarbeitung deiner Karte ist ein Fehler aufgetreten. Bitte versuche es erneut.",
-      "cardVelocityExceeded": "Deine Karte hat ihr Nutzungslimit überschritten. Versuche es später erneut oder verwende eine andere Karte.",
       "authenticationFailed": "Deine Zahlung konnte nicht authentifiziert werden. Bitte wähle eine andere Zahlungsmethode und versuche es erneut.",
       "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
