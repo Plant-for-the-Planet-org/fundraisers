@@ -37,7 +37,7 @@ export default async function FundraiserLayout({
   }
 
   return (
-    <ThemeShell initialTheme={theme}>
+    <ThemeShell initialTheme={theme} blurMainContentBackdrop>
       <Header />
       <MainContent>{children}</MainContent>
       <Footer />

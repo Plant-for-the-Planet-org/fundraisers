@@ -3,10 +3,11 @@
 import type { ReactNode } from 'react';
 import type { BgSettings, Theme } from '@/lib/theme/types';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { getAccentColor } from '@/lib/theme/accent-utils';
+import { shouldBlurForPathname } from '@/lib/theme/backdrop-blur-routes';
 import {
   DEFAULT_PATTERN_TILE,
   LOGO_LIBRARY,
@@ -19,6 +20,12 @@ import { useThemeStore } from '@/stores/theme-store';
 const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
   ssr: false,
 });
+
+// SSR / first-paint fallback clip for the blur layer, before useLayoutEffect measures the real element.
+// Approximates the main-content surface: 6.5rem top clears the header plus the surface's my-8 margin, the left/right max() centers a 60rem column to match MainContent's max-w-[960px], 0 bottom extends to the viewport, round 1rem matches rounded-2xl.
+// Keep in sync with the header height and MainContent's max-width.
+const INITIAL_MAIN_CONTENT_CLIP_PATH =
+  'inset(6.5rem max(0px, calc((100vw - 60rem) / 2)) 0 round 1rem)';
 
 /**
  * Guard against CSS injection via url("...") interpolation.
@@ -33,9 +40,11 @@ function safeCssUrl(src: string): string | null {
 export function ThemeShell({
   children,
   initialTheme,
+  blurMainContentBackdrop = false,
 }: {
   children: ReactNode;
   initialTheme?: Theme;
+  blurMainContentBackdrop?: boolean;
 }) {
   const pathname = usePathname();
   const { selectedTheme, setSelectedTheme } = useThemeStore();
@@ -67,6 +76,8 @@ export function ThemeShell({
   const bg = activeTheme.bg;
   // Empty string = no gradient.
   const gradientClass = bg.gradient;
+  const shouldBlurMainContentBackdrop =
+    blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
   return (
     <div
@@ -106,8 +117,84 @@ export function ThemeShell({
       {bg.animation !== 'none' && (
         <AnimationOverlay animation={bg.animation} mode={activeTheme.mode} />
       )}
+      {shouldBlurMainContentBackdrop && <MainContentBackdropBlur />}
       <div className='relative z-10 flex flex-col min-h-screen'>{children}</div>
     </div>
+  );
+}
+
+function MainContentBackdropBlur() {
+  const layerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const target = document.querySelector<HTMLElement>(
+      '[data-main-content-surface]'
+    );
+    const layer = layerRef.current;
+    if (!target || !layer) return;
+
+    const targetElement: HTMLElement = target;
+    const blurLayer: HTMLDivElement = layer;
+    let frameId = 0;
+
+    function updateClipPath() {
+      frameId = 0;
+
+      const rect = targetElement.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const isVisible =
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.top < viewportHeight &&
+        rect.left < viewportWidth;
+
+      if (!isVisible) {
+        blurLayer.style.clipPath = 'inset(100% 0 0 0)';
+        return;
+      }
+
+      const top = Math.max(0, Math.min(viewportHeight, rect.top));
+      const right = Math.max(
+        0,
+        viewportWidth - Math.min(viewportWidth, rect.right)
+      );
+      const bottom = Math.max(
+        0,
+        viewportHeight - Math.min(viewportHeight, rect.bottom)
+      );
+      const left = Math.max(0, Math.min(viewportWidth, rect.left));
+
+      blurLayer.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round 1rem)`;
+    }
+
+    function scheduleUpdate() {
+      if (frameId === 0) {
+        frameId = requestAnimationFrame(updateClipPath);
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(targetElement);
+    window.addEventListener('resize', scheduleUpdate);
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    updateClipPath();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', scheduleUpdate);
+      window.removeEventListener('scroll', scheduleUpdate);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={layerRef}
+      className='fixed inset-0 z-[6] pointer-events-none backdrop-blur-[10px]'
+      style={{ clipPath: INITIAL_MAIN_CONTENT_CLIP_PATH }}
+      aria-hidden
+    />
   );
 }
 
