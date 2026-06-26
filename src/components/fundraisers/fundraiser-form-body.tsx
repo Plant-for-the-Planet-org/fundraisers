@@ -9,8 +9,8 @@ import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
+import { GoalSettings } from './goal/goal-settings';
 import { GoalInput } from './goal-input';
-import { GoalPreview } from './goal-preview';
 import { Hosts } from './hosts';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
@@ -41,7 +41,7 @@ export function FundraiserFormBody({
     <FundraiserLayout>
       <SidebarPanel>
         <ImageSelector autoLoadDefault={!isEditMode} />
-        <GoalPreview
+        <GoalSettings
           isEditMode={isEditMode}
           totalRaised={totalRaised}
           endDate={endDate}
@@ -53,12 +53,10 @@ export function FundraiserFormBody({
       <MainPanel>
         <Title />
         <LeaderboardSettings />
+        <GoalInput />
         <ContributionSettings />
         <DescriptionInput />
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <WorkspaceSelector disabled={isEditMode} />
-          <GoalInput />
-        </div>
+        <WorkspaceSelector disabled={isEditMode} />
         <WorkspaceInfo />
         <BundleSelection mode={mode} />
         <Options />

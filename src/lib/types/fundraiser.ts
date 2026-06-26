@@ -61,6 +61,12 @@ export interface LeaderboardModuleSettings {
   aggregate_top_by_donor: boolean;
 }
 
+export interface DonorScoreModuleSettings {
+  enabled: boolean;
+  show_goal: boolean;
+  show_days_left: boolean;
+}
+
 export interface StageSlide {
   position: number;
   title: string;
@@ -103,11 +109,7 @@ export interface FundraiserSettings {
       allow_dedication: boolean;
       allow_recurrency: boolean;
     };
-    donor_score?: {
-      enabled: boolean;
-      show_goal: boolean;
-      show_days_left: boolean;
-    };
+    donor_score?: DonorScoreModuleSettings;
     projects_supported?: {
       enabled: boolean;
     };

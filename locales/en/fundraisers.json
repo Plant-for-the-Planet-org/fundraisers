@@ -112,6 +112,12 @@
         "goalLine": "of {amount} goal",
         "daysLeft": "{days, number}d left"
       },
+      "goalSettings": {
+        "sectionHeading": "Goal Settings",
+        "openSettings": "Goal settings",
+        "showGoal": "Show goal",
+        "showDaysLeft": "Show days left"
+      },
       "theme": {
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",

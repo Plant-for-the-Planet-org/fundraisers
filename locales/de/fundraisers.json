@@ -112,6 +112,12 @@
         "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
+      "goalSettings": {
+        "sectionHeading": "Zieleinstellungen",
+        "openSettings": "Zieleinstellungen",
+        "showGoal": "Ziel anzeigen",
+        "showDaysLeft": "Verbleibende Tage anzeigen"
+      },
       "theme": {
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
