@@ -31,9 +31,9 @@
         "linkedCategory": "Analyse"
       },
       "externalMedia": {
-        "title": "Cookies für externe Videos",
-        "description": "Diese Cookies ermöglichen es uns, eingebettete Videos von externen Diensten wie YouTube anzuzeigen. Ohne deine Zustimmung zeigen wir nur einen Link zum Video.",
-        "linkedCategory": "Externe Medien"
+        "title": "Externe Video-Cookies",
+        "description": "Diese Cookies erlauben es uns eingebettete Videos von externen Seiten, wie z.B. YouTube, abzuspielen. Ohne deine Zustimmung können wir nur einen Link zum Video zeigen.",
+        "linkedCategory": "externe Medien"
       },
       "moreInfo": {
         "title": "Mehr Informationen",
