@@ -21,11 +21,8 @@ export async function LeaderboardServerLoader({
 
   return (
     <LeaderboardView
-      idOrSlug={idOrSlug}
       initialRecentDonations={data.recent}
       initialTopDonations={data.top}
-      totalRecentDonationCount={data.recentTotal}
-      totalTopDonationCount={data.topTotal}
       settings={settings}
     />
   );
