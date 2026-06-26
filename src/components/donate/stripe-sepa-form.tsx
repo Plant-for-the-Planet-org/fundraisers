@@ -6,8 +6,10 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { getSepaCreditor } from '@/lib/constants/sepa-creditors';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
 
 export interface StripeSepaFormHandle {
@@ -44,14 +46,13 @@ const IBAN_ELEMENT_OPTIONS = {
   },
 };
 
-// TODO: make creditor ID dynamic (source TBD)
-const CREDITOR_ID = 'DE98ZZZ09999999999';
-
 export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
   function StripeSepaForm(_props, ref) {
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
+    const { fundraiser } = useDonationForm();
+    const creditor = getSepaCreditor(fundraiser.workspace?.country);
 
     const [ibanComplete, setIbanComplete] = useState(false);
     const [ibanError, setIbanError] = useState<string | null>(null);
@@ -177,12 +178,12 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
             <div>
               <span className='font-medium'>{t('creditor')}</span>
               <br />
-              {t('creditorName')}
+              {creditor.name}
             </div>
             <div>
               <span className='font-medium'>{t('creditorId')}</span>
               <br />
-              {CREDITOR_ID}
+              {creditor.id}
             </div>
           </div>
 
