@@ -45,6 +45,21 @@ export const SUBMISSION_ERROR_CODES = {
 
   // Payment response status
   PAYMENT_FAILED: 'paymentFailed',
+
+  // Stripe error/decline codes (sent directly as errorCode by server)
+  card_declined: 'cardDeclined',
+  generic_decline: 'cardDeclined',
+  do_not_honor: 'cardDeclined',
+  insufficient_funds: 'insufficientFunds',
+  lost_card: 'cardRestricted',
+  stolen_card: 'cardRestricted',
+  fraudulent: 'cardRestricted',
+  expired_card: 'expiredCard',
+  incorrect_cvc: 'incorrectCvc',
+  incorrect_number: 'incorrectNumber',
+  processing_error: 'processingError',
+  card_velocity_exceeded: 'cardVelocityExceeded',
+  authentication_required: 'authenticationFailed',
 } as const;
 
 export type ServiceErrorCode = keyof typeof SUBMISSION_ERROR_CODES;

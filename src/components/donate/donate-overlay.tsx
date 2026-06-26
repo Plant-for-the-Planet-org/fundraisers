@@ -193,11 +193,7 @@ function DonateOverlayInner({
           />
           {error?.code && (
             <div ref={errorBannerRef}>
-              <DonationFailureBanner
-                errorCode={error.code}
-                serverMessage={error.serverMessage}
-                reset={reset}
-              />
+              <DonationFailureBanner errorCode={error.code} reset={reset} />
             </div>
           )}
         </>

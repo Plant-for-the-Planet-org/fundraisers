@@ -5,15 +5,13 @@
 import type { SubmissionErrorKey } from '@/lib/types/submission-errors';
 
 import { useTranslations } from 'next-intl';
-import { Info, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export const DonationFailureBanner = ({
   errorCode,
-  serverMessage,
   reset,
 }: {
   errorCode: SubmissionErrorKey;
-  serverMessage?: string;
   reset: () => void;
 }) => {
   const t = useTranslations('Donate.submissionErrors');
@@ -35,12 +33,6 @@ export const DonationFailureBanner = ({
         </div>
         <div className='flex-1'>
           <p className='text-sm font-medium text-destructive'>{t(errorCode)}</p>
-          {serverMessage && (
-            <div className='mt-2 flex items-center gap-2 text-destructive'>
-              <Info className='w-3 h-3' />
-              <p className='text-xs '>{serverMessage}</p>
-            </div>
-          )}
         </div>
         <button
           onClick={reset}

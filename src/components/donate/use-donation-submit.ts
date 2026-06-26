@@ -40,14 +40,6 @@ import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
 import { useAuthStore } from '@/stores/auth-store';
 
-/** Extracts the user-facing detail from a server payment message.
- * Server format: "An unexpected error occurred... — Card payment failed: <detail>" */
-function extractServerMessage(message: string | undefined): string | undefined {
-  if (!message) return undefined;
-  const parts = message.split(' — ');
-  return parts.length > 1 ? parts.slice(1).join(' — ') : undefined;
-}
-
 /**
  * Encapsulates the full donation submission flow:
  * assembles form data, builds the payload, submits via the appropriate
@@ -261,7 +253,6 @@ export function useDonationSubmit(
                       paymentResponse.errorCode as ServiceErrorCode
                     ] ?? 'paymentFailed')
                   : 'paymentFailed',
-                serverMessage: extractServerMessage(paymentResponse.message),
               },
             }));
             return;
@@ -328,7 +319,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
                 return;
               }
@@ -366,12 +357,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: {
-                    code: 'paymentFailed',
-                    serverMessage: extractServerMessage(
-                      (finalResponse as { message?: string }).message
-                    ),
-                  },
+                  error: { code: 'paymentFailed' },
                 }));
                 return;
               }
@@ -408,7 +394,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
                 return;
               }
@@ -441,7 +427,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
               } else {
                 const thankYouState = await resolveThankYouStateFromDonation(
@@ -640,7 +626,6 @@ export function useDonationSubmit(
                     paymentResponse.errorCode as ServiceErrorCode
                   ] ?? 'paymentFailed')
                 : 'paymentFailed',
-              serverMessage: extractServerMessage(paymentResponse.message),
             },
           }));
           return;
@@ -763,7 +748,6 @@ export function useDonationSubmit(
                     paymentResponse.errorCode as ServiceErrorCode
                   ] ?? 'paymentFailed')
                 : 'paymentFailed',
-              serverMessage: extractServerMessage(paymentResponse.message),
             },
           }));
           return;
@@ -805,7 +789,7 @@ export function useDonationSubmit(
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                error: { code: 'authenticationFailed' },
               }));
               return;
             }
@@ -839,12 +823,7 @@ export function useDonationSubmit(
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: {
-                  code: 'paymentFailed',
-                  serverMessage: extractServerMessage(
-                    (finalResponse as { message?: string }).message
-                  ),
-                },
+                error: { code: 'paymentFailed' },
               }));
               return;
             }
@@ -863,7 +842,7 @@ export function useDonationSubmit(
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                error: { code: 'authenticationFailed' },
               }));
               return;
             }

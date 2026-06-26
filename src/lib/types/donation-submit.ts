@@ -32,8 +32,6 @@ export interface DonationSubmitState {
 export interface DonationSubmitError {
   /** Maps directly to a key under Donate.submissionErrors in locale JSON */
   code: SubmissionErrorKey;
-  /** Raw user-facing detail from server message, shown below the translated label */
-  serverMessage?: string;
 }
 
 export const INITIAL_DONATION_STATE: DonationSubmitState = {
