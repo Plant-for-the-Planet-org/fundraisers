@@ -58,6 +58,14 @@ const de = {
 };
 
 export const COOKIE_CONSENT_CONFIG: CookieConsentConfig = {
+  // No auto-shown banner. The app sets only strictly-necessary cookies on load
+  // (locale, auth/session) and gates the one non-essential embed (YouTube)
+  // behind an inline, contextual consent in <VideoEmbed>. Under ePrivacy /
+  // German TDDDG a banner is only required for non-essential storage that
+  // happens before consent — we have none — so the banner is obsolete.
+  // The consent engine still runs so the video's "Allow" button and the
+  // optional footer "Cookie Settings" preferences modal keep working.
+  autoShow: false,
   guiOptions: {
     consentModal: {
       layout: 'box wide',
