@@ -92,6 +92,11 @@ export function UserMenu() {
         >
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
+              {profile?.type !== 'individual' && profile?.name && (
+                <span className='text-xs leading-normal text-muted-foreground truncate max-w-full'>
+                  {profile.name}
+                </span>
+              )}
               <span className='text-sm font-medium leading-normal truncate max-w-full'>
                 {displayName || tAuth('impersonation.userDefault')}
               </span>
