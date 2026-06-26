@@ -25,6 +25,7 @@ export default getRequestConfig(async () => {
       ...(await import(`../../locales/${locale}/donate.json`)).default,
       ...(await import(`../../locales/${locale}/stage.json`)).default,
       ...(await import(`../../locales/${locale}/leaderboard.json`)).default,
+      ...(await import(`../../locales/${locale}/cookies.json`)).default,
     },
   };
 });
