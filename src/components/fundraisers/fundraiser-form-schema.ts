@@ -282,7 +282,6 @@ export function fundraiserToFormValues(
   fundraiser: Fundraiser
 ): FundraiserFormValues {
   const fallbackTheme = getThemeForPath('/');
-  const theme = fundraiser.settings?.theme ?? {};
   // Normalize the theme the same way as the public page
   // so the editor and rendered page stay in sync.
   const builtTheme = buildTheme(fundraiser.settings?.theme);
@@ -318,7 +317,10 @@ export function fundraiserToFormValues(
         percentage: allocation.percentage,
       })),
     settings: {
-      theme: themeToFormTheme(builtTheme, theme.base_id ?? fallbackTheme.id),
+      theme: themeToFormTheme(
+        builtTheme,
+        fundraiser.settings?.theme?.base_id ?? fallbackTheme.id
+      ),
       modules: {
         leaderboard: {
           ...DEFAULT_LEADERBOARD,
