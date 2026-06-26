@@ -11,6 +11,7 @@ import type {
   ContributionModuleSettings,
   RecurrencyType,
 } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -37,6 +38,7 @@ import { DonationGiftSection } from './donation-gift-section';
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
   currency?: string;
+  frequencies?: PaymentOptions['frequencies'];
   onDonate: (
     amountCents: number,
     isDedicated: boolean,
@@ -62,6 +64,7 @@ const recurrencyToValue = (recurrency: RecurrencyType): DonationFrequency => {
 export function DonationForm({
   contributionSettings,
   currency = 'EUR',
+  frequencies,
   onDonate,
 }: DonationFormProps) {
   const t = useTranslations('Fundraisers.form.contributionSettings');
@@ -101,6 +104,10 @@ export function DonationForm({
     recurrencyToUI(availableRecurrencyOptions[0] ?? 'once')
   );
   const [isDedicated, setIsDedicated] = useState(false);
+
+  const activeMinCents =
+    (frequencies?.[selectedFrequency.value as keyof typeof frequencies]
+      ?.minQuantity ?? 2) * 100;
 
   const [giftValues, setGiftValues] = useState<DonationGiftValues>({
     recipientName: '',
@@ -223,7 +230,7 @@ export function DonationForm({
 
       setGiftErrors({});
       onDonate(
-        customAmount || selectedAmount,
+        customAmount ? Math.max(customAmount, activeMinCents) : selectedAmount,
         true,
         selectedFrequency.value,
         gift
@@ -231,7 +238,11 @@ export function DonationForm({
       return;
     }
 
-    onDonate(customAmount || selectedAmount, false, selectedFrequency.value);
+    onDonate(
+      customAmount ? Math.max(customAmount, activeMinCents) : selectedAmount,
+      false,
+      selectedFrequency.value
+    );
   };
 
   return (
@@ -261,6 +272,7 @@ export function DonationForm({
           customAmount={customAmount}
           onCustomAmountChange={setCustomAmount}
           customOption={customOption}
+          minCents={activeMinCents}
         />
 
         {settings.allow_dedication && (
