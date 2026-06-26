@@ -219,6 +219,48 @@ export const THEMES: Record<string, Theme> = {
     ],
     bg: defineBg('bg-gradient-to-br from-gray-900 via-slate-800 to-zinc-900'),
   },
+  planet: {
+    id: 'planet',
+    name: 'Plant-for-the-Planet',
+    category: 'nature',
+    // Exact brand Planet Green (#007A49) via the `planet` ramp in globals.css,
+    // not Tailwind's approximated green/emerald.
+    accent: 'planet',
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'open-sans',
+    featured: true,
+    // Brand green first, then Plant-for-the-Planet's colorful palette:
+    // Golden Yellow, Sunrise Orange, Fire Red, Ocean Blue, Sky Blue,
+    // Purple Sky, Deep Purple. (The colorful options still map onto Tailwind
+    // shades for now; same `@theme` pattern can pin them to exact brand hexes.)
+    colorOptions: [
+      'planet',
+      'amber',
+      'orange',
+      'red',
+      'blue',
+      'cyan',
+      'indigo',
+      'purple',
+    ],
+    curatedBgs: [
+      'bg-planet-botanical',
+      'bg-leaves',
+      'bg-botanic',
+      'bg-watercolor',
+    ],
+    // Default: the botanical illustration over a soft morning-horizon wash —
+    // cool Soft Blue sky up top, a warm Soft Yellow band at the horizon, mint
+    // (planet-50) settling into the foliage at the bottom. Shows through the
+    // open middle of the SVG where the leaves only frame the edges.
+    bg: defineBg('bg-gradient-to-b from-soft-blue via-soft-gold to-planet-50', {
+      decoration: 'image',
+      image_url: 'bg-planet-botanical',
+      image_mode: 'cover',
+      opacity: 1,
+    }),
+  },
   dark: {
     id: 'dark',
     name: 'Professional Dark',
