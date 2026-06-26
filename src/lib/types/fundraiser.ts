@@ -27,15 +27,39 @@ export interface FundraiserUser {
 }
 
 export type FundraiserHostType = 'user' | 'team';
+/**
+ * 'admin' (full edit + manage hosts) and 'viewer' (read-only dashboard) are the
+ * supported roles.
+ */
+export type FundraiserHostRole = 'admin' | 'viewer';
+/** 'invited' hosts have no profile yet; claimed to 'active' on first login. */
+export type FundraiserHostStatus = 'active' | 'invited';
 export interface FundraiserHost {
   id: string;
   user: Nullable<FundraiserUser>;
   hostType: FundraiserHostType;
-  role: string; // 'owner' or 'admin'
+  role: FundraiserHostRole;
   isPublic: boolean;
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
-  status: string; //'active'
+  status: FundraiserHostStatus;
+  /** Set while status is 'invited' (no profile linked yet), else null. */
+  invitedEmail: Nullable<string>;
+}
+
+export interface AddFundraiserHostRequest {
+  email: string;
+  role: FundraiserHostRole;
+  isPublic: boolean;
+  displayName?: string;
+  displayOrder?: number;
+}
+
+export interface UpdateFundraiserHostRequest {
+  role?: FundraiserHostRole;
+  isPublic?: boolean;
+  displayName?: string;
+  displayOrder?: number;
 }
 
 export interface FundraiserWorkspace {
