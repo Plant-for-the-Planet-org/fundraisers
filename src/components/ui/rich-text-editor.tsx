@@ -5,7 +5,13 @@ import type { ReactNode } from 'react';
 import { useEffect, useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
+  AArrowDown,
+  AArrowUp,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
+  ChevronDown,
   Italic,
   List,
   ListOrdered,
@@ -16,11 +22,18 @@ import {
   Video,
 } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
-import { TextStyle } from '@tiptap/extension-text-style';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
@@ -40,9 +53,25 @@ interface RichTextEditorProps {
 interface ToolbarButtonProps {
   onClick: () => void;
   isActive?: boolean;
+  disabled?: boolean;
   children: ReactNode;
   title: string;
 }
+
+// Font-size ladder (px). "Normal" text is DEFAULT_FONT_SIZE and is stored with
+// no inline size at all, so untouched content stays byte-identical. The stepper
+// walks this ladder and is capped at the first/last entry. Keep these values in
+// sync with the `font-size` allow-list in `sanitize-html.ts`.
+const FONT_SIZE_STEPS = [12, 14, 16, 18, 20, 24, 30] as const;
+const DEFAULT_FONT_SIZE = 16;
+const MIN_FONT_SIZE = FONT_SIZE_STEPS[0];
+const MAX_FONT_SIZE = FONT_SIZE_STEPS[FONT_SIZE_STEPS.length - 1];
+
+const ALIGN_OPTIONS = [
+  { value: 'left', label: 'Left', Icon: AlignLeft },
+  { value: 'center', label: 'Center', Icon: AlignCenter },
+  { value: 'right', label: 'Right', Icon: AlignRight },
+] as const;
 
 const INACTIVE_EDITOR_STATE = {
   isBold: false,
@@ -52,25 +81,59 @@ const INACTIVE_EDITOR_STATE = {
   isBulletList: false,
   isOrderedList: false,
   isBlockquote: false,
+  align: 'left' as 'left' | 'center' | 'right',
+  fontSize: DEFAULT_FONT_SIZE,
 } as const;
+
+/** Parses a stored `fontSize` (e.g. `"18px"`) into a number, falling back to the default. */
+function parseFontSize(value: string | undefined): number {
+  if (!value) return DEFAULT_FONT_SIZE;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : DEFAULT_FONT_SIZE;
+}
+
+/** Returns the next size on the ladder in `direction` (+1 larger / -1 smaller), clamped to the ladder. */
+function nextFontSize(current: number, direction: 1 | -1): number {
+  const exactIndex = FONT_SIZE_STEPS.indexOf(
+    current as (typeof FONT_SIZE_STEPS)[number]
+  );
+  let nextIndex: number;
+  if (exactIndex !== -1) {
+    nextIndex = exactIndex + direction;
+  } else if (direction === 1) {
+    // Not on the ladder: step up to the first larger entry.
+    const i = FONT_SIZE_STEPS.findIndex(step => step > current);
+    nextIndex = i === -1 ? FONT_SIZE_STEPS.length - 1 : i;
+  } else {
+    // Step down to the last smaller entry.
+    const i = [...FONT_SIZE_STEPS].reverse().findIndex(step => step < current);
+    nextIndex = i === -1 ? 0 : FONT_SIZE_STEPS.length - 1 - i;
+  }
+  const clamped = Math.min(Math.max(nextIndex, 0), FONT_SIZE_STEPS.length - 1);
+  return FONT_SIZE_STEPS[clamped];
+}
 
 function ToolbarButton({
   onClick,
   isActive = false,
+  disabled = false,
   children,
   title,
 }: ToolbarButtonProps) {
   return (
     <button
       type='button'
+      disabled={disabled}
       onMouseDown={event => {
         // Keep editor focus on toolbar interactions so selection/active-state is preserved.
         event.preventDefault();
+        if (disabled) return;
         onClick();
       }}
       className={cn(
         'h-8 w-8 rounded-md p-0 inline-flex items-center justify-center transition-colors',
         'hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'disabled:pointer-events-none disabled:opacity-40',
         isActive && 'bg-muted'
       )}
       title={title}
@@ -109,6 +172,10 @@ export function RichTextEditor({
         placeholder,
       }),
       TextStyle,
+      FontSize,
+      TextAlign.configure({
+        types: ['paragraph'],
+      }),
       VideoEmbedNode,
     ],
     content: value,
@@ -121,7 +188,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          'min-h-[120px] p-3 text-sm text-foreground leading-[1.625] focus:outline-none',
+          'min-h-[120px] p-3 text-base text-foreground leading-[1.625] focus:outline-none',
           editableAreaClassName
         ),
         ...(ariaInvalid ? { 'aria-invalid': 'true' } : {}),
@@ -146,6 +213,14 @@ export function RichTextEditor({
         isBulletList: currentEditor.isActive('bulletList'),
         isOrderedList: currentEditor.isActive('orderedList'),
         isBlockquote: currentEditor.isActive('blockquote'),
+        align: currentEditor.isActive({ textAlign: 'center' })
+          ? ('center' as const)
+          : currentEditor.isActive({ textAlign: 'right' })
+            ? ('right' as const)
+            : ('left' as const),
+        fontSize: parseFontSize(
+          currentEditor.getAttributes('textStyle').fontSize
+        ),
       };
     },
   });
@@ -190,6 +265,20 @@ export function RichTextEditor({
   if (!editor) {
     return <div className='h-[171px] w-full bg-transparent' />;
   }
+
+  const applyFontStep = (direction: 1 | -1) => {
+    const target = nextFontSize(toolbarState.fontSize, direction);
+    const chain = editor.chain().focus();
+    if (target === DEFAULT_FONT_SIZE) {
+      chain.unsetFontSize().run();
+    } else {
+      chain.setFontSize(`${target}px`).run();
+    }
+  };
+
+  const CurrentAlignIcon =
+    ALIGN_OPTIONS.find(option => option.value === toolbarState.align)?.Icon ??
+    AlignLeft;
 
   return (
     <div
@@ -264,6 +353,58 @@ export function RichTextEditor({
         <div className='w-px h-6 bg-border mx-1' />
 
         <ToolbarButton
+          onClick={() => applyFontStep(-1)}
+          disabled={toolbarState.fontSize <= MIN_FONT_SIZE}
+          title='Decrease font size'
+        >
+          <AArrowDown className='h-4 w-4' />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => applyFontStep(1)}
+          disabled={toolbarState.fontSize >= MAX_FONT_SIZE}
+          title='Increase font size'
+        >
+          <AArrowUp className='h-4 w-4' />
+        </ToolbarButton>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type='button'
+              title='Text alignment'
+              aria-label='Text alignment'
+              className={cn(
+                'h-8 rounded-md px-1.5 inline-flex items-center gap-0.5 transition-colors',
+                'hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                toolbarState.align !== 'left' && 'bg-muted'
+              )}
+            >
+              <CurrentAlignIcon className='h-4 w-4' />
+              <ChevronDown className='h-3 w-3 opacity-60' />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='start' className='min-w-[8rem]'>
+            {ALIGN_OPTIONS.map(({ value, label, Icon }) => (
+              <DropdownMenuItem
+                key={value}
+                onSelect={() =>
+                  editor.chain().focus().setTextAlign(value).run()
+                }
+                className={cn(
+                  'gap-2',
+                  toolbarState.align === value && 'bg-muted'
+                )}
+              >
+                <Icon className='h-4 w-4' />
+                {label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className='w-px h-6 bg-border mx-1' />
+
+        <ToolbarButton
           onClick={() =>
             isVideoInputOpen ? closeVideoInput() : setIsVideoInputOpen(true)
           }
@@ -330,6 +471,7 @@ export function RichTextEditor({
       <EditorContent
         editor={editor}
         className='
+          rich-quote
           [&_.ProseMirror]:bg-transparent
           [&_.ProseMirror]:text-foreground
           [&_.ProseMirror]:border-0
@@ -350,13 +492,6 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_blockquote]:my-3
-          [&_.ProseMirror_blockquote]:py-2
-          [&_.ProseMirror_blockquote]:ml-4
-          [&_.ProseMirror_blockquote]:pl-4
-          [&_.ProseMirror_blockquote]:border-l-4
-          [&_.ProseMirror_blockquote]:border-l-border
-          [&_.ProseMirror_blockquote]:italic
           [&_.ProseMirror_blockquote]:text-muted-foreground
           [&_.ProseMirror_hr]:my-6
           [&_.ProseMirror_hr]:border-0

@@ -24,6 +24,7 @@ interface ThankYouSuggestionsDialogProps {
 }
 
 const CARD_PROSE_CLASSES = [
+  'rich-quote',
   '[&_p]:my-1.5',
   '[&_p:first-child]:mt-0',
   '[&_p:last-child]:mb-0',
@@ -32,11 +33,6 @@ const CARD_PROSE_CLASSES = [
   '[&_em]:italic',
   '[&_u]:underline',
   '[&_s]:line-through',
-  '[&_blockquote]:my-1.5',
-  '[&_blockquote]:border-l-2',
-  '[&_blockquote]:border-l-primary/40',
-  '[&_blockquote]:pl-2.5',
-  '[&_blockquote]:italic',
   '[&_blockquote]:text-foreground/80',
 ].join(' ');
 

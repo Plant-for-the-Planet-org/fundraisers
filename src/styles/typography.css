@@ -2,4 +2,37 @@
   .typo-form-title-input {
     @apply text-4xl font-bold placeholder:text-black/50 dark:placeholder:text-white/50;
   }
+
+  /*
+   * Blockquote styling shared by every rich-text surface (editor + displays).
+   * The old left border is replaced by a large opening quotation mark, using
+   * the real typographic character so it follows each language's convention:
+   * English “ sits high, German „ sits low (set per `:lang` below). Sizes are
+   * in `em` so the mark scales with each surface's own font size.
+   */
+  .rich-quote blockquote {
+    @apply relative italic;
+    margin-block: 0.75rem;
+    padding-left: 1.5em;
+  }
+
+  .rich-quote blockquote::before {
+    @apply absolute;
+    content: '\201C';
+    left: 0;
+    top: -0.25em;
+    /* Raw var (not the Tailwind token) so it tracks the runtime theme accent
+       set by theme-shell, exactly like the donate button. */
+    color: var(--accent-color);
+    opacity: 0.5;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 3.5em;
+    line-height: 1;
+  }
+
+  /* German opening quote „ is a low (baseline) mark, unlike English's high “. */
+  :lang(de) .rich-quote blockquote::before {
+    content: '\201E';
+    top: -0.55em;
+  }
 }
