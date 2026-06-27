@@ -18,10 +18,14 @@ import {
   Minus,
   Quote,
   Strikethrough,
+  Subscript as SubscriptIcon,
+  Superscript as SuperscriptIcon,
   Underline as UnderlineIcon,
   Video,
 } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
+import { Subscript } from '@tiptap/extension-subscript';
+import { Superscript } from '@tiptap/extension-superscript';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
@@ -78,6 +82,8 @@ const INACTIVE_EDITOR_STATE = {
   isItalic: false,
   isUnderline: false,
   isStrike: false,
+  isSubscript: false,
+  isSuperscript: false,
   isBulletList: false,
   isOrderedList: false,
   isBlockquote: false,
@@ -173,6 +179,10 @@ export function RichTextEditor({
       }),
       TextStyle,
       FontSize,
+      // Sub/superscript are mutually exclusive — applying one clears the other,
+      // so text can never be both at once (which renders nonsensically).
+      Subscript.extend({ excludes: 'superscript' }),
+      Superscript.extend({ excludes: 'subscript' }),
       TextAlign.configure({
         types: ['paragraph'],
       }),
@@ -210,6 +220,8 @@ export function RichTextEditor({
         isItalic: currentEditor.isActive('italic'),
         isUnderline: currentEditor.isActive('underline'),
         isStrike: currentEditor.isActive('strike'),
+        isSubscript: currentEditor.isActive('subscript'),
+        isSuperscript: currentEditor.isActive('superscript'),
         isBulletList: currentEditor.isActive('bulletList'),
         isOrderedList: currentEditor.isActive('orderedList'),
         isBlockquote: currentEditor.isActive('blockquote'),
@@ -315,6 +327,20 @@ export function RichTextEditor({
           title='Strikethrough'
         >
           <Strikethrough className='h-4 w-4' />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleSuperscript().run()}
+          isActive={toolbarState.isSuperscript}
+          title='Superscript'
+        >
+          <SuperscriptIcon className='h-4 w-4' />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleSubscript().run()}
+          isActive={toolbarState.isSubscript}
+          title='Subscript'
+        >
+          <SubscriptIcon className='h-4 w-4' />
         </ToolbarButton>
 
         <div className='w-px h-6 bg-border mx-1' />
