@@ -16,6 +16,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
     "imports:sort": "node scripts/sort-imports.mjs",
+    "setup:env": "bash scripts/setup-worktree-env.sh",
     "type-check": "tsc --noEmit",
     "find-typos": "cspell --words-only --unique . | sort --ignore-case > project-words.txt",
     "preinstall": "node scripts/preinstall.js",
