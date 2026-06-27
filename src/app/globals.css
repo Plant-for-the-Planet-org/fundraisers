@@ -58,6 +58,11 @@
   --color-neutral-foreground: hsl(var(--neutral-foreground));
   --color-tab-border: var(--tab-border-color);
 
+  /* Plant-for-the-Planet brand green (Planet Green). Fixed CI colour for
+     cross-app ForestCloud surfaces (e.g. the app switcher), independent of the
+     host app's --primary. */
+  --color-forestcloud: #007a49;
+
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
