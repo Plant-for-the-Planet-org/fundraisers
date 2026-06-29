@@ -127,8 +127,8 @@ export const stageModeSchema = z.object({
 });
 
 export const SLUG_MAX_LENGTH = 32;
-// Lowercase letters, numbers and single hyphens between segments.
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+// Lowercase letters, numbers and hyphens.
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
