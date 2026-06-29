@@ -1,0 +1,64 @@
+{
+  "Cookies": {
+    "meta": {
+      "title": "Cookies and consent",
+      "description": "Why this site shows no cookie banner, and how we handle your data with care instead."
+    },
+    "title": "Why this site has no cookie banner",
+    "lead": "Almost every website greets you with a cookie pop-up. This one does not. Not because we ignore the law, but because we followed it to its real conclusion.",
+    "summary": "EU law asks for a consent banner only when a site stores things on your device that it does not need. We do not load anything like that. So there is nothing to ask you about, and no banner to show.",
+    "toc": {
+      "label": "On this page",
+      "law": "The rule",
+      "store": "What we store",
+      "video": "Video",
+      "monitoring": "Error reporting",
+      "payments": "Payments",
+      "manifesto": "Why it matters"
+    },
+    "law": {
+      "title": "The rule, in plain words",
+      "p1": "Under EU rules (the <gdpr>GDPR</gdpr> and the <eprivacy>ePrivacy directive</eprivacy>), a site needs your consent before it stores or reads non-essential data on your device. That means tracking, advertising, and analytics that follow you around. Cookies that are strictly necessary for what you asked for, like staying logged in, do not need consent.",
+      "p2": "Most banners exist because a site loads trackers by default and then asks for permission after the fact. We turned that around. If the site never loads those things, the consent question never has to be asked."
+    },
+    "store": {
+      "title": "What we store, and why",
+      "intro": "We keep this to the essentials. Each item below is needed for the site to work, or to honour a choice you made.",
+      "items": {
+        "session": {
+          "title": "Staying signed in",
+          "body": "A session cookie set only after you log in, so you do not have to sign in again on every page."
+        },
+        "language": {
+          "title": "Your language",
+          "body": "A small cookie that remembers whether you read in English or German."
+        },
+        "consent": {
+          "title": "Your video choice",
+          "body": "If you choose to load a video, we remember that. We store nothing until you do."
+        }
+      }
+    },
+    "video": {
+      "title": "The one thing we ask about: video",
+      "body": "Some pages embed a video from YouTube, and YouTube sets its own tracking cookies. So we do not load it by default. We show a still placeholder with a clear button instead. The moment you click play is the moment we ask, and not a second before. If you never play it, nothing from YouTube reaches your browser."
+    },
+    "monitoring": {
+      "title": "We watch for crashes, not for you",
+      "body": "Like any careful team, we want to know when something breaks. Our error reporting records crashes only. It does not build a profile of you, does not measure your every move, and sets no cookie. We chose the lighter setup on purpose. It tells us a little less, and it respects you a lot more."
+    },
+    "payments": {
+      "title": "Payment loads only when you give",
+      "body": "When you donate, we use trusted providers like Stripe and PayPal to handle your payment safely. Their code loads only when you open the donation form, never on an ordinary visit."
+    },
+    "manifesto": {
+      "title": "A banner is a symptom, not a solution",
+      "p1": "Cookie banners did not make the web more private. They made it more tiring. Many are designed to wear you down until you click accept, while the data collection underneath stays exactly the same.",
+      "p2": "We think the honest fix sits upstream. Build the product so it does not depend on watching people. Track less. Ask only when you truly must, and ask in context, right where the choice makes sense. Do that, and the banner removes itself.",
+      "cta": "If you build for the web, we hope you try the same. Fewer pop-ups. Less tracking. Calmer, clearer screens. Treat consent as a real choice, not a toll gate. The payoff is a better experience and more trust, which is what good design was always for."
+    },
+    "legal": {
+      "body": "Plant-for-the-Planet's detailed <privacy>Privacy Policy</privacy> and <terms>Terms</terms> still apply to this site. This page does not replace them. It explains what we do differently here."
+    }
+  }
+}
