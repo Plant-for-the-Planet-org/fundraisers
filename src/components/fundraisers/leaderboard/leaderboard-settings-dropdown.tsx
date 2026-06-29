@@ -4,7 +4,7 @@ import type { LeaderboardModuleSettings } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Settings, X } from 'lucide-react';
+import { Settings2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -57,7 +57,7 @@ export function LeaderboardSettingsDropdown({
           {isOpen ? (
             <X className='w-4 h-4' />
           ) : (
-            <Settings className='w-4 h-4' />
+            <Settings2 className='w-4 h-4' />
           )}
         </Button>
       </DropdownMenuTrigger>

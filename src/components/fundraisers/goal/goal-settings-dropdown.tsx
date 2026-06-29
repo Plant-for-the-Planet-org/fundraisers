@@ -5,7 +5,7 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { memo, useState } from 'react';
 import { useController } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Settings, X } from 'lucide-react';
+import { Settings2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -57,7 +57,7 @@ export const GoalSettingsDropdown = memo(function GoalSettingsDropdown() {
           {isOpen ? (
             <X className='w-4 h-4' />
           ) : (
-            <Settings className='w-4 h-4' />
+            <Settings2 className='w-4 h-4' />
           )}
         </Button>
       </DropdownMenuTrigger>

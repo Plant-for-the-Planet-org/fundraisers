@@ -8,7 +8,7 @@ interface GoalProgressDisplayProps {
   progressPercentage: number;
   /** Omit (or pass undefined) to hide the days-left line, e.g. when the fundraiser is not active. */
   daysLeft?: number;
-  /** When false, hides the progress bar and goal line. Total raised always renders. */
+  /** When false, hides the goal amount line. Progress bar and total raised always render. */
   showGoal?: boolean;
 }
 
@@ -31,16 +31,14 @@ export function GoalProgressDisplay({
         })}
       </div>
 
-      {showGoal && (
-        <div className='mt-2'>
-          <div className='h-2 w-full rounded-full bg-muted overflow-hidden'>
-            <div
-              className='h-full bg-accent-color'
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
+      <div className='mt-2'>
+        <div className='h-2 w-full rounded-full bg-muted overflow-hidden'>
+          <div
+            className='h-full bg-accent-color'
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
-      )}
+      </div>
 
       {(showGoal || daysLeft !== undefined) && (
         <div className='mt-2 flex items-center justify-between text-sm text-muted-foreground'>
