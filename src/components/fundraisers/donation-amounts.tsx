@@ -154,7 +154,7 @@ export function DonationAmounts({
                   onClick={e => {
                     e.stopPropagation();
                     setInputValue('');
-                    onCustomAmountChange(0);
+                    onCustomAmountChange(undefined);
                     setIsCustomInputSelected(false);
                   }}
                   className='text-muted-foreground hover:text-foreground transition-colors'
