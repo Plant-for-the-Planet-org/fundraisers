@@ -367,8 +367,12 @@ export function fundraiserToFormValues(
           message: '',
         },
         donor_score: {
-          ...DEFAULT_DONOR_SCORE,
-          ...fundraiser.settings?.modules?.donor_score,
+          show_goal:
+            fundraiser.settings?.modules?.donor_score?.show_goal ??
+            DEFAULT_DONOR_SCORE.show_goal,
+          show_days_left:
+            fundraiser.settings?.modules?.donor_score?.show_days_left ??
+            DEFAULT_DONOR_SCORE.show_days_left,
         },
       },
     },

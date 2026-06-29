@@ -62,6 +62,9 @@ export interface LeaderboardModuleSettings {
 }
 
 export interface DonorScoreModuleSettings {
+  // Preserved in the API contract but intentionally not used to gate the goal
+  // section: total raised always renders. Only show_goal / show_days_left
+  // control visibility, unlike leaderboard which gates on enabled entirely.
   enabled: boolean;
   show_goal: boolean;
   show_days_left: boolean;
