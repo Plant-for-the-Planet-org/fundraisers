@@ -3,7 +3,7 @@ name: use-donation-submit-flow-split
 overview: Structural refactor that splits the useDonationSubmit hook into per-gateway internal composables (useCardFlow, usePayPalFlow, useWalletFlow) sharing a common submission core, leaving useDonationSubmit as a thin orchestrator. The hook's public return shape and all runtime behavior stay identical. This is the Tier 2 follow-up to the helper-extraction refactor in use-donation-submit-refactor.plan.md.
 todos:
   - id: extract-submission-core
-    content: Extract a useSubmissionCore hook that owns the shared state and helpers (donationState/setDonationState, submittingRef, donationKeyRef, paymentKeyRef, paypalDonationIdRef, rotateIdempotencyKeys, failSubmission, finalizeFromDonation, buildPayloadFor, resolveCreatedPaymentMethod, confirmCardActionPayment) and returns them for the flow hooks to consume.
+    content: Extract a useSubmissionCore hook that owns the shared state and helpers (donationState/setDonationState, submittingRef, donationKeyRef, paymentKeyRef, paypalDonationIdRef, rotateIdempotencyKeys, failSubmission, finalizeFromDonation, buildPayloadFor, classifyPaymentMethodResult, confirmCardActionPayment) and returns them for the flow hooks to consume.
     status: pending
   - id: extract-card-flow
     content: Move the onSubmit callback into useCardFlow(core, { sepaFormRef, cardFormRef, onPaymentValidationFailed }), returning { onSubmit }. Preserve the dep array exactly.
@@ -48,8 +48,8 @@ Tier 1 moved pure, stateless functions — relocation could not change behavior.
 - **`donationKeyRef` / `paymentKeyRef` are shared idempotency keys.** `onSubmit` and `onWalletConfirm` reuse the same attempt-scoped keys for `action_required` follow-ups and rotate them in their `finally`. `onPayPalApproved` rotates them mid-flow. All flows must share the same two refs and the same `rotateIdempotencyKeys`.
 - **`paypalDonationIdRef` bridges the two PayPal callbacks.** It is only used within the PayPal flow, so it can live in `usePayPalFlow` — but double-check no other flow reads it before moving it out of the core.
 - **`reset` rotates keys.** `reset` calls `rotateIdempotencyKeys`, so it belongs with the core (or the orchestrator), not a single flow.
-- **Closed-over hook params.** `buildPayloadFor`, `resolveCreatedPaymentMethod`, and `confirmCardActionPayment` close over `donationData`, `fundraiser`, `paymentOptions`, `isAuthenticated`, `donorProfile`, `onPaymentValidationFailed`. These belong in the core so all flows get the same memoized instances.
-- **`onPaymentValidationFailed` is card-flow-only via the helper.** It feeds `resolveCreatedPaymentMethod` (used only by `onSubmit`). Decide deliberately whether `resolveCreatedPaymentMethod` lives in the core (shared) or in `useCardFlow` (its only consumer). Either is fine; keep its dep `[onPaymentValidationFailed]` intact.
+- **Closed-over hook params.** `buildPayloadFor`, `classifyPaymentMethodResult`, and `confirmCardActionPayment` close over `donationData`, `fundraiser`, `paymentOptions`, `isAuthenticated`, `donorProfile`, `onPaymentValidationFailed`. These belong in the core so all flows get the same memoized instances.
+- **`onPaymentValidationFailed` is card-flow-only via the helper.** It feeds `classifyPaymentMethodResult` (used only by `onSubmit`). Decide deliberately whether `classifyPaymentMethodResult` lives in the core (shared) or in `useCardFlow` (its only consumer). Either is fine; keep its dep `[onPaymentValidationFailed]` intact.
 - **`token || undefined` vs `token ?? undefined`.** Unchanged from Tier 1 — pass `token` through verbatim per call site; do not unify the operator.
 - **Dep-array parity.** When a callback moves into a flow hook, its dependency array must list the exact same dependencies (now sourced from the `core` object). Destructure `core` at the top of each flow hook so the dep arrays reference stable identities.
 
@@ -60,7 +60,7 @@ Tier 1 moved pure, stateless functions — relocation could not change behavior.
 function useSubmissionCore(donationData, fundraiser, paymentOptions, onPaymentValidationFailed) {
   // donationState/setDonationState, submittingRef, donationKeyRef, paymentKeyRef
   // rotateIdempotencyKeys, failSubmission, finalizeFromDonation,
-  // buildPayloadFor, resolveCreatedPaymentMethod, confirmCardActionPayment
+  // buildPayloadFor, classifyPaymentMethodResult, confirmCardActionPayment
   return { /* all of the above */ };
 }
 

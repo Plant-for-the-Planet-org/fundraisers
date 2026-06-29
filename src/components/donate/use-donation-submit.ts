@@ -147,7 +147,7 @@ export function useDonationSubmit(
   // Classifies a Stripe createPaymentMethod result, applying the matching UI
   // side effect. Returns the paymentDetails to continue with, or null when the
   // result was handled (error/validation) and the caller should stop.
-  const resolveCreatedPaymentMethod = useCallback(
+  const classifyPaymentMethodResult = useCallback(
     (
       result: StripePaymentMethodResult | undefined
     ): { paymentMethodId: string } | null => {
@@ -249,7 +249,7 @@ export function useDonationSubmit(
               ),
             });
 
-            const resolved = resolveCreatedPaymentMethod(sepaResult);
+            const resolved = classifyPaymentMethodResult(sepaResult);
             if (!resolved) return;
             paymentDetails = resolved;
           } else if (values.selectedPaymentMethod === 'card') {
@@ -263,7 +263,7 @@ export function useDonationSubmit(
               ),
             });
 
-            const resolved = resolveCreatedPaymentMethod(cardResult);
+            const resolved = classifyPaymentMethodResult(cardResult);
             if (!resolved) return;
             paymentDetails = resolved;
           }
@@ -398,7 +398,7 @@ export function useDonationSubmit(
       token,
       sepaFormRef,
       cardFormRef,
-      resolveCreatedPaymentMethod,
+      classifyPaymentMethodResult,
       confirmCardActionPayment,
       rotateIdempotencyKeys,
       finalizeFromDonation,
