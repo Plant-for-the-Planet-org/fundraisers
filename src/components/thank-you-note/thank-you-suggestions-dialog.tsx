@@ -1,7 +1,8 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -70,6 +71,7 @@ export function ThankYouSuggestionsDialog({
   onSelect,
 }: ThankYouSuggestionsDialogProps) {
   const t = useTranslations('Fundraisers.form.options.thankYouNote');
+  const tActions = useTranslations('Common.actions');
   const locale = useLocale();
   const presetLocale = locale === 'de' ? 'de' : 'en';
 
@@ -92,16 +94,33 @@ export function ThankYouSuggestionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='border-border sm:max-w-2xl'>
+      <DialogContent
+        className='border-border sm:max-w-2xl'
+        showCloseButton={false}
+      >
         <DialogHeader>
-          <DialogTitle className='flex items-center gap-2 text-base'>
-            <Sparkles size={16} className='text-primary' />
-            {t('suggestionsTitle')}
-          </DialogTitle>
-          <DialogDescription>{t('suggestionsSubtitle')}</DialogDescription>
+          <div className='flex items-start justify-between gap-3'>
+            <div className='flex flex-col gap-2'>
+              <DialogTitle className='flex items-center gap-2 text-base'>
+                <Sparkles size={16} className='text-primary' />
+                {t('suggestionsTitle')}
+              </DialogTitle>
+              <DialogDescription>{t('suggestionsSubtitle')}</DialogDescription>
+            </div>
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              className='size-8 shrink-0'
+              onClick={() => onOpenChange(false)}
+              aria-label={tActions('close')}
+            >
+              <X size={16} />
+            </Button>
+          </div>
         </DialogHeader>
 
-        <div className='flex flex-col gap-4 max-h-[60vh] overflow-y-auto'>
+        <div className='-mr-6 flex max-h-[60vh] flex-col gap-4 overflow-y-auto pr-6'>
           {hasRecommended && (
             <section className='flex flex-col gap-2'>
               <span className='text-xs font-semibold tracking-wide text-muted-foreground'>

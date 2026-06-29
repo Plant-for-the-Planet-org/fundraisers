@@ -22,7 +22,7 @@ const EMPTY_SUMMARY: DashboardSummaryStats = {
   totalFundraiserCount: 0,
   activeFundraiserCount: 0,
   donationsCount: 0,
-  totalRaisedByCurrency: [],
+  consolidatedTotalRaised: null,
 };
 
 export default function DashboardPage() {

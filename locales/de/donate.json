@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "{recipientName} gewidmet",
-      "emailNotice": "Eine E-Mail mit deiner Nachricht und dem Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoMessage": "Der Link zur Geschenkurkunde wird an <highlight>{recipientEmail}</highlight> geschickt.",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein."
+      "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailPreview": {
+        "greeting": "Hallo {recipientName},",
+        "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
+        "certificate": "Lade deine Urkunde hier herunter.",
+        "messageFrom": "Hier ist eine Nachricht von {sender}:",
+        "signature": "Alles Gute,\nDein Plant-for-the-Planet Team",
+        "donorFallback": "der Spender"
+      }
     },
     "errors": {
       "zipCode": {
@@ -134,7 +142,6 @@
       "mandateTitle": "SEPA-Lastschriftmandat",
       "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) Rocketship Inc. und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von Rocketship Inc. und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
-      "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Gläubiger-ID",
       "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
       "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
@@ -182,12 +189,12 @@
       }
     },
     "applePay": {
-      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche es mit Safari auf macOS oder iOS, oder scanne den QR-Code mit deinem iPhone.",
-      "processing": "Apple-Pay-Spende wird verarbeitet…"
+      "unavailable": "Apple Pay ist in diesem Browser nicht verfügbar. Versuche Safari auf macOS oder iOS oder scanne den QR-Code mit deinem iPhone.",
+      "processing": "Verarbeitung der Spende mit Apple Pay..."
     },
     "googlePay": {
-      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche es mit Chrome auf Android, oder wähle eine andere Zahlungsmethode.",
-      "processing": "Google-Pay-Spende wird verarbeitet…"
+      "unavailable": "Google Pay ist in diesem Browser nicht verfügbar. Versuche Chrome auf Android oder wähle eine andere Zahlungsmethode.",
+      "processing": "Verarbeitung der Spende mit Google Pay..."
     },
     "submissionErrors": {
       "authRequired": "Bitte melde dich an, um mit der Spende fortzufahren.",
@@ -204,7 +211,13 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
-      "paymentCancelled": "Zahlung wurde abgebrochen.",
+      "cardDeclined": "Deine Karte wurde abgelehnt. Bitte versuche eine andere Zahlungsmethode oder kontaktiere deine Bank.",
+      "cardRestricted": "Deine Karte konnte nicht verarbeitet werden. Bitte kontaktiere deine Bank.",
+      "insufficientFunds": "Deine Karte hat kein ausreichendes Guthaben. Bitte versuche es mit einer anderen Karte.",
+      "expiredCard": "Deine Karte ist abgelaufen. Bitte verwende eine andere Karte.",
+      "processingError": "Bei der Verarbeitung deiner Karte ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      "authenticationFailed": "Deine Zahlung konnte nicht authentifiziert werden. Bitte wähle eine andere Zahlungsmethode und versuche es erneut.",
+      "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
     "cta": {

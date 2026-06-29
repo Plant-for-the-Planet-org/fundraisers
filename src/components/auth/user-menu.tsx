@@ -46,11 +46,12 @@ export function UserMenu() {
     return <div className='w-14 h-8 bg-gray-200 rounded-full animate-pulse' />;
   }
 
-  if (
-    !isAuthInitializing &&
-    !isAuthenticated &&
-    !pathname.startsWith('/login')
-  ) {
+  // Auth-flow pages have their own sign-in entry point, so the header button
+  // is redundant there (and would capture the page itself as redirectTo).
+  const isAuthFlowPage =
+    pathname.startsWith('/login') || pathname.startsWith('/verify-email');
+
+  if (!isAuthInitializing && !isAuthenticated && !isAuthFlowPage) {
     return <SignInButton />;
   }
 
@@ -91,6 +92,11 @@ export function UserMenu() {
         >
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
+              {profile?.type !== 'individual' && profile?.name && (
+                <span className='text-xs leading-normal text-muted-foreground truncate max-w-full'>
+                  {profile.name}
+                </span>
+              )}
               <span className='text-sm font-medium leading-normal truncate max-w-full'>
                 {displayName || tAuth('impersonation.userDefault')}
               </span>

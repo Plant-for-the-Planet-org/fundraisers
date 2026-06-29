@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { Toaster } from 'sonner';
 import { Footer } from '@/components/footer';
 import { Header } from '@/components/header';
 import { ThemeShell } from '@/components/theme/theme-shell';
@@ -12,7 +11,6 @@ export default function StandardLayout({ children }: { children: ReactNode }) {
       <Header />
       <MainContent>{children}</MainContent>
       <Footer />
-      <Toaster richColors />
     </ThemeShell>
   );
 }

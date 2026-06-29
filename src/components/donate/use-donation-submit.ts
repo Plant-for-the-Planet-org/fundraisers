@@ -322,7 +322,7 @@ export function useDonationSubmit(
               )) ?? { error: 'No card form available' };
 
               if ('error' in actionResult) {
-                setDonationState(withError('paymentFailed'));
+                setDonationState(withError('authenticationFailed'));
                 return;
               }
 
@@ -353,7 +353,7 @@ export function useDonationSubmit(
                 )) ?? { error: 'No card form available' };
 
               if (confirmResult.error) {
-                setDonationState(withError('paymentFailed'));
+                setDonationState(withError('authenticationFailed'));
                 return;
               }
 
@@ -371,7 +371,7 @@ export function useDonationSubmit(
                 )) ?? { error: 'No SEPA form available' };
 
               if (sepaResult.error) {
-                setDonationState(withError('paymentFailed'));
+                setDonationState(withError('authenticationFailed'));
               } else {
                 await finalizeFromDonation(
                   donationResponse.donationId,
@@ -562,7 +562,7 @@ export function useDonationSubmit(
               paymentResponse.response.payment_intent_client_secret
             );
             if (error || !paymentIntent) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
 
@@ -580,7 +580,7 @@ export function useDonationSubmit(
               { payment_method: paymentResponse.response.payment_method }
             );
             if (error) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
           } else {

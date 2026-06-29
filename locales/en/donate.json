@@ -82,9 +82,17 @@
     },
     "gift": {
       "dedicatedTo": "Dedicated to {recipientName}",
-      "emailNotice": "An email with your message and a link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoMessage": "The link to the gift-certificate will be sent to <highlight>{recipientEmail}</highlight>",
-      "emailNoticeNoEmail": "Your confirmation email will contain a link to the gift certificate"
+      "sentTo": "To: <recipient>{recipientName} <{recipientEmail}></recipient>",
+      "sentFrom": "From: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
+      "emailNoticeNoEmail": "Your confirmation email will include a link to the dedication certificate",
+      "emailPreview": {
+        "greeting": "Dear {recipientName},",
+        "intro": "{donor} has gifted their contribution of {amount} to you.",
+        "certificate": "Download your personal certificate.",
+        "messageFrom": "Here's a message from {sender}:",
+        "signature": "All the best,\nYour Plant-for-the-Planet team",
+        "donorFallback": "the donor"
+      }
     },
     "errors": {
       "zipCode": {
@@ -134,7 +142,6 @@
       "mandateTitle": "SEPA Direct Debit Mandate",
       "mandateIntro": "By providing your IBAN and confirming this payment, you authorise (A) Rocketship Inc. and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions.",
       "creditor": "Creditor",
-      "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Creditor ID",
       "mandateRights": "Your rights: You’re entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
       "mandateConsent": "I agree to the SEPA Direct Debit mandate and authorize the debit of my account",
@@ -204,6 +211,12 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "cardDeclined": "Your card was declined. Please try a different payment method or contact your bank.",
+      "cardRestricted": "Your card could not be processed. Please contact your bank.",
+      "insufficientFunds": "Your card has insufficient funds. Please try a different card.",
+      "expiredCard": "Your card has expired. Please use a different card.",
+      "processingError": "An error occurred while processing your card. Please try again.",
+      "authenticationFailed": "We could not authenticate your payment. Please choose a different payment method and try again.",
       "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },

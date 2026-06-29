@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import {
   exchangeCodeForTokens,
   getAccessTokenSilently,
@@ -16,6 +18,7 @@ async function handleCodeExchange(code: string) {
 }
 
 export function AuthInitializer() {
+  const tAuth = useTranslations('Auth');
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -55,6 +58,7 @@ export function AuthInitializer() {
         if (error === 'auth_failed') {
           console.warn('Auth previously failed, skipping silent auth');
           cleanUrl(['error', 'reason']);
+          toast.error(tAuth('signInError'));
           return;
         }
 
@@ -80,6 +84,7 @@ export function AuthInitializer() {
       } catch (err) {
         console.error('Auth init failed:', err);
         clearAuth();
+        toast.error(tAuth('signInError'));
       } finally {
         setIsAuthInitializing(false);
       }
@@ -93,6 +98,7 @@ export function AuthInitializer() {
     setIsAuthInitializing,
     code,
     error,
+    tAuth,
   ]);
 
   useEffect(() => {
