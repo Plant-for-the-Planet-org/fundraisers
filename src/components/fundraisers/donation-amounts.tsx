@@ -5,6 +5,7 @@ import type { ContributionOption } from '@/lib/types/fundraiser';
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Check, X } from 'lucide-react';
+import { DEFAULT_MIN_CENTS } from '@/lib/constants/donation';
 import { cn } from '@/lib/utils/cn';
 import { formatCurrency, getCurrencySymbol } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ interface DonationAmountsProps {
   onAmountSelect: (amount: number) => void;
   selectedAmount?: number;
   customAmount?: number;
-  onCustomAmountChange: (amount: number) => void;
+  onCustomAmountChange: (amount: number | undefined) => void;
   customOption?: ContributionOption | null;
   minCents?: number;
 }
@@ -34,7 +35,7 @@ export function DonationAmounts({
   const [isCustomInputSelected, setIsCustomInputSelected] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const effectiveMinCents = minCents ?? customOption?.min ?? 200;
+  const effectiveMinCents = minCents ?? customOption?.min ?? DEFAULT_MIN_CENTS;
   const showMinHint =
     isCustomInputSelected &&
     inputValue !== '' &&
@@ -103,6 +104,9 @@ export function DonationAmounts({
                   step='0.01'
                   placeholder={t('enterAmount')}
                   value={inputValue}
+                  aria-describedby={
+                    showMinHint ? 'custom-amount-min-hint' : undefined
+                  }
                   min={
                     customOption.min
                       ? (customOption.min / 100).toString()
@@ -113,7 +117,7 @@ export function DonationAmounts({
                     setInputValue(newValue);
 
                     if (newValue === '' || newValue === '.') {
-                      onCustomAmountChange(0);
+                      onCustomAmountChange(undefined);
                     } else {
                       const displayValue = parseFloat(newValue);
                       if (!isNaN(displayValue)) {
@@ -169,7 +173,10 @@ export function DonationAmounts({
             </div>
           </div>
           {showMinHint && (
-            <p className='text-xs text-muted-foreground px-1'>
+            <p
+              id='custom-amount-min-hint'
+              className='text-xs text-muted-foreground px-1'
+            >
               {t('customAmountMin', {
                 amount: formatCurrency(effectiveMinCents, currency, locale),
               })}

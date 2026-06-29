@@ -15,6 +15,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { DEFAULT_MIN_CENTS } from '@/lib/constants/donation';
 import {
   GIFT_MESSAGE_MAX_LENGTH,
   RECIPIENT_EMAIL_MAX_LENGTH,
@@ -105,9 +106,11 @@ export function DonationForm({
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
+  const freqMinQuantity =
+    frequencies?.[selectedFrequency.value as keyof typeof frequencies]
+      ?.minQuantity;
   const activeMinCents =
-    (frequencies?.[selectedFrequency.value as keyof typeof frequencies]
-      ?.minQuantity ?? 2) * 100;
+    freqMinQuantity != null ? freqMinQuantity * 100 : DEFAULT_MIN_CENTS;
 
   const [giftValues, setGiftValues] = useState<DonationGiftValues>({
     recipientName: '',
@@ -117,7 +120,10 @@ export function DonationForm({
   const [giftErrors, setGiftErrors] = useState<DonationGiftErrors>({});
 
   const getDonateButtonText = () => {
-    const amount = customAmount || selectedAmount;
+    const amount =
+      customAmount !== undefined
+        ? Math.max(customAmount, activeMinCents)
+        : selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
       ? `${formatCurrency(amount, currency, locale)} • `
       : '';
@@ -230,7 +236,9 @@ export function DonationForm({
 
       setGiftErrors({});
       onDonate(
-        customAmount ? Math.max(customAmount, activeMinCents) : selectedAmount,
+        customAmount !== undefined
+          ? Math.max(customAmount, activeMinCents)
+          : selectedAmount,
         true,
         selectedFrequency.value,
         gift
@@ -239,7 +247,9 @@ export function DonationForm({
     }
 
     onDonate(
-      customAmount ? Math.max(customAmount, activeMinCents) : selectedAmount,
+      customAmount !== undefined
+        ? Math.max(customAmount, activeMinCents)
+        : selectedAmount,
       false,
       selectedFrequency.value
     );
