@@ -11,7 +11,6 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  ChevronDown,
   Italic,
   List,
   ListOrdered,
@@ -32,12 +31,6 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
@@ -288,9 +281,22 @@ export function RichTextEditor({
     }
   };
 
-  const CurrentAlignIcon =
-    ALIGN_OPTIONS.find(option => option.value === toolbarState.align)?.Icon ??
-    AlignLeft;
+  const currentAlignOption =
+    ALIGN_OPTIONS.find(option => option.value === toolbarState.align) ??
+    ALIGN_OPTIONS[0];
+  const CurrentAlignIcon = currentAlignOption.Icon;
+
+  // Single button cycles through the alignments (left → center → right → left),
+  // Instagram-style, instead of opening a menu. The icon reflects the current
+  // alignment so the button stays self-describing.
+  const cycleAlign = () => {
+    const index = Math.max(
+      0,
+      ALIGN_OPTIONS.findIndex(option => option.value === toolbarState.align)
+    );
+    const next = ALIGN_OPTIONS[(index + 1) % ALIGN_OPTIONS.length];
+    editor.chain().focus().setTextAlign(next.value).run();
+  };
 
   return (
     <div
@@ -393,40 +399,13 @@ export function RichTextEditor({
           <AArrowUp className='h-4 w-4' />
         </ToolbarButton>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type='button'
-              title='Text alignment'
-              aria-label='Text alignment'
-              className={cn(
-                'h-8 rounded-md px-1.5 inline-flex items-center gap-0.5 transition-colors',
-                'hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                toolbarState.align !== 'left' && 'bg-muted'
-              )}
-            >
-              <CurrentAlignIcon className='h-4 w-4' />
-              <ChevronDown className='h-3 w-3 opacity-60' />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' className='min-w-[8rem]'>
-            {ALIGN_OPTIONS.map(({ value, label, Icon }) => (
-              <DropdownMenuItem
-                key={value}
-                onSelect={() =>
-                  editor.chain().focus().setTextAlign(value).run()
-                }
-                className={cn(
-                  'gap-2',
-                  toolbarState.align === value && 'bg-muted'
-                )}
-              >
-                <Icon className='h-4 w-4' />
-                {label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ToolbarButton
+          onClick={cycleAlign}
+          isActive={toolbarState.align !== 'left'}
+          title={`Align: ${currentAlignOption.label} (click to cycle)`}
+        >
+          <CurrentAlignIcon className='h-4 w-4' />
+        </ToolbarButton>
 
         <div className='w-px h-6 bg-border mx-1' />
 
