@@ -126,7 +126,7 @@ function TitleInput({
           {titleErrorMessage}
         </p>
       ) : (
-        <p id={helperId} className='text-xs text-muted-foreground'>
+        <p id={helperId} className='text-sm text-muted-foreground'>
           {helper}
         </p>
       )}

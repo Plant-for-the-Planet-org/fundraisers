@@ -116,7 +116,7 @@ export function SlugField({ savedSlug }: { savedSlug: string }) {
           {errorMessage}
         </p>
       ) : unlocked ? (
-        <p className='text-xs text-amber-600 dark:text-amber-400'>
+        <p className='text-sm text-amber-600 dark:text-amber-400'>
           {t('warning')}
         </p>
       ) : null}
