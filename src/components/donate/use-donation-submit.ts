@@ -288,7 +288,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
                 return;
               }
@@ -343,7 +343,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
                 return;
               }
@@ -370,7 +370,7 @@ export function useDonationSubmit(
                 setDonationState(prev => ({
                   ...prev,
                   isLoading: false,
-                  error: { code: 'paymentFailed' },
+                  error: { code: 'authenticationFailed' },
                 }));
               } else {
                 const thankYouState = await resolveThankYouStateFromDonation(
@@ -669,7 +669,7 @@ export function useDonationSubmit(
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                error: { code: 'authenticationFailed' },
               }));
               return;
             }
@@ -702,7 +702,7 @@ export function useDonationSubmit(
               setDonationState(prev => ({
                 ...prev,
                 isLoading: false,
-                error: { code: 'paymentFailed' },
+                error: { code: 'authenticationFailed' },
               }));
               return;
             }
