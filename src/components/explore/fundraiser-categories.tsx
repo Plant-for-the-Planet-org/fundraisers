@@ -24,7 +24,10 @@ export async function CategoriesSkeleton() {
       </div>
       <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
         {Array.from({ length: 8 }).map((_, i) => (
-          <li key={i} className='p-4 rounded-lg border border-border bg-card'>
+          <li
+            key={i}
+            className='p-4 rounded-xl border border-border bg-background'
+          >
             <div className='flex flex-col items-start space-y-3'>
               <Skeleton className='w-14 h-14' />
               <div className='w-full'>
@@ -113,14 +116,14 @@ export async function FundraiserCategories() {
           <li key={category.id}>
             <Link
               href={`/explore/${category.slug}`}
-              className='group block p-4 rounded-lg border border-border bg-card hover:bg-accent hover:border-accent-foreground/20 transition-colors'
+              className='block rounded-xl border border-border bg-background p-4 transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
             >
               <div className='flex flex-col items-start space-y-3'>
                 <div className='w-14 h-14 flex items-center justify-start'>
                   <CategoryIcon category={category} size='regular' />
                 </div>
                 <div>
-                  <h3 className='font-medium text-foreground group-hover:text-accent-foreground mb-1'>
+                  <h3 className='font-medium text-foreground mb-1'>
                     {category.name}
                   </h3>
                   <p className='text-sm text-muted-foreground'>

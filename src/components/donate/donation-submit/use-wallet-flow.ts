@@ -90,7 +90,7 @@ export function useWalletFlow(core: SubmissionCore) {
               paymentResponse.response.payment_intent_client_secret
             );
             if (error || !paymentIntent) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
 
@@ -108,7 +108,7 @@ export function useWalletFlow(core: SubmissionCore) {
               { payment_method: paymentResponse.response.payment_method }
             );
             if (error) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
           } else {

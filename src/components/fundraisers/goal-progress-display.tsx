@@ -6,7 +6,8 @@ interface GoalProgressDisplayProps {
   goalAmount: number;
   currency: string;
   progressPercentage: number;
-  daysLeft: number;
+  /** Omit (or pass undefined) to hide the days-left line, e.g. when the fundraiser is not active. */
+  daysLeft?: number;
 }
 
 export function GoalProgressDisplay({
@@ -42,7 +43,9 @@ export function GoalProgressDisplay({
             amount: formatCurrencyFromDecimal(goalAmount, currency, locale),
           })}
         </div>
-        <div>{t('daysLeft', { days: daysLeft })}</div>
+        {daysLeft !== undefined && (
+          <div>{t('daysLeft', { days: daysLeft })}</div>
+        )}
       </div>
     </div>
   );

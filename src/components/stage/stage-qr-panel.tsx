@@ -23,7 +23,9 @@ export function StageQRPanel({ fundraiserId, slug }: StageQRPanelProps) {
     });
     const target = `${window.location.origin}/raise/${fundraiserId}?${params.toString()}`;
     setDonateUrl(`stage.pp.eco/${slug}`);
-    setQrSrc(`https://qr.pp.eco/?data=${encodeURIComponent(target)}`);
+    // qr.pp.eco encodes whatever follows `?` verbatim, e.g.
+    // https://qr.pp.eco/?https://example.com — no named param, no encoding.
+    setQrSrc(`https://qr.pp.eco/?${target}`);
   }, [fundraiserId, slug]);
 
   return (

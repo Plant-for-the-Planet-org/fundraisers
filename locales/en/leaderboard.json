@@ -8,7 +8,7 @@
         "showRecentList": "Show Recent List",
         "showTopList": "Show Top List",
         "showAmounts": "Show Amounts",
-        "viewAllButton": "View All Button",
+        "viewAllButton": "Show all donations",
         "anonymizeDonors": "Anonymize Donors",
         "showAvatars": "Show Avatars",
         "groupTopByDonor": "Group Top Donations by Donor"
@@ -33,7 +33,8 @@
         "topDonations": "Top Donations",
         "topDonors": "Top Donors"
       },
-      "viewAll": "View all",
+      "demoData": "(*Demo data - only for preview)",
+      "viewAll": "Show all donations",
       "emptyState": "No donations to display",
       "viewAllOverlay": {
         "title": "All Donations",

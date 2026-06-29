@@ -94,7 +94,7 @@ export interface ConfirmCardActionPaymentParams {
  * These are NOT part of the shared core: the two Stripe form refs and
  * `onPaymentValidationFailed` are consumed solely by the Stripe `onSubmit` path
  * (card + SEPA, including saved Stripe methods), the latter via
- * `resolveCreatedPaymentMethod`, which lives in `useStripeFlow` because both the
+ * `classifyPaymentMethodResult`, which lives in `useStripeFlow` because both the
  * card and SEPA `createPaymentMethod` results flow through it.
  */
 export interface StripeFlowDeps {

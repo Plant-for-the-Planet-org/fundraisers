@@ -1,6 +1,6 @@
 {
   "Fundraisers": {
-    "startFundraiser": "Spendenaufruf erstellen",
+    "startFundraiser": "Erstellen",
     "donationCount": "{count, plural, =0 {0 Spenden} one {1 Spende} other {{formattedCount} Spenden}}",
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
     "amountRaised": "{formattedAmountWithCurrency}",
@@ -11,6 +11,7 @@
     "anonymousHost": "{count, plural, one {anonymer Gastgeber*in} other {anonyme Gastgeber*innen}}",
     "coverImageAlt": "Titelbild für {title}",
     "donationCountLabel": "Spendenanzahl",
+    "demoData": "*Demo-Daten - nur zur Vorschau",
     "amountRaisedLabel": "Gesammelter Betrag",
     "hostedByLabel": "Erstellt von",
     "hostsStripNames": "{names}{remaining, plural, =0 {} one { und # anderer} other { und # andere}}",
@@ -281,7 +282,19 @@
           "moveDown": "Nach unten",
           "removeSlide": "Folie entfernen",
           "imageUrlError": "Es sind nur Bilder aus vertrauenswürdigen Quellen erlaubt (Unsplash, Cloudinary, plant-for-the-planet.org, etc.)",
-          "maxSlidesReached": "Maximum von {max} Folien erreicht"
+          "maxSlidesReached": "Maximum von {max} Folien erreicht",
+          "browseTemplates": "Vorlagen anzeigen",
+          "useTemplate": "Vorlage verwenden",
+          "templatesTitle": "Folienvorlagen",
+          "templatesSubtitle": "Wähle eine Vorlage für eine Folie aus und bearbeite anschließend Text und Bild.",
+          "templatesSubtitleMulti": "Wähle eine oder mehrere Vorlagen aus und füge diese dann als Folien ein.",
+          "addSelected": "{count, plural, =0 {Folien hinzüfügen} one {# Folie hinzufügen} other {Füge # Folien hinzu}}",
+          "imageGuidelines": "Achte darauf, dass keine Bilder in den Ecken der Folien sind. Platziere wichtige Texte oder Gesichter in der Mitte. Auf der Leinwand werden Spendensummen, Titel und andere Live-Inhalte über die Ränder hinaus angezeigt, weshalb Inhalte an den Ecken verdeckt werden können.",
+          "previewSlide": "Vorschau",
+          "previewClose": "Vorschau schließen",
+          "previewRaisedLabel": "Bisher gesammelt",
+          "previewQrLabel": "Scannen und spenden",
+          "previewTickerLabel": "Die neuesten Spenden werden hier angezeigt"
         },
         "thankYouNote": {
           "title": "Dankesnachricht",

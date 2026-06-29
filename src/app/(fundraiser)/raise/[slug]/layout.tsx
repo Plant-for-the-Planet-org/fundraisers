@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
 import { getLocale } from 'next-intl/server';
-import { Toaster } from 'sonner';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
@@ -38,11 +37,10 @@ export default async function FundraiserLayout({
   }
 
   return (
-    <ThemeShell initialTheme={theme}>
+    <ThemeShell initialTheme={theme} blurMainContentBackdrop>
       <Header />
       <MainContent>{children}</MainContent>
       <Footer />
-      <Toaster richColors />
     </ThemeShell>
   );
 }

@@ -60,6 +60,10 @@ export function FundraiserView({
   const canShowLeaderboard =
     leaderboardSettings?.enabled &&
     (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
+  const canReceiveDonations =
+    fundraiser.canDonate &&
+    paymentOptions !== undefined &&
+    fundraiser.workspace !== null;
 
   return (
     <FundraiserLayout>
@@ -79,25 +83,32 @@ export function FundraiserView({
           goalAmount={fundraiser.goalAmount}
           currency={fundraiser.currency}
           progressPercentage={progressPercentage}
-          daysLeft={daysLeft}
+          daysLeft={canReceiveDonations ? daysLeft : undefined}
         />
 
-        {/* Donation count + donor avatars (only when leaderboard module is on) */}
+        {/* Donation count + donor avatars (only when leaderboard module is on).
+            DonorsSummary renders the count header + strip + a "View all" entry
+            into the donations modal; the fallback keeps the count visible while
+            the leaderboard loads. */}
         {canShowLeaderboard && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('donationCount', {
-                count: fundraiser.donationCount,
-                formattedCount: formatCompactNumber(
-                  fundraiser.donationCount,
-                  locale
-                ),
-              })}
-            </SectionHeader>
-            <Suspense fallback={<DonorsStripSkeleton />}>
-              <DonorsSummary fundraiser={fundraiser} />
-            </Suspense>
-          </div>
+          <Suspense
+            fallback={
+              <div className='flex flex-col gap-3'>
+                <SectionHeader>
+                  {t('donationCount', {
+                    count: fundraiser.donationCount,
+                    formattedCount: formatCompactNumber(
+                      fundraiser.donationCount,
+                      locale
+                    ),
+                  })}
+                </SectionHeader>
+                <DonorsStripSkeleton />
+              </div>
+            }
+          >
+            <DonorsSummary fundraiser={fundraiser} />
+          </Suspense>
         )}
 
         <div className='md:hidden flex flex-col'>
@@ -137,7 +148,7 @@ export function FundraiserView({
           ))}
 
         {/* Donation form + overlay */}
-        {fundraiser.canDonate && paymentOptions && fundraiser.workspace ? (
+        {canReceiveDonations ? (
           <>
             <DonationSection
               fundraiser={fundraiser}
@@ -166,7 +177,6 @@ export function FundraiserView({
         {/* Project allocations */}
         <ProjectsSupportedDisplay
           projectAllocations={fundraiser.projectAllocations}
-          bundleSlug={fundraiser.settings?.modules?.bundle?.slug ?? null}
         />
       </MainPanel>
     </FundraiserLayout>

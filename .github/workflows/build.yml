@@ -1,0 +1,44 @@
+name: Build
+
+# Build gate for the Vercel-deployed branches (develop, main). Runs on every
+# PR into them and blocks the merge if `next build` fails. Merges happen
+# GitHub-side, where the local pre-push hook never runs — so this is the gate
+# that stops a broken commit from triggering a Vercel deploy. (Feature
+# branches deploy via Coolify on push and are guarded by the pre-push build.)
+on:
+  pull_request:
+    branches: [develop, main]
+
+# A new push to the same PR cancels the in-flight run.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: next build
+    runs-on: ubuntu-latest
+    env:
+      # Public (NEXT_PUBLIC_*) placeholders so the build compiles in CI.
+      # These are NOT secrets — they ship in the browser bundle anyway. The
+      # real per-environment values are injected by Coolify at deploy time.
+      # auth0-config.ts throws at module load without a client id, which would
+      # fail the build; the placeholder satisfies that without weakening the
+      # deploy-time fail-fast.
+      NEXT_PUBLIC_AUTH0_CLIENT_ID: ci-placeholder
+      NEXT_PUBLIC_API_BASE_URL: https://app.plant-for-the-planet.org
+      NEXT_PUBLIC_CDN_URL: https://cdn.plant-for-the-planet.org
+      BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build

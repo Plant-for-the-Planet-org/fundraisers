@@ -37,6 +37,21 @@ export const cookieConsent = {
     lib?.showPreferences();
   },
 
+  /**
+   * Grant consent for a single category in one click, without opening the
+   * preferences modal. Used by a gated embed's "allow" button: the button is
+   * itself the clear, informed, affirmative consent action. Existing accepted
+   * categories are preserved (we accept the union), so this never silently
+   * revokes a prior choice such as analytics.
+   */
+  async accept(category: string): Promise<void> {
+    const lib = await getCookieConsent();
+    if (!lib) return;
+    const accepted = new Set(lib.getUserPreferences().acceptedCategories ?? []);
+    accepted.add(category);
+    lib.acceptCategory([...accepted]);
+  },
+
   async hide(): Promise<void> {
     const lib = await getCookieConsent();
     lib?.hide();

@@ -43,7 +43,7 @@ import { useAuthStore } from '@/stores/auth-store';
  * internal — only `buildPayload` consumes it.
  *
  * Intentionally does NOT own `paypalDonationIdRef` (PayPal-only) or
- * `resolveCreatedPaymentMethod` (card-only); those live in their owning flows.
+ * `classifyPaymentMethodResult` (card-only); those live in their owning flows.
  */
 export function useSubmissionCore(
   donationData: DonationData,

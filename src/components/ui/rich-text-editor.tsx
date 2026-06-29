@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 
-import { useEffect } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Bold,
   Italic,
@@ -12,12 +13,15 @@ import {
   Quote,
   Strikethrough,
   Underline as UnderlineIcon,
+  Video,
 } from 'lucide-react';
 import Placeholder from '@tiptap/extension-placeholder';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
+import { parseVideoUrl } from '@/lib/video/parse-video-url';
+import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
   value?: string;
@@ -105,6 +109,7 @@ export function RichTextEditor({
         placeholder,
       }),
       TextStyle,
+      VideoEmbedNode,
     ],
     content: value,
     onUpdate: ({ editor: currentEditor }) => {
@@ -145,6 +150,36 @@ export function RichTextEditor({
     },
   });
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
+
+  const t = useTranslations('Common.videoEmbed.editor');
+  const videoErrorId = useId();
+  const [isVideoInputOpen, setIsVideoInputOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [hasVideoError, setHasVideoError] = useState(false);
+
+  const closeVideoInput = () => {
+    setVideoUrl('');
+    setHasVideoError(false);
+    setIsVideoInputOpen(false);
+  };
+
+  const insertVideo = () => {
+    const parsed = parseVideoUrl(videoUrl);
+    if (!parsed || !editor) {
+      setHasVideoError(true);
+      return;
+    }
+    editor
+      .chain()
+      .focus()
+      .setVideoEmbed({
+        provider: parsed.provider,
+        videoId: parsed.id,
+        aspect: parsed.aspect,
+      })
+      .run();
+    closeVideoInput();
+  };
 
   useEffect(() => {
     if (editor && !editor.isFocused && value !== editor.getHTML()) {
@@ -226,12 +261,71 @@ export function RichTextEditor({
           <Minus className='h-4 w-4' />
         </ToolbarButton>
 
+        <div className='w-px h-6 bg-border mx-1' />
+
+        <ToolbarButton
+          onClick={() =>
+            isVideoInputOpen ? closeVideoInput() : setIsVideoInputOpen(true)
+          }
+          isActive={isVideoInputOpen}
+          title={t('toolbarButton')}
+        >
+          <Video className='h-4 w-4' />
+        </ToolbarButton>
+
         {extraToolbarActions && (
           <div className='ml-auto flex items-center gap-1'>
             {extraToolbarActions}
           </div>
         )}
       </div>
+
+      {isVideoInputOpen && (
+        <div className='flex flex-col gap-1 border-b border-input bg-muted/10 p-2'>
+          <div className='flex items-center gap-2'>
+            <input
+              type='url'
+              autoFocus
+              value={videoUrl}
+              onChange={event => {
+                setVideoUrl(event.target.value);
+                setHasVideoError(false);
+              }}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  insertVideo();
+                } else if (event.key === 'Escape') {
+                  closeVideoInput();
+                }
+              }}
+              placeholder={t('urlPlaceholder')}
+              aria-label={t('urlLabel')}
+              aria-invalid={hasVideoError}
+              aria-describedby={hasVideoError ? videoErrorId : undefined}
+              className={cn(
+                'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
+                hasVideoError ? 'border-destructive' : 'border-input'
+              )}
+            />
+            <button
+              type='button'
+              onMouseDown={event => {
+                event.preventDefault();
+                insertVideo();
+              }}
+              className='inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+            >
+              {t('add')}
+            </button>
+          </div>
+          {hasVideoError && (
+            <span id={videoErrorId} className='text-xs text-destructive'>
+              {t('invalidUrl')}
+            </span>
+          )}
+        </div>
+      )}
 
       <EditorContent
         editor={editor}
@@ -256,7 +350,9 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_blockquote]:my-4
+          [&_.ProseMirror_blockquote]:my-3
+          [&_.ProseMirror_blockquote]:py-2
+          [&_.ProseMirror_blockquote]:ml-4
           [&_.ProseMirror_blockquote]:pl-4
           [&_.ProseMirror_blockquote]:border-l-4
           [&_.ProseMirror_blockquote]:border-l-border

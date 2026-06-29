@@ -1,33 +1,56 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
-import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
 
 import { getLeaderboardWithRetry } from '@/lib/api/leaderboard-service';
-import { DonorsStrip, DonorsStripSkeleton } from './donors-strip';
+import { DonorsSummaryPanel } from './donors-summary-panel';
 
 interface DonorsSummaryProps {
   fundraiser: Fundraiser;
 }
 
 export async function DonorsSummary({ fundraiser }: DonorsSummaryProps) {
-  let donations: LeaderboardDonation[] = [];
-  let donationCount = fundraiser.donationCount;
+  let data: LeaderboardApiResponse | null = null;
   try {
-    const data = await getLeaderboardWithRetry(fundraiser.slug);
-    // Prefer top donors (often pre-aggregated by donor on the backend);
-    // fall back to recent if top is empty.
-    donations = data.top.length > 0 ? data.top : data.recent;
-    donationCount = data.donationCount;
+    data = await getLeaderboardWithRetry(fundraiser.slug);
   } catch {
-    // Leaderboard endpoint unavailable; render nothing rather than a
-    // stale or partial strip. The count text above stays visible.
+    // Leaderboard endpoint unavailable; fall through to the count-only header.
+    data = null;
   }
 
-  // No donations to render (zero donations, empty backend response, or fetch
-  // failed). Keep the skeleton visible so the layout below the count header
-  // stays stable instead of collapsing.
-  if (donations.length === 0) {
-    return <DonorsStripSkeleton />;
+  if (!data) {
+    // Keep the count header visible (no strip, no view-all) rather than a stale
+    // or partial summary.
+    const settings = fundraiser.settings?.modules?.leaderboard;
+    if (!settings) return null;
+
+    return (
+      <DonorsSummaryPanel
+        donations={[]}
+        donationCount={fundraiser.donationCount}
+        settings={{ ...settings, view_all: false }}
+        idOrSlug={fundraiser.slug}
+        initialRecentDonations={[]}
+        initialTopDonations={[]}
+        totalRecentDonationCount={0}
+        totalTopDonationCount={0}
+      />
+    );
   }
 
-  return <DonorsStrip donations={donations} donationCount={donationCount} />;
+  // Prefer top donors (often pre-aggregated by donor on the backend); fall back
+  // to recent if top is empty.
+  const donations = data.top.length > 0 ? data.top : data.recent;
+
+  return (
+    <DonorsSummaryPanel
+      donations={donations}
+      donationCount={data.donationCount}
+      settings={fundraiser.settings?.modules?.leaderboard ?? data.settings}
+      idOrSlug={fundraiser.slug}
+      initialRecentDonations={data.recent}
+      initialTopDonations={data.top}
+      totalRecentDonationCount={data.recentTotal}
+      totalTopDonationCount={data.topTotal}
+    />
+  );
 }

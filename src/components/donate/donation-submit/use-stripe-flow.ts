@@ -22,7 +22,7 @@ import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
  * Stripe submission flow: card, SEPA, and saved Stripe methods.
  *
  * Owns `onSubmit` for the Stripe-backed standard (two-step) donation path and
- * the `resolveCreatedPaymentMethod` helper. The latter handles both card and
+ * the `classifyPaymentMethodResult` helper. The latter handles both card and
  * SEPA `createPaymentMethod` results, so it lives here rather than in the core;
  * its only dependency, `onPaymentValidationFailed`, is passed in as a flow dep.
  *
@@ -51,7 +51,7 @@ export function useStripeFlow(
   // Classifies a Stripe createPaymentMethod result, applying the matching UI
   // side effect. Returns the paymentDetails to continue with, or null when the
   // result was handled (error/validation) and the caller should stop.
-  const resolveCreatedPaymentMethod = useCallback(
+  const classifyPaymentMethodResult = useCallback(
     (
       result: StripePaymentMethodResult | undefined
     ): { paymentMethodId: string } | null => {
@@ -117,7 +117,7 @@ export function useStripeFlow(
             ),
           });
 
-          const resolved = resolveCreatedPaymentMethod(sepaResult);
+          const resolved = classifyPaymentMethodResult(sepaResult);
           if (!resolved) return;
           paymentDetails = resolved;
         } else if (values.selectedPaymentMethod === 'card') {
@@ -131,7 +131,7 @@ export function useStripeFlow(
             ),
           });
 
-          const resolved = resolveCreatedPaymentMethod(cardResult);
+          const resolved = classifyPaymentMethodResult(cardResult);
           if (!resolved) return;
           paymentDetails = resolved;
         }
@@ -184,7 +184,7 @@ export function useStripeFlow(
             )) ?? { error: 'No card form available' };
 
             if ('error' in actionResult) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
 
@@ -215,7 +215,7 @@ export function useStripeFlow(
               )) ?? { error: 'No card form available' };
 
             if (confirmResult.error) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
               return;
             }
 
@@ -233,7 +233,7 @@ export function useStripeFlow(
               )) ?? { error: 'No SEPA form available' };
 
             if (sepaResult.error) {
-              setDonationState(withError('paymentFailed'));
+              setDonationState(withError('authenticationFailed'));
             } else {
               await finalizeDonation(
                 donationResponse.donationId,
@@ -259,7 +259,7 @@ export function useStripeFlow(
       token,
       sepaFormRef,
       cardFormRef,
-      resolveCreatedPaymentMethod,
+      classifyPaymentMethodResult,
       confirmCardActionPayment,
       rotateIdempotencyKeys,
       finalizeDonation,
