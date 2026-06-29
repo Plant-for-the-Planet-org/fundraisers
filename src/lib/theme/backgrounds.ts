@@ -146,6 +146,15 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     thumb: svgThumb('candle', ['#fff7ed', '#fdba74']),
     src: svgThumb('candle', ['#fff7ed', '#fdba74']),
   },
+  // First real curated asset: a static file under public/theme-backgrounds/
+  // (referenced by path, not an inline data URI — it is too large to inline).
+  {
+    id: 'bg-planet-botanical',
+    label: 'Botanical',
+    type: 'image',
+    thumb: '/theme-backgrounds/planet-botanical.svg',
+    src: '/theme-backgrounds/planet-botanical.svg',
+  },
   // Videos (looping placeholder = static SVG until real assets land)
   {
     id: 'bg-cake-loop',

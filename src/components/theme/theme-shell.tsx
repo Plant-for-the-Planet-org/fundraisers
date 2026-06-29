@@ -91,17 +91,20 @@ export function ThemeShell({
         } as React.CSSProperties
       }
     >
-      {/* Layer stack, back → front: image · gradient · pattern · logo · content */}
+      {/* Layer stack, back → front: gradient · image · pattern · logo · content.
+          The gradient is the base wash; image/pattern/logo are decorations that
+          sit on top of it. A transparent-based image (e.g. foliage) shows the
+          gradient through its gaps instead of being hidden behind it. */}
+      {gradientClass && (
+        <div
+          className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
+        />
+      )}
       {bg.decoration === 'image' && bg.image_url && (
         <ImageLayer
           imageUrl={bg.image_url}
           mode={bg.image_mode}
           opacity={bg.opacity}
-        />
-      )}
-      {gradientClass && (
-        <div
-          className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
         />
       )}
       {bg.decoration === 'pattern' && bg.pattern_id && (
