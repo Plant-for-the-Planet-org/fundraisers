@@ -51,7 +51,7 @@ export function LeaderboardSettingsDropdown({
           type='button'
           variant='ghost'
           size='sm'
-          className='p-px h-auto'
+          className='p-1 h-auto hover:bg-muted-foreground/15 dark:hover:bg-muted-foreground/30'
           aria-label={t('labels.openSettings')}
         >
           {isOpen ? (
