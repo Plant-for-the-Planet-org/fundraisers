@@ -24,11 +24,13 @@ function buildSections(t: PreferencesModalTranslation) {
       description: sections.necessary.description,
       linkedCategory: 'necessary',
     },
-    {
-      title: sections.analytics.title,
-      description: sections.analytics.description,
-      linkedCategory: 'analytics',
-    },
+    // analytics section commented out — no analytics service wired up yet;
+    // re-enable once a real service is added and /cookies page is updated.
+    // {
+    //   title: sections.analytics.title,
+    //   description: sections.analytics.description,
+    //   linkedCategory: 'analytics',
+    // },
     {
       title: sections.externalMedia.title,
       description: sections.externalMedia.description,
