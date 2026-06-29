@@ -5,6 +5,7 @@ import type { FundraiserHost } from '@/lib/types/fundraiser';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { EyeOff, Settings2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { listFundraiserHosts } from '@/lib/api/fundraiser-hosts-service';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
@@ -64,11 +65,12 @@ export function HostsManager({
       })
       .catch(err => {
         console.error('Loading fundraiser hosts failed:', err);
+        toast.warning(t('toastHostsLoadFailed'));
       });
     return () => {
       active = false;
     };
-  }, [fundraiserId, accessToken]);
+  }, [fundraiserId, accessToken, t]);
 
   return (
     <div className='flex flex-col gap-3'>

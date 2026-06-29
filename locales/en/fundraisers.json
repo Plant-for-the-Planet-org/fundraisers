@@ -130,7 +130,9 @@
         "toastUpdated": "Host updated",
         "toastRemoved": "Host removed",
         "toastDuplicate": "That person is already a host.",
-        "toastError": "Something went wrong. Please try again."
+        "toastError": "Something went wrong. Please try again.",
+        "toastHostsLoadFailed": "Could not load full host list. Some hosts may not be shown.",
+        "toastReorderError": "Reorder partially saved. Reload to see current order."
       },
       "goalPreview": {
         "raised": "{amount} raised",

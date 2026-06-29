@@ -130,7 +130,9 @@
         "toastUpdated": "Organisator*in aktualisiert",
         "toastRemoved": "Organisator*in entfernt",
         "toastDuplicate": "Diese Person ist bereits Organisator*in.",
-        "toastError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+        "toastError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "toastHostsLoadFailed": "Vollständige Organisator*innenliste konnte nicht geladen werden. Einige werden möglicherweise nicht angezeigt.",
+        "toastReorderError": "Reihenfolge teilweise gespeichert. Seite neu laden, um aktuelle Reihenfolge zu sehen."
       },
       "goalPreview": {
         "raised": "{amount} gesammelt",

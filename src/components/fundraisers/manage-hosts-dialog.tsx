@@ -133,7 +133,7 @@ export function ManageHostsDialog({
     } catch (err) {
       console.error('Reordering hosts failed:', err);
       onHostsChange(previous); // revert to the pre-drag order
-      toast.error(t('toastError'));
+      toast.error(t('toastReorderError'));
     }
   };
 

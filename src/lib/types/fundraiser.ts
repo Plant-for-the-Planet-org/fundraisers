@@ -43,7 +43,11 @@ export interface FundraiserHost {
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
   status: FundraiserHostStatus;
-  /** Set while status is 'invited' (no profile linked yet), else null. */
+  // Invariant: invitedEmail is non-null only when status === 'invited' (user is
+  // null). When status === 'active', user is non-null and invitedEmail is null.
+  // Not enforced as a discriminated union (YAGNI — all call sites guard via ??
+  // chains or status checks). Refactor to discriminated union if this type
+  // spreads beyond host management components.
   invitedEmail: Nullable<string>;
 }
 
@@ -55,6 +59,10 @@ export interface AddFundraiserHostRequest {
   displayOrder?: number;
 }
 
+// ponytail: all fields intentionally optional for partial updates. An empty
+// object {} is technically valid TypeScript but no call site constructs one —
+// every caller passes at least one field. Add RequireAtLeastOne<T> from
+// utility.ts if a conditional-build code path is ever introduced.
 export interface UpdateFundraiserHostRequest {
   role?: FundraiserHostRole;
   isPublic?: boolean;
