@@ -66,15 +66,6 @@ export function createUnsplashSelectedImage(
   };
 }
 
-export function pickRandomPhoto(photos: UnsplashPhoto[]): UnsplashPhoto | null {
-  if (photos.length === 0) {
-    return null;
-  }
-
-  const randomIndex = Math.floor(Math.random() * photos.length);
-  return photos[randomIndex] ?? null;
-}
-
 export function revokeSelectedImageObjectUrl(
   image: SelectedImage | null | undefined
 ): void {

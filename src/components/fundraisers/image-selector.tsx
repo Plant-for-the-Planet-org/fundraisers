@@ -1,18 +1,17 @@
 'use client';
 
-import type { SelectedImage } from '@/lib/types/image-selection';
+import type { SelectedImage, UnsplashPhoto } from '@/lib/types/image-selection';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
+import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { Image as ImageIcon, RefreshCw, Shuffle } from 'lucide-react';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { DEFAULT_IMAGE_LOAD_CATEGORY_ID } from '@/lib/constants/image-categories';
 import { cn } from '@/lib/utils';
 import {
   createUnsplashSelectedImage,
-  pickRandomPhoto,
   revokeSelectedImageObjectUrl,
 } from '@/lib/utils/image-selection';
 import { ImageComponentBase } from '@/components/fundraisers/image-component-base';
@@ -35,8 +34,21 @@ export function ImageSelector({
   const [hasAttemptedDefaultLoad, setHasAttemptedDefaultLoad] = useState(false);
 
   const latestImageRef = useRef<SelectedImage | null>(null);
+  // Cached batch of default photos so each shuffle advances through the batch
+  // instead of refetching from Unsplash on every click. We only refetch once
+  // the batch is exhausted.
+  const photoBatchRef = useRef<UnsplashPhoto[]>([]);
+  const photoCursorRef = useRef(0);
 
   const { control, setValue } = useFormContext<FundraiserFormValues>();
+  const { defaultValues } = useFormState({ control });
+
+  // "Saved" means persisted on the fundraiser record (the form baseline), not
+  // the in-form selection. Shuffle is offered only while there is none: always
+  // on create, and on edit only when the fundraiser has no image yet.
+  const showShuffle = !(
+    (defaultValues?.image as SelectedImage | null | undefined) ?? null
+  );
 
   const currentImage =
     (useWatch({ control, name: 'image' }) as
@@ -62,28 +74,29 @@ export function ImageSelector({
     [setValue]
   );
 
-  const loadDefaultImage = useCallback(
-    async (force: boolean = false) => {
-      if (!force && latestImageRef.current) {
-        return;
-      }
-
+  const applyNextDefaultPhoto = useCallback(
+    async (shouldDirty: boolean) => {
       setIsLoadingDefaultImage(true);
       setDefaultImageError(null);
 
       try {
-        const photos = await unsplashClient.getCategoryImages(
-          DEFAULT_IMAGE_LOAD_CATEGORY_ID,
-          20
-        );
-        const randomPhoto = pickRandomPhoto(photos);
+        // Refill the batch when it is empty or fully consumed.
+        if (photoCursorRef.current >= photoBatchRef.current.length) {
+          photoBatchRef.current = await unsplashClient.getCategoryImages(
+            DEFAULT_IMAGE_LOAD_CATEGORY_ID,
+            20
+          );
+          photoCursorRef.current = 0;
+        }
 
-        if (!randomPhoto) {
+        const nextPhoto = photoBatchRef.current[photoCursorRef.current];
+
+        if (!nextPhoto) {
           throw new Error('No default image available');
         }
 
-        const defaultImage = createUnsplashSelectedImage(randomPhoto);
-        setSelectedImage(defaultImage, false);
+        photoCursorRef.current += 1;
+        setSelectedImage(createUnsplashSelectedImage(nextPhoto), shouldDirty);
       } catch {
         setDefaultImageError(t('states.defaultError'));
       } finally {
@@ -103,12 +116,12 @@ export function ImageSelector({
       return;
     }
 
-    void loadDefaultImage();
+    void applyNextDefaultPhoto(false);
   }, [
     autoLoadDefault,
     currentImage,
     hasAttemptedDefaultLoad,
-    loadDefaultImage,
+    applyNextDefaultPhoto,
   ]);
 
   useEffect(() => {
@@ -125,8 +138,12 @@ export function ImageSelector({
   );
 
   const handleRetryDefaultImage = useCallback(() => {
-    void loadDefaultImage(true);
-  }, [loadDefaultImage]);
+    void applyNextDefaultPhoto(false);
+  }, [applyNextDefaultPhoto]);
+
+  const handleShuffleImage = useCallback(() => {
+    void applyNextDefaultPhoto(true);
+  }, [applyNextDefaultPhoto]);
 
   const baseClassName =
     'w-full h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400';
@@ -162,16 +179,35 @@ export function ImageSelector({
         alt={t('previewAlt')}
         fallback={fallbackContent}
       >
-        <button
-          onClick={() => {
-            setIsImageOverlayOpen(true);
-          }}
-          className='absolute bottom-3 right-3 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110 flex items-center justify-center'
-          aria-label={t('actions.changeAria')}
-          type='button'
-        >
-          <ImageIcon className='h-4 w-4 text-white' />
-        </button>
+        <div className='absolute bottom-3 right-3 flex items-center gap-2'>
+          {showShuffle && (
+            <button
+              onClick={handleShuffleImage}
+              disabled={isLoadingDefaultImage}
+              className='w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110 flex items-center justify-center disabled:opacity-50 disabled:hover:scale-100'
+              aria-label={t('actions.shuffleAria')}
+              title={t('actions.shuffleAria')}
+              type='button'
+            >
+              <Shuffle
+                className={cn(
+                  'h-4 w-4 text-white',
+                  isLoadingDefaultImage && 'animate-pulse'
+                )}
+              />
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setIsImageOverlayOpen(true);
+            }}
+            className='w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110 flex items-center justify-center'
+            aria-label={t('actions.changeAria')}
+            type='button'
+          >
+            <ImageIcon className='h-4 w-4 text-white' />
+          </button>
+        </div>
       </ImageComponentBase>
 
       <ImageSelectionOverlay

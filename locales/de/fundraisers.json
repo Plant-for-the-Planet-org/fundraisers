@@ -177,6 +177,7 @@
         },
         "actions": {
           "changeAria": "Bild ändern",
+          "shuffleAria": "Zufälliges Bild",
           "retry": "Wiederholen",
           "tryAgain": "Erneut versuchen",
           "closeAria": "Bildauswahl schließen",
