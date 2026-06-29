@@ -119,11 +119,11 @@ export function DonationForm({
   });
   const [giftErrors, setGiftErrors] = useState<DonationGiftErrors>({});
 
+  const isDonateButtonDisabled =
+    customAmount !== undefined && customAmount < activeMinCents;
+
   const getDonateButtonText = () => {
-    const amount =
-      customAmount !== undefined
-        ? Math.max(customAmount, activeMinCents)
-        : selectedAmount;
+    const amount = customAmount !== undefined ? customAmount : selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
       ? `${formatCurrency(amount, currency, locale)} • `
       : '';
@@ -236,9 +236,7 @@ export function DonationForm({
 
       setGiftErrors({});
       onDonate(
-        customAmount !== undefined
-          ? Math.max(customAmount, activeMinCents)
-          : selectedAmount,
+        customAmount !== undefined ? customAmount : selectedAmount,
         true,
         selectedFrequency.value,
         gift
@@ -247,9 +245,7 @@ export function DonationForm({
     }
 
     onDonate(
-      customAmount !== undefined
-        ? Math.max(customAmount, activeMinCents)
-        : selectedAmount,
+      customAmount !== undefined ? customAmount : selectedAmount,
       false,
       selectedFrequency.value
     );
@@ -279,7 +275,6 @@ export function DonationForm({
             setCustomAmount(undefined);
           }}
           selectedAmount={selectedAmount}
-          customAmount={customAmount}
           onCustomAmountChange={setCustomAmount}
           customOption={customOption}
           minCents={activeMinCents}
@@ -298,6 +293,7 @@ export function DonationForm({
         <Button
           className='h-9 w-full font-medium text-base hover:brightness-90'
           style={{ backgroundColor: 'var(--accent-color)' }}
+          disabled={isDonateButtonDisabled}
           onClick={handleDonate}
         >
           {getDonateButtonText()}

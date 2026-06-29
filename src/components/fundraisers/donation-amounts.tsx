@@ -15,7 +15,6 @@ interface DonationAmountsProps {
   currency: string;
   onAmountSelect: (amount: number) => void;
   selectedAmount?: number;
-  customAmount?: number;
   onCustomAmountChange: (amount: number | undefined) => void;
   customOption?: ContributionOption | null;
   minCents?: number;
@@ -113,7 +112,11 @@ export function DonationAmounts({
                       : undefined
                   }
                   onChange={e => {
-                    const newValue = e.target.value;
+                    let newValue = e.target.value;
+                    const dotIdx = newValue.indexOf('.');
+                    if (dotIdx !== -1 && newValue.length - dotIdx - 1 > 2) {
+                      newValue = newValue.slice(0, dotIdx + 3);
+                    }
                     setInputValue(newValue);
 
                     if (newValue === '' || newValue === '.') {
@@ -139,6 +142,13 @@ export function DonationAmounts({
                         e.ctrlKey)
                     ) {
                       return;
+                    }
+                    const dotIndex = inputValue.indexOf('.');
+                    if (dotIndex !== -1 && /^\d$/.test(e.key)) {
+                      if (inputValue.length - dotIndex - 1 >= 2) {
+                        e.preventDefault();
+                        return;
+                      }
                     }
                     if (!/^\d$/.test(e.key) && e.key !== '.') {
                       e.preventDefault();
