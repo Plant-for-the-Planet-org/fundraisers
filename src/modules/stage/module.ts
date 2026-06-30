@@ -10,6 +10,7 @@ export const stageModule = {
   route: { segment: 'stage' },
 } as const satisfies ModuleDescriptor;
 
+// Currently unused, is this needed?
 export const stageDefaultSettings: StageModuleSettings = {
   enabled: false,
   locale: 'en',

@@ -11,6 +11,7 @@ Modules are self-contained features that plug into the fundraiser. Each one owns
 A pluggable feature attached to a fundraiser. Toggled per fundraiser via `FundraiserSettings.modules.<id>`. Examples: Stage Mode (a live event display), Leaderboard (donor list block), DonorScore (decorates the donation form), Contribution (donation amount options).
 
 A module typically owns one or more of:
+
 - A **route segment** (Stage Mode owns `/raise/[slug]/stage`).
 - One or more **UI blocks** that render inside a host (Leaderboard renders inside `FundraiserView`).
 - A **settings panel** rendered inside the fundraiser admin form.
@@ -83,6 +84,7 @@ Module settings live on the fundraiser record at `fundraiser.settings.modules.<i
 - **No module-owned state yet**: if a module ever needs to store data beyond its settings (e.g. user-generated content, separate records), it would need its own endpoints — not the case for any current module.
 
 When designing a module's settings:
+
 - Keep the shape flat where possible; deep nesting is expensive to migrate.
 - Avoid storing computed values; store the inputs and recompute.
 - Mark optional fields with `?` so old fundraisers without the field still parse.
@@ -95,10 +97,10 @@ When designing a module's settings:
 Modules can read live data, but the fetch pattern depends on the surface:
 
 - **Live surfaces** (Stage Mode, real-time dashboards): a polling hook inside the module. Use a wall-clock bucket helper so all clients hit the backend at the same boundaries (better cache hits, predictable load). See Stage's [`stage-hash.ts`](./stage/stage-hash.ts) and [`useAlltimeStats`](./stage/hooks/use-alltime-stats.ts).
-- **Read-once surfaces** (public fundraiser page, admin reads): a one-shot fetch via the service layer (`src/lib/api/...`). No bucket, no polling. The service exposes the same endpoint as the polling hook; the hook calls the service with a bucket cache-buster, the one-shot caller omits it.
-- **SSR surfaces** (server components, initial page render): call the service from the server, pass data as props. No client hook involved.
+- **Read-once surfaces** (public fundraiser page, admin reads): a one-shot fetch, no bucket, no polling. The same fetch helper backs both shapes — the polling hook passes a bucket cache-buster, the one-shot caller omits it.
+- **SSR surfaces** (server components, initial page render): call the fetch helper from the server, pass data as props. No client hook involved.
 
-Rule of thumb: a module's polling hook stays inside the module; the underlying fetch helper lives in the service layer (`src/lib/api/...`) so non-module consumers can reuse it.
+Rule of thumb: a module's polling hook and its fetch helper start inside the module. The helper supports both shapes (bucket cache-buster for polling, omitted for a one-shot read). Promote it to the service layer (`src/lib/api/...`) only when a non-module consumer — a read-once page, SSR, or another module — needs the same endpoint. That is the "wait for the second consumer" rule (see Conventions); until then it stays module-local. Stage's [`getAlltimeStats`](./stage/alltime-stats.ts) is module-local today for exactly this reason.
 
 ---
 
@@ -123,12 +125,14 @@ import { StageView } from '@/modules/stage';
 For modules that render as blocks inside another page (e.g. Leaderboard inside `FundraiserView`), the planned shape is named slots:
 
 ```ts
-blocks: [{
-  component: LeaderboardBlock,
-  allowedSlots: ['fundraiser:main:top', 'fundraiser:sidebar:bottom'],
-  defaultSlot: 'fundraiser:main:top',
-  defaultOrder: 100,
-}]
+blocks: [
+  {
+    component: LeaderboardBlock,
+    allowedSlots: ['fundraiser:main:top', 'fundraiser:sidebar:bottom'],
+    defaultSlot: 'fundraiser:main:top',
+    defaultOrder: 100,
+  },
+];
 ```
 
 The host renders `<ModuleSlot name='fundraiser:main:top' ctx={{ fundraiser }} />` which queries the registry for enabled modules contributing to that slot, sorts by order, renders. Per-fundraiser layout (which slot, what order) lives in `FundraiserSettings.modules.<id>.layout` so the user can drag-and-drop.
@@ -153,9 +157,10 @@ This is **not built yet** — design only. Leaderboard's migration will trigger 
 
 Module string files live in `/locales/<locale>/<namespace>.json` — the same convention core uses. The module declares its `localeNamespace` in `module.ts`, and [`src/i18n/request.ts`](../i18n/request.ts) loads every registered module's namespace automatically. No manual edit to the i18n loader when adding a module.
 
-**Self-contained pages with a different locale** (e.g. Stage Mode, which can render in a locale different from the app) keep their own `NextIntlClientProvider` and load only their namespace — see [Stage's route](../app/(stage)/raise/[slug]/stage/page.tsx). The central loader still ships the namespace for everywhere else.
+**Self-contained pages with a different locale** (e.g. Stage Mode, which can render in a locale different from the app) keep their own `NextIntlClientProvider` and load only their namespace — see [Stage's route](<../app/(stage)/raise/[slug]/stage/page.tsx>). The central loader still ships the namespace for everywhere else.
 
 Pattern:
+
 1. Create `/locales/en/<id>.json` (and other locales).
 2. Set `localeNamespace: '<id>'` in `module.ts`.
 3. Make sure the module is in `registeredModules` in [`index.ts`](./index.ts).
@@ -176,11 +181,11 @@ No core code changes are needed.
 
 ## Migrated modules
 
-| Module | Folder | Status |
-|---|---|---|
-| Stage Mode | `src/modules/stage/` | Migrated |
-| Leaderboard | (not yet) | Lives under `src/components/fundraisers/leaderboard/` |
-| Contribution | (not yet) | Lives under `src/components/donate/` and form fields |
-| DonorScore | (not yet) | Setting-only |
-| ProjectsSupported | (not yet) | Lives under `src/components/fundraisers/` |
-| CustomFields | (not yet) | Form fields only |
+| Module            | Folder               | Status                                                |
+| ----------------- | -------------------- | ----------------------------------------------------- |
+| Stage Mode        | `src/modules/stage/` | Migrated                                              |
+| Leaderboard       | (not yet)            | Lives under `src/components/fundraisers/leaderboard/` |
+| Contribution      | (not yet)            | Lives under `src/components/donate/` and form fields  |
+| DonorScore        | (not yet)            | Setting-only                                          |
+| ProjectsSupported | (not yet)            | Lives under `src/components/fundraisers/`             |
+| CustomFields      | (not yet)            | Form fields only                                      |
