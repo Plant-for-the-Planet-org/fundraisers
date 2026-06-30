@@ -7,6 +7,12 @@ const COMPACT_SCALES = [
   { threshold: 1_000_000, divisor: 1_000_000, suffix: 'M' },
 ] as const;
 
+// In compact display, drop the cents once the value reaches this amount — they
+// are just noise on larger figures. Smaller values keep up to 2 decimals where
+// the cents still matter (e.g. a 3.50 donation). Only affects fractional inputs
+// (currency); counts are already whole.
+const COMPACT_WHOLE_NUMBER_THRESHOLD = 100;
+
 const GERMAN_COMPACT_SUFFIXES: Record<string, string> = {
   K: 'Tsd.',
   M: 'Mio.',
@@ -78,6 +84,15 @@ function formatCompactNumber(value: number, locale: string): string {
     }
 
     return `${formatLocalizedNumber(scaled, locale)} ${getCompactSuffix(locale, suffix)}`;
+  }
+
+  // Below the smallest compact scale, write the number out in full — as a whole
+  // number once it is large enough that trailing cents are noise, otherwise with
+  // up to 2 decimals.
+  if (Math.abs(numericValue) >= COMPACT_WHOLE_NUMBER_THRESHOLD) {
+    return new Intl.NumberFormat(normalizeLocale(locale), {
+      maximumFractionDigits: 0,
+    }).format(numericValue);
   }
 
   return formatLocalizedNumber(numericValue, locale);
