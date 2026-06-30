@@ -97,7 +97,8 @@ export function ImageSelector({
 
         photoCursorRef.current += 1;
         setSelectedImage(createUnsplashSelectedImage(nextPhoto), shouldDirty);
-      } catch {
+      } catch (error) {
+        console.error('[ImageSelector] applyNextDefaultPhoto failed', error);
         setDefaultImageError(t('states.defaultError'));
       } finally {
         setIsLoadingDefaultImage(false);
