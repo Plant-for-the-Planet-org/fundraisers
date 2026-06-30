@@ -332,6 +332,7 @@
         },
         "customAmount": "Custom Amount",
         "enterAmount": "Enter Amount",
+        "customAmountMin": "Minimum donation amount is {amount}",
         "gift": {
           "sectionTitle": "Gift Details",
           "recipientName": {

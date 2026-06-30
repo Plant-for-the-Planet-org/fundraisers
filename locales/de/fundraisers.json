@@ -332,6 +332,7 @@
         },
         "customAmount": "Benutzerdefinierter Betrag",
         "enterAmount": "Betrag eingeben",
+        "customAmountMin": "Mindestspendenbetrag ist {amount}",
         "gift": {
           "sectionTitle": "Geschenk Details",
           "recipientName": {
