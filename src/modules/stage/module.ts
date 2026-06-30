@@ -1,3 +1,4 @@
+import type { ModuleDescriptor } from '..';
 import type { StageModuleSettings } from './settings';
 
 export const STAGE_MODULE_ID = 'stage' as const;
@@ -7,7 +8,7 @@ export const stageModule = {
   settingsKey: 'stage',
   localeNamespace: 'stage',
   route: { segment: 'stage' },
-} as const;
+} as const satisfies ModuleDescriptor;
 
 export const stageDefaultSettings: StageModuleSettings = {
   enabled: false,

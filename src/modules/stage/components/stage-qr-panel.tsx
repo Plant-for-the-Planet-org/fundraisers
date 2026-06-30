@@ -26,7 +26,7 @@ export function StageQRPanel({
       utm_medium: 'qr',
       utm_campaign: 'stage-mode',
     });
-    const target = `${window.location.origin}/raise/${fundraiserId}?${params.toString()}`;
+    const target = `${window.location.origin}/raise/${encodeURIComponent(fundraiserId)}?${params.toString()}`;
     setDonateUrl(`stage.pp.eco/${slug}`);
     // qr.pp.eco encodes whatever follows `?` verbatim, e.g.
     // https://qr.pp.eco/?https://example.com — no named param, no encoding.

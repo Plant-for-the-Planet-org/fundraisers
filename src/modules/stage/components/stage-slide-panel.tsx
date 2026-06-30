@@ -1,6 +1,6 @@
 'use client';
 
-import type { StageSlide } from '@/lib/types/fundraiser';
+import type { StageSlide } from '../settings';
 
 import { useEffect, useState } from 'react';
 

@@ -26,16 +26,6 @@ import {
   X,
 } from 'lucide-react';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { routing } from '@/i18n/routing';
-import { STAGE_LIMITS } from '../constants';
-import { slideField, stageField } from './field-paths';
-import { StagePreviewDialog } from './stage-preview-dialog';
-import { StageSlideTemplatesDialog } from './stage-slide-templates-dialog';
-
-const LOCALE_OPTIONS: Record<string, string> = {
-  en: '🇬🇧 English',
-  de: '🇩🇪 Deutsch',
-};
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,6 +38,16 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { routing } from '@/i18n/routing';
+import { STAGE_LIMITS } from '../constants';
+import { slideField, stageField } from './field-paths';
+import { StagePreviewDialog } from './stage-preview-dialog';
+import { StageSlideTemplatesDialog } from './stage-slide-templates-dialog';
+
+const LOCALE_OPTIONS: Record<string, string> = {
+  en: '🇬🇧 English',
+  de: '🇩🇪 Deutsch',
+};
 
 const DEFAULT_SLIDE = {
   position: 1,

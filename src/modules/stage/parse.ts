@@ -1,6 +1,9 @@
 import type { StageFormValue } from './schema';
 import type { StageModuleSettings } from './settings';
 
+import { hasLocale } from 'next-intl';
+import { routing } from '@/i18n/routing';
+
 // Normalizes persisted stage settings into the form value shape, filling
 // defaults for fields that may be missing on older/loose API records.
 export function parseStageFormValue(
@@ -9,9 +12,7 @@ export function parseStageFormValue(
   if (!raw) return null;
   return {
     enabled: raw.enabled ?? true,
-    locale: (['en', 'de'] as const).includes(raw.locale as 'en' | 'de')
-      ? (raw.locale as 'en' | 'de')
-      : ('en' as const),
+    locale: hasLocale(routing.locales, raw.locale) ? raw.locale : 'en',
     title: raw.title ?? '',
     description: raw.description ?? '',
     partner_logo_url: raw.partner_logo_url ?? '',

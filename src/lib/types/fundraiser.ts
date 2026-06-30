@@ -1,12 +1,6 @@
 import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
-import type {
-  FundraiserModules,
-  StageModuleSettings,
-  StageSlide,
-} from '@/modules';
-
-export type { StageModuleSettings, StageSlide };
+import type { FundraiserModules } from '@/modules';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 

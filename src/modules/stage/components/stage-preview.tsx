@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import type { StageSlide } from '@/lib/types/fundraiser';
+import type { StageSlide } from '../settings';
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';

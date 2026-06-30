@@ -1,8 +1,8 @@
 'use client';
 
 import type { AccentColor, FontId } from '@/lib/theme/types';
-import type { StageSlide } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
+import type { StageSlide } from '../settings';
 
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
