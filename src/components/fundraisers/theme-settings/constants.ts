@@ -25,6 +25,7 @@ import { THEMES } from '@/lib/theme/themes';
 export type BgFormValue = FundraiserFormValues['settings']['theme']['bg'];
 
 export const ACCENT_BG: Record<AccentColor, string> = {
+  planet: 'bg-planet-600', // exact Planet Green #007A49
   blue: 'bg-blue-500',
   cyan: 'bg-cyan-500',
   emerald: 'bg-emerald-500',

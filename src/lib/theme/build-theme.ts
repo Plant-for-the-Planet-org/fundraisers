@@ -20,6 +20,7 @@ function clampOpacity(value: unknown, fallback: number): number {
 }
 
 const VALID_ACCENTS = new Set<string>([
+  'planet',
   'blue',
   'cyan',
   'emerald',

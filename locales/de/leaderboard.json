@@ -8,7 +8,7 @@
         "showRecentList": "Liste mit den letzten Spenden anzeigen",
         "showTopList": "Liste mit Top-Spendern anzeigen",
         "showAmounts": "Beträge anzeigen",
-        "viewAllButton": "\"Alle anzeigen\"-Knopf",
+        "viewAllButton": "Alle Spenden anzeigen",
         "anonymizeDonors": "Spender anonymisieren",
         "showAvatars": "Avatare anzeigen",
         "groupTopByDonor": "Gruppiere Top-Spenden nach Spender"
@@ -34,7 +34,7 @@
         "topDonors": "Top-Spender"
       },
       "demoData": "(*Demodaten - nur zur Vorschau)",
-      "viewAll": "Alle anzeigen",
+      "viewAll": "Alle Spenden anzeigen",
       "emptyState": "Keine Spenden zum anzeigen",
       "viewAllOverlay": {
         "title": "Alle Spenden",

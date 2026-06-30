@@ -58,6 +58,10 @@ Why: `platformFetch` owns HTTP-level concerns in one place — base URL, `X-SESS
 
 Domain concerns (response shaping, field-level error mapping, retries) belong in the service that calls `platformFetch`, not in the transport itself. If a service needs HTTP-level behavior `platformFetch` does not yet expose, extend `platformFetch` rather than bypassing it.
 
+## Cookies & consent (no cookie banner)
+
+See [`docs/cookie-consent-stance.md`](docs/cookie-consent-stance.md) for the full stance, default position, and review rule.
+
 ## Conventions
 
 <!-- Code style notes, naming, file layout patterns, comment policy. -->

@@ -4,6 +4,7 @@ import type { FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { useFormatter, useTranslations } from 'next-intl';
+import { RichTextContent } from '@/components/ui/rich-text-content';
 
 const MAX_NAMED_HOSTS = 3;
 
@@ -49,9 +50,9 @@ export function HostMessageCard({
         <h3 className='mb-2 text-sm font-semibold text-gray-900'>
           {t('hostMessageHeading', { count: hosts.length })}
         </h3>
-        <div
+        <RichTextContent
+          html={message}
           className='text-sm leading-relaxed text-gray-600 [&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_blockquote]:my-1.5 [&_blockquote]:border-l-2 [&_blockquote]:border-l-gray-200 [&_blockquote]:pl-3 [&_blockquote]:italic'
-          dangerouslySetInnerHTML={{ __html: message as string }}
         />
         {signature && <p className='mt-3 text-sm text-gray-500'>{signature}</p>}
       </div>

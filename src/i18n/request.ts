@@ -14,6 +14,7 @@ const CORE_NAMESPACES = [
   'dashboard',
   'donate',
   'leaderboard',
+  'cookies',
 ] as const;
 
 async function loadNamespace(locale: string, namespace: string) {

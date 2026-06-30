@@ -5,6 +5,11 @@ export function getAccentClasses(accent: AccentColor) {
     AccentColor,
     { button: string; buttonHover: string; icon: string }
   > = {
+    planet: {
+      button: 'bg-planet-600',
+      buttonHover: 'hover:bg-planet-700',
+      icon: 'text-planet-500',
+    },
     blue: {
       button: 'bg-blue-600',
       buttonHover: 'hover:bg-blue-700',
@@ -117,6 +122,7 @@ export function getAccentClasses(accent: AccentColor) {
 // Hex values used to set --accent-color CSS variable (for non-Tailwind consumers, e.g. SVG fills).
 export function getAccentColor(accent: AccentColor): string {
   const map: Record<AccentColor, string> = {
+    planet: '#007a49',
     blue: '#2563eb',
     cyan: '#0891b2',
     emerald: '#059669',

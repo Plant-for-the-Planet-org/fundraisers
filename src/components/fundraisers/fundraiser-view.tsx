@@ -86,22 +86,29 @@ export function FundraiserView({
           daysLeft={canReceiveDonations ? daysLeft : undefined}
         />
 
-        {/* Donation count + donor avatars (only when leaderboard module is on) */}
+        {/* Donation count + donor avatars (only when leaderboard module is on).
+            DonorsSummary renders the count header + strip + a "View all" entry
+            into the donations modal; the fallback keeps the count visible while
+            the leaderboard loads. */}
         {canShowLeaderboard && (
-          <div className='flex flex-col gap-3'>
-            <SectionHeader>
-              {t('donationCount', {
-                count: fundraiser.donationCount,
-                formattedCount: formatCompactNumber(
-                  fundraiser.donationCount,
-                  locale
-                ),
-              })}
-            </SectionHeader>
-            <Suspense fallback={<DonorsStripSkeleton />}>
-              <DonorsSummary fundraiser={fundraiser} />
-            </Suspense>
-          </div>
+          <Suspense
+            fallback={
+              <div className='flex flex-col gap-3'>
+                <SectionHeader>
+                  {t('donationCount', {
+                    count: fundraiser.donationCount,
+                    formattedCount: formatCompactNumber(
+                      fundraiser.donationCount,
+                      locale
+                    ),
+                  })}
+                </SectionHeader>
+                <DonorsStripSkeleton />
+              </div>
+            }
+          >
+            <DonorsSummary fundraiser={fundraiser} />
+          </Suspense>
         )}
 
         <div className='md:hidden flex flex-col'>

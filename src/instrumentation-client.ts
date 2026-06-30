@@ -7,11 +7,12 @@ import * as Sentry from '@sentry/nextjs';
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
-  // 1 = track 100% requests (good for dev)
-  // 0.1 = track 10% requests (recommended for production to reduce cost)
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1,
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+  // Error reporting only. We deliberately do NOT enable performance tracing
+  // (tracesSampleRate) or log forwarding (enableLogs): sampling real users'
+  // navigation/performance is the part a strict EU/German (DSK) reading would
+  // treat as non-essential and consent-requiring. Plain crash reporting is
+  // defensible as legitimate interest and sets no cookie — which is what lets
+  // us drop the cookie banner. Keep it this way unless legal signs off.
 
   // Ignore known non-critical / noisy errors
   ignoreErrors: [
@@ -35,5 +36,3 @@ Sentry.init({
   // Block errors originating from specific URLs/sources
   denyUrls: [/extensions\//i, /^chrome:\/\//i, /^moz-extension:\/\//i],
 });
-
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
