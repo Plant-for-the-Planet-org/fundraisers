@@ -177,6 +177,7 @@
         },
         "actions": {
           "changeAria": "Change image",
+          "shuffleAria": "Shuffle image",
           "retry": "Retry",
           "tryAgain": "Try again",
           "closeAria": "Close image selector",
