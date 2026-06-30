@@ -123,6 +123,10 @@
       "close-to-the-sea": {
         "label": "Nahe am Ozean",
         "tagline": "Unsere Ozeane vom Grund auf heilen."
+      },
+      "planet-projects": {
+        "label": "Planet Projekte",
+        "tagline": "Wo wir gutes tun."
       }
     }
   }

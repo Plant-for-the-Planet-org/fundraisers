@@ -20,6 +20,7 @@ export const BUNDLE_SLUGS = [
   'where-your-coffee-grows',
   'worst-of-the-worst',
   'close-to-the-sea',
+  'planet-projects',
 ] as const;
 
 export type BundleTabId = (typeof BUNDLE_TAB_IDS)[number];

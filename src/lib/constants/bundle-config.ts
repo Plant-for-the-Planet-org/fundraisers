@@ -7,13 +7,13 @@ export const BUNDLE_CONFIG: BundleConfig = {
     defaultTab: 'staff-picks',
   },
   supportProjects: {
-    DE: 'proj_bFH0BU0Qw02RuetpQlLOMVYX',
+    DE: 'proj_3VU0xgw7jJLDVDkMTpc5FC2w',
   },
   tabs: [
     {
       id: 'staff-picks',
       bundleSlugs: [
-        'underdog-bundle',
+        'planet-projects',
         'undo-your-amazon-order',
         'supply-chain-guilt-trip',
         'ancestral-lands',
@@ -109,7 +109,7 @@ export const BUNDLE_CONFIG: BundleConfig = {
     },
     {
       slug: 'underdog-bundle',
-      tabs: ['staff-picks', 'love'],
+      tabs: ['love'],
       projectIds: [
         'proj_b4OndX9CMNR502QSOWaU3iNz',
         'proj_gNHIESSoSSpiYXLvoqe5TT2y',
@@ -155,6 +155,16 @@ export const BUNDLE_CONFIG: BundleConfig = {
         'proj_8q3sCjaD74tgPe7QzmFCmWfA',
         'proj_6WQ1vARx59EPe4R6UNVRTUaP',
         'proj_fVvnwD74dAwkWs7wuyj0XmzG',
+      ],
+    },
+    {
+      slug: 'planet-projects',
+      tabs: ['staff-picks'],
+      projectIds: [
+        'proj_Ly4lVzw50r6hJtocv74al9Ps',
+        'proj_WZkyugryh35sMmZMmXCwq7YY',
+        'proj_nXBzA2sbX2tm1D75p7bfJ81Z',
+        'proj_eKBbIt7Bzavu9o7xzCAqjS2t',
       ],
     },
   ],
