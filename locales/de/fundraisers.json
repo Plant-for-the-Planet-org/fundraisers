@@ -183,6 +183,7 @@
         },
         "actions": {
           "changeAria": "Bild ändern",
+          "shuffleAria": "Zufälliges Bild",
           "retry": "Wiederholen",
           "tryAgain": "Erneut versuchen",
           "closeAria": "Bildauswahl schließen",
@@ -338,6 +339,7 @@
         },
         "customAmount": "Benutzerdefinierter Betrag",
         "enterAmount": "Betrag eingeben",
+        "customAmountMin": "Mindestspendenbetrag ist {amount}",
         "gift": {
           "sectionTitle": "Geschenk Details",
           "recipientName": {

@@ -65,6 +65,30 @@
 
   /* Breakpoints */
   --breakpoint-xs: 475px;
+
+  /* ── Plant-for-the-Planet brand palette ──────────────────────────────
+     Source of truth: planet-skills/branding/tokens.css (Figma styleguide).
+     Registered as Tailwind v4 @theme tokens so the brand greens are first
+     class utilities (bg-planet-600, text-planet-500, border-planet-200, …)
+     instead of being approximated by Tailwind's built-in green/emerald.
+     600 is the exact Planet Green CTA color; 50–200 are the brand mint tints.
+     Long-term this block should ship from the shared SDK so every Planet
+     project imports the same tokens after `@import 'tailwindcss'`. */
+  --color-planet-50: #f0faf4; /* Soft Green */
+  --color-planet-100: #d5f2e1; /* Mint */
+  --color-planet-200: #c9efd9; /* Mint gradient */
+  --color-planet-300: #6fcf97; /* Bright Green */
+  --color-planet-400: #27ae60; /* Leaf Green */
+  --color-planet-500: #219653; /* Forest Green */
+  --color-planet-600: #007a49; /* Planet Green — primary / CTA */
+  --color-planet-700: #00663d; /* darkened Planet Green — hover */
+  --color-planet-800: #00502f; /* deeper */
+  --color-planet-900: #003333; /* Deep Green */
+
+  /* Brand soft atmospheric tints (sky / morning horizon), from tokens.css.
+     Pale by design so they sit behind content in light themes. */
+  --color-soft-blue: #eff6ff; /* Soft Blue, Pantone 290 C */
+  --color-soft-gold: #fff8e4; /* Soft Yellow, Pantone 7401 C */
 }
 
 :root {

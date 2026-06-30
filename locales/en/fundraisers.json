@@ -183,6 +183,7 @@
         },
         "actions": {
           "changeAria": "Change image",
+          "shuffleAria": "Shuffle image",
           "retry": "Retry",
           "tryAgain": "Try again",
           "closeAria": "Close image selector",
@@ -338,6 +339,7 @@
         },
         "customAmount": "Custom Amount",
         "enterAmount": "Enter Amount",
+        "customAmountMin": "Minimum donation amount is {amount}",
         "gift": {
           "sectionTitle": "Gift Details",
           "recipientName": {

@@ -211,6 +211,12 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "cardDeclined": "Die Karte wurde abgelehnt. Wähle eine andere Zahlmethode oder kontaktiere deine Bank.",
+      "cardRestricted": "Die Karte konnte nicht belastet werden, bitte kontaktiere deine Bank.",
+      "insufficientFunds": "Die Verfügbarkeit der Karte ist überschritten, bitte versuche eine andere.",
+      "expiredCard": "Die Karte ist abgelaufen, bitte verwende eine andere.",
+      "processingError": "Ein Fehler ist bei der Durchführung aufgetreten. Versuche es nochmal.",
+      "authenticationFailed": "Die Zahlung konnte nicht autorisiert werden. Bitte wähle eine andere Zahlmethode und versuche es nochmal.",
       "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },

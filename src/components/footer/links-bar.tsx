@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { CookieSettingsButton } from '../cookie/cookie-settings-button';
 import { FOOTER_LINKS, getFooterLinkHref } from './config';
@@ -19,14 +20,23 @@ export function LinksBar() {
                 •
               </span>
             )}
-            <a
-              href={getFooterLinkHref(link, locale)}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='hover:text-foreground'
-            >
-              {tLinks(link.labelKey)}
-            </a>
+            {link.internal ? (
+              <Link
+                href={getFooterLinkHref(link, locale)}
+                className='hover:text-foreground'
+              >
+                {tLinks(link.labelKey)}
+              </Link>
+            ) : (
+              <a
+                href={getFooterLinkHref(link, locale)}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='hover:text-foreground'
+              >
+                {tLinks(link.labelKey)}
+              </a>
+            )}
           </li>
         ))}
         <span className='text-muted-foreground/40'>•</span>

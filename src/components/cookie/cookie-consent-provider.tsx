@@ -19,25 +19,23 @@ export function CookieConsentProvider(): null {
         cc.run({
           ...COOKIE_CONSENT_CONFIG,
 
-          onConsent: () => {
-            // Handle analytics consent
-            if (cc.acceptedCategory('analytics')) {
-              import('@/lib/analytics').then(({ initializeAnalytics }) => {
-                initializeAnalytics();
-              });
-            }
-          },
-
-          onChange: ({ changedCategories }) => {
-            // Handle category changes
-            if (changedCategories.includes('analytics')) {
-              if (cc.acceptedCategory('analytics')) {
-                import('@/lib/analytics').then(({ initializeAnalytics }) => {
-                  initializeAnalytics();
-                });
-              }
-            }
-          },
+          // analytics hooks commented out — no service wired up yet.
+          // onConsent: () => {
+          //   if (cc.acceptedCategory('analytics')) {
+          //     import('@/lib/analytics').then(({ initializeAnalytics }) => {
+          //       initializeAnalytics();
+          //     });
+          //   }
+          // },
+          // onChange: ({ changedCategories }) => {
+          //   if (changedCategories.includes('analytics')) {
+          //     if (cc.acceptedCategory('analytics')) {
+          //       import('@/lib/analytics').then(({ initializeAnalytics }) => {
+          //         initializeAnalytics();
+          //       });
+          //     }
+          //   }
+          // },
         });
       })
       .catch(err => {

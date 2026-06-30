@@ -211,6 +211,12 @@
       "paypalCaptureError": "PayPal payment could not be completed. Please try again.",
       "paypalPaymentError": "PayPal payment failed. Please try again.",
       "paymentFailed": "Payment failed. Please check your details and try again.",
+      "cardDeclined": "Your card was declined. Please try a different payment method or contact your bank.",
+      "cardRestricted": "Your card could not be processed. Please contact your bank.",
+      "insufficientFunds": "Your card has insufficient funds. Please try a different card.",
+      "expiredCard": "Your card has expired. Please use a different card.",
+      "processingError": "An error occurred while processing your card. Please try again.",
+      "authenticationFailed": "We could not authenticate your payment. Please choose a different payment method and try again.",
       "paymentCancelled": "Payment was cancelled.",
       "unexpected": "An unexpected error occurred. Please try again."
     },

@@ -46,11 +46,8 @@ export function LeaderboardClientLoader({
 
   return (
     <LeaderboardView
-      idOrSlug={idOrSlug}
       initialRecentDonations={data.recent}
       initialTopDonations={data.top}
-      totalRecentDonationCount={data.recentTotal}
-      totalTopDonationCount={data.topTotal}
       settings={settings}
     />
   );
