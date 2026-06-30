@@ -69,7 +69,10 @@ export function DonateOverlay({
         if (!open) onClose();
       }}
     >
-      <DialogContentFullScreen className='light bg-gray-50 text-foreground overflow-auto'>
+      <DialogContentFullScreen
+        className='light bg-gray-50 text-foreground overflow-auto'
+        onEscapeKeyDown={e => e.preventDefault()}
+      >
         <DialogTitle className='sr-only'>
           {tDonate('overlay.aria.label')}
         </DialogTitle>

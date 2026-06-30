@@ -210,7 +210,7 @@ export function ViewAllOverlay({
     >
       <DialogContent
         showCloseButton={false}
-        className='w-full max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
+        className='w-full sm:max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
       >
         <DialogTitle className='sr-only'>
           {t('viewAllOverlay.title')}

@@ -212,7 +212,7 @@ export function ImageSelectionOverlay({
           event.preventDefault();
           searchInputRef.current?.focus();
         }}
-        className='w-full max-w-4xl gap-0 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-900'
+        className='w-full sm:max-w-4xl gap-0 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-900'
       >
         <DialogTitle className='sr-only'>{t('overlay.title')}</DialogTitle>
         <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-zinc-700'>

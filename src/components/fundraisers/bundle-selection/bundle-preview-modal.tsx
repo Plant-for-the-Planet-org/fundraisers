@@ -89,7 +89,7 @@ export function BundlePreviewModal({
           event.preventDefault();
           closeButtonRef.current?.focus();
         }}
-        className='w-full max-w-[56rem] gap-0 overflow-hidden rounded-2xl p-0'
+        className='w-full sm:max-w-4xl gap-0 overflow-hidden rounded-2xl p-0'
       >
         <DialogTitle className='sr-only'>{label}</DialogTitle>
         <div className='flex shrink-0 flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
