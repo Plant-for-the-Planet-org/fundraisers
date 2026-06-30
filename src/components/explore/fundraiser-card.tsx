@@ -10,6 +10,7 @@ import {
   getFundraiserUrl,
 } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
+import { useHostDisplay } from '@/components/fundraisers/use-host-display';
 import { FundraiserCardImage } from './fundraiser-card-image';
 
 interface FundraiserCardProps {
@@ -33,26 +34,8 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
     { compact: true }
   );
 
-  const hostDisplay = (() => {
-    const hosts = fundraiser.hosts;
-    if (hosts.length === 0) return tFundraisers('anonymousHost', { count: 1 });
-
-    const firstHost = hosts[0];
-    // Although we expect user to be always present, keeping a fallback to avoid runtime errors in case of unexpected data
-    const hostName =
-      firstHost.displayName ??
-      firstHost.user?.name ??
-      tFundraisers('unknownHost');
-
-    if (hosts.length === 1) {
-      return tFundraisers('hostedBy', { hostName });
-    }
-
-    return tFundraisers('hostedByWithOthers', {
-      hostName,
-      othersCount: hosts.length - 1,
-    });
-  })();
+  const hostDisplay =
+    useHostDisplay(fundraiser) ?? tFundraisers('anonymousHost', { count: 1 });
 
   return (
     <article className='fundraiser-card'>

@@ -5,7 +5,6 @@
     "donorsAndOthers": "{names} und {count, plural, one {# anderer} other {# andere}}",
     "amountRaised": "{formattedAmountWithCurrency}",
     "hostedBy": "von {hostName}",
-    "hostedByWithOthers": "von {hostName} und {othersCount, plural, one {1 weiteren} other {# weiteren}}",
     "hostedByAnonymous": "von einer*einem anonymen Organisator*in",
     "unknownHost": "Unbekannt",
     "anonymousHost": "{count, plural, one {anonyme*r Organisator*in} other {anonyme Organisator*innen}}",
