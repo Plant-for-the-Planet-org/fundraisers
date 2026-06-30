@@ -112,6 +112,12 @@
         "goalLine": "of {amount} goal",
         "daysLeft": "{days, number}d left"
       },
+      "goalSettings": {
+        "sectionHeading": "Goal Settings",
+        "openSettings": "Goal settings",
+        "showGoal": "Show goal",
+        "showDaysLeft": "Show days left"
+      },
       "theme": {
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
@@ -177,6 +183,7 @@
         },
         "actions": {
           "changeAria": "Change image",
+          "shuffleAria": "Shuffle image",
           "retry": "Retry",
           "tryAgain": "Try again",
           "closeAria": "Close image selector",
@@ -332,6 +339,7 @@
         },
         "customAmount": "Custom Amount",
         "enterAmount": "Enter Amount",
+        "customAmountMin": "Minimum donation amount is {amount}",
         "gift": {
           "sectionTitle": "Gift Details",
           "recipientName": {

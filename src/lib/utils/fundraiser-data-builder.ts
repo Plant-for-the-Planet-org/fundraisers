@@ -19,6 +19,13 @@ function isThemeDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(theme).some(Boolean);
 }
 
+function isDonorScoreDirty(dirty: UpdateDirtyFields): boolean {
+  const donorScore = dirty.settings?.modules?.donor_score;
+  if (!donorScore) return false;
+  if (typeof donorScore === 'boolean') return donorScore;
+  return Object.values(donorScore).some(Boolean);
+}
+
 function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   const leaderboard = dirty.settings?.modules?.leaderboard;
   if (!leaderboard) return false;
@@ -116,7 +123,8 @@ export function buildUpdateFundraiserRequest(
     isLeaderboardDirty(dirtyFields) ||
     isStageDirty(dirtyFields) ||
     isThankYouNoteDirty(dirtyFields) ||
-    isBundleDirty(dirtyFields);
+    isBundleDirty(dirtyFields) ||
+    isDonorScoreDirty(dirtyFields);
 
   if (isSettingsDirty) {
     // `settings` is a free-form JSON blob the backend can edit directly, so a stored value may hold keys that are in neither the form schema nor our TS types.
@@ -125,7 +133,9 @@ export function buildUpdateFundraiserRequest(
     request.settings = {
       theme: values.settings.theme,
       modules: {
-        // Spread server modules first so whole non-form-managed slots survive (contribution, donor_score, projects_supported, custom_fields); the keys below override.
+        // Spread server modules first to preserve non-form keys
+        // (contribution, projects_supported, custom_fields).
+        // Form-managed keys follow and override.
         ...existingSettings?.modules,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
@@ -136,6 +146,10 @@ export function buildUpdateFundraiserRequest(
             }
           : values.settings.modules.stage, // null = removed; pass through unchanged
         thankYouNote: values.settings.modules.thankYouNote,
+        donor_score: {
+          enabled: existingSettings?.modules?.donor_score?.enabled ?? true,
+          ...values.settings.modules.donor_score,
+        },
       },
     };
   }
@@ -165,6 +179,10 @@ export function buildCreateFundraiserRequest(
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
         thankYouNote: values.settings.modules.thankYouNote,
+        donor_score: {
+          enabled: true,
+          ...values.settings.modules.donor_score,
+        },
       },
     },
     startDate: getTodayString(),

@@ -56,6 +56,10 @@ export function FundraiserView({
       ? Math.min(100, (totalRaisedAmount / fundraiser.goalAmount) * 100)
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
+  const donorScoreSettings = fundraiser.settings?.modules?.donor_score;
+  const showGoal = donorScoreSettings?.show_goal ?? true;
+  const showDaysLeft = donorScoreSettings?.show_days_left ?? true;
+
   const leaderboardSettings = fundraiser.settings?.modules?.leaderboard;
   const canShowLeaderboard =
     leaderboardSettings?.enabled &&
@@ -83,7 +87,8 @@ export function FundraiserView({
           goalAmount={fundraiser.goalAmount}
           currency={fundraiser.currency}
           progressPercentage={progressPercentage}
-          daysLeft={canReceiveDonations ? daysLeft : undefined}
+          daysLeft={canReceiveDonations && showDaysLeft ? daysLeft : undefined}
+          showGoal={showGoal}
         />
 
         {/* Donation count + donor avatars (only when leaderboard module is on).

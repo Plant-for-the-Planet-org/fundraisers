@@ -1,5 +1,6 @@
 import type { Theme } from '@/lib/theme/types';
 import type {
+  DonorScoreModuleSettings,
   Fundraiser,
   LeaderboardModuleSettings,
 } from '@/lib/types/fundraiser';
@@ -28,6 +29,11 @@ import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
 import { parseStageFormValue, stageModeSchema } from '@/modules/stage';
+
+const DEFAULT_DONOR_SCORE = {
+  show_goal: true,
+  show_days_left: true,
+} satisfies Omit<DonorScoreModuleSettings, 'enabled'>;
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,
@@ -143,6 +149,10 @@ export const fundraiserFormSchema = z.object({
       }),
       stage: stageModeSchema.nullable(),
       thankYouNote: thankYouNoteSchema,
+      donor_score: z.object({
+        show_goal: z.boolean(),
+        show_days_left: z.boolean(),
+      }),
     }),
   }),
 });
@@ -185,6 +195,7 @@ export function buildDefaultCreateValues(
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
         thankYouNote: { enabled: false, message: '' },
+        donor_score: { ...DEFAULT_DONOR_SCORE },
       },
     },
   };
@@ -286,6 +297,14 @@ export function fundraiserToFormValues(
         thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
           enabled: false,
           message: '',
+        },
+        donor_score: {
+          show_goal:
+            fundraiser.settings?.modules?.donor_score?.show_goal ??
+            DEFAULT_DONOR_SCORE.show_goal,
+          show_days_left:
+            fundraiser.settings?.modules?.donor_score?.show_days_left ??
+            DEFAULT_DONOR_SCORE.show_days_left,
         },
       },
     },

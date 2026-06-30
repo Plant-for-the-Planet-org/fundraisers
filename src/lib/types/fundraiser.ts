@@ -61,6 +61,15 @@ export interface LeaderboardModuleSettings {
   aggregate_top_by_donor: boolean;
 }
 
+export interface DonorScoreModuleSettings {
+  // Preserved in the API contract but intentionally not used to gate the goal
+  // section: total raised always renders. Only show_goal / show_days_left
+  // control visibility, unlike leaderboard which gates on enabled entirely.
+  enabled: boolean;
+  show_goal: boolean;
+  show_days_left: boolean;
+}
+
 export interface ThankYouNoteModuleSettings {
   enabled: boolean;
   message: string;
@@ -86,11 +95,7 @@ export interface FundraiserSettings {
       allow_dedication: boolean;
       allow_recurrency: boolean;
     };
-    donor_score?: {
-      enabled: boolean;
-      show_goal: boolean;
-      show_days_left: boolean;
-    };
+    donor_score?: DonorScoreModuleSettings;
     projects_supported?: {
       enabled: boolean;
     };

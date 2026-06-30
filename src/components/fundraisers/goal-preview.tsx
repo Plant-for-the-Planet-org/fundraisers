@@ -32,6 +32,17 @@ export function GoalPreview({
   const currency = useWatch<FundraiserFormValues, 'currency'>({
     name: 'currency',
   });
+  const showGoal = useWatch<
+    FundraiserFormValues,
+    'settings.modules.donor_score.show_goal'
+  >({ name: 'settings.modules.donor_score.show_goal', defaultValue: true });
+  const showDaysLeft = useWatch<
+    FundraiserFormValues,
+    'settings.modules.donor_score.show_days_left'
+  >({
+    name: 'settings.modules.donor_score.show_days_left',
+    defaultValue: true,
+  });
 
   const safeGoalAmount = toSafeNumber(goalAmount);
 
@@ -52,9 +63,10 @@ export function GoalPreview({
     <GoalProgressDisplay
       raisedAmount={raisedAmount}
       goalAmount={safeGoalAmount}
-      currency={currency ?? 'EUR'}
+      currency={currency ?? 'EUR'} // ponytail: form always has currency; EUR guards first render
       progressPercentage={progressPercentage}
-      daysLeft={daysLeft}
+      daysLeft={showDaysLeft ? daysLeft : undefined}
+      showGoal={showGoal}
     />
   );
 }

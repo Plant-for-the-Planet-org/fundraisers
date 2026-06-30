@@ -112,6 +112,12 @@
         "goalLine": "vom Ziel von {amount} ",
         "daysLeft": "{days, number}T übrig"
       },
+      "goalSettings": {
+        "sectionHeading": "Zieleinstellungen",
+        "openSettings": "Zieleinstellungen",
+        "showGoal": "Ziel anzeigen",
+        "showDaysLeft": "Verbleibende Tage anzeigen"
+      },
       "theme": {
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
@@ -177,6 +183,7 @@
         },
         "actions": {
           "changeAria": "Bild ändern",
+          "shuffleAria": "Zufälliges Bild",
           "retry": "Wiederholen",
           "tryAgain": "Erneut versuchen",
           "closeAria": "Bildauswahl schließen",
@@ -332,6 +339,7 @@
         },
         "customAmount": "Benutzerdefinierter Betrag",
         "enterAmount": "Betrag eingeben",
+        "customAmountMin": "Mindestspendenbetrag ist {amount}",
         "gift": {
           "sectionTitle": "Geschenk Details",
           "recipientName": {
