@@ -21,10 +21,8 @@
     content: '\201C';
     left: 0;
     top: -0.25em;
-    /* Raw var (not the Tailwind token) so it tracks the runtime theme accent
-       set by theme-shell, exactly like the donate button. */
-    color: var(--accent-color);
-    opacity: 0.5;
+    color: hsl(var(--foreground));
+    opacity: 1;
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 3.5em;
     line-height: 1;

@@ -501,7 +501,7 @@ export function RichTextEditor({
           [&_.ProseMirror_hr]:my-6
           [&_.ProseMirror_hr]:border-0
           [&_.ProseMirror_hr]:border-t-2
-          [&_.ProseMirror_hr]:border-t-border
+          [&_.ProseMirror_hr]:border-t-foreground
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left
