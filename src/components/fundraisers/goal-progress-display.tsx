@@ -8,6 +8,8 @@ interface GoalProgressDisplayProps {
   progressPercentage: number;
   /** Omit (or pass undefined) to hide the days-left line, e.g. when the fundraiser is not active. */
   daysLeft?: number;
+  /** When false, hides the goal amount line. Progress bar and total raised always render. */
+  showGoal?: boolean;
 }
 
 export function GoalProgressDisplay({
@@ -16,6 +18,7 @@ export function GoalProgressDisplay({
   currency,
   progressPercentage,
   daysLeft,
+  showGoal = true,
 }: GoalProgressDisplayProps) {
   const t = useTranslations('Fundraisers.form.goalPreview');
   const locale = useLocale();
@@ -37,16 +40,20 @@ export function GoalProgressDisplay({
         </div>
       </div>
 
-      <div className='mt-2 flex items-center justify-between text-sm text-muted-foreground'>
-        <div>
-          {t('goalLine', {
-            amount: formatCurrencyFromDecimal(goalAmount, currency, locale),
-          })}
+      {(showGoal || daysLeft !== undefined) && (
+        <div className='mt-2 flex items-center justify-between text-sm text-muted-foreground'>
+          {showGoal && (
+            <div>
+              {t('goalLine', {
+                amount: formatCurrencyFromDecimal(goalAmount, currency, locale),
+              })}
+            </div>
+          )}
+          {daysLeft !== undefined && (
+            <div>{t('daysLeft', { days: daysLeft })}</div>
+          )}
         </div>
-        {daysLeft !== undefined && (
-          <div>{t('daysLeft', { days: daysLeft })}</div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
