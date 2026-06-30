@@ -37,16 +37,20 @@ export function DonationSection({
     fundraiser.settings?.modules?.contribution
   );
 
+  // Donatable fundraisers always have a currency; fall back to EUR (the
+  // DonationForm default) defensively so a missing one never breaks the form.
+  const currency = fundraiser.currency ?? 'EUR';
+
   return (
     <>
       <DonationForm
-        currency={fundraiser.currency}
+        currency={currency}
         contributionSettings={contributionSettings}
         frequencies={resolvedPaymentOptions.frequencies}
         onDonate={(amountCents, isDedicated, frequency, gift) => {
           setDonationData({
             amountCents,
-            currency: fundraiser.currency,
+            currency,
             frequency,
             dedicated: isDedicated,
             gift,

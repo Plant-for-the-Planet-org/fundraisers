@@ -28,7 +28,7 @@ export function StageCounter({
 
   const raised =
     data?.stats.raised.total ??
-    fundraiser.totalRaised[fundraiser.currency] ??
+    fundraiser.totalRaised[fundraiser.currency ?? ''] ??
     0;
   const currency = data?.stats.raised.currency ?? fundraiser.currency;
   const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;

@@ -4,7 +4,7 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 interface GoalProgressDisplayProps {
   raisedAmount: number;
   goalAmount: number;
-  currency: string;
+  currency: string | null | undefined;
   progressPercentage: number;
   /** Omit (or pass undefined) to hide the days-left line, e.g. when the fundraiser is not active. */
   daysLeft?: number;
