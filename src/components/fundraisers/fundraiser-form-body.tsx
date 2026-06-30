@@ -17,6 +17,8 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
+import { PreviewButton } from './preview-button';
+import { StickyFormBar } from './sticky-form-bar';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
 import { WorkspaceInfo } from './workspace-info';
@@ -77,7 +79,12 @@ export function FundraiserFormBody({
         <WorkspaceInfo />
         <BundleSelection mode={mode} />
         <Options />
-        {submitButton}
+        <StickyFormBar>
+          <div className='flex gap-2'>
+            <PreviewButton />
+            {submitButton}
+          </div>
+        </StickyFormBar>
       </MainPanel>
     </FundraiserLayout>
   );

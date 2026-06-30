@@ -107,6 +107,7 @@
       "subtitle": "Give people something to feel. Then give them a way to give."
     },
     "form": {
+      "viewButton": "View",
       "hosts": {
         "title": "Hosts",
         "manage": "Manage",

@@ -107,6 +107,7 @@
       "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
     },
     "form": {
+      "viewButton": "Ansehen",
       "hosts": {
         "title": "Organisator*innen",
         "manage": "Verwalten",
