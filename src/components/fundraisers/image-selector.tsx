@@ -86,6 +86,9 @@ export function ImageSelector({
             DEFAULT_IMAGE_LOAD_CATEGORY_ID,
             20
           );
+          if (photoBatchRef.current.length === 0) {
+            throw new Error('No images returned from Unsplash');
+          }
           photoCursorRef.current = 0;
         }
 
