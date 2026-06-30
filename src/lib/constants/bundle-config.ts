@@ -13,10 +13,10 @@ export const BUNDLE_CONFIG: BundleConfig = {
     {
       id: 'staff-picks',
       bundleSlugs: [
+        'ancestral-lands',
         'planet-projects',
         'undo-your-amazon-order',
         'supply-chain-guilt-trip',
-        'ancestral-lands',
       ],
     },
     {
