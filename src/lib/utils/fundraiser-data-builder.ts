@@ -119,16 +119,22 @@ export function buildUpdateFundraiserRequest(
     isBundleDirty(dirtyFields);
 
   if (isSettingsDirty) {
+    // `settings` is a free-form JSON blob the backend can edit directly, so a stored value may hold keys that are in neither the form schema nor our TS types.
+    // Where that's possible, merge the form value onto the stored one instead of replacing it, or those backend-set keys are dropped on save (see `stage`).
+    // Nullable slots (null means "removed") must guard the merge: spreading null is a no-op that would resurrect the slot as `{}`.
     request.settings = {
       theme: values.settings.theme,
       modules: {
-        // Spread server modules first to preserve non-form keys
-        // (contribution, donor_score, projects_supported, custom_fields).
-        // Form-managed keys follow and override.
+        // Spread server modules first so whole non-form-managed slots survive (contribution, donor_score, projects_supported, custom_fields); the keys below override.
         ...existingSettings?.modules,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
-        stage: values.settings.modules.stage,
+        stage: values.settings.modules.stage
+          ? {
+              ...existingSettings?.modules?.stage, // keep backend-set keys the form omits (show_impact, show_progress_bar)
+              ...values.settings.modules.stage, // form-managed fields override
+            }
+          : values.settings.modules.stage, // null = removed; pass through unchanged
         thankYouNote: values.settings.modules.thankYouNote,
       },
     };
