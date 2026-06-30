@@ -124,9 +124,9 @@ function ToolbarButton({
       type='button'
       disabled={disabled}
       onMouseDown={event => {
+        if (disabled) return;
         // Keep editor focus on toolbar interactions so selection/active-state is preserved.
         event.preventDefault();
-        if (disabled) return;
         onClick();
       }}
       className={cn(
@@ -290,10 +290,10 @@ export function RichTextEditor({
   // Instagram-style, instead of opening a menu. The icon reflects the current
   // alignment so the button stays self-describing.
   const cycleAlign = () => {
-    const index = Math.max(
-      0,
-      ALIGN_OPTIONS.findIndex(option => option.value === toolbarState.align)
+    const index = ALIGN_OPTIONS.findIndex(
+      option => option.value === toolbarState.align
     );
+    if (index === -1) return;
     const next = ALIGN_OPTIONS[(index + 1) % ALIGN_OPTIONS.length];
     editor.chain().focus().setTextAlign(next.value).run();
   };
