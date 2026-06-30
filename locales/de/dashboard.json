@@ -68,6 +68,7 @@
     "actions": {
       "menuLabel": "Aktionen öffnen",
       "edit": "Bearbeiten",
+      "stageMode": "Bühnenmodus",
       "copyLink": "Link kopieren",
       "pause": "Pausieren",
       "resume": "Fortsetzen",
@@ -77,7 +78,11 @@
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
       "activateSuccess": "Spendenaufruf aktiviert",
-      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
+      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut.",
+      "reactivateEndedTitle": "Spenden aktivieren?",
+      "reactivateEndedDescription": "Dieser Spendenaufruf endete am {date}. Möchtest du Spenden wirklich aktivieren?",
+      "reactivateEndedConfirm": "Ja, Spenden aktivieren",
+      "reactivateEndedCancel": "Schließen"
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",

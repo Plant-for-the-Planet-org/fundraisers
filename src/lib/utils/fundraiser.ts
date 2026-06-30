@@ -25,6 +25,23 @@ export function isFundraiserOwnerOrAdmin(
 }
 
 /**
+ * True when the fundraiser has the Stage Mode display module enabled.
+ */
+export function isStageModeEnabled(fundraiser: Fundraiser): boolean {
+  return fundraiser.settings?.modules?.stage?.enabled === true;
+}
+
+/**
+ * True when the fundraiser's end date is in the past. Returns false for an
+ * unparseable end date.
+ */
+export function hasFundraiserEnded(fundraiser: Fundraiser): boolean {
+  const end = new Date(fundraiser.endDate);
+  if (isNaN(end.getTime())) return false;
+  return end.getTime() < Date.now();
+}
+
+/**
  * Generate a fundraiser URL using the new /raise/[id|slug] pattern
  * Prioritizes slug over ID when available
  *
@@ -93,9 +110,9 @@ const FLOOR_RATES: Record<string, Record<string, number>> = {
  */
 export function convertTotalRaisedToSingleCurrency(
   totalRaised: Record<string, number>,
-  targetCurrency: string
+  targetCurrency: string | null | undefined
 ): number {
-  const target = targetCurrency.toUpperCase();
+  const target = targetCurrency?.toUpperCase() ?? '';
   const targetRates = FLOOR_RATES[target] ?? { [target]: 1 };
   const total = Object.entries(totalRaised)
     .filter(([, amount]) => Number.isFinite(amount) && amount > 0)

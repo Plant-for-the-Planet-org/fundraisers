@@ -68,6 +68,7 @@
     "actions": {
       "menuLabel": "Open actions",
       "edit": "Edit",
+      "stageMode": "Stage Mode",
       "copyLink": "Copy link",
       "pause": "Pause",
       "resume": "Resume",
@@ -77,7 +78,11 @@
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
       "activateSuccess": "Fundraiser activated",
-      "mutationError": "Something went wrong. Try again."
+      "mutationError": "Something went wrong. Try again.",
+      "reactivateEndedTitle": "Enable donations?",
+      "reactivateEndedDescription": "This fundraiser ended on {date}. Are you sure you want to enable donations?",
+      "reactivateEndedConfirm": "Yes, enable donations",
+      "reactivateEndedCancel": "Close"
     },
     "list": {
       "loading": "Loading fundraiser item...",
