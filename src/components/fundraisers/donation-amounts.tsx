@@ -35,10 +35,19 @@ export function DonationAmounts({
   const [inputValue, setInputValue] = useState('');
 
   const effectiveMinCents = minCents ?? customOption?.min ?? DEFAULT_MIN_CENTS;
+
+  const decimalSep =
+    new Intl.NumberFormat(locale)
+      .formatToParts(1.1)
+      .find(p => p.type === 'decimal')?.value ?? '.';
+
+  const parseLocalizedFloat = (raw: string) =>
+    parseFloat(decimalSep === ',' ? raw.replace(',', '.') : raw);
+
   const showMinHint =
     isCustomInputSelected &&
     inputValue !== '' &&
-    parseFloat(inputValue) * 100 < effectiveMinCents;
+    parseLocalizedFloat(inputValue) * 100 < effectiveMinCents;
 
   const symbol = getCurrencySymbol(currency);
   const currencyCode = currency.toUpperCase();
@@ -99,30 +108,25 @@ export function DonationAmounts({
             {isCustomInputSelected ? (
               <div className='flex items-center flex-1 gap-2'>
                 <input
-                  type='number'
-                  step='0.01'
+                  type='text'
+                  inputMode='decimal'
                   placeholder={t('enterAmount')}
                   value={inputValue}
                   aria-describedby={
                     showMinHint ? 'custom-amount-min-hint' : undefined
                   }
-                  min={
-                    customOption.min
-                      ? (customOption.min / 100).toString()
-                      : undefined
-                  }
                   onChange={e => {
                     let newValue = e.target.value;
-                    const dotIdx = newValue.indexOf('.');
-                    if (dotIdx !== -1 && newValue.length - dotIdx - 1 > 2) {
-                      newValue = newValue.slice(0, dotIdx + 3);
+                    const sepIdx = newValue.indexOf(decimalSep);
+                    if (sepIdx !== -1 && newValue.length - sepIdx - 1 > 2) {
+                      newValue = newValue.slice(0, sepIdx + 3);
                     }
                     setInputValue(newValue);
 
-                    if (newValue === '' || newValue === '.') {
+                    if (newValue === '' || newValue === decimalSep) {
                       onCustomAmountChange(undefined);
                     } else {
-                      const displayValue = parseFloat(newValue);
+                      const displayValue = parseLocalizedFloat(newValue);
                       if (!isNaN(displayValue)) {
                         onCustomAmountChange(Math.round(displayValue * 100));
                       }
@@ -143,21 +147,21 @@ export function DonationAmounts({
                     ) {
                       return;
                     }
-                    const dotIndex = inputValue.indexOf('.');
-                    if (dotIndex !== -1 && /^\d$/.test(e.key)) {
-                      if (inputValue.length - dotIndex - 1 >= 2) {
+                    const sepIdx = inputValue.indexOf(decimalSep);
+                    if (sepIdx !== -1 && /^\d$/.test(e.key)) {
+                      if (inputValue.length - sepIdx - 1 >= 2) {
                         e.preventDefault();
                         return;
                       }
                     }
-                    if (!/^\d$/.test(e.key) && e.key !== '.') {
+                    if (!/^\d$/.test(e.key) && e.key !== decimalSep) {
                       e.preventDefault();
                     }
                   }}
                   onBlur={() => {
                     if (!inputValue) setIsCustomInputSelected(false);
                   }}
-                  className='flex-1 bg-transparent border-none outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground text-base font-semibold p-0 h-auto shadow-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                  className='flex-1 bg-transparent border-none outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground text-base font-semibold p-0 h-auto shadow-none'
                   autoFocus
                 />
                 <button
