@@ -497,7 +497,6 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_blockquote]:text-muted-foreground
           [&_.ProseMirror_hr]:my-6
           [&_.ProseMirror_hr]:border-0
           [&_.ProseMirror_hr]:border-t-2

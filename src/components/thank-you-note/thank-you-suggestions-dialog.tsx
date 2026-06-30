@@ -33,7 +33,6 @@ const CARD_PROSE_CLASSES = [
   '[&_em]:italic',
   '[&_u]:underline',
   '[&_s]:line-through',
-  '[&_blockquote]:text-foreground/80',
 ].join(' ');
 
 function SuggestionCard({
