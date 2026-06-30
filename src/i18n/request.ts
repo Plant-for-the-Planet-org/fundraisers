@@ -17,8 +17,17 @@ const CORE_NAMESPACES = [
   'cookies',
 ] as const;
 
+// If a namespace file is missing, log a warning and skip it (return {}) instead of throwing.
+// That way one missing file shows up as missing text, not a crashed page; the locale build check catches a missing file before it ships.
 async function loadNamespace(locale: string, namespace: string) {
-  return (await import(`../../locales/${locale}/${namespace}.json`)).default;
+  try {
+    return (await import(`../../locales/${locale}/${namespace}.json`)).default;
+  } catch {
+    console.warn(
+      `[i18n] missing namespace "${namespace}" for locale "${locale}"`
+    );
+    return {};
+  }
 }
 
 export default getRequestConfig(async () => {
