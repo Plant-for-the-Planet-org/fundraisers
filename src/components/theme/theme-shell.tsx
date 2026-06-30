@@ -21,11 +21,17 @@ const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
   ssr: false,
 });
 
-// SSR / first-paint fallback clip for the blur layer, before useLayoutEffect measures the real element.
-// Approximates the main-content surface: 6.5rem top clears the header plus the surface's my-8 margin, the left/right max() centers a 60rem column to match MainContent's max-w-[960px], 0 bottom extends to the viewport, round 1rem matches rounded-2xl.
-// Keep in sync with the header height and MainContent's max-width.
-const INITIAL_MAIN_CONTENT_CLIP_PATH =
-  'inset(6.5rem max(0px, calc((100vw - 60rem) / 2)) 0 round 1rem)';
+// SSR / first-paint approximation for the blur layer, before useLayoutEffect measures the real element.
+// Matches MainContent: 6.5rem top clears header + my-8, max() centers the 60rem column, bottom:0 extends to viewport.
+// Keep in sync with header height and MainContent's max-width.
+// Note: uses top/left/right/bottom positioning instead of clip-path — clip-path with backdrop-filter causes a
+// visible compositing layer border in Chromium (Chrome/Edge) but not in Firefox or Safari.
+const INITIAL_BLUR_STYLE = {
+  top: '6.5rem',
+  bottom: '0',
+  left: 'max(0px, calc((100vw - 60rem) / 2))',
+  right: 'max(0px, calc((100vw - 60rem) / 2))',
+} as React.CSSProperties;
 
 /**
  * Guard against CSS injection via url("...") interpolation.
@@ -153,22 +159,22 @@ function MainContentBackdropBlur() {
         rect.left < viewportWidth;
 
       if (!isVisible) {
-        blurLayer.style.clipPath = 'inset(100% 0 0 0)';
+        blurLayer.style.width = '0';
+        blurLayer.style.height = '0';
         return;
       }
 
       const top = Math.max(0, Math.min(viewportHeight, rect.top));
-      const right = Math.max(
-        0,
-        viewportWidth - Math.min(viewportWidth, rect.right)
-      );
-      const bottom = Math.max(
-        0,
-        viewportHeight - Math.min(viewportHeight, rect.bottom)
-      );
       const left = Math.max(0, Math.min(viewportWidth, rect.left));
+      const width = Math.min(viewportWidth, rect.right) - left;
+      const height = Math.min(viewportHeight, rect.bottom) - top;
 
-      blurLayer.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round 1rem)`;
+      blurLayer.style.top = `${top}px`;
+      blurLayer.style.left = `${left}px`;
+      blurLayer.style.width = `${width}px`;
+      blurLayer.style.height = `${height}px`;
+      blurLayer.style.right = 'auto';
+      blurLayer.style.bottom = 'auto';
     }
 
     function scheduleUpdate() {
@@ -194,8 +200,8 @@ function MainContentBackdropBlur() {
   return (
     <div
       ref={layerRef}
-      className='fixed inset-0 z-[6] pointer-events-none backdrop-blur-[10px]'
-      style={{ clipPath: INITIAL_MAIN_CONTENT_CLIP_PATH }}
+      className='fixed z-[6] pointer-events-none backdrop-blur-[10px] rounded-2xl'
+      style={INITIAL_BLUR_STYLE}
       aria-hidden
     />
   );
