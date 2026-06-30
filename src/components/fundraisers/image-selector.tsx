@@ -43,9 +43,9 @@ export function ImageSelector({
   const { control, setValue } = useFormContext<FundraiserFormValues>();
   const { defaultValues } = useFormState({ control });
 
-  // "Saved" means persisted on the fundraiser record (the form baseline), not
-  // the in-form selection. Shuffle is offered only while there is none: always
-  // on create, and on edit only when the fundraiser has no image yet.
+  // Shuffle button is hidden once the form's defaultValues contain a saved image
+  // (the server baseline, not the current in-form selection). Auto-load on mount
+  // is gated separately via hasAttemptedDefaultLoad.
   const showShuffle = !(
     (defaultValues?.image as SelectedImage | null | undefined) ?? null
   );
