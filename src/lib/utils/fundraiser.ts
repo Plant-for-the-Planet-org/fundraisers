@@ -11,7 +11,7 @@ export interface FundraiserUrlData {
 }
 
 /**
- * True when `userId` matches a host on `fundraiser` whose role is `owner`.
+ * True when `userId` matches an `admin` host on `fundraiser`.
  * Returns false when `userId` is missing.
  */
 export function isFundraiserOwnerOrAdmin(
@@ -20,9 +20,7 @@ export function isFundraiserOwnerOrAdmin(
 ): boolean {
   if (!userId) return false;
   return fundraiser.hosts.some(
-    host =>
-      host.user?.id === userId &&
-      (host.role === 'owner' || host.role === 'admin')
+    host => host.user?.id === userId && host.role === 'admin'
   );
 }
 

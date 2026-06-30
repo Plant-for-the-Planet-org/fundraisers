@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { FundraiserHost } from '@/lib/types/fundraiser';
 
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -12,6 +13,7 @@ import { DonorsPreview } from './donors-preview';
 import { GoalSettings } from './goal/goal-settings';
 import { GoalInput } from './goal-input';
 import { Hosts } from './hosts';
+import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
@@ -27,6 +29,10 @@ interface FundraiserFormBodyProps {
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
   endDate?: string;
+  /** Fundraiser id. Required in edit mode to manage hosts. */
+  fundraiserId?: string;
+  /** Existing hosts. Only meaningful in edit mode. */
+  hosts?: FundraiserHost[];
 }
 
 export function FundraiserFormBody({
@@ -34,6 +40,8 @@ export function FundraiserFormBody({
   submitButton,
   totalRaised,
   endDate,
+  fundraiserId,
+  hosts,
 }: FundraiserFormBodyProps) {
   const isEditMode = mode === 'edit';
 
@@ -47,7 +55,14 @@ export function FundraiserFormBody({
           endDate={endDate}
         />
         <DonorsPreview />
-        <Hosts mode='preview' />
+        {isEditMode && fundraiserId ? (
+          <HostsManager
+            fundraiserId={fundraiserId}
+            initialHosts={hosts ?? []}
+          />
+        ) : (
+          <Hosts mode='preview' />
+        )}
         <ThemeSettings />
       </SidebarPanel>
       <MainPanel>

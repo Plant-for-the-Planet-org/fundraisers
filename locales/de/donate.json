@@ -228,7 +228,7 @@
       "success": "Spende erfolgreich"
     },
     "thankYou": {
-      "hostMessageHeading": "{count, plural, one {Nachricht vom Gastgeber*in} other {Nachricht der Gastgeber*innen}}",
+      "hostMessageHeading": "{count, plural, one {Nachricht von der*dem Organisator*in} other {Nachricht der Organisator*innen}}",
       "hostMessageSignature": "- {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",

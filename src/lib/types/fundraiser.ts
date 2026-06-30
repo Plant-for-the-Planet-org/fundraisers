@@ -27,15 +27,47 @@ export interface FundraiserUser {
 }
 
 export type FundraiserHostType = 'user' | 'team';
+/**
+ * 'admin' (full edit + manage hosts) and 'viewer' (read-only dashboard) are the
+ * supported roles.
+ */
+export type FundraiserHostRole = 'admin' | 'viewer';
+/** 'invited' hosts have no profile yet; claimed to 'active' on first login. */
+export type FundraiserHostStatus = 'active' | 'invited';
 export interface FundraiserHost {
   id: string;
   user: Nullable<FundraiserUser>;
   hostType: FundraiserHostType;
-  role: string; // 'owner' or 'admin'
+  role: FundraiserHostRole;
   isPublic: boolean;
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
-  status: string; //'active'
+  status: FundraiserHostStatus;
+  // Invariant: invitedEmail is non-null only when status === 'invited' (user is
+  // null). When status === 'active', user is non-null and invitedEmail is null.
+  // Not enforced as a discriminated union (YAGNI — all call sites guard via ??
+  // chains or status checks). Refactor to discriminated union if this type
+  // spreads beyond host management components.
+  invitedEmail: Nullable<string>;
+}
+
+export interface AddFundraiserHostRequest {
+  email: string;
+  role: FundraiserHostRole;
+  isPublic: boolean;
+  displayName?: string;
+  displayOrder?: number;
+}
+
+// ponytail: all fields intentionally optional for partial updates. An empty
+// object {} is technically valid TypeScript but no call site constructs one —
+// every caller passes at least one field. Add RequireAtLeastOne<T> from
+// utility.ts if a conditional-build code path is ever introduced.
+export interface UpdateFundraiserHostRequest {
+  role?: FundraiserHostRole;
+  isPublic?: boolean;
+  displayName?: string;
+  displayOrder?: number;
 }
 
 export interface FundraiserWorkspace {

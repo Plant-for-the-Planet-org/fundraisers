@@ -107,6 +107,33 @@
       "subtitle": "Give people something to feel. Then give them a way to give."
     },
     "form": {
+      "hosts": {
+        "title": "Hosts",
+        "manage": "Manage",
+        "dialogTitle": "Manage hosts",
+        "dialogDescription": "Add people to manage or view this fundraiser. Hosts can be shown publicly or kept private.",
+        "unknownHost": "Unknown",
+        "you": "(you)",
+        "invited": "Invited",
+        "roleAdmin": "Admin",
+        "roleViewer": "Viewer",
+        "visibilityOn": "Shown publicly",
+        "visibilityOff": "Hidden from public",
+        "reorder": "Drag to reorder",
+        "remove": "Remove",
+        "lastAdminHint": "A fundraiser needs at least one admin.",
+        "lastPublicHint": "A fundraiser needs at least one public host.",
+        "emailPlaceholder": "Email address",
+        "addButton": "Add",
+        "toastAdded": "Host added",
+        "toastInvited": "Invitation sent to {email}",
+        "toastUpdated": "Host updated",
+        "toastRemoved": "Host removed",
+        "toastDuplicate": "That person is already a host.",
+        "toastError": "Something went wrong. Please try again.",
+        "toastHostsLoadFailed": "Could not load full host list. Some hosts may not be shown.",
+        "toastReorderError": "Reorder partially saved. Reload to see current order."
+      },
       "goalPreview": {
         "raised": "{amount} raised",
         "goalLine": "of {amount} goal",
