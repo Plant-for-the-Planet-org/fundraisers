@@ -1,8 +1,10 @@
+// Compaction only kicks in at a million and up. Thousands stay fully written
+// out (e.g. "96,120", not "96.12 K") — full counts read clearer and the space
+// saving below 1M is not worth the loss of precision. Do not re-add a `K` scale.
 const COMPACT_SCALES = [
   { threshold: 1_000_000_000_000, divisor: 1_000_000_000_000, suffix: 'T' },
   { threshold: 1_000_000_000, divisor: 1_000_000_000, suffix: 'B' },
   { threshold: 1_000_000, divisor: 1_000_000, suffix: 'M' },
-  { threshold: 1_000, divisor: 1_000, suffix: 'K' },
 ] as const;
 
 const GERMAN_COMPACT_SUFFIXES: Record<string, string> = {
@@ -51,8 +53,9 @@ function formatLocalizedNumber(value: number, locale: string): string {
 }
 
 /**
- * Format a number in compact notation with a localized suffix.
- * - `1200`    → `1.20 K` (en) / `1,20 Tsd.` (de)
+ * Format a number in compact notation with a localized suffix, but only from a
+ * million up — smaller values are written out in full with grouping.
+ * - `96120`   → `96,120` (en) / `96.120` (de)
  * - `1200000` → `1.20 M` / `1,20 Mio.`
  */
 function formatCompactNumber(value: number, locale: string): string {

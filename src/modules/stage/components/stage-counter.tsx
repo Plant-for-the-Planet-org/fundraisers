@@ -83,7 +83,9 @@ export function StageCounter({
 
   function formatDonorCount(n: number): string {
     const formatted = formatCompactNumber(n, locale);
-    return n >= 1000 ? `${formatted}+` : formatted;
+    // Only mark the count as approximate ("1.2 M+") when it is actually
+    // abbreviated; full counts below a million are exact, so no "+".
+    return n >= 1_000_000 ? `${formatted}+` : formatted;
   }
 
   return (
