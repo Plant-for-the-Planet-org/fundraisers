@@ -1,6 +1,6 @@
 import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
-import type { Locale } from '@/i18n/routing';
+import type { FundraiserModules } from '@/modules';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 
@@ -70,25 +70,6 @@ export interface DonorScoreModuleSettings {
   show_days_left: boolean;
 }
 
-export interface StageSlide {
-  position: number;
-  title: string;
-  description: string;
-  image: string;
-  duration: number;
-}
-
-export interface StageModuleSettings {
-  enabled: boolean;
-  locale: Locale;
-  title: string;
-  description: string;
-  partner_logo_url: string;
-  slides: StageSlide[];
-  show_impact?: boolean;
-  show_progress_bar?: boolean;
-}
-
 export interface ThankYouNoteModuleSettings {
   enabled: boolean;
   message: string;
@@ -96,12 +77,14 @@ export interface ThankYouNoteModuleSettings {
 
 export interface FundraiserSettings {
   theme: FundraiserThemeSettings;
-  modules: {
+  modules: FundraiserModules & {
+    // Modules below have not yet migrated into `src/modules/`. Their settings
+    // shapes live inline here. As each module migrates, move its slot into
+    // `FundraiserModules` in `src/modules/index.ts` and remove it from here.
     leaderboard?: LeaderboardModuleSettings;
     bundle?: {
       slug: string | null;
     };
-    stage?: StageModuleSettings | null;
     thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
       options: Array<{

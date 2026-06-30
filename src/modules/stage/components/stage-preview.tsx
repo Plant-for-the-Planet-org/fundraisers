@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import type { StageSlide } from '@/lib/types/fundraiser';
+import type { StageSlide } from '../settings';
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -88,6 +88,7 @@ export function StagePreview({
           title={stageTitle}
           description={stageDescription}
           logoUrl={logoUrl}
+          className='absolute left-12 right-12 top-12 z-20'
         />
 
         {/* Placeholder: Raised counter — top right */}

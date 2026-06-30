@@ -1,18 +1,20 @@
 'use client';
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
+import type { HighlightImpactUnit } from '../alltime-stats';
 
 import { useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { useAlltimeStats } from '../hooks/use-alltime-stats';
 import { GlassPanel } from './glass-panel';
-import { useAlltimeStats } from './hooks/use-alltime-stats';
 
 interface StageCounterProps {
   fundraiser: Fundraiser;
   showImpact: boolean;
   showProgressBar: boolean;
   locale: string;
+  className?: string;
 }
 
 export function StageCounter({
@@ -20,6 +22,7 @@ export function StageCounter({
   showImpact,
   showProgressBar,
   locale,
+  className,
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
@@ -31,6 +34,7 @@ export function StageCounter({
   const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
   const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
   const trees = data?.stats.impact.trees ?? 0;
+  const restoredM2 = data?.stats.impact.restoredM2 ?? 0;
   const daysLeft = data?.stats.daysLeft;
 
   const showDaysLeft = data?.settings.show_days_left ?? false;
@@ -40,15 +44,52 @@ export function StageCounter({
   const pct = goal ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
   const t = useTranslations('Stage');
 
+  function formatImpact(unit: HighlightImpactUnit): {
+    value: number;
+    label: string;
+    display: string;
+  } {
+    switch (unit) {
+      case 'trees':
+        return {
+          value: trees,
+          label: t('treesPlanted'),
+          display: trees.toLocaleString(locale),
+        };
+      case 'restoredM2':
+        return {
+          value: restoredM2,
+          label: t('areaRestored'),
+          display: `${restoredM2.toLocaleString(locale)} m²`,
+        };
+      case 'funding':
+      default:
+        return {
+          value: raised,
+          label: t('raisedSoFar'),
+          display: formatCurrencyFromDecimal(raised, currency, locale, {
+            compact: true,
+          }),
+        };
+    }
+  }
+
+  const requestedHighlight: HighlightImpactUnit =
+    data?.settings.highlight_impact ?? 'funding';
+  const heroUnit: HighlightImpactUnit =
+    formatImpact(requestedHighlight).value > 0 ? requestedHighlight : 'funding';
+  const hero = formatImpact(heroUnit);
+  const heroIsFunding = heroUnit === 'funding';
+
   function formatDonorCount(n: number): string {
     const formatted = formatCompactNumber(n, locale);
     return n >= 1000 ? `${formatted}+` : formatted;
   }
 
   return (
-    <GlassPanel className='absolute right-12 top-12 z-[18] w-[440px] p-6'>
+    <GlassPanel className={`p-6 ${className ?? ''}`}>
       <div className='text-[11px] font-bold uppercase tracking-[.18em] opacity-60'>
-        {t('raisedSoFar')}
+        {hero.label}
       </div>
 
       <div
@@ -58,21 +99,23 @@ export function StageCounter({
           color: 'var(--accent-color)',
         }}
       >
-        {formatCurrencyFromDecimal(raised, currency, locale, { compact: true })}
+        {hero.display}
       </div>
 
-      <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
-        <span>
-          {t('ofGoal', {
-            goal: formatCurrencyFromDecimal(goal, currency, locale, {
-              compact: true,
-            }),
-          })}
-        </span>
-        <span>{pct}%</span>
-      </div>
+      {heroIsFunding && (
+        <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
+          <span>
+            {t('ofGoal', {
+              goal: formatCurrencyFromDecimal(goal, currency, locale, {
+                compact: true,
+              }),
+            })}
+          </span>
+          <span>{pct}%</span>
+        </div>
+      )}
 
-      {showProgressBar && (
+      {showProgressBar && heroIsFunding && (
         <div
           className='mt-2.5 h-2 overflow-hidden rounded-full'
           style={{ background: 'rgba(11,18,32,.08)' }}
@@ -122,18 +165,34 @@ export function StageCounter({
           </span>
         </div>
 
-        {showTrees && (
+        {!heroIsFunding ? (
           <div className='flex flex-col gap-0.5'>
             <span
               className='text-[22px] font-bold'
               style={{ fontVariantNumeric: 'tabular-nums' }}
             >
-              {trees.toLocaleString(locale)}
+              {formatCurrencyFromDecimal(raised, currency, locale, {
+                compact: true,
+              })}
             </span>
             <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
-              {t('trees')}
+              {t('raised')}
             </span>
           </div>
+        ) : (
+          showTrees && (
+            <div className='flex flex-col gap-0.5'>
+              <span
+                className='text-[22px] font-bold'
+                style={{ fontVariantNumeric: 'tabular-nums' }}
+              >
+                {trees.toLocaleString(locale)}
+              </span>
+              <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
+                {t('trees')}
+              </span>
+            </div>
+          )
         )}
 
         {showDaysLeft && daysLeft !== undefined && daysLeft > 0 && (

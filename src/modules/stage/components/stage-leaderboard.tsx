@@ -9,6 +9,7 @@ import { GlassPanel } from './glass-panel';
 interface StageLeaderboardProps {
   top: LeaderboardDonation[];
   locale: string;
+  className?: string;
 }
 
 const RANK_STYLE: Record<number, string> = {
@@ -17,13 +18,17 @@ const RANK_STYLE: Record<number, string> = {
   3: 'bg-gradient-to-br from-[#F6C89C] to-[#B76E41] text-[#3C1F0A]',
 };
 
-export function StageLeaderboard({ top, locale }: StageLeaderboardProps) {
+export function StageLeaderboard({
+  top,
+  locale,
+  className,
+}: StageLeaderboardProps) {
   const t = useTranslations('Stage');
 
   if (top.length === 0) return null;
 
   return (
-    <GlassPanel className='absolute right-12 top-[350px] z-[17] w-[440px] px-[22px] pb-3.5 pt-5'>
+    <GlassPanel className={`px-[22px] pb-3.5 pt-5 ${className ?? ''}`}>
       {/* Header */}
       <div className='mb-2 flex items-baseline justify-between'>
         <span className='text-[18px] font-bold'>{t('topDonors')}</span>

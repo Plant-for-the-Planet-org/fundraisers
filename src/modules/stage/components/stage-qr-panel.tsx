@@ -8,9 +8,14 @@ import { GlassPanel } from './glass-panel';
 interface StageQRPanelProps {
   fundraiserId: string;
   slug: string;
+  className?: string;
 }
 
-export function StageQRPanel({ fundraiserId, slug }: StageQRPanelProps) {
+export function StageQRPanel({
+  fundraiserId,
+  slug,
+  className,
+}: StageQRPanelProps) {
   const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
   const [donateUrl, setDonateUrl] = useState('');
@@ -21,7 +26,7 @@ export function StageQRPanel({ fundraiserId, slug }: StageQRPanelProps) {
       utm_medium: 'qr',
       utm_campaign: 'stage-mode',
     });
-    const target = `${window.location.origin}/raise/${fundraiserId}?${params.toString()}`;
+    const target = `${window.location.origin}/raise/${encodeURIComponent(fundraiserId)}?${params.toString()}`;
     setDonateUrl(`stage.pp.eco/${slug}`);
     // qr.pp.eco encodes whatever follows `?` verbatim, e.g.
     // https://qr.pp.eco/?https://example.com — no named param, no encoding.
@@ -29,7 +34,7 @@ export function StageQRPanel({ fundraiserId, slug }: StageQRPanelProps) {
   }, [fundraiserId, slug]);
 
   return (
-    <GlassPanel className='absolute bottom-[170px] left-12 z-[18] w-[300px] p-[18px]'>
+    <GlassPanel className={`p-[18px] ${className ?? ''}`}>
       <div className='flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5'>
         {qrSrc ? (
           <img src={qrSrc} alt={t('scanToDonate')} className='h-full w-full' />

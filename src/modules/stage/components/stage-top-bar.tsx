@@ -6,13 +6,19 @@ interface StageTopBarProps {
   title: string;
   description?: string;
   logoUrl?: string;
+  className?: string;
 }
 
-export function StageTopBar({ title, description, logoUrl }: StageTopBarProps) {
+export function StageTopBar({
+  title,
+  description,
+  logoUrl,
+  className,
+}: StageTopBarProps) {
   const t = useTranslations('Stage.topBar');
 
   return (
-    <div className='absolute left-12 right-12 top-12 z-20'>
+    <div className={className}>
       <div className='flex flex-col gap-5'>
         {/* Logo row */}
         <div

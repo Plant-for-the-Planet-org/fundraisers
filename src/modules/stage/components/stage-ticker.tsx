@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
-import { STAGE_POLL_INTERVAL_SECONDS } from './stage-hash';
+import { STAGE_POLL_INTERVAL_SECONDS } from '../stage-hash';
 
 function getRemaining() {
   return (
@@ -65,9 +65,15 @@ interface StageTickerProps {
   recent: LeaderboardDonation[];
   offline: boolean;
   locale: string;
+  className?: string;
 }
 
-export function StageTicker({ recent, offline, locale }: StageTickerProps) {
+export function StageTicker({
+  recent,
+  offline,
+  locale,
+  className,
+}: StageTickerProps) {
   const t = useTranslations('Stage');
   const remaining = useCountdown();
   const trackRef = useRef<HTMLDivElement>(null);
@@ -88,7 +94,7 @@ export function StageTicker({ recent, offline, locale }: StageTickerProps) {
 
   return (
     <div
-      className='absolute bottom-12 left-12 right-12 z-[19] grid h-[88px] overflow-hidden rounded-[18px] border'
+      className={`grid h-[88px] overflow-hidden rounded-[18px] border ${className ?? ''}`}
       style={{
         gridTemplateColumns: 'auto 1fr auto',
         background: 'rgba(255,255,255,0.92)',

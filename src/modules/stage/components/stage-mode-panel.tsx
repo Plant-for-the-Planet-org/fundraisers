@@ -1,8 +1,8 @@
 'use client';
 
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
-import type { StageModeValues } from '@/components/stage/field-paths';
-import type { StageSlideTemplate } from '@/components/stage/slide-templates';
+import type { StageModeValues } from './field-paths';
+import type { StageSlideTemplate } from './slide-templates';
 
 import { useState } from 'react';
 import {
@@ -26,16 +26,6 @@ import {
   X,
 } from 'lucide-react';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
-import { STAGE_LIMITS } from '@/components/stage/constants';
-import { slideField, stageField } from '@/components/stage/field-paths';
-import { StagePreviewDialog } from '@/components/stage/stage-preview-dialog';
-import { StageSlideTemplatesDialog } from '@/components/stage/stage-slide-templates-dialog';
-import { routing } from '@/i18n/routing';
-
-const LOCALE_OPTIONS: Record<string, string> = {
-  en: '🇬🇧 English',
-  de: '🇩🇪 Deutsch',
-};
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,6 +38,16 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { routing } from '@/i18n/routing';
+import { STAGE_LIMITS } from '../constants';
+import { slideField, stageField } from './field-paths';
+import { StagePreviewDialog } from './stage-preview-dialog';
+import { StageSlideTemplatesDialog } from './stage-slide-templates-dialog';
+
+const LOCALE_OPTIONS: Record<string, string> = {
+  en: '🇬🇧 English',
+  de: '🇩🇪 Deutsch',
+};
 
 const DEFAULT_SLIDE = {
   position: 1,
