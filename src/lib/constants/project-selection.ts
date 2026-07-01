@@ -2,7 +2,7 @@ import type { DefaultCauseIdByCountry } from '@/lib/types/project-selection';
 
 export const MIN_DEFAULT_CAUSE_PERCENT = 20;
 
-export const DEFAULT_NON_EARMARKED_CAUSE_ID = 'proj_bFH0BU0Qw02RuetpQlLOMVYX';
+export const DEFAULT_NON_EARMARKED_CAUSE_ID = 'proj_3VU0xgw7jJLDVDkMTpc5FC2w';
 
 export const DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY: Readonly<DefaultCauseIdByCountry> =
   {
@@ -12,7 +12,7 @@ export const DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY: Readonly<DefaultCauseIdByCo
   };
 
 export const DEFAULT_NON_EARMARKED_CAUSE_FALLBACK = {
-  name: 'Empower Young People and Bring Back Forests',
+  name: 'Education for Climate Justice',
   description:
     "Support Plant-for-the-Planet's mission to empower young people worldwide to take climate action. We restore forests, educate communities, and advocate for climate justice to create a sustainable future for all.",
   image: '6852bd2495cde981886580.png',
