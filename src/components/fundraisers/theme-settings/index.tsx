@@ -8,6 +8,7 @@ import { useController } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Moon, Shuffle, Sun } from 'lucide-react';
+import { getReadableMode } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { THEMES } from '@/lib/theme/themes';
 import { cn } from '@/lib/utils/cn';
@@ -198,8 +199,27 @@ export function ThemeSettings() {
         <TabsContent value='background' className='flex flex-col gap-4'>
           <BackgroundTab
             bg={field.value.bg}
+            onBackgroundColor={hex => {
+              if (hex === null) {
+                patchBg({ background_color: null });
+                return;
+              }
+              // Solid colour and gradient are mutually exclusive: setting one
+              // clears the other. Mode auto-follows the colour's luminance.
+              const nextBg = {
+                ...field.value.bg,
+                background_color: hex,
+                gradient: '',
+              };
+              const mode = getReadableMode(hex);
+              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+            }}
             onGradient={(value, mode) => {
-              const nextBg = { ...field.value.bg, gradient: value };
+              const nextBg = {
+                ...field.value.bg,
+                gradient: value,
+                background_color: null,
+              };
               syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
             }}
             onDecoration={decoration => patchBg({ decoration })}

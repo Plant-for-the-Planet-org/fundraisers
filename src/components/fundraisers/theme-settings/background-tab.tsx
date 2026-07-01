@@ -9,6 +9,7 @@ import type {
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
+import { BackgroundColorRow } from './color-picker-row';
 import {
   ANIMATION_OPTIONS,
   type BgFormValue,
@@ -23,6 +24,7 @@ import { AssetGrid, OpacitySlider, ThemeChipRow } from './primitives';
 
 type Props = {
   bg: BgFormValue;
+  onBackgroundColor: (hex: string | null) => void;
   onGradient: (value: string, mode: 'light' | 'dark') => void;
   onDecoration: (value: BgDecoration) => void;
   onPatternId: (id: string | null) => void;
@@ -36,6 +38,7 @@ type Props = {
 
 export function BackgroundTab({
   bg,
+  onBackgroundColor,
   onGradient,
   onDecoration,
   onPatternId,
@@ -48,6 +51,10 @@ export function BackgroundTab({
 }: Props) {
   return (
     <div className='flex flex-col gap-4'>
+      <BackgroundColorRow
+        value={bg.background_color}
+        onChange={onBackgroundColor}
+      />
       <GradientRow value={bg.gradient} onChange={onGradient} />
       <DecorationRow
         value={bg.decoration}
