@@ -169,6 +169,7 @@ export function ImageSelectionOverlay({
     }
   }, [categories, selectedCategory]);
 
+  // TODO: a whitespace-only query trims to empty, so every space keystroke re-runs this with delay 0 and reloads the category, flashing the spinner. Fix by skipping the reload when the trimmed query is unchanged from the last load.
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -204,6 +205,7 @@ export function ImageSelectionOverlay({
         if (!open) onClose();
       }}
     >
+      {/* Top-aligned (not centered) so the pre-existing spinner reload blip grows downward instead of re-centering the whole dialog, which reads as a flash. */}
       <DialogContent
         showCloseButton={false}
         onOpenAutoFocus={event => {
@@ -212,7 +214,7 @@ export function ImageSelectionOverlay({
           event.preventDefault();
           searchInputRef.current?.focus();
         }}
-        className='w-full sm:max-w-4xl gap-0 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-900'
+        className='top-[10vh] w-full translate-y-0 gap-0 overflow-hidden rounded-2xl border border-gray-200/60 bg-white p-0 sm:max-w-4xl dark:border-zinc-700 dark:bg-zinc-900'
       >
         <DialogTitle className='sr-only'>{t('overlay.title')}</DialogTitle>
         <div className='px-4 pt-4 pb-2 border-b border-gray-100 dark:border-zinc-700'>
