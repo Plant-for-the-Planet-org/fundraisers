@@ -14,9 +14,9 @@ export function getStageUrl(fundraiser: FundraiserUrlData): string {
 /**
  * Open Stage Mode in a separate, centered 16:9 window sized to fit the screen
  * (capped at 1600px wide). Must be called from a user gesture (e.g. a click) so
- * the popup is not blocked.
+ * the popup is not blocked. Returns false if the popup was blocked.
  */
-export function openStageWindow(fundraiser: FundraiserUrlData): void {
+export function openStageWindow(fundraiser: FundraiserUrlData): boolean {
   const { availWidth, availHeight } = window.screen;
 
   let width = Math.min(1600, availWidth * 0.9);
@@ -31,9 +31,11 @@ export function openStageWindow(fundraiser: FundraiserUrlData): void {
   const left = Math.round((availWidth - width) / 2);
   const top = Math.round((availHeight - height) / 2);
 
-  window.open(
+  const win = window.open(
     getStageUrl(fundraiser),
     '_blank',
     `width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`
   );
+
+  return win !== null;
 }

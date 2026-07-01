@@ -197,7 +197,11 @@ export function FundraiserActionMenu({
           {actions.stageMode && (
             <DropdownMenuItem
               className='cursor-pointer py-2'
-              onSelect={() => openStageWindow(fundraiser)}
+              onSelect={() => {
+                if (!openStageWindow(fundraiser)) {
+                  toast.error(t('stageModeBlocked'));
+                }
+              }}
             >
               <Monitor aria-hidden='true' />
               {t('stageMode')}
