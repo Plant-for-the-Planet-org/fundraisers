@@ -13,6 +13,7 @@ import {
   LOGO_LIBRARY,
   resolveBgAsset,
 } from '@/lib/theme/backgrounds';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
@@ -82,6 +83,13 @@ export function ThemeShell({
   const bg = activeTheme.bg;
   // Empty string = no gradient.
   const gradientClass = bg.gradient;
+  // Solid colour is the alternative base wash. Gradient wins if both are set
+  // (they are kept mutually exclusive at write-time). Validate before inline
+  // styling, matching the safeCssUrl guard below.
+  const solidColor =
+    !gradientClass && isValidHexColor(bg.background_color)
+      ? bg.background_color
+      : null;
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
@@ -104,6 +112,12 @@ export function ThemeShell({
       {gradientClass && (
         <div
           className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
+        />
+      )}
+      {solidColor && (
+        <div
+          className='fixed inset-0 transition-colors duration-300'
+          style={{ backgroundColor: solidColor }}
         />
       )}
       {bg.decoration === 'image' && bg.image_url && (
