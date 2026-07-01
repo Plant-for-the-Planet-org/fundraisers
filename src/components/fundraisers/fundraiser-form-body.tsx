@@ -1,7 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { FundraiserHost } from '@/lib/types/fundraiser';
+import type {
+  FundraiserHost,
+  FundraiserSettings,
+} from '@/lib/types/fundraiser';
 
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -17,6 +20,7 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
+import { PreviewButton } from './preview/preview-button';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
 import { WorkspaceInfo } from './workspace-info';
@@ -33,6 +37,8 @@ interface FundraiserFormBodyProps {
   fundraiserId?: string;
   /** Existing hosts. Only meaningful in edit mode. */
   hosts?: FundraiserHost[];
+  /** Stored settings. Only meaningful in edit mode (preview Save reuses them). */
+  existingSettings?: FundraiserSettings | null;
 }
 
 export function FundraiserFormBody({
@@ -42,6 +48,7 @@ export function FundraiserFormBody({
   endDate,
   fundraiserId,
   hosts,
+  existingSettings,
 }: FundraiserFormBodyProps) {
   const isEditMode = mode === 'edit';
 
@@ -77,7 +84,15 @@ export function FundraiserFormBody({
         <WorkspaceInfo />
         <BundleSelection mode={mode} />
         <Options />
-        {submitButton}
+        <div className='flex flex-wrap gap-3'>
+          {submitButton}
+          <PreviewButton
+            mode={mode}
+            fundraiserId={fundraiserId}
+            existingSettings={existingSettings}
+            hosts={hosts}
+          />
+        </div>
       </MainPanel>
     </FundraiserLayout>
   );

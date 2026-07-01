@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { getLeaderboardByTab } from '@/lib/api/leaderboard-service';
 import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
+import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DonationTable } from './donation-table';
 import { OverlayHeader } from './overlay-header';
@@ -30,6 +31,13 @@ interface ViewAllOverlayProps {
   showAmount: boolean;
   showAvatar: boolean;
   aggregateTopByDonor: boolean;
+  /**
+   * Extra classes for the portal root. Lets a caller fix stacking/interaction
+   * when this opens over another modal (e.g. the preview dialog re-enables
+   * pointer events blocked by radix's modal body lock) without editing the
+   * base styles.
+   */
+  className?: string;
 }
 
 export function ViewAllOverlay({
@@ -47,6 +55,7 @@ export function ViewAllOverlay({
   showAmount,
   showAvatar,
   aggregateTopByDonor,
+  className,
 }: ViewAllOverlayProps) {
   const t = useTranslations('Leaderboard.view');
   const [tab, setTab] = useState<'recent' | 'top'>(activeTab);
@@ -217,7 +226,10 @@ export function ViewAllOverlay({
       // Focusable so useModalDialog's focus-on-open actually moves focus into
       // the dialog (a plain div is not focusable; .focus() would be a no-op).
       tabIndex={-1}
-      className='fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center outline-none'
+      className={cn(
+        'fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center outline-none',
+        className
+      )}
       onMouseDown={event => {
         if (event.target === event.currentTarget) {
           handleClose();

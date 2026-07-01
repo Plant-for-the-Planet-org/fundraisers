@@ -25,6 +25,8 @@ interface DonorsSummaryPanelProps {
   totalTopDonationCount: number;
   /** Shows the "demo data" note in the edit-mode preview. */
   demo?: boolean;
+  /** Extra classes forwarded to the ViewAllOverlay portal root (see there). */
+  viewAllClassName?: string;
 }
 
 /**
@@ -43,6 +45,7 @@ export function DonorsSummaryPanel({
   totalRecentDonationCount,
   totalTopDonationCount,
   demo = false,
+  viewAllClassName,
 }: DonorsSummaryPanelProps) {
   const t = useTranslations('Fundraisers');
   const tLeaderboard = useTranslations('Leaderboard.view');
@@ -104,6 +107,7 @@ export function DonorsSummaryPanel({
         showAmount={settings.show_amount}
         showAvatar={settings.show_avatar}
         aggregateTopByDonor={settings.aggregate_top_by_donor}
+        className={viewAllClassName}
       />
     </div>
   );

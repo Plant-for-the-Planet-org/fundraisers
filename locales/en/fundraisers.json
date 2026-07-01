@@ -430,7 +430,18 @@
       "label": "Copy Link",
       "copiedLabel": "Copied!",
       "successToast": "Link copied!",
-      "errorToast": "Could not copy link. Please copy the URL manually."
+      "errorToast": "Could not copy link. Please copy the URL manually.",
+      "previewTitle": "Preview mode",
+      "previewDescription": "Copy link is disabled in preview."
+    },
+    "preview": {
+      "title": "Fundraiser preview",
+      "button": "Preview",
+      "close": "Close",
+      "saveCreate": "Save & Create",
+      "saveUpdate": "Save & Update",
+      "bannerTitle": "Preview only",
+      "bannerDescription": "Sample data is shown. Donations are disabled in preview."
     }
   }
 }

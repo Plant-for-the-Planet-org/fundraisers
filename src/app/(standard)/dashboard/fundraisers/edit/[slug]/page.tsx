@@ -28,6 +28,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
         endDate={fundraiser.endDate}
         fundraiserId={fundraiser.id}
         hosts={fundraiser.hosts}
+        existingSettings={fundraiser.settings}
       />
     </EditFundraiserFormProvider>
   );

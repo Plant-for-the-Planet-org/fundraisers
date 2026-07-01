@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 
@@ -14,6 +15,7 @@ import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { DonorsStripSkeleton } from '@/components/fundraisers/donors-strip';
 import { DonorsSummary } from '@/components/fundraisers/donors-summary';
+import { DonorsSummaryPanel } from '@/components/fundraisers/donors-summary-panel';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
@@ -28,17 +30,29 @@ import { CopyLinkButton } from './copy-link-button';
 import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
 import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
 import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
+import { LeaderboardView } from './leaderboard/leaderboard-view';
+import { getMockLeaderboardDonations } from './leaderboard/mock-data';
+import { PreviewDonationForm } from './preview/preview-donation-form';
 
 export function FundraiserView({
   fundraiser,
   paymentOptions,
   paymentOptionsAreAuthenticated = false,
   leaderboardFetchStrategy = 'ssr',
+  preview = false,
+  previewActions,
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
   paymentOptionsAreAuthenticated?: boolean;
   leaderboardFetchStrategy?: 'ssr' | 'client';
+  /**
+   * Renders with dummy data (mock donors, toast-only donate) for the
+   * create/edit preview overlay. Public page never sets this.
+   */
+  preview?: boolean;
+  /** Buttons appended to the main column in preview (Close / Save). */
+  previewActions?: ReactNode;
 }) {
   const t = useTranslations('Fundraisers');
   const locale = useLocale();
@@ -69,6 +83,16 @@ export function FundraiserView({
     paymentOptions !== undefined &&
     fundraiser.workspace !== null;
 
+  // Preview mode has no real donations; render mock donors instead of fetching.
+  const mockDonations = preview
+    ? getMockLeaderboardDonations(fundraiser.currency)
+    : null;
+  const mockStripDonations =
+    mockDonations &&
+    (leaderboardSettings?.show_top_list && mockDonations.top.length > 0
+      ? mockDonations.top
+      : mockDonations.recent);
+
   return (
     <FundraiserLayout>
       <SidebarPanel>
@@ -95,30 +119,48 @@ export function FundraiserView({
             DonorsSummary renders the count header + strip + a "View all" entry
             into the donations modal; the fallback keeps the count visible while
             the leaderboard loads. */}
-        {canShowLeaderboard && (
-          <Suspense
-            fallback={
-              <div className='flex flex-col gap-3'>
-                <SectionHeader>
-                  {t('donationCount', {
-                    count: fundraiser.donationCount,
-                    formattedCount: formatCompactNumber(
-                      fundraiser.donationCount,
-                      locale
-                    ),
-                  })}
-                </SectionHeader>
-                <DonorsStripSkeleton />
-              </div>
-            }
-          >
-            <DonorsSummary fundraiser={fundraiser} />
-          </Suspense>
-        )}
+        {canShowLeaderboard &&
+          (preview && mockDonations && mockStripDonations ? (
+            <DonorsSummaryPanel
+              demo
+              donations={mockStripDonations}
+              donationCount={mockStripDonations.length}
+              settings={leaderboardSettings!}
+              idOrSlug=''
+              initialRecentDonations={mockDonations.recent}
+              initialTopDonations={mockDonations.top}
+              totalRecentDonationCount={mockDonations.recent.length}
+              totalTopDonationCount={mockDonations.top.length}
+              // Re-enable pointer events + stack above the preview's modal
+              // radix dialog, which otherwise blocks this body-portaled overlay.
+              viewAllClassName='z-[60] pointer-events-auto'
+            />
+          ) : (
+            <Suspense
+              fallback={
+                <div className='flex flex-col gap-3'>
+                  <SectionHeader>
+                    {t('donationCount', {
+                      count: fundraiser.donationCount,
+                      formattedCount: formatCompactNumber(
+                        fundraiser.donationCount,
+                        locale
+                      ),
+                    })}
+                  </SectionHeader>
+                  <DonorsStripSkeleton />
+                </div>
+              }
+            >
+              <DonorsSummary fundraiser={fundraiser} />
+            </Suspense>
+          ))}
 
         <div className='md:hidden flex flex-col'>
           {/** Copy link */}
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+          {fundraiser.visibility === 'public' && (
+            <CopyLinkButton preview={preview} />
+          )}
         </div>
 
         {/* Hosts */}
@@ -127,7 +169,7 @@ export function FundraiserView({
         {/** Copy link */}
         {fundraiser.visibility === 'public' && (
           <div className='hidden md:block mt-3'>
-            <CopyLinkButton />
+            <CopyLinkButton preview={preview} />
           </div>
         )}
       </SidebarPanel>
@@ -138,7 +180,14 @@ export function FundraiserView({
 
         {/* Leaderboard */}
         {canShowLeaderboard &&
-          (leaderboardFetchStrategy === 'client' ? (
+          (preview && mockDonations ? (
+            <LeaderboardView
+              demo
+              initialRecentDonations={mockDonations.recent}
+              initialTopDonations={mockDonations.top}
+              settings={leaderboardSettings!}
+            />
+          ) : leaderboardFetchStrategy === 'client' ? (
             <LeaderboardClientLoader
               idOrSlug={fundraiser.slug}
               settings={leaderboardSettings}
@@ -153,7 +202,16 @@ export function FundraiserView({
           ))}
 
         {/* Donation form + overlay */}
-        {canReceiveDonations ? (
+        {preview ? (
+          <>
+            <PreviewDonationForm currency={fundraiser.currency} />
+            <SecurityNotice
+              organizationName={workspaceName}
+              countryCode={workspaceCountry}
+              isTaxDeductible={isTaxDeductible}
+            />
+          </>
+        ) : canReceiveDonations ? (
           <>
             <DonationSection
               fundraiser={fundraiser}
@@ -183,6 +241,10 @@ export function FundraiserView({
         <ProjectsSupportedDisplay
           projectAllocations={fundraiser.projectAllocations}
         />
+
+        {preview && previewActions && (
+          <div className='flex flex-wrap gap-3'>{previewActions}</div>
+        )}
       </MainPanel>
     </FundraiserLayout>
   );

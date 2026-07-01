@@ -430,7 +430,18 @@
       "label": "Link kopieren",
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
-      "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+      "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell.",
+      "previewTitle": "Vorschaumodus",
+      "previewDescription": "Link kopieren ist in der Vorschau deaktiviert."
+    },
+    "preview": {
+      "title": "Vorschau der Spendenaktion",
+      "button": "Vorschau",
+      "close": "Schließen",
+      "saveCreate": "Speichern & Erstellen",
+      "saveUpdate": "Speichern & Aktualisieren",
+      "bannerTitle": "Nur Vorschau",
+      "bannerDescription": "Es werden Beispieldaten angezeigt. Spenden sind in der Vorschau deaktiviert."
     }
   }
 }

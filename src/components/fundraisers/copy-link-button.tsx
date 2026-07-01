@@ -8,14 +8,23 @@ import { Button } from '@/components/ui/button';
 
 type CopyLinkButtonProps = {
   url?: string;
+  /** Preview mode: show a toast instead of copying (no real link yet). */
+  preview?: boolean;
 };
 
-export function CopyLinkButton({ url }: CopyLinkButtonProps) {
+export function CopyLinkButton({ url, preview = false }: CopyLinkButtonProps) {
   const [copied, setCopied] = useState(false);
   const t = useTranslations('Fundraisers.copyLinkButton');
 
   const handleCopy = async () => {
     if (copied) return;
+
+    if (preview) {
+      toast.message(t('previewTitle'), {
+        description: t('previewDescription'),
+      });
+      return;
+    }
 
     try {
       await navigator.clipboard.writeText(url ?? window.location.href);
