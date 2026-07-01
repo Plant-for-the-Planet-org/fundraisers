@@ -15,6 +15,7 @@ import {
   GOAL_AMOUNT_MIN,
 } from '@/lib/constants/fundraiser-creation';
 import { buildTheme } from '@/lib/theme/build-theme';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
@@ -110,6 +111,12 @@ export const fundraiserFormSchema = z.object({
       title_font: z.string(),
       bg: z.object({
         gradient: z.string(),
+        background_color: z
+          .string()
+          .nullable()
+          .refine(value => value === null || isValidHexColor(value), {
+            message: 'invalidColor',
+          }),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
         // External URLs must use https and be from an allowed host (same list

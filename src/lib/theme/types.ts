@@ -54,6 +54,7 @@ export type BgImageMode = (typeof BG_IMAGE_MODES)[number];
 
 export interface BgSettings {
   gradient: string; // tailwind class string, '' = no gradient layer
+  background_color: string | null; // '#RRGGBB' solid wash, null = none; mutually exclusive with gradient
   decoration: BgDecoration;
   pattern_id: string | null;
   image_url: string | null; // library key OR https URL
@@ -94,6 +95,7 @@ export interface FundraiserThemeSettings {
   animation?: string;
   bg?: {
     gradient?: string;
+    background_color?: string | null;
     decoration?: string;
     pattern_id?: string | null;
     image_url?: string | null;

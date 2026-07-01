@@ -10,6 +10,7 @@ import {
 
 // Defaults for a fresh bg block (everything except the gradient).
 export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
+  background_color: null,
   decoration: 'none',
   pattern_id: null,
   image_url: null,

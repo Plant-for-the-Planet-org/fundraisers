@@ -11,6 +11,7 @@ import {
   isValidDecoration,
   isValidImageMode,
 } from './backgrounds';
+import { isValidHexColor } from './color-utils';
 import { DEFAULT_THEME, THEMES } from './themes';
 import { isValidMode } from './validators';
 
@@ -56,6 +57,9 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
 
   const gradient =
     typeof raw.gradient === 'string' ? raw.gradient : base.bg.gradient;
+  const background_color = isValidHexColor(raw.background_color)
+    ? raw.background_color
+    : (base.bg.background_color ?? null);
   const pattern_id =
     raw.pattern_id !== undefined ? raw.pattern_id : base.bg.pattern_id;
   const image_url =
@@ -86,6 +90,7 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
 
   return {
     gradient,
+    background_color,
     decoration,
     pattern_id,
     image_url,
