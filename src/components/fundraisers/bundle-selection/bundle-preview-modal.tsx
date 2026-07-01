@@ -44,7 +44,7 @@ export function BundlePreviewModal({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   // The persisted bundle shows its saved projects (donatable and non-donatable
   // alike), but never the unresolvable "unknown" placeholders for bundle-config
@@ -82,14 +82,17 @@ export function BundlePreviewModal({
       }}
     >
       <DialogContent
+        ref={dialogContentRef}
+        tabIndex={-1}
         showCloseButton={false}
         onOpenAutoFocus={event => {
           // Avoid focusing the "Use Bundle" CTA on open (Enter would trigger it).
-          // Focus the close button instead — non-destructive default.
+          // Focus the dialog surface instead so this does not depend on the
+          // close button existing.
           event.preventDefault();
-          closeButtonRef.current?.focus();
+          dialogContentRef.current?.focus();
         }}
-        className='w-full sm:max-w-4xl gap-0 overflow-hidden rounded-2xl p-0'
+        className='flex max-h-[calc(100dvh-2rem)] w-full flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-4xl'
       >
         <DialogTitle className='sr-only'>{label}</DialogTitle>
         <div className='flex shrink-0 flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
@@ -113,9 +116,7 @@ export function BundlePreviewModal({
           >
             {t('modal.useBundle')}
           </Button>
-
           <button
-            ref={closeButtonRef}
             type='button'
             onClick={onClose}
             aria-label={t('aria.closeModal')}
@@ -125,7 +126,7 @@ export function BundlePreviewModal({
           </button>
         </div>
 
-        <div className='px-4 py-4'>
+        <div className='min-h-0 flex-1 overflow-y-auto px-4 py-4'>
           <p className='mb-3 text-xs font-bold tracking-wide text-muted-foreground'>
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
