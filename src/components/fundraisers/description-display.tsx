@@ -26,7 +26,13 @@ export default function DescriptionDisplay({
         html={value}
         sanitize={sanitizeDescriptionHtml}
         className={cn(
-          'rich-quote text-base text-foreground leading-relaxed [&_p]:my-2 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_ul]:my-2 [&_ul]:pl-6 [&_ul]:list-disc [&_ol]:my-2 [&_ol]:pl-6 [&_ol]:list-decimal [&_li]:my-1 [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through',
+          'rich-quote text-foreground leading-relaxed ',
+          '[&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 ',
+          '[&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through ',
+          '[&_ul]:my-3 [&_ul]:pl-6 [&_ul]:list-disc ',
+          '[&_ol]:my-3 [&_ol]:pl-6 [&_ol]:list-decimal ',
+          '[&_li]:my-1 ',
+          '[&_hr]:my-6 [&_hr]:border-0 [&_hr]:border-t-2 [&_hr]:border-t-foreground',
           className
         )}
       />

@@ -4,6 +4,7 @@ import type { FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { useFormatter, useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { RichTextContent } from '@/components/ui/rich-text-content';
 
 const MAX_NAMED_HOSTS = 3;
@@ -52,7 +53,16 @@ export function HostMessageCard({
         </h3>
         <RichTextContent
           html={message}
-          className='rich-quote text-sm leading-relaxed text-gray-600 [&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5'
+          className={cn(
+            'rich-quote text-foreground leading-relaxed ',
+            '[&_p]:my-1.5 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 ',
+            '[&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through ',
+            '[&_ul]:my-1.5 [&_ul]:pl-5 [&_ul]:list-disc ',
+            '[&_ol]:my-1.5 [&_ol]:pl-5 [&_ol]:list-decimal ',
+            '[&_li]:my-0.5',
+            '[&_hr]:my-6 [&_hr]:border-0 [&_hr]:border-t-2 [&_hr]:border-t-foreground',
+            'text-sm text-gray-600'
+          )}
         />
         {signature && <p className='mt-3 text-sm text-gray-500'>{signature}</p>}
       </div>

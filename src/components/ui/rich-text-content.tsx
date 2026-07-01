@@ -1,5 +1,6 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
+import { cn } from '@/lib/utils';
 import {
   hasVideoMarker,
   splitVideoMarkers,
@@ -43,7 +44,7 @@ export function RichTextContent({
   if (!hasVideoMarker(safeHtml)) {
     return (
       <div
-        className={className}
+        className={cn(className)}
         dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
       />
     );
