@@ -16,10 +16,9 @@ function getRemaining() {
 }
 
 function useCountdown() {
-  const [remaining, setRemaining] = useState(STAGE_POLL_INTERVAL_SECONDS);
+  const [remaining, setRemaining] = useState(getRemaining);
 
   useEffect(() => {
-    setRemaining(getRemaining());
     const id = setInterval(() => setRemaining(getRemaining()), 1000);
     return () => clearInterval(id);
   }, []);

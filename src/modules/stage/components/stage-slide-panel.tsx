@@ -2,7 +2,7 @@
 
 import type { StageSlide } from '../settings';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface StageSlidePanelProps {
   slides: StageSlide[];
@@ -11,7 +11,10 @@ interface StageSlidePanelProps {
 export function StageSlidePanel({ slides }: StageSlidePanelProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const sorted = slides.slice().sort((a, b) => a.position - b.position);
+  const sorted = useMemo(
+    () => slides.slice().sort((a, b) => a.position - b.position),
+    [slides]
+  );
 
   useEffect(() => {
     if (sorted.length <= 1) return;
@@ -20,7 +23,7 @@ export function StageSlidePanel({ slides }: StageSlidePanelProps) {
       setActiveIndex(i => (i + 1) % sorted.length);
     }, duration);
     return () => clearTimeout(timer);
-  }, [activeIndex, sorted.length]);
+  }, [activeIndex, sorted]);
 
   if (sorted.length === 0) {
     return <div className='absolute inset-0 z-0 bg-[#0b1220]' />;
