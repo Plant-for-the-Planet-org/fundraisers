@@ -52,6 +52,14 @@ export function BackgroundTab({
   return (
     <div className='flex flex-col gap-4'>
       <BackgroundColorRow
+        label='Background color - option 1'
+        variant='none-swatch'
+        value={bg.background_color}
+        onChange={onBackgroundColor}
+      />
+      <BackgroundColorRow
+        label='Background color - option 2'
+        variant='clear-button'
         value={bg.background_color}
         onChange={onBackgroundColor}
       />
