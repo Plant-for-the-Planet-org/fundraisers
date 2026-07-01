@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { getLeaderboardByTab } from '@/lib/api/leaderboard-service';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DonationTable } from './donation-table';
 import { OverlayHeader } from './overlay-header';
@@ -217,9 +217,6 @@ export function ViewAllOverlay({
         }}
         className='w-full sm:max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
       >
-        <DialogTitle className='sr-only'>
-          {t('viewAllOverlay.title')}
-        </DialogTitle>
         <OverlayHeader onClose={handleClose} />
 
         {/* Tabs + List */}
