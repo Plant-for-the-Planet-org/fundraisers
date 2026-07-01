@@ -13,22 +13,12 @@ import {
 } from '@/components/ui/popover';
 import { SectionHeader } from '../typography';
 
-// Shown in the picker before the user has committed a colour.
 const DEFAULT_COLOR = '#ffffff';
 
-// Accepts hex with/without '#', expands #abc shorthand, returns '#rrggbb' or
-// null. react-colorful's HexColorInput can emit 3-digit and unprefixed values,
-// so we normalise before committing to keep stored data as strict 6-digit hex.
+// Only commit a complete 6-digit hex; a 3-digit value would snap the field before typing finishes.
 function normalizeHex(input: string): string | null {
-  let hex = input.startsWith('#') ? input : `#${input}`;
-  if (/^#[0-9a-fA-F]{3}$/.test(hex)) {
-    hex = `#${hex
-      .slice(1)
-      .split('')
-      .map(c => c + c)
-      .join('')}`;
-  }
-  return isValidHexColor(hex) ? hex.toLowerCase() : null;
+  const hex = (input.startsWith('#') ? input : `#${input}`).toLowerCase();
+  return isValidHexColor(hex) ? hex : null;
 }
 
 export function BackgroundColorRow({
@@ -94,8 +84,10 @@ export function BackgroundColorRow({
                   #
                 </span>
                 <HexColorInput
-                  color={current}
+                  // Empty (not the default) when unset, so a fresh code isn't truncated on the first keystroke.
+                  color={value ?? ''}
                   onChange={commit}
+                  placeholder='RRGGBB'
                   className='w-24 rounded-md border border-border bg-background px-2 py-1 text-xs uppercase'
                 />
               </div>
