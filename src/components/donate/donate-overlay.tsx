@@ -61,6 +61,7 @@ export function DonateOverlay({
   paymentOptionsReady,
 }: DonateOverlayProps) {
   const tDonate = useTranslations('Donate');
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   return (
     <Dialog
@@ -70,8 +71,15 @@ export function DonateOverlay({
       }}
     >
       <DialogContentFullScreen
+        ref={dialogContentRef}
+        tabIndex={-1}
         className='light bg-gray-50 text-foreground'
         onEscapeKeyDown={e => e.preventDefault()}
+        onOpenAutoFocus={event => {
+          // Radix focuses the first focusable (the corner close button) by default, which makes Space/Enter dismiss the overlay. Focus the dialog surface instead so no control is one keystroke from firing.
+          event.preventDefault();
+          dialogContentRef.current?.focus();
+        }}
       >
         <DialogTitle className='sr-only'>
           {tDonate('overlay.aria.label')}

@@ -210,6 +210,11 @@ export function ViewAllOverlay({
     >
       <DialogContent
         showCloseButton={false}
+        onOpenAutoFocus={event => {
+          // Radix focuses the first focusable (the header close button) by default, which makes Space/Enter dismiss the overlay. Focus the scrollable list instead so Space scrolls and no control fires.
+          event.preventDefault();
+          scrollRef.current?.focus();
+        }}
         className='w-full sm:max-w-3xl gap-0 overflow-hidden rounded-2xl p-0'
       >
         <DialogTitle className='sr-only'>
