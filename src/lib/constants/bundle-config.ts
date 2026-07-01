@@ -14,7 +14,7 @@ export const BUNDLE_CONFIG: BundleConfig = {
       id: 'staff-picks',
       bundleSlugs: [
         'ancestral-lands',
-        'planet-projects',
+        'plant-for-the-planet',
         'undo-your-amazon-order',
         'supply-chain-guilt-trip',
       ],
@@ -158,7 +158,7 @@ export const BUNDLE_CONFIG: BundleConfig = {
       ],
     },
     {
-      slug: 'planet-projects',
+      slug: 'plant-for-the-planet',
       tabs: ['staff-picks'],
       projectIds: [
         'proj_Ly4lVzw50r6hJtocv74al9Ps',
