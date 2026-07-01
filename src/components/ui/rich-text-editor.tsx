@@ -497,10 +497,8 @@ export function RichTextEditor({
           [&_.ProseMirror_ol]:pl-6
           [&_.ProseMirror_ol]:list-decimal
           [&_.ProseMirror_li]:my-1
-          [&_.ProseMirror_hr]:my-6
-          [&_.ProseMirror_hr]:border-0
-          [&_.ProseMirror_hr]:border-t-2
-          [&_.ProseMirror_hr]:border-t-foreground
+          [&_.ProseMirror_hr]:border-t
+          [&_.ProseMirror_hr]:border-t-section-divider
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground
           [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left

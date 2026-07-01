@@ -60,7 +60,7 @@ export function HostMessageCard({
             '[&_ul]:my-1.5 [&_ul]:pl-5 [&_ul]:list-disc ',
             '[&_ol]:my-1.5 [&_ol]:pl-5 [&_ol]:list-decimal ',
             '[&_li]:my-0.5',
-            '[&_hr]:my-6 [&_hr]:border-0 [&_hr]:border-t-2 [&_hr]:border-t-foreground',
+            '[&_hr]:border-t [&_hr]:border-t-section-divider',
             'text-sm text-gray-600'
           )}
         />

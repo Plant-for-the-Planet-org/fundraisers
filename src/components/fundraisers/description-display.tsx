@@ -32,7 +32,7 @@ export default function DescriptionDisplay({
           '[&_ul]:my-3 [&_ul]:pl-6 [&_ul]:list-disc ',
           '[&_ol]:my-3 [&_ol]:pl-6 [&_ol]:list-decimal ',
           '[&_li]:my-1 ',
-          '[&_hr]:my-6 [&_hr]:border-0 [&_hr]:border-t-2 [&_hr]:border-t-foreground',
+          '[&_hr]:border-t [&_hr]:border-t-section-divider',
           className
         )}
       />
