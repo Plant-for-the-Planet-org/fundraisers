@@ -121,8 +121,8 @@
         "visibilityOff": "Öffentlich verborgen",
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
-        "lastAdminHint": "Eine Spendenaktion braucht mindestens einen Admin.",
-        "lastPublicHint": "Eine Spendenaktion braucht mindestens eine*n öffentliche*n Organisator*in.",
+        "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
+        "lastPublicHint": "Ein Spendenaufruf braucht mindestens eine*n öffentliche*n Organisator*in.",
         "emailPlaceholder": "E-Mail-Adresse",
         "addButton": "Hinzufügen",
         "toastAdded": "Organisator*in hinzugefügt",
@@ -130,9 +130,9 @@
         "toastUpdated": "Organisator*in aktualisiert",
         "toastRemoved": "Organisator*in entfernt",
         "toastDuplicate": "Diese Person ist bereits Organisator*in.",
-        "toastError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "toastError": "Etwas ist schiefgelaufen, versuche es erneut.",
         "toastHostsLoadFailed": "Vollständige Organisator*innenliste konnte nicht geladen werden. Einige werden möglicherweise nicht angezeigt.",
-        "toastReorderError": "Reihenfolge teilweise gespeichert. Seite neu laden, um aktuelle Reihenfolge zu sehen."
+        "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen."
       },
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -140,8 +140,8 @@
         "daysLeft": "{days, number}T übrig"
       },
       "goalSettings": {
-        "sectionHeading": "Zieleinstellungen",
-        "openSettings": "Zieleinstellungen",
+        "sectionHeading": "Ziel-Einstellungen",
+        "openSettings": "Ziel-Einstellungen",
         "showGoal": "Ziel anzeigen",
         "showDaysLeft": "Verbleibende Tage anzeigen"
       },
