@@ -58,7 +58,8 @@
       "draft": "Draft",
       "paused": "Paused",
       "ended": "Ended",
-      "ending-soon": "Ending soon"
+      "ending-soon": "Ending soon",
+      "archived": "Archived"
     },
     "noResults": {
       "title": "No fundraisers match these filters.",
@@ -72,12 +73,28 @@
       "pause": "Pause",
       "resume": "Resume",
       "activate": "Activate",
+      "delete": "Delete",
+      "archive": "Archive",
       "copyLinkSuccess": "Link copied",
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
       "activateSuccess": "Fundraiser activated",
+      "deleteSuccess": "Fundraiser deleted",
+      "archiveSuccess": "Fundraiser archived",
       "mutationError": "Something went wrong. Try again."
+    },
+    "deleteDialog": {
+      "title": "Delete fundraiser?",
+      "description": "This permanently removes it. This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "archiveDialog": {
+      "title": "Archive fundraiser?",
+      "description": "The fundraiser will stop accepting donations and will no longer be publicly available to donors. It will remain visible in the dashboard under All and Ended.",
+      "cancel": "Cancel",
+      "confirm": "Archive"
     },
     "list": {
       "loading": "Loading fundraiser item...",

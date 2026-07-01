@@ -93,6 +93,12 @@ export default function DashboardPage() {
     []
   );
 
+  // Hard-delete (204): drop the row. Summary stays at its last snapshot, in
+  // line with how archive/pause leave the summary untouched.
+  const handleFundraiserRemoved = useCallback((id: string) => {
+    setFundraisers(prev => prev.filter(fundraiser => fundraiser.id !== id));
+  }, []);
+
   return (
     <AuthGuard>
       <section className='space-y-6'>
@@ -117,6 +123,7 @@ export default function DashboardPage() {
             fundraisers={fundraisers}
             isLoading={isLoading}
             onFundraiserUpdated={handleFundraiserUpdated}
+            onFundraiserRemoved={handleFundraiserRemoved}
           />
         )}
       </section>

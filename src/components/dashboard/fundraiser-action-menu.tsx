@@ -6,15 +6,18 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
+  Archive,
   Link as LinkIcon,
   Loader2,
   MoreVertical,
   Pause,
   Pencil,
   Play,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
+  deleteFundraiser,
   pauseFundraiser,
   resumeFundraiser,
 } from '@/lib/api/fundraiser-service';
@@ -24,6 +27,15 @@ import {
 } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +47,7 @@ import {
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
+  onFundraiserRemoved: (id: string) => void;
 }
 
 interface ActionVisibility {
@@ -42,6 +55,7 @@ interface ActionVisibility {
   copyLink: boolean;
   pause: boolean;
   resume: boolean;
+  delete: boolean;
 }
 
 const NON_OWNER_ACTIONS: ActionVisibility = {
@@ -49,14 +63,18 @@ const NON_OWNER_ACTIONS: ActionVisibility = {
   copyLink: true,
   pause: false,
   resume: false,
+  delete: false,
 };
 
+// prettier-ignore
 const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
-  active: { edit: true, copyLink: true, pause: true, resume: false },
-  paused: { edit: true, copyLink: true, pause: false, resume: true },
-  draft: { edit: true, copyLink: true, pause: false, resume: true },
-  completed: { edit: false, copyLink: true, pause: false, resume: false },
-  cancelled: { edit: false, copyLink: true, pause: false, resume: false },
+  active:    { edit: true,  copyLink: true, pause: true,  resume: false, delete: true },
+  paused:    { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
+  draft:     { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
+  completed: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
+  cancelled: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
+  // Archived is terminal: keep the link shareable but no further mutations.
+  archived:  { edit: false, copyLink: true, pause: false, resume: false, delete: false },
 };
 
 function getAvailableActions(
@@ -70,22 +88,37 @@ function getAvailableActions(
 }
 
 type StatusActionKind = 'pause' | 'resume';
-type PendingAction = StatusActionKind | null;
+type PendingAction = StatusActionKind | 'delete' | null;
 
 export function FundraiserActionMenu({
   fundraiser,
   onFundraiserUpdated,
+  onFundraiserRemoved,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
+  const tDeleteDialog = useTranslations('Dashboard.deleteDialog');
+  const tArchiveDialog = useTranslations('Dashboard.archiveDialog');
   const accessToken = useAuthStore(state => state.accessToken);
   const currentUserId = useAuthStore(state => state.user?.sub ?? null);
 
+  // The API archives (soft-delete) fundraisers that already have donations and
+  // hard-deletes the rest. `donationCount` lets us predict which, so the menu
+  // label and dialog copy match the real outcome. The API response is still the
+  // source of truth for the toast + state update, so a stale count is harmless.
+  const willArchive = fundraiser.donationCount > 0;
+  const tDialog = willArchive ? tArchiveDialog : tDeleteDialog;
+
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
-    actions.edit || actions.copyLink || actions.pause || actions.resume;
+    actions.edit ||
+    actions.copyLink ||
+    actions.pause ||
+    actions.resume ||
+    actions.delete;
   const showStatusGroup = actions.pause || actions.resume;
   const showSeparator = showStatusGroup && (actions.edit || actions.copyLink);
 
@@ -128,7 +161,37 @@ export function FundraiserActionMenu({
     }
   };
 
+  const handleDelete = async () => {
+    if (pending || !accessToken) return;
+
+    setPending('delete');
+    try {
+      const result = await deleteFundraiser(fundraiser.id, accessToken);
+      if (result.archived) {
+        // 200: had donations, soft-deleted to `archived`. Keep the row and
+        // merge. If the API omitted the body, patch the status locally so the
+        // Archived badge shows immediately without a refetch.
+        onFundraiserUpdated(
+          result.fundraiser ?? { ...fundraiser, status: 'archived' }
+        );
+        toast.success(t('archiveSuccess'));
+      } else {
+        // 204: no donations, hard-deleted. Remove the row.
+        onFundraiserRemoved(fundraiser.id);
+        toast.success(t('deleteSuccess'));
+      }
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      // Keep the dialog open so the user can retry.
+      console.error('[FundraiserActionMenu] delete failed:', error);
+      toast.error(t('mutationError'));
+    } finally {
+      setPending(null);
+    }
+  };
+
   const isMutating = pending !== null;
+  const isDeleting = pending === 'delete';
 
   return (
     <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
@@ -211,7 +274,63 @@ export function FundraiserActionMenu({
             {fundraiser.status === 'draft' ? t('activate') : t('resume')}
           </DropdownMenuItem>
         )}
+
+        {actions.delete && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant={willArchive ? 'default' : 'destructive'}
+              className='cursor-pointer py-2'
+              disabled={isMutating}
+              onSelect={event => {
+                event.preventDefault();
+                setOpen(false);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              {willArchive ? (
+                <Archive aria-hidden='true' />
+              ) : (
+                <Trash2 aria-hidden='true' />
+              )}
+              {willArchive ? t('archive') : t('delete')}
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onOpenChange={next => {
+          // Don't allow closing mid-request; the button shows a spinner.
+          if (isDeleting) return;
+          setDeleteDialogOpen(next);
+        }}
+      >
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>{tDialog('title')}</DialogTitle>
+            <DialogDescription>{tDialog('description')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant='outline' disabled={isDeleting}>
+                {tDialog('cancel')}
+              </Button>
+            </DialogClose>
+            <Button
+              variant={willArchive ? 'default' : 'destructive'}
+              disabled={isDeleting}
+              onClick={() => void handleDelete()}
+            >
+              {isDeleting && (
+                <Loader2 className='animate-spin' aria-hidden='true' />
+              )}
+              {tDialog('confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DropdownMenu>
   );
 }

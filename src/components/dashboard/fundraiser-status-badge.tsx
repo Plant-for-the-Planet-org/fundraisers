@@ -16,6 +16,7 @@ const STATUS_INDICATOR_STYLES: Record<DisplayStatus, string> = {
   paused: 'bg-muted-foreground/60',
   ended: 'bg-muted-foreground/40',
   'ending-soon': 'bg-warning',
+  archived: 'bg-muted-foreground/40',
 };
 
 const STATUS_BADGE_STYLES: Record<DisplayStatus, string> = {
@@ -24,6 +25,7 @@ const STATUS_BADGE_STYLES: Record<DisplayStatus, string> = {
   paused: 'border border-border bg-muted text-muted-foreground',
   ended: 'border border-border bg-muted text-muted-foreground',
   'ending-soon': 'bg-warning/15 text-warning',
+  archived: 'border border-border bg-muted text-muted-foreground',
 };
 
 export function FundraiserStatusBadge({

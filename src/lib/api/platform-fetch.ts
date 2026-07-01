@@ -53,10 +53,17 @@ export interface PlatformFetchOptions {
   skipImpersonationFromStore?: boolean;
 }
 
-export async function platformFetch<T>(
+export interface PlatformResponse<T> {
+  /** HTTP status of a successful (2xx) response. */
+  status: number;
+  /** Parsed body, or `undefined` for 204 / empty-body responses. */
+  data: T | undefined;
+}
+
+async function performPlatformRequest<T>(
   path: string,
   opts: PlatformFetchOptions = {}
-): Promise<T> {
+): Promise<PlatformResponse<T>> {
   const headers: Record<string, string> = {
     ...(opts.extraHeaders as Record<string, string> | undefined),
     'X-SESSION-ID': getSessionId(),
@@ -136,24 +143,49 @@ export async function platformFetch<T>(
   }
 
   if (response.status === 204) {
-    return undefined as T;
+    return { status: 204, data: undefined };
   }
 
   const text = await response.text();
   if (!text) {
-    return undefined as T;
+    return { status: response.status, data: undefined };
   }
 
   const contentType = response.headers.get('content-type');
   if (contentType?.includes('application/json')) {
     try {
-      return JSON.parse(text) as T;
+      return { status: response.status, data: JSON.parse(text) as T };
     } catch {
       // Server claimed JSON but body is not parseable. Fall through to text.
     }
   }
 
-  return text as unknown as T;
+  return { status: response.status, data: text as unknown as T };
+}
+
+/**
+ * Returns the parsed body only (or `undefined` for 204 / empty responses).
+ * This is the common case. Use `platformFetchWithResponse` when the caller
+ * needs the HTTP status to disambiguate success shapes (e.g. 200 vs 204).
+ */
+export async function platformFetch<T>(
+  path: string,
+  opts: PlatformFetchOptions = {}
+): Promise<T> {
+  const { data } = await performPlatformRequest<T>(path, opts);
+  return data as T;
+}
+
+/**
+ * Like `platformFetch`, but also returns the HTTP status. Needed when two
+ * success codes mean different things and the body alone can't tell them
+ * apart — a 200 with an empty body is indistinguishable from a 204 otherwise.
+ */
+export function platformFetchWithResponse<T>(
+  path: string,
+  opts: PlatformFetchOptions = {}
+): Promise<PlatformResponse<T>> {
+  return performPlatformRequest<T>(path, opts);
 }
 
 async function safeParseBody(response: Response): Promise<unknown> {

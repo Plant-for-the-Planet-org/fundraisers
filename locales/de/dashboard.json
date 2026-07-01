@@ -58,7 +58,8 @@
       "draft": "Entwurf",
       "paused": "Pausiert",
       "ended": "Beendet",
-      "ending-soon": "Endet bald"
+      "ending-soon": "Endet bald",
+      "archived": "Archiviert"
     },
     "noResults": {
       "title": "Keiner der Aufrufe entspricht diesem Filter.",
@@ -72,12 +73,28 @@
       "pause": "Pausieren",
       "resume": "Fortsetzen",
       "activate": "Aktivieren",
+      "delete": "Löschen",
+      "archive": "Archivieren",
       "copyLinkSuccess": "Link kopiert",
       "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
       "activateSuccess": "Spendenaufruf aktiviert",
+      "deleteSuccess": "Spendenaufruf gelöscht",
+      "archiveSuccess": "Spendenaufruf archiviert",
       "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
+    },
+    "deleteDialog": {
+      "title": "Spendenaufruf löschen?",
+      "description": "Dies entfernt ihn dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen"
+    },
+    "archiveDialog": {
+      "title": "Spendenaufruf archivieren?",
+      "description": "Die Spendenaktion akzeptiert keine weiteren Spenden mehr und ist für Spender nicht mehr öffentlich sichtbar. Sie bleibt jedoch im Dashboard unter „Alle“ und „Beendet“ sichtbar.",
+      "cancel": "Abbrechen",
+      "confirm": "Archivieren"
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",

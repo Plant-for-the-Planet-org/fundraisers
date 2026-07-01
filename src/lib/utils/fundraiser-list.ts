@@ -7,7 +7,8 @@ export type DisplayStatus =
   | 'draft'
   | 'paused'
   | 'ended'
-  | 'ending-soon';
+  | 'ending-soon'
+  | 'archived';
 
 export type FundraiserListSort =
   | 'newest'
@@ -48,6 +49,8 @@ export const DEFAULT_FUNDRAISER_LIST_FILTERS: FundraiserListFilters = {
 // Used by `FundraiserStatusBadge` (added in PR 3) to pick the badge variant.
 export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   switch (fundraiser.status) {
+    case 'archived':
+      return 'archived';
     case 'completed':
     case 'cancelled':
       return 'ended';
@@ -96,7 +99,9 @@ function matchesStatus(
       return fundraiser.status === 'paused';
     case 'ended':
       return (
-        fundraiser.status === 'completed' || fundraiser.status === 'cancelled'
+        fundraiser.status === 'completed' ||
+        fundraiser.status === 'cancelled' ||
+        fundraiser.status === 'archived'
       );
     default: {
       filter satisfies never;
@@ -213,6 +218,7 @@ export function getStatusCounts(
         break;
       case 'completed':
       case 'cancelled':
+      case 'archived':
         counts.ended += 1;
         break;
     }
