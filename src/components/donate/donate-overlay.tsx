@@ -70,7 +70,7 @@ export function DonateOverlay({
       }}
     >
       <DialogContentFullScreen
-        className='light bg-gray-50 text-foreground overflow-auto'
+        className='light bg-gray-50 text-foreground'
         onEscapeKeyDown={e => e.preventDefault()}
       >
         <DialogTitle className='sr-only'>

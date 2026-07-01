@@ -90,6 +90,9 @@ function DialogContentFullScreen({
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal data-slot='dialog-portal'>
+      {/* Fullscreen dialog doesn't need a visible backdrop, but the overlay is
+    required to prevent the page behind from scrolling. */}
+      <DialogOverlay className='bg-transparent' />
       <DialogPrimitive.Content
         data-slot='dialog-content-fullscreen'
         className={cn(
