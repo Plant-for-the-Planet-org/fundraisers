@@ -17,7 +17,7 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
-import { PreviewButton } from './preview-button';
+import { ViewButton } from './preview-button';
 import { StickyFormBar } from './sticky-form-bar';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
@@ -27,6 +27,8 @@ import { WorkspaceSelector } from './workspace-selector';
 interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
+  /** Fundraiser slug for the View link. Only meaningful in edit mode. */
+  slug?: string;
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
@@ -40,6 +42,7 @@ interface FundraiserFormBodyProps {
 export function FundraiserFormBody({
   mode,
   submitButton,
+  slug,
   totalRaised,
   endDate,
   fundraiserId,
@@ -81,7 +84,7 @@ export function FundraiserFormBody({
         <Options />
         <StickyFormBar>
           <div className='flex gap-2'>
-            <PreviewButton />
+            {isEditMode && slug && <ViewButton slug={slug} />}
             {submitButton}
           </div>
         </StickyFormBar>

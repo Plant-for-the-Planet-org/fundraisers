@@ -421,7 +421,7 @@
       "backToDashboard": "Back to dashboard",
       "formSubmission": {
         "buttonProcessing": "Updating fundraiser...",
-        "buttonSubmit": "Update fundraiser",
+        "buttonSubmit": "Save Changes",
         "successMessage": "Fundraiser updated!",
         "errorMessage": "Update failed",
         "errorDescription": "Your changes could not be saved. Please try again."

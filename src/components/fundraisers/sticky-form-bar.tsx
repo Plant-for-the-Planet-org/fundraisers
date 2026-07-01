@@ -24,7 +24,7 @@ export function StickyFormBar({ children }: { children: React.ReactNode }) {
         className={cn(
           'flex justify-end py-4',
           isStuck &&
-            'fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background/50 backdrop-blur-sm'
+            'fixed bottom-0 inset-x-0 z-50 bg-background/50 backdrop-blur-sm'
         )}
       >
         <div

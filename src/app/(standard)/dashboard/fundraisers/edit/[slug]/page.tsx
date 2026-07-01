@@ -18,6 +18,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
     <EditFundraiserFormProvider fundraiser={fundraiser}>
       <FundraiserFormBody
         mode='edit'
+        slug={fundraiser.slug}
         submitButton={
           <UpdateFundraiserButton
             fundraiserId={fundraiser.id}

@@ -421,7 +421,7 @@
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
-        "buttonSubmit": "Spendenaufruf aktualisieren",
+        "buttonSubmit": "Änderungen speichern",
         "successMessage": "Spendenaufruf aktualisiert!",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
