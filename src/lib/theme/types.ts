@@ -52,9 +52,23 @@ export type BgDecoration = (typeof BG_DECORATIONS)[number];
 export const BG_IMAGE_MODES = ['cover', 'repeat'] as const;
 export type BgImageMode = (typeof BG_IMAGE_MODES)[number];
 
+export interface GradientStop {
+  color: string; // '#RRGGBB' hex
+  position: number; // 0–100
+}
+
+// Custom (user-built) gradient. Rendered as an inline linear-gradient, unlike
+// the preset `gradient` Tailwind class. Shape is forward-compatible: more stops
+// or an angle control are UI-only, alpha is a colour-validation-only change.
+export interface CustomGradient {
+  angle: number; // 0–360 degrees
+  stops: GradientStop[]; // length >= 2
+}
+
 export interface BgSettings {
   gradient: string; // tailwind class string, '' = no gradient layer
-  background_color: string | null; // '#RRGGBB' solid wash, null = none; mutually exclusive with gradient
+  background_color: string | null; // '#RRGGBB' solid wash, null = none
+  custom_gradient: CustomGradient | null; // inline gradient, null = none
   decoration: BgDecoration;
   pattern_id: string | null;
   image_url: string | null; // library key OR https URL
@@ -96,6 +110,10 @@ export interface FundraiserThemeSettings {
   bg?: {
     gradient?: string;
     background_color?: string | null;
+    custom_gradient?: {
+      angle?: number;
+      stops?: Array<{ color?: string; position?: number }>;
+    } | null;
     decoration?: string;
     pattern_id?: string | null;
     image_url?: string | null;

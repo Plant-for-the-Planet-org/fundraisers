@@ -117,6 +117,21 @@ export const fundraiserFormSchema = z.object({
           .refine(value => value === null || isValidHexColor(value), {
             message: 'invalidColor',
           }),
+        custom_gradient: z
+          .object({
+            angle: z.number().min(0).max(360),
+            stops: z
+              .array(
+                z.object({
+                  color: z.string().refine(isValidHexColor, {
+                    message: 'invalidColor',
+                  }),
+                  position: z.number().min(0).max(100),
+                })
+              )
+              .min(2),
+          })
+          .nullable(),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
         // External URLs must use https and be from an allowed host (same list

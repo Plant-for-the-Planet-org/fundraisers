@@ -8,9 +8,13 @@ import {
   type BgSettings,
 } from './types';
 
+// Default angle for a custom (user-built) gradient, in degrees.
+export const DEFAULT_GRADIENT_ANGLE = 135;
+
 // Defaults for a fresh bg block (everything except the gradient).
 export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   background_color: null,
+  custom_gradient: null,
   decoration: 'none',
   pattern_id: null,
   image_url: null,
