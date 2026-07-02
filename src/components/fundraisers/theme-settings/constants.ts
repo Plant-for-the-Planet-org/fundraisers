@@ -4,6 +4,7 @@ import type {
   AnimationType,
   BgDecoration,
   BgImageMode,
+  CustomGradient,
   FontId,
   Theme,
 } from '@/lib/theme/types';
@@ -19,7 +20,11 @@ import {
   Sparkles,
   SquareDashed,
 } from 'lucide-react';
-import { BG_LIBRARY, LOGO_LIBRARY } from '@/lib/theme/backgrounds';
+import {
+  BG_LIBRARY,
+  DEFAULT_GRADIENT_ANGLE,
+  LOGO_LIBRARY,
+} from '@/lib/theme/backgrounds';
 import { THEMES } from '@/lib/theme/themes';
 
 export type BgFormValue = FundraiserFormValues['settings']['theme']['bg'];
@@ -113,5 +118,37 @@ export const GRADIENT_OPTIONS: GradientOption[] = [
 export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
+
+// Quick-pick swatches shown beneath the picker, from the Planet CI palette
+// (branding in planet-skills). Five hue columns; the grid is 5-wide so the top
+// row reads as the light "Soft" background wash and the bottom row as the
+// deeper brand variant of the same hue.
+export const QUICK_PICK_COLORS = [
+  // Top row — light "Soft" backgrounds
+  '#f0faf4', // Soft Green
+  '#eff6ff', // Soft Blue
+  '#f9f1ff', // Soft Purple
+  '#fff3f3', // Soft Red
+  '#fff8e4', // Soft Yellow
+  // Bottom row — medium tints of the same brand hues (~50% mix on white), so
+  // they read as a stronger wash but still work as a background with dark text.
+  '#93d6af', // Leaf Green
+  '#97bff6', // Ocean Blue
+  '#b5b1ff', // Purple Sky
+  '#f5abab', // Fire Red
+  '#f9dda2', // Golden Yellow
+];
+
+export const DEFAULT_SOLID_COLOR = '#ffffff';
+
+export function defaultCustomGradient(accentColor: string): CustomGradient {
+  return {
+    angle: DEFAULT_GRADIENT_ANGLE,
+    stops: [
+      { color: accentColor, position: 0 },
+      { color: '#ffffff', position: 100 },
+    ],
+  };
+}
 
 export { pickRandom } from '@/components/theme/animations/base';

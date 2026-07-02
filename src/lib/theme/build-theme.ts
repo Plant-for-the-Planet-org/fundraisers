@@ -1,22 +1,58 @@
 import type {
   AccentColor,
   BgSettings,
+  CustomGradient,
   FontId,
   FundraiserThemeSettings,
   Theme,
 } from './types';
 
 import {
+  DEFAULT_GRADIENT_ANGLE,
   isValidAnimation,
   isValidDecoration,
   isValidImageMode,
 } from './backgrounds';
+import { isValidHexColor } from './color-utils';
 import { DEFAULT_THEME, THEMES } from './themes';
 import { isValidMode } from './validators';
 
 function clampOpacity(value: unknown, fallback: number): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
   return Math.min(1, Math.max(0.05, value));
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+// Keep only valid-hex stops; a gradient needs >= 2 or it falls back to `base`.
+// Missing positions default to an even spread so legacy/partial data still renders.
+function buildCustomGradient(
+  raw: FundraiserThemeSettings['bg'],
+  base: CustomGradient | null
+): CustomGradient | null {
+  const value = raw?.custom_gradient;
+  if (!value || !Array.isArray(value.stops)) return base;
+
+  const stops = value.stops.filter(s => isValidHexColor(s?.color));
+  if (stops.length < 2) return base;
+
+  const angle =
+    typeof value.angle === 'number' && Number.isFinite(value.angle)
+      ? clamp(value.angle, 0, 360)
+      : DEFAULT_GRADIENT_ANGLE;
+
+  return {
+    angle,
+    stops: stops.map((s, i) => ({
+      color: (s.color as string).toLowerCase(),
+      position:
+        typeof s.position === 'number' && Number.isFinite(s.position)
+          ? clamp(s.position, 0, 100)
+          : Math.round((i / (stops.length - 1)) * 100),
+    })),
+  };
 }
 
 const VALID_ACCENTS = new Set<string>([
@@ -56,6 +92,10 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
 
   const gradient =
     typeof raw.gradient === 'string' ? raw.gradient : base.bg.gradient;
+  const background_color = isValidHexColor(raw.background_color)
+    ? raw.background_color
+    : (base.bg.background_color ?? null);
+  const custom_gradient = buildCustomGradient(raw, base.bg.custom_gradient);
   const pattern_id =
     raw.pattern_id !== undefined ? raw.pattern_id : base.bg.pattern_id;
   const image_url =
@@ -86,6 +126,8 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
 
   return {
     gradient,
+    background_color,
+    custom_gradient,
     decoration,
     pattern_id,
     image_url,

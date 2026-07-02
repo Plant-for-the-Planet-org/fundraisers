@@ -13,6 +13,7 @@ import {
   LOGO_LIBRARY,
   resolveBgAsset,
 } from '@/lib/theme/backgrounds';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
@@ -82,6 +83,22 @@ export function ThemeShell({
   const bg = activeTheme.bg;
   // Empty string = no gradient.
   const gradientClass = bg.gradient;
+  // Base wash priority: preset class > custom gradient > solid colour. They are
+  // kept mutually exclusive at write-time; this order is the safety net.
+  // Values are validated (hex stops, numeric angle/positions) before inline
+  // styling, matching the safeCssUrl guard below.
+  const cg = bg.custom_gradient;
+  const customGradient =
+    !gradientClass &&
+    cg &&
+    cg.stops.length >= 2 &&
+    cg.stops.every(s => isValidHexColor(s.color))
+      ? `linear-gradient(${cg.angle}deg, ${cg.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+      : null;
+  const solidColor =
+    !gradientClass && !customGradient && isValidHexColor(bg.background_color)
+      ? bg.background_color
+      : null;
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
@@ -104,6 +121,18 @@ export function ThemeShell({
       {gradientClass && (
         <div
           className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
+        />
+      )}
+      {customGradient && (
+        <div
+          className='fixed inset-0 transition-colors duration-300'
+          style={{ backgroundImage: customGradient }}
+        />
+      )}
+      {solidColor && (
+        <div
+          className='fixed inset-0 transition-colors duration-300'
+          style={{ backgroundColor: solidColor }}
         />
       )}
       {bg.decoration === 'image' && bg.image_url && (
