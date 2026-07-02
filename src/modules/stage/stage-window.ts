@@ -1,10 +1,10 @@
 /**
- * Stage Mode (TV/projector display) helpers.
+ * Stage Mode (TV/projector display) window helpers.
  */
 
-import type { FundraiserUrlData } from './fundraiser';
+import type { FundraiserUrlData } from '@/lib/utils/fundraiser';
 
-import { getFundraiserUrl } from './fundraiser';
+import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 
 /** Path to a fundraiser's Stage Mode view, e.g. `/raise/my-slug/stage`. */
 export function getStageUrl(fundraiser: FundraiserUrlData): string {
@@ -15,6 +15,11 @@ export function getStageUrl(fundraiser: FundraiserUrlData): string {
  * Open Stage Mode in a separate, centered 16:9 window sized to fit the screen
  * (capped at 1600px wide). Must be called from a user gesture (e.g. a click) so
  * the popup is not blocked. Returns false if the popup was blocked.
+ *
+ * We deliberately omit `noopener`: the spec lets `window.open` return `null`
+ * even on success when `noopener` is set, which would make the blocked-popup
+ * check below fire false positives. The target is a same-origin, trusted
+ * `/stage` route, so reverse-tabnabbing is not a concern.
  */
 export function openStageWindow(fundraiser: FundraiserUrlData): boolean {
   const { availWidth, availHeight } = window.screen;
@@ -34,7 +39,7 @@ export function openStageWindow(fundraiser: FundraiserUrlData): boolean {
   const win = window.open(
     getStageUrl(fundraiser),
     '_blank',
-    `width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`
+    `width=${width},height=${height},left=${left},top=${top}`
   );
 
   return win !== null;

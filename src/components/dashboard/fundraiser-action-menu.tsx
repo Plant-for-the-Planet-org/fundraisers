@@ -25,7 +25,6 @@ import {
   isFundraiserOwnerOrAdmin,
   isStageModeEnabled,
 } from '@/lib/utils/fundraiser';
-import { openStageWindow } from '@/lib/utils/stage';
 import { useAuthStore } from '@/stores/auth-store';
 import {
   AlertDialog,
@@ -45,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { openStageWindow } from '@/modules/stage';
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
