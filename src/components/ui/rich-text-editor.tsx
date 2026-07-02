@@ -294,21 +294,15 @@ export function RichTextEditor({
       editor.chain().focus().toggleBlockquote().run();
       return;
     }
-
-    // Toggle ON: blockquote + center align (chain is synchronous, commits before next read).
-    editor.chain().focus().toggleBlockquote().setTextAlign('center').run();
-
-    // Apply italic to the full paragraph. If cursor-only (no selection), expand
-    // to the paragraph bounds so existing text gets the <em> mark too.
-    const { selection } = editor.state;
-    const from = selection.$from.start();
-    const to = selection.$from.end();
-
-    if (selection.empty) {
-      editor.chain().focus().setTextSelection({ from, to }).setItalic().run();
-    } else {
-      editor.chain().focus().setItalic().run();
-    }
+    // Single chain keeps toggle-on as one undo step. setItalic applies to the
+    // selection if text is selected, or stores a pending mark for cursor-only.
+    editor
+      .chain()
+      .focus()
+      .toggleBlockquote()
+      .setTextAlign('center')
+      .setItalic()
+      .run();
   };
 
   const cycleAlign = () => {
