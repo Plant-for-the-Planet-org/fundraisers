@@ -1,14 +1,13 @@
 /**
- * Country mapping utility for displaying country names in different locales
- * Uses i18n-iso-countries for comprehensive country coverage and localization
+ * Country mapping utility for displaying country names in different locales.
+ * Uses i18n-iso-countries for comprehensive country coverage and localization,returning the full (official) country name, e.g. 'United States of America'.
  */
 
 import countries from 'i18n-iso-countries';
 import deLocale from 'i18n-iso-countries/langs/de.json';
-// Register supported locales
 import enLocale from 'i18n-iso-countries/langs/en.json';
 
-// Register the locales
+// Register one language pack per locale the app serves. Keep this list in sync with the locales in `src/i18n/routing.ts`
 countries.registerLocale(enLocale);
 countries.registerLocale(deLocale);
 
@@ -48,14 +47,15 @@ export function countryCodeToFlag(countryCode: string): string {
 }
 
 /**
- * Get the localized country name for a given country code
+ * Get the localized country name for a given country code.
  * @param countryCode - ISO 3166-1 alpha-2 country code (e.g., 'DE', 'US', 'FR')
  * @param locale - The locale for the country name (defaults to 'en')
- * @returns The localized country name or the country code if not found
+ * @returns The localized country name, or the uppercase code if unknown
  *
  * @example
  * getCountry('DE', 'en') // Returns 'Germany'
  * getCountry('DE', 'de') // Returns 'Deutschland'
+ * getCountry('US', 'en') // Returns 'United States of America'
  */
 export function getCountry(countryCode: string, locale: string = 'en'): string {
   try {
@@ -65,7 +65,7 @@ export function getCountry(countryCode: string, locale: string = 'en'): string {
     // Convert locale from 'en-US' format to 'en' format if needed
     const lang = locale.split('-')[0] || 'en';
 
-    // Get country name using i18n-iso-countries
+    // Get country name using i18n-iso-countries (full official name)
     const countryName = countries.getName(code, lang as any);
 
     // Return the localized name or fallback to code
@@ -104,7 +104,7 @@ export function getCountryDisplay(
 }
 
 /**
- * Get all available countries as an array of objects
+ * Get all available countries as an array of objects, sorted by localized name.
  * @param locale - The locale for country names (defaults to 'en')
  * @returns Array of country objects with code, name, and flag
  *
@@ -124,7 +124,7 @@ export function getAllCountries(
         name: name as string,
         flag: countryCodeToFlag(code),
       }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) => a.name.localeCompare(b.name, lang));
   } catch (error) {
     console.warn(`Failed to get all countries for locale ${locale}:`, error);
     return [];

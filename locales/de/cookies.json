@@ -1,0 +1,64 @@
+{
+  "Cookies": {
+    "meta": {
+      "title": "Cookies und Einwilligung",
+      "description": "Warum diese Website kein Cookie-Banner zeigt und wie wir stattdessen sorgsam mit deinen Daten umgehen."
+    },
+    "title": "Warum diese Website kein Cookie-Banner hat",
+    "lead": "Fast jede Website begrüßt dich mit einem Cookie-Hinweis. Diese nicht. Nicht, weil wir das Gesetz ignorieren, sondern weil wir es konsequent zu Ende gedacht haben.",
+    "summary": "Das EU-Recht verlangt ein Einwilligungs-Banner nur dann, wenn eine Website Dinge auf deinem Gerät speichert, die sie nicht braucht. So etwas laden wir nicht. Es gibt also nichts zu fragen und kein Banner zu zeigen.",
+    "toc": {
+      "label": "Auf dieser Seite",
+      "law": "Die Regel",
+      "store": "Was wir speichern",
+      "video": "Video",
+      "monitoring": "Fehlererfassung",
+      "payments": "Zahlung",
+      "manifesto": "Warum das zählt"
+    },
+    "law": {
+      "title": "Die Regel, einfach gesagt",
+      "p1": "Nach EU-Recht (<gdpr>DSGVO</gdpr> und <eprivacy>ePrivacy-Richtlinie</eprivacy>) braucht eine Website deine Einwilligung, bevor sie nicht notwendige Daten auf deinem Gerät speichert oder ausliest. Gemeint sind Tracking, Werbung und Analyse, die dir folgen. Cookies, die für das, was du angefragt hast, unbedingt nötig sind, etwa um angemeldet zu bleiben, brauchen keine Einwilligung.",
+      "p2": "Die meisten Banner gibt es, weil eine Website Tracker standardmäßig lädt und erst danach um Erlaubnis fragt. Wir haben das umgedreht. Wenn die Website solche Dinge nie lädt, muss die Einwilligungsfrage nie gestellt werden."
+    },
+    "store": {
+      "title": "Was wir speichern, und warum",
+      "intro": "Wir beschränken uns auf das Nötigste. Jeder Punkt unten wird gebraucht, damit die Website funktioniert, oder um eine Wahl zu wahren, die du getroffen hast.",
+      "items": {
+        "session": {
+          "title": "Angemeldet bleiben",
+          "body": "Ein Sitzungs-Cookie, das erst nach deiner Anmeldung gesetzt wird, damit du dich nicht auf jeder Seite neu anmelden musst."
+        },
+        "language": {
+          "title": "Deine Sprache",
+          "body": "Ein kleines Cookie, das sich merkt, ob du auf Deutsch oder Englisch liest."
+        },
+        "consent": {
+          "title": "Deine Video-Wahl",
+          "body": "Wenn du ein Video laden möchtest, merken wir uns das. Vorher speichern wir nichts."
+        }
+      }
+    },
+    "video": {
+      "title": "Das Einzige, wonach wir fragen: Video",
+      "body": "Manche Seiten betten ein Video von YouTube ein, und YouTube setzt eigene Tracking-Cookies. Deshalb laden wir es nicht standardmäßig. Stattdessen zeigen wir ein ruhendes Vorschaubild mit einem klaren Button. Der Moment, in dem du auf Abspielen klickst, ist der Moment, in dem wir fragen, und keine Sekunde früher. Wenn du es nie abspielst, erreicht dich nichts von YouTube."
+    },
+    "monitoring": {
+      "title": "Wir achten auf Abstürze, nicht auf dich",
+      "body": "Wie jedes sorgfältige Team wollen wir wissen, wenn etwas kaputtgeht. Unsere Fehlererfassung zeichnet nur Abstürze auf. Sie erstellt kein Profil von dir, misst nicht jeden deiner Schritte und setzt kein Cookie. Wir haben uns bewusst für die leichtere Variante entschieden. Sie sagt uns etwas weniger und achtet dich dafür deutlich mehr."
+    },
+    "payments": {
+      "title": "Zahlung lädt erst, wenn du gibst",
+      "body": "Wenn du spendest, nutzen wir vertrauenswürdige Anbieter wie Stripe und PayPal, um deine Zahlung sicher abzuwickeln. Deren Code lädt erst, wenn du das Spendenformular öffnest, nie bei einem normalen Besuch."
+    },
+    "manifesto": {
+      "title": "Ein Banner ist ein Symptom, keine Lösung",
+      "p1": "Cookie-Banner haben das Web nicht privater gemacht. Sie haben es anstrengender gemacht. Viele sind so gebaut, dass sie dich zermürben, bis du auf Akzeptieren klickst, während die Datensammlung darunter genau gleich bleibt.",
+      "p2": "Wir glauben, die ehrliche Lösung liegt weiter vorne. Baue das Produkt so, dass es nicht darauf angewiesen ist, Menschen zu beobachten. Tracke weniger. Frag nur, wenn du wirklich musst, und frag im Kontext, genau dort, wo die Wahl Sinn ergibt. Tu das, und das Banner erübrigt sich von selbst.",
+      "cta": "Wenn du fürs Web baust, hoffen wir, du probierst dasselbe. Weniger Pop-ups. Weniger Tracking. Ruhigere, klarere Oberflächen. Behandle Einwilligung als echte Wahl, nicht als Schranke. Der Gewinn ist ein besseres Erlebnis und mehr Vertrauen, und genau dafür war gutes Design immer da."
+    },
+    "legal": {
+      "body": "Die ausführlichen <privacy>Datenschutzbestimmungen</privacy> und <terms>Nutzungsbedingungen</terms> von Plant-for-the-Planet gelten weiterhin für diese Website. Diese Seite ersetzt sie nicht. Sie erklärt, was wir hier anders machen."
+    }
+  }
+}

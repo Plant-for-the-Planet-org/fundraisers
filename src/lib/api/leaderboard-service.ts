@@ -3,6 +3,7 @@ import type {
   LeaderboardPageResponse,
 } from '@/lib/types/leaderboard';
 
+import { cache } from 'react';
 import { platformFetch } from './platform-fetch';
 
 export async function getLeaderboard(
@@ -15,26 +16,28 @@ export async function getLeaderboard(
   );
 }
 
-export async function getLeaderboardWithRetry(
-  idOrSlug: string,
-  maxRetries: number = 2
-): Promise<LeaderboardApiResponse> {
-  let lastError: Error;
+export const getLeaderboardWithRetry = cache(
+  async (
+    idOrSlug: string,
+    maxRetries: number = 2
+  ): Promise<LeaderboardApiResponse> => {
+    let lastError: Error;
 
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await getLeaderboard(idOrSlug);
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error');
-      if (attempt === maxRetries) break;
-      await new Promise(resolve =>
-        setTimeout(resolve, Math.pow(2, attempt) * 1000)
-      );
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await getLeaderboard(idOrSlug);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error('Unknown error');
+        if (attempt === maxRetries) break;
+        await new Promise(resolve =>
+          setTimeout(resolve, Math.pow(2, attempt) * 1000)
+        );
+      }
     }
-  }
 
-  throw lastError!;
-}
+    throw lastError!;
+  }
+);
 
 export async function getLeaderboardByTab(
   idOrSlug: string,
@@ -47,6 +50,6 @@ export async function getLeaderboardByTab(
     limit: limit.toString(),
   });
   return platformFetch<LeaderboardPageResponse>(
-    `/fundraisers/${idOrSlug}/leaderboard/${tab}?${params.toString()}`
+    `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard/${tab}?${params.toString()}`
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { FundraiserHost } from '@/lib/types/fundraiser';
 
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
@@ -9,9 +10,10 @@ import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
+import { GoalSettings } from './goal/goal-settings';
 import { GoalInput } from './goal-input';
-import { GoalPreview } from './goal-preview';
 import { Hosts } from './hosts';
+import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
@@ -30,6 +32,10 @@ interface FundraiserFormBodyProps {
   endDate?: string;
   /** Currently saved slug. Drives the inline link editor in edit mode. */
   savedSlug?: string;
+  /** Fundraiser id. Required in edit mode to manage hosts. */
+  fundraiserId?: string;
+  /** Existing hosts. Only meaningful in edit mode. */
+  hosts?: FundraiserHost[];
 }
 
 export function FundraiserFormBody({
@@ -38,6 +44,8 @@ export function FundraiserFormBody({
   totalRaised,
   endDate,
   savedSlug,
+  fundraiserId,
+  hosts,
 }: FundraiserFormBodyProps) {
   const isEditMode = mode === 'edit';
 
@@ -45,13 +53,20 @@ export function FundraiserFormBody({
     <FundraiserLayout>
       <SidebarPanel>
         <ImageSelector autoLoadDefault={!isEditMode} />
-        <GoalPreview
+        <GoalSettings
           isEditMode={isEditMode}
           totalRaised={totalRaised}
           endDate={endDate}
         />
         <DonorsPreview />
-        <Hosts mode='preview' />
+        {isEditMode && fundraiserId ? (
+          <HostsManager
+            fundraiserId={fundraiserId}
+            initialHosts={hosts ?? []}
+          />
+        ) : (
+          <Hosts mode='preview' />
+        )}
         <ThemeSettings />
       </SidebarPanel>
       <MainPanel>

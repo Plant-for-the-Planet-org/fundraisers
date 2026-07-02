@@ -1,6 +1,6 @@
 import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
-import type { Locale } from '@/i18n/routing';
+import type { FundraiserModules } from '@/modules';
 
 export type RecurrencyType = 'once' | 'monthly' | 'quarterly' | 'yearly';
 
@@ -27,15 +27,47 @@ export interface FundraiserUser {
 }
 
 export type FundraiserHostType = 'user' | 'team';
+/**
+ * 'admin' (full edit + manage hosts) and 'viewer' (read-only dashboard) are the
+ * supported roles.
+ */
+export type FundraiserHostRole = 'admin' | 'viewer' | 'owner'; //owner is for backward compatibility, and can be removed once the API no longer returns it.
+/** 'invited' hosts have no profile yet; claimed to 'active' on first login. */
+export type FundraiserHostStatus = 'active' | 'invited';
 export interface FundraiserHost {
   id: string;
   user: Nullable<FundraiserUser>;
   hostType: FundraiserHostType;
-  role: string; // 'owner' or 'admin'
+  role: FundraiserHostRole;
   isPublic: boolean;
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
-  status: string; //'active'
+  status: FundraiserHostStatus;
+  // Invariant: invitedEmail is non-null only when status === 'invited' (user is
+  // null). When status === 'active', user is non-null and invitedEmail is null.
+  // Not enforced as a discriminated union (YAGNI — all call sites guard via ??
+  // chains or status checks). Refactor to discriminated union if this type
+  // spreads beyond host management components.
+  invitedEmail: Nullable<string>;
+}
+
+export interface AddFundraiserHostRequest {
+  email: string;
+  role: FundraiserHostRole;
+  isPublic: boolean;
+  displayName?: string;
+  displayOrder?: number;
+}
+
+// ponytail: all fields intentionally optional for partial updates. An empty
+// object {} is technically valid TypeScript but no call site constructs one —
+// every caller passes at least one field. Add RequireAtLeastOne<T> from
+// utility.ts if a conditional-build code path is ever introduced.
+export interface UpdateFundraiserHostRequest {
+  role?: FundraiserHostRole;
+  isPublic?: boolean;
+  displayName?: string;
+  displayOrder?: number;
 }
 
 export interface FundraiserWorkspace {
@@ -61,23 +93,13 @@ export interface LeaderboardModuleSettings {
   aggregate_top_by_donor: boolean;
 }
 
-export interface StageSlide {
-  position: number;
-  title: string;
-  description: string;
-  image: string;
-  duration: number;
-}
-
-export interface StageModuleSettings {
+export interface DonorScoreModuleSettings {
+  // Preserved in the API contract but intentionally not used to gate the goal
+  // section: total raised always renders. Only show_goal / show_days_left
+  // control visibility, unlike leaderboard which gates on enabled entirely.
   enabled: boolean;
-  locale: Locale;
-  title: string;
-  description: string;
-  partner_logo_url: string;
-  slides: StageSlide[];
-  show_impact?: boolean;
-  show_progress_bar?: boolean;
+  show_goal: boolean;
+  show_days_left: boolean;
 }
 
 export interface ThankYouNoteModuleSettings {
@@ -87,12 +109,14 @@ export interface ThankYouNoteModuleSettings {
 
 export interface FundraiserSettings {
   theme: FundraiserThemeSettings;
-  modules: {
+  modules: FundraiserModules & {
+    // Modules below have not yet migrated into `src/modules/`. Their settings
+    // shapes live inline here. As each module migrates, move its slot into
+    // `FundraiserModules` in `src/modules/index.ts` and remove it from here.
     leaderboard?: LeaderboardModuleSettings;
     bundle?: {
       slug: string | null;
     };
-    stage?: StageModuleSettings | null;
     thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
       options: Array<{
@@ -103,11 +127,7 @@ export interface FundraiserSettings {
       allow_dedication: boolean;
       allow_recurrency: boolean;
     };
-    donor_score?: {
-      enabled: boolean;
-      show_goal: boolean;
-      show_days_left: boolean;
-    };
+    donor_score?: DonorScoreModuleSettings;
     projects_supported?: {
       enabled: boolean;
     };

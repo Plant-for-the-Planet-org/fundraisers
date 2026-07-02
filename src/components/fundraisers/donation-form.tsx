@@ -11,9 +11,11 @@ import type {
   ContributionModuleSettings,
   RecurrencyType,
 } from '@/lib/types/fundraiser';
+import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { DEFAULT_MIN_CENTS } from '@/lib/constants/donation';
 import {
   GIFT_MESSAGE_MAX_LENGTH,
   RECIPIENT_EMAIL_MAX_LENGTH,
@@ -37,6 +39,7 @@ import { DonationGiftSection } from './donation-gift-section';
 interface DonationFormProps {
   contributionSettings?: ContributionModuleSettings;
   currency?: string;
+  frequencies?: PaymentOptions['frequencies'];
   onDonate: (
     amountCents: number,
     isDedicated: boolean,
@@ -62,6 +65,7 @@ const recurrencyToValue = (recurrency: RecurrencyType): DonationFrequency => {
 export function DonationForm({
   contributionSettings,
   currency = 'EUR',
+  frequencies,
   onDonate,
 }: DonationFormProps) {
   const t = useTranslations('Fundraisers.form.contributionSettings');
@@ -102,6 +106,12 @@ export function DonationForm({
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
+  const freqMinQuantity =
+    frequencies?.[selectedFrequency.value as keyof typeof frequencies]
+      ?.minQuantity;
+  const activeMinCents =
+    freqMinQuantity != null ? freqMinQuantity * 100 : DEFAULT_MIN_CENTS;
+
   const [giftValues, setGiftValues] = useState<DonationGiftValues>({
     recipientName: '',
     recipientEmail: '',
@@ -109,8 +119,11 @@ export function DonationForm({
   });
   const [giftErrors, setGiftErrors] = useState<DonationGiftErrors>({});
 
+  const isDonateButtonDisabled =
+    customAmount !== undefined && customAmount < activeMinCents;
+
   const getDonateButtonText = () => {
-    const amount = customAmount || selectedAmount;
+    const amount = customAmount !== undefined ? customAmount : selectedAmount;
     const amountText = settings.show_totals_on_fundraiser
       ? `${formatCurrency(amount, currency, locale)} • `
       : '';
@@ -223,7 +236,7 @@ export function DonationForm({
 
       setGiftErrors({});
       onDonate(
-        customAmount || selectedAmount,
+        customAmount !== undefined ? customAmount : selectedAmount,
         true,
         selectedFrequency.value,
         gift
@@ -231,7 +244,11 @@ export function DonationForm({
       return;
     }
 
-    onDonate(customAmount || selectedAmount, false, selectedFrequency.value);
+    onDonate(
+      customAmount !== undefined ? customAmount : selectedAmount,
+      false,
+      selectedFrequency.value
+    );
   };
 
   return (
@@ -258,9 +275,9 @@ export function DonationForm({
             setCustomAmount(undefined);
           }}
           selectedAmount={selectedAmount}
-          customAmount={customAmount}
           onCustomAmountChange={setCustomAmount}
           customOption={customOption}
+          minCents={activeMinCents}
         />
 
         {settings.allow_dedication && (
@@ -276,6 +293,7 @@ export function DonationForm({
         <Button
           className='h-9 w-full font-medium text-base hover:brightness-90'
           style={{ backgroundColor: 'var(--accent-color)' }}
+          disabled={isDonateButtonDisabled}
           onClick={handleDonate}
         >
           {getDonateButtonText()}

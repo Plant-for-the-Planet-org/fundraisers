@@ -4,10 +4,8 @@ import type { Bundle, BundleTabId, BundleWorkspace } from '@/lib/types/bundle';
 import type { GetProject } from '@/lib/types/project-selection';
 
 import { useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
-import { useModalDialog } from '@/lib/hooks/use-modal-dialog';
 import {
   getBundleProjectIds,
   getDonatableBundleProjectIds,
@@ -15,6 +13,7 @@ import {
 } from '@/lib/utils/bundle';
 import { calculateProjectAllocations } from '@/lib/utils/project-allocation';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { SelectedProjectRow } from './selected-project-row';
 
 interface BundlePreviewModalProps {
@@ -45,9 +44,7 @@ export function BundlePreviewModal({
   const t = useTranslations('Bundles');
   const label = t(`entries.${bundle.slug}.label`);
   const tagline = t(`entries.${bundle.slug}.tagline`);
-
-  const dialogRef = useRef<HTMLDivElement>(null);
-  useModalDialog({ isOpen, onClose, dialogRef });
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   // The persisted bundle shows its saved projects (donatable and non-donatable
   // alike), but never the unresolvable "unknown" placeholders for bundle-config
@@ -77,21 +74,27 @@ export function BundlePreviewModal({
     return Object.fromEntries(allocations.map(a => [a.id, a.percentage]));
   }, [projectIds, supportProjectId, getProject]);
 
-  if (!isOpen || typeof document === 'undefined') return null;
-
-  return createPortal(
-    <div
-      ref={dialogRef}
-      tabIndex={-1}
-      className='fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-black/30 px-3 py-3 backdrop-blur-sm outline-none sm:px-4 sm:py-6'
-      onMouseDown={event => {
-        if (event.target === event.currentTarget) onClose();
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) onClose();
       }}
-      role='dialog'
-      aria-modal='true'
-      aria-label={label}
     >
-      <div className='mx-auto flex w-full max-w-[56rem] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl'>
+      <DialogContent
+        ref={dialogContentRef}
+        tabIndex={-1}
+        showCloseButton={false}
+        onOpenAutoFocus={event => {
+          // Avoid focusing the "Use Bundle" CTA on open (Enter would trigger it).
+          // Focus the dialog surface instead so this does not depend on the
+          // close button existing.
+          event.preventDefault();
+          dialogContentRef.current?.focus();
+        }}
+        className='flex max-h-[calc(100dvh-2rem)] w-full flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-4xl'
+      >
+        <DialogTitle className='sr-only'>{label}</DialogTitle>
         <div className='flex shrink-0 flex-wrap items-center gap-2 bg-orange-100 px-4 py-4 dark:bg-orange-950/30'>
           <div className='min-w-0 flex-1'>
             <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
@@ -113,7 +116,6 @@ export function BundlePreviewModal({
           >
             {t('modal.useBundle')}
           </Button>
-
           <button
             type='button'
             onClick={onClose}
@@ -124,7 +126,7 @@ export function BundlePreviewModal({
           </button>
         </div>
 
-        <div className='px-4 py-4'>
+        <div className='min-h-0 flex-1 overflow-y-auto px-4 py-4'>
           <p className='mb-3 text-xs font-bold tracking-wide text-muted-foreground'>
             {t('modal.projectsInside', { count: projectIds.length })}
           </p>
@@ -152,8 +154,7 @@ export function BundlePreviewModal({
             })}
           </ul>
         </div>
-      </div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 }

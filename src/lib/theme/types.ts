@@ -1,4 +1,5 @@
 export type AccentColor =
+  | 'planet' // Plant-for-the-Planet brand green (#007A49), registered in globals.css @theme
   | 'blue'
   | 'cyan'
   | 'emerald'

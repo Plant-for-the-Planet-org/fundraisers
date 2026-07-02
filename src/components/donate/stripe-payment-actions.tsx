@@ -9,7 +9,7 @@ import { useStripe } from '@stripe/react-stripe-js';
 
 // Lightweight Stripe bridges used when a donor selects a saved payment method.
 // The full entry forms stay unmounted (no new details collected), but
-// `useDonationSubmit` still needs Stripe confirmation methods for
+// `useDonationSubmission` still needs Stripe confirmation methods for
 // `action_required` flows like 3DS/SCA. `createPaymentMethod` intentionally
 // errors because saved flows reuse an existing `pm_...` id.
 

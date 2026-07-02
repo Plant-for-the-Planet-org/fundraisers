@@ -142,7 +142,6 @@
       "mandateTitle": "SEPA-Lastschriftmandat",
       "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) Rocketship Inc. und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von Rocketship Inc. und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
-      "creditorName": "Plant-for-the-Planet Foundation",
       "creditorId": "Gläubiger-ID",
       "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
       "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
@@ -212,6 +211,12 @@
       "paypalCaptureError": "Die PayPal-Spende konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
       "paypalPaymentError": "PayPal-Spende fehlgeschlagen. Bitte versuche es erneut.",
       "paymentFailed": "Die Zahlung ist fehlgeschlagen. Bitte überprüfe deine Angaben und versuche es erneut.",
+      "cardDeclined": "Die Karte wurde abgelehnt. Wähle eine andere Zahlmethode oder kontaktiere deine Bank.",
+      "cardRestricted": "Die Karte konnte nicht belastet werden, bitte kontaktiere deine Bank.",
+      "insufficientFunds": "Die Verfügbarkeit der Karte ist überschritten, bitte versuche eine andere.",
+      "expiredCard": "Die Karte ist abgelaufen, bitte verwende eine andere.",
+      "processingError": "Ein Fehler ist bei der Durchführung aufgetreten. Versuche es nochmal.",
+      "authenticationFailed": "Die Zahlung konnte nicht autorisiert werden. Bitte wähle eine andere Zahlmethode und versuche es nochmal.",
       "paymentCancelled": "Die Zahlung wurde abgebrochen.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Versuche es erneut."
     },
@@ -223,7 +228,7 @@
       "success": "Spende erfolgreich"
     },
     "thankYou": {
-      "hostMessageHeading": "{count, plural, one {Nachricht vom Gastgeber*in} other {Nachricht der Gastgeber*innen}}",
+      "hostMessageHeading": "{count, plural, one {Nachricht von der*dem Organisator*in} other {Nachricht der Organisator*innen}}",
       "hostMessageSignature": "- {names}{remaining, plural, =0 {} one { und # weiteren} other { und # weiteren}}.",
       "title": {
         "completed": "Vielen Dank für deine Spende!",

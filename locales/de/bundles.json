@@ -119,6 +119,14 @@
       "worst-of-the-worst": {
         "label": "Schlimmer gehts nicht",
         "tagline": "Die am stärksten betroffenen Orte. Die, die dich am meisten brauchen."
+      },
+      "close-to-the-sea": {
+        "label": "Nahe am Ozean",
+        "tagline": "Unsere Ozeane vom Grund auf heilen."
+      },
+      "plant-for-the-planet": {
+        "label": "Plant-for-the-Planet",
+        "tagline": "Wo wir gutes tun."
       }
     }
   }

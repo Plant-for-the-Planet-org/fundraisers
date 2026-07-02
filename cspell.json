@@ -6,8 +6,10 @@
   "language": "en",
   // words - list of words to be always considered correct
   "words": [
+    "alltime",
     "applepay",
     "bic",
+    "cloudflarestream",
     "cookieconsent",
     "firstname",
     "googlepay",
@@ -20,7 +22,9 @@
     "Recurrency",
     "renderable",
     "sepa",
-    "subline"
+    "subline",
+    "videodelivery",
+    "youtu.be"
   ],
   // flagWords - list of words to be always considered incorrect
   // This is useful for offensive words and common spelling errors.

@@ -25,12 +25,30 @@
     "legalLinks": {
       "privacy": "Datenschutzbestimmungen",
       "terms": "Nutzungsbedingungen",
-      "imprint": "Impressum"
+      "imprint": "Impressum",
+      "cookies": "Cookies"
     },
     "cookieSettings": "Cookie-Einstellungen",
     "headerLinks": {
       "explore": "Entdecken",
       "startFundraiser": "Erstellen"
+    },
+    "videoEmbed": {
+      "gatedDescription": "Um dieses Video abzuspielen muss der Verwendung von Cookies von YouTube zugestimmt werden.",
+      "allowButton": "Video-Cookies zulassen.",
+      "watchOnYoutube": "Auf YouTube ansehen",
+      "playerTitle": "Eingebettetes Video",
+      "editor": {
+        "toolbarButton": "Video einbetten (YouTube, Cloudflare Stream)",
+        "urlLabel": "Video-URL",
+        "urlPlaceholder": "Füge einen YouTube oder Cloudflare Stream Link ein",
+        "add": "Hinzufügen",
+        "invalidUrl": "Gib einen gültigen YouTube oder Cloudflare Stream Link ein.",
+        "aspectLandscape": "Querformat (16:9)",
+        "aspectPortrait": "Hochformat (9:16)",
+        "aspectSquare": "Quadratisch (1:1)",
+        "removeVideo": "Video entfernen"
+      }
     }
   }
 }

@@ -19,6 +19,8 @@ export const BUNDLE_SLUGS = [
   'undo-your-amazon-order',
   'where-your-coffee-grows',
   'worst-of-the-worst',
+  'close-to-the-sea',
+  'plant-for-the-planet',
 ] as const;
 
 export type BundleTabId = (typeof BUNDLE_TAB_IDS)[number];

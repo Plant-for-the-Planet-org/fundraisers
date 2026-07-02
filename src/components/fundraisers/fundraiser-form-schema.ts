@@ -1,4 +1,6 @@
+import type { Theme } from '@/lib/theme/types';
 import type {
+  DonorScoreModuleSettings,
   Fundraiser,
   LeaderboardModuleSettings,
 } from '@/lib/types/fundraiser';
@@ -12,13 +14,8 @@ import {
   DESCRIPTION_MAX_LENGTH,
   GOAL_AMOUNT_MIN,
 } from '@/lib/constants/fundraiser-creation';
-import {
-  isValidAnimation,
-  isValidDecoration,
-  isValidImageMode,
-} from '@/lib/theme/backgrounds';
+import { buildTheme } from '@/lib/theme/build-theme';
 import { getThemeForPath } from '@/lib/theme/route-themes';
-import { isValidMode } from '@/lib/theme/validators';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
 import {
@@ -26,12 +23,17 @@ import {
   getCurrencyForCountry,
   SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
+import { isAllowedImageUrl } from '@/lib/utils/image-url';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
-import { STAGE_LIMITS } from '@/components/stage/constants';
 import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
-import { routing } from '@/i18n/routing';
+import { parseStageFormValue, stageModeSchema } from '@/modules/stage';
+
+const DEFAULT_DONOR_SCORE = {
+  show_goal: true,
+  show_days_left: true,
+} satisfies Omit<DonorScoreModuleSettings, 'enabled'>;
 
 const DEFAULT_LEADERBOARD: LeaderboardModuleSettings = {
   enabled: true,
@@ -70,42 +72,6 @@ const projectAllocationSchema = z.object({
   percentage: z.number().int().min(1).max(100),
 });
 
-// Trusted hostnames for stage images. Prevents javascript:/data: injection and SSRF.
-const ALLOWED_IMAGE_HOSTNAME_SUFFIXES = [
-  'plant-for-the-planet.org',
-  'unsplash.com',
-  'cloudinary.com',
-  'amazonaws.com',
-  'imgix.net',
-  'googleusercontent.com',
-] as const;
-
-function isAllowedImageUrl(value: string): boolean {
-  if (!value) return true;
-  try {
-    const url = new URL(value);
-    if (url.protocol !== 'https:') return false;
-    const host = url.hostname.toLowerCase();
-    return ALLOWED_IMAGE_HOSTNAME_SUFFIXES.some(
-      suffix => host === suffix || host.endsWith(`.${suffix}`)
-    );
-  } catch {
-    return false;
-  }
-}
-
-const stageImageUrlSchema = z
-  .string()
-  .refine(isAllowedImageUrl, { message: 'imageUrlNotAllowed' });
-
-const stageSlideSchema = z.object({
-  position: z.number().int().min(1),
-  title: z.string().max(STAGE_LIMITS.slideTitle),
-  description: z.string().max(STAGE_LIMITS.slideDescription),
-  image: stageImageUrlSchema,
-  duration: z.number().int().min(1).max(60),
-});
-
 export const thankYouNoteSchema = z.object({
   enabled: z.boolean(),
   message: z
@@ -115,15 +81,6 @@ export const thankYouNoteSchema = z.object({
         getRichTextTextContent(val).length <= THANK_YOU_NOTE_LIMITS.message,
       { message: 'maxLength' }
     ),
-});
-
-export const stageModeSchema = z.object({
-  enabled: z.boolean(),
-  locale: z.enum(routing.locales),
-  title: z.string().max(STAGE_LIMITS.stageTitle),
-  description: z.string().max(STAGE_LIMITS.stageDescription),
-  partner_logo_url: stageImageUrlSchema,
-  slides: z.array(stageSlideSchema).max(STAGE_LIMITS.maxSlides),
 });
 
 export const SLUG_MAX_LENGTH = 32;
@@ -205,6 +162,10 @@ export const fundraiserFormSchema = z.object({
       }),
       stage: stageModeSchema.nullable(),
       thankYouNote: thankYouNoteSchema,
+      donor_score: z.object({
+        show_goal: z.boolean(),
+        show_days_left: z.boolean(),
+      }),
     }),
   }),
 });
@@ -241,21 +202,33 @@ export function buildDefaultCreateValues(
     status: 'draft',
     projectAllocations,
     settings: {
-      theme: {
-        base_id: initialTheme.id,
-        mode: initialTheme.mode,
-        accent: initialTheme.accent,
-        body_font: initialTheme.bodyFont,
-        title_font: initialTheme.titleFont,
-        bg: initialTheme.bg,
-      },
+      theme: themeToFormTheme(initialTheme, initialTheme.id),
       modules: {
         leaderboard: { ...DEFAULT_LEADERBOARD },
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
         thankYouNote: { enabled: false, message: '' },
+        donor_score: { ...DEFAULT_DONOR_SCORE },
       },
     },
+  };
+}
+
+// Maps a resolved Theme into the form's theme shape (camelCase → snake_case).
+// base_id is passed in separately: create uses the picked theme's id, while
+// edit keeps the raw stored id because buildTheme collapses it to a synthetic
+// 'fundraiser-custom' id.
+function themeToFormTheme(
+  theme: Theme,
+  baseId: string
+): FundraiserFormValues['settings']['theme'] {
+  return {
+    base_id: baseId,
+    mode: theme.mode,
+    accent: theme.accent,
+    body_font: theme.bodyFont,
+    title_font: theme.titleFont,
+    bg: theme.bg,
   };
 }
 
@@ -288,7 +261,9 @@ export function fundraiserToFormValues(
   fundraiser: Fundraiser
 ): FundraiserFormValues {
   const fallbackTheme = getThemeForPath('/');
-  const theme = fundraiser.settings?.theme ?? {};
+  // Normalize the theme the same way as the public page
+  // so the editor and rendered page stay in sync.
+  const builtTheme = buildTheme(fundraiser.settings?.theme);
 
   const rawCountry = fundraiser.workspace?.country?.toUpperCase() ?? 'DE';
   const country: AllowedCountry = isAllowedCountry(rawCountry)
@@ -322,78 +297,28 @@ export function fundraiserToFormValues(
         percentage: allocation.percentage,
       })),
     settings: {
-      theme: {
-        base_id: theme.base_id ?? fallbackTheme.id,
-        mode: isValidMode(theme.mode) ? theme.mode : fallbackTheme.mode,
-        accent: theme.accent ?? fallbackTheme.accent,
-        body_font: theme.body_font ?? fallbackTheme.bodyFont,
-        title_font: theme.title_font ?? fallbackTheme.titleFont,
-        bg: {
-          gradient: theme.bg?.gradient ?? fallbackTheme.bg.gradient,
-          decoration: isValidDecoration(theme.bg?.decoration)
-            ? theme.bg.decoration
-            : fallbackTheme.bg.decoration,
-          pattern_id:
-            theme.bg?.pattern_id !== undefined
-              ? theme.bg.pattern_id
-              : fallbackTheme.bg.pattern_id,
-          image_url:
-            theme.bg?.image_url !== undefined
-              ? theme.bg.image_url
-              : fallbackTheme.bg.image_url,
-          image_mode: isValidImageMode(theme.bg?.image_mode)
-            ? theme.bg.image_mode
-            : fallbackTheme.bg.image_mode,
-          logo_id:
-            theme.bg?.logo_id !== undefined
-              ? theme.bg.logo_id
-              : fallbackTheme.bg.logo_id,
-          opacity:
-            typeof theme.bg?.opacity === 'number'
-              ? Math.min(1, Math.max(0.05, theme.bg.opacity))
-              : fallbackTheme.bg.opacity,
-          // Phase 1 records stored animation at the top level (theme.animation).
-          // Phase 2 moved it into bg.animation. Read both for back-compat.
-          animation: isValidAnimation(theme.bg?.animation)
-            ? theme.bg.animation
-            : isValidAnimation(theme.animation)
-              ? theme.animation
-              : fallbackTheme.bg.animation,
-        },
-      },
+      theme: themeToFormTheme(
+        builtTheme,
+        fundraiser.settings?.theme?.base_id ?? fallbackTheme.id
+      ),
       modules: {
         leaderboard: {
           ...DEFAULT_LEADERBOARD,
           ...fundraiser.settings?.modules?.leaderboard,
         },
         bundle: { slug: bundleSlug },
-        stage: (() => {
-          const raw = fundraiser.settings?.modules?.stage;
-          if (!raw) return null;
-          return {
-            enabled: raw.enabled ?? true,
-            locale: (['en', 'de'] as const).includes(raw.locale as 'en' | 'de')
-              ? (raw.locale as 'en' | 'de')
-              : ('en' as const),
-            title: raw.title ?? '',
-            description: raw.description ?? '',
-            partner_logo_url: raw.partner_logo_url ?? '',
-            slides: (raw.slides ?? []).map((slide, i) => ({
-              position: slide.position ?? i + 1,
-              title: slide.title ?? '',
-              description: slide.description ?? '',
-              image: slide.image ?? '',
-              duration:
-                typeof slide.duration === 'number' &&
-                Number.isFinite(slide.duration)
-                  ? Math.min(60, Math.max(1, Math.round(slide.duration)))
-                  : 8,
-            })),
-          };
-        })(),
+        stage: parseStageFormValue(fundraiser.settings?.modules?.stage),
         thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
           enabled: false,
           message: '',
+        },
+        donor_score: {
+          show_goal:
+            fundraiser.settings?.modules?.donor_score?.show_goal ??
+            DEFAULT_DONOR_SCORE.show_goal,
+          show_days_left:
+            fundraiser.settings?.modules?.donor_score?.show_days_left ??
+            DEFAULT_DONOR_SCORE.show_days_left,
         },
       },
     },

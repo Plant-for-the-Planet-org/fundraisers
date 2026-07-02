@@ -119,6 +119,14 @@
       "worst-of-the-worst": {
         "label": "Worst of the Worst",
         "tagline": "The hardest hit places. The ones that need you most."
+      },
+      "close-to-the-sea": {
+        "label": "Close to the Sea",
+        "tagline": "Healing our oceans from the ground up."
+      },
+      "plant-for-the-planet": {
+        "label": "Plant-for-the-Planet",
+        "tagline": "Where we do good."
       }
     }
   }

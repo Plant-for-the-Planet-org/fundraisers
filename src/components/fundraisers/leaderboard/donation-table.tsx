@@ -47,11 +47,7 @@ function DonationRow({
           {showAvatar && (
             <Avatar className='h-8 w-8 shrink-0 ring-2 ring-white/20 dark:ring-gray-500/20'>
               {avatarSrc !== null && (
-                <AvatarImage
-                  src={avatarSrc}
-                  alt={donation.donorName}
-                  loading='lazy'
-                />
+                <AvatarImage src={avatarSrc} alt={displayName} loading='lazy' />
               )}
               <FallbackAvatar seed={donation.id} />
             </Avatar>

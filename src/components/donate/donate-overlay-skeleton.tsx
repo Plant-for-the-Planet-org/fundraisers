@@ -1,9 +1,8 @@
-import { createPortal } from 'react-dom';
 import { Skeleton } from '../ui/skeleton';
 import { DonateOverlayLayout } from './donate-overlay-layout';
 
 export function DonateOverlaySkeleton({ onClose }: { onClose: () => void }) {
-  return createPortal(
+  return (
     <DonateOverlayLayout
       onClose={onClose}
       leftColumn={
@@ -14,7 +13,6 @@ export function DonateOverlaySkeleton({ onClose }: { onClose: () => void }) {
         </>
       }
       rightColumn={<Skeleton className='h-40 rounded-md' />}
-    />,
-    document.body
+    />
   );
 }

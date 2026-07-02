@@ -6,34 +6,26 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SectionHeader } from '@/components/fundraisers/typography';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { resolveActiveTab } from './resolve-tab';
 import { ScrollingDonationList } from './scrolling-donation-list';
-import { ViewAllOverlay } from './view-all-overlay';
 
 interface LeaderboardViewProps {
-  idOrSlug: string;
   initialRecentDonations: LeaderboardDonation[];
   initialTopDonations: LeaderboardDonation[];
-  totalRecentDonationCount: number;
-  totalTopDonationCount: number;
   settings: LeaderboardModuleSettings;
   demo?: boolean;
 }
 
 export function LeaderboardView({
-  idOrSlug,
   initialRecentDonations,
   initialTopDonations,
-  totalRecentDonationCount,
-  totalTopDonationCount,
   settings,
   demo = false,
 }: LeaderboardViewProps) {
   const {
     show_recent_list,
     show_top_list,
-    view_all,
     anonymize,
     show_amount,
     show_avatar,
@@ -43,11 +35,8 @@ export function LeaderboardView({
 
   const t = useTranslations('Leaderboard.view');
   const [activeTab, setActiveTab] = useState<'recent' | 'top'>(default_tab);
-  const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
-  let resolvedTab = activeTab;
-  if (activeTab === 'recent' && !show_recent_list) resolvedTab = 'top';
-  if (activeTab === 'top' && !show_top_list) resolvedTab = 'recent';
+  const resolvedTab = resolveActiveTab(activeTab, settings);
 
   const shouldShowTabs = show_recent_list && show_top_list;
 
@@ -113,39 +102,7 @@ export function LeaderboardView({
             />
           </TabsContent>
         )}
-
-        {view_all && (
-          <div className='flex justify-end'>
-            <Button
-              variant='text'
-              className='text-sm font-semibold leading-tight p-0 h-auto'
-              onClick={() => setIsViewAllOpen(true)}
-            >
-              {t('viewAll')}
-            </Button>
-          </div>
-        )}
       </Tabs>
-
-      <ViewAllOverlay
-        idOrSlug={idOrSlug}
-        isOpen={isViewAllOpen}
-        onClose={closedTab => {
-          setIsViewAllOpen(false);
-          setActiveTab(closedTab);
-        }}
-        initialRecentDonations={initialRecentDonations}
-        initialTopDonations={initialTopDonations}
-        totalRecentDonationCount={totalRecentDonationCount}
-        totalTopDonationCount={totalTopDonationCount}
-        activeTab={resolvedTab}
-        showRecentList={show_recent_list}
-        showTopList={show_top_list}
-        anonymize={anonymize}
-        showAmount={show_amount}
-        showAvatar={show_avatar}
-        aggregateTopByDonor={aggregate_top_by_donor}
-      />
     </div>
   );
 }
