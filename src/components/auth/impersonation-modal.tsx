@@ -134,7 +134,7 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
           <DialogFooter>
             <Button
               type='button'
-              variant='ghost'
+              variant='outline'
               onClick={onClose}
               disabled={isSubmitting}
             >

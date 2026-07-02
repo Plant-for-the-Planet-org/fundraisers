@@ -307,18 +307,19 @@ export function FundraiserActionMenu({
           setDeleteDialogOpen(next);
         }}
       >
-        <DialogContent className='sm:max-w-md'>
+        <DialogContent className='sm:max-w-md' showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>{tDialog('title')}</DialogTitle>
             <DialogDescription>{tDialog('description')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant='outline' disabled={isDeleting}>
+              <Button type='button' variant='outline' disabled={isDeleting}>
                 {tDialog('cancel')}
               </Button>
             </DialogClose>
             <Button
+              type='button'
               variant={willArchive ? 'default' : 'destructive'}
               disabled={isDeleting}
               onClick={() => void handleDelete()}

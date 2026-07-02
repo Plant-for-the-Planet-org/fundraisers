@@ -86,13 +86,13 @@
     },
     "deleteDialog": {
       "title": "Spendenaufruf löschen?",
-      "description": "Dies entfernt ihn dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Dieser Spendenaufruf wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "confirm": "Löschen"
     },
     "archiveDialog": {
       "title": "Spendenaufruf archivieren?",
-      "description": "Die Spendenaktion akzeptiert keine weiteren Spenden mehr und ist für Spender nicht mehr öffentlich sichtbar. Sie bleibt jedoch im Dashboard unter „Alle“ und „Beendet“ sichtbar.",
+      "description": "Dieser Spendenaufruf akzeptiert keine weiteren Spenden mehr und ist nicht mehr öffentlich sichtbar. Du kannst weiterhin über dein Dashboard darauf zugreifen.",
       "cancel": "Abbrechen",
       "confirm": "Archivieren"
     },

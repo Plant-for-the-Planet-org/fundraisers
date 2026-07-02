@@ -86,13 +86,13 @@
     },
     "deleteDialog": {
       "title": "Delete fundraiser?",
-      "description": "This permanently removes it. This action cannot be undone.",
+      "description": "This will permanently delete this fundraiser. This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
     },
     "archiveDialog": {
       "title": "Archive fundraiser?",
-      "description": "The fundraiser will stop accepting donations and will no longer be publicly available to donors. It will remain visible in the dashboard under All and Ended.",
+      "description": "This fundraiser will stop accepting donations and will no longer be publicly visible. You can still access it from your dashboard.",
       "cancel": "Cancel",
       "confirm": "Archive"
     },
