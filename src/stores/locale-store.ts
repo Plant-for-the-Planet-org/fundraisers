@@ -14,12 +14,20 @@ function setCookie(name: string, value: string, days: number) {
   document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;samesite=lax`;
 }
 
+function cookieExists(name: string) {
+  return new RegExp(`(?:^|;\\s*)${name}=`).test(document.cookie);
+}
+
 /* You only need `useLocaleStore` when you want to *change* the locale (via `setLocale()`). For just *reading* the current locale, use next-intl's `useLocale()` hook. */
 export const useLocaleStore = create<LocaleStore>()(set => ({
   locale: routing.defaultLocale,
   setLocale: (newLocale: string) => {
     set({ locale: newLocale });
     setCookie('ui-locale', newLocale, 365);
-    window.location.reload(); // Refresh to load new translations
+    // Reload only if the cookie was saved successfully. Otherwise,
+    // LocaleProfileSync could keep triggering reloads indefinitely.
+    if (cookieExists('ui-locale')) {
+      window.location.reload(); // Refresh to load new translations
+    }
   },
 }));

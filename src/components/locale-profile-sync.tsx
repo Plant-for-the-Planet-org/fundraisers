@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { hasLocale, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/stores/auth-store';
 import { useLocaleStore } from '@/stores/locale-store';
-import { routing } from '@/i18n/routing';
+import { normalizeToLocale } from '@/i18n/resolve-locale';
 
 function hasUiLocaleCookie() {
   return (
@@ -27,13 +27,16 @@ export function LocaleProfileSync() {
   const profileLocale = useAuthStore(state => state.user?.profile?.locale);
   const setLocale = useLocaleStore(state => state.setLocale);
 
+  // Normalize the profile locale (e.g. "en-US" -> "en") to match
+  // supported locales, just like Accept-Language.
+  const targetLocale = normalizeToLocale(profileLocale);
+
   useEffect(() => {
-    if (!profileLocale) return;
+    if (!targetLocale) return;
     if (hasUiLocaleCookie()) return; // explicit / prior preference wins
-    if (!hasLocale(routing.locales, profileLocale)) return;
-    if (profileLocale === currentLocale) return; // already correct
-    setLocale(profileLocale); // writes cookie + reloads to load translations
-  }, [profileLocale, currentLocale, setLocale]);
+    if (targetLocale === currentLocale) return; // already correct
+    setLocale(targetLocale); // writes cookie + reloads to load translations
+  }, [targetLocale, currentLocale, setLocale]);
 
   return null;
 }

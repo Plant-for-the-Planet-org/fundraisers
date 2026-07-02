@@ -25,12 +25,22 @@ export function parseAcceptLanguage(header?: string | null): string[] {
     .map(item => item.tag.split('-')[0]); // primary subtag only
 }
 
+/**
+ * Converts locale values like "en-US" to "en" and returns undefined
+ * for unsupported locales.
+ */
+export function normalizeToLocale(tag?: string | null): string | undefined {
+  const primary = tag?.trim().toLowerCase().split('-')[0];
+  return primary && hasLocale(routing.locales, primary) ? primary : undefined;
+}
+
 /** First browser language that is a supported locale, else undefined. */
 export function matchBrowserLocale(
   acceptLanguage?: string | null
 ): string | undefined {
   for (const lang of parseAcceptLanguage(acceptLanguage)) {
-    if (hasLocale(routing.locales, lang)) return lang;
+    const locale = normalizeToLocale(lang);
+    if (locale) return locale;
   }
   return undefined;
 }
@@ -48,8 +58,9 @@ export function resolveLocale(input: {
   cookieLocale?: string | null;
   acceptLanguage?: string | null;
 }): string {
-  if (hasLocale(routing.locales, input.cookieLocale)) {
-    return input.cookieLocale;
-  }
-  return matchBrowserLocale(input.acceptLanguage) ?? routing.defaultLocale;
+  return (
+    normalizeToLocale(input.cookieLocale) ??
+    matchBrowserLocale(input.acceptLanguage) ??
+    routing.defaultLocale
+  );
 }
