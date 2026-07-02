@@ -10,12 +10,29 @@ import { EditFundraiserFormProvider } from '@/components/fundraisers/edit-fundra
 import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
 import { UpdateFundraiserButton } from '@/components/fundraisers/update-fundraiser-button';
 import { useFundraiserForEdit } from '@/components/fundraisers/use-fundraiser-for-edit';
+import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
 
 function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
+  const t = useTranslations('Fundraisers.edit');
+  const tNav = useTranslations('Dashboard.breadcrumb');
+
   return (
     <EditFundraiserFormProvider fundraiser={fundraiser}>
+      <div className='mb-8 flex flex-col gap-6'>
+        <BreadcrumbTrail
+          items={[
+            { label: tNav('home'), href: '/' },
+            { label: tNav('dashboard'), href: '/dashboard' },
+            { label: fundraiser.title },
+          ]}
+        />
+        <div>
+          <h1 className='text-4xl font-bold text-foreground'>{t('title')}</h1>
+          <p className='mt-1 text-foreground/80'>{t('subtitle')}</p>
+        </div>
+      </div>
       <FundraiserFormBody
         mode='edit'
         submitButton={
