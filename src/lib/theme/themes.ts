@@ -173,8 +173,7 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-leaves', 'bg-meadow-loop', 'bg-botanic', 'bg-watercolor'],
     bg: defineBg(
-      'bg-gradient-to-br from-green-800 via-emerald-700 to-teal-800',
-      { animation: 'snow' }
+      'bg-gradient-to-br from-green-800 via-emerald-700 to-teal-800'
     ),
   },
   volcanic: {

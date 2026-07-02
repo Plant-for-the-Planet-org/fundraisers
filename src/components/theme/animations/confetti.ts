@@ -36,7 +36,7 @@ function rollExtra(): ConfettiExtra {
 
 const confettiConfig: ParticleConfig = {
   count: 35,
-  speedRange: [2.2, 4.5],
+  speedRange: [0.5, 2.5],
   sizeRange: [3, 9],
   driftRange: [-0.4, 0.4],
   opacityRange: [0.7, 1],
@@ -50,7 +50,7 @@ const confettiConfig: ParticleConfig = {
     p.x += p.drift;
     // p.phase (0..2π, unused elsewhere in confetti) doubles as each piece's own
     // tumble rate — spinning every piece at the same fixed rate looked robotic.
-    p.rotation += 0.1 + (p.phase / (Math.PI * 2)) * 0.3;
+    p.rotation += 0.15 + (p.phase / (Math.PI * 2)) * 0.25;
 
     const extra = extraByParticle.get(p);
     if (extra) extra.axis += extra.axisSpeed;
