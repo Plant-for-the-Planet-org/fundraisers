@@ -27,6 +27,16 @@ export function isFundraiserOwnerOrAdmin(
 }
 
 /**
+ * True when the fundraiser's end date is in the past. Returns false for an
+ * unparseable end date.
+ */
+export function hasFundraiserEnded(fundraiser: Fundraiser): boolean {
+  const end = new Date(fundraiser.endDate);
+  if (isNaN(end.getTime())) return false;
+  return end.getTime() < Date.now();
+}
+
+/**
  * Generate a fundraiser URL using the new /raise/[id|slug] pattern
  * Prioritizes slug over ID when available
  *
