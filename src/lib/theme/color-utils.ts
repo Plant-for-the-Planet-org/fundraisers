@@ -32,9 +32,18 @@ export function getRelativeLuminance(hex: string): number {
 // between black-on-colour and white-on-colour contrast.
 const LIGHT_MODE_LUMINANCE_THRESHOLD = 0.179;
 
+function luminanceToMode(luminance: number): ThemeMode {
+  return luminance > LIGHT_MODE_LUMINANCE_THRESHOLD ? 'light' : 'dark';
+}
+
 /** Picks the theme mode whose text colour stays readable on `hex`. */
 export function getReadableMode(hex: string): ThemeMode {
-  return getRelativeLuminance(hex) > LIGHT_MODE_LUMINANCE_THRESHOLD
-    ? 'light'
-    : 'dark';
+  return luminanceToMode(getRelativeLuminance(hex));
+}
+
+/** Readable mode for a gradient: the average luminance across its stops. */
+export function getReadableModeForStops(colors: string[]): ThemeMode {
+  const avg =
+    colors.reduce((sum, c) => sum + getRelativeLuminance(c), 0) / colors.length;
+  return luminanceToMode(avg);
 }
