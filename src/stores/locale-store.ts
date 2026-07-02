@@ -22,12 +22,17 @@ function cookieExists(name: string) {
 export const useLocaleStore = create<LocaleStore>()(set => ({
   locale: routing.defaultLocale,
   setLocale: (newLocale: string) => {
-    set({ locale: newLocale });
     setCookie('ui-locale', newLocale, 365);
-    // Reload only if the cookie was saved successfully. Otherwise,
-    // LocaleProfileSync could keep triggering reloads indefinitely.
+    // Only commit the change if the cookie was saved successfully. Otherwise
+    // the store would report a locale the server never renders (stuck UI,
+    // no reload) and LocaleProfileSync could keep retrying indefinitely.
     if (cookieExists('ui-locale')) {
+      set({ locale: newLocale });
       window.location.reload(); // Refresh to load new translations
+    } else {
+      console.warn(
+        '[i18n] ui-locale cookie write failed, locale change not persisted'
+      );
     }
   },
 }));
