@@ -30,7 +30,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
         />
         <div>
           <h1 className='text-4xl font-bold text-foreground'>{t('title')}</h1>
-          <p className='mt-1 text-foreground/80'>{t('subtitle')}</p>
+          <p className='mt-1 text-muted-foreground'>{t('subtitle')}</p>
         </div>
       </div>
       <FundraiserFormBody
