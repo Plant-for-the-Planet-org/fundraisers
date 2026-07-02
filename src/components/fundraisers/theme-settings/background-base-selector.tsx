@@ -26,6 +26,7 @@ import {
   GRADIENT_OPTIONS,
   QUICK_PICK_COLORS,
 } from './constants';
+import { EyedropperButton } from './eyedropper-button';
 import { GradientMaker } from './gradient-maker';
 
 // The theme gradient swatches shown as circles, skipping the leading "None"
@@ -265,14 +266,7 @@ function SolidPicker({
           placeholder='RRGGBB'
           className='w-24 rounded-md border border-border bg-background px-2 py-1 text-xs uppercase'
         />
-        {/* Native OS colour picker (with eyedropper) — solid mode only */}
-        <input
-          type='color'
-          aria-label={tTheme('selectColor')}
-          value={current}
-          onChange={e => onChange(e.target.value)}
-          className='ml-auto h-7 w-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0.5'
-        />
+        <EyedropperButton onPick={onChange} className='ml-auto' />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { Plus, X } from 'lucide-react';
 import { hexToRgb, isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
+import { EyedropperButton } from './eyedropper-button';
 
 const MAX_STOPS = 6;
 
@@ -139,156 +140,168 @@ export function GradientMaker({
   const angleRad = ((gradient.angle - 90) * Math.PI) / 180;
 
   return (
-    <div className='flex w-72 flex-col gap-4'>
-      {/* Gradient bar with draggable stops; click empty space to add one */}
-      <div className='pt-1'>
-        <div
-          ref={barRef}
-          className='relative h-6 cursor-copy touch-none rounded-md ring-1 ring-border'
-          onPointerDown={e => {
-            if (e.target === e.currentTarget)
-              addStop(posFromClientX(e.clientX));
-          }}
-        >
+    <div className='flex w-72 flex-col gap-5 sm:w-[440px] sm:flex-row sm:gap-6'>
+      {/* LEFT: gradient bar + colour picker */}
+      <div className='flex flex-col gap-3 sm:flex-1'>
+        {/* Gradient bar with draggable stops; click empty space to add one */}
+        <div className='pt-1'>
           <div
-            className='pointer-events-none absolute inset-0 rounded-md'
-            style={{ backgroundImage: barCss(stops) }}
-          />
-          {stops.map((stop, i) => (
-            <button
-              key={i}
-              type='button'
-              aria-label={`${tTheme('gradientStop')} ${i + 1}`}
-              onPointerDown={e => {
-                e.stopPropagation();
-                setActive(i);
-                setDragStop(i);
-              }}
-              className={cn(
-                'absolute top-1/2 z-10 h-8 w-3.5 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize rounded-full border-2 shadow-sm',
-                active === i ? 'border-foreground' : 'border-white'
-              )}
-              style={{ left: `${stop.position}%`, backgroundColor: stop.color }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Angle wheel + numeric input */}
-      <div className='flex items-center gap-3'>
-        <button
-          ref={wheelRef}
-          type='button'
-          aria-label={tTheme('gradientAngle')}
-          onPointerDown={() => setDragAngle(true)}
-          className='relative size-8 shrink-0 cursor-grab rounded-full border-2 border-border touch-none'
-        >
-          <span
-            className='absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground'
-            style={{
-              transform: `translate(calc(-50% + ${Math.cos(angleRad) * 10}px), calc(-50% + ${Math.sin(angleRad) * 10}px))`,
+            ref={barRef}
+            className='relative h-6 cursor-copy touch-none rounded-md ring-1 ring-border'
+            onPointerDown={e => {
+              if (e.target === e.currentTarget)
+                addStop(posFromClientX(e.clientX));
             }}
-          />
-        </button>
-        <label className='flex items-center gap-1.5 text-xs text-muted-foreground'>
-          {tTheme('gradientAngle')}
-          <input
-            type='number'
-            min={0}
-            max={360}
-            value={gradient.angle}
-            onChange={e =>
-              onChange({
-                ...gradient,
-                angle: clamp(Math.round(Number(e.target.value) || 0), 0, 360),
-              })
-            }
-            className='h-8 w-16 rounded-md border border-border bg-background px-2 text-right text-xs text-foreground'
-          />
-          °
-        </label>
+          >
+            <div
+              className='pointer-events-none absolute inset-0 rounded-md'
+              style={{ backgroundImage: barCss(stops) }}
+            />
+            {stops.map((stop, i) => (
+              <button
+                key={i}
+                type='button'
+                aria-label={`${tTheme('gradientStop')} ${i + 1}`}
+                onPointerDown={e => {
+                  e.stopPropagation();
+                  setActive(i);
+                  setDragStop(i);
+                }}
+                className={cn(
+                  'absolute top-1/2 z-10 h-8 w-3.5 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize rounded-full border-2 shadow-sm',
+                  active === i ? 'border-foreground' : 'border-white'
+                )}
+                style={{
+                  left: `${stop.position}%`,
+                  backgroundColor: stop.color,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Picker for the active stop */}
+        <HexColorPicker
+          color={activeStop.color}
+          onChange={hex => {
+            const c = normalizeHex(hex);
+            if (c) patchStop(active, { color: c });
+          }}
+        />
+        <div className='flex justify-end'>
+          <EyedropperButton onPick={hex => patchStop(active, { color: hex })} />
+        </div>
       </div>
 
-      {/* Picker for the active stop */}
-      <HexColorPicker
-        color={activeStop.color}
-        onChange={hex => {
-          const c = normalizeHex(hex);
-          if (c) patchStop(active, { color: c });
-        }}
-      />
-
-      {/* Stops list */}
-      <div className='flex flex-col gap-1'>
-        <div className='flex items-center justify-between'>
-          <span className='text-[11px] font-semibold uppercase tracking-wide text-muted-foreground'>
-            {tTheme('gradientStops')}
-          </span>
+      {/* RIGHT: angle + stops */}
+      <div className='flex flex-col gap-4 sm:w-44'>
+        {/* Angle wheel + numeric input */}
+        <div className='flex items-center gap-3'>
           <button
+            ref={wheelRef}
             type='button'
-            onClick={() => addStop(50)}
-            disabled={stops.length >= MAX_STOPS}
-            className='inline-flex items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[11px] font-semibold hover:border-foreground/40 disabled:opacity-40'
+            aria-label={tTheme('gradientAngle')}
+            onPointerDown={() => setDragAngle(true)}
+            className='relative size-8 shrink-0 cursor-grab rounded-full border-2 border-border touch-none'
           >
-            <Plus className='h-3 w-3' />
-            {tTheme('gradientAddStop')}
-          </button>
-        </div>
-        {stops.map((stop, i) => (
-          <div
-            key={i}
-            className={cn(
-              'flex items-center gap-2 rounded-md p-1',
-              active === i && 'bg-muted/50'
-            )}
-          >
-            <button
-              type='button'
-              onClick={() => setActive(i)}
-              aria-label={`${tTheme('gradientStop')} ${i + 1}`}
-              className={cn(
-                'h-7 w-7 shrink-0 rounded-sm border',
-                active === i ? 'border-foreground' : 'border-border'
-              )}
-              style={{ backgroundColor: stop.color }}
-            />
-            <HexColorInput
-              color={stop.color}
-              onChange={hex => {
-                const c = normalizeHex(hex);
-                if (c) patchStop(i, { color: c });
+            <span
+              className='absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground'
+              style={{
+                transform: `translate(calc(-50% + ${Math.cos(angleRad) * 10}px), calc(-50% + ${Math.sin(angleRad) * 10}px))`,
               }}
-              prefixed
-              className='h-7 w-20 rounded-md border border-border bg-background px-2 text-xs uppercase'
             />
+          </button>
+          <label className='flex items-center gap-1.5 text-xs text-muted-foreground'>
+            {tTheme('gradientAngle')}
             <input
               type='number'
               min={0}
-              max={100}
-              value={stop.position}
+              max={360}
+              value={gradient.angle}
               onChange={e =>
-                patchStop(i, {
-                  position: clamp(
-                    Math.round(Number(e.target.value) || 0),
-                    0,
-                    100
-                  ),
+                onChange({
+                  ...gradient,
+                  angle: clamp(Math.round(Number(e.target.value) || 0), 0, 360),
                 })
               }
-              className='h-7 w-14 rounded-md border border-border bg-background px-2 text-right text-xs'
+              className='h-8 w-16 rounded-md border border-border bg-background px-2 text-right text-xs text-foreground'
             />
-            <span className='text-xs text-muted-foreground'>%</span>
+            °
+          </label>
+        </div>
+
+        {/* Stops list */}
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center justify-between'>
+            <span className='text-[11px] font-semibold uppercase tracking-wide text-muted-foreground'>
+              {tTheme('gradientStops')}
+            </span>
             <button
               type='button'
-              onClick={() => removeStop(i)}
-              disabled={stops.length <= 2}
-              aria-label={tTheme('gradientRemoveStop')}
-              className='shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground disabled:opacity-30'
+              onClick={() => addStop(50)}
+              disabled={stops.length >= MAX_STOPS}
+              className='inline-flex items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[11px] font-semibold hover:border-foreground/40 disabled:opacity-40'
             >
-              <X className='h-3.5 w-3.5' />
+              <Plus className='h-3 w-3' />
+              {tTheme('gradientAddStop')}
             </button>
           </div>
-        ))}
+          {stops.map((stop, i) => (
+            <div
+              key={i}
+              className={cn(
+                'flex items-center gap-2 rounded-md p-1',
+                active === i && 'bg-muted/50'
+              )}
+            >
+              <button
+                type='button'
+                onClick={() => setActive(i)}
+                aria-label={`${tTheme('gradientStop')} ${i + 1}`}
+                className={cn(
+                  'h-7 w-7 shrink-0 rounded-sm border',
+                  active === i ? 'border-foreground' : 'border-border'
+                )}
+                style={{ backgroundColor: stop.color }}
+              />
+              <HexColorInput
+                color={stop.color}
+                onChange={hex => {
+                  const c = normalizeHex(hex);
+                  if (c) patchStop(i, { color: c });
+                }}
+                prefixed
+                className='h-7 w-20 rounded-md border border-border bg-background px-2 text-xs uppercase'
+              />
+              <input
+                type='number'
+                min={0}
+                max={100}
+                value={stop.position}
+                onChange={e =>
+                  patchStop(i, {
+                    position: clamp(
+                      Math.round(Number(e.target.value) || 0),
+                      0,
+                      100
+                    ),
+                  })
+                }
+                className='h-7 w-14 rounded-md border border-border bg-background px-2 text-right text-xs'
+              />
+              <span className='text-xs text-muted-foreground'>%</span>
+              <button
+                type='button'
+                onClick={() => removeStop(i)}
+                disabled={stops.length <= 2}
+                aria-label={tTheme('gradientRemoveStop')}
+                className='shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground disabled:opacity-30'
+              >
+                <X className='h-3.5 w-3.5' />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
