@@ -14,23 +14,23 @@ interface SizeTier {
 
 const SIZE_TIERS: Record<BurstSize, SizeTier> = {
   s: {
-    fragments: 24,
+    fragments: 16,
     speed: 3.0,
-    fadeFrames: 70,
+    fadeFrames: 40,
     trailWidth: 1.5,
     glowRadius: 4,
   },
   m: {
-    fragments: 40,
+    fragments: 28,
     speed: 3.8,
-    fadeFrames: 120,
+    fadeFrames: 70,
     trailWidth: 2,
     glowRadius: 5,
   },
   l: {
-    fragments: 60,
+    fragments: 42,
     speed: 4.6,
-    fadeFrames: 170,
+    fadeFrames: 100,
     trailWidth: 2.5,
     glowRadius: 6,
   },
@@ -212,8 +212,8 @@ export interface FireworkConfig {
   draw: (ctx: CanvasRenderingContext2D, state: FireworkState) => void;
 }
 
-const SPAWN_INTERVAL_MIN = 25;
-const SPAWN_INTERVAL_MAX = 75;
+const SPAWN_INTERVAL_MIN = 40;
+const SPAWN_INTERVAL_MAX = 100;
 const FLASH_DURATION = 10; // frames the blast-center flash stays visible
 
 export const fireworkConfig: FireworkConfig = {
@@ -224,8 +224,8 @@ export const fireworkConfig: FireworkConfig = {
       bursts: [],
       spawnTimer: 0,
       nextSpawnAt: Math.floor(rand(10, 40)),
-      maxRockets: isMobile ? 3 : 6,
-      maxBursts: isMobile ? 5 : 9,
+      maxRockets: isMobile ? 2 : 4,
+      maxBursts: isMobile ? 3 : 6,
       fragmentScale: isMobile ? 0.55 : 1,
     };
   },
