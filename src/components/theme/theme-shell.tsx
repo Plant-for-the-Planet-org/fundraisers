@@ -83,11 +83,20 @@ export function ThemeShell({
   const bg = activeTheme.bg;
   // Empty string = no gradient.
   const gradientClass = bg.gradient;
-  // Solid colour is the alternative base wash. Gradient wins if both are set
-  // (they are kept mutually exclusive at write-time). Validate before inline
+  // Base wash priority: preset class > custom gradient > solid colour. They are
+  // kept mutually exclusive at write-time; this order is the safety net.
+  // Values are validated (hex stops, numeric angle/positions) before inline
   // styling, matching the safeCssUrl guard below.
+  const cg = bg.custom_gradient;
+  const customGradient =
+    !gradientClass &&
+    cg &&
+    cg.stops.length >= 2 &&
+    cg.stops.every(s => isValidHexColor(s.color))
+      ? `linear-gradient(${cg.angle}deg, ${cg.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+      : null;
   const solidColor =
-    !gradientClass && isValidHexColor(bg.background_color)
+    !gradientClass && !customGradient && isValidHexColor(bg.background_color)
       ? bg.background_color
       : null;
   const shouldBlurMainContentBackdrop =
@@ -112,6 +121,12 @@ export function ThemeShell({
       {gradientClass && (
         <div
           className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
+        />
+      )}
+      {customGradient && (
+        <div
+          className='fixed inset-0 transition-colors duration-300'
+          style={{ backgroundImage: customGradient }}
         />
       )}
       {solidColor && (
