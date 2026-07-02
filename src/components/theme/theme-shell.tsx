@@ -21,23 +21,17 @@ const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
   ssr: false,
 });
 
-// Which elements the backdrop blur tracks. Flip to compare variants while reviewing.
-//  - 'surface': one layer over the whole content column (legacy; blurs empty space below the shorter panel).
-//  - 'panels':  one layer per content column (sidebar + main), each sized to its real content height.
-//  - 'block':   one layer per tagged card ([data-blur-block]); no-op until cards are tagged.
-// Note: layers use top/left/width/height positioning, never clip-path — clip-path + backdrop-filter
-// produces a visible gray compositing-layer edge in Chromium (Chrome/Edge) but not Firefox/Safari.
-type BackdropBlurMode = 'surface' | 'panels' | 'block';
-const BACKDROP_BLUR_MODE: BackdropBlurMode = 'panels';
-
-const BLUR_SELECTORS: Record<BackdropBlurMode, string> = {
-  surface: '[data-main-content-surface]',
-  panels: '[data-blur-surface]',
-  block: '[data-blur-block]',
-};
-
-// Expand each blur layer slightly beyond its content bounds for breathing room (matches the old px-4/py-4 inset).
-const BLUR_PADDING = 8;
+// SSR / first-paint approximation for the blur layer, before useLayoutEffect measures the real element.
+// Matches MainContent: 6.5rem top clears header + my-8, max() centers the 60rem column, bottom:0 extends to viewport.
+// Keep in sync with header height and MainContent's max-width.
+// Note: uses top/left/right/bottom positioning instead of clip-path — clip-path with backdrop-filter causes a
+// visible compositing layer border in Chromium (Chrome/Edge) but not in Firefox or Safari.
+const INITIAL_BLUR_STYLE = {
+  top: '6.5rem',
+  bottom: '0',
+  left: 'max(0px, calc((100vw - 60rem) / 2))',
+  right: 'max(0px, calc((100vw - 60rem) / 2))',
+} as React.CSSProperties;
 
 /**
  * Guard against CSS injection via url("...") interpolation.
@@ -139,124 +133,78 @@ export function ThemeShell({
 }
 
 function MainContentBackdropBlur() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const target = document.querySelector<HTMLElement>(
+      '[data-main-content-surface]'
+    );
+    const layer = layerRef.current;
+    if (!target || !layer) return;
 
-    const selector = BLUR_SELECTORS[BACKDROP_BLUR_MODE];
-    // Target elements can appear after this component mounts (loading.tsx /
-    // Suspense-streamed page content, client-side data fetches), so the tracked
-    // set is re-synced on DOM changes rather than queried once at mount.
-    const layerByTarget = new Map<Element, HTMLDivElement>();
+    const targetElement: HTMLElement = target;
+    const blurLayer: HTMLDivElement = layer;
     let frameId = 0;
-    let syncFrameId = 0;
 
-    function makeLayer(): HTMLDivElement {
-      const el = document.createElement('div');
-      el.className =
-        'fixed z-[6] pointer-events-none backdrop-blur-[10px] rounded-2xl';
-      el.setAttribute('aria-hidden', 'true');
-      el.style.width = '0';
-      el.style.height = '0';
-      container!.appendChild(el);
-      return el;
-    }
-
-    function update() {
+    function updateClipPath() {
       frameId = 0;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
 
-      for (const [target, layer] of layerByTarget) {
-        const rect = target.getBoundingClientRect();
-        const isVisible =
-          rect.bottom > 0 &&
-          rect.right > 0 &&
-          rect.top < vh &&
-          rect.left < vw &&
-          rect.width > 0 &&
-          rect.height > 0;
+      const rect = targetElement.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const isVisible =
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.top < viewportHeight &&
+        rect.left < viewportWidth;
 
-        if (!isVisible) {
-          layer.style.width = '0';
-          layer.style.height = '0';
-          continue;
-        }
-
-        const top = Math.max(0, Math.min(vh, rect.top - BLUR_PADDING));
-        const left = Math.max(0, Math.min(vw, rect.left - BLUR_PADDING));
-        const width = Math.min(vw, rect.right + BLUR_PADDING) - left;
-        const height = Math.min(vh, rect.bottom + BLUR_PADDING) - top;
-
-        layer.style.top = `${top}px`;
-        layer.style.left = `${left}px`;
-        layer.style.width = `${width}px`;
-        layer.style.height = `${height}px`;
+      if (!isVisible) {
+        blurLayer.style.width = '0';
+        blurLayer.style.height = '0';
+        return;
       }
+
+      const top = Math.max(0, Math.min(viewportHeight, rect.top));
+      const left = Math.max(0, Math.min(viewportWidth, rect.left));
+      const width = Math.min(viewportWidth, rect.right) - left;
+      const height = Math.min(viewportHeight, rect.bottom) - top;
+
+      blurLayer.style.top = `${top}px`;
+      blurLayer.style.left = `${left}px`;
+      blurLayer.style.width = `${width}px`;
+      blurLayer.style.height = `${height}px`;
+      blurLayer.style.right = 'auto';
+      blurLayer.style.bottom = 'auto';
     }
 
     function scheduleUpdate() {
       if (frameId === 0) {
-        frameId = requestAnimationFrame(update);
+        frameId = requestAnimationFrame(updateClipPath);
       }
     }
 
     const resizeObserver = new ResizeObserver(scheduleUpdate);
-
-    function syncTargets() {
-      syncFrameId = 0;
-      const found = document.querySelectorAll<HTMLElement>(selector);
-      const seen = new Set<Element>();
-
-      found.forEach(target => {
-        seen.add(target);
-        if (!layerByTarget.has(target)) {
-          layerByTarget.set(target, makeLayer());
-          resizeObserver.observe(target);
-        }
-      });
-
-      for (const [target, layer] of layerByTarget) {
-        if (!seen.has(target)) {
-          resizeObserver.unobserve(target);
-          layer.remove();
-          layerByTarget.delete(target);
-        }
-      }
-
-      scheduleUpdate();
-    }
-
-    function scheduleSync() {
-      if (syncFrameId === 0) {
-        syncFrameId = requestAnimationFrame(syncTargets);
-      }
-    }
-
-    const mutationObserver = new MutationObserver(scheduleSync);
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
+    resizeObserver.observe(targetElement);
     window.addEventListener('resize', scheduleUpdate);
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
-    syncTargets();
+    updateClipPath();
 
     return () => {
       cancelAnimationFrame(frameId);
-      cancelAnimationFrame(syncFrameId);
-      mutationObserver.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener('resize', scheduleUpdate);
       window.removeEventListener('scroll', scheduleUpdate);
-      layerByTarget.forEach(layer => layer.remove());
     };
   }, []);
 
-  return <div ref={containerRef} aria-hidden />;
+  return (
+    <div
+      ref={layerRef}
+      className='fixed z-[6] pointer-events-none backdrop-blur-[10px] rounded-2xl'
+      style={INITIAL_BLUR_STYLE}
+      aria-hidden
+    />
+  );
 }
 
 function ImageLayer({
