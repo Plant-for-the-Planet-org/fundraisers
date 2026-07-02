@@ -17,10 +17,10 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
-import { ViewButton } from './preview-button';
 import { StickyFormBar } from './sticky-form-bar';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
+import { ViewButton } from './view-button';
 import { WorkspaceInfo } from './workspace-info';
 import { WorkspaceSelector } from './workspace-selector';
 
