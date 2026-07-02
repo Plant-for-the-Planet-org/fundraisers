@@ -214,7 +214,8 @@ export interface FireworkConfig {
 
 const SPAWN_INTERVAL_MIN = 40;
 const SPAWN_INTERVAL_MAX = 100;
-const FLASH_DURATION = 10; // frames the blast-center flash stays visible
+const FLASH_DURATION = 2.5; // frames the blast-center flash stays visible
+const FLASH_PEAK_ALPHA = 0.5; // dims the flash so it doesn't blow out the burst
 
 export const fireworkConfig: FireworkConfig = {
   init(w) {
@@ -316,7 +317,8 @@ export const fireworkConfig: FireworkConfig = {
 
       // Bright flash at the blast center, quick decay over the first few frames.
       if (burst.age <= FLASH_DURATION) {
-        const flashAlpha = (1 - burst.age / FLASH_DURATION) ** 2;
+        const flashAlpha =
+          FLASH_PEAK_ALPHA * (1 - burst.age / FLASH_DURATION) ** 2;
         if (flashAlpha > 0.02) {
           const color = burst.fragments[0]?.color ?? '#ffffff';
           const rgb = hexToRgb(color);
