@@ -236,6 +236,7 @@ h6 {
    single-class defaults, so no !important is needed. */
 .rcp-compact .react-colorful {
   height: 132px;
+  width: 100%;
 }
 .rcp-compact .react-colorful__hue {
   height: 14px;

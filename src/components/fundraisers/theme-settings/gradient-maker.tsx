@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { Plus, X } from 'lucide-react';
 import { hexToRgb, isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
-import { EyedropperButton } from './eyedropper-button';
 
 const MAX_STOPS = 6;
 
@@ -93,6 +92,29 @@ export function GradientMaker({
     setActive(next.length - 1);
   };
 
+  // "+ Add stop" drops a stop at a random point inside the widest gap between
+  // existing stops (so repeated clicks spread out instead of stacking), taking
+  // the interpolated colour there.
+  const addStopInGap = () => {
+    const sorted = [...stops].sort((a, b) => a.position - b.position);
+    let start = 0;
+    let end = 100;
+    let widest = -1;
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const gap = sorted[i + 1].position - sorted[i].position;
+      if (gap > widest) {
+        widest = gap;
+        start = sorted[i].position;
+        end = sorted[i + 1].position;
+      }
+    }
+    // Random point kept off the exact edges so it never lands on a neighbour.
+    const position = Math.round(
+      start + (end - start) * (0.25 + Math.random() * 0.5)
+    );
+    addStop(position);
+  };
+
   const removeStop = (index: number) => {
     if (stops.length <= 2) return;
     onChange({ ...gradient, stops: stops.filter((_, i) => i !== index) });
@@ -140,9 +162,9 @@ export function GradientMaker({
   const angleRad = ((gradient.angle - 90) * Math.PI) / 180;
 
   return (
-    <div className='flex w-72 flex-col gap-5 sm:w-[440px] sm:flex-row sm:gap-6'>
+    <div className='flex w-72 flex-col gap-5 sm:w-[420px] sm:flex-row sm:gap-6'>
       {/* LEFT: gradient bar + colour picker */}
-      <div className='rcp-compact flex flex-col gap-3 sm:flex-1'>
+      <div className='rcp-compact flex flex-col gap-3 sm:min-w-0 sm:flex-1'>
         {/* Gradient bar with draggable stops; click empty space to add one */}
         <div className='pt-1'>
           <div
@@ -188,13 +210,10 @@ export function GradientMaker({
             if (c) patchStop(active, { color: c });
           }}
         />
-        <div className='flex justify-end'>
-          <EyedropperButton onPick={hex => patchStop(active, { color: hex })} />
-        </div>
       </div>
 
       {/* RIGHT: angle + stops */}
-      <div className='flex flex-col gap-4 sm:w-44'>
+      <div className='flex flex-col gap-4 sm:min-w-0 sm:flex-1'>
         {/* Angle wheel + numeric input */}
         <div className='flex items-center gap-3'>
           <button
@@ -238,7 +257,7 @@ export function GradientMaker({
             </span>
             <button
               type='button'
-              onClick={() => addStop(50)}
+              onClick={addStopInGap}
               disabled={stops.length >= MAX_STOPS}
               className='inline-flex items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[11px] font-semibold hover:border-foreground/40 disabled:opacity-40'
             >
@@ -250,7 +269,7 @@ export function GradientMaker({
             <div
               key={i}
               className={cn(
-                'flex items-center gap-2 rounded-md p-1',
+                'flex items-center gap-1.5 rounded-md p-1',
                 active === i && 'bg-muted/50'
               )}
             >
@@ -271,7 +290,7 @@ export function GradientMaker({
                   if (c) patchStop(i, { color: c });
                 }}
                 prefixed
-                className='h-7 w-20 rounded-md border border-border bg-background px-2 text-xs uppercase'
+                className='h-7 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs uppercase'
               />
               <input
                 type='number'
@@ -287,7 +306,7 @@ export function GradientMaker({
                     ),
                   })
                 }
-                className='h-7 w-14 rounded-md border border-border bg-background px-2 text-right text-xs'
+                className='h-7 w-11 rounded-md border border-border bg-background px-1.5 text-right text-xs'
               />
               <span className='text-xs text-muted-foreground'>%</span>
               <button
