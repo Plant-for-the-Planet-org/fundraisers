@@ -230,3 +230,17 @@ h6 {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
+
+/* Compact react-colorful picker: shorter overall + slimmer hue slider, so the
+   colour popover stays tight. Class-scoped selectors outrank the library's
+   single-class defaults, so no !important is needed. */
+.rcp-compact .react-colorful {
+  height: 132px;
+}
+.rcp-compact .react-colorful__hue {
+  height: 14px;
+}
+.rcp-compact .react-colorful__pointer {
+  width: 16px;
+  height: 16px;
+}

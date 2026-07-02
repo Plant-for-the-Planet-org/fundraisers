@@ -142,7 +142,7 @@ export function GradientMaker({
   return (
     <div className='flex w-72 flex-col gap-5 sm:w-[440px] sm:flex-row sm:gap-6'>
       {/* LEFT: gradient bar + colour picker */}
-      <div className='flex flex-col gap-3 sm:flex-1'>
+      <div className='rcp-compact flex flex-col gap-3 sm:flex-1'>
         {/* Gradient bar with draggable stops; click empty space to add one */}
         <div className='pt-1'>
           <div

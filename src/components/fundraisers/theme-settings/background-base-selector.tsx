@@ -238,7 +238,7 @@ function SolidPicker({
   };
 
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='rcp-compact flex flex-col gap-3'>
       <HexColorPicker color={current} onChange={commit} />
       <div>
         <div className='mb-1.5 text-[11px] font-semibold text-muted-foreground'>
