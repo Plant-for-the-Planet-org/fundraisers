@@ -8,7 +8,11 @@ import { useController } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Moon, Shuffle, Sun } from 'lucide-react';
-import { getReadableMode } from '@/lib/theme/color-utils';
+import { getAccentColor } from '@/lib/theme/accent-utils';
+import {
+  getReadableMode,
+  getReadableModeForStops,
+} from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { THEMES } from '@/lib/theme/themes';
 import { cn } from '@/lib/utils/cn';
@@ -199,19 +203,37 @@ export function ThemeSettings() {
         <TabsContent value='background' className='flex flex-col gap-4'>
           <BackgroundTab
             bg={field.value.bg}
-            onBackgroundColor={hex => {
-              if (hex === null) {
-                patchBg({ background_color: null });
-                return;
-              }
-              // Solid colour and gradient are mutually exclusive: setting one
-              // clears the other. Mode auto-follows the colour's luminance.
+            accentColor={getAccentColor(activeTheme.accent)}
+            // One base wash at a time: each setter clears the other two.
+            onSelectNone={() => {
+              const nextBg = {
+                ...field.value.bg,
+                background_color: null,
+                gradient: '',
+                custom_gradient: null,
+              };
+              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
+            }}
+            onSolidColor={hex => {
               const nextBg = {
                 ...field.value.bg,
                 background_color: hex,
                 gradient: '',
+                custom_gradient: null,
               };
               const mode = getReadableMode(hex);
+              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+            }}
+            onGradientChange={next => {
+              const nextBg = {
+                ...field.value.bg,
+                custom_gradient: next,
+                background_color: null,
+                gradient: '',
+              };
+              const mode = getReadableModeForStops(
+                next.stops.map(s => s.color)
+              );
               syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
             }}
             onGradient={(value, mode) => {
@@ -219,6 +241,7 @@ export function ThemeSettings() {
                 ...field.value.bg,
                 gradient: value,
                 background_color: null,
+                custom_gradient: null,
               };
               syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
             }}

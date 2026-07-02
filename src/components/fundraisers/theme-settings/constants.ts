@@ -4,6 +4,7 @@ import type {
   AnimationType,
   BgDecoration,
   BgImageMode,
+  CustomGradient,
   FontId,
   Theme,
 } from '@/lib/theme/types';
@@ -19,7 +20,11 @@ import {
   Sparkles,
   SquareDashed,
 } from 'lucide-react';
-import { BG_LIBRARY, LOGO_LIBRARY } from '@/lib/theme/backgrounds';
+import {
+  BG_LIBRARY,
+  DEFAULT_GRADIENT_ANGLE,
+  LOGO_LIBRARY,
+} from '@/lib/theme/backgrounds';
 import { THEMES } from '@/lib/theme/themes';
 
 export type BgFormValue = FundraiserFormValues['settings']['theme']['bg'];
@@ -113,5 +118,32 @@ export const GRADIENT_OPTIONS: GradientOption[] = [
 export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
+
+// Quick-pick swatches shown beneath the picker. On-brand accent hexes plus a few
+// neutrals. Placeholder set for now — tweak freely; keep it to ~10 (two rows).
+export const QUICK_PICK_COLORS = [
+  '#007a49',
+  '#2563eb',
+  '#0d9488',
+  '#7c3aed',
+  '#e11d48',
+  '#ea580c',
+  '#d97706',
+  '#ffffff',
+  '#64748b',
+  '#111827',
+];
+
+export const DEFAULT_SOLID_COLOR = '#ffffff';
+
+export function defaultCustomGradient(accentColor: string): CustomGradient {
+  return {
+    angle: DEFAULT_GRADIENT_ANGLE,
+    stops: [
+      { color: accentColor, position: 0 },
+      { color: '#ffffff', position: 100 },
+    ],
+  };
+}
 
 export { pickRandom } from '@/components/theme/animations/base';

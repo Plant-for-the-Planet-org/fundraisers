@@ -3,15 +3,14 @@
 import { useState } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
-import { Palette, X } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { isValidHexColor } from '@/lib/theme/color-utils';
-import { cn } from '@/lib/utils/cn';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { SectionHeader } from '../typography';
+import { QUICK_PICK_COLORS } from './constants';
 
 const DEFAULT_COLOR = '#ffffff';
 
@@ -22,14 +21,16 @@ function normalizeHex(input: string): string | null {
 }
 
 // Combined swatch + Palette icon; clicking anywhere on it opens the picker.
-function ColorTrigger({
+// Shared by the solid colour control and each gradient stop.
+export function ColorTrigger({
   value,
   onChange,
+  label,
 }: {
   value: string | null;
-  onChange: (hex: string | null) => void;
+  onChange: (hex: string) => void;
+  label: string;
 }) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
   const [open, setOpen] = useState(false);
   const current = value ?? DEFAULT_COLOR;
 
@@ -43,8 +44,8 @@ function ColorTrigger({
       <PopoverTrigger asChild>
         <button
           type='button'
-          title={tTheme('selectColor')}
-          aria-label={tTheme('selectColor')}
+          title={label}
+          aria-label={label}
           className='inline-flex h-8 items-center gap-1.5 rounded-md border-2 border-border px-1.5 transition-all hover:border-foreground/40'
         >
           <span
@@ -57,6 +58,7 @@ function ColorTrigger({
       <PopoverContent align='start' className='w-auto'>
         <div className='flex flex-col gap-3'>
           <HexColorPicker color={current} onChange={commit} />
+          <QuickPicks onPick={onChange} />
           <div className='flex items-center gap-1'>
             <span className='text-xs font-semibold text-muted-foreground'>
               #
@@ -75,78 +77,25 @@ function ColorTrigger({
   );
 }
 
-// Always-visible "None" tile (diagonal-slash glyph, like the gradient None) that clears the colour.
-function NoneSwatch({
-  active,
-  onClick,
-}: {
-  active: boolean;
-  onClick: () => void;
-}) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      title={tTheme('clearColor')}
-      aria-label={tTheme('clearColor')}
-      aria-pressed={active}
-      className={cn(
-        'relative h-8 w-8 overflow-hidden rounded-md border-2 bg-background',
-        active
-          ? 'border-foreground'
-          : 'border-border hover:border-foreground/40'
-      )}
-    >
-      <svg
-        viewBox='0 0 24 24'
-        className='absolute inset-0 h-full w-full text-muted-foreground'
-        preserveAspectRatio='none'
-        aria-hidden
-      >
-        <line
-          x1='2'
-          y1='22'
-          x2='22'
-          y2='2'
-          stroke='currentColor'
-          strokeWidth='1.5'
-        />
-      </svg>
-    </button>
-  );
-}
-
-export function BackgroundColorRow({
-  label,
-  variant,
-  value,
-  onChange,
-}: {
-  label: string;
-  variant: 'none-swatch' | 'clear-button';
-  value: string | null;
-  onChange: (hex: string | null) => void;
-}) {
+function QuickPicks({ onPick }: { onPick: (hex: string) => void }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
     <div>
-      <SectionHeader showDivider={false}>{label}</SectionHeader>
-      <div className='mt-2 flex items-center gap-2'>
-        {variant === 'none-swatch' && (
-          <NoneSwatch active={!value} onClick={() => onChange(null)} />
-        )}
-        <ColorTrigger value={value} onChange={onChange} />
-        {variant === 'clear-button' && value && (
+      <div className='mb-1.5 text-[11px] font-semibold text-muted-foreground'>
+        {tTheme('quickPicks')}
+      </div>
+      <div className='grid grid-cols-5 gap-1.5'>
+        {QUICK_PICK_COLORS.map(hex => (
           <button
+            key={hex}
             type='button'
-            onClick={() => onChange(null)}
-            className='inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:border-foreground/40'
-          >
-            <X className='h-3.5 w-3.5' />
-            {tTheme('clearColor')}
-          </button>
-        )}
+            onClick={() => onPick(hex)}
+            title={hex}
+            aria-label={hex}
+            className='aspect-square rounded-[5px] border border-border transition-transform hover:scale-110'
+            style={{ backgroundColor: hex }}
+          />
+        ))}
       </div>
     </div>
   );
