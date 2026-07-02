@@ -66,9 +66,10 @@ export interface CustomGradient {
 }
 
 export interface BgSettings {
-  gradient: string; // tailwind class string, '' = no gradient layer
-  background_color: string | null; // '#RRGGBB' solid wash, null = none
-  custom_gradient: CustomGradient | null; // inline gradient, null = none
+  // Base wash: at most one of these three is set at a time.
+  gradient: string; // preset/theme gradient as a Tailwind class ('' = none); set by the built-in themes and the preset picker
+  background_color: string | null; // user-picked solid hex, null = none
+  custom_gradient: CustomGradient | null; // user-built gradient, null = none
   decoration: BgDecoration;
   pattern_id: string | null;
   image_url: string | null; // library key OR https URL
