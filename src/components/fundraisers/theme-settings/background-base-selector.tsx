@@ -71,24 +71,26 @@ export function BackgroundBaseSelector({
         {tTheme('labelBackgroundColor')}
       </SectionHeader>
 
-      <div className='mt-2 inline-flex overflow-hidden rounded-md border border-border'>
-        {options.map((opt, i) => (
-          <button
-            key={opt.id}
-            type='button'
-            onClick={() => selectBase(opt.id)}
-            aria-pressed={base === opt.id}
-            className={cn(
-              'px-3 py-1 text-xs font-semibold',
-              i > 0 && 'border-l border-border',
-              base === opt.id
-                ? 'bg-muted/40 text-foreground'
-                : 'text-muted-foreground hover:bg-muted/20'
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div className='mt-2 flex flex-wrap gap-2'>
+        {options.map(opt => {
+          const active = base === opt.id;
+          return (
+            <button
+              key={opt.id}
+              type='button'
+              onClick={() => selectBase(opt.id)}
+              aria-pressed={active}
+              className={cn(
+                'inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold',
+                active
+                  ? 'border-foreground'
+                  : 'border-border hover:border-foreground/40'
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {base === 'solid' && (
