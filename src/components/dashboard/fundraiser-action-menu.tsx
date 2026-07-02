@@ -106,7 +106,23 @@ export function FundraiserActionMenu({
   // label and dialog copy match the real outcome. The API response is still the
   // source of truth for the toast + state update, so a stale count is harmless.
   const willArchive = fundraiser.donationCount > 0;
-  const tDialog = willArchive ? tArchiveDialog : tDeleteDialog;
+
+  // Single source for the two outcome variants so the menu item and the
+  // confirmation dialog can't drift apart. `t` is the matching dialog namespace.
+  const deleteAction = willArchive
+    ? {
+        variant: 'default' as const,
+        Icon: Archive,
+        label: t('archive'),
+        t: tArchiveDialog,
+      }
+    : {
+        variant: 'destructive' as const,
+        Icon: Trash2,
+        label: t('delete'),
+        t: tDeleteDialog,
+      };
+  const tDialog = deleteAction.t;
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
@@ -279,7 +295,7 @@ export function FundraiserActionMenu({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              variant={willArchive ? 'default' : 'destructive'}
+              variant={deleteAction.variant}
               className='cursor-pointer py-2'
               disabled={isMutating}
               onSelect={event => {
@@ -288,12 +304,8 @@ export function FundraiserActionMenu({
                 setDeleteDialogOpen(true);
               }}
             >
-              {willArchive ? (
-                <Archive aria-hidden='true' />
-              ) : (
-                <Trash2 aria-hidden='true' />
-              )}
-              {willArchive ? t('archive') : t('delete')}
+              <deleteAction.Icon aria-hidden='true' />
+              {deleteAction.label}
             </DropdownMenuItem>
           </>
         )}
@@ -320,7 +332,7 @@ export function FundraiserActionMenu({
             </DialogClose>
             <Button
               type='button'
-              variant={willArchive ? 'default' : 'destructive'}
+              variant={deleteAction.variant}
               disabled={isDeleting}
               onClick={() => void handleDelete()}
             >
