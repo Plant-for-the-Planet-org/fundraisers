@@ -32,7 +32,8 @@ interface AuthStore {
   setIsAuthInitializing: (value: boolean) => void;
   loadUserProfile: () => Promise<void>;
   logout: (customReturnTo?: string | undefined) => void;
-  clearAuth: () => void;
+  /** Returns true if a profile-sourced `ui-locale` cookie was cleared. */
+  clearAuth: () => boolean;
   refreshProfile: () => Promise<void>;
 }
 
@@ -143,25 +144,30 @@ export const useAuthStore = create<AuthStore>()(
 
       clearAuth: () => {
         useImpersonationStore.getState().stop();
+        let clearedProfileLocale = false;
         if (isBrowser) {
           localStorage.removeItem('access_token');
           localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
           // A shared/public browser should fall back to browser-language /
-          // default after sign-out, not stay on the previous user's profile
-          // language — but only if the cookie is profile-sourced. An
-          // explicit pick (`.explicit` tag) is untouched, same as today.
+          // default after de-authing, not stay on the previous user's
+          // profile language — but only if the cookie is profile-sourced.
+          // An explicit pick (`.explicit` tag) is untouched, same as today.
+          // Reload is NOT triggered here: clearAuth() runs on every deauth
+          // path (token expiry, guard failures, init failures — not just
+          // logout), and forcing a reload on all of those would surprise
+          // users mid-session. Only the logout flow, which already expects
+          // a full-page transition, decides whether to reload — see its
+          // call site for why one is needed there.
           const { locale, source } = parseLocaleCookieValue(
             readCookie('ui-locale')
           );
           if (locale && source === 'profile') {
             deleteCookie('ui-locale');
-            // The post-logout redirect (redirecting/page.tsx) uses a soft
-            // client-side router.replace(), which only re-fetches the leaf
-            // route — the root layout (header/nav) keeps its already-
-            // rendered, now-stale locale. Reload so the whole tree re-
-            // resolves against the cookie we just cleared, same as every
-            // other locale change in this codebase.
-            if (!readCookie('ui-locale')) window.location.reload();
+            if (readCookie('ui-locale')) {
+              console.warn('[i18n] failed to clear profile-locale cookie');
+            } else {
+              clearedProfileLocale = true;
+            }
           }
         }
         set(
@@ -175,6 +181,7 @@ export const useAuthStore = create<AuthStore>()(
           undefined,
           'auth/clear_auth'
         );
+        return clearedProfileLocale;
       },
 
       refreshProfile: async () => {
