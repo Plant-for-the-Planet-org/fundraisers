@@ -289,6 +289,28 @@ export function RichTextEditor({
   // Single button cycles through the alignments (left → center → right → left),
   // Instagram-style, instead of opening a menu. The icon reflects the current
   // alignment so the button stays self-describing.
+  const toggleBlockquote = () => {
+    if (toolbarState.isBlockquote) {
+      editor.chain().focus().toggleBlockquote().run();
+      return;
+    }
+
+    // Toggle ON: blockquote + center align (chain is synchronous, commits before next read).
+    editor.chain().focus().toggleBlockquote().setTextAlign('center').run();
+
+    // Apply italic to the full paragraph. If cursor-only (no selection), expand
+    // to the paragraph bounds so existing text gets the <em> mark too.
+    const { selection } = editor.state;
+    const from = selection.$from.start();
+    const to = selection.$from.end();
+
+    if (selection.empty) {
+      editor.chain().focus().setTextSelection({ from, to }).setItalic().run();
+    } else {
+      editor.chain().focus().setItalic().run();
+    }
+  };
+
   const cycleAlign = () => {
     const index = ALIGN_OPTIONS.findIndex(
       option => option.value === toolbarState.align
@@ -369,7 +391,7 @@ export function RichTextEditor({
         <div className='w-px h-6 bg-border mx-1' />
 
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          onClick={toggleBlockquote}
           isActive={toolbarState.isBlockquote}
           title='Quote'
         >
