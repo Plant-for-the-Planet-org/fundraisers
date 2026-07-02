@@ -32,7 +32,8 @@ async function loadNamespace(locale: string, namespace: string) {
 export default getRequestConfig(async () => {
   const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
 
-  // Priority: user preference (cookie) > browser language (Accept-Language) > default.
+  // Priority: explicit selection > profile language (both tags of the same
+  // `ui-locale` cookie, see resolve-locale.ts) > browser language > default.
   const locale = resolveLocale({
     cookieLocale: cookieStore.get('ui-locale')?.value,
     acceptLanguage: headerStore.get('accept-language'),

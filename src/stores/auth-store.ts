@@ -10,6 +10,8 @@ import {
   IMPERSONATION_STORAGE_KEY,
   useImpersonationStore,
 } from '@/stores/impersonation-store';
+import { deleteCookie, readCookie } from '@/i18n/locale-cookie';
+import { parseLocaleCookieValue } from '@/i18n/resolve-locale';
 
 interface User {
   sub: string;
@@ -144,6 +146,23 @@ export const useAuthStore = create<AuthStore>()(
         if (isBrowser) {
           localStorage.removeItem('access_token');
           localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
+          // A shared/public browser should fall back to browser-language /
+          // default after sign-out, not stay on the previous user's profile
+          // language — but only if the cookie is profile-sourced. An
+          // explicit pick (`.explicit` tag) is untouched, same as today.
+          const { locale, source } = parseLocaleCookieValue(
+            readCookie('ui-locale')
+          );
+          if (locale && source === 'profile') {
+            deleteCookie('ui-locale');
+            // The post-logout redirect (redirecting/page.tsx) uses a soft
+            // client-side router.replace(), which only re-fetches the leaf
+            // route — the root layout (header/nav) keeps its already-
+            // rendered, now-stale locale. Reload so the whole tree re-
+            // resolves against the cookie we just cleared, same as every
+            // other locale change in this codebase.
+            if (!readCookie('ui-locale')) window.location.reload();
+          }
         }
         set(
           {
