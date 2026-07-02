@@ -162,6 +162,7 @@
         "baseNone": "None",
         "baseSolid": "Solid",
         "baseGradient": "Gradient",
+        "baseCustom": "Custom",
         "gradientStart": "Start",
         "gradientEnd": "End",
         "quickPicks": "Quick picks",

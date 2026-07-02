@@ -119,19 +119,24 @@ export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
 export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
 export const LOGOS = LOGO_LIBRARY;
 
-// Quick-pick swatches shown beneath the picker. On-brand accent hexes plus a few
-// neutrals. Placeholder set for now — tweak freely; keep it to ~10 (two rows).
+// Quick-pick swatches shown beneath the picker, from the Planet CI palette
+// (branding in planet-skills). Five hue columns; the grid is 5-wide so the top
+// row reads as the light "Soft" background wash and the bottom row as the
+// deeper brand variant of the same hue.
 export const QUICK_PICK_COLORS = [
-  '#007a49',
-  '#2563eb',
-  '#0d9488',
-  '#7c3aed',
-  '#e11d48',
-  '#ea580c',
-  '#d97706',
-  '#ffffff',
-  '#64748b',
-  '#111827',
+  // Top row — light "Soft" backgrounds
+  '#f0faf4', // Soft Green
+  '#eff6ff', // Soft Blue
+  '#f9f1ff', // Soft Purple
+  '#fff3f3', // Soft Red
+  '#fff8e4', // Soft Yellow
+  // Bottom row — medium tints of the same brand hues (~50% mix on white), so
+  // they read as a stronger wash but still work as a background with dark text.
+  '#93d6af', // Leaf Green
+  '#97bff6', // Ocean Blue
+  '#b5b1ff', // Purple Sky
+  '#f5abab', // Fire Red
+  '#f9dda2', // Golden Yellow
 ];
 
 export const DEFAULT_SOLID_COLOR = '#ffffff';

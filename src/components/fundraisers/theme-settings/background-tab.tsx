@@ -15,7 +15,6 @@ import {
   ANIMATION_OPTIONS,
   type BgFormValue,
   DECORATIONS,
-  GRADIENT_OPTIONS,
   IMAGE_MODES,
   IMAGES,
   LOGOS,
@@ -64,8 +63,8 @@ export function BackgroundTab({
         onSelectNone={onSelectNone}
         onSolidColor={onSolidColor}
         onGradientChange={onGradientChange}
+        onGradient={onGradient}
       />
-      <GradientRow value={bg.gradient} onChange={onGradient} />
       <DecorationRow
         value={bg.decoration}
         onChange={onDecoration}
@@ -135,64 +134,6 @@ function AnimationRow({
         );
       })}
     </ThemeChipRow>
-  );
-}
-
-function GradientRow({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string, mode: 'light' | 'dark') => void;
-}) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
-  return (
-    <div>
-      <SectionHeader showDivider={false}>
-        {tTheme('labelGradient')}
-      </SectionHeader>
-      <div className='grid grid-cols-4 gap-2 mt-2'>
-        {GRADIENT_OPTIONS.map(g => {
-          const active = value === g.value;
-          const isNone = g.value === '';
-          return (
-            <button
-              type='button'
-              key={g.id}
-              onClick={() => onChange(g.value, g.mode)}
-              title={g.label}
-              aria-label={g.label}
-              aria-pressed={active}
-              className={cn(
-                'relative h-8 rounded-md border-2 overflow-hidden',
-                g.value || 'bg-background',
-                active
-                  ? 'border-foreground'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              {isNone && (
-                <svg
-                  viewBox='0 0 24 24'
-                  className='absolute inset-0 w-full h-full text-muted-foreground'
-                  preserveAspectRatio='none'
-                  aria-hidden
-                >
-                  <line
-                    x1='2'
-                    y1='22'
-                    x2='22'
-                    y2='2'
-                    stroke='currentColor'
-                    strokeWidth='1.5'
-                  />
-                </svg>
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

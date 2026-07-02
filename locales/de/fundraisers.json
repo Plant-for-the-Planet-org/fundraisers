@@ -162,6 +162,7 @@
         "baseNone": "Keine",
         "baseSolid": "Einfarbig",
         "baseGradient": "Verlauf",
+        "baseCustom": "Eigene",
         "gradientStart": "Start",
         "gradientEnd": "Ende",
         "quickPicks": "Schnellauswahl",
