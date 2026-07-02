@@ -445,7 +445,7 @@
       "successToast": "Link copied!",
       "errorToast": "Could not copy link. Please copy the URL manually."
     },
-    "hostBanner": {
+    "hostControls": {
       "hostLabel": "You're a host",
       "editButton": "Edit fundraiser"
     }

@@ -14,8 +14,8 @@ import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { DonorsStripSkeleton } from '@/components/fundraisers/donors-strip';
 import { DonorsSummary } from '@/components/fundraisers/donors-summary';
-import { FundraiserHostBanner } from '@/components/fundraisers/fundraiser-host-banner';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
+import { HostControls } from '@/components/fundraisers/host-controls';
 import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
@@ -126,7 +126,7 @@ export function FundraiserView({
         <Hosts mode='display' fundraiser={fundraiser} />
 
         {/* Host edit shortcut (only visible to logged-in hosts) */}
-        <FundraiserHostBanner fundraiser={fundraiser} />
+        <HostControls fundraiser={fundraiser} />
 
         {/** Copy link */}
         {fundraiser.visibility === 'public' && (

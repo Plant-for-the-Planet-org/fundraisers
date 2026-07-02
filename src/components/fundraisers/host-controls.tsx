@@ -13,12 +13,8 @@ import { useAuthStore } from '@/stores/auth-store';
  * Auth lives in the client store, so this renders as a client island inside
  * the server-rendered fundraiser view and renders nothing for everyone else.
  */
-export function FundraiserHostBanner({
-  fundraiser,
-}: {
-  fundraiser: Fundraiser;
-}) {
-  const t = useTranslations('Fundraisers.hostBanner');
+export function HostControls({ fundraiser }: { fundraiser: Fundraiser }) {
+  const t = useTranslations('Fundraisers.hostControls');
   const userId = useAuthStore(state => state.user?.sub);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
