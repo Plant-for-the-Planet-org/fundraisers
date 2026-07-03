@@ -2,7 +2,7 @@
 
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
-import { useState, useSyncExternalStore } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Globe, Pencil } from 'lucide-react';
@@ -27,7 +27,7 @@ const getHostServerSnapshot = () => '';
  */
 export function SlugField() {
   const t = useTranslations('Fundraisers.form.slug');
-  const [unlocked, setUnlocked] = useState(false);
+  const [isLocked, setIsLocked] = useState(true);
 
   // Display-only live host: empty on the server, filled after hydration.
   const host = useSyncExternalStore(
@@ -45,12 +45,20 @@ export function SlugField() {
   const errorId = `${inputId}-error`;
 
   const hasError = Boolean((touchedFields.slug || isSubmitted) && errors.slug);
-  const errorMessage =
-    errors.slug?.type === 'too_big'
-      ? t('errors.maxLength', { max: SLUG_MAX_LENGTH })
-      : errors.slug?.type === 'invalid_format'
-        ? t('errors.invalid')
-        : t('errors.required');
+  const showWarning = Boolean(!hasError && !isLocked);
+
+  const errorMessage = useMemo(() => {
+    switch (errors.slug?.message) {
+      case 'required':
+        return t('errors.required');
+      case 'maxLength':
+        return t('errors.maxLength', { max: SLUG_MAX_LENGTH });
+      case 'invalid':
+        return t('errors.invalid');
+      default:
+        return null;
+    }
+  }, [t, errors.slug?.message]);
 
   return (
     <div className='-mt-4 flex flex-col gap-1.5'>
@@ -70,16 +78,16 @@ export function SlugField() {
         <Input
           id={inputId}
           aria-label={t('label')}
-          readOnly={!unlocked}
+          readOnly={isLocked}
           aria-invalid={hasError}
           aria-describedby={hasError ? errorId : undefined}
           className={cn(
             'h-8 flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0',
-            !unlocked && 'cursor-default'
+            isLocked && 'cursor-default'
           )}
           {...register('slug')}
         />
-        {!unlocked && (
+        {isLocked && (
           <Button
             type='button'
             variant='ghost'
@@ -87,22 +95,23 @@ export function SlugField() {
             aria-label={t('edit')}
             title={t('edit')}
             className='shrink-0 text-muted-foreground/60 hover:text-foreground'
-            onClick={() => setUnlocked(true)}
+            onClick={() => setIsLocked(false)}
           >
             <Pencil aria-hidden='true' />
           </Button>
         )}
       </div>
 
-      {hasError ? (
+      {hasError && (
         <p id={errorId} className='text-sm text-destructive'>
           {errorMessage}
         </p>
-      ) : unlocked ? (
+      )}
+      {showWarning && (
         <p className='text-sm text-amber-600 dark:text-amber-400'>
           {t('warning')}
         </p>
-      ) : null}
+      )}
     </div>
   );
 }
