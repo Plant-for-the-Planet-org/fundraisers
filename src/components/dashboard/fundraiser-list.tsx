@@ -13,6 +13,7 @@ interface FundraiserListProps {
   isFiltered: boolean;
   onClearFilters: () => void;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
+  onFundraiserRemoved: (id: string) => void;
 }
 
 const SKELETON_ROWS = 4;
@@ -23,6 +24,7 @@ export function FundraiserList({
   isFiltered,
   onClearFilters,
   onFundraiserUpdated,
+  onFundraiserRemoved,
 }: FundraiserListProps) {
   if (isLoading) {
     return (
@@ -48,6 +50,7 @@ export function FundraiserList({
           key={fundraiser.id}
           fundraiser={fundraiser}
           onFundraiserUpdated={onFundraiserUpdated}
+          onFundraiserRemoved={onFundraiserRemoved}
         />
       ))}
     </ul>

@@ -12,9 +12,11 @@ import {
   Pause,
   Pencil,
   Play,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
+  deleteFundraiser,
   pauseFundraiser,
   resumeFundraiser,
 } from '@/lib/api/fundraiser-service';
@@ -24,6 +26,15 @@ import {
 } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +46,7 @@ import {
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
+  onFundraiserRemoved: (id: string) => void;
 }
 
 interface ActionVisibility {
@@ -42,6 +54,7 @@ interface ActionVisibility {
   copyLink: boolean;
   pause: boolean;
   resume: boolean;
+  delete: boolean;
 }
 
 const NON_OWNER_ACTIONS: ActionVisibility = {
@@ -49,14 +62,18 @@ const NON_OWNER_ACTIONS: ActionVisibility = {
   copyLink: true,
   pause: false,
   resume: false,
+  delete: false,
 };
 
+// prettier-ignore
 const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
-  active: { edit: true, copyLink: true, pause: true, resume: false },
-  paused: { edit: true, copyLink: true, pause: false, resume: true },
-  draft: { edit: true, copyLink: true, pause: false, resume: true },
-  completed: { edit: false, copyLink: true, pause: false, resume: false },
-  cancelled: { edit: false, copyLink: true, pause: false, resume: false },
+  active:    { edit: true,  copyLink: true, pause: true,  resume: false, delete: true },
+  paused:    { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
+  draft:     { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
+  completed: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
+  cancelled: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
+// Archived fundraisers are not returned by the list API, so this is a defensive check.
+  archived:  { edit: false, copyLink: true, pause: false, resume: false, delete: false },
 };
 
 function getAvailableActions(
@@ -70,22 +87,29 @@ function getAvailableActions(
 }
 
 type StatusActionKind = 'pause' | 'resume';
-type PendingAction = StatusActionKind | null;
+type PendingAction = StatusActionKind | 'delete' | null;
 
 export function FundraiserActionMenu({
   fundraiser,
   onFundraiserUpdated,
+  onFundraiserRemoved,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
+  const tDialog = useTranslations('Dashboard.deleteDialog');
   const accessToken = useAuthStore(state => state.accessToken);
   const currentUserId = useAuthStore(state => state.user?.sub ?? null);
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
-    actions.edit || actions.copyLink || actions.pause || actions.resume;
+    actions.edit ||
+    actions.copyLink ||
+    actions.pause ||
+    actions.resume ||
+    actions.delete;
   const showStatusGroup = actions.pause || actions.resume;
   const showSeparator = showStatusGroup && (actions.edit || actions.copyLink);
 
@@ -128,7 +152,29 @@ export function FundraiserActionMenu({
     }
   };
 
+  const handleDelete = async () => {
+    if (pending || !accessToken) return;
+
+    setPending('delete');
+    try {
+      // Both 204 and 200 (`status: 'archived'`) indicate a successful delete.
+      await deleteFundraiser(fundraiser.id, accessToken);
+      toast.success(t('deleteSuccess'));
+      // Close first in case the row remains mounted in the future.
+      setDeleteDialogOpen(false);
+      // Removed from the list because archived fundraisers are never returned.
+      onFundraiserRemoved(fundraiser.id);
+    } catch (error) {
+      // Keep the dialog open so the user can retry.
+      console.error('[FundraiserActionMenu] delete failed:', error);
+      toast.error(t('mutationError'));
+    } finally {
+      setPending(null);
+    }
+  };
+
   const isMutating = pending !== null;
+  const isDeleting = pending === 'delete';
 
   return (
     <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
@@ -149,7 +195,7 @@ export function FundraiserActionMenu({
         className='w-52 rounded-xl border-border/60 shadow-lg'
       >
         {actions.edit && (
-          <DropdownMenuItem asChild className='cursor-pointer py-2'>
+          <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
             <Link href={editHref}>
               <Pencil aria-hidden='true' />
               {t('edit')}
@@ -159,7 +205,7 @@ export function FundraiserActionMenu({
 
         {actions.copyLink && (
           <DropdownMenuItem
-            className='cursor-pointer py-2'
+            className='cursor-pointer rounded-lg py-2'
             onSelect={handleCopyLink}
           >
             <LinkIcon aria-hidden='true' />
@@ -172,7 +218,7 @@ export function FundraiserActionMenu({
         {actions.pause && (
           <DropdownMenuItem
             variant='destructive'
-            className='cursor-pointer py-2'
+            className='cursor-pointer rounded-lg py-2'
             disabled={isMutating}
             onSelect={event => {
               event.preventDefault();
@@ -190,7 +236,7 @@ export function FundraiserActionMenu({
 
         {actions.resume && (
           <DropdownMenuItem
-            className='cursor-pointer py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
+            className='cursor-pointer rounded-lg py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
             disabled={isMutating}
             onSelect={event => {
               event.preventDefault();
@@ -211,7 +257,60 @@ export function FundraiserActionMenu({
             {fundraiser.status === 'draft' ? t('activate') : t('resume')}
           </DropdownMenuItem>
         )}
+
+        {actions.delete && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant='destructive'
+              className='cursor-pointer rounded-lg py-2'
+              disabled={isMutating}
+              onSelect={event => {
+                event.preventDefault();
+                setOpen(false);
+                setDeleteDialogOpen(true);
+              }}
+            >
+              <Trash2 aria-hidden='true' />
+              {t('delete')}
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onOpenChange={next => {
+          // Don't allow closing mid-request; the button shows a spinner.
+          if (isDeleting) return;
+          setDeleteDialogOpen(next);
+        }}
+      >
+        <DialogContent className='sm:max-w-md' showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>{tDialog('title')}</DialogTitle>
+            <DialogDescription>{tDialog('description')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type='button' variant='outline' disabled={isDeleting}>
+                {tDialog('cancel')}
+              </Button>
+            </DialogClose>
+            <Button
+              type='button'
+              variant='destructive'
+              disabled={isDeleting}
+              onClick={() => void handleDelete()}
+            >
+              {isDeleting && (
+                <Loader2 className='animate-spin' aria-hidden='true' />
+              )}
+              {tDialog('confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DropdownMenu>
   );
 }

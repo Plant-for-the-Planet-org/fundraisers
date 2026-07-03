@@ -50,6 +50,9 @@ export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   switch (fundraiser.status) {
     case 'completed':
     case 'cancelled':
+    // Archived fundraisers are not shown in the list, but map them to `ended`
+    // to avoid falling back to `active`.
+    case 'archived':
       return 'ended';
     case 'paused':
       return 'paused';

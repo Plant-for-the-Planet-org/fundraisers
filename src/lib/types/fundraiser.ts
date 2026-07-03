@@ -159,7 +159,10 @@ export type FundraiserStatus =
   | 'active'
   | 'cancelled'
   | 'completed'
-  | 'paused';
+  | 'paused'
+  // Terminal state returned by DELETE /fundraisers/{id} when the fundraiser
+  // has donations and cannot be hard-deleted. Read-only from the client.
+  | 'archived';
 export type FundraiserVisibility = 'public' | 'unlisted';
 
 // From API response - response structure for a single fundraiser in the list response (GET /fundraisers) and the details response (GET /fundraisers/{id}) is the same

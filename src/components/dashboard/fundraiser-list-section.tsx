@@ -18,12 +18,14 @@ interface FundraiserListSectionProps {
   fundraisers: Fundraiser[];
   isLoading: boolean;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
+  onFundraiserRemoved: (id: string) => void;
 }
 
 export function FundraiserListSection({
   fundraisers,
   isLoading,
   onFundraiserUpdated,
+  onFundraiserRemoved,
 }: FundraiserListSectionProps) {
   const t = useTranslations('Dashboard.toolbar');
   const locale = useLocale();
@@ -94,6 +96,7 @@ export function FundraiserListSection({
         isFiltered={isFiltered}
         onClearFilters={resetFilters}
         onFundraiserUpdated={onFundraiserUpdated}
+        onFundraiserRemoved={onFundraiserRemoved}
       />
     </div>
   );

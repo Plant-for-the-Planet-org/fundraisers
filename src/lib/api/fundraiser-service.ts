@@ -62,3 +62,26 @@ export function resumeFundraiser(
 ): Promise<Fundraiser> {
   return updateFundraiser(id, { status: 'active' }, token);
 }
+
+/**
+ * Deletes a fundraiser.
+ *
+ * Success can return either:
+ * - 204 No Content (hard-deleted)
+ * - 200 OK with `{ status: 'archived' }` (soft-deleted)
+ *
+ * Both are treated as successful deletes. The fundraiser is removed from the
+ * UI list, and archived fundraisers are never returned by the list API.
+ *
+ * `platformFetch` throws on non-2xx responses, so reaching the end of this
+ * function means the delete succeeded.
+ */
+export async function deleteFundraiser(
+  id: string,
+  token: string
+): Promise<void> {
+  await platformFetch(`/fundraisers/${id}`, {
+    method: 'DELETE',
+    token,
+  });
+}

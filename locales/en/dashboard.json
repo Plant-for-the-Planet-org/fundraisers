@@ -72,12 +72,20 @@
       "pause": "Pause",
       "resume": "Resume",
       "activate": "Activate",
+      "delete": "Delete",
       "copyLinkSuccess": "Link copied",
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
       "activateSuccess": "Fundraiser activated",
+      "deleteSuccess": "Fundraiser deleted",
       "mutationError": "Something went wrong. Try again."
+    },
+    "deleteDialog": {
+      "title": "Delete fundraiser?",
+      "description": "Are you sure you want to delete this fundraiser? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
     },
     "list": {
       "loading": "Loading fundraiser item...",

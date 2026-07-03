@@ -21,11 +21,13 @@ import { FundraiserStatusBadge } from './fundraiser-status-badge';
 interface FundraiserListItemProps {
   fundraiser: Fundraiser;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
+  onFundraiserRemoved: (id: string) => void;
 }
 
 export function FundraiserListItem({
   fundraiser,
   onFundraiserUpdated,
+  onFundraiserRemoved,
 }: FundraiserListItemProps) {
   const t = useTranslations('Dashboard.list.item');
   const tFundraisers = useTranslations('Fundraisers');
@@ -88,6 +90,7 @@ export function FundraiserListItem({
           <FundraiserActionMenu
             fundraiser={fundraiser}
             onFundraiserUpdated={onFundraiserUpdated}
+            onFundraiserRemoved={onFundraiserRemoved}
           />
         </div>
 
