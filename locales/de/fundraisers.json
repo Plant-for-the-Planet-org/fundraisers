@@ -197,7 +197,7 @@
         }
       },
       "slug": {
-        "label": "Link des Spendenaufrufs",
+        "label": "Link zum Spendenaufruf",
         "edit": "Link bearbeiten",
         "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
         "errors": {
@@ -454,7 +454,7 @@
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
     },
     "hostControls": {
-      "hostLabel": "Du bist Gastgeber",
+      "hostLabel": "Du bist Organisator*in",
       "editButton": "Spendenaufruf bearbeiten"
     }
   }
