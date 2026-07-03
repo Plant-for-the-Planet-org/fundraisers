@@ -140,7 +140,7 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
   - `modal={false}` on the `DropdownMenu` to disable Radix's scroll‑lock side effects (prevents horizontal layout shift on open/close), matching `FundraiserSortMenu`.
 - API layer:
   - Reuse the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts) (which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`). Pause = `updateFundraiser(id, { status: 'paused' }, token)`; Resume = `updateFundraiser(id, { status: 'active' }, token)`. `UpdateFundraiserRequest` already accepts `status?: FundraiserStatus` — no type, client, or service changes required.
-- Page composition: thread `onFundraiserUpdated` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume, the menu calls `onFundraiserUpdated(updatedFundraiser)` with the API response and the page applies it to local state via `setFundraisers(prev => prev.map(...))` — no refetch, no `isLoading` toggle, no skeleton flash on unrelated rows. The summary tiles are intentionally **not** recomputed from the patched list; they remain a snapshot from the last full load. The page also exposes `retryAfterError` (loud — toggles `isLoading`) wired to `DashboardSummary onRetry`.
+- Page composition: thread `onFundraiserUpdated` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume, the menu calls `onFundraiserUpdated(updatedFundraiser)` with the API response and the page applies it to local state via `setFundraisers(prev => prev.map(...))` — no refetch, no `isLoading` toggle, no skeleton flash on unrelated rows. The summary tiles are derived from the patched list (`useMemo`), so they update alongside the affected row. The page also exposes `retryAfterError` (loud — toggles `isLoading`) wired to `DashboardSummary onRetry`.
 - Locale keys added: `actions.*`.
 - **Split Draft out of Paused** (carry‑over from PR 3, where drafts collapsed into Paused):
   - Extend `DisplayStatus`, `FundraiserListStatusFilter`, and `FundraiserStatusCounts` with a `'draft'` member.
@@ -160,9 +160,9 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 **Acceptance**
 
-- Pause on an Active row → row badge flips to Paused, status‑filter pill counts update (Active −1, Paused +1). Summary tiles do **not** re‑render — they reflect the snapshot from the last full load.
+- Pause on an Active row → row badge flips to Paused, status‑filter pill counts update (Active −1, Paused +1). The Fundraisers tile's active count also drops by one (summary is derived from the list).
 - Resume on a Paused row → reverse.
-- Activate on a Draft row → row transitions to Active (badge flips, Draft pill −1, Active pill +1). Summary tiles unchanged.
+- Activate on a Draft row → row transitions to Active (badge flips, Draft pill −1, Active pill +1). The Fundraisers tile's active count increases by one.
 - Admin co‑host viewing a fundraiser they do not own → menu shows **Copy link only** for any status.
 - Copy link → clipboard contains `${origin}${getFundraiserUrl(fundraiser)}` (i.e. `${origin}/fundraisers/{slug-or-id}`); toast shows.
 - Network failure on Pause → row stays Active, error toast shows, no local state corruption.
@@ -181,7 +181,7 @@ The kebab menu's **Delete** action removes a fundraiser. The user always sees a 
 | `204 No Content`                        | No donations → hard-deleted                    | Row removed from list    |
 | `200 OK` with `{ "status": "archived" }`| Had donations → soft-deleted (archived)        | Row removed from list    |
 
-Both mean "the delete succeeded," so `deleteFundraiser` ([src/lib/api/fundraiser-service.ts](../src/lib/api/fundraiser-service.ts)) resolves without inspecting the body, and `FundraiserActionMenu.handleDelete` calls `onFundraiserRemoved(id)` in either case. The page drops the row via `handleFundraiserRemoved`; the summary tiles stay frozen at their last full-load snapshot (same as pause/resume).
+Both mean "the delete succeeded," so `deleteFundraiser` ([src/lib/api/fundraiser-service.ts](../src/lib/api/fundraiser-service.ts)) resolves without inspecting the body, and `FundraiserActionMenu.handleDelete` calls `onFundraiserRemoved(id)` in either case. The page drops the row via `handleFundraiserRemoved`; the summary tiles, derived from the list, update to reflect the removed fundraiser (total, donations, and total-raised all drop).
 
 **Archived fundraisers are never shown.** The list API (`GET /fundraisers`) does not return archived fundraisers, and a delete removes the row from local state by id (see `handleFundraiserRemoved`), so an archived fundraiser never enters the list in the first place. There is deliberately no extra client-side filter for `status: 'archived'` — the API contract owns this exclusion. This is expected behavior, **not a bug**.
 
@@ -533,7 +533,7 @@ export function useFundraiserListFilters(): {
 
 The page stays thin: `AuthGuard` → single `getFundraisers(accessToken)` fetch → memoized `getDashboardSummary` → composes feature components. Per‑PR composition (what's wired up at each step) lives in the **Delivery Plan** section above.
 
-After PR 4, mutation refresh strategy: a successful Pause/Resume calls `onFundraiserUpdated(updatedFundraiser)` with the API response. The page merges that single fundraiser into local state (`setFundraisers(prev => prev.map(fundraiser => fundraiser.id === updatedFundraiser.id ? { ...fundraiser, ...updatedFundraiser } : fundraiser))`) — no refetch, no `isLoading` toggle, only the affected row re‑renders. The summary stat tiles are stored in their own `useState` and only refresh on full loads (initial mount, retry-after-error), so pause/resume does not re‑render them. The error retry path on `DashboardSummary` uses a separate `retryAfterError` callback that does toggle `isLoading=true`.
+Mutation refresh strategy: a successful Pause/Resume calls `onFundraiserUpdated(updatedFundraiser)` with the API response, and a successful Delete calls `onFundraiserRemoved(id)`. The page applies these to local state (`setFundraisers(prev => prev.map(...))` or `.filter(...)`) — no refetch, no `isLoading` toggle. The summary stat tiles are **derived from the `fundraisers` list via `useMemo(getDashboardSummary, [fundraisers])`**, so they stay in sync with every mutation: activating a draft bumps the active count, deleting a fundraiser drops it from the total / donations / total-raised, and so on. The list is the single source of truth for both the rows and the tiles. The error retry path on `DashboardSummary` uses a separate `retryAfterError` callback that does toggle `isLoading=true`.
 
 ---
 
@@ -655,7 +655,7 @@ Proposed key shape (English; German mirrors structure):
 | `navigator.clipboard` unavailable (HTTP, old browser)          | Show error toast. No `execCommand` fallback for v1 — the app is HTTPS‑only in supported browsers.                                                                                                                                                                |
 | Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
 | Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
-| Pause/Resume API succeeds                                      | The API response is merged into local state for that one fundraiser — no refetch, no `isLoading` toggle, only the affected row re‑renders. Status‑filter pill counts update; summary stat tiles stay frozen at the last full‑load snapshot. The toast confirms success. |
+| Pause/Resume API succeeds                                      | The API response is merged into local state for that one fundraiser — no refetch, no `isLoading` toggle. Status‑filter pill counts update, and the summary stat tiles (derived from the list) update too. The toast confirms success. |
 | Search typed quickly                                           | Debounce 250 ms before filtering; filtering itself is sync and cheap.                                                                                                                                                                                            |
 | List > ~50 items                                               | Acceptable for v1 (no virtualization). Flag as a future concern if perf testing shows scroll stutter.                                                                                                                                                            |
 | User on small screen                                           | Toolbar stacks; status filter scrolls horizontally; action menu remains a `Dropdown` (not a sheet) for v1.                                                                                                                                                       |
