@@ -190,7 +190,6 @@
       },
       "slug": {
         "label": "Link des Spendenaufrufs",
-        "viewPage": "Vorschau",
         "edit": "Link bearbeiten",
         "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
         "errors": {

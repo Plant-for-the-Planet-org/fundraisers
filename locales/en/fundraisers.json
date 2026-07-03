@@ -190,7 +190,6 @@
       },
       "slug": {
         "label": "Fundraiser link",
-        "viewPage": "Preview",
         "edit": "Edit link",
         "warning": "Changing the link breaks any link already shared. Old links will stop working.",
         "errors": {

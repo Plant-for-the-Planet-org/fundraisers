@@ -4,9 +4,8 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 
 import { useState, useSyncExternalStore } from 'react';
 import { useFormContext } from 'react-hook-form';
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { Eye, Globe, Pencil } from 'lucide-react';
+import { Globe, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SLUG_MAX_LENGTH } from '@/components/fundraisers/fundraiser-form-schema';
 import { Button } from '@/components/ui/button';
@@ -24,9 +23,9 @@ const getHostServerSnapshot = () => '';
  *
  * The slug is locked by default so it cannot be changed by accident, since
  * changing it breaks any link already shared. Unlocking reveals a warning and
- * enables editing. "Preview" always points at the currently saved slug.
+ * enables editing.
  */
-export function SlugField({ savedSlug }: { savedSlug: string }) {
+export function SlugField() {
   const t = useTranslations('Fundraisers.form.slug');
   const [unlocked, setUnlocked] = useState(false);
 
@@ -52,9 +51,6 @@ export function SlugField({ savedSlug }: { savedSlug: string }) {
       : errors.slug?.type === 'invalid_format'
         ? t('errors.invalid')
         : t('errors.required');
-
-  // Preview the live page for whatever is saved, not the in-progress edit.
-  const livePath = `/raise/${savedSlug}`;
 
   return (
     <div className='-mt-4 flex flex-col gap-1.5'>
@@ -83,32 +79,19 @@ export function SlugField({ savedSlug }: { savedSlug: string }) {
           )}
           {...register('slug')}
         />
-        <div className='flex shrink-0 items-center'>
-          {!unlocked && (
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon-sm'
-              aria-label={t('edit')}
-              title={t('edit')}
-              className='text-muted-foreground/60 hover:text-foreground'
-              onClick={() => setUnlocked(true)}
-            >
-              <Pencil aria-hidden='true' />
-            </Button>
-          )}
+        {!unlocked && (
           <Button
-            asChild
+            type='button'
             variant='ghost'
-            size='sm'
-            className='text-muted-foreground/60 hover:text-foreground'
+            size='icon-sm'
+            aria-label={t('edit')}
+            title={t('edit')}
+            className='shrink-0 text-muted-foreground/60 hover:text-foreground'
+            onClick={() => setUnlocked(true)}
           >
-            <Link href={livePath} target='_blank' rel='noopener noreferrer'>
-              <Eye aria-hidden='true' />
-              {t('viewPage')}
-            </Link>
+            <Pencil aria-hidden='true' />
           </Button>
-        </div>
+        )}
       </div>
 
       {hasError ? (

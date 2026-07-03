@@ -30,8 +30,6 @@ interface FundraiserFormBodyProps {
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
   endDate?: string;
-  /** Currently saved slug. Drives the inline link editor in edit mode. */
-  savedSlug?: string;
   /** Fundraiser id. Required in edit mode to manage hosts. */
   fundraiserId?: string;
   /** Existing hosts. Only meaningful in edit mode. */
@@ -43,7 +41,6 @@ export function FundraiserFormBody({
   submitButton,
   totalRaised,
   endDate,
-  savedSlug,
   fundraiserId,
   hosts,
 }: FundraiserFormBodyProps) {
@@ -71,7 +68,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
-        {isEditMode && savedSlug && <SlugField savedSlug={savedSlug} />}
+        {isEditMode && <SlugField />}
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
