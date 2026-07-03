@@ -122,7 +122,10 @@ export function BackgroundBaseSelector({
               aria-label={g.label}
               aria-pressed={active}
               className={cn(circleBase, g.value, !active && inactiveBorder)}
-              style={active ? selectedStyle : undefined}
+              style={{
+                backgroundColor: '#fff',
+                ...(active ? selectedStyle : {}),
+              }}
             />
           );
         })}
