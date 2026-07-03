@@ -4,7 +4,7 @@ import type { SelectedImage } from '@/lib/types/image-selection';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useFormState } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
@@ -18,7 +18,8 @@ import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {
   const t = useTranslations('Fundraisers.create.formSubmission');
-  const { handleSubmit } = useFormContext<FundraiserFormValues>();
+  const { handleSubmit, control } = useFormContext<FundraiserFormValues>();
+  const { isValid } = useFormState({ control });
   const accessToken = useAuthStore(state => state.accessToken);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +62,7 @@ export function CreateFundraiserButton() {
   return (
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
-      disabled={isSubmitting}
+      disabled={isSubmitting || !isValid}
       onClick={handleSubmit(onSubmit)}
       type='button'
     >

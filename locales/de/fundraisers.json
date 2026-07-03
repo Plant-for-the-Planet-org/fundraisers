@@ -107,6 +107,7 @@
       "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
     },
     "form": {
+      "viewButton": "Ansehen",
       "hosts": {
         "title": "Organisator*innen",
         "manage": "Verwalten",
@@ -439,7 +440,7 @@
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
-        "buttonSubmit": "Spendenaufruf aktualisieren",
+        "buttonSubmit": "Änderungen speichern",
         "successMessage": "Spendenaufruf aktualisiert!",
         "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
