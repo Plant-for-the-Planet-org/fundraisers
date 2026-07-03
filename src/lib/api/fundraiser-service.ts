@@ -80,7 +80,7 @@ export async function deleteFundraiser(
   id: string,
   token: string
 ): Promise<void> {
-  await platformFetch<Fundraiser>(`/fundraisers/${id}`, {
+  await platformFetch(`/fundraisers/${id}`, {
     method: 'DELETE',
     token,
   });
