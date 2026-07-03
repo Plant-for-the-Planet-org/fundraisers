@@ -188,6 +188,8 @@ export interface Fundraiser {
 }
 
 export interface UpdateFundraiserRequest {
+  /** Needs to be unique. Changing it breaks any already-shared links. */
+  slug?: string;
   title?: string;
   description?: string;
   goalAmount?: number;

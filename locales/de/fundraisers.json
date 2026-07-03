@@ -195,6 +195,16 @@
           "maxLength": "Der Name des Aufrufs darf nicht länger als {max, number} Zeichen lang sein."
         }
       },
+      "slug": {
+        "label": "Link des Spendenaufrufs",
+        "edit": "Link bearbeiten",
+        "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
+        "errors": {
+          "required": "Bitte gib einen Link ein.",
+          "maxLength": "Der Link darf nicht länger als {max, number} Zeichen sein.",
+          "invalid": "Verwende nur Kleinbuchstaben, Zahlen und Bindestriche."
+        }
+      },
       "description": {
         "label": "Beschreibung",
         "placeholder": "Erzähle anderen von deinem Spendenaufruf...",
@@ -431,6 +441,7 @@
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
         "buttonSubmit": "Spendenaufruf aktualisieren",
         "successMessage": "Spendenaufruf aktualisiert!",
+        "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
@@ -440,6 +451,10 @@
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+    },
+    "hostControls": {
+      "hostLabel": "Du bist Gastgeber",
+      "editButton": "Spendenaufruf bearbeiten"
     }
   }
 }

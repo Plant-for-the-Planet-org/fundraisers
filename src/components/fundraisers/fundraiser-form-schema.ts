@@ -84,8 +84,21 @@ export const thankYouNoteSchema = z.object({
     ),
 });
 
+export const SLUG_MAX_LENGTH = 32;
+// Lowercase letters, numbers and hyphens.
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
+
 export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
+  // Edit-only. The create flow never renders a slug field, so this stays
+  // optional and is validated only when present.
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'required')
+    .max(SLUG_MAX_LENGTH, 'maxLength')
+    .regex(SLUG_PATTERN, 'invalid')
+    .optional(),
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0)
@@ -288,6 +301,7 @@ export function fundraiserToFormValues(
 
   return {
     title: fundraiser.title,
+    slug: fundraiser.slug,
     description: fundraiser.description ?? '',
     image: buildExistingSelectedImage(fundraiser.image),
     country,

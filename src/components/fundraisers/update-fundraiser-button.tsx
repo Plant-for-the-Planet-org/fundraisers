@@ -7,6 +7,7 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 
 import { useState } from 'react';
 import { useFormContext, useFormState } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -31,6 +32,7 @@ export function UpdateFundraiserButton({
     useFormContext<FundraiserFormValues>();
   const { isDirty, dirtyFields, defaultValues } = useFormState({ control });
   const accessToken = useAuthStore(state => state.accessToken);
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (values: FundraiserFormValues) => {
@@ -77,7 +79,22 @@ export function UpdateFundraiserButton({
       );
 
       reset(values);
-      toast.success(t('successMessage'));
+
+      // The backend appends a suffix when the chosen link collides with an existing one, so the saved slug can differ from what was submitted.
+      const slugWasAdjusted =
+        Boolean(dirtyFields.slug) && updated.slug !== values.slug;
+      toast.success(t('successMessage'), {
+        description: slugWasAdjusted
+          ? t('slugAdjusted', { slug: updated.slug })
+          : undefined,
+      });
+
+      // The edit route is keyed by slug. If the slug changed, move to the new
+      // URL so a refresh or back-navigation still resolves.
+      if (updated.slug && updated.slug !== defaultValues?.slug) {
+        router.replace(`/dashboard/fundraisers/edit/${updated.slug}`);
+      }
+
       return updated;
     } catch (err) {
       console.error('Failed to update fundraiser:', err);
