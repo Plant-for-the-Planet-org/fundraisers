@@ -4,7 +4,7 @@ import type { Fundraiser, FundraiserStatus } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import {
   Link as LinkIcon,
   Loader2,
@@ -20,8 +20,10 @@ import {
 } from '@/lib/api/fundraiser-service';
 import {
   getFundraiserUrl,
+  getReactivationEndDate,
   hasFundraiserEnded,
   isFundraiserOwnerOrAdmin,
+  REACTIVATION_EXTENSION_DAYS,
 } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import {
@@ -92,7 +94,6 @@ export function FundraiserActionMenu({
   onFundraiserUpdated,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
-  const format = useFormatter();
   const accessToken = useAuthStore(state => state.accessToken);
   const currentUserId = useAuthStore(state => state.user?.sub ?? null);
 
@@ -110,8 +111,6 @@ export function FundraiserActionMenu({
 
   const editHref = `/dashboard/fundraisers/edit/${fundraiser.slug}`;
 
-  const endDate = new Date(fundraiser.endDate);
-
   const handleCopyLink = async () => {
     const path = getFundraiserUrl(fundraiser);
     const url = `${window.location.origin}${path}`;
@@ -123,7 +122,10 @@ export function FundraiserActionMenu({
     }
   };
 
-  const handleStatusChange = async (action: StatusActionKind) => {
+  const handleStatusChange = async (
+    action: StatusActionKind,
+    tillDate?: string
+  ) => {
     if (pending || !accessToken) return;
 
     setPending(action);
@@ -134,7 +136,11 @@ export function FundraiserActionMenu({
         toast.success(t('pauseSuccess'));
       } else {
         const isDraft = fundraiser.status === 'draft';
-        updatedFundraiser = await resumeFundraiser(fundraiser.id, accessToken);
+        updatedFundraiser = await resumeFundraiser(
+          fundraiser.id,
+          accessToken,
+          tillDate
+        );
         toast.success(t(isDraft ? 'activateSuccess' : 'resumeSuccess'));
       }
       onFundraiserUpdated(updatedFundraiser);
@@ -248,7 +254,7 @@ export function FundraiserActionMenu({
             <AlertDialogTitle>{t('reactivateEndedTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('reactivateEndedDescription', {
-                date: format.dateTime(endDate, { dateStyle: 'long' }),
+                days: REACTIVATION_EXTENSION_DAYS,
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -258,7 +264,9 @@ export function FundraiserActionMenu({
             </AlertDialogCancel>
             <AlertDialogAction
               variant='outline'
-              onClick={() => void handleStatusChange('resume')}
+              onClick={() =>
+                void handleStatusChange('resume', getReactivationEndDate())
+              }
             >
               {t('reactivateEndedConfirm')}
             </AlertDialogAction>

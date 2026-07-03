@@ -79,7 +79,7 @@
       "activateSuccess": "Spendenaufruf aktiviert",
       "mutationError": "Etwas ist schief gelaufen. Versuche es erneut.",
       "reactivateEndedTitle": "Spenden aktivieren?",
-      "reactivateEndedDescription": "Dieser Spendenaufruf endete am {date}. Möchtest du Spenden wirklich aktivieren?",
+      "reactivateEndedDescription": "Möchtest du diesen Spendenaufruf wirklich für {days, plural, one {den nächsten Tag} other {die nächsten # Tage}} reaktivieren?",
       "reactivateEndedConfirm": "Ja, Spenden aktivieren",
       "reactivateEndedCancel": "Schließen"
     },

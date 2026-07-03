@@ -5,6 +5,8 @@
 import type { Fundraiser } from '../types/fundraiser';
 import type { Nullable } from '../types/utility';
 
+import { getDateOffsetString } from './fundraiser-data-builder';
+
 export interface FundraiserUrlData {
   id: string;
   slug?: Nullable<string>;
@@ -34,6 +36,17 @@ export function hasFundraiserEnded(fundraiser: Fundraiser): boolean {
   const end = new Date(fundraiser.endDate);
   if (isNaN(end.getTime())) return false;
   return end.getTime() < Date.now();
+}
+
+// ponytail: hardcoded until the reactivation flow lets the host pick a date.
+export const REACTIVATION_EXTENSION_DAYS = 30;
+
+/**
+ * New end date when reactivating an ended fundraiser: today +
+ * REACTIVATION_EXTENSION_DAYS.
+ */
+export function getReactivationEndDate(): string {
+  return getDateOffsetString(REACTIVATION_EXTENSION_DAYS);
 }
 
 /**

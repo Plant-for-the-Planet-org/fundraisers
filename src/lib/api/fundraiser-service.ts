@@ -58,7 +58,12 @@ export function pauseFundraiser(
 
 export function resumeFundraiser(
   id: string,
-  token: string
+  token: string,
+  tillDate?: string
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { status: 'active' }, token);
+  return updateFundraiser(
+    id,
+    { status: 'active', ...(tillDate ? { endDate: tillDate } : {}) },
+    token
+  );
 }

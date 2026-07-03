@@ -79,7 +79,7 @@
       "activateSuccess": "Fundraiser activated",
       "mutationError": "Something went wrong. Try again.",
       "reactivateEndedTitle": "Enable donations?",
-      "reactivateEndedDescription": "This fundraiser ended on {date}. Are you sure you want to enable donations?",
+      "reactivateEndedDescription": "Are you sure you want to reactivate this fundraiser for the next {days, plural, one {# day} other {# days}}?",
       "reactivateEndedConfirm": "Yes, enable donations",
       "reactivateEndedCancel": "Close"
     },
