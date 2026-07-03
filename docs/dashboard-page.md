@@ -185,7 +185,7 @@ Both mean "the delete succeeded," so `deleteFundraiser` ([src/lib/api/fundraiser
 
 **Archived fundraisers are never shown.** The list API (`GET /fundraisers`) does not return archived fundraisers, and a delete removes the row from local state by id (see `handleFundraiserRemoved`), so an archived fundraiser never enters the list in the first place. There is deliberately no extra client-side filter for `status: 'archived'` — the API contract owns this exclusion. This is expected behavior, **not a bug**.
 
-**States.** The confirm button shows a spinner and disables the dialog while the request is in flight; on error the dialog stays open with an error toast so the user can retry; on success the dialog closes and a "Fundraiser deleted" toast confirms.
+**States.** The confirm button shows a spinner and disables the dialog while the request is in flight; on error the dialog stays open with an error toast so the user can retry; on success the row is removed from the list, which unmounts the dialog along with it (so it disappears with the row rather than playing a close animation), and a "Fundraiser deleted" toast confirms.
 
 ---
 

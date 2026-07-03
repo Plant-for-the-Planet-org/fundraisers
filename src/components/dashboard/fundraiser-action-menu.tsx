@@ -158,11 +158,12 @@ export function FundraiserActionMenu({
     setPending('delete');
     try {
       // Both 204 and 200 (`status: 'archived'`) indicate a successful delete.
-      // Remove the fundraiser from the list, as archived fundraisers are never returned.
       await deleteFundraiser(fundraiser.id, accessToken);
-      onFundraiserRemoved(fundraiser.id);
       toast.success(t('deleteSuccess'));
+      // Close first in case the row remains mounted in the future.
       setDeleteDialogOpen(false);
+      // Removed from the list because archived fundraisers are never returned.
+      onFundraiserRemoved(fundraiser.id);
     } catch (error) {
       // Keep the dialog open so the user can retry.
       console.error('[FundraiserActionMenu] delete failed:', error);
