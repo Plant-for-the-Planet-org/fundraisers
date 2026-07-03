@@ -107,7 +107,7 @@
       "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
     },
     "form": {
-      "viewButton": "Anzeigen",
+      "viewButton": "Ansehen",
       "hosts": {
         "title": "Organisator*innen",
         "manage": "Verwalten",
@@ -159,9 +159,9 @@
         "switchToLight": "In hellen Modus wechseln",
         "labelBackgroundColor": "Hintergrundfarbe",
         "baseNone": "Keine",
-        "baseSolid": "Uni",
+        "baseSolid": "Einfarbig",
         "baseGradient": "Verlauf",
-        "baseCustom": "Wähle eine benutzerdefinierte Farbe",
+        "baseCustom": "Eigene Farbe wählen",
         "gradientStart": "Start",
         "gradientEnd": "Ende",
         "quickPicks": "Schnellauswahl",
@@ -199,11 +199,11 @@
       "slug": {
         "label": "Link zum Spendenaufruf",
         "edit": "Link bearbeiten",
-        "warning": "Durch Änderungen am Link werden alle zuvor geteilten Links ungültig. Alte Links werden nicht mehr funktionieren.",
+        "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
         "errors": {
           "required": "Bitte gib einen Link ein.",
-          "maxLength": "Bitte beschränke die Länge des Links auf {max, number} Zeichen.",
-          "invalid": "Bitte nutze nur Kleinbuchstaben, Zahlen und Bindestriche."
+          "maxLength": "Der Link darf nicht länger als {max, number} Zeichen sein.",
+          "invalid": "Verwende nur Kleinbuchstaben, Zahlen und Bindestriche."
         }
       },
       "description": {
@@ -440,9 +440,9 @@
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
-        "buttonSubmit": "Änderungen speichern.",
+        "buttonSubmit": "Änderungen speichern",
         "successMessage": "Spendenaufruf aktualisiert!",
-        "slugAdjusted": "Der Link den du gewählt hast war schon vergeben, daher lautet er jetzt /raise/{slug}.",
+        "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
