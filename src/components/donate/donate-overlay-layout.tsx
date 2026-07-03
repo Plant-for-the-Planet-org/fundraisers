@@ -14,13 +14,7 @@ export function DonateOverlayLayout({
 }: DonateOverlayLayoutProps) {
   const tDonate = useTranslations('Donate');
   return (
-    <div
-      className='light fixed inset-0 z-50 bg-gray-50 text-foreground overflow-auto'
-      data-scroll-container
-      role='dialog'
-      aria-modal='true'
-      aria-label={tDonate('overlay.aria.label')}
-    >
+    <div className='h-full w-full overflow-auto' data-scroll-container>
       <button
         type='button'
         onClick={onClose}

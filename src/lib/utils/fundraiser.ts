@@ -11,7 +11,7 @@ export interface FundraiserUrlData {
 }
 
 /**
- * True when `userId` matches an `admin` host on `fundraiser`.
+ * True when `userId` matches an `admin` host on `fundraiser`. 'owner' is also treated as an admin for backward compatibility, and can be removed once the API no longer returns it.
  * Returns false when `userId` is missing.
  */
 export function isFundraiserOwnerOrAdmin(
@@ -20,7 +20,9 @@ export function isFundraiserOwnerOrAdmin(
 ): boolean {
   if (!userId) return false;
   return fundraiser.hosts.some(
-    host => host.user?.id === userId && host.role === 'admin'
+    host =>
+      host.user?.id === userId &&
+      (host.role === 'owner' || host.role === 'admin')
   );
 }
 

@@ -3,7 +3,7 @@
 import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   getDashboardSummary,
@@ -30,9 +30,17 @@ export default function DashboardPage() {
   const accessToken = useAuthStore(state => state.accessToken);
 
   const [fundraisers, setFundraisers] = useState<Fundraiser[]>([]);
-  const [summary, setSummary] = useState<DashboardSummaryStats>(EMPTY_SUMMARY);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+
+  // Derived from the list so the stat tiles stay in sync with every mutation
+  // (delete, activate, pause, resume) without a refetch. The list is the single
+  // source of truth for both the rows and the summary.
+  const summary = useMemo<DashboardSummaryStats>(
+    () =>
+      fundraisers.length > 0 ? getDashboardSummary(fundraisers) : EMPTY_SUMMARY,
+    [fundraisers]
+  );
 
   const fetchFundraisers = useCallback(
     async (signal?: { aborted: boolean }) => {
@@ -49,7 +57,6 @@ export default function DashboardPage() {
 
         if (signal?.aborted) return;
         setFundraisers(data);
-        setSummary(data.length > 0 ? getDashboardSummary(data) : EMPTY_SUMMARY);
       } catch (error) {
         if (!signal?.aborted) {
           console.error('[Dashboard] Failed to fetch fundraisers:', error);
@@ -78,8 +85,8 @@ export default function DashboardPage() {
     void fetchFundraisers();
   }, [fetchFundraisers]);
 
-  // Merge locally so only the affected row re-renders; summary stays at its
-  // last full-load snapshot (deliberately not derived from this list).
+  // Merge the updated fundraiser into local state. The affected row and the
+  // summary tiles (derived from this list) both reflect the change; no refetch.
   const handleFundraiserUpdated = useCallback(
     (updatedFundraiser: Fundraiser) => {
       setFundraisers(prev =>
@@ -92,6 +99,12 @@ export default function DashboardPage() {
     },
     []
   );
+
+  // Delete: remove the fundraiser from the list. Both 204 (deleted) and
+  // 200 (`status: 'archived'`) are treated as a successful delete.
+  const handleFundraiserRemoved = useCallback((id: string) => {
+    setFundraisers(prev => prev.filter(fundraiser => fundraiser.id !== id));
+  }, []);
 
   return (
     <AuthGuard>
@@ -117,6 +130,7 @@ export default function DashboardPage() {
             fundraisers={fundraisers}
             isLoading={isLoading}
             onFundraiserUpdated={handleFundraiserUpdated}
+            onFundraiserRemoved={handleFundraiserRemoved}
           />
         )}
       </section>

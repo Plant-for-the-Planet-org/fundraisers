@@ -25,6 +25,8 @@ const DESCRIPTION_ALLOWED_TAGS = [
   'em',
   'u',
   's',
+  'sub',
+  'sup',
   'blockquote',
   'hr',
   'br',
@@ -35,8 +37,23 @@ const DESCRIPTION_ALLOWED_TAGS = [
   VIDEO_EMBED_TAG,
 ];
 
+// The rich-text editor (shared by descriptions and thank-you notes) emits two
+// inline styles: `text-align` on paragraphs (TextAlign extension) and
+// `font-size` on spans (FontSize extension). Only those two properties are
+// allowed, and only with the exact values the toolbar can produce — so a stored
+// `style` attribute can never carry arbitrary CSS. Keep the `font-size` values
+// in sync with FONT_SIZE_STEPS in `rich-text-editor.tsx`.
+const RICH_TEXT_ALLOWED_STYLES: IOptions['allowedStyles'] = {
+  '*': {
+    'text-align': [/^(left|right|center)$/],
+    'font-size': [/^(12|14|16|18|20|24|30)px$/],
+  },
+};
+
 const DESCRIPTION_ALLOWED_ATTR: IOptions['allowedAttributes'] = {
   a: ['href', 'title', 'rel'],
+  p: ['style'],
+  span: ['style'],
   [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
 };
 
@@ -51,6 +68,8 @@ const THANK_YOU_ALLOWED_TAGS = [
   'em',
   'u',
   's',
+  'sub',
+  'sup',
   'ul',
   'ol',
   'li',
@@ -65,8 +84,11 @@ export function sanitizeThankYouHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: THANK_YOU_ALLOWED_TAGS,
     allowedAttributes: {
+      p: ['style'],
+      span: ['style'],
       [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
     },
+    allowedStyles: RICH_TEXT_ALLOWED_STYLES,
     allowedSchemes: [],
     allowProtocolRelative: false,
   });
@@ -77,6 +99,7 @@ export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: DESCRIPTION_ALLOWED_TAGS,
     allowedAttributes: DESCRIPTION_ALLOWED_ATTR,
+    allowedStyles: RICH_TEXT_ALLOWED_STYLES,
     allowedSchemes: ['http', 'https', 'mailto'],
     allowProtocolRelative: false,
     transformTags: {

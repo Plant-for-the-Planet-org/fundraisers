@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
+import { DialogTitle } from '@/components/ui/dialog';
 
 interface OverlayHeaderProps {
   onClose: () => void;
@@ -11,12 +12,9 @@ export function OverlayHeader({ onClose }: OverlayHeaderProps) {
   return (
     <div className='flex items-start justify-between px-4 pt-4 pb-3'>
       <div>
-        <h2
-          id='leaderboard-overlay-title'
-          className='text-xl font-semibold text-foreground'
-        >
+        <DialogTitle className='text-xl font-semibold text-foreground'>
           {t('viewAllOverlay.title')}
-        </h2>
+        </DialogTitle>
         <p className='text-sm text-muted-foreground mt-1'>
           {t('viewAllOverlay.subtitle')}
         </p>

@@ -106,6 +106,7 @@
       "subtitle": "Gib den Menschen etwas zu fühlen. Dann gib ihnen eine Möglichkeit zu geben."
     },
     "form": {
+      "viewButton": "Ansehen",
       "hosts": {
         "title": "Organisator*innen",
         "manage": "Verwalten",
@@ -120,8 +121,8 @@
         "visibilityOff": "Öffentlich verborgen",
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
-        "lastAdminHint": "Eine Spendenaktion braucht mindestens einen Admin.",
-        "lastPublicHint": "Eine Spendenaktion braucht mindestens eine*n öffentliche*n Organisator*in.",
+        "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
+        "lastPublicHint": "Ein Spendenaufruf braucht mindestens eine*n öffentliche*n Organisator*in.",
         "emailPlaceholder": "E-Mail-Adresse",
         "addButton": "Hinzufügen",
         "toastAdded": "Organisator*in hinzugefügt",
@@ -129,9 +130,9 @@
         "toastUpdated": "Organisator*in aktualisiert",
         "toastRemoved": "Organisator*in entfernt",
         "toastDuplicate": "Diese Person ist bereits Organisator*in.",
-        "toastError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "toastError": "Etwas ist schiefgelaufen, versuche es erneut.",
         "toastHostsLoadFailed": "Vollständige Organisator*innenliste konnte nicht geladen werden. Einige werden möglicherweise nicht angezeigt.",
-        "toastReorderError": "Reihenfolge teilweise gespeichert. Seite neu laden, um aktuelle Reihenfolge zu sehen."
+        "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen."
       },
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -139,8 +140,8 @@
         "daysLeft": "{days, number}T übrig"
       },
       "goalSettings": {
-        "sectionHeading": "Zieleinstellungen",
-        "openSettings": "Zieleinstellungen",
+        "sectionHeading": "Ziel-Einstellungen",
+        "openSettings": "Ziel-Einstellungen",
         "showGoal": "Ziel anzeigen",
         "showDaysLeft": "Verbleibende Tage anzeigen"
       },
@@ -155,7 +156,14 @@
         "shuffle": "Mischen",
         "switchToDark": "In dunkelen Modus wechseln",
         "switchToLight": "In hellen Modus wechseln",
-        "labelGradient": "Verlauf",
+        "labelBackgroundColor": "Hintergrundfarbe",
+        "baseNone": "Keine",
+        "baseSolid": "Einfarbig",
+        "baseGradient": "Verlauf",
+        "baseCustom": "Eigene Farbe wählen",
+        "gradientStart": "Start",
+        "gradientEnd": "Ende",
+        "quickPicks": "Schnellauswahl",
         "labelTitleFont": "Titel Schriftart",
         "labelBodyFont": "Schriftart",
         "labelAnimation": "Animation",
@@ -185,6 +193,16 @@
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Aufrufs darf nicht länger als {max, number} Zeichen lang sein."
+        }
+      },
+      "slug": {
+        "label": "Link zum Spendenaufruf",
+        "edit": "Link bearbeiten",
+        "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
+        "errors": {
+          "required": "Bitte gib einen Link ein.",
+          "maxLength": "Der Link darf nicht länger als {max, number} Zeichen sein.",
+          "invalid": "Verwende nur Kleinbuchstaben, Zahlen und Bindestriche."
         }
       },
       "description": {
@@ -407,6 +425,8 @@
       }
     },
     "edit": {
+      "title": "Spendenaufruf bearbeiten",
+      "subtitle": "Aktualisiere die Details und Einstellungen deines Spendenaufrufs.",
       "loading": "Spendenaufruf laden...",
       "notFoundTitle": "Spendenaufruf wurde nicht gefunden",
       "notFoundDescription": "Dieser Spendenaufruf konnte nicht geladen werden.",
@@ -419,8 +439,9 @@
       "backToDashboard": "Zurück zum Dashboard",
       "formSubmission": {
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
-        "buttonSubmit": "Spendenaufruf aktualisieren",
+        "buttonSubmit": "Änderungen speichern",
         "successMessage": "Spendenaufruf aktualisiert!",
+        "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
@@ -430,6 +451,10 @@
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+    },
+    "hostControls": {
+      "hostLabel": "Du bist Organisator*in",
+      "editButton": "Spendenaufruf bearbeiten"
     }
   }
 }

@@ -37,7 +37,7 @@ export function Heading1({ children, className }: BaseTypographyProps) {
   return (
     <h1
       className={cn(
-        'text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight',
+        'text-heading text-sm font-semibold leading-tight',
         className
       )}
     >
@@ -50,7 +50,7 @@ export function Heading2({ children, className }: BaseTypographyProps) {
   return (
     <h2
       className={cn(
-        'text-zinc-800 dark:text-gray-100 text-sm font-semibold leading-tight',
+        'text-heading text-sm font-semibold leading-tight',
         className
       )}
     >
@@ -72,7 +72,7 @@ export function SectionHeader({
         <Heading2 className='mb-1'>{children}</Heading2>
         {actionSlot}
       </div>
-      {showDivider && <div className='h-px bg-gray-200 dark:bg-gray-700' />}
+      {showDivider && <div className='h-px bg-section-divider' />}
     </div>
   );
 }

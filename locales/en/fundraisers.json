@@ -106,6 +106,7 @@
       "subtitle": "Give people something to feel. Then give them a way to give."
     },
     "form": {
+      "viewButton": "View",
       "hosts": {
         "title": "Hosts",
         "manage": "Manage",
@@ -155,7 +156,14 @@
         "shuffle": "Shuffle",
         "switchToDark": "Switch to dark mode",
         "switchToLight": "Switch to light mode",
-        "labelGradient": "Gradient",
+        "labelBackgroundColor": "Background color",
+        "baseNone": "None",
+        "baseSolid": "Solid",
+        "baseGradient": "Gradient",
+        "baseCustom": "Pick a custom color",
+        "gradientStart": "Start",
+        "gradientEnd": "End",
+        "quickPicks": "Quick picks",
         "labelTitleFont": "Title font",
         "labelBodyFont": "Body font",
         "labelAnimation": "Animation",
@@ -185,6 +193,16 @@
         "errors": {
           "required": "Please enter a fundraiser name.",
           "maxLength": "Please keep the fundraiser name within {max, number} characters."
+        }
+      },
+      "slug": {
+        "label": "Fundraiser link",
+        "edit": "Edit link",
+        "warning": "Changing the link breaks any link already shared. Old links will stop working.",
+        "errors": {
+          "required": "Please enter a link.",
+          "maxLength": "Please keep the link within {max, number} characters.",
+          "invalid": "Use only lowercase letters, numbers and hyphens."
         }
       },
       "description": {
@@ -407,6 +425,8 @@
       }
     },
     "edit": {
+      "title": "Edit Fundraiser",
+      "subtitle": "Update your fundraiser's details and settings.",
       "loading": "Loading fundraiser...",
       "notFoundTitle": "Fundraiser not found",
       "notFoundDescription": "This fundraiser could not be loaded.",
@@ -419,8 +439,9 @@
       "backToDashboard": "Back to dashboard",
       "formSubmission": {
         "buttonProcessing": "Updating fundraiser...",
-        "buttonSubmit": "Update fundraiser",
+        "buttonSubmit": "Save Changes",
         "successMessage": "Fundraiser updated!",
+        "slugAdjusted": "The link you chose was taken, so it's now /raise/{slug}.",
         "errorMessage": "Update failed",
         "errorDescription": "Your changes could not be saved. Please try again."
       }
@@ -430,6 +451,10 @@
       "copiedLabel": "Copied!",
       "successToast": "Link copied!",
       "errorToast": "Could not copy link. Please copy the URL manually."
+    },
+    "hostControls": {
+      "hostLabel": "You're a host",
+      "editButton": "Edit fundraiser"
     }
   }
 }

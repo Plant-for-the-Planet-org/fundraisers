@@ -17,14 +17,19 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
+import { SlugField } from './slug-field';
+import { StickyFormBar } from './sticky-form-bar';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
+import { ViewButton } from './view-button';
 import { WorkspaceInfo } from './workspace-info';
 import { WorkspaceSelector } from './workspace-selector';
 
 interface FundraiserFormBodyProps {
   mode: 'create' | 'edit';
   submitButton: ReactNode;
+  /** Fundraiser slug for the View link. Only meaningful in edit mode. */
+  slug?: string;
   /** Server-reported raised amount. Only meaningful in edit mode. */
   totalRaised?: number;
   /** Fundraiser end date (ISO string). Only meaningful in edit mode. */
@@ -38,6 +43,7 @@ interface FundraiserFormBodyProps {
 export function FundraiserFormBody({
   mode,
   submitButton,
+  slug,
   totalRaised,
   endDate,
   fundraiserId,
@@ -67,6 +73,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
+        {isEditMode && <SlugField />}
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
@@ -77,7 +84,12 @@ export function FundraiserFormBody({
         <WorkspaceInfo />
         <BundleSelection mode={mode} />
         <Options />
-        {submitButton}
+        <StickyFormBar>
+          <div className='flex gap-2'>
+            {isEditMode && slug && <ViewButton slug={slug} />}
+            {submitButton}
+          </div>
+        </StickyFormBar>
       </MainPanel>
     </FundraiserLayout>
   );
