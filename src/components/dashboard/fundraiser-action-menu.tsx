@@ -20,9 +20,22 @@ import {
 } from '@/lib/api/fundraiser-service';
 import {
   getFundraiserUrl,
+  getReactivationEndDate,
+  hasFundraiserEnded,
   isFundraiserOwnerOrAdmin,
+  REACTIVATION_EXTENSION_DAYS,
 } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -55,7 +68,11 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
   active: { edit: true, copyLink: true, pause: true, resume: false },
   paused: { edit: true, copyLink: true, pause: false, resume: true },
   draft: { edit: true, copyLink: true, pause: false, resume: true },
-  completed: { edit: false, copyLink: true, pause: false, resume: false },
+  // Completed fundraisers stay editable by owners/admins and can be reactivated
+  // (resumed back to active); only pause is withheld until they are active again.
+  completed: { edit: true, copyLink: true, pause: false, resume: true },
+  // Cancelled fundraisers are locked: cancellation is a Plant-for-the-Planet
+  // action, so hosts cannot edit them.
   cancelled: { edit: false, copyLink: true, pause: false, resume: false },
 };
 
@@ -82,6 +99,7 @@ export function FundraiserActionMenu({
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
+  const [showEndedConfirm, setShowEndedConfirm] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
@@ -104,7 +122,10 @@ export function FundraiserActionMenu({
     }
   };
 
-  const handleStatusChange = async (action: StatusActionKind) => {
+  const handleStatusChange = async (
+    action: StatusActionKind,
+    tillDate?: string
+  ) => {
     if (pending || !accessToken) return;
 
     setPending(action);
@@ -115,7 +136,11 @@ export function FundraiserActionMenu({
         toast.success(t('pauseSuccess'));
       } else {
         const isDraft = fundraiser.status === 'draft';
-        updatedFundraiser = await resumeFundraiser(fundraiser.id, accessToken);
+        updatedFundraiser = await resumeFundraiser(
+          fundraiser.id,
+          accessToken,
+          tillDate
+        );
         toast.success(t(isDraft ? 'activateSuccess' : 'resumeSuccess'));
       }
       onFundraiserUpdated(updatedFundraiser);
@@ -131,87 +156,123 @@ export function FundraiserActionMenu({
   const isMutating = pending !== null;
 
   return (
-    <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='h-6 w-6 self-start rounded-full shrink-0 text-muted-foreground hover:text-foreground'
-          aria-label={t('menuLabel')}
-          disabled={isMutating}
+    <>
+      <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='h-6 w-6 self-start rounded-full shrink-0 text-muted-foreground hover:text-foreground'
+            aria-label={t('menuLabel')}
+            disabled={isMutating}
+          >
+            <MoreVertical className='h-4 w-4' aria-hidden='true' />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          align='end'
+          className='w-52 rounded-xl border-border/60 shadow-lg'
         >
-          <MoreVertical className='h-4 w-4' aria-hidden='true' />
-        </Button>
-      </DropdownMenuTrigger>
+          {actions.edit && (
+            <DropdownMenuItem asChild className='cursor-pointer py-2'>
+              <Link href={editHref}>
+                <Pencil aria-hidden='true' />
+                {t('edit')}
+              </Link>
+            </DropdownMenuItem>
+          )}
 
-      <DropdownMenuContent
-        align='end'
-        className='w-52 rounded-xl border-border/60 shadow-lg'
-      >
-        {actions.edit && (
-          <DropdownMenuItem asChild className='cursor-pointer py-2'>
-            <Link href={editHref}>
-              <Pencil aria-hidden='true' />
-              {t('edit')}
-            </Link>
-          </DropdownMenuItem>
-        )}
+          {actions.copyLink && (
+            <DropdownMenuItem
+              className='cursor-pointer py-2'
+              onSelect={handleCopyLink}
+            >
+              <LinkIcon aria-hidden='true' />
+              {t('copyLink')}
+            </DropdownMenuItem>
+          )}
 
-        {actions.copyLink && (
-          <DropdownMenuItem
-            className='cursor-pointer py-2'
-            onSelect={handleCopyLink}
-          >
-            <LinkIcon aria-hidden='true' />
-            {t('copyLink')}
-          </DropdownMenuItem>
-        )}
+          {showSeparator && <DropdownMenuSeparator />}
 
-        {showSeparator && <DropdownMenuSeparator />}
+          {actions.pause && (
+            <DropdownMenuItem
+              variant='destructive'
+              className='cursor-pointer py-2'
+              disabled={isMutating}
+              onSelect={event => {
+                event.preventDefault();
+                void handleStatusChange('pause');
+              }}
+            >
+              {pending === 'pause' ? (
+                <Loader2 className='animate-spin' aria-hidden='true' />
+              ) : (
+                <Pause aria-hidden='true' />
+              )}
+              {t('pause')}
+            </DropdownMenuItem>
+          )}
 
-        {actions.pause && (
-          <DropdownMenuItem
-            variant='destructive'
-            className='cursor-pointer py-2'
-            disabled={isMutating}
-            onSelect={event => {
-              event.preventDefault();
-              void handleStatusChange('pause');
-            }}
-          >
-            {pending === 'pause' ? (
-              <Loader2 className='animate-spin' aria-hidden='true' />
-            ) : (
-              <Pause aria-hidden='true' />
-            )}
-            {t('pause')}
-          </DropdownMenuItem>
-        )}
+          {actions.resume && (
+            <DropdownMenuItem
+              className='cursor-pointer py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
+              disabled={isMutating}
+              onSelect={event => {
+                event.preventDefault();
+                // Reactivating a fundraiser whose end date is already in the
+                // past re-enables donations on an expired campaign, so confirm
+                // first.
+                if (hasFundraiserEnded(fundraiser)) {
+                  setOpen(false);
+                  setShowEndedConfirm(true);
+                } else {
+                  void handleStatusChange('resume');
+                }
+              }}
+            >
+              {pending === 'resume' ? (
+                <Loader2
+                  className='animate-spin text-emerald-600 dark:text-emerald-400'
+                  aria-hidden='true'
+                />
+              ) : (
+                <Play
+                  className='text-emerald-600 dark:text-emerald-400'
+                  aria-hidden='true'
+                />
+              )}
+              {fundraiser.status === 'draft' ? t('activate') : t('resume')}
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-        {actions.resume && (
-          <DropdownMenuItem
-            className='cursor-pointer py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
-            disabled={isMutating}
-            onSelect={event => {
-              event.preventDefault();
-              void handleStatusChange('resume');
-            }}
-          >
-            {pending === 'resume' ? (
-              <Loader2
-                className='animate-spin text-emerald-600 dark:text-emerald-400'
-                aria-hidden='true'
-              />
-            ) : (
-              <Play
-                className='text-emerald-600 dark:text-emerald-400'
-                aria-hidden='true'
-              />
-            )}
-            {fundraiser.status === 'draft' ? t('activate') : t('resume')}
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <AlertDialog open={showEndedConfirm} onOpenChange={setShowEndedConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('reactivateEndedTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('reactivateEndedDescription', {
+                days: REACTIVATION_EXTENSION_DAYS,
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel variant='default'>
+              {t('reactivateEndedCancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant='outline'
+              onClick={() =>
+                void handleStatusChange('resume', getReactivationEndDate())
+              }
+            >
+              {t('reactivateEndedConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -195,6 +195,7 @@ export interface UpdateFundraiserRequest {
   goalAmount?: number;
   visibility?: FundraiserVisibility;
   status?: FundraiserStatus;
+  endDate?: string; // YYYY-MM-DD
   projectAllocations?: Array<{
     percentage: number;
     project_id: string;

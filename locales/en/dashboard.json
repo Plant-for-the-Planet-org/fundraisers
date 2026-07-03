@@ -77,7 +77,11 @@
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
       "activateSuccess": "Fundraiser activated",
-      "mutationError": "Something went wrong. Try again."
+      "mutationError": "Something went wrong. Try again.",
+      "reactivateEndedTitle": "Enable donations?",
+      "reactivateEndedDescription": "Are you sure you want to reactivate this fundraiser for the next {days, plural, one {# day} other {# days}}?",
+      "reactivateEndedConfirm": "Yes, enable donations",
+      "reactivateEndedCancel": "Close"
     },
     "list": {
       "loading": "Loading fundraiser item...",
