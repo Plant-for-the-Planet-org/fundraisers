@@ -45,11 +45,54 @@ export function matchBrowserLocale(
   return undefined;
 }
 
+/** Who set the current value of the `ui-locale` cookie. */
+export type LocaleSource = 'explicit' | 'profile';
+
+const LOCALE_SOURCE_SEPARATOR = '.';
+
 /**
- * Resolve the UI locale by priority:
- *   1. user preference (the `ui-locale` cookie)
+ * The `ui-locale` cookie holds both a locale and who set it, as
+ * `<locale>.<source>` (e.g. `de.profile`, `en.explicit`) — one cookie, not
+ * two, but still able to tell "the user picked this" from "this is what
+ * their profile says" so a profile update can keep taking priority over
+ * browser language without ever clobbering an explicit pick.
+ *
+ * Legacy cookies written before this tag existed have no separator — those
+ * are treated as `explicit`, since that's the only thing they could have
+ * meant (the cookie was only ever written by an explicit pick or an
+ * old one-time profile seed, both of which should keep outranking a
+ * fresh profile sync).
+ */
+export function parseLocaleCookieValue(raw?: string | null): {
+  locale?: string;
+  source: LocaleSource;
+} {
+  if (!raw) return { locale: undefined, source: 'explicit' };
+  const [locale, source] = raw.split(LOCALE_SOURCE_SEPARATOR);
+  return {
+    locale: locale || undefined,
+    source: source === 'profile' ? 'profile' : 'explicit',
+  };
+}
+
+export function serializeLocaleCookieValue(
+  locale: string,
+  source: LocaleSource
+): string {
+  return `${locale}${LOCALE_SOURCE_SEPARATOR}${source}`;
+}
+
+/**
+ * Resolve the UI locale by priority, low to high:
+ *   1. default locale
  *   2. browser language (Accept-Language) if it maps to a supported locale
- *   3. default locale
+ *   3. user's profile language (`ui-locale` cookie, `.profile` tag)
+ *   4. user's explicit selection (`ui-locale` cookie, `.explicit` tag)
+ *
+ * Tiers 3 and 4 share one cookie — whichever tag is stored is already the
+ * winner between them, so the server only needs the locale value, never the
+ * tag itself (the tag only matters client-side, to decide whether a profile
+ * sync is allowed to overwrite the cookie).
  *
  * Kept free of `next/headers` so it stays pure and unit-testable — the caller
  * (i18n/request.ts) reads the cookie + header and passes the values in.
@@ -58,8 +101,9 @@ export function resolveLocale(input: {
   cookieLocale?: string | null;
   acceptLanguage?: string | null;
 }): string {
+  const { locale } = parseLocaleCookieValue(input.cookieLocale);
   return (
-    normalizeToLocale(input.cookieLocale) ??
+    normalizeToLocale(locale) ??
     matchBrowserLocale(input.acceptLanguage) ??
     routing.defaultLocale
   );

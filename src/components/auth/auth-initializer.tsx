@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import {
@@ -19,6 +19,7 @@ async function handleCodeExchange(code: string) {
 
 export function AuthInitializer() {
   const tAuth = useTranslations('Auth');
+  const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -102,8 +103,16 @@ export function AuthInitializer() {
   ]);
 
   useEffect(() => {
-    if (logoutSuccess === 'true') clearAuth();
-  }, [clearAuth, logoutSuccess]);
+    if (logoutSuccess !== 'true') return;
+    // The post-logout redirect (redirecting/page.tsx) uses a soft client-
+    // side router.replace(), which only re-fetches the leaf route — the
+    // root layout (header/nav) keeps its already-rendered, now-stale
+    // locale. router.refresh() re-resolves the whole route tree (incl. the
+    // layout) against the cookie clearAuth() just cleared, without a full
+    // document reload — but only when it actually cleared one; an ordinary
+    // logout with an explicit (or no) locale cookie needs no extra refresh.
+    if (clearAuth()) router.refresh();
+  }, [clearAuth, logoutSuccess, router]);
 
   return null;
 }
