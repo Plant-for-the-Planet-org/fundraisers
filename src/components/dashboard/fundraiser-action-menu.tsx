@@ -6,7 +6,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
-  Archive,
   Link as LinkIcon,
   Loader2,
   MoreVertical,
@@ -73,7 +72,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
   draft:     { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
   completed: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
   cancelled: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
-  // Archived is terminal: keep the link shareable but no further mutations.
+// Archived fundraisers are not returned by the list API, so this is a defensive check.
   archived:  { edit: false, copyLink: true, pause: false, resume: false, delete: false },
 };
 
@@ -96,33 +95,9 @@ export function FundraiserActionMenu({
   onFundraiserRemoved,
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
-  const tDeleteDialog = useTranslations('Dashboard.deleteDialog');
-  const tArchiveDialog = useTranslations('Dashboard.archiveDialog');
+  const tDialog = useTranslations('Dashboard.deleteDialog');
   const accessToken = useAuthStore(state => state.accessToken);
   const currentUserId = useAuthStore(state => state.user?.sub ?? null);
-
-  // The API archives (soft-delete) fundraisers that already have donations and
-  // hard-deletes the rest. `donationCount` lets us predict which, so the menu
-  // label and dialog copy match the real outcome. The API response is still the
-  // source of truth for the toast + state update, so a stale count is harmless.
-  const willArchive = fundraiser.donationCount > 0;
-
-  // Single source for the two outcome variants so the menu item and the
-  // confirmation dialog can't drift apart. `t` is the matching dialog namespace.
-  const deleteAction = willArchive
-    ? {
-        variant: 'default' as const,
-        Icon: Archive,
-        label: t('archive'),
-        t: tArchiveDialog,
-      }
-    : {
-        variant: 'destructive' as const,
-        Icon: Trash2,
-        label: t('delete'),
-        t: tDeleteDialog,
-      };
-  const tDialog = deleteAction.t;
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
@@ -182,20 +157,11 @@ export function FundraiserActionMenu({
 
     setPending('delete');
     try {
-      const result = await deleteFundraiser(fundraiser.id, accessToken);
-      if (result.archived) {
-        // 200: had donations, soft-deleted to `archived`. Keep the row and
-        // merge. If the API omitted the body, patch the status locally so the
-        // Archived badge shows immediately without a refetch.
-        onFundraiserUpdated(
-          result.fundraiser ?? { ...fundraiser, status: 'archived' }
-        );
-        toast.success(t('archiveSuccess'));
-      } else {
-        // 204: no donations, hard-deleted. Remove the row.
-        onFundraiserRemoved(fundraiser.id);
-        toast.success(t('deleteSuccess'));
-      }
+      // Both 204 and 200 (`status: 'archived'`) indicate a successful delete.
+      // Remove the fundraiser from the list, as archived fundraisers are never returned.
+      await deleteFundraiser(fundraiser.id, accessToken);
+      onFundraiserRemoved(fundraiser.id);
+      toast.success(t('deleteSuccess'));
       setDeleteDialogOpen(false);
     } catch (error) {
       // Keep the dialog open so the user can retry.
@@ -228,7 +194,7 @@ export function FundraiserActionMenu({
         className='w-52 rounded-xl border-border/60 shadow-lg'
       >
         {actions.edit && (
-          <DropdownMenuItem asChild className='cursor-pointer py-2'>
+          <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
             <Link href={editHref}>
               <Pencil aria-hidden='true' />
               {t('edit')}
@@ -238,7 +204,7 @@ export function FundraiserActionMenu({
 
         {actions.copyLink && (
           <DropdownMenuItem
-            className='cursor-pointer py-2'
+            className='cursor-pointer rounded-lg py-2'
             onSelect={handleCopyLink}
           >
             <LinkIcon aria-hidden='true' />
@@ -251,7 +217,7 @@ export function FundraiserActionMenu({
         {actions.pause && (
           <DropdownMenuItem
             variant='destructive'
-            className='cursor-pointer py-2'
+            className='cursor-pointer rounded-lg py-2'
             disabled={isMutating}
             onSelect={event => {
               event.preventDefault();
@@ -269,7 +235,7 @@ export function FundraiserActionMenu({
 
         {actions.resume && (
           <DropdownMenuItem
-            className='cursor-pointer py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
+            className='cursor-pointer rounded-lg py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
             disabled={isMutating}
             onSelect={event => {
               event.preventDefault();
@@ -295,8 +261,8 @@ export function FundraiserActionMenu({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              variant={deleteAction.variant}
-              className='cursor-pointer py-2'
+              variant='destructive'
+              className='cursor-pointer rounded-lg py-2'
               disabled={isMutating}
               onSelect={event => {
                 event.preventDefault();
@@ -304,8 +270,8 @@ export function FundraiserActionMenu({
                 setDeleteDialogOpen(true);
               }}
             >
-              <deleteAction.Icon aria-hidden='true' />
-              {deleteAction.label}
+              <Trash2 aria-hidden='true' />
+              {t('delete')}
             </DropdownMenuItem>
           </>
         )}
@@ -332,7 +298,7 @@ export function FundraiserActionMenu({
             </DialogClose>
             <Button
               type='button'
-              variant={deleteAction.variant}
+              variant='destructive'
               disabled={isDeleting}
               onClick={() => void handleDelete()}
             >

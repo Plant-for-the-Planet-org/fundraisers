@@ -4,7 +4,7 @@ import type {
 } from '@/lib/types/fundraiser';
 
 import { cache } from 'react';
-import { platformFetch, platformFetchWithResponse } from './platform-fetch';
+import { platformFetch } from './platform-fetch';
 
 function fundraiserPath(slug: string, locale?: string): string {
   const path = `/fundraisers/${encodeURIComponent(slug)}`;
@@ -63,29 +63,25 @@ export function resumeFundraiser(
   return updateFundraiser(id, { status: 'active' }, token);
 }
 
-export type DeleteFundraiserResult =
-  | { archived: false }
-  | { archived: true; fundraiser: Fundraiser | null };
-
 /**
- * Deletes a fundraiser. The API has two success shapes, distinguished by
- * HTTP status (not by whether a body is present — a 200 can come back empty):
- * - 204 No Content: no donations, hard-deleted. Caller removes the row.
- * - 200 OK: had donations, soft-deleted to `status: 'archived'`. The body is
- *   the updated fundraiser, but may be empty; caller keeps the row and, if the
- *   body is missing, patches `status` locally.
+ * Deletes a fundraiser.
+ *
+ * Success can return either:
+ * - 204 No Content (hard-deleted)
+ * - 200 OK with `{ status: 'archived' }` (soft-deleted)
+ *
+ * Both are treated as successful deletes. The fundraiser is removed from the
+ * UI list, and archived fundraisers are never returned by the list API.
+ *
+ * `platformFetch` throws on non-2xx responses, so reaching the end of this
+ * function means the delete succeeded.
  */
 export async function deleteFundraiser(
   id: string,
   token: string
-): Promise<DeleteFundraiserResult> {
-  const { status, data } = await platformFetchWithResponse<Fundraiser>(
-    `/fundraisers/${id}`,
-    { method: 'DELETE', token }
-  );
-
-  if (status === 204) {
-    return { archived: false };
-  }
-  return { archived: true, fundraiser: data ?? null };
+): Promise<void> {
+  await platformFetch<Fundraiser>(`/fundraisers/${id}`, {
+    method: 'DELETE',
+    token,
+  });
 }

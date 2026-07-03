@@ -93,8 +93,8 @@ export default function DashboardPage() {
     []
   );
 
-  // Hard-delete (204): drop the row. Summary stays at its last snapshot, in
-  // line with how archive/pause leave the summary untouched.
+  // Delete: remove the fundraiser from the list. Both 204 (deleted) and
+  // 200 (`status: 'archived'`) are treated as a successful delete.
   const handleFundraiserRemoved = useCallback((id: string) => {
     setFundraisers(prev => prev.filter(fundraiser => fundraiser.id !== id));
   }, []);

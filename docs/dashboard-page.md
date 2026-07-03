@@ -170,6 +170,25 @@ The work ships in four PRs so each lands a reviewable, user‑visible slice. Eac
 
 ---
 
+## Delete action
+
+The kebab menu's **Delete** action removes a fundraiser. The user always sees a single, delete-focused flow — there is no separate "archive" option or copy.
+
+**Two API responses, one outcome.** `DELETE /fundraisers/{id}` succeeds in one of two shapes, and the UI treats them identically:
+
+| Response                                | Backend meaning                                | UI behavior              |
+| --------------------------------------- | ---------------------------------------------- | ------------------------ |
+| `204 No Content`                        | No donations → hard-deleted                    | Row removed from list    |
+| `200 OK` with `{ "status": "archived" }`| Had donations → soft-deleted (archived)        | Row removed from list    |
+
+Both mean "the delete succeeded," so `deleteFundraiser` ([src/lib/api/fundraiser-service.ts](../src/lib/api/fundraiser-service.ts)) resolves without inspecting the body, and `FundraiserActionMenu.handleDelete` calls `onFundraiserRemoved(id)` in either case. The page drops the row via `handleFundraiserRemoved`; the summary tiles stay frozen at their last full-load snapshot (same as pause/resume).
+
+**Archived fundraisers are never shown.** The list API (`GET /fundraisers`) does not return archived fundraisers, and a delete removes the row from local state by id (see `handleFundraiserRemoved`), so an archived fundraiser never enters the list in the first place. There is deliberately no extra client-side filter for `status: 'archived'` — the API contract owns this exclusion. This is expected behavior, **not a bug**.
+
+**States.** The confirm button shows a spinner and disables the dialog while the request is in flight; on error the dialog stays open with an error toast so the user can retry; on success the dialog closes and a "Fundraiser deleted" toast confirms.
+
+---
+
 ## Page Layout (top → bottom)
 
 ```
