@@ -434,6 +434,7 @@
         "buttonProcessing": "Updating fundraiser...",
         "buttonSubmit": "Update fundraiser",
         "successMessage": "Fundraiser updated!",
+        "slugAdjusted": "The link you chose was taken, so it's now /raise/{slug}.",
         "errorMessage": "Update failed",
         "errorDescription": "Your changes could not be saved. Please try again."
       }

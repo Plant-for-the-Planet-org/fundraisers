@@ -434,6 +434,7 @@
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
         "buttonSubmit": "Spendenaufruf aktualisieren",
         "successMessage": "Spendenaufruf aktualisiert!",
+        "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }

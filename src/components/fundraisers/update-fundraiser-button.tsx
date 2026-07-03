@@ -79,7 +79,15 @@ export function UpdateFundraiserButton({
       );
 
       reset(values);
-      toast.success(t('successMessage'));
+
+      // The backend appends a suffix when the chosen link collides with an existing one, so the saved slug can differ from what was submitted.
+      const slugWasAdjusted =
+        Boolean(dirtyFields.slug) && updated.slug !== values.slug;
+      toast.success(t('successMessage'), {
+        description: slugWasAdjusted
+          ? t('slugAdjusted', { slug: updated.slug })
+          : undefined,
+      });
 
       // The edit route is keyed by slug. If the slug changed, move to the new
       // URL so a refresh or back-navigation still resolves.
