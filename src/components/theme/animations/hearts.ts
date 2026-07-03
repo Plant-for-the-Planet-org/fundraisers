@@ -8,7 +8,7 @@ export function createHeartsConfig(mode: ThemeMode): ParticleConfig {
 
   return {
     count: 25,
-    speedRange: [0.2, 0.6],
+    speedRange: [0.5, 1.3],
     sizeRange: [6, 12],
     driftRange: [-0.2, 0.2],
     opacityRange: isDark ? [0.2, 0.7] : [0.3, 0.6],
