@@ -2,4 +2,30 @@
   .typo-form-title-input {
     @apply text-4xl font-bold placeholder:text-black/50 dark:placeholder:text-white/50;
   }
+
+  /*
+   * Blockquote styling shared by every rich-text surface (editor + displays).
+   * The old left border is replaced by a large opening quotation mark, using
+   * the real typographic character so it follows each language's convention:
+   * English “ sits high, German „ sits low (set per `:lang` below). Sizes are
+   * in `em` so the mark scales with each surface's own font size.
+   */
+  .rich-quote blockquote {
+    margin-block: 0.75rem;
+  }
+
+  /* Quote mark is inline before the first word — tracks text alignment. */
+  .rich-quote blockquote p:first-child::before {
+    content: '\201C';
+    color: hsl(var(--foreground));
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 3.5em;
+    line-height: 0;
+    vertical-align: -0.25em;
+    margin-right: 0.05em;
+  }
+
+  :lang(de) .rich-quote blockquote p:first-child::before {
+    content: '\201E';
+  }
 }
