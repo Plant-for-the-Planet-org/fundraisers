@@ -299,7 +299,7 @@ Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `to
 - Owns local state via `useFundraiserListFilters` (see Hooks).
 - Computes `visibleFundraisers = sortFundraisers(filterFundraisers(fundraisers, { search, status }), sort)`.
 - Renders: `FundraiserListToolbar` → result count line (`Showing <bold>{visible}</bold> of {total}`, rendered via `t.rich` so the visible count is bolded) → `FundraiserList`.
-- Threads `onFundraiserUpdated` down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume the page merges the API response into local state — no refetch, no `isLoading` toggle, only the affected row re‑renders.
+- Threads `onFundraiserUpdated` and `onFundraiserRemoved` down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume the page merges the API response into local state, and after a successful Delete it filters the row out by id — no refetch, no `isLoading` toggle. The affected row re‑renders (or drops), and because the summary is derived from the list, the stat tiles recompute in the same pass.
 
 ### `FundraiserListToolbar`
 
@@ -656,6 +656,9 @@ Proposed key shape (English; German mirrors structure):
 | Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
 | Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
 | Pause/Resume API succeeds                                      | The API response is merged into local state for that one fundraiser — no refetch, no `isLoading` toggle. Status‑filter pill counts update, and the summary stat tiles (derived from the list) update too. The toast confirms success. |
+| Delete confirmed, API in flight                                | Confirm button shows a spinner; the dialog cannot be dismissed (`onOpenChange` ignores close while `isDeleting`); Cancel is disabled.                                                                                                                            |
+| Delete API succeeds (`204` or `200 archived`)                  | Both responses mean success. The row is filtered out of the list by id; the dialog unmounts with the row (no close animation); a "Fundraiser deleted" toast confirms. The summary tiles (total / donations / total‑raised) drop accordingly, since they derive from the list. |
+| Delete API fails                                               | The dialog stays open with an error toast so the user can retry; local state is untouched, the row remains.                                                                                                                                                      |
 | Search typed quickly                                           | Debounce 250 ms before filtering; filtering itself is sync and cheap.                                                                                                                                                                                            |
 | List > ~50 items                                               | Acceptable for v1 (no virtualization). Flag as a future concern if perf testing shows scroll stutter.                                                                                                                                                            |
 | User on small screen                                           | Toolbar stacks; status filter scrolls horizontally; action menu remains a `Dropdown` (not a sheet) for v1.                                                                                                                                                       |
@@ -758,7 +761,7 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
 - [x] Add `fundraiser-action-menu.tsx` — calls existing `updateFundraiser` for Pause/Resume; uses `getFundraiserUrl` for Copy link; mounted with `modal={false}` for layout stability. Export from `index.ts`.
 - [x] Owner gating: read current user from `useAuthStore` and compare against `fundraiser.hosts[].user.id` + `role === 'owner'`. Non‑owners see Copy link only.
 - [x] Drafts include the same Resume case as `paused` in `getAvailableActions` (publishes via `{ status: 'active' }`), but the menu item label is **Activate** when `fundraiser.status === 'draft'`.
-- [x] Thread `onFundraiserUpdated = (updatedFundraiser) => setFundraisers(prev => prev.map(...))` from the page → section → list → item → menu. The menu calls it with the API response from `pauseFundraiser` / `resumeFundraiser`. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button. Summary lives in its own `useState` and is only set on full loads, so action‑driven row updates do not touch it.
+- [x] Thread `onFundraiserUpdated = (updatedFundraiser) => setFundraisers(prev => prev.map(...))` from the page → section → list → item → menu. The menu calls it with the API response from `pauseFundraiser` / `resumeFundraiser`. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button. The summary is **derived from the `fundraisers` list** via `useMemo(getDashboardSummary, [fundraisers])` (updated in the delete/archive work), so action‑driven row mutations recompute the tiles automatically — no separate summary state, no refetch.
 - [x] Locale keys: `actions.*`.
 - [x] Verify Pause/Resume endpoint contract with backend before merging.
 - [x] Split Draft out of Paused:
@@ -768,6 +771,16 @@ Unit (recommended for `lib/utils/fundraiser-list.ts`):
   - [x] Add `draft` variant (reuses the muted Paused treatment) to `fundraiser-status-badge.tsx`.
   - [x] Locale keys: `statusFilter.draft`, `statusBadge.draft` (en + de).
   - [ ] Update `deriveDisplayStatus` / `filterFundraisers` / `getStatusCounts` unit tests.
+
+### PR 5 — Delete / archive action ✅
+
+- [x] Add the **Delete** item to `fundraiser-action-menu.tsx` (`delete` in `ActionVisibility`, gated by `OWNER_ACTIONS_BY_STATUS`; hidden for non‑owners and for already‑`archived` fundraisers). A single delete‑focused flow — no separate "archive" option or copy.
+- [x] Add `deleteFundraiser(id, token)` to `fundraiser-service.ts`. It treats both `204 No Content` (hard delete) and `200 { status: 'archived' }` (soft delete) as success and resolves without inspecting the body; `platformFetch` throws on non‑2xx.
+- [x] Confirmation dialog (shadcn `Dialog`): spinner + non‑dismissible while the request is in flight; error toast keeps it open for retry; on success the row is removed and the dialog unmounts with it.
+- [x] `handleDelete` settles local UI state (`setDeleteDialogOpen(false)`) before calling `onFundraiserRemoved(id)`, so the ordering stays correct if the row is ever kept and only flipped to `archived`.
+- [x] Thread `onFundraiserRemoved = (id) => setFundraisers(prev => prev.filter(...))` from the page → section → list → item → menu.
+- [x] Keep the summary in sync by deriving it from the list (`useMemo(getDashboardSummary, [fundraisers])`) instead of a separate summary `useState`, so a delete drops the total / donations / total‑raised without a refetch.
+- [x] Locale keys: `actions.delete`, `actions.deleteSuccess`, `deleteDialog.*` (en + de).
 
 ### Cross‑PR housekeeping
 
