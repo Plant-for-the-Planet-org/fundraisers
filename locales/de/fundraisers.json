@@ -157,7 +157,14 @@
         "shuffle": "Mischen",
         "switchToDark": "In dunkelen Modus wechseln",
         "switchToLight": "In hellen Modus wechseln",
-        "labelGradient": "Verlauf",
+        "labelBackgroundColor": "Hintergrundfarbe",
+        "baseNone": "Keine",
+        "baseSolid": "Einfarbig",
+        "baseGradient": "Verlauf",
+        "baseCustom": "Eigene Farbe wählen",
+        "gradientStart": "Start",
+        "gradientEnd": "Ende",
+        "quickPicks": "Schnellauswahl",
         "labelTitleFont": "Titel Schriftart",
         "labelBodyFont": "Schriftart",
         "labelAnimation": "Animation",
@@ -187,6 +194,16 @@
         "errors": {
           "required": "Bitte gib einen Namen für den Spendenaufruf ein.",
           "maxLength": "Der Name des Aufrufs darf nicht länger als {max, number} Zeichen lang sein."
+        }
+      },
+      "slug": {
+        "label": "Link des Spendenaufrufs",
+        "edit": "Link bearbeiten",
+        "warning": "Wenn du den Link änderst, funktionieren bereits geteilte Links nicht mehr.",
+        "errors": {
+          "required": "Bitte gib einen Link ein.",
+          "maxLength": "Der Link darf nicht länger als {max, number} Zeichen sein.",
+          "invalid": "Verwende nur Kleinbuchstaben, Zahlen und Bindestriche."
         }
       },
       "description": {
@@ -409,6 +426,8 @@
       }
     },
     "edit": {
+      "title": "Spendenaufruf bearbeiten",
+      "subtitle": "Aktualisiere die Details und Einstellungen deines Spendenaufrufs.",
       "loading": "Spendenaufruf laden...",
       "notFoundTitle": "Spendenaufruf wurde nicht gefunden",
       "notFoundDescription": "Dieser Spendenaufruf konnte nicht geladen werden.",
@@ -423,6 +442,7 @@
         "buttonProcessing": "Spendenaufruf wird aktualisiert...",
         "buttonSubmit": "Änderungen speichern",
         "successMessage": "Spendenaufruf aktualisiert!",
+        "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
       }
@@ -432,6 +452,10 @@
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+    },
+    "hostControls": {
+      "hostLabel": "Du bist Gastgeber",
+      "editButton": "Spendenaufruf bearbeiten"
     }
   }
 }

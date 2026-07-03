@@ -31,7 +31,7 @@ export type FundraiserHostType = 'user' | 'team';
  * 'admin' (full edit + manage hosts) and 'viewer' (read-only dashboard) are the
  * supported roles.
  */
-export type FundraiserHostRole = 'admin' | 'viewer';
+export type FundraiserHostRole = 'admin' | 'viewer' | 'owner'; //owner is for backward compatibility, and can be removed once the API no longer returns it.
 /** 'invited' hosts have no profile yet; claimed to 'active' on first login. */
 export type FundraiserHostStatus = 'active' | 'invited';
 export interface FundraiserHost {
@@ -188,6 +188,8 @@ export interface Fundraiser {
 }
 
 export interface UpdateFundraiserRequest {
+  /** Needs to be unique. Changing it breaks any already-shared links. */
+  slug?: string;
   title?: string;
   description?: string;
   goalAmount?: number;

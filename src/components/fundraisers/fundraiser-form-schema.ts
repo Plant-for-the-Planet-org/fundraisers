@@ -15,6 +15,7 @@ import {
   GOAL_AMOUNT_MIN,
 } from '@/lib/constants/fundraiser-creation';
 import { buildTheme } from '@/lib/theme/build-theme';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
@@ -83,8 +84,21 @@ export const thankYouNoteSchema = z.object({
     ),
 });
 
+export const SLUG_MAX_LENGTH = 32;
+// Lowercase letters, numbers and hyphens.
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
+
 export const fundraiserFormSchema = z.object({
   title: z.string().trim().min(1).max(50),
+  // Edit-only. The create flow never renders a slug field, so this stays
+  // optional and is validated only when present.
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'required')
+    .max(SLUG_MAX_LENGTH, 'maxLength')
+    .regex(SLUG_PATTERN, 'invalid')
+    .optional(),
   description: z
     .string()
     .refine(value => getRichTextTextContent(value).length > 0)
@@ -110,6 +124,27 @@ export const fundraiserFormSchema = z.object({
       title_font: z.string(),
       bg: z.object({
         gradient: z.string(),
+        background_color: z
+          .string()
+          .nullable()
+          .refine(value => value === null || isValidHexColor(value), {
+            message: 'invalidColor',
+          }),
+        custom_gradient: z
+          .object({
+            angle: z.number().min(0).max(360),
+            stops: z
+              .array(
+                z.object({
+                  color: z.string().refine(isValidHexColor, {
+                    message: 'invalidColor',
+                  }),
+                  position: z.number().min(0).max(100),
+                })
+              )
+              .min(2),
+          })
+          .nullable(),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
         // External URLs must use https and be from an allowed host (same list
@@ -266,6 +301,7 @@ export function fundraiserToFormValues(
 
   return {
     title: fundraiser.title,
+    slug: fundraiser.slug,
     description: fundraiser.description ?? '',
     image: buildExistingSelectedImage(fundraiser.image),
     country,

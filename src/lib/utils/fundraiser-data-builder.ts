@@ -109,6 +109,7 @@ export function buildUpdateFundraiserRequest(
 ): UpdateFundraiserRequest {
   const request: UpdateFundraiserRequest = {};
 
+  if (dirtyFields.slug && values.slug) request.slug = values.slug;
   if (dirtyFields.title) request.title = values.title;
   if (dirtyFields.description) request.description = values.description;
   if (dirtyFields.goalAmount) request.goalAmount = values.goalAmount;

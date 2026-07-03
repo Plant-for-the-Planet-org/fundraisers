@@ -51,7 +51,7 @@ export function CreateFundraiserButton() {
         throw new Error('Invalid response from server - missing slug');
       }
       toast.success(t('successMessage'));
-      router.replace(`/raise/${fundraiser.slug}`);
+      router.replace(`/dashboard/fundraisers/edit/${fundraiser.slug}`);
     } catch (err) {
       console.error('Failed to create fundraiser:', err);
       toast.error(t('errorMessage'), { description: t('errorDescription') });

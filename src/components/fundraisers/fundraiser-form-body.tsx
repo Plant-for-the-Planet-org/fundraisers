@@ -17,6 +17,7 @@ import { HostsManager } from './hosts-manager';
 import { ImageSelector } from './image-selector';
 import { LeaderboardSettings } from './leaderboard/leaderboard-settings';
 import { Options } from './options';
+import { SlugField } from './slug-field';
 import { StickyFormBar } from './sticky-form-bar';
 import { ThemeSettings } from './theme-settings';
 import { Title } from './title';
@@ -72,6 +73,7 @@ export function FundraiserFormBody({
       </SidebarPanel>
       <MainPanel>
         <Title />
+        {isEditMode && <SlugField />}
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
