@@ -199,7 +199,9 @@ export function PaymentMethods() {
           <h2 className='text-foreground text-base font-medium'>
             {t('title')}
           </h2>
-          <p className='text-muted-foreground text-sm'>{t('description')}</p>
+          {showMethodFees && (
+            <p className='text-muted-foreground text-sm'>{t('description')}</p>
+          )}
         </div>
         <div className='border border-border rounded-lg p-4 text-sm text-muted-foreground'>
           {t('empty')}
@@ -212,7 +214,9 @@ export function PaymentMethods() {
     <div className='space-y-3'>
       <div className='space-y-2'>
         <h2 className='text-foreground font-medium'>{t('title')}</h2>
-        <p className='text-muted-foreground text-sm'>{t('description')}</p>
+        {showMethodFees && (
+          <p className='text-muted-foreground text-sm'>{t('description')}</p>
+        )}
       </div>
 
       <div className='border border-border rounded-lg'>
