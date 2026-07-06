@@ -179,6 +179,7 @@ export function buildCreateFundraiserRequest(
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,
         bundle: values.settings.modules.bundle,
+        stage: values.settings.modules.stage,
         thankYouNote: values.settings.modules.thankYouNote,
         donor_score: {
           enabled: true,
