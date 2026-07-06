@@ -7,3 +7,4 @@ export { parseStageFormValue } from './parse';
 export type { StageFormValue } from './schema';
 export { stageModeSchema } from './schema';
 export type { StageModuleSettings, StageSlide } from './settings';
+export { getStageUrl, openStageWindow } from './stage-window';

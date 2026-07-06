@@ -176,7 +176,7 @@ export interface Fundraiser {
   goalAmount: number; // Integer, not in cents
   totalRaised: Record<string, number>; // currency-keyed, e.g. { EUR: 2052.85 }
   donationCount: number;
-  currency: string;
+  currency: Nullable<string>;
   workspace: Nullable<FundraiserWorkspace>;
   hosts: FundraiserHost[];
   visibility: FundraiserVisibility;

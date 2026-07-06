@@ -68,6 +68,8 @@
     "actions": {
       "menuLabel": "Open actions",
       "edit": "Edit",
+      "stageMode": "Stage Mode",
+      "stageModeBlocked": "Your browser blocked the Stage Mode popup. Allow popups for this site and try again.",
       "copyLink": "Copy link",
       "pause": "Pause",
       "resume": "Resume",

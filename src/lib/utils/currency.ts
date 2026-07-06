@@ -79,14 +79,15 @@ function attachSymbol(formattedAmount: string, currencyUpper: string): string {
  */
 export function formatCurrency(
   amountInCents: number,
-  currency: string,
+  currency: string | null | undefined,
   locale: string,
   options?: FormatCurrencyOptions
 ): string {
   const compact = options?.compact ?? false;
-  const currencyUpper = currency.toUpperCase();
   const amount = amountInCents / 100;
   const formattedAmount = formatAmount(amount, locale, compact);
+  const currencyUpper = currency?.toUpperCase();
+  if (!currencyUpper) return formattedAmount;
   return attachSymbol(formattedAmount, currencyUpper);
 }
 
@@ -104,14 +105,17 @@ export function formatCurrency(
  */
 export function formatCurrencyFromDecimal(
   amount: number,
-  currency: string,
+  currency: string | null | undefined,
   locale: string,
   options?: FormatCurrencyFromDecimalOptions
 ): string {
   const compact = options?.compact ?? false;
   const currencyDisplay = options?.currencyDisplay ?? 'symbol';
-  const currencyUpper = currency.toUpperCase();
   const formattedAmount = formatAmount(amount, locale, compact);
+
+  // No currency set yet (e.g. a draft): show the bare amount rather than crash.
+  const currencyUpper = currency?.toUpperCase();
+  if (!currencyUpper) return formattedAmount;
 
   if (currencyDisplay === 'code') {
     return `${currencyUpper} ${formattedAmount}`;
@@ -123,14 +127,18 @@ export function formatCurrencyFromDecimal(
 /**
  * Get currency symbol for a given currency code
  */
-export function getCurrencySymbol(currency: string): string {
+export function getCurrencySymbol(currency: string | null | undefined): string {
+  if (!currency) return '';
   return CURRENCY_SYMBOLS[currency.toUpperCase()] || currency.toUpperCase();
 }
 
 /**
  * Check if a currency has a dedicated symbol
  */
-export function hasCurrencySymbol(currency: string): boolean {
+export function hasCurrencySymbol(
+  currency: string | null | undefined
+): boolean {
+  if (!currency) return false;
   return currency.toUpperCase() in CURRENCY_SYMBOLS;
 }
 

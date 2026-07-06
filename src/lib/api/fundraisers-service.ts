@@ -90,15 +90,18 @@ export function getDashboardSummary(
       }
     }
 
-    // Count each fundraiser once against its primary currency
-    const primaryCurrency = fundraiser.currency.toUpperCase();
-    const primaryEntry = raisedByCurrency.get(primaryCurrency) ?? {
-      currency: primaryCurrency,
-      totalRaised: 0,
-      fundraiserCount: 0,
-    };
-    primaryEntry.fundraiserCount += 1;
-    raisedByCurrency.set(primaryCurrency, primaryEntry);
+    // Count each fundraiser once against its primary currency (skip when a
+    // fundraiser has no currency set yet, e.g. a draft).
+    if (fundraiser.currency) {
+      const primaryCurrency = fundraiser.currency.toUpperCase();
+      const primaryEntry = raisedByCurrency.get(primaryCurrency) ?? {
+        currency: primaryCurrency,
+        totalRaised: 0,
+        fundraiserCount: 0,
+      };
+      primaryEntry.fundraiserCount += 1;
+      raisedByCurrency.set(primaryCurrency, primaryEntry);
+    }
   }
 
   const sortedRaisedByCurrency = Array.from(raisedByCurrency.values()).sort(

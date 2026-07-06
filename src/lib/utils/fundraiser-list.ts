@@ -159,7 +159,7 @@ export function sortFundraisers(
           sumTotalRaised(b.totalRaised)
         );
         if (diff !== 0) return diff;
-        return a.currency.localeCompare(b.currency);
+        return (a.currency ?? '').localeCompare(b.currency ?? '');
       });
     case 'ending-soonest':
       // Active rows first, then non-active by endDate. Within active, rows

@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
+import {
+  QR_CODE_BASE_URL,
+  STAGE_SHORT_URL_DOMAIN,
+} from '@/lib/constants/app-config';
 import { GlassPanel } from './glass-panel';
 
 interface StageQRPanelProps {
@@ -18,7 +22,7 @@ export function StageQRPanel({
 }: StageQRPanelProps) {
   const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
-  const [donateUrl, setDonateUrl] = useState('');
+  const donateUrl = `${STAGE_SHORT_URL_DOMAIN}/${slug}`;
 
   useEffect(() => {
     const params = new URLSearchParams({
@@ -27,10 +31,13 @@ export function StageQRPanel({
       utm_campaign: 'stage-mode',
     });
     const target = `${window.location.origin}/raise/${encodeURIComponent(fundraiserId)}?${params.toString()}`;
-    setDonateUrl(`stage.pp.eco/${slug}`);
-    // qr.pp.eco encodes whatever follows `?` verbatim, e.g.
+    // ponytail: window.location.origin is unavailable during SSR, so this
+    // value can only be computed client-side after mount — the effect is
+    // intentional here, not an oversight the lint rule assumes.
+    // QR_CODE_BASE_URL encodes whatever follows `?` verbatim, e.g.
     // https://qr.pp.eco/?https://example.com — no named param, no encoding.
-    setQrSrc(`https://qr.pp.eco/?${target}`);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQrSrc(`${QR_CODE_BASE_URL}/?${target}`);
   }, [fundraiserId, slug]);
 
   return (

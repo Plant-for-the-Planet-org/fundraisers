@@ -11,10 +11,11 @@ import {
   getDaysLeft,
   getFundraiserUrl,
 } from '@/lib/utils/fundraiser';
-import { deriveDisplayStatus, getHostNames } from '@/lib/utils/fundraiser-list';
+import { deriveDisplayStatus } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
 import { cn } from '@/lib/utils/index';
 import { FundraiserCardImage } from '@/components/explore/fundraiser-card-image';
+import { useHostDisplay } from '@/components/fundraisers/use-host-display';
 import { FundraiserActionMenu } from './fundraiser-action-menu';
 import { FundraiserStatusBadge } from './fundraiser-status-badge';
 
@@ -37,14 +38,9 @@ export function FundraiserListItem({
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const displayStatus = deriveDisplayStatus(fundraiser);
 
-  const hostNames = getHostNames(fundraiser);
-  const hostName =
-    hostNames.length === 0
-      ? tFundraisers('unknownHost')
-      : new Intl.ListFormat(locale, {
-          style: 'long',
-          type: 'conjunction',
-        }).format(hostNames);
+  const hostDisplay =
+    useHostDisplay(fundraiser) ??
+    t('byHost', { host: tFundraisers('unknownHost') });
 
   const totalRaised = convertTotalRaisedToSingleCurrency(
     fundraiser.totalRaised,
@@ -126,7 +122,7 @@ export function FundraiserListItem({
         </div>
 
         <p className='mt-1 truncate text-sm text-muted-foreground'>
-          {t('byHost', { host: hostName })}
+          {hostDisplay}
         </p>
       </div>
     </li>

@@ -2,7 +2,7 @@
 
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
@@ -15,16 +15,18 @@ function getRemaining() {
   );
 }
 
+function subscribe(onChange: () => void) {
+  const id = setInterval(onChange, 1000);
+  return () => clearInterval(id);
+}
+
+// getRemaining() reads Date.now(), so it only runs on the client. The server snapshot stays stable so SSR and the first client render match.
 function useCountdown() {
-  const [remaining, setRemaining] = useState(STAGE_POLL_INTERVAL_SECONDS);
-
-  useEffect(() => {
-    setRemaining(getRemaining());
-    const id = setInterval(() => setRemaining(getRemaining()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  return remaining;
+  return useSyncExternalStore(
+    subscribe,
+    getRemaining,
+    () => STAGE_POLL_INTERVAL_SECONDS
+  );
 }
 
 function CountdownRing({ remaining }: { remaining: number }) {

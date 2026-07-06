@@ -68,6 +68,8 @@
     "actions": {
       "menuLabel": "Aktionen öffnen",
       "edit": "Bearbeiten",
+      "stageMode": "Bühnenmodus",
+      "stageModeBlocked": "Dein Browser hat das Bühnenmodus-Popup blockiert. Erlaube Popups für diese Seite und versuche es erneut.",
       "copyLink": "Link kopieren",
       "pause": "Pausieren",
       "resume": "Fortsetzen",

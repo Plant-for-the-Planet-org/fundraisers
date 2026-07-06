@@ -42,7 +42,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
             existingSettings={fundraiser.settings}
           />
         }
-        totalRaised={fundraiser.totalRaised[fundraiser.currency] ?? 0}
+        totalRaised={fundraiser.totalRaised[fundraiser.currency ?? ''] ?? 0}
         endDate={fundraiser.endDate}
         fundraiserId={fundraiser.id}
         hosts={fundraiser.hosts}

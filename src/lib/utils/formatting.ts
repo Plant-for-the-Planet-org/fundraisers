@@ -1,9 +1,17 @@
+// Compaction only kicks in at a million and up. Thousands stay fully written
+// out (e.g. "96,120", not "96.12 K") — full counts read clearer and the space
+// saving below 1M is not worth the loss of precision. Do not re-add a `K` scale.
 const COMPACT_SCALES = [
   { threshold: 1_000_000_000_000, divisor: 1_000_000_000_000, suffix: 'T' },
   { threshold: 1_000_000_000, divisor: 1_000_000_000, suffix: 'B' },
   { threshold: 1_000_000, divisor: 1_000_000, suffix: 'M' },
-  { threshold: 1_000, divisor: 1_000, suffix: 'K' },
 ] as const;
+
+// In compact display, drop the cents once the value reaches this amount — they
+// are just noise on larger figures. Smaller values keep up to 2 decimals where
+// the cents still matter (e.g. a 3.50 donation). Only affects fractional inputs
+// (currency); counts are already whole.
+const COMPACT_WHOLE_NUMBER_THRESHOLD = 100;
 
 const GERMAN_COMPACT_SUFFIXES: Record<string, string> = {
   K: 'Tsd.',
@@ -51,8 +59,9 @@ function formatLocalizedNumber(value: number, locale: string): string {
 }
 
 /**
- * Format a number in compact notation with a localized suffix.
- * - `1200`    → `1.20 K` (en) / `1,20 Tsd.` (de)
+ * Format a number in compact notation with a localized suffix, but only from a
+ * million up — smaller values are written out in full with grouping.
+ * - `96120`   → `96,120` (en) / `96.120` (de)
  * - `1200000` → `1.20 M` / `1,20 Mio.`
  */
 function formatCompactNumber(value: number, locale: string): string {
@@ -75,6 +84,15 @@ function formatCompactNumber(value: number, locale: string): string {
     }
 
     return `${formatLocalizedNumber(scaled, locale)} ${getCompactSuffix(locale, suffix)}`;
+  }
+
+  // Below the smallest compact scale, write the number out in full — as a whole
+  // number once it is large enough that trailing cents are noise, otherwise with
+  // up to 2 decimals.
+  if (Math.abs(numericValue) >= COMPACT_WHOLE_NUMBER_THRESHOLD) {
+    return new Intl.NumberFormat(normalizeLocale(locale), {
+      maximumFractionDigits: 0,
+    }).format(numericValue);
   }
 
   return formatLocalizedNumber(numericValue, locale);

@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import {
   Link as LinkIcon,
   Loader2,
+  Monitor,
   MoreVertical,
   Pause,
   Pencil,
@@ -23,6 +24,7 @@ import {
 import {
   getFundraiserUrl,
   isFundraiserOwnerOrAdmin,
+  isStageModeEnabled,
 } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
@@ -42,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { openStageWindow } from '@/modules/stage';
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
@@ -54,6 +57,7 @@ interface ActionVisibility {
   copyLink: boolean;
   pause: boolean;
   resume: boolean;
+  stageMode: boolean;
   delete: boolean;
 }
 
@@ -62,18 +66,58 @@ const NON_OWNER_ACTIONS: ActionVisibility = {
   copyLink: true,
   pause: false,
   resume: false,
+  stageMode: false,
   delete: false,
 };
 
-// prettier-ignore
-const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, ActionVisibility> = {
-  active:    { edit: true,  copyLink: true, pause: true,  resume: false, delete: true },
-  paused:    { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
-  draft:     { edit: true,  copyLink: true, pause: false, resume: true,  delete: true },
-  completed: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
-  cancelled: { edit: false, copyLink: true, pause: false, resume: false, delete: true },
-// Archived fundraisers are not returned by the list API, so this is a defensive check.
-  archived:  { edit: false, copyLink: true, pause: false, resume: false, delete: false },
+// Status drives edit/pause/resume; Stage Mode is orthogonal (it depends on the
+// fundraiser's module settings, not its status) and is layered on afterwards.
+type StatusActions = Omit<ActionVisibility, 'stageMode'>;
+
+const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
+  active: {
+    edit: true,
+    copyLink: true,
+    pause: true,
+    resume: false,
+    delete: true,
+  },
+  paused: {
+    edit: true,
+    copyLink: true,
+    pause: false,
+    resume: true,
+    delete: true,
+  },
+  draft: {
+    edit: true,
+    copyLink: true,
+    pause: false,
+    resume: true,
+    delete: true,
+  },
+  completed: {
+    edit: false,
+    copyLink: true,
+    pause: false,
+    resume: false,
+    delete: true,
+  },
+  cancelled: {
+    edit: false,
+    copyLink: true,
+    pause: false,
+    resume: false,
+    delete: true,
+  },
+  // Archived fundraisers are not returned by the list API, so this is a defensive check.
+  archived: {
+    edit: false,
+    copyLink: true,
+    pause: false,
+    resume: false,
+    delete: false,
+  },
 };
 
 function getAvailableActions(
@@ -83,7 +127,10 @@ function getAvailableActions(
   if (!isFundraiserOwnerOrAdmin(fundraiser, currentUserId)) {
     return NON_OWNER_ACTIONS;
   }
-  return OWNER_ACTIONS_BY_STATUS[fundraiser.status];
+  return {
+    ...OWNER_ACTIONS_BY_STATUS[fundraiser.status],
+    stageMode: isStageModeEnabled(fundraiser),
+  };
 }
 
 type StatusActionKind = 'pause' | 'resume';
@@ -109,9 +156,11 @@ export function FundraiserActionMenu({
     actions.copyLink ||
     actions.pause ||
     actions.resume ||
+    actions.stageMode ||
     actions.delete;
   const showStatusGroup = actions.pause || actions.resume;
-  const showSeparator = showStatusGroup && (actions.edit || actions.copyLink);
+  const showSeparator =
+    showStatusGroup && (actions.edit || actions.copyLink || actions.stageMode);
 
   if (!hasAnyAction) return null;
 
@@ -200,6 +249,20 @@ export function FundraiserActionMenu({
               <Pencil aria-hidden='true' />
               {t('edit')}
             </Link>
+          </DropdownMenuItem>
+        )}
+
+        {actions.stageMode && (
+          <DropdownMenuItem
+            className='cursor-pointer rounded-lg py-2'
+            onSelect={() => {
+              if (!openStageWindow(fundraiser)) {
+                toast.error(t('stageModeBlocked'));
+              }
+            }}
+          >
+            <Monitor aria-hidden='true' />
+            {t('stageMode')}
           </DropdownMenuItem>
         )}
 

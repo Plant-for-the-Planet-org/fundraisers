@@ -170,7 +170,9 @@ All file paths below are relative to `src/`.
 | `useAlltimeStats`  | `modules/stage/hooks/use-alltime-stats.ts`       | Done — stage-internal polling hook, uses poll-bucket |
 | `useLeaderboard`   | `modules/stage/hooks/use-leaderboard.ts`         | Done — polls every 15s, feeds ticker + leaderboard   |
 
-**Public surface** ([`index.ts`](./index.ts)): components `StageView`, `StageModePanel`, `StageMenuItem`, `StageSection`; values `STAGE_LIMITS`, `STAGE_MODULE_ID`, `stageModule`, `stageDefaultSettings`, `stageModeSchema`, `parseStageFormValue`; and the `StageModuleSettings`, `StageSlide`, `StageFormValue` types.
+**Public surface** ([`index.ts`](./index.ts)): components `StageView`, `StageModePanel`, `StageMenuItem`, `StageSection`; values `STAGE_LIMITS`, `STAGE_MODULE_ID`, `stageModule`, `stageDefaultSettings`, `stageModeSchema`, `parseStageFormValue`, `getStageUrl`, `openStageWindow`; and the `StageModuleSettings`, `StageSlide`, `StageFormValue` types.
+
+`openStageWindow` / `getStageUrl` ([`stage-window.ts`](./stage-window.ts)) let a host (e.g. the dashboard action menu) launch the Stage Mode display in a centered popup. They live in the module so core stays free of Stage semantics; the host imports them from `@/modules/stage`.
 
 ---
 
