@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import {
@@ -19,7 +19,6 @@ async function handleCodeExchange(code: string) {
 
 export function AuthInitializer() {
   const tAuth = useTranslations('Auth');
-  const router = useRouter();
   const searchParams = useSearchParams();
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -104,15 +103,9 @@ export function AuthInitializer() {
 
   useEffect(() => {
     if (logoutSuccess !== 'true') return;
-    // The post-logout redirect (redirecting/page.tsx) uses a soft client-
-    // side router.replace(), which only re-fetches the leaf route — the
-    // root layout (header/nav) keeps its already-rendered, now-stale
-    // locale. router.refresh() re-resolves the whole route tree (incl. the
-    // layout) against the cookie clearAuth() just cleared, without a full
-    // document reload — but only when it actually cleared one; an ordinary
-    // logout with an explicit (or no) locale cookie needs no extra refresh.
-    if (clearAuth()) router.refresh();
-  }, [clearAuth, logoutSuccess, router]);
+    // When clearAuth() clears a profile-tagged locale cookie, the resolved locale changes and the whole UI must re-render against it. A full reload (not router.refresh()) is required: refresh only re-renders server components, leaving client components on their stale hydrated locale. We reload only when a cookie was actually cleared; an ordinary logout with an explicit (or no) locale cookie needs no reload.
+    if (clearAuth()) window.location.reload();
+  }, [clearAuth, logoutSuccess]);
 
   return null;
 }

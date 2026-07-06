@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/stores/auth-store';
 import { deleteCookie, readCookie, writeCookie } from '@/i18n/locale-cookie';
@@ -26,7 +25,6 @@ import {
  * before auth settles.
  */
 export function LocaleProfileSync() {
-  const router = useRouter();
   const currentLocale = useLocale();
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const profileLocale = useAuthStore(state => state.user?.profile?.locale);
@@ -59,17 +57,14 @@ export function LocaleProfileSync() {
     const value = serializeLocaleCookieValue(targetLocale, 'profile');
     writeCookie('ui-locale', value, 365);
     if (readCookie('ui-locale') === value) {
-      // router.refresh() re-resolves server components (incl. the root
-      // layout) against the new cookie without a full document reload —
-      // no bundle re-download/re-parse/re-hydrate, unlike
-      // window.location.reload().
-      router.refresh();
+      // Full reload, not router.refresh(): refresh only re-renders server components — client components keep the messages they hydrated with,leaving a mixed-language UI. A reload re-resolves both against the new cookie.
+      window.location.reload();
     } else {
       console.warn(
         '[i18n] profile-locale cookie write failed, locale change not persisted'
       );
     }
-  }, [isAuthInitializing, targetLocale, currentLocale, router]);
+  }, [isAuthInitializing, targetLocale, currentLocale]);
 
   return null;
 }
