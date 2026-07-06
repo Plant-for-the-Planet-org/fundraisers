@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useAuthStore } from '@/stores/auth-store';
-import { deleteCookie, readCookie, writeCookie } from '@/i18n/locale-cookie';
+import { readCookie, writeCookie } from '@/i18n/locale-cookie';
 import {
   normalizeToLocale,
   parseLocaleCookieValue,
@@ -35,24 +35,20 @@ export function LocaleProfileSync() {
 
   useEffect(() => {
     if (isAuthInitializing) return;
+    // No (valid) profile locale to apply — e.g. logged out, or profile locale is empty/unsupported. Leave any existing cookie in place; a logout keeps the last profile-synced language rather than reverting it.
+    if (!targetLocale) return;
 
     const { locale: cookieLocale, source } = parseLocaleCookieValue(
       readCookie('ui-locale')
     );
-
-    if (!targetLocale) {
-      // No (valid) profile locale — e.g. logged out, or profile locale is
-      // empty/unsupported. Clear the cookie only if we're the ones who set
-      // it; never touch an explicit pick.
-      if (cookieLocale && source === 'profile') deleteCookie('ui-locale');
-      return;
-    }
 
     // Only an actual stored explicit pick wins — `source` defaults to
     // 'explicit' even when there's no cookie at all (see
     // parseLocaleCookieValue), so this must also check a value is present.
     if (cookieLocale && source === 'explicit') return;
     if (targetLocale === currentLocale) return; // already correct
+    // Loop guard: if the cookie already carries this target, we have synced it before. currentLocale can still lag (e.g. a failed/partial render leaving the client on the default locale); reloading again would not change the cookie and would spin forever. One reload per target is enough.
+    if (cookieLocale === targetLocale) return;
 
     const value = serializeLocaleCookieValue(targetLocale, 'profile');
     writeCookie('ui-locale', value, 365);
