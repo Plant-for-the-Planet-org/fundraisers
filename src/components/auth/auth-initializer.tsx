@@ -102,7 +102,9 @@ export function AuthInitializer() {
   ]);
 
   useEffect(() => {
-    if (logoutSuccess === 'true') clearAuth();
+    if (logoutSuccess !== 'true') return;
+    // When clearAuth() clears a profile-tagged locale cookie, the resolved locale changes and the whole UI must re-render against it. A full reload (not router.refresh()) is required: refresh only re-renders server components, leaving client components on their stale hydrated locale. We reload only when a cookie was actually cleared; an ordinary logout with an explicit (or no) locale cookie needs no reload.
+    if (clearAuth()) window.location.reload();
   }, [clearAuth, logoutSuccess]);
 
   return null;

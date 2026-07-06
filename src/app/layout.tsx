@@ -16,6 +16,7 @@ import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
 import { CookieConsentProvider } from '@/components/cookie/cookie-consent-provider';
 import { LocaleInitializer } from '@/components/locale-initializer';
+import { LocaleProfileSync } from '@/components/locale-profile-sync';
 
 import './globals.css';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
@@ -92,6 +93,7 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <LocaleInitializer initialLocale={locale} />
+          <LocaleProfileSync />
           {/* Mounted before AuthInitializer so its toast subscription is ready
               when AuthInitializer fires a sign-in-error toast during mount. */}
           <Toaster richColors />

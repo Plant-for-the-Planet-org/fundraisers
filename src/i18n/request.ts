@@ -1,8 +1,7 @@
-import { cookies } from 'next/headers';
-import { hasLocale } from 'next-intl';
+import { cookies, headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
 import { registeredModules } from '@/modules';
-import { routing } from './routing';
+import { resolveLocale } from './resolve-locale';
 
 // Namespaces owned by core (always loaded).
 const CORE_NAMESPACES = [
@@ -31,14 +30,14 @@ async function loadNamespace(locale: string, namespace: string) {
 }
 
 export default getRequestConfig(async () => {
-  // Get locale from cookie (set by client)
-  const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get('ui-locale')?.value;
+  const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
 
-  // Validate and fallback to default if invalid
-  const locale = hasLocale(routing.locales, cookieLocale)
-    ? cookieLocale
-    : routing.defaultLocale;
+  // Priority: explicit selection > profile language (both tags of the same
+  // `ui-locale` cookie, see resolve-locale.ts) > browser language > default.
+  const locale = resolveLocale({
+    cookieLocale: cookieStore.get('ui-locale')?.value,
+    acceptLanguage: headerStore.get('accept-language'),
+  });
 
   const moduleNamespaces = registeredModules
     .map(m => m.localeNamespace)
