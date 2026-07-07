@@ -14,6 +14,7 @@ import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { DonorsStripSkeleton } from '@/components/fundraisers/donors-strip';
 import { DonorsSummary } from '@/components/fundraisers/donors-summary';
+import { DonorsSummaryClientLoader } from '@/components/fundraisers/donors-summary-client-loader';
 import { GoalProgressDisplay } from '@/components/fundraisers/goal-progress-display';
 import { HostControls } from '@/components/fundraisers/host-controls';
 import { Hosts } from '@/components/fundraisers/hosts';
@@ -96,26 +97,29 @@ export function FundraiserView({
             DonorsSummary renders the count header + strip + a "View all" entry
             into the donations modal; the fallback keeps the count visible while
             the leaderboard loads. */}
-        {canShowLeaderboard && (
-          <Suspense
-            fallback={
-              <div className='flex flex-col gap-3'>
-                <SectionHeader>
-                  {t('donationCount', {
-                    count: fundraiser.donationCount,
-                    formattedCount: formatCompactNumber(
-                      fundraiser.donationCount,
-                      locale
-                    ),
-                  })}
-                </SectionHeader>
-                <DonorsStripSkeleton />
-              </div>
-            }
-          >
-            <DonorsSummary fundraiser={fundraiser} />
-          </Suspense>
-        )}
+        {canShowLeaderboard &&
+          (leaderboardFetchStrategy === 'client' ? (
+            <DonorsSummaryClientLoader fundraiser={fundraiser} />
+          ) : (
+            <Suspense
+              fallback={
+                <div className='flex flex-col gap-3'>
+                  <SectionHeader>
+                    {t('donationCount', {
+                      count: fundraiser.donationCount,
+                      formattedCount: formatCompactNumber(
+                        fundraiser.donationCount,
+                        locale
+                      ),
+                    })}
+                  </SectionHeader>
+                  <DonorsStripSkeleton />
+                </div>
+              }
+            >
+              <DonorsSummary fundraiser={fundraiser} />
+            </Suspense>
+          ))}
 
         <div className='md:hidden flex flex-col'>
           {/** Copy link */}
