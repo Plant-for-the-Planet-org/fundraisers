@@ -1,8 +1,18 @@
 import type { MetadataRoute } from 'next';
 
-import { getSiteUrl } from '@/lib/utils/site-url';
+import { headers } from 'next/headers';
+import { getSiteUrl, isProductionHost } from '@/lib/utils/site-url';
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const headersList = await headers();
+  const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
+
+  if (!isProductionHost(host)) {
+    return { rules: { userAgent: '*', disallow: '/' } };
+  }
+
+  const siteUrl = getSiteUrl();
+
   return {
     rules: {
       userAgent: '*',
@@ -12,6 +22,6 @@ export default function robots(): MetadataRoute.Robots {
       // Crawlers that ignore '$' simply won't match this rule.
       disallow: ['/$', '/sentry-test'],
     },
-    sitemap: `${getSiteUrl()}/sitemap.xml`,
+    sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/raise/sitemap.xml`],
   };
 }
