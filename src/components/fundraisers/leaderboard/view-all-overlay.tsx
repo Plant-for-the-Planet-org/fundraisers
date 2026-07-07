@@ -173,21 +173,17 @@ export function ViewAllOverlay({
     fetchNextPageRef.current = fetchNextPage;
   }, [fetchNextPage]);
 
-  // Sentinel element observed for infinite scroll. A callback ref (state,
-  // not useRef) so the observer effect reruns exactly when the node attaches
-  // to the DOM - the dialog mounts through Radix's Presence + Portal, which
-  // each defer real mounting to their own layout effect, so a useRef read
-  // synchronously in an effect keyed on [isOpen, effectiveTab] can run before
-  // the node exists and never gets a second chance until effectiveTab changes.
-  const [sentinelNode, setSentinelNode] = useState<HTMLDivElement | null>(null);
+  // Sentinel element observed for infinite scroll
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // IntersectionObserver triggers fetch when sentinel nears the viewport.
   // Handles both scroll-near-bottom AND content-shorter-than-container cases.
   useEffect(() => {
-    if (!isOpen || !sentinelNode) return;
+    if (!isOpen) return;
 
+    const sentinel = sentinelRef.current;
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
+    if (!sentinel || !scrollContainer) return;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -201,9 +197,9 @@ export function ViewAllOverlay({
       }
     );
 
-    observer.observe(sentinelNode);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [isOpen, effectiveTab, sentinelNode]);
+  }, [isOpen, effectiveTab]);
 
   return (
     <Dialog
@@ -284,7 +280,7 @@ export function ViewAllOverlay({
                   </div>
                 )}
                 {/* Sentinel observed by IntersectionObserver for infinite scroll */}
-                <div ref={setSentinelNode} className='h-1' aria-hidden='true' />
+                <div ref={sentinelRef} className='h-1' aria-hidden='true' />
               </>
             ) : (
               <div className='py-8 text-center'>
