@@ -12,7 +12,7 @@ import { resolveActiveTab } from './leaderboard/resolve-tab';
 import { ViewAllOverlay } from './leaderboard/view-all-overlay';
 import { SectionHeader } from './typography';
 
-interface DonorsSummaryPanelProps {
+export interface DonorsSummaryPanelProps {
   /** Strip avatars + names. Recent or top, depending on caller. */
   donations: LeaderboardDonation[];
   donationCount: number;

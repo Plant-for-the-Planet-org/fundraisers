@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getLeaderboard } from '@/lib/api/leaderboard-service';
 import { formatCompactNumber } from '@/lib/utils';
 import { DonorsStripSkeleton } from './donors-strip';
+import { donorsSummaryPanelProps } from './donors-summary';
 import { DonorsSummaryPanel } from './donors-summary-panel';
 import { SectionHeader } from './typography';
 
@@ -60,36 +61,8 @@ export function DonorsSummaryClientLoader({
     );
   }
 
-  const settings = fundraiser.settings?.modules?.leaderboard;
-  if (!settings) return null;
+  const props = donorsSummaryPanelProps(fundraiser, data);
+  if (!props) return null;
 
-  if (!data) {
-    return (
-      <DonorsSummaryPanel
-        donations={[]}
-        donationCount={fundraiser.donationCount}
-        settings={{ ...settings, view_all: false }}
-        idOrSlug={fundraiser.slug}
-        initialRecentDonations={[]}
-        initialTopDonations={[]}
-        totalRecentDonationCount={0}
-        totalTopDonationCount={0}
-      />
-    );
-  }
-
-  const donations = data.top.length > 0 ? data.top : data.recent;
-
-  return (
-    <DonorsSummaryPanel
-      donations={donations}
-      donationCount={data.donationCount}
-      settings={settings ?? data.settings}
-      idOrSlug={fundraiser.slug}
-      initialRecentDonations={data.recent}
-      initialTopDonations={data.top}
-      totalRecentDonationCount={data.recentTotal}
-      totalTopDonationCount={data.topTotal}
-    />
-  );
+  return <DonorsSummaryPanel {...props} />;
 }
