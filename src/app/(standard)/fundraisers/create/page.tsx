@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
+
 import { getTranslations } from 'next-intl/server';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { CreateFundraiserButton } from '@/components/fundraisers/create-fundraiser-button';
 import { CreateFundraiserFormProvider } from '@/components/fundraisers/create-fundraiser-form-context';
 import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
+
+export const metadata: Metadata = {
+  robots: 'noindex, nofollow',
+};
 
 export default async function CreateFundraiserPage() {
   const t = await getTranslations('Fundraisers.createPage');
