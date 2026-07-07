@@ -10,6 +10,7 @@ import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useAuthStore } from '@/stores/auth-store';
 import { useThemeStore } from '@/stores/theme-store';
+import { FundraiserLoadingSkeleton } from '@/components/fundraisers/fundraiser-loading-skeleton';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 
 export function FundraiserAuthRetry({ slug }: { slug: string }) {
@@ -43,7 +44,10 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
   }, [isAuthInitializing, accessToken, slug, setSelectedTheme]);
 
   if (failed) notFound();
-  if (!fundraiser) return null;
+  // Auth finished with no token → treat as not found (drafts stay invisible to the public; a host can view after logging in).
+  if (!isAuthInitializing && !accessToken) notFound();
+  // Still initializing, or the authenticated fetch is in flight.
+  if (!fundraiser) return <FundraiserLoadingSkeleton />;
 
   return (
     <FundraiserView
