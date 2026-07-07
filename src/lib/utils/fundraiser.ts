@@ -30,7 +30,10 @@ export function isFundraiserOwnerOrAdmin(
  * True when the fundraiser has the Stage Mode display module enabled.
  */
 export function isStageModeEnabled(fundraiser: Fundraiser): boolean {
-  return fundraiser.settings?.modules?.stage?.enabled === true;
+  return (
+    fundraiser.settings?.modules?.stage?.enabled === true &&
+    fundraiser.status !== 'draft'
+  );
 }
 
 /**
