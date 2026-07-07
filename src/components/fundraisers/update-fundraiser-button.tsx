@@ -30,7 +30,7 @@ export function UpdateFundraiserButton({
   const t = useTranslations('Fundraisers.edit.formSubmission');
   const { control, handleSubmit, reset } =
     useFormContext<FundraiserFormValues>();
-  const { isDirty, isValid, dirtyFields, defaultValues } = useFormState({
+  const { isDirty, dirtyFields, defaultValues } = useFormState({
     control,
   });
   const accessToken = useAuthStore(state => state.accessToken);
@@ -109,7 +109,7 @@ export function UpdateFundraiserButton({
   return (
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
-      disabled={isSubmitting || !isDirty || !isValid}
+      disabled={isSubmitting || !isDirty}
       onClick={handleSubmit(onSubmit, errors =>
         console.error('Update blocked by validation errors:', errors)
       )}
