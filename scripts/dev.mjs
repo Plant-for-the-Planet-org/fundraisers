@@ -1,7 +1,7 @@
 // RAM-aware dev bundler selection.
 // Turbopack (Next's default) is fast but memory-hungry; on low-RAM machines it swaps and thrashes the CPU. Webpack has a lower, more predictable memory ceiling.
 // We pick by total installed RAM (a per-machine constant) rather than free RAM, because free RAM fluctuates and flipping bundlers between runs invalidates the .next cache.
-// Use `npm run dev:webpack` to force webpack regardless of this heuristic.
+// To override this heuristic, force a bundler with `npm run dev:webpack` or `npm run dev:turbopack`.
 import { spawn } from 'node:child_process';
 import os from 'node:os';
 
