@@ -1,8 +1,6 @@
 // RAM-aware dev bundler selection.
-// Turbopack (Next's default) is fast but memory-hungry; on low-RAM machines it swaps
-// and thrashes the CPU. Webpack has a lower, more predictable memory ceiling.
-// We pick by total installed RAM (a per-machine constant) rather than free RAM, because
-// free RAM fluctuates and flipping bundlers between runs invalidates the .next cache.
+// Turbopack (Next's default) is fast but memory-hungry; on low-RAM machines it swaps and thrashes the CPU. Webpack has a lower, more predictable memory ceiling.
+// We pick by total installed RAM (a per-machine constant) rather than free RAM, because free RAM fluctuates and flipping bundlers between runs invalidates the .next cache.
 // Use `npm run dev:webpack` to force webpack regardless of this heuristic.
 import { spawn } from 'node:child_process';
 import os from 'node:os';
@@ -21,4 +19,17 @@ console.log(
 const command = `next dev${useWebpack ? ' --webpack' : ''}`;
 const child = spawn(command, { stdio: 'inherit', shell: true });
 
-child.on('exit', code => process.exit(code ?? 0));
+child.on('error', err => {
+  console.error('[dev] failed to start the dev server:', err);
+  process.exit(1);
+});
+
+child.on('exit', (code, signal) => {
+  // OOM kills (SIGKILL) are plausible on the low-RAM machines this script targets; surface them as a failure instead of a false success.
+  // Interactive stops (Ctrl-C / SIGINT, SIGTERM) exit cleanly to avoid npm error noise.
+  if (signal && signal !== 'SIGINT' && signal !== 'SIGTERM') {
+    console.error(`[dev] dev server terminated by ${signal}`);
+    process.exit(1);
+  }
+  process.exit(code ?? 0);
+});
