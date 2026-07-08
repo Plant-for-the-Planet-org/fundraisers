@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   AArrowDown,
@@ -11,7 +11,10 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
+  Check,
+  ExternalLink,
   Italic,
+  Link as LinkIcon,
   List,
   ListOrdered,
   Minus,
@@ -20,8 +23,10 @@ import {
   Subscript as SubscriptIcon,
   Superscript as SuperscriptIcon,
   Underline as UnderlineIcon,
+  Unlink,
   Video,
 } from 'lucide-react';
+import { Link } from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
@@ -80,6 +85,8 @@ const INACTIVE_EDITOR_STATE = {
   isBulletList: false,
   isOrderedList: false,
   isBlockquote: false,
+  isLink: false,
+  linkHref: '',
   align: 'left' as 'left' | 'center' | 'right',
   fontSize: DEFAULT_FONT_SIZE,
 } as const;
@@ -110,6 +117,16 @@ function nextFontSize(current: number, direction: 1 | -1): number {
   }
   const clamped = Math.min(Math.max(nextIndex, 0), FONT_SIZE_STEPS.length - 1);
   return FONT_SIZE_STEPS[clamped];
+}
+
+// TipTap's `defaultProtocol` only prepends a scheme for autolink/paste, never
+// for `setLink` — so a typed bare domain would be stored as a relative href.
+// Prepend https for anything without a scheme; leave http/https/mailto/tel/etc.
+// exactly as typed.
+function normalizeLinkHref(value: string): string {
+  const v = value.trim();
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(v)) return v;
+  return `https://${v}`;
 }
 
 function ToolbarButton({
@@ -154,6 +171,37 @@ export function RichTextEditor({
   ariaDescribedBy,
   extraToolbarActions,
 }: RichTextEditorProps) {
+  // Lets the Mod-k keyboard shortcut (registered once on the extension below)
+  // reach the current React setters that open the link input row. Reassigned
+  // each render so it never goes stale.
+  const openLinkInputRef = useRef<(href: string) => void>(() => {});
+
+  // Custom Link extension: same config as before, plus a Mod-k shortcut that
+  // opens the link input (prefilled from the link under the cursor). `useEditor`
+  // reads its extensions once (empty deps), so recreating this object per render
+  // is harmless — only the first instance is used.
+  const linkExtension = Link.extend({
+    addKeyboardShortcuts() {
+      return {
+        'Mod-k': () => {
+          const href = (this.editor.getAttributes('link').href as string) ?? '';
+          openLinkInputRef.current(href);
+          return true;
+        },
+      };
+    },
+  }).configure({
+    openOnClick: false,
+    enableClickSelection: true,
+    autolink: true,
+    linkOnPaste: true,
+    defaultProtocol: 'https',
+    HTMLAttributes: {
+      target: '_blank',
+      rel: 'noopener noreferrer nofollow',
+    },
+  });
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -179,6 +227,7 @@ export function RichTextEditor({
       TextAlign.configure({
         types: ['paragraph'],
       }),
+      linkExtension,
       VideoEmbedNode,
     ],
     content: value,
@@ -218,6 +267,8 @@ export function RichTextEditor({
         isBulletList: currentEditor.isActive('bulletList'),
         isOrderedList: currentEditor.isActive('orderedList'),
         isBlockquote: currentEditor.isActive('blockquote'),
+        isLink: currentEditor.isActive('link'),
+        linkHref: (currentEditor.getAttributes('link').href as string) ?? '',
         align: currentEditor.isActive({ textAlign: 'center' })
           ? ('center' as const)
           : currentEditor.isActive({ textAlign: 'right' })
@@ -232,10 +283,15 @@ export function RichTextEditor({
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
   const t = useTranslations('Common.videoEmbed.editor');
+  const tLink = useTranslations('Common');
   const videoErrorId = useId();
+  const linkErrorId = useId();
   const [isVideoInputOpen, setIsVideoInputOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [hasVideoError, setHasVideoError] = useState(false);
+  const [isLinkInputOpen, setIsLinkInputOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [hasLinkError, setHasLinkError] = useState(false);
 
   const closeVideoInput = () => {
     setVideoUrl('');
@@ -260,6 +316,45 @@ export function RichTextEditor({
       .run();
     closeVideoInput();
   };
+
+  const closeLinkInput = () => {
+    setLinkUrl('');
+    setHasLinkError(false);
+    setIsLinkInputOpen(false);
+  };
+
+  const openLinkInput = (href: string) => {
+    setLinkUrl(href);
+    setHasLinkError(false);
+    setIsLinkInputOpen(true);
+  };
+  // Keep the ref pointing at the current opener so the Mod-k shortcut (bound
+  // once on the extension) always calls the live setters. Done in an effect so
+  // the ref is never written during render.
+  useEffect(() => {
+    openLinkInputRef.current = openLinkInput;
+  });
+
+  // Clicking inside an existing link opens the same row, prefilled — mirrors
+  // clicking the toolbar button, without requiring it. Adjusted during render
+  // (not an effect) since this only needs to react to cursor-position
+  // transitions, not synchronize with an external system.
+  const [lastSeenLink, setLastSeenLink] = useState<{
+    isLink: boolean;
+    href: string;
+  }>({ isLink: toolbarState.isLink, href: toolbarState.linkHref });
+  if (
+    toolbarState.isLink !== lastSeenLink.isLink ||
+    toolbarState.linkHref !== lastSeenLink.href
+  ) {
+    setLastSeenLink({
+      isLink: toolbarState.isLink,
+      href: toolbarState.linkHref,
+    });
+    if (toolbarState.isLink) {
+      openLinkInput(toolbarState.linkHref);
+    }
+  }
 
   useEffect(() => {
     if (editor && !editor.isFocused && value !== editor.getHTML()) {
@@ -314,6 +409,34 @@ export function RichTextEditor({
     editor.chain().focus().setTextAlign(next.value).run();
   };
 
+  const applyLink = () => {
+    if (!linkUrl.trim()) {
+      setHasLinkError(true);
+      return;
+    }
+    editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: normalizeLinkHref(linkUrl) })
+      .run();
+    closeLinkInput();
+  };
+
+  const removeLink = () => {
+    editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    closeLinkInput();
+  };
+
+  const openLinkInNewTab = () => {
+    if (!toolbarState.linkHref) return;
+    const anchor = document.createElement('a');
+    anchor.href = toolbarState.linkHref;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    anchor.click();
+  };
+
   return (
     <div
       className={cn(
@@ -321,7 +444,7 @@ export function RichTextEditor({
         className
       )}
     >
-      <div className='border-b border-input p-2 flex items-center gap-1 flex-wrap bg-muted/10'>
+      <div className='border-b border-input p-1 flex items-center gap-0.5 flex-wrap bg-muted/10'>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={toolbarState.isBold}
@@ -351,18 +474,15 @@ export function RichTextEditor({
           <Strikethrough className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.chain().focus().toggleSuperscript().run()}
-          isActive={toolbarState.isSuperscript}
-          title='Superscript'
+          onClick={() =>
+            isLinkInputOpen
+              ? closeLinkInput()
+              : openLinkInput(toolbarState.linkHref)
+          }
+          isActive={isLinkInputOpen || toolbarState.isLink}
+          title={tLink('linkEditor.toolbarButton')}
         >
-          <SuperscriptIcon className='h-4 w-4' />
-        </ToolbarButton>
-        <ToolbarButton
-          onClick={() => editor.chain().focus().toggleSubscript().run()}
-          isActive={toolbarState.isSubscript}
-          title='Subscript'
-        >
-          <SubscriptIcon className='h-4 w-4' />
+          <LinkIcon className='h-4 w-4' />
         </ToolbarButton>
 
         <div className='w-px h-6 bg-border mx-1' />
@@ -381,9 +501,6 @@ export function RichTextEditor({
         >
           <ListOrdered className='h-4 w-4' />
         </ToolbarButton>
-
-        <div className='w-px h-6 bg-border mx-1' />
-
         <ToolbarButton
           onClick={toggleBlockquote}
           isActive={toolbarState.isBlockquote}
@@ -397,9 +514,23 @@ export function RichTextEditor({
         >
           <Minus className='h-4 w-4' />
         </ToolbarButton>
+        <ToolbarButton
+          onClick={cycleAlign}
+          isActive={toolbarState.align !== 'left'}
+          title={`Align: ${currentAlignOption.label} (click to cycle)`}
+        >
+          <CurrentAlignIcon className='h-4 w-4' />
+        </ToolbarButton>
 
         <div className='w-px h-6 bg-border mx-1' />
 
+        <ToolbarButton
+          onClick={() => applyFontStep(1)}
+          disabled={toolbarState.fontSize >= MAX_FONT_SIZE}
+          title='Increase font size'
+        >
+          <AArrowUp className='h-4 w-4' />
+        </ToolbarButton>
         <ToolbarButton
           onClick={() => applyFontStep(-1)}
           disabled={toolbarState.fontSize <= MIN_FONT_SIZE}
@@ -408,19 +539,18 @@ export function RichTextEditor({
           <AArrowDown className='h-4 w-4' />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => applyFontStep(1)}
-          disabled={toolbarState.fontSize >= MAX_FONT_SIZE}
-          title='Increase font size'
+          onClick={() => editor.chain().focus().toggleSuperscript().run()}
+          isActive={toolbarState.isSuperscript}
+          title='Superscript'
         >
-          <AArrowUp className='h-4 w-4' />
+          <SuperscriptIcon className='h-4 w-4' />
         </ToolbarButton>
-
         <ToolbarButton
-          onClick={cycleAlign}
-          isActive={toolbarState.align !== 'left'}
-          title={`Align: ${currentAlignOption.label} (click to cycle)`}
+          onClick={() => editor.chain().focus().toggleSubscript().run()}
+          isActive={toolbarState.isSubscript}
+          title='Subscript'
         >
-          <CurrentAlignIcon className='h-4 w-4' />
+          <SubscriptIcon className='h-4 w-4' />
         </ToolbarButton>
 
         <div className='w-px h-6 bg-border mx-1' />
@@ -489,8 +619,78 @@ export function RichTextEditor({
         </div>
       )}
 
+      {isLinkInputOpen && (
+        <div className='flex flex-col gap-1 border-b border-input bg-muted/10 p-2'>
+          <div className='flex items-center gap-2'>
+            <input
+              type='url'
+              autoFocus
+              value={linkUrl}
+              onChange={event => {
+                setLinkUrl(event.target.value);
+                setHasLinkError(false);
+              }}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  applyLink();
+                } else if (event.key === 'Escape') {
+                  closeLinkInput();
+                }
+              }}
+              placeholder={tLink('linkEditor.urlPlaceholder')}
+              aria-label={tLink('linkEditor.urlLabel')}
+              aria-invalid={hasLinkError}
+              aria-describedby={hasLinkError ? linkErrorId : undefined}
+              className={cn(
+                'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
+                hasLinkError ? 'border-destructive' : 'border-input'
+              )}
+            />
+            <ToolbarButton
+              onClick={applyLink}
+              title={tLink('linkEditor.setLink')}
+            >
+              <Check className='h-4 w-4' />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={removeLink}
+              disabled={!toolbarState.isLink}
+              title={tLink('linkEditor.unlink')}
+            >
+              <Unlink className='h-4 w-4' />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={openLinkInNewTab}
+              disabled={!toolbarState.linkHref}
+              title={tLink('linkEditor.openInNewTab')}
+            >
+              <ExternalLink className='h-4 w-4' />
+            </ToolbarButton>
+          </div>
+          {hasLinkError && (
+            <span id={linkErrorId} className='text-xs text-destructive'>
+              {tLink('linkEditor.invalidUrl')}
+            </span>
+          )}
+        </div>
+      )}
+
       <EditorContent
         editor={editor}
+        // Capture-phase guard: a stored link is a real `<a href target="_blank">`
+        // in the contenteditable DOM, and the browser would navigate it on
+        // click. Cancelling the default here (before ProseMirror / the anchor's
+        // own default) stops navigation for every click path, while letting the
+        // event continue so ProseMirror still selects the link and opens the
+        // input row. Links are followed only via the row's open-in-new-tab
+        // button.
+        onClickCapture={event => {
+          const target = event.target;
+          if (target instanceof Element && target.closest('a')) {
+            event.preventDefault();
+          }
+        }}
         className='
           rich-quote
           [&_.ProseMirror]:bg-transparent

@@ -1,11 +1,6 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
-import { cn } from '@/lib/utils';
-import {
-  hasVideoMarker,
-  splitVideoMarkers,
-} from '@/lib/video/split-video-markers';
-import { VideoEmbed } from '@/components/ui/video-embed';
+import { RichTextClickCapture } from '@/components/ui/rich-text-click-capture';
 
 // Discriminated for safety: a raw string without a `sanitize` fn is a compile error, not a silent XSS vulnerability
 type RichTextContentProps = {
@@ -24,12 +19,11 @@ type RichTextContentProps = {
 );
 
 /**
- * Renders sanitized rich-text HTML, replacing each `<video-embed>` marker with
- * a live `<VideoEmbed>` player. HTML segments render via `dangerouslySetInnerHTML`
- * so the markup is SSR-friendly (and so plain descriptions stay byte-identical
- * to before this feature). The iframe is built by `VideoEmbed` from the
- * re-validated id — never from stored HTML. Splitting lives in
- * `splitVideoMarkers`.
+ * Sanitizes rich-text HTML (this part can run in a Server Component, since
+ * `sanitize` is a plain synchronous function) and hands the resulting string
+ * to `RichTextClickCapture`, a Client Component, for actual rendering. That
+ * split exists because `sanitize` is a function prop — functions can't cross
+ * the Server → Client boundary, but the sanitized string can.
  */
 export function RichTextContent({
   html,
@@ -38,35 +32,7 @@ export function RichTextContent({
 }: RichTextContentProps) {
   if (!html) return null;
 
-  const safeHtml = sanitize ? sanitize(html) : (html as string);
+  const safeHtml = sanitize ? sanitize(html) : (html as SafeHtml);
 
-  // Fast path: no video markers → single node, byte-identical to before.
-  if (!hasVideoMarker(safeHtml)) {
-    return (
-      <div
-        className={cn(className)}
-        dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
-      />
-    );
-  }
-
-  return (
-    <div className={className}>
-      {splitVideoMarkers(safeHtml).map((segment, index) =>
-        segment.kind === 'video' ? (
-          <VideoEmbed
-            key={index}
-            provider={segment.provider}
-            id={segment.id}
-            aspect={segment.aspect}
-          />
-        ) : (
-          <div
-            key={index}
-            dangerouslySetInnerHTML={{ __html: segment.html as TrustedHTML }}
-          />
-        )
-      )}
-    </div>
-  );
+  return <RichTextClickCapture safeHtml={safeHtml} className={className} />;
 }
