@@ -7,6 +7,13 @@ import { localeDeclarations } from './next.config.utils';
 const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
+  experimental: {
+    // Lower dev/build memory pressure on constrained machines.
+    // webpackMemoryOptimizations is inert under Turbopack, so it only
+    // affects the webpack (low-RAM) path.
+    webpackMemoryOptimizations: true,
+    preloadEntriesOnStart: false,
+  },
   redirects: async () => {
     return [
       {
