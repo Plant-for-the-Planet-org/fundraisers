@@ -73,13 +73,11 @@
       "copyLink": "Copy link",
       "pause": "Pause",
       "resume": "Resume",
-      "activate": "Activate",
       "delete": "Delete",
       "copyLinkSuccess": "Link copied",
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
-      "activateSuccess": "Fundraiser activated",
       "deleteSuccess": "Fundraiser deleted",
       "mutationError": "Something went wrong. Try again."
     },
