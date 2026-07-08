@@ -1,34 +1,22 @@
 /**
  * Classifies a link URL into what clicking it will actually do, so the
- * external-redirect warning can adapt its copy and behaviour per scheme.
- * `web` links auto-open in a new tab after the countdown; `mail`/`tel` only
- * fire on an explicit click (no silent hand-off to another app).
+ * `/external` redirect page can adapt its copy per scheme. Every scheme
+ * requires an explicit "Continue" click — nothing auto-fires.
  */
 
-export type LinkScheme = 'web' | 'mail' | 'tel';
+import { isWhitelistedHostname } from '@/lib/constants/trusted-domains';
+
+export type LinkScheme = 'web' | 'mail';
 
 export interface LinkIntent {
   scheme: LinkScheme;
-  /** Domain for web links, the raw address/number otherwise. */
+  /** Domain for web links, the raw address otherwise. */
   destination: string;
-  autoFire: boolean;
 }
 
 export function getLinkIntent(href: string): LinkIntent {
   if (href.startsWith('mailto:')) {
-    return {
-      scheme: 'mail',
-      destination: href.slice('mailto:'.length),
-      autoFire: false,
-    };
-  }
-
-  if (href.startsWith('tel:')) {
-    return {
-      scheme: 'tel',
-      destination: href.slice('tel:'.length),
-      autoFire: false,
-    };
+    return { scheme: 'mail', destination: href.slice('mailto:'.length) };
   }
 
   let destination = href;
@@ -38,7 +26,60 @@ export function getLinkIntent(href: string): LinkIntent {
     // Not a parseable absolute URL — fall back to the raw href as the label.
   }
 
-  return { scheme: 'web', destination, autoFire: true };
+  return { scheme: 'web', destination };
+}
+
+/**
+ * Whether a link can skip the `/external` warning gate and open directly.
+ * Only `http`/`https` links to a domain Plant-for-the-Planet owns qualify —
+ * `mailto:` has no domain to check, so it never does.
+ */
+export function isWhitelistedHref(href: string): boolean {
+  const intent = getLinkIntent(href);
+  if (intent.scheme !== 'web') return false;
+
+  try {
+    return isWhitelistedHostname(new URL(href).hostname);
+  } catch {
+    return false;
+  }
+}
+
+// Requires at least one label + a dot + a letters-only TLD, e.g. "example.com"
+// or "sub.example.co.uk" — rejects a bare word like "asdfasdf" with no dot,
+// which `new URL()` alone happily accepts as a "valid" hostname.
+const DOMAIN_PATTERN = /^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
+
+function looksLikeADomain(hostname: string): boolean {
+  return DOMAIN_PATTERN.test(hostname);
+}
+
+/**
+ * Whether a link is a type this app supports at all, with a destination that
+ * actually looks real — `http:`/`https:` to a domain-shaped hostname, or
+ * `mailto:` to an address whose domain is domain-shaped. Anything else
+ * (`tel:`, `javascript:`, `data:`, `file:`, a bare word with no TLD, a bare/
+ * relative string, ...) is rejected. This is the single gate shared by the
+ * editor (rejects an unsupported/malformed link at entry, before it can ever
+ * be saved) and the `/external` page (a defensive backstop, since that route
+ * is still directly reachable with an arbitrary query value).
+ */
+export function isValidExternalHref(href: string): boolean {
+  if (href.startsWith('mailto:')) {
+    const [addressPart] = href.slice('mailto:'.length).split('?');
+    const [firstAddress] = addressPart.split(',');
+    const atIndex = firstAddress.lastIndexOf('@');
+    if (atIndex === -1) return false;
+    return looksLikeADomain(firstAddress.slice(atIndex + 1));
+  }
+
+  try {
+    const { protocol, hostname } = new URL(href);
+    if (protocol !== 'http:' && protocol !== 'https:') return false;
+    return looksLikeADomain(hostname);
+  } catch {
+    return false;
+  }
 }
 
 /**

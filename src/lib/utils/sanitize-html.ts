@@ -83,7 +83,7 @@ const THANK_YOU_ALLOWED_TAGS = [
 
 // Links behave identically in descriptions and thank-you notes — same allowed
 // schemes and the same forced target/rel — so both sanitizers share them.
-const LINK_ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel'];
+const LINK_ALLOWED_SCHEMES = ['http', 'https', 'mailto'];
 const LINK_TRANSFORM_TAGS: IOptions['transformTags'] = {
   a: (tagName, attribs) => ({
     tagName,

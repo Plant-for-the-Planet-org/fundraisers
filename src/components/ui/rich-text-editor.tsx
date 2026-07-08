@@ -26,15 +26,19 @@ import {
   Unlink,
   Video,
 } from 'lucide-react';
+import { Extension, getMarkRange } from '@tiptap/core';
 import { Link } from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Subscript } from '@tiptap/extension-subscript';
 import { Superscript } from '@tiptap/extension-superscript';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { FontSize, TextStyle } from '@tiptap/extension-text-style';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
+import { isValidExternalHref } from '@/lib/utils/link-intent';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
@@ -121,13 +125,50 @@ function nextFontSize(current: number, direction: 1 | -1): number {
 
 // TipTap's `defaultProtocol` only prepends a scheme for autolink/paste, never
 // for `setLink` — so a typed bare domain would be stored as a relative href.
-// Prepend https for anything without a scheme; leave http/https/mailto/tel/etc.
+// Prepend https for anything without a scheme; leave http/https/mailto/etc.
 // exactly as typed.
 function normalizeLinkHref(value: string): string {
   const v = value.trim();
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(v)) return v;
   return `https://${v}`;
 }
+
+/**
+ * Keeps the text being linked visibly highlighted while the link input row
+ * has keyboard focus. Without this, the browser clears the native selection
+ * highlight the instant focus moves to the URL field, so the host loses any
+ * visual cue of what they're about to link. The range lives in the
+ * extension's own storage (TipTap's mechanism for state that isn't React
+ * state) rather than a React ref, so nothing here ever reads a ref during
+ * render — the component below only ever writes to `editor.storage` from an
+ * effect.
+ */
+const SelectionHighlight = Extension.create({
+  name: 'selectionHighlight',
+  addStorage() {
+    return { range: null as { from: number; to: number } | null };
+  },
+  addProseMirrorPlugins() {
+    // Arrow function so `this` stays the extension instance (its storage),
+    // instead of aliasing `this` to a local variable.
+    return [
+      new Plugin({
+        key: new PluginKey('selectionHighlight'),
+        props: {
+          decorations: state => {
+            const range = this.storage.range;
+            if (!range || range.from === range.to) return null;
+            return DecorationSet.create(state.doc, [
+              Decoration.inline(range.from, range.to, {
+                class: 'link-target-highlight',
+              }),
+            ]);
+          },
+        },
+      }),
+    ];
+  },
+});
 
 function ToolbarButton({
   onClick,
@@ -175,6 +216,10 @@ export function RichTextEditor({
   // reach the current React setters that open the link input row. Reassigned
   // each render so it never goes stale.
   const openLinkInputRef = useRef<(href: string) => void>(() => {});
+
+  // See closeLinkInput below — guards the link URL input's onBlur against
+  // firing (with a stale value) as a side effect of the input unmounting.
+  const suppressNextLinkBlurRef = useRef(false);
 
   // Custom Link extension: same config as before, plus a Mod-k shortcut that
   // opens the link input (prefilled from the link under the cursor). `useEditor`
@@ -228,6 +273,7 @@ export function RichTextEditor({
         types: ['paragraph'],
       }),
       linkExtension,
+      SelectionHighlight,
       VideoEmbedNode,
     ],
     content: value,
@@ -318,6 +364,13 @@ export function RichTextEditor({
   };
 
   const closeLinkInput = () => {
+    // Removing a focused element from the DOM fires a native blur on it as a
+    // side effect (browsers move focus away when it's disconnected) — which
+    // would otherwise re-trigger the auto-commit-on-blur handler below with a
+    // stale closure (still seeing the URL from just before this close/apply).
+    // Set the flag here, the single choke point every close path already
+    // goes through, so that follow-on blur is recognised and ignored once.
+    suppressNextLinkBlurRef.current = true;
     setLinkUrl('');
     setHasLinkError(false);
     setIsLinkInputOpen(false);
@@ -334,6 +387,50 @@ export function RichTextEditor({
   useEffect(() => {
     openLinkInputRef.current = openLinkInput;
   });
+
+  // Drives the SelectionHighlight plugin. This is a real effect (not done
+  // inline in openLinkInput/the render-time adjustment below) because it
+  // dispatches into ProseMirror — a side effect on an external system, which
+  // must not happen during React's render phase. A plugin's `decorations()`
+  // only reruns as part of a ProseMirror state transition, so mutating
+  // storage alone wouldn't repaint anything; dispatching a no-op transaction
+  // is the standard way to trigger that recompute on demand. Re-runs if the
+  // underlying link changes while the row stays open (moving from one link
+  // straight into another without closing it first).
+  useEffect(() => {
+    if (!editor) return;
+    // `Editor.storage`'s type only knows about extensions declared through
+    // TipTap's module-augmentation mechanism; a plain cast is simpler here
+    // than adding that boilerplate for one small piece of internal state.
+    const storage = (
+      editor.storage as unknown as {
+        selectionHighlight: { range: { from: number; to: number } | null };
+      }
+    ).selectionHighlight;
+
+    if (!isLinkInputOpen) {
+      // TipTap extension storage is mutable-by-design (it isn't React state) —
+      // this is the documented way to feed a value into a plugin's decorations.
+      // eslint-disable-next-line react-hooks/immutability
+      storage.range = null;
+      editor.view.dispatch(editor.state.tr);
+      return;
+    }
+
+    const { from, to } = editor.state.selection;
+    // A real selection highlights as-is; a collapsed cursor inside an
+    // existing link highlights that link's whole range instead, since
+    // there's nothing else to show the host what they're editing.
+    // eslint-disable-next-line react-hooks/immutability -- see note above
+    storage.range =
+      from === to
+        ? (getMarkRange(
+            editor.state.selection.$from,
+            editor.schema.marks.link
+          ) ?? null)
+        : { from, to };
+    editor.view.dispatch(editor.state.tr);
+  }, [editor, isLinkInputOpen, toolbarState.linkHref]);
 
   // Clicking inside an existing link opens the same row, prefilled — mirrors
   // clicking the toolbar button, without requiring it. Adjusted during render
@@ -409,8 +506,21 @@ export function RichTextEditor({
     editor.chain().focus().setTextAlign(next.value).run();
   };
 
+  // Same check `/external` uses as its defensive backstop — this is the
+  // actual gate: an unsupported link (tel:, javascript:, an empty string,
+  // a domain-shaped-but-fake string, ...) never gets saved in the first
+  // place. Shared by the explicit "set" action and the auto-commit-on-blur
+  // behaviour below, so both agree on what counts as valid.
+  const getNormalizedLinkUrlIfValid = (): string | null => {
+    const normalized = normalizeLinkHref(linkUrl);
+    return linkUrl.trim() && isValidExternalHref(normalized)
+      ? normalized
+      : null;
+  };
+
   const applyLink = () => {
-    if (!linkUrl.trim()) {
+    const normalized = getNormalizedLinkUrlIfValid();
+    if (!normalized) {
       setHasLinkError(true);
       return;
     }
@@ -418,9 +528,28 @@ export function RichTextEditor({
       .chain()
       .focus()
       .extendMarkRange('link')
-      .setLink({ href: normalizeLinkHref(linkUrl) })
+      .setLink({ href: normalized })
       .run();
     closeLinkInput();
+  };
+
+  // Committing shouldn't require the explicit "set" click: once the URL is
+  // valid, moving on — clicking elsewhere in the editor, clicking outside it
+  // entirely, or tabbing away — should save it and close the row on its own.
+  // An invalid/empty URL is discarded quietly instead (no error nagging the
+  // host just for clicking away). The row's own buttons are unaffected: they
+  // use onMouseDown+preventDefault (see ToolbarButton) specifically so
+  // clicking them never blurs this input in the first place.
+  const handleLinkInputBlur = () => {
+    if (suppressNextLinkBlurRef.current) {
+      suppressNextLinkBlurRef.current = false;
+      return;
+    }
+    if (getNormalizedLinkUrlIfValid()) {
+      applyLink();
+    } else {
+      closeLinkInput();
+    }
   };
 
   const removeLink = () => {
@@ -638,6 +767,7 @@ export function RichTextEditor({
                   closeLinkInput();
                 }
               }}
+              onBlur={handleLinkInputBlur}
               placeholder={tLink('linkEditor.urlPlaceholder')}
               aria-label={tLink('linkEditor.urlLabel')}
               aria-invalid={hasLinkError}
