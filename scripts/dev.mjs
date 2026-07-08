@@ -14,9 +14,11 @@ console.log(
   `[dev] ${Math.round(totalGiB)} GiB RAM detected -> ${useWebpack ? 'webpack' : 'Turbopack'}`
 );
 
-const child = spawn('next', ['dev', ...(useWebpack ? ['--webpack'] : [])], {
-  stdio: 'inherit',
-  shell: true, // resolves the next.cmd shim on Windows; harmless elsewhere
-});
+// Pass the command as a single string (not args + shell:true, which Node 24
+// deprecates via DEP0190). shell:true resolves the next.cmd shim on Windows and
+// is harmless elsewhere; the arguments are static literals, so there is nothing
+// unsafe to escape.
+const command = `next dev${useWebpack ? ' --webpack' : ''}`;
+const child = spawn(command, { stdio: 'inherit', shell: true });
 
 child.on('exit', code => process.exit(code ?? 0));
