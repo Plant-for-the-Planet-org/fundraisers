@@ -9,13 +9,13 @@ const isDev = process.env.NODE_ENV === 'development';
 const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
-  experimental: {
-    // Lower dev/build memory pressure on constrained machines.
-    // webpackMemoryOptimizations is inert under Turbopack, so it only
-    // affects the webpack (low-RAM) path.
-    webpackMemoryOptimizations: true,
-    preloadEntriesOnStart: false,
-  },
+  // Dev-only memory tweak; gated so it can never affect a production build.
+  // Lowers webpack's memory ceiling on the low-RAM (8 GB) dev path; inert under Turbopack.
+  ...(isDev && {
+    experimental: {
+      webpackMemoryOptimizations: true,
+    },
+  }),
   redirects: async () => {
     return [
       {
