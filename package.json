@@ -7,11 +7,14 @@
     "npm": "11.x"
   },
   "scripts": {
-    "dev-https": "next dev --experimental-https",
-    "dev": "next dev",
+    "dev-https": "node scripts/dev.mjs --experimental-https",
+    "dev": "node scripts/dev.mjs",
+    "dev:webpack": "next dev --webpack",
+    "dev:turbopack": "next dev --turbopack",
     "check:locales": "node scripts/check-locales.mjs",
     "prebuild": "npm run check:locales",
     "build": "next build",
+    "clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
