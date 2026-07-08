@@ -93,7 +93,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
     edit: true,
     copyLink: true,
     pause: false,
-    resume: true,
+    resume: false,
     delete: true,
   },
   completed: {
@@ -187,9 +187,8 @@ export function FundraiserActionMenu({
         updatedFundraiser = await pauseFundraiser(fundraiser.id, accessToken);
         toast.success(t('pauseSuccess'));
       } else {
-        const isDraft = fundraiser.status === 'draft';
         updatedFundraiser = await resumeFundraiser(fundraiser.id, accessToken);
-        toast.success(t(isDraft ? 'activateSuccess' : 'resumeSuccess'));
+        toast.success(t('resumeSuccess'));
       }
       onFundraiserUpdated(updatedFundraiser);
       setOpen(false);
@@ -317,7 +316,7 @@ export function FundraiserActionMenu({
                 aria-hidden='true'
               />
             )}
-            {fundraiser.status === 'draft' ? t('activate') : t('resume')}
+            {t('resume')}
           </DropdownMenuItem>
         )}
 
