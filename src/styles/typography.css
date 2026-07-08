@@ -28,4 +28,10 @@
   :lang(de) .rich-quote blockquote p:first-child::before {
     content: '\201E';
   }
+
+  .rich-quote a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }

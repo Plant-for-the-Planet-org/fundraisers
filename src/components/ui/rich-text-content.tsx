@@ -1,12 +1,6 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
-import {
-  hasEmbedMarker,
-  splitEmbedMarkers,
-} from '@/lib/rich-text/split-embed-markers';
-import { cn } from '@/lib/utils';
-import { ImageEmbed } from '@/components/ui/image-embed';
-import { VideoEmbed } from '@/components/ui/video-embed';
+import { RichTextClickCapture } from '@/components/ui/rich-text-click-capture';
 
 // Discriminated for safety: a raw string without a `sanitize` fn is a compile error, not a silent XSS vulnerability
 type RichTextContentProps = {
@@ -25,13 +19,14 @@ type RichTextContentProps = {
 );
 
 /**
- * Renders sanitized rich-text HTML, replacing each embed marker with a live
- * component: `<video-embed>` becomes a `<VideoEmbed>` player, `<image-embed>` an
- * `<ImageEmbed>`. HTML segments render via `dangerouslySetInnerHTML` so the
- * markup is SSR-friendly (and so plain descriptions stay byte-identical to
- * before this feature). The iframe is built by `VideoEmbed` from the
- * re-validated id and the `<img>` by `ImageEmbed` from the re-validated src —
- * never from stored HTML. Splitting lives in `splitEmbedMarkers`.
+ * Sanitizes rich-text HTML (this part can run in a Server Component, since
+ * `sanitize` is a plain synchronous function) and hands the resulting string
+ * to `RichTextClickCapture`, a Client Component, for actual rendering. That
+ * split exists because `sanitize` is a function prop — functions can't cross
+ * the Server → Client boundary, but the sanitized string can.
+ *
+ * Embed markers (`<video-embed>`, `<image-embed>`) become live components there
+ * too, since the split has to happen wherever the HTML is rendered.
  */
 export function RichTextContent({
   html,
@@ -40,41 +35,7 @@ export function RichTextContent({
 }: RichTextContentProps) {
   if (!html) return null;
 
-  const safeHtml = sanitize ? sanitize(html) : (html as string);
+  const safeHtml = sanitize ? sanitize(html) : (html as SafeHtml);
 
-  // Fast path: no embed markers → single node, byte-identical to before.
-  if (!hasEmbedMarker(safeHtml)) {
-    return (
-      <div
-        className={cn(className)}
-        dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
-      />
-    );
-  }
-
-  return (
-    <div className={className}>
-      {splitEmbedMarkers(safeHtml).map((segment, index) => {
-        if (segment.kind === 'video') {
-          return (
-            <VideoEmbed
-              key={index}
-              provider={segment.provider}
-              id={segment.id}
-              aspect={segment.aspect}
-            />
-          );
-        }
-        if (segment.kind === 'image') {
-          return <ImageEmbed key={index} src={segment.src} alt={segment.alt} />;
-        }
-        return (
-          <div
-            key={index}
-            dangerouslySetInnerHTML={{ __html: segment.html as TrustedHTML }}
-          />
-        );
-      })}
-    </div>
-  );
+  return <RichTextClickCapture safeHtml={safeHtml} className={className} />;
 }
