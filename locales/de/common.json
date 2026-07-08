@@ -48,6 +48,33 @@
         "aspectSquare": "Quadratisch (1:1)",
         "removeVideo": "Video entfernen"
       }
+    },
+    "linkEditor": {
+      "toolbarButton": "Link hinzufügen",
+      "urlLabel": "Link-URL",
+      "urlPlaceholder": "Link einfügen oder eingeben",
+      "setLink": "Link setzen",
+      "unlink": "Link entfernen",
+      "openInNewTab": "In neuem Tab öffnen",
+      "invalidUrl": "Bitte gib zuerst einen Link ein."
+    },
+    "externalLinkWarning": {
+      "webTitle": "Du verlässt startplanting.org",
+      "webBody": "Dieser Link führt zu <strong>{domain}</strong>. Du wirst in {seconds}s weitergeleitet.",
+      "mailTitle": "Dies öffnet deine Mail-App",
+      "mailBody": "Du sendest gleich eine E-Mail an <strong>{address}</strong>.",
+      "telTitle": "Dies öffnet deine Telefon-App",
+      "telBody": "Du rufst gleich <strong>{number}</strong> an.",
+      "stayHere": "Hierbleiben",
+      "goToLink": "Zum Link",
+      "goToMail": "Zur Mail",
+      "goToPhone": "Zum Anruf"
+    },
+    "popupBlocked": {
+      "title": "Popup blockiert",
+      "description": "Dein Browser hat den neuen Tab blockiert. Öffne ihn hier:",
+      "copy": "Link kopieren",
+      "copied": "Link kopiert"
     }
   }
 }

@@ -77,20 +77,37 @@ const THANK_YOU_ALLOWED_TAGS = [
   'br',
   'span',
   'blockquote',
+  'a',
   VIDEO_EMBED_TAG,
 ];
+
+// Links behave identically in descriptions and thank-you notes — same allowed
+// schemes and the same forced target/rel — so both sanitizers share them.
+const LINK_ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel'];
+const LINK_TRANSFORM_TAGS: IOptions['transformTags'] = {
+  a: (tagName, attribs) => ({
+    tagName,
+    attribs: {
+      ...attribs,
+      target: '_blank',
+      rel: 'nofollow ugc noopener noreferrer',
+    },
+  }),
+};
 
 export function sanitizeThankYouHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: THANK_YOU_ALLOWED_TAGS,
     allowedAttributes: {
+      a: ['href', 'title', 'rel'],
       p: ['style'],
       span: ['style'],
       [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
     },
     allowedStyles: RICH_TEXT_ALLOWED_STYLES,
-    allowedSchemes: [],
+    allowedSchemes: LINK_ALLOWED_SCHEMES,
     allowProtocolRelative: false,
+    transformTags: LINK_TRANSFORM_TAGS,
   });
   return toSafeHtml(clean);
 }
@@ -100,18 +117,9 @@ export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
     allowedTags: DESCRIPTION_ALLOWED_TAGS,
     allowedAttributes: DESCRIPTION_ALLOWED_ATTR,
     allowedStyles: RICH_TEXT_ALLOWED_STYLES,
-    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemes: LINK_ALLOWED_SCHEMES,
     allowProtocolRelative: false,
-    transformTags: {
-      a: (tagName, attribs) => ({
-        tagName,
-        attribs: {
-          ...attribs,
-          target: '_blank',
-          rel: 'nofollow ugc noopener noreferrer',
-        },
-      }),
-    },
+    transformTags: LINK_TRANSFORM_TAGS,
   });
 
   return toSafeHtml(clean);
