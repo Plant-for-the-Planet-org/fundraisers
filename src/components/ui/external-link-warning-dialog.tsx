@@ -1,5 +1,18 @@
 'use client';
 
+// DEAD CODE — superseded by the `/external` page route
+// (`src/app/(standard)/external/page.tsx`). The in-page modal warning was
+// replaced so the fundraiser page itself is never interrupted: trusted
+// domains now open instantly, everything else opens `/external` in a new
+// tab instead of this dialog. Kept unused (not deleted) so it can be
+// restored quickly if the redesign doesn't hold up in review. No longer
+// imported anywhere — safe to delete once the review is done.
+//
+// Adjusted minimally (not functionally) after `tel:` support and the
+// `autoFire` field were removed from the shared `link-intent.ts` types, so
+// this file keeps compiling: the `tel` case is gone and "auto-fires" is
+// inlined as `scheme === 'web'` instead of reading the removed field.
+
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { getLinkIntent, openInNewTab } from '@/lib/utils/link-intent';
@@ -32,10 +45,10 @@ export function ExternalLinkWarningDialog({
 
   const intent = href ? getLinkIntent(href) : null;
 
-  // Only web links auto-redirect on a countdown — mailto/tel require an
+  // Only web links auto-redirect on a countdown — mailto requires an
   // explicit click so an app hand-off never happens silently.
   useEffect(() => {
-    if (!href || !intent?.autoFire) return undefined;
+    if (!href || intent?.scheme !== 'web') return undefined;
 
     setSecondsLeft(COUNTDOWN_SECONDS);
     const interval = setInterval(() => {
@@ -60,7 +73,7 @@ export function ExternalLinkWarningDialog({
   };
 
   useEffect(() => {
-    if (intent?.autoFire && secondsLeft === 0) {
+    if (intent?.scheme === 'web' && secondsLeft === 0) {
       go();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,11 +92,6 @@ export function ExternalLinkWarningDialog({
       title = t('mailTitle');
       body = t.rich('mailBody', { address: intent.destination, strong });
       actionLabel = t('goToMail');
-      break;
-    case 'tel':
-      title = t('telTitle');
-      body = t.rich('telBody', { number: intent.destination, strong });
-      actionLabel = t('goToPhone');
       break;
     default:
       title = t('webTitle');
