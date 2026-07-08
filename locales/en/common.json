@@ -64,7 +64,7 @@
       "setLink": "Set link",
       "unlink": "Remove link",
       "openInNewTab": "Open in new tab",
-      "invalidUrl": "Enter a link first."
+      "invalidUrl": "Enter a valid link (a web address or an email)."
     },
     "externalLinkWarning": {
       "webTitle": "You're leaving startplanting.org",
@@ -74,9 +74,17 @@
       "telTitle": "This will open your phone app",
       "telBody": "You're about to call <strong>{number}</strong>.",
       "stayHere": "Stay Here",
+      "goBack": "Go back",
       "goToLink": "Go to Link",
       "goToMail": "Go to Mail",
-      "goToPhone": "Go to Phone"
+      "goToPhone": "Go to Phone",
+      "invalidTitle": "Invalid link",
+      "invalidBody": "This link isn't valid, so it can't be opened.",
+      "leavingTitle": "You're leaving startplanting.org",
+      "leavingBody": "This link leads to an external website that we don't control or verify. Please make sure you trust it before continuing - proceed at your own risk.",
+      "mailPromptTitle": "Open your mail app?",
+      "mailPromptBody": "This will open your email app to send a message to <strong>{address}</strong>.",
+      "continue": "Continue"
     },
     "popupBlocked": {
       "title": "Popup blocked",

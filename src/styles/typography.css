@@ -34,4 +34,15 @@
     text-decoration: underline;
     text-underline-offset: 2px;
   }
+
+  /*
+   * Editor-only: a ProseMirror decoration (not a Tailwind utility, so it
+   * can't be a JIT class — see SelectionHighlight in rich-text-editor.tsx)
+   * that keeps the text being linked visibly highlighted while the link
+   * input row has keyboard focus and the browser's own selection is gone.
+   */
+  .link-target-highlight {
+    background-color: hsl(var(--primary) / 0.25);
+    border-radius: 2px;
+  }
 }
