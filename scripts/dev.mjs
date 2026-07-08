@@ -12,12 +12,17 @@ console.log(
   `[dev] ${Math.round(totalGiB)} GiB RAM detected -> ${useWebpack ? 'webpack' : 'Turbopack'}`
 );
 
-// Pass the command as a single string (not args + shell:true, which Node 24
-// deprecates via DEP0190). shell:true resolves the next.cmd shim on Windows and
-// is harmless elsewhere; the arguments are static literals, so there is nothing
-// unsafe to escape.
-const command = `next dev${useWebpack ? ' --webpack' : ''}`;
-const child = spawn(command, { stdio: 'inherit', shell: true });
+// Forward any extra flags to `next dev` (e.g. --experimental-https from dev-https), so every dev command gets the same RAM-based bundler selection.
+const passthrough = process.argv.slice(2);
+
+// Pass the command as a single string (not args + shell:true, which Node 24 deprecates via DEP0190). shell:true resolves the next.cmd shim on Windows and is harmless elsewhere; the args are script/developer-supplied, not untrusted input.
+const parts = [
+  'next',
+  'dev',
+  ...(useWebpack ? ['--webpack'] : []),
+  ...passthrough,
+];
+const child = spawn(parts.join(' '), { stdio: 'inherit', shell: true });
 
 child.on('error', err => {
   console.error('[dev] failed to start the dev server:', err);
