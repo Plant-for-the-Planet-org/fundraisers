@@ -194,10 +194,6 @@ export const fundraiserFormSchema = z.object({
 
 export type FundraiserFormValues = z.infer<typeof fundraiserFormSchema>;
 
-function isAllowedCountry(code: string): code is AllowedCountry {
-  return (ALLOWED_COUNTRIES as readonly string[]).includes(code);
-}
-
 export function buildDefaultCreateValues(
   pathname: string
 ): FundraiserFormValues {
@@ -287,10 +283,9 @@ export function fundraiserToFormValues(
   // so the editor and rendered page stay in sync.
   const builtTheme = buildTheme(fundraiser.settings?.theme);
 
-  const rawCountry = fundraiser.workspace?.country?.toUpperCase() ?? 'DE';
-  const country: AllowedCountry = isAllowedCountry(rawCountry)
-    ? rawCountry
-    : 'ROW';
+  // `workspace.country` is already normalized to an `AllowedCountry` at the API
+  // boundary (see `normalizeFundraiser`); a missing workspace defaults to DE.
+  const country: AllowedCountry = fundraiser.workspace?.country ?? 'DE';
 
   const storedBundleSlug = fundraiser.settings?.modules?.bundle?.slug;
   const bundleSlug = (BUNDLE_SLUGS as readonly string[]).includes(

@@ -6,6 +6,7 @@
 import type { Category } from '@/lib/types/category';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
+import { normalizeFundraiser } from '@/lib/api/normalize-fundraiser';
 import { platformFetch } from '@/lib/api/platform-fetch';
 
 export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
@@ -41,15 +42,6 @@ export function isFundraiserSortOption(
 
 export interface CategoryOptions {
   sort_by?: FundraiserSortOptions;
-}
-
-function normalizeFundraiser(fundraiser: ApiFundraiser): Fundraiser {
-  return {
-    ...fundraiser,
-    workspace: Array.isArray(fundraiser.workspace)
-      ? null
-      : fundraiser.workspace,
-  };
 }
 
 function normalizeFundraisersResponse(
