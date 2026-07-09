@@ -1,3 +1,4 @@
+import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { FundraiserThemeSettings } from '../theme/types';
 import type { Nullable } from './utility';
 import type { FundraiserModules } from '@/modules';
@@ -71,12 +72,19 @@ export interface UpdateFundraiserHostRequest {
 }
 
 export interface FundraiserWorkspace {
-  country: string;
+  /**
+   * The workspace country, one of `AllowedCountry`. Populated from the
+   * ForestCloud API response; consumers read workspace config from the
+   * workspace registry (`src/lib/workspaces/registry.ts`) via this value.
+   */
+  country: AllowedCountry;
   name: string;
   address: {
     address: string;
     city: string;
     zipCode: string;
+    // Physical address country (donor/org address), a raw ISO code — not an
+    // `AllowedCountry` workspace selector.
     country: string;
   };
 }

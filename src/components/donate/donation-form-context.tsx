@@ -4,6 +4,7 @@ import type { ReactNode, RefObject } from 'react';
 import type { Control } from 'react-hook-form';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
+import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { DonationData } from './donate-overlay';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
@@ -14,6 +15,7 @@ import dynamic from 'next/dynamic';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 
 const DevTool =
   process.env.NODE_ENV === 'development'
@@ -63,7 +65,13 @@ const donationFormFields = z.object({
 
 export type DonationFormValues = z.infer<typeof donationFormFields>;
 
-function createDonationFormSchema(fundraiserCountry: string) {
+function createDonationFormSchema(
+  workspaceCountry: AllowedCountry | undefined
+) {
+  const requiresTin = workspaceCountry
+    ? getWorkspaceProfile(workspaceCountry).requiresTin
+    : false;
+
   return donationFormFields.superRefine((values, ctx) => {
     const hasAddressId =
       !!values.selectedAddressId?.trim() && values.selectedAddressId !== 'new';
@@ -135,7 +143,7 @@ function createDonationFormSchema(fundraiserCountry: string) {
       });
     }
 
-    if (fundraiserCountry === 'ES' && !values.tin?.trim()) {
+    if (requiresTin && !values.tin?.trim()) {
       ctx.addIssue({
         code: 'custom',
         message: DONATION_FORM_ERRORS['tin.required'],
@@ -193,7 +201,7 @@ export function DonationFormProvider({
   children,
 }: DonationFormProviderProps) {
   const schema = useMemo(
-    () => createDonationFormSchema(fundraiser.workspace?.country ?? ''),
+    () => createDonationFormSchema(fundraiser.workspace?.country),
     [fundraiser.workspace?.country]
   );
 

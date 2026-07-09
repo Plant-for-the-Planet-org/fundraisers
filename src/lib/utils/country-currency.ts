@@ -1,3 +1,4 @@
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 import { countryCodeToFlag, getCountry } from './country';
 import { getCurrencySymbol } from './currency';
 
@@ -35,25 +36,13 @@ export const ALLOWED_COUNTRIES = [
 export type AllowedCountry = (typeof ALLOWED_COUNTRIES)[number];
 
 /**
- * Mapping of allowed countries to their currencies
- */
-const COUNTRY_CURRENCY_MAP: Record<AllowedCountry, SupportedCurrency> = {
-  DE: 'EUR', // Germany
-  // US: 'USD', // USA
-  ES: 'EUR', // Spain
-  // CZ: 'CZK', // Czechia
-  CH: 'CHF', // Switzerland
-  ROW: 'EUR', // Rest of World — maps to DE (default workspace country)
-};
-
-/**
  * Coerce an arbitrary country string to an `AllowedCountry`.
  * Unknown or empty values fall back to `'ROW'`.
  */
 export function toAllowedCountry(
   country: string | null | undefined
 ): AllowedCountry {
-  const normalized = (country ?? '').toUpperCase();
+  const normalized = (country ?? '').trim().toUpperCase();
   return (ALLOWED_COUNTRIES as readonly string[]).includes(normalized)
     ? (normalized as AllowedCountry)
     : 'ROW';
@@ -65,7 +54,7 @@ export function toAllowedCountry(
  * @returns Currency code (supported currencies only) or 'EUR' as fallback
  */
 export function getCurrencyForCountry(countryCode: string): SupportedCurrency {
-  return COUNTRY_CURRENCY_MAP[toAllowedCountry(countryCode)];
+  return getWorkspaceProfile(toAllowedCountry(countryCode)).currency;
 }
 
 /**
@@ -111,23 +100,17 @@ export function getAllowedCountries(locale: string = 'en'): Array<{
         code,
         name: code,
         flag: '🌍',
-        currency: getCurrencyForCountry(code),
+        currency: getWorkspaceProfile(code).currency,
       };
     }
     return {
       code,
       name: getCountry(code, locale),
       flag: countryCodeToFlag(code),
-      currency: COUNTRY_CURRENCY_MAP[code],
+      currency: getWorkspaceProfile(code).currency,
     };
   });
 }
-
-const TAX_DEDUCTIBLE_COUNTRIES: ReadonlySet<string> = new Set([
-  'DE',
-  // 'US',
-  'ES',
-]);
 
 /**
  * Get tax deductibility information for a country
@@ -142,11 +125,12 @@ export function getTaxDeductibilityInfo(
   isDeductible: boolean;
   countryName: string;
 } {
-  const code = toAllowedCountry(countryCode);
-  const resolvedCode = code === 'ROW' ? 'DE' : code; // ROW uses DE as the default workspace country
+  const profile = getWorkspaceProfile(toAllowedCountry(countryCode));
   return {
-    isDeductible: TAX_DEDUCTIBLE_COUNTRIES.has(resolvedCode),
-    countryName: getCountry(resolvedCode, locale),
+    isDeductible: profile.taxDeductible,
+    // `apiCountry` is the concrete country backing the workspace (ROW → DE), so
+    // it also gives the right country name to display.
+    countryName: getCountry(profile.apiCountry, locale),
   };
 }
 
@@ -158,5 +142,5 @@ export function getTaxDeductibilityInfo(
 export function getCurrencySymbolForCountry(
   countryCode: AllowedCountry
 ): string {
-  return getCurrencySymbol(COUNTRY_CURRENCY_MAP[countryCode]);
+  return getCurrencySymbol(getWorkspaceProfile(countryCode).currency);
 }

@@ -3,14 +3,14 @@ import type {
   ProjectPurpose,
 } from '@/lib/types/project-selection';
 import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { ApiCountry } from '@/lib/workspaces/registry';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
 import { PROJECT_PURPOSES } from '@/lib/types/project-selection';
-
-type ApiCountry = Exclude<AllowedCountry, 'ROW'>;
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 
 function resolveProjectsApiCountry(countryCode: AllowedCountry): ApiCountry {
-  return countryCode === 'ROW' ? 'DE' : countryCode;
+  return getWorkspaceProfile(countryCode).apiCountry;
 }
 
 interface ProjectsApiEnvelope {
