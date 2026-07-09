@@ -38,7 +38,7 @@
     "@sentry/nextjs": "^10.58.0",
     "@stripe/react-stripe-js": "^6.1.0",
     "@stripe/stripe-js": "^9.1.0",
-    "@tiptap/extension-link": "^3.22.4",
+    "@tiptap/extension-link": "^3.20.0",
     "@tiptap/extension-placeholder": "^3.20.0",
     "@tiptap/extension-subscript": "^3.20.0",
     "@tiptap/extension-superscript": "^3.20.0",
