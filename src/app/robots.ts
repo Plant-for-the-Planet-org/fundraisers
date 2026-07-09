@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 import { headers } from 'next/headers';
-import { getSiteUrl, isProductionHost } from '@/lib/utils/site-url';
+import { isProductionHost } from '@/lib/utils/site-url';
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const headersList = await headers();
@@ -11,7 +11,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     return { rules: { userAgent: '*', disallow: '/' } };
   }
 
-  const siteUrl = getSiteUrl();
+  // Same-origin reference: point to the sitemaps on whichever production
+  // host actually served this robots.txt, rather than a hardcoded domain
+  // (getSiteUrl() is for the sitemaps' own <loc> entries, which must stay
+  // pinned to the canonical content domain - a different concern).
+  const origin = `https://${host}`;
 
   return {
     rules: {
@@ -22,6 +26,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       // Crawlers that ignore '$' simply won't match this rule.
       disallow: ['/$', '/sentry-test'],
     },
-    sitemap: [`${siteUrl}/sitemap.xml`, `${siteUrl}/raise/sitemap.xml`],
+    sitemap: [`${origin}/sitemap.xml`, `${origin}/raise/sitemap.xml`],
   };
 }

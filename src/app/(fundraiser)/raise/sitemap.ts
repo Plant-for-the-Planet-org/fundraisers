@@ -7,22 +7,37 @@ import { getSiteUrl } from '@/lib/utils/site-url';
 
 const TOP_N = 10;
 
+// Regenerate once a day rather than only on deploy, so `changeFrequency:
+// 'daily'` below is actually true.
+export const revalidate = 86400;
+
+async function fetchTopFundraisers(
+  sort: 'popular' | 'gross'
+): Promise<Fundraiser[]> {
+  try {
+    const response = await categoriesService.getCategoryFundraisersWithRetry(
+      'all',
+      { sort_by: sort }
+    );
+    return response.fundraisers;
+  } catch (error) {
+    console.error(`Failed to fetch ${sort} fundraisers for sitemap:`, error);
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
 
   const [popular, topRaised] = await Promise.all([
-    categoriesService.getCategoryFundraisersWithRetry('all', {
-      sort_by: 'popular',
-    }),
-    categoriesService.getCategoryFundraisersWithRetry('all', {
-      sort_by: 'gross',
-    }),
+    fetchTopFundraisers('popular'),
+    fetchTopFundraisers('gross'),
   ]);
 
   const fundraisersById = new Map<string, Fundraiser>();
   for (const fundraiser of [
-    ...popular.fundraisers.slice(0, TOP_N),
-    ...topRaised.fundraisers.slice(0, TOP_N),
+    ...popular.slice(0, TOP_N),
+    ...topRaised.slice(0, TOP_N),
   ]) {
     if (fundraiser.visibility === 'public') {
       fundraisersById.set(fundraiser.id, fundraiser);

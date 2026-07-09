@@ -19,12 +19,27 @@ function isVisibleOnExplore(category: Category): boolean {
   return false;
 }
 
+// Regenerate once a day rather than only on deploy, so `changeFrequency:
+// 'daily'` below is actually true.
+export const revalidate = 86400;
+
+async function fetchCategories(
+  type: 'cause' | 'location'
+): Promise<Category[]> {
+  try {
+    return await categoriesService.getCategoriesWithRetry(type);
+  } catch (error) {
+    console.error(`Failed to fetch ${type} categories for sitemap:`, error);
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
 
   const [causeCategories, locationCategories] = await Promise.all([
-    categoriesService.getCategoriesWithRetry('cause'),
-    categoriesService.getCategoriesWithRetry('location'),
+    fetchCategories('cause'),
+    fetchCategories('location'),
   ]);
 
   const categoriesBySlug = new Map<string, Category>();
