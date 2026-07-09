@@ -11,12 +11,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     return { rules: { userAgent: '*', disallow: '/' } };
   }
 
-  // Same-origin reference: point to the sitemap on whichever production
-  // host actually served this robots.txt, rather than a hardcoded domain
-  // (getSiteUrl() is for the sitemap's own <loc> entries, which must stay
-  // pinned to the canonical content domain - a different concern).
-  const origin = `https://${host}`;
-
   return {
     rules: {
       userAgent: '*',
@@ -26,6 +20,5 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       // Crawlers that ignore '$' simply won't match this rule.
       disallow: ['/$', '/sentry-test'],
     },
-    sitemap: `${origin}/sitemap.xml`,
   };
 }
