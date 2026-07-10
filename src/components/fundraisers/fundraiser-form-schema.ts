@@ -12,6 +12,7 @@ import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
 import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import {
   DESCRIPTION_MAX_LENGTH,
+  getEndDateBounds,
   GOAL_AMOUNT_MIN,
 } from '@/lib/constants/fundraiser-creation';
 import { buildTheme } from '@/lib/theme/build-theme';
@@ -24,6 +25,7 @@ import {
   getCurrencyForCountry,
   SUPPORTED_CURRENCIES,
 } from '@/lib/utils/country-currency';
+import { isValidDateInput, toDateInputValue } from '@/lib/utils/date';
 import { isAllowedImageUrl } from '@/lib/utils/image-url';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
@@ -88,7 +90,7 @@ export const SLUG_MAX_LENGTH = 32;
 // Lowercase letters, numbers and hyphens.
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
-export const fundraiserFormSchema = z.object({
+const fundraiserFormBaseSchema = z.object({
   title: z.string().trim().min(1).max(50),
   // Edit-only. The create flow never renders a slug field, so this stays
   // optional and is validated only when present.
@@ -112,6 +114,8 @@ export const fundraiserFormSchema = z.object({
     .number({ error: 'required' })
     .int()
     .min(GOAL_AMOUNT_MIN, 'minAmount'),
+  // Date-only value (YYYY-MM-DD). Optional for drafts, required for publishing.
+  endDate: z.string().optional(),
   visibility: z.enum(['public', 'unlisted']),
   status: z.enum(['draft', 'active']),
   projectAllocations: z.array(projectAllocationSchema).min(1, 'required'),
@@ -192,6 +196,38 @@ export const fundraiserFormSchema = z.object({
   }),
 });
 
+// End-date validation:
+// - Required when publishing
+// - Optional for drafts
+// - Must be valid and within the configured date range
+export const fundraiserFormSchema = fundraiserFormBaseSchema
+  .refine(data => !(data.status === 'active' && !data.endDate), {
+    message: 'required',
+    path: ['endDate'],
+  })
+  .refine(data => !(data.endDate && !isValidDateInput(data.endDate)), {
+    message: 'invalid',
+    path: ['endDate'],
+  })
+  .refine(
+    data =>
+      !(
+        data.endDate &&
+        isValidDateInput(data.endDate) &&
+        data.endDate < getEndDateBounds().min
+      ),
+    { message: 'minDate', path: ['endDate'] }
+  )
+  .refine(
+    data =>
+      !(
+        data.endDate &&
+        isValidDateInput(data.endDate) &&
+        data.endDate > getEndDateBounds().max
+      ),
+    { message: 'maxDate', path: ['endDate'] }
+  );
+
 export type FundraiserFormValues = z.infer<typeof fundraiserFormSchema>;
 
 function isAllowedCountry(code: string): code is AllowedCountry {
@@ -220,6 +256,7 @@ export function buildDefaultCreateValues(
     country: defaultCountry,
     currency: getCurrencyForCountry(defaultCountry),
     goalAmount: undefined as unknown as number,
+    endDate: '',
     visibility: 'public',
     status: 'draft',
     projectAllocations,
@@ -307,6 +344,9 @@ export function fundraiserToFormValues(
     country,
     currency: getCurrencyForCountry(country),
     goalAmount: fundraiser.goalAmount,
+    // Convert the API's ISO datetime to YYYY-MM-DD for the date input.
+    // Missing end dates are normalized to an empty string.
+    endDate: toDateInputValue(fundraiser.endDate),
     visibility: fundraiser.visibility,
     status: fundraiser.canDonate ? 'active' : 'draft',
     // Drop non-donatable projects so they are never carried back into the
