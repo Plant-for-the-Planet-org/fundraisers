@@ -22,11 +22,13 @@ function toPaymentError(err: unknown): PaymentError {
 
   if (err instanceof PlatformAPIError) {
     if (err.kind === 'timeout') {
-      return new PaymentError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+      return new PaymentError(err.message, 'api', 'TIMEOUT_ERROR', 0, {
+        originalError: err,
+      });
     }
     if (err.kind === 'network') {
       return new PaymentError(err.message, 'api', 'NETWORK_ERROR', 0, {
-        originalError: err.message,
+        originalError: err,
       });
     }
     const { type, code } = classifyPlatformError(err.status);
@@ -40,7 +42,7 @@ function toPaymentError(err: unknown): PaymentError {
     'api',
     'NETWORK_ERROR',
     0,
-    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+    { originalError: err }
   );
 }
 
@@ -69,6 +71,10 @@ export class PaymentService {
       // are not returned by this API: success (boolean), paymentId, status 'completed',
       // redirectUrl, message (on success), type (top-level). In real responses, type was
       // nested inside data.response — the top-level field was never populated.
+      // Frontend audit (issue #127): no call site or downstream consumer reads any of
+      // these fields — every consumer branches on `status` plus nested `response.type` /
+      // `errorCode` (see PaymentResponse type and the donation-submit flow hooks). Still
+      // needs an explicit backend confirm-and-remove pass before this TODO can be deleted.
       return data;
     } catch (err) {
       throw toPaymentError(err);

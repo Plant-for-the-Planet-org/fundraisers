@@ -161,7 +161,10 @@ export class UserService {
     try {
       return await this.getProfile(token);
     } catch (error) {
-      if (error instanceof PlatformAPIError && error.status === 401) {
+      if (
+        error instanceof PlatformAPIError &&
+        (error.status === 401 || error.status === 403)
+      ) {
         return null;
       }
       throw error;

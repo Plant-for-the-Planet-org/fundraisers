@@ -21,11 +21,13 @@ function toPaypalOrderError(err: unknown): PaypalOrderError {
 
   if (err instanceof PlatformAPIError) {
     if (err.kind === 'timeout') {
-      return new PaypalOrderError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+      return new PaypalOrderError(err.message, 'api', 'TIMEOUT_ERROR', 0, {
+        originalError: err,
+      });
     }
     if (err.kind === 'network') {
       return new PaypalOrderError(err.message, 'api', 'NETWORK_ERROR', 0, {
-        originalError: err.message,
+        originalError: err,
       });
     }
     const { type, code } = classifyPlatformError(err.status);
@@ -39,7 +41,7 @@ function toPaypalOrderError(err: unknown): PaypalOrderError {
     'api',
     'NETWORK_ERROR',
     0,
-    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+    { originalError: err }
   );
 }
 
