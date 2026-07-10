@@ -26,6 +26,14 @@ import {
  * `rich-text-editor.tsx`), so this normally only triggers for a malformed or
  * hand-crafted `/external` URL, not anything a host can author.
  */
+const MAX_DESTINATION_DISPLAY_LENGTH = 64;
+
+function truncateForDisplay(value: string): string {
+  return value.length > MAX_DESTINATION_DISPLAY_LENGTH
+    ? `${value.slice(0, MAX_DESTINATION_DISPLAY_LENGTH)}...`
+    : value;
+}
+
 export default function ExternalPage() {
   const t = useTranslations('Common.externalLinkWarning');
   const searchParams = useSearchParams();
@@ -33,6 +41,10 @@ export default function ExternalPage() {
 
   const isValid = !!href && isValidExternalHref(href);
   const intent = isValid ? getLinkIntent(href) : null;
+  // Only for web links — the mail case already spells out the address inline
+  // in mailPromptBody, so a second copy of it here would be redundant.
+  const destinationUrl =
+    intent?.scheme === 'web' && href ? truncateForDisplay(href) : null;
 
   const goToDestination = () => {
     if (!href) return;
@@ -77,6 +89,9 @@ export default function ExternalPage() {
           <CardDescription className='text-sm lg:text-base'>
             {body}
           </CardDescription>
+          {destinationUrl && (
+            <p className='mt-3 break-all px-3 py-2 text-sm'>{destinationUrl}</p>
+          )}
         </CardContent>
         <CardFooter className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-center'>
           <Button
