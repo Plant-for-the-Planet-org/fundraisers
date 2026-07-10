@@ -24,6 +24,8 @@ Node 24 is required (Next.js needs ≥20.9). The dev server may already be runni
 | `npm run type-check`   | TypeScript checks without emitting files                         |
 | `npm run format`       | Auto-format code style issues                                    |
 | `npm run imports:sort` | Sort import order                                                |
+| `npm run test`         | Run unit tests once (Vitest)                                     |
+| `npm run test:watch`   | Run unit tests in watch mode                                     |
 
 ## Project structure
 
@@ -39,6 +41,7 @@ The codebase has two parts:
 The dependency rule: **modules consume core; core does not consume modules.** The one allowed bridge is the modules type registry at [`src/modules/index.ts`](src/modules/index.ts) — `src/lib/types/fundraiser.ts` imports `FundraiserModules` from there to compose the central settings shape.
 
 **Before editing anything in `src/modules/*`:**
+
 1. Read [`src/modules/README.md`](src/modules/README.md) for conventions (folder layout, persistence rules, registry, public surface).
 2. Read the target module's own `README.md` for what it does and how it works.
 
@@ -99,7 +102,7 @@ Translation key: `"photoBy": "Photo by <photographerLink>{name}</photographerLin
 
 <!-- Test runner, where tests live, what to run before pushing. -->
 
-Do not start a dev server or verify changes in the browser. A dev session is usually already running; rely on `npm run type-check` and `npm run lint` for correctness, then let the reviewer check the UI and report back.
+Do not start a dev server or verify changes in the browser. A dev session is usually already running; rely on `npm run type-check`, `npm run lint`, and `npm run test` for correctness, then let the reviewer check the UI and report back.
 
 ## Gotchas
 
