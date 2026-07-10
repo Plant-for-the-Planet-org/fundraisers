@@ -29,8 +29,9 @@
     content: '\201E';
   }
 
+  /* Match the fundraiser theme accent (set as --accent-color by ThemeShell), falling back to the primary colour outside a theme. */
   .rich-quote a {
-    color: hsl(var(--primary));
+    color: var(--accent-color, hsl(var(--primary)));
     text-decoration: underline;
     text-underline-offset: 2px;
   }
