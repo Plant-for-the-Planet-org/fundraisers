@@ -293,7 +293,7 @@
         "errors": {
           "required": "Please choose an end date before publishing.",
           "invalid": "Please enter a valid date.",
-          "minDate": "Choose a date  after {date}.",
+          "minDate": "Choose a date after {date}.",
           "maxDate": "Choose a date before {date}."
         }
       },

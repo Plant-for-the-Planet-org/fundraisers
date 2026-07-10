@@ -290,6 +290,7 @@
       "endDate": {
         "label": "Enddatum",
         "openCalendar": "Kalender öffnen",
+        "errors": {
           "required": "Bitte wählen Sie vor der Veröffentlichung ein Enddatum aus.",
           "invalid": "Bitte geben Sie ein gültiges Datum ein.",
           "minDate": "Wählen Sie ein Datum nach dem {date}.",

@@ -28,9 +28,9 @@ export function EndDateInput() {
       new Date(`${dateString}T00:00:00`)
     );
 
-  const helperId = 'form-end-date-helper';
   const errorId = 'form-end-date-error';
-  const describedBy = `${helperId}${fieldState.error ? ` ${errorId}` : ''}`;
+  // Only describe the input by the error node when one is actually rendered.
+  const describedBy = fieldState.error ? errorId : undefined;
 
   // Map validation codes to translated error messages.
   const errorCode = fieldState.error?.message;
@@ -100,7 +100,12 @@ export function EndDateInput() {
         </button>
       </div>
       {errorMessage && (
-        <p id={errorId} className='text-sm text-destructive'>
+        <p
+          id={errorId}
+          role='alert'
+          aria-live='polite'
+          className='text-sm text-destructive'
+        >
           {errorMessage}
         </p>
       )}
