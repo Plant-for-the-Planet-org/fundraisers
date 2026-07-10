@@ -17,18 +17,6 @@ export function Logos() {
           className='h-[34px] w-[33px]'
         />
       </a>
-      <a
-        href='https://www.unep.org'
-        target='_blank'
-        rel='noopener noreferrer'
-        className='hover:opacity-80'
-      >
-        <img
-          src='https://cdn.plant-for-the-planet.org/logo/svg/unep.svg?12'
-          alt={t('unepAlt')}
-          className='h-full w-auto'
-        />
-      </a>
     </div>
   );
 }
