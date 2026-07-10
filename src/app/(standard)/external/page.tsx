@@ -1,5 +1,7 @@
 'use client';
 
+import type { Metadata } from 'next';
+
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getLinkIntent, isValidExternalHref } from '@/lib/utils/link-intent';
@@ -12,6 +14,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+  robots: 'noindex, nofollow',
+};
 
 /**
  * Warning page for links that aren't a trusted Plant-for-the-Planet domain
