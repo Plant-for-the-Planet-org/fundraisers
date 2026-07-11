@@ -6,8 +6,6 @@ import type {
 } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
-import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
-
 export type UpdateDirtyFields = Partial<
   Readonly<FieldNamesMarkedBoolean<FundraiserFormValues>>
 >;
@@ -95,12 +93,6 @@ function getTodayString(): string {
   return new Date().toISOString().split('T')[0]!;
 }
 
-function getDateOffsetString(days: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0]!;
-}
-
 export function buildUpdateFundraiserRequest(
   values: FundraiserFormValues,
   dirtyFields: UpdateDirtyFields,
@@ -113,6 +105,7 @@ export function buildUpdateFundraiserRequest(
   if (dirtyFields.title) request.title = values.title;
   if (dirtyFields.description) request.description = values.description;
   if (dirtyFields.goalAmount) request.goalAmount = values.goalAmount;
+  if (dirtyFields.endDate && values.endDate) request.endDate = values.endDate;
   if (dirtyFields.visibility) request.visibility = values.visibility;
   if (dirtyFields.status) request.status = values.status;
   if (isProjectAllocationsDirty(dirtyFields)) {
@@ -188,10 +181,11 @@ export function buildCreateFundraiserRequest(
       },
     },
     startDate: getTodayString(),
-    endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),
     tags: [],
     content: {},
     metadata: {},
+    // Only send an end date if the user selected one. Drafts fundraiser can leave it empty.
+    ...(values.endDate && { endDate: values.endDate }),
     ...(imageFile && { imageFile }),
   };
 }

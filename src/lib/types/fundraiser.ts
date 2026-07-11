@@ -196,6 +196,7 @@ export interface UpdateFundraiserRequest {
   title?: string;
   description?: string;
   goalAmount?: number;
+  endDate?: string; // YYYY-MM-DD
   visibility?: FundraiserVisibility;
   status?: FundraiserStatus;
   projectAllocations?: Array<{
@@ -226,7 +227,7 @@ export interface CreateFundraiserRequest {
     project_id: string;
   }>;
   startDate: string; // YYYY-MM-DD
-  endDate: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD. Omitted when the user has not chosen a date (drafts).
   imageFile?: string; // base64 encoded
   settings: FundraiserSettings;
   metadata?: Record<string, unknown>;

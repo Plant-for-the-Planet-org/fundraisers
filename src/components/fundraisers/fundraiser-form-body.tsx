@@ -10,6 +10,7 @@ import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
+import { EndDateInput } from './end-date-input';
 import { GoalSettings } from './goal/goal-settings';
 import { GoalInput } from './goal-input';
 import { Hosts } from './hosts';
@@ -77,11 +78,12 @@ export function FundraiserFormBody({
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <WorkspaceSelector disabled={isEditMode} />
-          <GoalInput />
-        </div>
+        <WorkspaceSelector disabled={isEditMode} />
         <WorkspaceInfo />
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <GoalInput />
+          <EndDateInput />
+        </div>
         <BundleSelection mode={mode} />
         <Options />
         <StickyFormBar>

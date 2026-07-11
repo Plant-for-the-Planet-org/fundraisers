@@ -287,6 +287,16 @@
           "minAmount": "Der Betrag für das Ziel muss mindestens {formattedAmount} sein."
         }
       },
+      "endDate": {
+        "label": "Enddatum",
+        "openCalendar": "Kalender öffnen",
+        "errors": {
+          "required": "Bitte wählen Sie vor der Veröffentlichung ein Enddatum aus.",
+          "invalid": "Bitte geben Sie ein gültiges Datum ein.",
+          "minDate": "Wählen Sie ein Datum nach dem {date}.",
+          "maxDate": "Wählen Sie ein Datum vor dem {date}."
+        }
+      },
       "projectSelection": {
         "viewModeSectionHeading": "Projekte, die durch diesen Spendenaufruf unterstützt werden.",
         "projectImageAlt": "Bild für {name}",
