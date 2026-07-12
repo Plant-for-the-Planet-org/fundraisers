@@ -294,7 +294,8 @@
           "required": "Bitte wählen Sie vor der Veröffentlichung ein Enddatum aus.",
           "invalid": "Bitte geben Sie ein gültiges Datum ein.",
           "minDate": "Wählen Sie ein Datum nach dem {date}.",
-          "maxDate": "Wählen Sie ein Datum vor dem {date}."
+          "maxDate": "Wählen Sie ein Datum vor dem {date}.",
+          "afterCurrentEndDate": "Das neue Enddatum muss nach dem {date} liegen."
         }
       },
       "projectSelection": {
