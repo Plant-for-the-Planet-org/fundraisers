@@ -46,3 +46,28 @@ export function toDateInputValue(value: string | null | undefined): string {
   if (!value) return '';
   return /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : '';
 }
+
+/**
+ * Returns a YYYY-MM-DD date offset by `days` from the given YYYY-MM-DD value.
+ * Returns the input unchanged when it is not a valid date.
+ */
+export function addDaysToDateInput(value: string, days: number): string {
+  if (!isValidDateInput(value)) return value;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year!, month! - 1, day!);
+  date.setDate(date.getDate() + days);
+  return formatLocalDate(date);
+}
+
+/**
+ * Whole-day difference between two YYYY-MM-DD values (`to` minus `from`).
+ * Positive when `to` is later than `from`; 0 when either value is invalid.
+ */
+export function daysBetweenDateInputs(from: string, to: string): number {
+  if (!isValidDateInput(from) || !isValidDateInput(to)) return 0;
+  const [fy, fm, fd] = from.split('-').map(Number);
+  const [ty, tm, td] = to.split('-').map(Number);
+  const fromDate = new Date(fy!, fm! - 1, fd!);
+  const toDate = new Date(ty!, tm! - 1, td!);
+  return Math.round((toDate.getTime() - fromDate.getTime()) / 86_400_000);
+}

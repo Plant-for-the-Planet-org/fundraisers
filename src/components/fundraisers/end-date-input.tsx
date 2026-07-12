@@ -1,5 +1,6 @@
 'use client';
 
+import type { EndDateBounds } from '@/lib/constants/fundraiser-creation';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useRef } from 'react';
@@ -9,7 +10,22 @@ import { CalendarDays } from 'lucide-react';
 import { getEndDateBounds } from '@/lib/constants/fundraiser-creation';
 import { Input } from '@/components/ui/input';
 
-export function EndDateInput() {
+interface EndDateInputProps {
+  /** Allowed date range for the date picker. */
+  bounds?: EndDateBounds;
+
+  /** Current fundraiser end date used in validation messages. */
+  currentEndDate?: string;
+
+  /** Optional helper text shown when there is no validation error. */
+  helperText?: string;
+}
+
+export function EndDateInput({
+  bounds: boundsProp,
+  currentEndDate,
+  helperText,
+}: EndDateInputProps = {}) {
   const locale = useLocale();
   const t = useTranslations('Fundraisers.form.endDate');
   const {
@@ -20,7 +36,7 @@ export function EndDateInput() {
   });
 
   // Allowed end date range used by both validation and the date picker.
-  const bounds = getEndDateBounds();
+  const bounds = boundsProp ?? getEndDateBounds();
 
   // Format dates in a clear, localized format for validation messages.
   const formatLong = (dateString: string) =>
@@ -29,8 +45,7 @@ export function EndDateInput() {
     );
 
   const errorId = 'form-end-date-error';
-  // Only describe the input by the error node when one is actually rendered.
-  const describedBy = fieldState.error ? errorId : undefined;
+  const helperId = 'form-end-date-helper';
 
   // Map validation codes to translated error messages.
   const errorCode = fieldState.error?.message;
@@ -38,12 +53,22 @@ export function EndDateInput() {
   if (errorCode === 'invalid') {
     errorMessage = t('errors.invalid');
   } else if (errorCode === 'minDate') {
-    errorMessage = t('errors.minDate', { date: formatLong(bounds.min) });
+    errorMessage = currentEndDate
+      ? t('errors.afterCurrentEndDate', { date: formatLong(currentEndDate) })
+      : t('errors.minDate', { date: formatLong(bounds.min) });
   } else if (errorCode === 'maxDate') {
     errorMessage = t('errors.maxDate', { date: formatLong(bounds.max) });
   } else if (errorCode) {
     errorMessage = t('errors.required');
   }
+
+  // Error takes precedence: the field shows the error or the helper, never both.
+  const showHelper = !errorMessage && Boolean(helperText);
+  const describedBy = errorMessage
+    ? errorId
+    : showHelper
+      ? helperId
+      : undefined;
 
   // Store the input ref so the calendar button can open the native date picker..
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +124,7 @@ export function EndDateInput() {
           <CalendarDays className='size-4' aria-hidden='true' />
         </button>
       </div>
-      {errorMessage && (
+      {errorMessage ? (
         <p
           id={errorId}
           role='alert'
@@ -108,7 +133,15 @@ export function EndDateInput() {
         >
           {errorMessage}
         </p>
-      )}
+      ) : showHelper ? (
+        <p
+          id={helperId}
+          aria-live='polite'
+          className='text-sm text-muted-foreground'
+        >
+          {helperText}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -64,6 +64,21 @@ export function resumeFundraiser(
 }
 
 /**
+ * Extends a fundraiser by setting a new end date only.
+ *
+ * A partial PUT: status, donations, and every other field are left untouched
+ * (same pattern as `pauseFundraiser`/`resumeFundraiser`). `endDate` is a
+ * date-only value (YYYY-MM-DD).
+ */
+export function extendFundraiser(
+  id: string,
+  endDate: string,
+  token: string
+): Promise<Fundraiser> {
+  return updateFundraiser(id, { endDate }, token);
+}
+
+/**
  * Deletes a fundraiser.
  *
  * Success can return either:
