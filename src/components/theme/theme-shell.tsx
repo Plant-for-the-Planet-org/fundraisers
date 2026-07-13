@@ -34,6 +34,10 @@ const INITIAL_BLUR_STYLE = {
   right: 'max(0px, calc((100vw - 60rem) / 2))',
 } as React.CSSProperties;
 
+// Opacity of the user colour selection (solid or custom gradient) painted as a
+// tint over the mode base layer. Preset gradient classes keep their authored alpha.
+const TINT_OPACITY = 0.14;
+
 /**
  * Guard against CSS injection via url("...") interpolation.
  * A URL containing `"` or `)` could break out of the CSS literal.
@@ -114,10 +118,16 @@ export function ThemeShell({
         } as React.CSSProperties
       }
     >
-      {/* Layer stack, back → front: gradient · image · pattern · logo · content.
-          The gradient is the base wash; image/pattern/logo are decorations that
-          sit on top of it. A transparent-based image (e.g. foliage) shows the
-          gradient through its gaps instead of being hidden behind it. */}
+      {/* Layer stack, back → front: base · colour tint · image · pattern · logo · content.
+          The mode base layer (black in dark, white in light) is always painted at
+          100%. The user colour selection sits over it at TINT_OPACITY, so the page
+          reads as a subtle tint of the base. Preset gradient classes keep their own
+          authored alpha. Decorations (image/pattern/logo) sit on top and show the
+          tinted base through their gaps. */}
+      <div
+        className='fixed inset-0 transition-colors duration-300'
+        style={{ backgroundColor: 'rgb(var(--base-rgb))' }}
+      />
       {gradientClass && (
         <div
           className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
@@ -125,14 +135,14 @@ export function ThemeShell({
       )}
       {customGradient && (
         <div
-          className='fixed inset-0 transition-colors duration-300'
-          style={{ backgroundImage: customGradient }}
+          className='fixed inset-0 transition-opacity duration-300'
+          style={{ backgroundImage: customGradient, opacity: TINT_OPACITY }}
         />
       )}
       {solidColor && (
         <div
-          className='fixed inset-0 transition-colors duration-300'
-          style={{ backgroundColor: solidColor }}
+          className='fixed inset-0 transition-opacity duration-300'
+          style={{ backgroundColor: solidColor, opacity: TINT_OPACITY }}
         />
       )}
       {bg.decoration === 'image' && bg.image_url && (
