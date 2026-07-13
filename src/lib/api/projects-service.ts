@@ -2,8 +2,8 @@ import type {
   ProjectData,
   ProjectPurpose,
 } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
 import type { ApiCountry } from '@/lib/workspaces/registry';
+import type { AllowedCountry } from '../workspaces/countries';
 
 import { platformFetch } from '@/lib/api/platform-fetch';
 import { PROJECT_PURPOSES } from '@/lib/types/project-selection';

@@ -1,7 +1,7 @@
 'use client';
 
 import type { GetProject, ProjectData } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';

@@ -1,8 +1,5 @@
 import type { BundleWorkspace } from '@/lib/types/bundle';
-import type {
-  AllowedCountry,
-  SupportedCurrency,
-} from '@/lib/utils/country-currency';
+import type { AllowedCountry, SupportedCurrency } from './countries';
 
 /**
  * ForestCloud country code accepted by the projects / country API. `'ROW'`
@@ -103,8 +100,8 @@ export const WORKSPACE_PROFILES: Record<AllowedCountry, WorkspaceProfile> = {
  * Look up the profile for an already-normalized `AllowedCountry`.
  *
  * Callers holding an arbitrary string should coerce with `toAllowedCountry`
- * (from `country-currency.ts`) first — that keeps the string-coercion concern
- * in one place and this module free of a runtime dependency on it.
+ * (from `country-currency.ts`) first, keeping the string-coercion concern in
+ * one place.
  */
 export function getWorkspaceProfile(country: AllowedCountry): WorkspaceProfile {
   return WORKSPACE_PROFILES[country];

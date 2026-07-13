@@ -1,5 +1,5 @@
 import type { BundleWorkspace } from '@/lib/types/bundle';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '../workspaces/countries';
 
 import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 
