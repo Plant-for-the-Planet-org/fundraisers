@@ -8,9 +8,9 @@ import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
 import { Palette } from 'lucide-react';
 import {
-  getReadableMode,
-  getReadableModeForStops,
+  getSwatchContrast,
   isValidHexColor,
+  swatchSelectedStyle,
 } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
@@ -47,15 +47,6 @@ const circleBase =
   'relative h-9 w-9 rounded-full border-2 overflow-hidden transition-colors';
 const inactiveBorder = 'border-border hover:border-foreground/40';
 
-// Selected state uses the live theme accent (raw var — the Tailwind `accent`
-// token bakes in the default green) with a soft halo ring so it reads clearly
-// on any swatch colour.
-const selectedStyle: React.CSSProperties = {
-  borderColor: 'var(--accent-color)',
-  boxShadow:
-    '0 0 0 2px color-mix(in srgb, var(--accent-color) 30%, transparent)',
-};
-
 export function BackgroundBaseSelector({
   bg,
   accentColor,
@@ -91,7 +82,7 @@ export function BackgroundBaseSelector({
           aria-label={tTheme('baseNone')}
           aria-pressed={isNone}
           className={cn(circleBase, 'bg-background', !isNone && inactiveBorder)}
-          style={isNone ? selectedStyle : undefined}
+          style={isNone ? swatchSelectedStyle : undefined}
         >
           <svg
             viewBox='0 0 24 24'
@@ -124,7 +115,7 @@ export function BackgroundBaseSelector({
               className={cn(circleBase, g.value, !active && inactiveBorder)}
               style={{
                 backgroundColor: '#fff',
-                ...(active ? selectedStyle : {}),
+                ...(active ? swatchSelectedStyle : {}),
               }}
             />
           );
@@ -172,17 +163,10 @@ function CustomColorButton({
 
   // The palette icon always sits on top of the chosen colour; flip it light or
   // dark to stay legible against whatever solid / gradient is behind it.
-  const contrastMode = bg.background_color
-    ? getReadableMode(bg.background_color)
-    : bg.custom_gradient
-      ? getReadableModeForStops(bg.custom_gradient.stops.map(s => s.color))
-      : null;
-  const iconColor =
-    contrastMode === 'dark'
-      ? 'text-white'
-      : contrastMode === 'light'
-        ? 'text-zinc-900'
-        : 'text-muted-foreground';
+  const { iconClass } = getSwatchContrast(
+    bg.background_color,
+    bg.custom_gradient?.stops.map(s => s.color)
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -197,9 +181,11 @@ function CustomColorButton({
             'flex items-center justify-center',
             !active && inactiveBorder
           )}
-          style={active ? { ...previewStyle, ...selectedStyle } : previewStyle}
+          style={
+            active ? { ...previewStyle, ...swatchSelectedStyle } : previewStyle
+          }
         >
-          <Palette className={cn('h-4 w-4', iconColor)} aria-hidden />
+          <Palette className={cn('h-4 w-4', iconClass)} aria-hidden />
         </button>
       </PopoverTrigger>
       <PopoverContent align='start' className='w-auto'>

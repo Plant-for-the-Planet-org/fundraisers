@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { ThemeMode } from './types';
 
 /**
@@ -47,3 +48,38 @@ export function getReadableModeForStops(colors: string[]): ThemeMode {
     colors.reduce((sum, c) => sum + getRelativeLuminance(c), 0) / colors.length;
   return luminanceToMode(avg);
 }
+
+/**
+ * Foreground/icon class that stays legible on top of a solid or gradient swatch.
+ * `solid` takes priority; otherwise the gradient `stops` are averaged. Returns
+ * `text-muted-foreground` (and `mode: null`) when there is no colour to read on.
+ */
+export function getSwatchContrast(
+  solid: string | null,
+  stops?: string[] | null
+): { iconClass: string; mode: ThemeMode | null } {
+  const mode = solid
+    ? getReadableMode(solid)
+    : stops && stops.length > 0
+      ? getReadableModeForStops(stops)
+      : null;
+  return {
+    mode,
+    iconClass:
+      mode === 'dark'
+        ? 'text-white'
+        : mode === 'light'
+          ? 'text-zinc-900'
+          : 'text-muted-foreground',
+  };
+}
+
+/**
+ * Selected-swatch marker: the live theme accent as border + a soft halo ring,
+ * so selection reads clearly on any swatch colour.
+ */
+export const swatchSelectedStyle: CSSProperties = {
+  borderColor: 'var(--accent-color)',
+  boxShadow:
+    '0 0 0 2px color-mix(in srgb, var(--accent-color) 30%, transparent)',
+};
