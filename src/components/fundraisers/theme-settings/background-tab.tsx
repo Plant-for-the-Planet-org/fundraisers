@@ -22,6 +22,10 @@ import {
 } from './constants';
 import { AssetGrid, OpacitySlider, ThemeChipRow } from './primitives';
 
+// Cap pattern/image opacity so a decoration can't fully cover the base + tint
+// and invert the effective surface luminance that text contrast relies on.
+const DECORATION_MAX_OPACITY = 0.6;
+
 type Props = {
   bg: BgFormValue;
   accentColor: string;
@@ -256,7 +260,11 @@ function PatternPanel({
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
     <>
-      <OpacitySlider value={opacity} onChange={onOpacity} />
+      <OpacitySlider
+        value={opacity}
+        onChange={onOpacity}
+        max={DECORATION_MAX_OPACITY}
+      />
       <div>
         <SectionHeader showDivider={false}>
           {tTheme('labelPattern')}
@@ -311,7 +319,11 @@ function ImagePanel({
           );
         })}
       </ThemeChipRow>
-      <OpacitySlider value={opacity} onChange={onOpacity} />
+      <OpacitySlider
+        value={opacity}
+        onChange={onOpacity}
+        max={DECORATION_MAX_OPACITY}
+      />
       <div>
         <SectionHeader showDivider={false}>
           {tTheme('labelImage')}

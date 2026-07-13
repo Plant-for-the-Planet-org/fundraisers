@@ -66,9 +66,11 @@ export function FontChipRow({
 export function OpacitySlider({
   value,
   onChange,
+  max = 1,
 }: {
   value: number;
   onChange: (value: number) => void;
+  max?: number;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
@@ -84,7 +86,7 @@ export function OpacitySlider({
       <input
         type='range'
         min={0.05}
-        max={1}
+        max={max}
         step={0.05}
         value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
