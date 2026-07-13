@@ -2,8 +2,50 @@
 
 import type { Theme } from '@/lib/theme/types';
 
+import { resolveBgAsset } from '@/lib/theme/backgrounds';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { ACCENT_BG, FEATURED_THEMES } from './constants';
+
+// Resolve a theme's background to a small preview visual, mirroring how
+// ThemeShell paints its base wash. Falls back to the decoration thumbnail (then
+// bg-muted) so solid/gradient/image/pattern themes never render a blank swatch.
+function swatchVisual(bg: Theme['bg']): {
+  className?: string;
+  style?: React.CSSProperties;
+} {
+  if (bg.gradient) return { className: bg.gradient };
+  const cg = bg.custom_gradient;
+  if (
+    cg &&
+    cg.stops.length >= 2 &&
+    cg.stops.every(s => isValidHexColor(s.color))
+  ) {
+    return {
+      style: {
+        backgroundImage: `linear-gradient(${cg.angle}deg, ${cg.stops
+          .map(s => `${s.color} ${s.position}%`)
+          .join(', ')})`,
+      },
+    };
+  }
+  if (isValidHexColor(bg.background_color)) {
+    return { style: { backgroundColor: bg.background_color } };
+  }
+  const decorationKey = bg.image_url ?? bg.pattern_id;
+  if (decorationKey) {
+    const asset = resolveBgAsset(decorationKey);
+    if (asset?.kind === 'library') {
+      return {
+        style: {
+          backgroundImage: `url("${asset.asset.thumb}")`,
+          backgroundSize: 'cover',
+        },
+      };
+    }
+  }
+  return { className: 'bg-muted' };
+}
 
 export function ThemeBrowseGrid({
   activeId,
@@ -16,6 +58,7 @@ export function ThemeBrowseGrid({
     <div className='grid grid-cols-2 gap-2'>
       {FEATURED_THEMES.map(theme => {
         const active = theme.id === activeId;
+        const visual = swatchVisual(theme.bg);
         return (
           <button
             type='button'
@@ -32,8 +75,9 @@ export function ThemeBrowseGrid({
             <span
               className={cn(
                 'w-6 h-6 rounded-md border border-border flex-shrink-0',
-                theme.bg.gradient
+                visual.className
               )}
+              style={visual.style}
             />
             <div className='flex-1 min-w-0'>
               <div className='text-xs font-semibold text-foreground truncate'>
