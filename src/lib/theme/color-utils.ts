@@ -49,6 +49,16 @@ export function getReadableModeForStops(colors: string[]): ThemeMode {
   return luminanceToMode(avg);
 }
 
+/** The gradient stop colour nearest position 50 — the visually dominant one. */
+export function getDominantStopColor(
+  stops: { color: string; position: number }[]
+): string | null {
+  if (stops.length === 0) return null;
+  return stops.reduce((best, s) =>
+    Math.abs(s.position - 50) < Math.abs(best.position - 50) ? s : best
+  ).color;
+}
+
 /**
  * Foreground/icon class that stays legible on top of a solid or gradient swatch.
  * `solid` takes priority; otherwise the gradient `stops` are averaged. Returns

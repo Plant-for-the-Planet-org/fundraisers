@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Moon, Shuffle, Sun } from 'lucide-react';
 import { getAccentColor } from '@/lib/theme/accent-utils';
+import { getDominantStopColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { THEMES } from '@/lib/theme/themes';
 import { cn } from '@/lib/utils/cn';
@@ -220,7 +221,11 @@ export function ThemeSettings() {
                 gradient: '',
                 custom_gradient: null,
               };
-              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
+              // A new background colour re-seeds the accent (the selected colour).
+              syncFormAndPreview(
+                { bg: nextBg, accent: hex },
+                { bg: nextBg, accent: hex as AccentColor }
+              );
             }}
             onGradientChange={next => {
               const nextBg = {
@@ -229,7 +234,12 @@ export function ThemeSettings() {
                 background_color: null,
                 gradient: '',
               };
-              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
+              // Re-seed the accent from the gradient's dominant stop.
+              const accent = getDominantStopColor(next.stops);
+              syncFormAndPreview(
+                { bg: nextBg, ...(accent && { accent }) },
+                { bg: nextBg, ...(accent && { accent: accent as AccentColor }) }
+              );
             }}
             onGradient={value => {
               const nextBg = {

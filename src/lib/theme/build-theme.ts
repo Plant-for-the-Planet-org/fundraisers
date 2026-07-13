@@ -148,9 +148,11 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
     ...base,
     id: 'fundraiser-custom',
     name: 'Custom',
-    accent: VALID_ACCENTS.has(settings.accent ?? '')
-      ? (settings.accent as AccentColor)
-      : base.accent,
+    accent:
+      VALID_ACCENTS.has(settings.accent ?? '') ||
+      isValidHexColor(settings.accent)
+        ? (settings.accent as AccentColor)
+        : base.accent,
     mode: isValidMode(settings.mode) ? settings.mode : base.mode,
     bodyFont: VALID_FONTS.has(settings.body_font ?? '')
       ? (settings.body_font as FontId)

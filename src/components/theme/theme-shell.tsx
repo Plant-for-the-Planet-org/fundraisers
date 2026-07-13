@@ -1,12 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type {
-  BgSettings,
-  CustomGradient,
-  Theme,
-  ThemeMode,
-} from '@/lib/theme/types';
+import type { BgSettings, Theme, ThemeMode } from '@/lib/theme/types';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -49,43 +44,6 @@ const CTA_TEXT_ON_DARK = '#ffffff';
 // 'light' means the CTA surface is light, so it needs dark text; 'dark' needs white text.
 function ctaTextFor(mode: ThemeMode): string {
   return mode === 'light' ? CTA_TEXT_ON_LIGHT : CTA_TEXT_ON_DARK;
-}
-
-/**
- * CTA background + text colour derived from the user colour selection.
- * - solid → that colour
- * - gradient whose stops agree on a readable text colour → the full gradient
- * - gradient whose stops disagree (light↔dark) → a solid dominant stop, so one
- *   text colour stays legible across the whole button
- * The background is always a background-image value (a solid is expressed as a
- * flat linear-gradient) so the button paints it uniformly and falls back to
- * --accent-color when there is no user selection (preset gradient / none).
- */
-function resolveCtaVars(
-  gradientCss: string | null,
-  cg: CustomGradient | null,
-  solidColor: string | null
-): { bg: string; fg: string } | null {
-  if (gradientCss && cg) {
-    const modes = cg.stops.map(s => getReadableMode(s.color));
-    if (modes.every(m => m === modes[0])) {
-      return { bg: gradientCss, fg: ctaTextFor(modes[0]) };
-    }
-    const dominant = cg.stops.reduce((best, s) =>
-      Math.abs(s.position - 50) < Math.abs(best.position - 50) ? s : best
-    );
-    return {
-      bg: `linear-gradient(${dominant.color}, ${dominant.color})`,
-      fg: ctaTextFor(getReadableMode(dominant.color)),
-    };
-  }
-  if (solidColor) {
-    return {
-      bg: `linear-gradient(${solidColor}, ${solidColor})`,
-      fg: ctaTextFor(getReadableMode(solidColor)),
-    };
-  }
-  return null;
 }
 
 /**
@@ -156,8 +114,9 @@ export function ThemeShell({
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
-  // CTA colour follows the user colour selection; falls back to --accent-color.
-  const cta = resolveCtaVars(customGradient, cg, solidColor);
+  // The accent colour drives the CTA (solid) and every other accent surface;
+  // the CTA text colour is picked for contrast against it.
+  const accentColor = getAccentColor(activeTheme.accent);
 
   return (
     <div
@@ -167,8 +126,8 @@ export function ThemeShell({
         {
           fontFamily: getFontStack(activeTheme.bodyFont),
           '--theme-title-font': getFontStack(activeTheme.titleFont),
-          '--accent-color': getAccentColor(activeTheme.accent),
-          ...(cta && { '--cta-bg': cta.bg, '--cta-foreground': cta.fg }),
+          '--accent-color': accentColor,
+          '--cta-foreground': ctaTextFor(getReadableMode(accentColor)),
         } as React.CSSProperties
       }
     >

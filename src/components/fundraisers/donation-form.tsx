@@ -294,7 +294,6 @@ export function DonationForm({
           className='h-9 w-full font-medium text-base hover:brightness-90'
           style={{
             backgroundColor: 'var(--accent-color)',
-            backgroundImage: 'var(--cta-bg, none)',
             color: 'var(--cta-foreground, #ffffff)',
           }}
           disabled={isDonateButtonDisabled}

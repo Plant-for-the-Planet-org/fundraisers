@@ -1,5 +1,7 @@
 import type { AccentColor } from './types';
 
+import { isValidHexColor } from './color-utils';
+
 export function getAccentClasses(accent: AccentColor) {
   const map: Record<
     AccentColor,
@@ -119,8 +121,12 @@ export function getAccentClasses(accent: AccentColor) {
   return map[accent];
 }
 
-// Hex values used to set --accent-color CSS variable (for non-Tailwind consumers, e.g. SVG fills).
-export function getAccentColor(accent: AccentColor): string {
+// Hex values used to set the --accent-color CSS variable (for non-Tailwind
+// consumers, e.g. SVG fills). Accepts a named palette accent OR a raw hex
+// (the accent can be seeded from the background colour), and never returns
+// undefined so the CSS var always resolves.
+export function getAccentColor(accent: string): string {
+  if (isValidHexColor(accent)) return accent;
   const map: Record<AccentColor, string> = {
     planet: '#007a49',
     blue: '#2563eb',
@@ -145,5 +151,5 @@ export function getAccentColor(accent: AccentColor): string {
     neutral: '#525252',
     stone: '#57534e',
   };
-  return map[accent];
+  return map[accent as AccentColor] ?? '#16a34a';
 }
