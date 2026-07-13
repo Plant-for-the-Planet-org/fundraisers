@@ -252,8 +252,8 @@ export function DonationForm({
   };
 
   return (
-    <Card className='donation-form border-2 border-card shadow py-0 gap-0 rounded-2xl'>
-      <CardHeader className='px-4 py-2.5 mx-1 mt-1 bg-muted rounded-tl-lg rounded-tr-lg flex flex-row justify-between items-center gap-0 space-y-0'>
+    <Card className='donation-form border border-surface-border bg-surface-2 shadow py-0 gap-0 rounded-2xl'>
+      <CardHeader className='px-4 py-2.5 mx-1 mt-1 bg-surface-3 rounded-tl-lg rounded-tr-lg flex flex-row justify-between items-center gap-0 space-y-0'>
         <div className='text-muted-foreground text-sm font-semibold'>
           {t('cardHeader')}
         </div>
