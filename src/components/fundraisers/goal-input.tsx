@@ -61,7 +61,7 @@ export function GoalInput() {
           autoComplete='off'
           aria-invalid={fieldState.invalid}
           aria-describedby={describedBy}
-          className='bg-transparent border-border hover:bg-muted/5 pr-12'
+          className='bg-base/20 border-border hover:bg-base/30 pr-12'
           value={displayValue}
           onChange={handleChange}
           onFocus={() => setIsFocused(true)}

@@ -66,7 +66,7 @@ export function WorkspaceSelector({
         disabled={disabled}
       >
         <SelectTrigger
-          className='w-full bg-transparent border-border hover:bg-muted/5'
+          className='w-full bg-base/20 border-border hover:bg-base/30'
           id='form-country'
         >
           <SelectValue>

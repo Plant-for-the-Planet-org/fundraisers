@@ -317,11 +317,11 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        'border border-input rounded-md bg-card/5 backdrop-blur-sm',
+        'border border-input rounded-md bg-base/20 backdrop-blur-sm',
         className
       )}
     >
-      <div className='border-b border-input p-2 flex items-center gap-1 flex-wrap bg-muted/10'>
+      <div className='border-b border-input p-2 flex items-center gap-1 flex-wrap bg-base/60'>
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           isActive={toolbarState.isBold}
