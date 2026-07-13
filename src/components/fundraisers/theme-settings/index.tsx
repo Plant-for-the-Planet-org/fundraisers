@@ -131,7 +131,7 @@ export function ThemeSettings() {
   );
 
   return (
-    <div className='theme-settings flex flex-col gap-3'>
+    <div className='theme-settings flex flex-col gap-3 rounded-xl border bg-popover text-popover-foreground p-4 shadow-sm'>
       <div className='theme-settings-toolbar flex items-center gap-2 pb-3 border-b border-border'>
         <div className='flex-1 min-w-0'>
           <SectionHeader showDivider={false}>
