@@ -60,16 +60,11 @@
   --color-heading: hsl(var(--heading));
   --color-section-divider: hsl(var(--section-divider));
 
-  /* Layered theme model — translucent surfaces over the mode base layer.
-     --base-rgb / --reverse-rgb flip by mode (:root / .light / .dark).
-     Surfaces reinforce the base (recede); callouts use the reverse (pop).
-     Complete colors with alpha, so no hsl() wrapper. */
-  --color-surface-1: rgb(var(--base-rgb) / 0.06);
-  --color-surface-2: rgb(var(--base-rgb) / 0.1);
-  --color-surface-3: rgb(var(--base-rgb) / 0.16);
-  --color-surface-border: rgb(var(--base-rgb) / 0.14);
-  --color-callout: rgb(var(--reverse-rgb) / 0.1);
-  --color-callout-border: rgb(var(--reverse-rgb) / 0.2);
+  /* Layered theme model — base/reverse colours for the mode base layer.
+     --base-rgb / --reverse-rgb flip by mode (:root / .light / .dark). Surfaces
+     use bg-base/N (recede); callouts use bg-reverse/N (pop) via opacity modifiers. */
+  --color-base: rgb(var(--base-rgb));
+  --color-reverse: rgb(var(--reverse-rgb));
 
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
@@ -207,12 +202,8 @@
   --color-tab-border: var(--tab-border-color);
   --color-heading: hsl(var(--heading));
   --color-section-divider: hsl(var(--section-divider));
-  --color-surface-1: rgb(var(--base-rgb) / 0.06);
-  --color-surface-2: rgb(var(--base-rgb) / 0.1);
-  --color-surface-3: rgb(var(--base-rgb) / 0.16);
-  --color-surface-border: rgb(var(--base-rgb) / 0.14);
-  --color-callout: rgb(var(--reverse-rgb) / 0.1);
-  --color-callout-border: rgb(var(--reverse-rgb) / 0.2);
+  --color-base: rgb(var(--base-rgb));
+  --color-reverse: rgb(var(--reverse-rgb));
 }
 
 body {
