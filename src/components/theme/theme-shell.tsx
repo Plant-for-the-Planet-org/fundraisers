@@ -343,11 +343,35 @@ function PatternLayer({
 }) {
   const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
+  const asset = resolved.kind === 'library' ? resolved.asset : null;
+  const tileSize = asset?.tileSize ?? DEFAULT_PATTERN_TILE;
+  const maskSrc = asset?.maskSrc ? safeCssUrl(asset.maskSrc) : null;
+
+  // Monochrome mask: the theme colour is painted underneath and revealed only
+  // where the pattern shapes are, so the colour appears to tint the pattern.
+  if (maskSrc) {
+    const maskUrl = `url("${maskSrc}")`;
+    return (
+      <div
+        className='fixed inset-0 bg-top-left pointer-events-none transition-opacity duration-300'
+        style={{
+          backgroundColor: 'var(--accent-color)',
+          WebkitMaskImage: maskUrl,
+          maskImage: maskUrl,
+          WebkitMaskRepeat: 'repeat',
+          maskRepeat: 'repeat',
+          WebkitMaskSize: tileSize,
+          maskSize: tileSize,
+          WebkitMaskPosition: 'top left',
+          maskPosition: 'top left',
+          opacity,
+        }}
+        aria-hidden
+      />
+    );
+  }
+
   const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
-  const tileSize =
-    resolved.kind === 'library'
-      ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
-      : DEFAULT_PATTERN_TILE;
   return (
     <div
       className='fixed inset-0 bg-repeat bg-top-left pointer-events-none transition-opacity duration-300'

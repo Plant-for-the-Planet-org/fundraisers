@@ -42,6 +42,7 @@ export interface BackgroundAsset {
   thumb: string; // Picker thumbnail (data URI today, real assets later).
   src: string; // Full asset (rendered on the fundraiser page).
   tileSize?: string; // Optional override for the rendered tile size, eg '138px 92px'.
+  maskSrc?: string; // Monochrome mask (white shapes on transparent). When set, the pattern is rendered as a mask tinted by the theme colour instead of a baked-in image.
 }
 
 export const DEFAULT_PATTERN_TILE = '115px 77px';
@@ -77,6 +78,20 @@ function svgThumb(
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+// Monochrome mask factory: white shapes on a transparent field. Used as a CSS
+// mask-image so the rendered pattern takes the theme colour (painted underneath)
+// and its gaps stay clear — the colour appears to tint the pattern.
+function svgMask(kind: string, { wide = false } = {}): string {
+  const shapes: Record<string, string> = {
+    grid: `<pattern id='m' width='8' height='8' patternUnits='userSpaceOnUse'><path d='M0 0 H8 M0 0 V8' stroke='#fff' stroke-width='0.5'/></pattern><rect width='100%' height='100%' fill='url(#m)'/>`,
+    dots: `<pattern id='m' width='8' height='8' patternUnits='userSpaceOnUse'><circle cx='4' cy='4' r='1.5' fill='#fff'/></pattern><rect width='100%' height='100%' fill='url(#m)'/>`,
+  };
+  const vb = wide ? '0 0 240 40' : '0 0 60 40';
+  const body = shapes[kind] ?? shapes.grid;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}' preserveAspectRatio='xMidYMid slice'>${body}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export const BG_LIBRARY: BackgroundAsset[] = [
   // Patterns
   {
@@ -85,6 +100,7 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     type: 'pattern',
     thumb: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
     src: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
+    maskSrc: svgMask('grid'),
     tileSize: '138px 92px',
   },
   {
