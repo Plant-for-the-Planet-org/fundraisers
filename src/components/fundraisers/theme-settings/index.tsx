@@ -9,10 +9,6 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Moon, Shuffle, Sun } from 'lucide-react';
 import { getAccentColor } from '@/lib/theme/accent-utils';
-import {
-  getReadableMode,
-  getReadableModeForStops,
-} from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { THEMES } from '@/lib/theme/themes';
 import { cn } from '@/lib/utils/cn';
@@ -205,6 +201,9 @@ export function ThemeSettings() {
             bg={field.value.bg}
             accentColor={getAccentColor(activeTheme.accent)}
             // One base wash at a time: each setter clears the other two.
+            // Colour selection does not change light/dark mode; in the layered
+            // model the colour is only a tint over the mode base, so mode is a
+            // deliberate toggle, not derived from the picked colour.
             onSelectNone={() => {
               const nextBg = {
                 ...field.value.bg,
@@ -221,8 +220,7 @@ export function ThemeSettings() {
                 gradient: '',
                 custom_gradient: null,
               };
-              const mode = getReadableMode(hex);
-              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
             }}
             onGradientChange={next => {
               const nextBg = {
@@ -231,19 +229,16 @@ export function ThemeSettings() {
                 background_color: null,
                 gradient: '',
               };
-              const mode = getReadableModeForStops(
-                next.stops.map(s => s.color)
-              );
-              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
             }}
-            onGradient={(value, mode) => {
+            onGradient={value => {
               const nextBg = {
                 ...field.value.bg,
                 gradient: value,
                 background_color: null,
                 custom_gradient: null,
               };
-              syncFormAndPreview({ bg: nextBg, mode }, { bg: nextBg, mode });
+              syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
             }}
             onDecoration={decoration => patchBg({ decoration })}
             onPatternId={pattern_id => patchBg({ pattern_id })}

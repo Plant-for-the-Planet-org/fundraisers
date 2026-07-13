@@ -60,7 +60,7 @@ export function BackgroundBaseSelector({
   onSelectNone: () => void;
   onSolidColor: (hex: string) => void;
   onGradientChange: (next: CustomGradient) => void;
-  onGradient: (value: string, mode: 'light' | 'dark') => void;
+  onGradient: (value: string) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
 
@@ -108,7 +108,7 @@ export function BackgroundBaseSelector({
             <button
               type='button'
               key={g.id}
-              onClick={() => onGradient(g.value, g.mode)}
+              onClick={() => onGradient(g.value)}
               title={g.label}
               aria-label={g.label}
               aria-pressed={active}
