@@ -320,17 +320,30 @@ function ImageLayer({
       ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
       : DEFAULT_PATTERN_TILE;
   return (
-    <div
-      className='fixed inset-0 pointer-events-none transition-opacity duration-300'
-      style={{
-        backgroundImage: `url("${src}")`,
-        backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
-        backgroundSize: mode === 'repeat' ? tileSize : 'cover',
-        backgroundPosition: 'center',
-        opacity,
-      }}
-      aria-hidden
-    />
+    <>
+      <div
+        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+        style={{
+          backgroundImage: `url("${src}")`,
+          backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
+          backgroundSize: mode === 'repeat' ? tileSize : 'cover',
+          backgroundPosition: 'center',
+          opacity,
+        }}
+        aria-hidden
+      />
+      {/* Colour layer above the image: multiply-tints it with the theme colour.
+          Capped so the image stays visible even at high decoration opacity. */}
+      <div
+        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+        style={{
+          backgroundColor: 'var(--accent-color)',
+          mixBlendMode: 'multiply',
+          opacity: Math.min(opacity, 0.55),
+        }}
+        aria-hidden
+      />
+    </>
   );
 }
 
