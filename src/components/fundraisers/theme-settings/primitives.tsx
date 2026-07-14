@@ -48,7 +48,7 @@ export function FontChipRow({
             onClick={() => onChange(font.id)}
             title={font.id}
             className={cn(
-              'inline-flex items-center justify-center w-9 h-8 rounded-md border text-base',
+              'inline-flex items-center justify-center w-9 h-8 rounded-md border text-foreground font-semibold',
               active
                 ? 'border-foreground'
                 : 'border-border hover:border-foreground/40'
