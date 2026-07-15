@@ -1,5 +1,7 @@
+import type { RawFundraiser } from '@/lib/api/normalize-fundraiser';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
+import { normalizeFundraiser } from '@/lib/api/normalize-fundraiser';
 import { platformFetch } from '@/lib/api/platform-fetch';
 import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 
@@ -18,7 +20,7 @@ export interface DashboardSummaryStats {
 
 function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
   if (Array.isArray(payload)) {
-    return payload as Fundraiser[];
+    return (payload as RawFundraiser[]).map(normalizeFundraiser);
   }
 
   if (!payload || typeof payload !== 'object') {
@@ -30,7 +32,7 @@ function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
 
   for (const candidate of candidates) {
     if (Array.isArray(candidate)) {
-      return candidate as Fundraiser[];
+      return (candidate as RawFundraiser[]).map(normalizeFundraiser);
     }
   }
 

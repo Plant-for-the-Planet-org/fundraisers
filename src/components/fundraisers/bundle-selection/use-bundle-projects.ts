@@ -1,13 +1,14 @@
 'use client';
 
 import type { GetProject, ProjectData } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { projectsService } from '@/lib/api/projects-service';
 import { DEFAULT_NON_EARMARKED_CAUSE_FALLBACK } from '@/lib/constants/project-selection';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 import { useEditProjectDetails } from './edit-project-details-context';
 
 type ProjectsById = Record<string, ProjectData>;
@@ -82,10 +83,10 @@ export function useBundleProjects(
           name: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.name,
           description: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.description,
           image: DEFAULT_NON_EARMARKED_CAUSE_FALLBACK.image,
-          // ROW (Rest of the World) falls back to DE since the workspace's
+          // ROW (Rest of the World) resolves to DE since the workspace's
           // default cause is physically a German project regardless of the
           // fundraiser's selected country.
-          country: country === 'ROW' ? 'DE' : country,
+          country: getWorkspaceProfile(country).apiCountry,
           allowDonations: true,
           isTopProject: false,
         };

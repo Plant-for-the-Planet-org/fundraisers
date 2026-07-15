@@ -1,5 +1,3 @@
-import type { AllowedCountry } from '@/lib/utils/country-currency';
-
 export const PROJECT_PURPOSES = [
   'trees',
   'conservation',
@@ -58,5 +56,3 @@ export interface ProjectAllocationPreview extends SelectedProject {
   percentage: number;
   isDefault: boolean;
 }
-
-export type DefaultCauseIdByCountry = Partial<Record<AllowedCountry, string>>;

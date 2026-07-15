@@ -6,6 +6,7 @@ import type {
 } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
 
 export type UpdateDirtyFields = Partial<
@@ -167,7 +168,7 @@ export function buildCreateFundraiserRequest(
   return {
     title: values.title,
     description: values.description,
-    country: values.country === 'ROW' ? 'DE' : values.country, // ROW maps to DE (default workspace country) for the API
+    country: getWorkspaceProfile(values.country).apiCountry, // ROW is served by the DE workspace for the API
     currency: values.currency,
     goalAmount: values.goalAmount,
     visibility: values.visibility,
