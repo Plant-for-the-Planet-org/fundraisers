@@ -317,25 +317,31 @@ function PatternLayer({
   if (!resolved) return null;
   const asset = resolved.kind === 'library' ? resolved.asset : null;
   const tileSize = asset?.tileSize ?? DEFAULT_PATTERN_TILE;
-  const maskSrc = asset?.maskSrc ? safeCssUrl(asset.maskSrc) : null;
+  const fullBleed = asset?.fullBleed ?? false;
+  const masked = asset?.masked ?? false;
+  const rawSrc =
+    resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const src = safeCssUrl(rawSrc);
+  if (!src) return null;
 
   // Monochrome mask: the theme colour is painted underneath and revealed only
-  // where the pattern shapes are, so the colour appears to tint the pattern.
-  if (maskSrc) {
-    const maskUrl = `url("${maskSrc}")`;
+  // where the stencil shapes are, so the colour appears to tint the pattern.
+  // Full-bleed designs cover the viewport once; the rest tile.
+  if (masked) {
+    const maskUrl = `url("${src}")`;
     return (
       <div
-        className='fixed inset-0 bg-top-left pointer-events-none transition-opacity duration-300'
+        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
         style={{
           backgroundColor: 'var(--accent-color)',
           WebkitMaskImage: maskUrl,
           maskImage: maskUrl,
-          WebkitMaskRepeat: 'repeat',
-          maskRepeat: 'repeat',
-          WebkitMaskSize: tileSize,
-          maskSize: tileSize,
-          WebkitMaskPosition: 'top left',
-          maskPosition: 'top left',
+          WebkitMaskRepeat: fullBleed ? 'no-repeat' : 'repeat',
+          maskRepeat: fullBleed ? 'no-repeat' : 'repeat',
+          WebkitMaskSize: fullBleed ? 'cover' : tileSize,
+          maskSize: fullBleed ? 'cover' : tileSize,
+          WebkitMaskPosition: fullBleed ? 'center' : 'top left',
+          maskPosition: fullBleed ? 'center' : 'top left',
           opacity,
         }}
         aria-hidden
@@ -343,13 +349,14 @@ function PatternLayer({
     );
   }
 
-  const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
   return (
     <div
-      className='fixed inset-0 bg-repeat bg-top-left pointer-events-none transition-opacity duration-300'
+      className='fixed inset-0 pointer-events-none transition-opacity duration-300'
       style={{
         backgroundImage: `url("${src}")`,
-        backgroundSize: tileSize,
+        backgroundRepeat: fullBleed ? 'no-repeat' : 'repeat',
+        backgroundSize: fullBleed ? 'cover' : tileSize,
+        backgroundPosition: fullBleed ? 'center' : 'top left',
         opacity,
       }}
       aria-hidden

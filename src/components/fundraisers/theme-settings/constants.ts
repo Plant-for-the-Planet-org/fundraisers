@@ -115,8 +115,23 @@ export const GRADIENT_OPTIONS: GradientOption[] = [
     })),
 ];
 
-export const PATTERNS = BG_LIBRARY.filter(b => b.type === 'pattern');
-export const IMAGES = BG_LIBRARY.filter(b => b.type !== 'pattern');
+// Only these curated assets show in the picker for now. The rest stay in
+// BG_LIBRARY as resources (still resolvable for saved themes) but are hidden.
+const PICKABLE_BG_IDS = new Set([
+  'bg-dots',
+  'bg-grid-lines',
+  'bg-trees',
+  'bg-woodgrain',
+  'bg-forest',
+  'bg-planet-botanical',
+]);
+
+export const PATTERNS = BG_LIBRARY.filter(
+  b => b.type === 'pattern' && PICKABLE_BG_IDS.has(b.id)
+);
+export const IMAGES = BG_LIBRARY.filter(
+  b => b.type !== 'pattern' && PICKABLE_BG_IDS.has(b.id)
+);
 export const LOGOS = LOGO_LIBRARY;
 
 // Quick-pick swatches shown beneath the picker, from the Planet CI palette

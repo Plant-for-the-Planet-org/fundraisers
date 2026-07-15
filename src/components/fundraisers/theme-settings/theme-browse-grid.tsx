@@ -38,7 +38,7 @@ function swatchVisual(bg: Theme['bg']): {
     if (asset?.kind === 'library') {
       return {
         style: {
-          backgroundImage: `url("${asset.asset.thumb}")`,
+          backgroundImage: `url("${asset.asset.thumb ?? asset.asset.src}")`,
           backgroundSize: 'cover',
         },
       };

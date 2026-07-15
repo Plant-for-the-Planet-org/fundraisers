@@ -20,7 +20,7 @@ export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   image_url: null,
   image_mode: 'cover',
   logo_id: null,
-  opacity: 0.5,
+  opacity: 0.2, // default decoration (pattern/image/logo) opacity — subtle by default
   animation: 'none',
 };
 
@@ -39,10 +39,12 @@ export interface BackgroundAsset {
   id: string; // Library key — currently persisted in settings.theme.bg.pattern_id or settings.theme.bg.image_url.
   label: string;
   type: BackgroundAssetType;
-  thumb: string; // Picker thumbnail (data URI today, real assets later).
-  src: string; // Full asset (rendered on the fundraiser page).
+  src: string; // Full asset (rendered on the fundraiser page). Also the mask source when `masked`.
+  thumb?: string; // Picker thumbnail; falls back to `src` when omitted.
   tileSize?: string; // Optional override for the rendered tile size, eg '138px 92px'.
-  maskSrc?: string; // Monochrome mask (white shapes on transparent). When set, the pattern is rendered as a mask tinted by the theme colour instead of a baked-in image.
+  masked?: boolean; // Render `src` as a monochrome stencil (white shapes on transparent) tinted by the theme colour, instead of a baked-in image.
+  fullBleed?: boolean; // Render as one full-bleed cover layer instead of a repeating tile (for large full-canvas designs).
+  thumbMaskSize?: string; // Per-asset zoom for a masked picker thumbnail (CSS mask-size); defaults to THUMB_MASK_SIZE.
 }
 
 export const DEFAULT_PATTERN_TILE = '115px 77px';
@@ -93,14 +95,57 @@ function svgMask(kind: string, { wide = false } = {}): string {
 }
 
 export const BG_LIBRARY: BackgroundAsset[] = [
-  // Patterns
+  // Curated patterns — monochrome stencils (white shapes on a transparent
+  // field) tinted by the theme colour and rendered full-bleed. One file per
+  // pattern: it is the mask at render time and the source for the picker
+  // thumbnail (drawn through the same mask in AssetGrid).
+  {
+    id: 'bg-dots',
+    label: 'Dots',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-dots.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-grid-lines',
+    label: 'Grid',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-grid.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-trees',
+    label: 'Trees',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-trees.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-woodgrain',
+    label: 'Woodgrain',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-woodgrain.svg',
+    masked: true,
+    fullBleed: true,
+    thumbMaskSize: '400%',
+  },
+  // Curated sample image.
+  {
+    id: 'bg-forest',
+    label: 'Forest',
+    type: 'image',
+    src: '/theme-backgrounds/forest.jpg',
+  },
+  // Patterns (legacy placeholders — kept as resources, hidden from the picker)
   {
     id: 'bg-grid',
     label: 'Grid',
     type: 'pattern',
-    thumb: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
-    src: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
-    maskSrc: svgMask('grid'),
+    src: svgMask('grid'),
+    masked: true,
     tileSize: '138px 92px',
   },
   {
