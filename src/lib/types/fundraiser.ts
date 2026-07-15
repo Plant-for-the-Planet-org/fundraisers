@@ -1,5 +1,5 @@
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 import type { FundraiserThemeSettings } from '../theme/types';
-import type { AllowedCountry } from '../workspaces/countries';
 import type { Nullable } from './utility';
 import type { FundraiserModules } from '@/modules';
 
