@@ -825,6 +825,7 @@ export function RichTextEditor({
         }}
         className='
           rich-quote
+          rich-links
           [&_.ProseMirror]:bg-transparent
           [&_.ProseMirror]:text-foreground
           [&_.ProseMirror]:border-0
