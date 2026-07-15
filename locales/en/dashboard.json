@@ -79,7 +79,7 @@
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
-      "extendSuccess": "End date updated",
+      "extendSuccess": "Fundraiser extended",
       "deleteSuccess": "Fundraiser deleted",
       "mutationError": "Something went wrong. Try again."
     },

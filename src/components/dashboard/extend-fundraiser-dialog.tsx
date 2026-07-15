@@ -49,22 +49,31 @@ export function ExtendFundraiserDialog({
 
   const currentEndDate = toDateInputValue(fundraiser.endDate);
 
-  // The new end date must be after the current end date.
-  // Fall back to the default minimum date when no end date exists.
+  // Extending a completed fundraiser reactivates it with a new future end date.
+  const isReactivating = fundraiser.status === 'completed';
+
+  // Use an empty value when reactivating so the previous end date isn't shown.
+  const baseEndDate = isReactivating ? '' : currentEndDate;
+
+  // The new end date must be after the current end date, but never earlier than
+  // tomorrow. for an ended fundraiser the current end date is in the past, so
+  // the global minimum wins.
   const bounds = useMemo(() => {
     const globalBounds = getEndDateBounds();
+    const afterCurrent = currentEndDate
+      ? addDaysToDateInput(currentEndDate, 1)
+      : globalBounds.min;
     return {
-      min: currentEndDate
-        ? addDaysToDateInput(currentEndDate, 1)
-        : globalBounds.min,
+      min: afterCurrent > globalBounds.min ? afterCurrent : globalBounds.min,
       max: globalBounds.max,
     };
   }, [currentEndDate]);
 
   const methods = useForm<ExtendFundraiserValues>({
     resolver: zodResolver(createExtendFundraiserSchema(bounds)),
-    // Pre-fill with the current end date (same normalization as the edit form).
-    defaultValues: { endDate: currentEndDate },
+    // Pre-fill with the current end date (same normalization as the edit form);
+    // blank when reactivating an ended fundraiser.
+    defaultValues: { endDate: baseEndDate },
     // Validate on every change so the error clears and `isValid` (and therefore
     // the Save button) updates the instant a valid new date is picked or typed.
     mode: 'onChange',
@@ -78,22 +87,25 @@ export function ExtendFundraiserDialog({
     formState: { isSubmitting, isValid },
   } = methods;
 
-  // Sync the field with the current end date whenever the modal opens.
+  // Sync the field with the seed value whenever the modal opens.
   useEffect(() => {
     if (open) {
-      reset({ endDate: currentEndDate });
+      reset({ endDate: baseEndDate });
     }
-  }, [open, currentEndDate, reset]);
+  }, [open, baseEndDate, reset]);
 
   // Disable save until a different valid end date is selected.
   const selectedEndDate = useWatch({ control, name: 'endDate' }) ?? '';
-  const isUnchanged = selectedEndDate === currentEndDate;
+  const isUnchanged = selectedEndDate === baseEndDate;
   const isSaveDisabled = isSubmitting || isUnchanged || !isValid;
 
   // Show how many days are being added when a valid later date is selected.
-  const daysAdded = daysBetweenDateInputs(currentEndDate, selectedEndDate);
+  // Not meaningful when reactivating (the old end date is in the past).
+  const daysAdded = daysBetweenDateInputs(baseEndDate, selectedEndDate);
   const helperText =
-    isValid && daysAdded > 0 ? t('daysAdded', { count: daysAdded }) : undefined;
+    !isReactivating && isValid && daysAdded > 0
+      ? t('daysAdded', { count: daysAdded })
+      : undefined;
 
   const onSubmit = handleSubmit(async values => {
     if (!accessToken) return;
@@ -102,7 +114,8 @@ export function ExtendFundraiserDialog({
       const updated = await extendFundraiser(
         fundraiser.id,
         values.endDate,
-        accessToken
+        accessToken,
+        { reactivate: isReactivating }
       );
       toast.success(tActions('extendSuccess'));
       onFundraiserUpdated(updated);
@@ -133,7 +146,8 @@ export function ExtendFundraiserDialog({
           <form onSubmit={onSubmit} noValidate className='space-y-6'>
             <EndDateInput
               bounds={bounds}
-              currentEndDate={currentEndDate}
+              // Use tomorrow as the minimum date when reactivating.
+              currentEndDate={isReactivating ? undefined : currentEndDate}
               helperText={helperText}
             />
             <DialogFooter>

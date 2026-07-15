@@ -136,8 +136,10 @@ function getAvailableActions(
   return {
     ...OWNER_ACTIONS_BY_STATUS[fundraiser.status],
     stageMode: isStageModeEnabled(fundraiser),
-    // Show "Extend Fundraiser" only for active fundraisers that are ending soon.
-    extend: deriveDisplayStatus(fundraiser) === 'ending-soon',
+    // Show "Extend Fundraiser" for ending-soon and completed fundraisers.
+    extend:
+      deriveDisplayStatus(fundraiser) === 'ending-soon' ||
+      fundraiser.status === 'completed',
   };
 }
 

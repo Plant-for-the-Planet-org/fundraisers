@@ -64,18 +64,27 @@ export function resumeFundraiser(
 }
 
 /**
- * Extends a fundraiser by setting a new end date only.
+ * Extends a fundraiser by setting a new end date.
  *
- * A partial PUT: status, donations, and every other field are left untouched
- * (same pattern as `pauseFundraiser`/`resumeFundraiser`). `endDate` is a
- * date-only value (YYYY-MM-DD).
+ * A partial PUT: donations and every other field are left untouched (same
+ * pattern as `pauseFundraiser`/`resumeFundraiser`). `endDate` is a date-only
+ * value (YYYY-MM-DD).
+ *
+ * Pass `reactivate: true` to also flip the status back to `active`. This is
+ * used when extending a fundraiser that has already ended (`completed`), so a
+ * future end date alone would leave it stuck in a terminal state.
  */
 export function extendFundraiser(
   id: string,
   endDate: string,
-  token: string
+  token: string,
+  options?: { reactivate?: boolean }
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { endDate }, token);
+  const data: UpdateFundraiserRequest = { endDate };
+  if (options?.reactivate) {
+    data.status = 'active';
+  }
+  return updateFundraiser(id, data, token);
 }
 
 /**

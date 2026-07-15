@@ -79,7 +79,7 @@
       "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
-      "extendSuccess": "Enddatum aktualisiert",
+      "extendSuccess": "Spendenaktion verlängert",
       "deleteSuccess": "Spendenaufruf gelöscht",
       "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
     },
