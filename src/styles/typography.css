@@ -29,11 +29,20 @@
     content: '\201E';
   }
 
-  /* Match the fundraiser theme accent (set as --accent-color by ThemeShell), falling back to the primary colour outside a theme. */
-  .rich-quote a {
-    color: var(--accent-color, hsl(var(--primary)));
+  /*
+   * Links inside rich-text surfaces (editor + displays). Separate from
+   * .rich-quote — quotes and links are independent features. Uniform link
+   * style: same colors as the footer links (text-muted-foreground +
+   * hover:text-foreground); underline stays specific to rich-text links.
+   */
+  .rich-links a {
+    color: hsl(var(--muted-foreground));
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+
+  .rich-links a:hover {
+    color: hsl(var(--foreground));
   }
 
   /*
