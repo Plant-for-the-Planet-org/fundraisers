@@ -123,6 +123,9 @@ const PICKABLE_BG_IDS = new Set([
   'bg-trees',
   'bg-woodgrain',
   'bg-forest',
+  'bg-forest-bw',
+  'bg-academy',
+  'bg-academy-bw',
   'bg-planet-botanical',
 ]);
 

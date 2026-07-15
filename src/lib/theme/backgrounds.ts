@@ -132,12 +132,30 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     fullBleed: true,
     thumbMaskSize: '400%',
   },
-  // Curated sample image.
+  // Curated images.
   {
     id: 'bg-forest',
     label: 'Forest',
     type: 'image',
     src: '/theme-backgrounds/forest.jpg',
+  },
+  {
+    id: 'bg-forest-bw',
+    label: 'Forest BW',
+    type: 'image',
+    src: '/theme-backgrounds/forest-bw.jpg',
+  },
+  {
+    id: 'bg-academy',
+    label: 'Academy',
+    type: 'image',
+    src: '/theme-backgrounds/academy.jpg',
+  },
+  {
+    id: 'bg-academy-bw',
+    label: 'Academy BW',
+    type: 'image',
+    src: '/theme-backgrounds/academy-bw.jpg',
   },
   // Patterns (legacy placeholders — kept as resources, hidden from the picker)
   {
