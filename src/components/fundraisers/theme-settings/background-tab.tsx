@@ -4,6 +4,8 @@ import type {
   AnimationType,
   BgDecoration,
   BgImageMode,
+  BgImageTint,
+  BgPatternTint,
   CustomGradient,
 } from '@/lib/theme/types';
 
@@ -16,15 +18,18 @@ import {
   type BgFormValue,
   DECORATIONS,
   IMAGE_MODES,
+  IMAGE_TINTS,
   IMAGES,
   LOGOS,
+  PATTERN_TINTS,
   PATTERNS,
 } from './constants';
 import { AssetGrid, OpacitySlider, ThemeChipRow } from './primitives';
 
-// Cap pattern/image opacity so a decoration can't fully cover the base + tint
-// and invert the effective surface luminance that text contrast relies on.
-const DECORATION_MAX_OPACITY = 0.6;
+// Pattern/image opacity can go to full. Mode is a deliberate toggle (not derived
+// from the wash), so a strong decoration no longer risks flipping the effective
+// surface luminance that text contrast relies on.
+const DECORATION_MAX_OPACITY = 1;
 
 type Props = {
   bg: BgFormValue;
@@ -40,6 +45,8 @@ type Props = {
   onLogoId: (id: string | null) => void;
   onOpacity: (value: number) => void;
   onAnimation: (value: AnimationType) => void;
+  onImageTint: (value: BgImageTint) => void;
+  onPatternTint: (value: BgPatternTint) => void;
   allowLogo: boolean;
 };
 
@@ -57,6 +64,8 @@ export function BackgroundTab({
   onLogoId,
   onOpacity,
   onAnimation,
+  onImageTint,
+  onPatternTint,
   allowLogo,
 }: Props) {
   return (
@@ -79,8 +88,10 @@ export function BackgroundTab({
         <PatternPanel
           patternId={bg.pattern_id}
           opacity={bg.opacity}
+          tint={bg.pattern_tint}
           onPick={onPatternId}
           onOpacity={onOpacity}
+          onTint={onPatternTint}
         />
       )}
       {bg.decoration === 'image' && (
@@ -88,9 +99,11 @@ export function BackgroundTab({
           imageUrl={bg.image_url}
           imageMode={bg.image_mode}
           opacity={bg.opacity}
+          tint={bg.image_tint}
           onPick={onImageUrl}
           onMode={onImageMode}
           onOpacity={onOpacity}
+          onTint={onImageTint}
         />
       )}
       {bg.decoration === 'logo' && allowLogo && (
@@ -185,6 +198,44 @@ function DecorationRow({
   );
 }
 
+// Chip row for a decoration tint choice (image or pattern). English-only
+// labels for now — POC exploratory controls.
+function TintRow<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: ReadonlyArray<{ id: T; label: string }>;
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <ThemeChipRow label={label}>
+      {options.map(({ id, label: optionLabel }) => {
+        const active = value === id;
+        return (
+          <button
+            type='button'
+            key={id}
+            onClick={() => onChange(id)}
+            aria-pressed={active}
+            className={cn(
+              'px-2 py-1 rounded-md border text-xs font-semibold',
+              active
+                ? 'border-foreground'
+                : 'border-border hover:border-foreground/40'
+            )}
+          >
+            {optionLabel}
+          </button>
+        );
+      })}
+    </ThemeChipRow>
+  );
+}
+
 function LogoPanel({
   logoId,
   opacity,
@@ -249,13 +300,17 @@ function LogoPanel({
 function PatternPanel({
   patternId,
   opacity,
+  tint,
   onPick,
   onOpacity,
+  onTint,
 }: {
   patternId: string | null;
   opacity: number;
+  tint: BgPatternTint | undefined;
   onPick: (id: string | null) => void;
   onOpacity: (value: number) => void;
+  onTint: (value: BgPatternTint) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
@@ -264,6 +319,12 @@ function PatternPanel({
         value={opacity}
         onChange={onOpacity}
         max={DECORATION_MAX_OPACITY}
+      />
+      <TintRow
+        label='Pattern colour'
+        options={PATTERN_TINTS}
+        value={tint ?? 'accent'}
+        onChange={onTint}
       />
       <div>
         <SectionHeader showDivider={false}>
@@ -284,16 +345,20 @@ function ImagePanel({
   imageUrl,
   imageMode,
   opacity,
+  tint,
   onPick,
   onMode,
   onOpacity,
+  onTint,
 }: {
   imageUrl: string | null;
   imageMode: BgImageMode;
   opacity: number;
+  tint: BgImageTint | undefined;
   onPick: (key: string | null) => void;
   onMode: (mode: BgImageMode) => void;
   onOpacity: (value: number) => void;
+  onTint: (value: BgImageTint) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
@@ -319,6 +384,12 @@ function ImagePanel({
           );
         })}
       </ThemeChipRow>
+      <TintRow
+        label='Image colour'
+        options={IMAGE_TINTS}
+        value={tint ?? 'background'}
+        onChange={onTint}
+      />
       <OpacitySlider
         value={opacity}
         onChange={onOpacity}

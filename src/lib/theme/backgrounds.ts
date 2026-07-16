@@ -3,8 +3,12 @@ import {
   type AnimationType,
   BG_DECORATIONS,
   BG_IMAGE_MODES,
+  BG_IMAGE_TINTS,
+  BG_PATTERN_TINTS,
   type BgDecoration,
   type BgImageMode,
+  type BgImageTint,
+  type BgPatternTint,
   type BgSettings,
 } from './types';
 
@@ -22,6 +26,8 @@ export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   logo_id: null,
   opacity: 0.2, // default decoration (pattern/image/logo) opacity — subtle by default
   animation: 'none',
+  image_tint: 'background', // image overlay follows the background colour by default
+  pattern_tint: 'accent', // pattern stencil painted with the accent by default
 };
 
 // Build a preset bg block from a gradient class plus optional overrides.
@@ -329,5 +335,18 @@ export function isValidAnimation(value: unknown): value is AnimationType {
   return (
     typeof value === 'string' &&
     ANIMATION_TYPES.includes(value as AnimationType)
+  );
+}
+
+export function isValidImageTint(value: unknown): value is BgImageTint {
+  return (
+    typeof value === 'string' && BG_IMAGE_TINTS.includes(value as BgImageTint)
+  );
+}
+
+export function isValidPatternTint(value: unknown): value is BgPatternTint {
+  return (
+    typeof value === 'string' &&
+    BG_PATTERN_TINTS.includes(value as BgPatternTint)
   );
 }

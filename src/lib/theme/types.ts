@@ -52,6 +52,15 @@ export type BgDecoration = (typeof BG_DECORATIONS)[number];
 export const BG_IMAGE_MODES = ['cover', 'repeat'] as const;
 export type BgImageMode = (typeof BG_IMAGE_MODES)[number];
 
+// Colour overlay applied to an image decoration: none (background shows through
+// the image at its opacity), the background colour, or the accent colour.
+export const BG_IMAGE_TINTS = ['none', 'background', 'accent'] as const;
+export type BgImageTint = (typeof BG_IMAGE_TINTS)[number];
+
+// Colour a monochrome pattern stencil is painted with.
+export const BG_PATTERN_TINTS = ['accent', 'background'] as const;
+export type BgPatternTint = (typeof BG_PATTERN_TINTS)[number];
+
 export interface GradientStop {
   color: string; // '#RRGGBB' hex
   position: number; // 0–100
@@ -77,6 +86,8 @@ export interface BgSettings {
   logo_id: string | null; // library key for partner logo decoration
   opacity: number; // applies to pattern + image layers, 0.05–1
   animation: AnimationType; // overlay animation (snow, confetti, hearts, fireworks)
+  image_tint?: BgImageTint; // colour overlay on an image decoration (default 'background')
+  pattern_tint?: BgPatternTint; // colour a pattern stencil is painted with (default 'accent')
 }
 
 export interface Theme {
@@ -122,5 +133,7 @@ export interface FundraiserThemeSettings {
     logo_id?: string | null;
     opacity?: number;
     animation?: string;
+    image_tint?: string;
+    pattern_tint?: string;
   };
 }

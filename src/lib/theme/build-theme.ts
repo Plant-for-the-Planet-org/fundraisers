@@ -12,6 +12,8 @@ import {
   isValidAnimation,
   isValidDecoration,
   isValidImageMode,
+  isValidImageTint,
+  isValidPatternTint,
 } from './backgrounds';
 import { isValidHexColor } from './color-utils';
 import { DEFAULT_THEME, THEMES } from './themes';
@@ -105,6 +107,12 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     : base.bg.image_mode;
   const logo_id = raw.logo_id !== undefined ? raw.logo_id : base.bg.logo_id;
   const opacity = clampOpacity(raw.opacity, base.bg.opacity);
+  const image_tint = isValidImageTint(raw.image_tint)
+    ? raw.image_tint
+    : (base.bg.image_tint ?? 'background');
+  const pattern_tint = isValidPatternTint(raw.pattern_tint)
+    ? raw.pattern_tint
+    : (base.bg.pattern_tint ?? 'accent');
 
   // Phase 2 reads bg.animation; Phase 1 records stored animation at the
   // top level (settings.animation). Fall back to the legacy field so
@@ -135,6 +143,8 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     logo_id,
     opacity,
     animation,
+    image_tint,
+    pattern_tint,
   };
 }
 

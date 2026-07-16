@@ -4,6 +4,8 @@ import type {
   AnimationType,
   BgDecoration,
   BgImageMode,
+  BgImageTint,
+  BgPatternTint,
   CustomGradient,
   FontId,
   Theme,
@@ -81,6 +83,19 @@ export const DECORATIONS: Array<{ id: BgDecoration; icon: LucideIcon }> = [
 ];
 
 export const IMAGE_MODES: BgImageMode[] = ['cover', 'repeat'];
+
+// POC exploratory controls (English-only labels, not translated) — let the
+// design team compare how a decoration is tinted.
+export const IMAGE_TINTS: Array<{ id: BgImageTint; label: string }> = [
+  { id: 'none', label: 'None' },
+  { id: 'background', label: 'Background' },
+  { id: 'accent', label: 'Accent' },
+];
+
+export const PATTERN_TINTS: Array<{ id: BgPatternTint; label: string }> = [
+  { id: 'accent', label: 'Accent' },
+  { id: 'background', label: 'Background' },
+];
 
 export const THEME_LIST: Theme[] = Object.values(THEMES);
 export const FEATURED_THEMES = THEME_LIST.filter(t => t.featured);

@@ -257,6 +257,8 @@ export function ThemeSettings() {
             onLogoId={logo_id => patchBg({ logo_id })}
             onOpacity={opacity => patchBg({ opacity })}
             onAnimation={animation => patchBg({ animation })}
+            onImageTint={image_tint => patchBg({ image_tint })}
+            onPatternTint={pattern_tint => patchBg({ pattern_tint })}
             allowLogo={allowLogo}
           />
         </TabsContent>

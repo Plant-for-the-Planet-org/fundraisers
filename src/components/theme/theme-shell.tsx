@@ -13,7 +13,11 @@ import {
   LOGO_LIBRARY,
   resolveBgAsset,
 } from '@/lib/theme/backgrounds';
-import { getReadableMode, isValidHexColor } from '@/lib/theme/color-utils';
+import {
+  getDominantStopColor,
+  getReadableMode,
+  isValidHexColor,
+} from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
@@ -114,9 +118,17 @@ export function ThemeShell({
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
-  // The accent colour drives the CTA (solid) and every other accent surface;
+  // The accent colour drives the CTA (solid), progress fill, and the nav logo;
   // the CTA text colour is picked for contrast against it.
   const accentColor = getAccentColor(activeTheme.accent);
+
+  // A single colour representing the chosen background, at full strength (not
+  // the 14% wash). Used to tint image/pattern decorations. Falls back to the
+  // accent when the wash is a preset gradient class with no extractable hex.
+  const bgTintColor =
+    solidColor ??
+    (customGradient && cg ? getDominantStopColor(cg.stops) : null) ??
+    accentColor;
 
   return (
     <div
@@ -127,6 +139,7 @@ export function ThemeShell({
           fontFamily: getFontStack(activeTheme.bodyFont),
           '--theme-title-font': getFontStack(activeTheme.titleFont),
           '--accent-color': accentColor,
+          '--theme-bg-color': bgTintColor,
           '--cta-foreground': ctaTextFor(getReadableMode(accentColor)),
         } as React.CSSProperties
       }
@@ -163,10 +176,15 @@ export function ThemeShell({
           imageUrl={bg.image_url}
           mode={bg.image_mode}
           opacity={bg.opacity}
+          tint={bg.image_tint}
         />
       )}
       {bg.decoration === 'pattern' && bg.pattern_id && (
-        <PatternLayer patternId={bg.pattern_id} opacity={bg.opacity} />
+        <PatternLayer
+          patternId={bg.pattern_id}
+          opacity={bg.opacity}
+          tint={bg.pattern_tint}
+        />
       )}
       {bg.decoration === 'logo' && bg.logo_id && (
         <LogoLayer
@@ -263,10 +281,12 @@ function ImageLayer({
   imageUrl,
   mode,
   opacity,
+  tint = 'background',
 }: {
   imageUrl: string;
   mode: BgSettings['image_mode'];
   opacity: number;
+  tint?: BgSettings['image_tint'];
 }) {
   const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
@@ -278,6 +298,15 @@ function ImageLayer({
     resolved.kind === 'library'
       ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
       : DEFAULT_PATTERN_TILE;
+  // The overlay colour: the background colour tints the image (default), the
+  // accent, or nothing (the image shows at its opacity and the base + tint
+  // wash shows through). Capped so the image stays visible at high opacity.
+  const overlayColor =
+    tint === 'accent'
+      ? 'var(--accent-color)'
+      : tint === 'background'
+        ? 'var(--theme-bg-color)'
+        : null;
   return (
     <>
       <div
@@ -291,17 +320,17 @@ function ImageLayer({
         }}
         aria-hidden
       />
-      {/* Colour layer above the image: multiply-tints it with the theme colour.
-          Capped so the image stays visible even at high decoration opacity. */}
-      <div
-        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
-        style={{
-          backgroundColor: 'var(--accent-color)',
-          mixBlendMode: 'multiply',
-          opacity: Math.min(opacity, 0.55),
-        }}
-        aria-hidden
-      />
+      {overlayColor && (
+        <div
+          className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+          style={{
+            backgroundColor: overlayColor,
+            mixBlendMode: 'multiply',
+            opacity: Math.min(opacity, 0.55),
+          }}
+          aria-hidden
+        />
+      )}
     </>
   );
 }
@@ -309,9 +338,11 @@ function ImageLayer({
 function PatternLayer({
   patternId,
   opacity,
+  tint = 'accent',
 }: {
   patternId: string;
   opacity: number;
+  tint?: BgSettings['pattern_tint'];
 }) {
   const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
@@ -326,14 +357,17 @@ function PatternLayer({
 
   // Monochrome mask: the theme colour is painted underneath and revealed only
   // where the stencil shapes are, so the colour appears to tint the pattern.
+  // The paint colour is the accent (default) or the background colour.
   // Full-bleed designs cover the viewport once; the rest tile.
   if (masked) {
     const maskUrl = `url("${src}")`;
+    const paintColor =
+      tint === 'background' ? 'var(--theme-bg-color)' : 'var(--accent-color)';
     return (
       <div
         className='fixed inset-0 pointer-events-none transition-opacity duration-300'
         style={{
-          backgroundColor: 'var(--accent-color)',
+          backgroundColor: paintColor,
           WebkitMaskImage: maskUrl,
           maskImage: maskUrl,
           WebkitMaskRepeat: fullBleed ? 'no-repeat' : 'repeat',
