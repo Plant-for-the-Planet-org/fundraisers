@@ -52,8 +52,8 @@ export function ExtendFundraiserDialog({
   // Extending a completed fundraiser reactivates it with a new future end date.
   const isReactivating = fundraiser.status === 'completed';
 
-  // Use an empty value when reactivating so the previous end date isn't shown.
-  const baseEndDate = isReactivating ? '' : currentEndDate;
+  // Prefill with the current end date as a reference point for the user.
+  const baseEndDate = currentEndDate;
 
   // The new end date must be after the current end date, but never earlier than
   // tomorrow. for an ended fundraiser the current end date is in the past, so
@@ -87,17 +87,15 @@ export function ExtendFundraiserDialog({
     formState: { isSubmitting, isValid },
   } = methods;
 
-  // Sync the field with the seed value whenever the modal opens.
+  // Reset on close so validation errors from a previous session don't persist when the dialog is reopened.
   useEffect(() => {
-    if (open) {
-      reset({ endDate: baseEndDate });
-    }
+    reset({ endDate: baseEndDate });
   }, [open, baseEndDate, reset]);
 
-  // Disable save until a different valid end date is selected.
+  // Save stays enabled so the modal opens without an error state. Submitting an
+  // unchanged (still-invalid) date runs validation and surfaces the message.
   const selectedEndDate = useWatch({ control, name: 'endDate' }) ?? '';
-  const isUnchanged = selectedEndDate === baseEndDate;
-  const isSaveDisabled = isSubmitting || isUnchanged || !isValid;
+  const isSaveDisabled = isSubmitting;
 
   // Show how many days are being added when a valid later date is selected.
   // Not meaningful when reactivating (the old end date is in the past).
@@ -146,8 +144,10 @@ export function ExtendFundraiserDialog({
           <form onSubmit={onSubmit} noValidate className='space-y-6'>
             <EndDateInput
               bounds={bounds}
-              // Use tomorrow as the minimum date when reactivating.
+              // Active fundraisers require a date after the current end date.
+              // Ended fundraisers allow the earliest selectable date.
               currentEndDate={isReactivating ? undefined : currentEndDate}
+              minDateMessage={isReactivating ? 'onOrAfter' : 'after'}
               helperText={helperText}
             />
             <DialogFooter>

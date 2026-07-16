@@ -295,7 +295,8 @@
           "invalid": "Bitte geben Sie ein gültiges Datum ein.",
           "minDate": "Wählen Sie ein Datum nach dem {date}.",
           "maxDate": "Wählen Sie ein Datum vor dem {date}.",
-          "afterCurrentEndDate": "Das neue Enddatum muss nach dem {date} liegen."
+          "afterCurrentEndDate": "Das neue Enddatum muss nach dem {date} liegen.",
+          "onOrAfterMinDate": "Das neue Enddatum muss am oder nach dem {date} liegen."
         }
       },
       "projectSelection": {
