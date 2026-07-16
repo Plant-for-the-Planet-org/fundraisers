@@ -23,11 +23,11 @@ Back to front:
 
 1. **Base** — the mode colour (white in light, black in dark) at 100%: `rgb(var(--base-rgb))`.
 2. **Colour tint** — the picked background *over* the base. A preset Tailwind gradient class keeps its authored opacity; a custom gradient or solid colour renders on a layer at a low fixed opacity (`TINT_OPACITY = 0.14`). So the page reads as a subtle tint of the base, not a full fill.
-3. **Image** — the image plus an accent-coloured `multiply` overlay (capped) so it takes on the theme colour.
-4. **Pattern** — masked stencil, see below.
+3. **Image** — the image plus a colour `multiply` overlay (capped). The overlay colour follows the **Image colour** setting (see Decoration tint below): the background colour (default), the accent, or none.
+4. **Pattern** — masked stencil, painted with the accent (default) or the background colour per the **Pattern colour** setting.
 5. **Logo → animation → content.**
 
-The wrapper sets `--accent-color` and `--cta-foreground` (the CTA text colour, auto-picked for contrast).
+The wrapper sets `--accent-color`, `--theme-bg-color` (the chosen background colour at full strength, for decoration tints), and `--cta-foreground` (the CTA text colour, auto-picked for contrast).
 
 ### Surface tokens — `src/app/globals.css`
 
@@ -38,15 +38,24 @@ The wrapper sets `--accent-color` and `--cta-foreground` (the CTA text colour, a
 
 ### One accent colour
 
-- One colour drives the CTA, progress fill, pattern tint, and image overlay. They all read `--accent-color`.
+- The accent drives the **CTA, progress fill, and the nav "Planting" logo** — all read `--accent-color`. (The logo already did; the header is inside `ThemeShell`.) Image and pattern decorations are tinted by the **background colour** by default instead, so the accent stays a highlight and does not recolour a full-page image (see Decoration tint).
 - Picking a background **seeds** the accent: a solid uses its hex, a custom gradient uses its dominant stop (`getDominantStopColor`). A preset accent chip overrides until the next background change.
 - The CTA is the **solid accent** with auto-picked text colour (`getReadableMode`).
 - The accent now accepts a raw hex, not only the named palette. No data change: the field was already `z.string()`, so this widens accepted values (named accents still work).
 
+### Decoration tint (image + pattern)
+
+The background colour, not the accent, tints decorations. Two persisted, optional bg fields carry the choice (added the same way as `image_mode`/`animation`: TS type + `DEFAULT_BG` + validators + `buildBg` + the zod schema — the field must be in zod because `FundraiserFormValues` is `z.infer` and zod strips unknown keys):
+
+- `image_tint`: `none` (no overlay — the image shows at its opacity and the wash shows through), `background` (default), or `accent`.
+- `pattern_tint`: `accent` (default) or `background`.
+
+`ThemeShell` exposes `--theme-bg-color = solidColor ?? getDominantStopColor(cg.stops) ?? accentColor`. The fallback to the accent means a preset-gradient wash with no extractable hex renders as before until a solid/custom colour is picked. The editor shows these as chip rows ("Image colour" / "Pattern colour") under the image/pattern decoration — plain English labels, since they are exploratory controls for the design review.
+
 ### Curated patterns (masked stencils) — `backgrounds.ts` + `AssetGrid`
 
 - Four curated patterns: **Dots, Grid, Trees, Woodgrain**. Each is **one SVG stencil** (white shapes on a transparent field).
-- `masked: true` means: paint `--accent-color` and clip it through the stencil, so the shapes take the theme colour and the gaps show the background through. `fullBleed` covers the viewport once; others tile at `tileSize`.
+- `masked: true` means: paint a colour (the accent or the background, per `pattern_tint`) and clip it through the stencil, so the shapes take that colour and the gaps show the background through. `fullBleed` covers the viewport once; others tile at `tileSize`.
 - The picker thumbnail draws through the **same** stencil (`foreground` shapes on a `muted` cell) so it reads in light and dark, zoomed so a few motifs show (`THUMB_MASK_SIZE`, with a per-asset `thumbMaskSize` override, e.g. Woodgrain).
 - One curated image (**Forest**). The picker is limited to a curated allow-list (`PICKABLE_BG_IDS`); legacy placeholder assets stay in the library as resources but are hidden.
 - Assets optimised before commit: Trees SVG via SVGO (~2.3 MB → ~0.9 MB, visually identical), Forest PNG → JPEG (~3.4 MB → ~0.6 MB).
@@ -56,11 +65,13 @@ The wrapper sets `--accent-color` and `--cta-foreground` (the CTA text colour, a
 - The panel sits on its own base-colour scrim with a border, so token-based controls resolve against a stable surface instead of the live background.
 - A reusable swatch-contrast helper (`getSwatchContrast` / `swatchSelectedStyle` in `color-utils.ts`) flips the swatch icon and halo by luminance.
 - The browse grid renders a real preview for every theme (gradient, solid, or decoration) instead of a blank cell.
-- The decoration opacity slider is capped (`DECORATION_MAX_OPACITY = 0.6`) so a decoration can't fully cover the base and flip the effective contrast.
+- The decoration opacity slider allows full opacity (`DECORATION_MAX_OPACITY = 1`). Mode is a deliberate toggle rather than derived from the wash, so a strong decoration no longer risks flipping the effective contrast.
 
 ### Defaults
 
 - New backgrounds default decoration opacity to **20%** (was 50%). Existing saved values are left alone.
+- `image_tint` defaults to `background`, `pattern_tint` to `accent`.
+- The **Plant-for-the-Planet** preset overrides `image_tint` to `none`, so its botanical illustration shows in its own colours.
 
 ## Key files
 
@@ -85,6 +96,7 @@ The final shape is quite different from the first plan. What changed and why:
 - **Fully opaque editor panel (`bg-popover`) — softened** to a base-colour scrim with a border.
 - **A "surface" Tabs variant — built then reverted, deferred.** Tabs are a shared primitive and several sit on opaque surfaces; bundle-selection is a custom segmented control. Needs its own pass.
 - **Higher woodgrain thumbnail zoom — tried, reversed.** Zooming *in* collapsed it to a few plain lines and cut out the knots, so it reads better at a lower zoom. This is why the per-asset `thumbMaskSize` override exists.
+- **Accent tinting every decoration — reversed.** Round 2 pointed the image overlay and pattern paint at the accent. That meant changing the accent recoloured a full-cover image (very visible on the Plant-for-the-Planet theme). Now the background colour tints decorations and the accent is reserved for the CTA, progress, and nav logo, with the per-decoration overrides above.
 
 ## Back-compat
 
@@ -101,6 +113,18 @@ Per project convention, no dev server. `npm run type-check`, `npm run lint`, and
 - the four patterns (accent tint, background through the gaps) and the Forest image;
 - editor panel readability on each of the above;
 - donation form, goal progress, and the closed-for-contribution callout on the public page.
+
+## Open decisions (settle with design, then clean up)
+
+The tint controls are **exploratory** — they exist so the design team can compare looks. Once a direction is chosen, some of this changes:
+
+- **Keep the controls, or bake a default?** If the answer is a single fixed behaviour (e.g. "images always follow the background"), remove the chip rows and keep just the default value; the persisted fields can stay (harmless) or be dropped. If per-fundraiser choice stays, the controls remain.
+- **i18n.** The "Image colour" / "Pattern colour" labels and options are hardcoded English. Shipping as a real user setting needs `en`/`de` translation keys (Lingohub).
+- **Which options survive.** If images should never be accent-tinted, drop the `accent` option from `image_tint`. If patterns are always the accent, drop `pattern_tint` entirely.
+- **Default per theme.** `image_tint` defaults to `background` globally and `none` on the planet preset. Design may want other presets to override too (e.g. photo backgrounds set to `none`).
+- **`--theme-bg-color` fallback.** When the wash is a preset gradient class (no extractable hex) the tint falls back to the accent. If that is wrong for a chosen look, change the fallback (e.g. a neutral, or no overlay).
+- **B&W images.** With `background`/`accent` tint they pick up colour; only `none` keeps them greyscale. If greyscale is the intent, set those assets' default to `none` or add a per-asset "no tint" flag.
+- ~~Planet image opacity vs the editor cap.~~ Resolved: the decoration slider now allows full opacity (`DECORATION_MAX_OPACITY = 1`), so the planet preset's `opacity: 1` is reachable and nudging the slider no longer forces a drop.
 
 ## Deferred (not in this POC)
 
