@@ -9,7 +9,10 @@ import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { extendFundraiser } from '@/lib/api/fundraiser-service';
+import {
+  extendActiveFundraiser,
+  reactivateAndExtendFundraiser,
+} from '@/lib/api/fundraiser-service';
 import { getEndDateBounds } from '@/lib/constants/fundraiser-creation';
 import {
   addDaysToDateInput,
@@ -109,12 +112,17 @@ export function ExtendFundraiserDialog({
     if (!accessToken) return;
 
     try {
-      const updated = await extendFundraiser(
-        fundraiser.id,
-        values.endDate,
-        accessToken,
-        { reactivate: isReactivating }
-      );
+      const updated = isReactivating
+        ? await reactivateAndExtendFundraiser(
+            fundraiser.id,
+            values.endDate,
+            accessToken
+          )
+        : await extendActiveFundraiser(
+            fundraiser.id,
+            values.endDate,
+            accessToken
+          );
       toast.success(tActions('extendSuccess'));
       onFundraiserUpdated(updated);
       onOpenChange(false);
