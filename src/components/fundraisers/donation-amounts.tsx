@@ -68,9 +68,9 @@ export function DonationAmounts({
               setInputValue('');
             }}
             className={cn(
-              'h-14 p-5 bg-card rounded-lg border border-border/50 flex items-center gap-3 transition-all justify-start',
+              'h-14 p-5 bg-card dark:bg-white/10 rounded-lg border border-border/50 flex items-center gap-3 transition-all justify-start',
               selectedAmount === amount && !isCustomInputSelected
-                ? 'border-foreground'
+                ? 'border-foreground dark:border-foreground'
                 : 'hover:border-border'
             )}
           >
@@ -98,9 +98,9 @@ export function DonationAmounts({
         <div className='space-y-1.5'>
           <div
             className={cn(
-              'h-12 px-5 py-6 bg-card rounded-lg border border-border/50 flex justify-between items-center cursor-pointer transition-all',
+              'h-12 px-5 py-6 bg-card dark:bg-white/5 rounded-lg border border-border/50 flex justify-between items-center cursor-pointer transition-all',
               isCustomInputSelected
-                ? 'border-foreground'
+                ? 'border-foreground dark:border-foreground'
                 : 'hover:border-border'
             )}
             onClick={() => setIsCustomInputSelected(true)}

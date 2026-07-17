@@ -22,7 +22,7 @@ export function WorkspaceInfo() {
   // TODO: If this info banner pattern appears elsewhere, replace with shadcn <Alert> + <AlertDescription>
   // (npx shadcn@latest add alert) to avoid duplication.
   return (
-    <div className='workspace-info flex items-start gap-2 p-3 bg-reverse/2 rounded-md'>
+    <div className='workspace-info flex items-start gap-2 p-3 bg-reverse/2 dark:bg-reverse/5 rounded-md'>
       <Info className='w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0' />
       <div className='text-xs text-foreground'>
         <p>{t('general')}</p>

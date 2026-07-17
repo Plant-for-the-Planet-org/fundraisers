@@ -252,9 +252,9 @@ export function DonationForm({
   };
 
   return (
-    <Card className='donation-form bg-base/20 py-0 gap-0 rounded-2xl shadow-none border-2 border-white dark:border-gray-600'>
-      <CardHeader className='px-4 py-2.5 bg-base rounded-t-xl flex flex-row justify-between items-center gap-0 space-y-0'>
-        <div className='text-muted-foreground text-sm font-semibold'>
+    <Card className='donation-form bg-base/20 dark:bg-white/10 py-0 gap-0 rounded-2xl shadow-none border-2 border-white dark:border-none'>
+      <CardHeader className='px-4 py-2.5 bg-base dark:bg-white/15 rounded-t-xl flex flex-row justify-between items-center gap-0 space-y-0'>
+        <div className='text-muted-foreground dark:text-foreground text-sm font-semibold'>
           {t('cardHeader')}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
@@ -266,7 +266,7 @@ export function DonationForm({
         )}
       </CardHeader>
 
-      <CardContent className='p-4 bg-base/30 rounded-bl-2xl rounded-br-2xl flex flex-col gap-4'>
+      <CardContent className='p-4 bg-base/30 dark:bg-white/5 rounded-bl-2xl rounded-br-2xl flex flex-col gap-4'>
         <DonationAmounts
           amounts={presetAmounts}
           currency={currency}
