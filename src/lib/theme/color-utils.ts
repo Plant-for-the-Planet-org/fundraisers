@@ -85,11 +85,11 @@ export function getSwatchContrast(
 }
 
 /**
- * Selected-swatch marker: the live theme accent as border + a soft halo ring,
- * so selection reads clearly on any swatch colour.
+ * Selected-swatch marker: a high-contrast foreground border, then a mode-base
+ * gap and an accent-coloured ring. The foreground border keeps selection legible
+ * on any swatch colour; the accent stays present as the outer ring.
  */
 export const swatchSelectedStyle: CSSProperties = {
-  borderColor: 'var(--accent-color)',
-  boxShadow:
-    '0 0 0 2px color-mix(in srgb, var(--accent-color) 30%, transparent)',
+  borderColor: 'hsl(var(--foreground))',
+  boxShadow: '0 0 0 2px rgb(var(--base-rgb)), 0 0 0 4px var(--accent-color)',
 };

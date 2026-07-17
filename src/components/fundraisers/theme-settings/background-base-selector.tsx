@@ -45,7 +45,7 @@ function gradientCss(g: CustomGradient): string {
 
 const circleBase =
   'relative h-9 w-9 rounded-full border-2 overflow-hidden transition-colors';
-const inactiveBorder = 'border-border hover:border-foreground/40';
+const inactiveBorder = 'border-foreground/30 hover:border-foreground/60';
 
 export function BackgroundBaseSelector({
   bg,
@@ -114,7 +114,9 @@ export function BackgroundBaseSelector({
               aria-pressed={active}
               className={cn(circleBase, g.value, !active && inactiveBorder)}
               style={{
-                backgroundColor: '#fff',
+                // Preview the gradient over the mode base (white in light, black
+                // in dark), matching how it renders on the page.
+                backgroundColor: 'rgb(var(--base-rgb))',
                 ...(active ? swatchSelectedStyle : {}),
               }}
             />
