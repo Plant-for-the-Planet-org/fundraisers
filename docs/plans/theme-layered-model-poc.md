@@ -38,7 +38,7 @@ The wrapper sets `--accent-color`, `--theme-bg-color` (the chosen background col
 
 ### One accent colour
 
-- The accent drives the **CTA, progress fill, and the nav "Planting" logo** — all read `--accent-color`. (The logo already did; the header is inside `ThemeShell`.) Image and pattern decorations are tinted by the **background colour** by default instead, so the accent stays a highlight and does not recolour a full-page image (see Decoration tint).
+- The accent drives the **CTA button and the nav "Planting" logo** (both read `--accent-color`; the logo already did, since the header is inside `ThemeShell`). The **goal progress bar** is meant to use the accent too (`bg-accent-color`) but currently renders the default green instead — see Known issues. Image and pattern decorations are tinted by the **background colour** by default instead, so the accent stays a highlight and does not recolour a full-page image (see Decoration tint).
 - Picking a background **seeds** the accent: a solid uses its hex, a custom gradient uses its dominant stop (`getDominantStopColor`). A preset accent chip overrides until the next background change.
 - The CTA is the **solid accent** with auto-picked text colour (`getReadableMode`).
 - The accent now accepts a raw hex, not only the named palette. No data change: the field was already `z.string()`, so this widens accepted values (named accents still work).
@@ -114,6 +114,10 @@ Per project convention, no dev server. `npm run type-check`, `npm run lint`, and
 - editor panel readability on each of the above;
 - donation form, goal progress, and the closed-for-contribution callout on the public page.
 
+## Known issues (not fixed in this PR)
+
+- **Goal progress bar does not pick up the accent colour.** The fill uses `bg-accent-color` (→ `var(--accent-color)`), which is correct in code, but in the live view it falls back to the `:root` default green instead of the theme accent. Likely a cascade/scope issue where that element does not resolve the themed `--accent-color`. Left as a follow-up so it is not forgotten; not fixed here.
+
 ## Open decisions (settle with design, then clean up)
 
 The tint controls are **exploratory** — they exist so the design team can compare looks. Once a direction is chosen, some of this changes:
@@ -125,6 +129,12 @@ The tint controls are **exploratory** — they exist so the design team can comp
 - **`--theme-bg-color` fallback.** When the wash is a preset gradient class (no extractable hex) the tint falls back to the accent. If that is wrong for a chosen look, change the fallback (e.g. a neutral, or no overlay).
 - **B&W images.** With `background`/`accent` tint they pick up colour; only `none` keeps them greyscale. If greyscale is the intent, set those assets' default to `none` or add a per-asset "no tint" flag.
 - ~~Planet image opacity vs the editor cap.~~ Resolved: the decoration slider now allows full opacity (`DECORATION_MAX_OPACITY = 1`), so the planet preset's `opacity: 1` is reachable and nudging the slider no longer forces a drop.
+
+### Dark-mode surfaces: a `surface` token (cleanup, if this ships)
+
+Frosted surfaces are written as `bg-base/N`, which is white/N in light but **black/N in dark** (nearly invisible on the dark base). The fix in place (option 1, done) is a per-element `dark:bg-white/N` override on each surface: donation card, header, body, amount rows, theme panel, rich-text editor (container + toolbar), goal input, workspace selector. Controls were brought along too: the switch uses a lighter unchecked track (`dark:...bg-reverse/15`) and a light thumb (`dark:bg-foreground`), and the selected amount border uses `dark:border-foreground` so it beats shadcn's `dark:border-input` (a plain `border-foreground` loses to that variant on a `Button`). Callouts (`bg-reverse/N`, e.g. workspace-info) already go white in dark, so they only needed small opacity nudges.
+
+The cleaner long-term shape (option 2, **not done** — this whole POC may still be abandoned, so it is a cleanup task only if we continue) is a dedicated **`surface` token that is white-frost in both modes with per-mode opacity baked in** (e.g. `--surface`, `--surface-emphasis`, `--surface-field` defined in `:root`/`.light`/`.dark` and mapped in `@theme`), so each surface is one class (`bg-surface`) that is correct in both modes and new surfaces get it for free. It reintroduces a small named ramp (which round 1 removed) but pinned to white rather than `--base-rgb`. Migration = swap the `bg-base/N dark:bg-white/N` pairs above for `bg-surface*` across ~6-8 files.
 
 ## Deferred (not in this POC)
 
