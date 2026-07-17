@@ -16,9 +16,38 @@ import { Button, buttonVariants } from '@/components/ui/button';
 // Stable across renders — react-day-picker returns the same class-name map.
 const defaultClassNames = getDefaultClassNames();
 
-// Base styles for each day button, extracted for readability.
-const dayButtonClassName =
-  'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 font-normal leading-none group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70';
+// Base styles for calendar day states:
+// - Default: inherited text color, transparent background
+// - Today: subtle highlight
+// - Hover: outlined circled
+// - Selected: solid primary fill
+const dayButtonClassName = [
+  // Selected (single).
+  'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground',
+  'data-[selected-single=true]:hover:bg-primary data-[selected-single=true]:hover:text-primary-foreground',
+  // Range.
+  'data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground',
+  'data-[range-middle=true]:hover:bg-accent data-[range-middle=true]:hover:text-accent-foreground',
+  'data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground',
+  'data-[range-start=true]:hover:bg-primary data-[range-start=true]:hover:text-primary-foreground',
+  'data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground',
+  'data-[range-end=true]:hover:bg-primary data-[range-end=true]:hover:text-primary-foreground',
+  // Today: emphasized without using the selected state.
+  'data-[today=true]:bg-primary/35 data-[today=true]:font-medium data-[today=true]:text-primary',
+  'dark:data-[today=true]:bg-primary/60',
+  'dark:data-[today=true]:text-primary-foreground',
+  // Hover — hollow blue circle for the default state.
+  'hover:bg-transparent hover:text-foreground hover:ring-1 hover:ring-inset hover:ring-primary',
+  'dark:hover:bg-transparent dark:hover:text-foreground',
+  // Keyboard focus ring.
+  'group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50',
+  'group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px]',
+  // Layout & shape — circular by default so today/hover/selected all align.
+  'flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 rounded-full font-normal leading-none',
+  // Range corner radii override the circular base within a range.
+  'data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md',
+  '[&>span]:text-xs [&>span]:opacity-70',
+].join(' ');
 
 function Calendar({
   className,
@@ -109,7 +138,7 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          'group/day relative aspect-square h-full w-full select-none p-0 text-center [&:last-child[data-selected=true]_button]:rounded-r-md',
+          '[&[data-selected=true]_button]:rounded-full [&:last-child[data-selected=true]_button]:rounded-r-md',
           props.showWeekNumber
             ? '[&:nth-child(2)[data-selected=true]_button]:rounded-l-md'
             : '[&:first-child[data-selected=true]_button]:rounded-l-md',
@@ -121,10 +150,7 @@ function Calendar({
         ),
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
         range_end: cn('bg-accent rounded-r-md', defaultClassNames.range_end),
-        today: cn(
-          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
-          defaultClassNames.today
-        ),
+        today: defaultClassNames.today,
         outside: cn(
           'text-muted-foreground aria-selected:text-muted-foreground',
           defaultClassNames.outside
@@ -200,6 +226,8 @@ function CalendarDayButton({
       data-range-start={modifiers.range_start}
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
+      // Don't apply the today highlight to the selected date.
+      data-today={modifiers.today && !modifiers.selected}
       className={cn(dayButtonClassName, defaultClassNames.day, className)}
       {...props}
     />
