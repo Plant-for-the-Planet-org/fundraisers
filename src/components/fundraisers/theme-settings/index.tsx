@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useController } from 'react-hook-form';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Moon, Shuffle, Sun } from 'lucide-react';
+import { ChevronDown, Moon, Shuffle, Sun } from 'lucide-react';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { getDominantStopColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
@@ -15,6 +15,11 @@ import { THEMES } from '@/lib/theme/themes';
 import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/stores/auth-store';
 import { useThemeStore } from '@/stores/theme-store';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { BackgroundTab } from './background-tab';
@@ -47,8 +52,7 @@ export function ThemeSettings() {
   const allowLogo = isPlanetStaff || hasExistingLogo;
 
   const [tab, setTab] = useState<'theme' | 'background'>('theme');
-  const [isBrowsing, setIsBrowsing] = useState(true);
-  const isCustomizing = tab === 'theme' && !isBrowsing;
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
 
   const baseFromForm = THEMES[field.value.base_id] ?? getThemeForPath(pathname);
   const activeTheme: Theme = selectedTheme ?? {
@@ -95,7 +99,7 @@ export function ThemeSettings() {
       bg,
     });
     setSelectedTheme({ ...theme, bg });
-    setIsBrowsing(false);
+    setThemePickerOpen(false);
   };
 
   const randomize = () => {
@@ -107,15 +111,6 @@ export function ThemeSettings() {
       bodyFont: pickRandom(FONT_OPTIONS).id,
       bg: { ...theme.bg, animation: pickRandom(ANIMATION_OPTIONS).id },
     });
-  };
-
-  const toggleBrowse = () => {
-    if (isCustomizing) {
-      setIsBrowsing(true);
-    } else {
-      setTab('theme');
-      setIsBrowsing(false);
-    }
   };
 
   const toggleMode = () => {
@@ -153,16 +148,21 @@ export function ThemeSettings() {
         <IconButton onClick={randomize} label={tTheme('shuffle')}>
           <Shuffle className='w-3.5 h-3.5' />
         </IconButton>
-        <button
-          type='button'
-          onClick={toggleBrowse}
-          className={cn(
-            'inline-flex items-center px-2.5 h-8 rounded-md border border-border text-xs font-semibold',
-            isCustomizing ? 'bg-muted/40' : 'bg-transparent hover:bg-muted/20'
-          )}
-        >
-          {isCustomizing ? tTheme('browse') : tTheme('done')}
-        </button>
+        <Popover open={themePickerOpen} onOpenChange={setThemePickerOpen}>
+          <PopoverTrigger
+            className='inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md border border-border text-xs font-semibold bg-transparent hover:bg-muted/20 data-[state=open]:bg-muted/40'
+            aria-label={tTheme('chooseTheme')}
+          >
+            {tTheme('chooseTheme')}
+            <ChevronDown className='w-3.5 h-3.5 opacity-60' />
+          </PopoverTrigger>
+          <PopoverContent align='end' className='w-80'>
+            <ThemeBrowseGrid
+              activeId={field.value.base_id}
+              onPick={applyTheme}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <Tabs
@@ -178,23 +178,16 @@ export function ThemeSettings() {
         </TabsList>
 
         <TabsContent value='theme' className='flex flex-col gap-4'>
-          {isBrowsing ? (
-            <ThemeBrowseGrid
-              activeId={field.value.base_id}
-              onPick={applyTheme}
-            />
-          ) : (
-            <CustomizePanels
-              activeTheme={activeTheme}
-              onAccent={accent => syncFormAndPreview({ accent }, { accent })}
-              onTitleFont={titleFont =>
-                syncFormAndPreview({ title_font: titleFont }, { titleFont })
-              }
-              onBodyFont={bodyFont =>
-                syncFormAndPreview({ body_font: bodyFont }, { bodyFont })
-              }
-            />
-          )}
+          <CustomizePanels
+            activeTheme={activeTheme}
+            onAccent={accent => syncFormAndPreview({ accent }, { accent })}
+            onTitleFont={titleFont =>
+              syncFormAndPreview({ title_font: titleFont }, { titleFont })
+            }
+            onBodyFont={bodyFont =>
+              syncFormAndPreview({ body_font: bodyFont }, { bodyFont })
+            }
+          />
         </TabsContent>
 
         <TabsContent value='background' className='flex flex-col gap-4'>
