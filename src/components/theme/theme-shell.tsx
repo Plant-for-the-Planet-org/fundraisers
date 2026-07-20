@@ -297,8 +297,17 @@ function PatternLayer({
   );
 }
 
-// Build a 100×100 SVG tile that contains the source logo at 40px max-height,
-// centered (width auto-scales). Cached per logo so each is fetched only once.
+// Watermark tile width in px. Single knob for spacing/density: the repeating
+// unit is LOGO_TILE_PX wide and 2×LOGO_TILE_PX tall (two logo rows, the lower
+// one offset by half a tile for a staggered / half-drop pattern instead of an
+// aligned grid).
+const LOGO_TILE_PX = 100;
+
+// Build the repeating half-drop unit: the source logo inlined into a
+// LOGO_TILE_PX × (2·LOGO_TILE_PX) SVG. The upper row is centered; the lower row
+// is shifted by half a tile (drawn as two edge copies so it wraps seamlessly
+// when the unit repeats horizontally). Cached per logo so each is fetched only
+// once.
 const logoTileCache = new Map<string, Promise<string>>();
 
 async function buildLogoTile(src: string): Promise<string> {
@@ -310,7 +319,15 @@ async function buildLogoTile(src: string): Promise<string> {
   const inner = text
     .replace(/^[\s\S]*?<svg[^>]*>/, '')
     .replace(/<\/svg>\s*$/, '');
-  const wrapper = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><svg x='0' y='30' width='100' height='40' preserveAspectRatio='xMidYMid meet' viewBox='${viewBox}'>${inner}</svg></svg>`;
+  const logoH = LOGO_TILE_PX * 0.4;
+  const half = LOGO_TILE_PX / 2;
+  const topY = (LOGO_TILE_PX - logoH) / 2;
+  const bottomY = LOGO_TILE_PX + topY;
+  const cell = (x: number, y: number) =>
+    `<svg x='${x}' y='${y}' width='${LOGO_TILE_PX}' height='${logoH}' preserveAspectRatio='xMidYMid meet' viewBox='${viewBox}'>${inner}</svg>`;
+  const wrapper =
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${LOGO_TILE_PX} ${LOGO_TILE_PX * 2}'>` +
+    `${cell(0, topY)}${cell(-half, bottomY)}${cell(half, bottomY)}</svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(wrapper)}`;
 }
 
@@ -358,7 +375,7 @@ function LogoLayer({
       className='fixed inset-0 bg-repeat bg-top-left pointer-events-none transition-opacity duration-300'
       style={{
         backgroundImage: `url("${tile}")`,
-        backgroundSize: '100px 100px',
+        backgroundSize: `${LOGO_TILE_PX}px ${LOGO_TILE_PX * 2}px`,
         opacity,
         filter: mode === 'dark' ? 'invert(1)' : undefined,
       }}
