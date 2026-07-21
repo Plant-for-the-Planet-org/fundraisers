@@ -73,11 +73,13 @@
       "copyLink": "Link kopieren",
       "pause": "Pausieren",
       "resume": "Fortsetzen",
+      "extend": "Spendenaufruf verlängern",
       "delete": "Löschen",
       "copyLinkSuccess": "Link kopiert",
       "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "extendSuccess": "Spendenaktion verlängert",
       "deleteSuccess": "Spendenaufruf gelöscht",
       "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
     },
@@ -86,6 +88,13 @@
       "description": "Möchtest du diesen Spendenaufruf wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "confirm": "Löschen"
+    },
+    "extendDialog": {
+      "title": "Spendenaufruf verlängern",
+      "description": "Verlängern Sie Ihre Spendenaktion, indem Sie ein neues Enddatum auswählen.",
+      "daysAdded": "{count, plural, one {+# Tag hinzugefügt} other {+# Tage hinzugefügt}}",
+      "cancel": "Abbrechen",
+      "confirm": "Speichern"
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",

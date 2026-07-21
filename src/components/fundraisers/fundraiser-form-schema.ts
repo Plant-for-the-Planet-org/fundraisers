@@ -114,7 +114,7 @@ const fundraiserFormBaseSchema = z.object({
     .number({ error: 'required' })
     .int()
     .min(GOAL_AMOUNT_MIN, 'minAmount'),
-  // Date-only value (YYYY-MM-DD). Optional for drafts, required for publishing.
+  // Optional in the form. A default end date is applied before the API call.
   endDate: z.string().optional(),
   visibility: z.enum(['public', 'unlisted']),
   status: z.enum(['draft', 'active']),
@@ -197,14 +197,10 @@ const fundraiserFormBaseSchema = z.object({
 });
 
 // End-date validation:
-// - Required when publishing
-// - Optional for drafts
-// - Must be valid and within the configured date range
+// - Optional in the form.
+// - A default end date is applied when none is provided.
+// - Must be valid and within the configured date range.
 export const fundraiserFormSchema = fundraiserFormBaseSchema
-  .refine(data => !(data.status === 'active' && !data.endDate), {
-    message: 'required',
-    path: ['endDate'],
-  })
   .refine(data => !(data.endDate && !isValidDateInput(data.endDate)), {
     message: 'invalid',
     path: ['endDate'],

@@ -58,6 +58,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-colorful": "^5.7.0",
+    "react-day-picker": "^10.0.1",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.2",
     "react-svg-credit-card-payment-icons": "6.0.4",

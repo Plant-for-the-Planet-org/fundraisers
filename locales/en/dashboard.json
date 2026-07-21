@@ -73,11 +73,13 @@
       "copyLink": "Copy link",
       "pause": "Pause",
       "resume": "Resume",
+      "extend": "Extend fundraiser",
       "delete": "Delete",
       "copyLinkSuccess": "Link copied",
       "copyLinkError": "Could not copy link",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
+      "extendSuccess": "Fundraiser extended",
       "deleteSuccess": "Fundraiser deleted",
       "mutationError": "Something went wrong. Try again."
     },
@@ -86,6 +88,13 @@
       "description": "Are you sure you want to delete this fundraiser? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "extendDialog": {
+      "title": "Extend fundraiser",
+      "description": "Extend your fundraiser by selecting a new end date.",
+      "daysAdded": "{count, plural, one {+# day added} other {+# days added}}",
+      "cancel": "Cancel",
+      "confirm": "Save"
     },
     "list": {
       "loading": "Loading fundraiser item...",

@@ -78,12 +78,24 @@ export function FundraiserFormBody({
         <LeaderboardSettings />
         <ContributionSettings />
         <DescriptionInput />
-        <WorkspaceSelector disabled={isEditMode} />
-        <WorkspaceInfo />
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <GoalInput />
-          <EndDateInput />
-        </div>
+        {isEditMode ? (
+          <>
+            <WorkspaceSelector disabled />
+            <WorkspaceInfo />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <GoalInput />
+              <EndDateInput />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <WorkspaceSelector />
+              <GoalInput />
+            </div>
+            <WorkspaceInfo />
+          </>
+        )}
         <BundleSelection mode={mode} />
         <Options />
         <StickyFormBar>

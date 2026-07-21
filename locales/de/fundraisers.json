@@ -291,10 +291,12 @@
         "label": "Enddatum",
         "openCalendar": "Kalender öffnen",
         "errors": {
-          "required": "Bitte wählen Sie vor der Veröffentlichung ein Enddatum aus.",
+          "required": "Bitte wähle ein Enddatum aus.",
           "invalid": "Bitte geben Sie ein gültiges Datum ein.",
           "minDate": "Wählen Sie ein Datum nach dem {date}.",
-          "maxDate": "Wählen Sie ein Datum vor dem {date}."
+          "maxDate": "Wählen Sie ein Datum vor dem {date}.",
+          "afterCurrentEndDate": "Das neue Enddatum muss nach dem {date} liegen.",
+          "onOrAfterMinDate": "Das neue Enddatum muss am oder nach dem {date} liegen."
         }
       },
       "projectSelection": {

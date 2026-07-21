@@ -6,6 +6,9 @@ import type {
 } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
+import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '@/lib/constants/fundraiser-creation';
+import { getDateOffsetFromToday } from '@/lib/utils/date';
+
 export type UpdateDirtyFields = Partial<
   Readonly<FieldNamesMarkedBoolean<FundraiserFormValues>>
 >;
@@ -92,6 +95,10 @@ export const DEFAULT_MODULES: FundraiserSettings['modules'] = {
 function getTodayString(): string {
   return new Date().toISOString().split('T')[0]!;
 }
+// Default fundraiser end date when none is selected.
+function getDefaultEndDate(): string {
+  return getDateOffsetFromToday(DEFAULT_FUNDRAISER_DURATION_DAYS);
+}
 
 export function buildUpdateFundraiserRequest(
   values: FundraiserFormValues,
@@ -105,7 +112,10 @@ export function buildUpdateFundraiserRequest(
   if (dirtyFields.title) request.title = values.title;
   if (dirtyFields.description) request.description = values.description;
   if (dirtyFields.goalAmount) request.goalAmount = values.goalAmount;
-  if (dirtyFields.endDate && values.endDate) request.endDate = values.endDate;
+  // If the end date was changed, use the selected date or fall back to the default.
+  if (dirtyFields.endDate) {
+    request.endDate = values.endDate || getDefaultEndDate();
+  }
   if (dirtyFields.visibility) request.visibility = values.visibility;
   if (dirtyFields.status) request.status = values.status;
   if (isProjectAllocationsDirty(dirtyFields)) {
@@ -181,11 +191,11 @@ export function buildCreateFundraiserRequest(
       },
     },
     startDate: getTodayString(),
+    // Always send an end date. Use the default duration when none is provided.
+    endDate: values.endDate || getDefaultEndDate(),
     tags: [],
     content: {},
     metadata: {},
-    // Only send an end date if the user selected one. Drafts fundraiser can leave it empty.
-    ...(values.endDate && { endDate: values.endDate }),
     ...(imageFile && { imageFile }),
   };
 }

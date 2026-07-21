@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
+  CalendarPlus,
   Link as LinkIcon,
   Loader2,
   Monitor,
@@ -26,6 +27,7 @@ import {
   isFundraiserOwnerOrAdmin,
   isStageModeEnabled,
 } from '@/lib/utils/fundraiser';
+import { deriveDisplayStatus } from '@/lib/utils/fundraiser-list';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +47,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { openStageWindow } from '@/modules/stage';
+import { ExtendFundraiserDialog } from './extend-fundraiser-dialog';
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
@@ -58,6 +61,7 @@ interface ActionVisibility {
   pause: boolean;
   resume: boolean;
   stageMode: boolean;
+  extend: boolean;
   delete: boolean;
 }
 
@@ -67,12 +71,14 @@ const NON_OWNER_ACTIONS: ActionVisibility = {
   pause: false,
   resume: false,
   stageMode: false,
+  extend: false,
   delete: false,
 };
 
-// Status drives edit/pause/resume; Stage Mode is orthogonal (it depends on the
-// fundraiser's module settings, not its status) and is layered on afterwards.
-type StatusActions = Omit<ActionVisibility, 'stageMode'>;
+// Status drives edit/pause/resume; Stage Mode and Extend are orthogonal (they
+// depend on module settings / derived "ending soon" state, not the raw status)
+// and are layered on afterwards.
+type StatusActions = Omit<ActionVisibility, 'stageMode' | 'extend'>;
 
 const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   active: {
@@ -130,6 +136,10 @@ function getAvailableActions(
   return {
     ...OWNER_ACTIONS_BY_STATUS[fundraiser.status],
     stageMode: isStageModeEnabled(fundraiser),
+    // Show "Extend Fundraiser" for ending-soon and completed fundraisers.
+    extend:
+      deriveDisplayStatus(fundraiser) === 'ending-soon' ||
+      fundraiser.status === 'completed',
   };
 }
 
@@ -149,6 +159,7 @@ export function FundraiserActionMenu({
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [extendDialogOpen, setExtendDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
@@ -157,6 +168,7 @@ export function FundraiserActionMenu({
     actions.pause ||
     actions.resume ||
     actions.stageMode ||
+    actions.extend ||
     actions.delete;
   const showStatusGroup = actions.pause || actions.resume;
   const showSeparator =
@@ -242,6 +254,24 @@ export function FundraiserActionMenu({
         align='end'
         className='w-52 rounded-xl border-border/60 shadow-lg'
       >
+        {/* Place "Extend Fundraiser" at the top for ending-soon fundraisers. */}
+        {actions.extend && (
+          <>
+            <DropdownMenuItem
+              className='cursor-pointer rounded-lg py-2'
+              disabled={isMutating}
+              onSelect={event => {
+                event.preventDefault();
+                setOpen(false);
+                setExtendDialogOpen(true);
+              }}
+            >
+              <CalendarPlus aria-hidden='true' />
+              {t('extend')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         {actions.edit && (
           <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
             <Link href={editHref}>
@@ -250,7 +280,6 @@ export function FundraiserActionMenu({
             </Link>
           </DropdownMenuItem>
         )}
-
         {actions.stageMode && (
           <DropdownMenuItem
             className='cursor-pointer rounded-lg py-2'
@@ -264,7 +293,6 @@ export function FundraiserActionMenu({
             {t('stageMode')}
           </DropdownMenuItem>
         )}
-
         {actions.copyLink && (
           <DropdownMenuItem
             className='cursor-pointer rounded-lg py-2'
@@ -274,9 +302,7 @@ export function FundraiserActionMenu({
             {t('copyLink')}
           </DropdownMenuItem>
         )}
-
         {showSeparator && <DropdownMenuSeparator />}
-
         {actions.pause && (
           <DropdownMenuItem
             variant='destructive'
@@ -295,7 +321,6 @@ export function FundraiserActionMenu({
             {t('pause')}
           </DropdownMenuItem>
         )}
-
         {actions.resume && (
           <DropdownMenuItem
             className='cursor-pointer rounded-lg py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
@@ -319,7 +344,6 @@ export function FundraiserActionMenu({
             {t('resume')}
           </DropdownMenuItem>
         )}
-
         {actions.delete && (
           <>
             <DropdownMenuSeparator />
@@ -339,6 +363,13 @@ export function FundraiserActionMenu({
           </>
         )}
       </DropdownMenuContent>
+
+      <ExtendFundraiserDialog
+        fundraiser={fundraiser}
+        open={extendDialogOpen}
+        onOpenChange={setExtendDialogOpen}
+        onFundraiserUpdated={onFundraiserUpdated}
+      />
 
       <Dialog
         open={deleteDialogOpen}

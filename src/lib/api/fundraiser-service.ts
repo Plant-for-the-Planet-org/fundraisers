@@ -49,18 +49,68 @@ export async function updateFundraiser(
   });
 }
 
+/**
+ * Pauses an active fundraiser using
+ * `POST /fundraisers/{id}/transition/pause`.
+ *
+ * The backend handles the status transition.
+ */
 export function pauseFundraiser(
   id: string,
   token: string
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { status: 'paused' }, token);
+  return platformFetch<Fundraiser>(`/fundraisers/${id}/transition/pause`, {
+    method: 'POST',
+    token,
+  });
 }
 
+/**
+ * Resumes a paused fundraiser using
+ * `POST /fundraisers/{id}/transition/resume`.
+ *
+ * The backend handles the status transition.
+ */
 export function resumeFundraiser(
   id: string,
   token: string
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { status: 'active' }, token);
+  return platformFetch<Fundraiser>(`/fundraisers/${id}/transition/resume`, {
+    method: 'POST',
+    token,
+  });
+}
+
+/**
+ * Extends an active fundraiser by updating its end date.
+ *
+ * Uses a partial update and only sends `{ endDate }`, leaving all other
+ * fundraiser fields unchanged.
+ */
+export function extendActiveFundraiser(
+  id: string,
+  endDate: string,
+  token: string
+): Promise<Fundraiser> {
+  return updateFundraiser(id, { endDate }, token);
+}
+
+/**
+ * Reactivates a fundraiser with a new end date.
+ *
+ * Uses `POST /fundraisers/{id}/transition/reactivate`.
+ * The backend handles the status transition.
+ */
+export function reactivateAndExtendFundraiser(
+  id: string,
+  endDate: string,
+  token: string
+): Promise<Fundraiser> {
+  return platformFetch<Fundraiser>(`/fundraisers/${id}/transition/reactivate`, {
+    method: 'POST',
+    body: { endDate },
+    token,
+  });
 }
 
 /**
