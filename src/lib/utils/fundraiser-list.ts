@@ -70,8 +70,15 @@ export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   }
 }
 
+/**
+ * Names of hosts to attribute a fundraiser to ("by {names}"). Only hosts marked
+ * `isPublic` are included: private hosts must not surface in the dashboard
+ * attribution line, the public explore cards, or the search haystack. The
+ * public hosts strip applies the same `isPublic` filter separately.
+ */
 export function getHostNames(fundraiser: Fundraiser): string[] {
   return fundraiser.hosts
+    .filter(host => host.isPublic)
     .map(host => host.displayName ?? host.user?.name)
     .filter((name): name is string => Boolean(name));
 }
