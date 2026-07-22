@@ -43,6 +43,14 @@ interface HostedFundraisersStore {
     token: string,
     userId: string
   ) => Promise<Set<string>>;
+  /**
+   * Drop the cache so the next read refetches. Call after a mutation that can
+   * change which fundraisers the user owns/admins — creating a fundraiser, or
+   * adding/removing/re-roling a host (which can remove or demote the user
+   * themselves). Not needed for plain fundraiser edits: those never change host
+   * membership or roles, so `adminIds` is unaffected.
+   */
+  reset: () => void;
 }
 
 export const useHostedFundraisersStore = create<HostedFundraisersStore>()(
@@ -51,6 +59,13 @@ export const useHostedFundraisersStore = create<HostedFundraisersStore>()(
       identityKey: null,
       adminIds: null,
       promise: null,
+
+      reset: () =>
+        set(
+          { identityKey: null, adminIds: null, promise: null },
+          undefined,
+          'hostedFundraisers/reset'
+        ),
 
       ensureLoaded: (identityKey, token, userId) => {
         const state = get();

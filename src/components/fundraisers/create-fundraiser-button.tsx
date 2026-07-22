@@ -14,6 +14,7 @@ import { unsplashClient } from '@/lib/api/unsplash-client';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
 import { imageToBase64 } from '@/lib/utils/image-processor';
 import { useAuthStore } from '@/stores/auth-store';
+import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
 import { Button } from '@/components/ui/button';
 
 export function CreateFundraiserButton() {
@@ -49,6 +50,8 @@ export function CreateFundraiserButton() {
       if (!fundraiser.slug) {
         throw new Error('Invalid response from server - missing slug');
       }
+      // The user now owns a fundraiser that wasn't in the cached admin set.
+      useHostedFundraisersStore.getState().reset();
       toast.success(t('successMessage'));
       router.replace(`/dashboard/fundraisers/edit/${fundraiser.slug}`);
     } catch (err) {
