@@ -9,6 +9,7 @@ export class PaypalOrderError extends Error {
     public type: ErrorType,
     public code: string,
     public status?: number,
+    // Diagnostic only - no consumer reads this today. `originalError` may be an Error instance, so don't JSON.stringify `details` or pass it across the server/client boundary without first extracting fields (message/status/kind); an Error serializes to {}.
     public details?: Record<string, unknown>
   ) {
     super(message);
