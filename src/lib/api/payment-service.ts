@@ -68,14 +68,10 @@ export class PaymentService {
         }
       );
 
-      // TODO: Confirm with backend that the following fields from the prior implementation
-      // are not returned by this API: success (boolean), paymentId, status 'completed',
-      // redirectUrl, message (on success), type (top-level). In real responses, type was
-      // nested inside data.response — the top-level field was never populated.
-      // Frontend audit (issue #127): no call site or downstream consumer reads any of
-      // these fields — every consumer branches on `status` plus nested `response.type` /
-      // `errorCode` (see PaymentResponse type and the donation-submit flow hooks). Still
-      // needs an explicit backend confirm-and-remove pass before this TODO can be deleted.
+      // PaymentResponse models all three shapes below (confirmed against backend)
+      //   success:                   { id, status: 'success', response? }
+      //   needs client action (3DS): { id, status: 'action_required', response }
+      //   failed:                    { id, status: 'failed', errorCode, message }
       return data;
     } catch (err) {
       throw toPaymentError(err);
