@@ -8,6 +8,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { normalizeFundraiser } from '@/lib/api/normalize-fundraiser';
 import { platformFetch } from '@/lib/api/platform-fetch';
+import { withRetry } from '@/lib/api/utils';
 
 export interface ApiFundraiser extends Omit<Fundraiser, 'workspace'> {
   workspace: Fundraiser['workspace'] | [];
@@ -53,27 +54,6 @@ function normalizeFundraisersResponse(
   };
 }
 
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  maxRetries: number
-): Promise<T> {
-  let lastError: Error;
-
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error');
-      if (attempt === maxRetries) break;
-      await new Promise(resolve =>
-        setTimeout(resolve, Math.pow(2, attempt) * 1000)
-      );
-    }
-  }
-
-  throw lastError!;
-}
-
 export class CategoriesService {
   /**
    * Get categories by type
@@ -105,8 +85,8 @@ export class CategoriesService {
     options?: CategoryOptions
   ): Promise<CategoryFundraisersResponse> {
     const path = options?.sort_by
-      ? `/fundraiser/categories/${slug}?sort_by=${encodeURIComponent(options.sort_by)}`
-      : `/fundraiser/categories/${slug}`;
+      ? `/fundraiser/categories/${encodeURIComponent(slug)}?sort_by=${encodeURIComponent(options.sort_by)}`
+      : `/fundraiser/categories/${encodeURIComponent(slug)}`;
     const data = await platformFetch<RawCategoryFundraisersResponse>(path);
     return normalizeFundraisersResponse(data);
   }

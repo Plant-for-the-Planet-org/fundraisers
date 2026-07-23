@@ -161,6 +161,7 @@ export class UserService {
     try {
       return await this.getProfile(token);
     } catch (error) {
+      // Only 401 (unauthenticated) means "no profile". A 403 on /profile is an authorization denial (a denied impersonation switch, e.g. a stale support pin), not an invalid session, so let it throw rather than clear the impersonator's own auth.
       if (error instanceof PlatformAPIError && error.status === 401) {
         return null;
       }
