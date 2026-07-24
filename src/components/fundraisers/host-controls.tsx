@@ -24,18 +24,20 @@ export function HostControls({ fundraiser }: { fundraiser: Fundraiser }) {
   const userId = useAuthStore(state => state.user?.sub);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
-  // Fast path: the (anonymous) payload already lists the user as an owner/admin
-  // host — no fetch needed.
+  // Does the page data already show the user as an owner/admin host? Then they can edit, no lookup needed.
   const isVisibleHostAdmin = isFundraiserOwnerOrAdmin(fundraiser, userId);
 
-  // Slow path: logged in but not a *visible* host here. Only then do we pay the
-  // authenticated lookup to catch the private-host case.
+  // Does the page data show the user as a host at all (any role)? If so we can see their role, so they are not a hidden private host. Only a user missing from the page data could be one.
+  const isVisibleHost =
+    !!userId && fundraiser.hosts.some(host => host.user?.id === userId);
+
+  // Logged in but not shown as a host here. Only now do the extra lookup, to catch a private host (private hosts are removed from the page data). A visible viewer already cannot edit, so we skip them.
   const { adminIds } = useHostedAdminIds({
-    enabled: !isAuthInitializing && !!userId && !isVisibleHostAdmin,
+    enabled: !isAuthInitializing && !!userId && !isVisibleHost,
   });
 
   const isHostAdmin =
-    isVisibleHostAdmin || (adminIds?.has(fundraiser.id) ?? false);
+    (isVisibleHostAdmin || adminIds?.has(fundraiser.id)) ?? false;
 
   // Wait for auth to settle, then only show to hosts.
   if (isAuthInitializing || !isHostAdmin) {
