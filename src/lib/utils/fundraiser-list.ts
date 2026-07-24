@@ -70,8 +70,15 @@ export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   }
 }
 
+/**
+ * - Names of public hosts to attribute a fundraiser to ("by {names}"), used by the dashboard cards and the search haystack.
+ * - The `isPublic` filter is load-bearing here, not defensive: on the dashboard the backend returns all hosts (including private ones), so without this filter a private co-host would leak into the owner's own attribution line and search.
+ * - On public/explore surfaces the backend already returns only public hosts, so the filter is a harmless no-op there — do not remove it as redundant.
+ * - The public hosts strip in `hosts.tsx` applies its own `isPublic` filter separately.
+ */
 export function getHostNames(fundraiser: Fundraiser): string[] {
   return fundraiser.hosts
+    .filter(host => host.isPublic)
     .map(host => host.displayName ?? host.user?.name)
     .filter((name): name is string => Boolean(name));
 }

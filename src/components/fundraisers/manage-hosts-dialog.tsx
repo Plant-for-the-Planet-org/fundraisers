@@ -35,6 +35,7 @@ import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
+import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -243,6 +244,8 @@ function HostRow({
       replaceHost(
         await updateFundraiserHost(fundraiserId, host.id, { role: next }, token)
       );
+      // A role change is always to another host (self-demotion is API-rejected), so it does not change the current user's own access. Reset anyway as cheap insurance in case host rules change.
+      useHostedFundraisersStore.getState().reset();
       toast.success(t('toastUpdated'));
     } catch (err) {
       handleError(err);
@@ -275,6 +278,8 @@ function HostRow({
     setIsSaving(true);
     try {
       await removeFundraiserHost(fundraiserId, host.id, token);
+      // Removing a host can remove the current user's own admin access.
+      useHostedFundraisersStore.getState().reset();
       onHostsChange(hosts.filter(h => h.id !== host.id));
       toast.success(t('toastRemoved'));
     } catch (err) {
