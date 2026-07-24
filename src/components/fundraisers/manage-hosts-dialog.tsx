@@ -244,7 +244,7 @@ function HostRow({
       replaceHost(
         await updateFundraiserHost(fundraiserId, host.id, { role: next }, token)
       );
-      // A role change can demote the current user from admin on this fundraiser.
+      // A role change is always to another host (self-demotion is API-rejected), so it does not change the current user's own access. Reset anyway as cheap insurance in case host rules change.
       useHostedFundraisersStore.getState().reset();
       toast.success(t('toastUpdated'));
     } catch (err) {

@@ -50,7 +50,7 @@ export function CreateFundraiserButton() {
       if (!fundraiser.slug) {
         throw new Error('Invalid response from server - missing slug');
       }
-      // The user now owns a fundraiser that wasn't in the cached admin set.
+      // Drop the hosted-fundraisers cache: the user now owns a fundraiser it does not know about, so its public-page edit shortcut would stay hidden until the cache refetches.
       useHostedFundraisersStore.getState().reset();
       toast.success(t('successMessage'));
       router.replace(`/dashboard/fundraisers/edit/${fundraiser.slug}`);

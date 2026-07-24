@@ -34,10 +34,10 @@ export function useHostedAdminIds({ enabled }: { enabled: boolean }): {
   const identityKey =
     token && userId ? `${token}::${impersonationEmail ?? ''}` : null;
 
+  // Reloads on identity change, not on hosted fundraisers store reset(). A reset() hides the shortcut but won't re-run this effect, so a mounted consumer only recovers on remount. Safe today: reset() fires on dashboard/edit routes while this hook lives on the public page, so reaching the shortcut always remounts.
   useEffect(() => {
     if (!enabled || !identityKey || !token || !userId) return;
-    // Swallow errors (401/403 for non-hosts is expected and simply means "no
-    // edit shortcut"); real failures are non-fatal for this cosmetic control.
+    // A non-host gets a normal 200 with an empty list, so what we catch here is a real failure (network, 5xx, timeout). Swallow it: non-fatal for this cosmetic control, it just means no edit shortcut.
     ensureLoaded(identityKey, token, userId).catch(() => {});
   }, [enabled, identityKey, token, userId, ensureLoaded]);
 

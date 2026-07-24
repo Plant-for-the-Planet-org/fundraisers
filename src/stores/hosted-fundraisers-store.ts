@@ -44,11 +44,11 @@ interface HostedFundraisersStore {
     userId: string
   ) => Promise<Set<string>>;
   /**
-   * Drop the cache so the next read refetches. Call after a mutation that can
-   * change which fundraisers the user owns/admins — creating a fundraiser, or
-   * adding/removing/re-roling a host (which can remove or demote the user
-   * themselves). Not needed for plain fundraiser edits: those never change host
-   * membership or roles, so `adminIds` is unaffected.
+   * Drop the cache so the next read refetches.
+   * - Call after creating a fundraiser (the user gains one) or removing a host (can drop the user's own admin access).
+   * - Also called on host role changes as cheap insurance, though self-demotion is API-rejected so a role change never changes the current user's own access in practice.
+   * - Not needed when adding a host (you cannot add yourself), nor for plain fundraiser edits (they never touch host membership or roles).
+   * - Not needed for impersonation switches: they window.location.reload(), which destroys the store anyway.
    */
   reset: () => void;
 }
