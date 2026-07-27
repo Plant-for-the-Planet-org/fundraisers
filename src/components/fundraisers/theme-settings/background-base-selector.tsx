@@ -44,7 +44,7 @@ function gradientCss(g: CustomGradient): string {
 }
 
 const circleBase =
-  'relative h-9 w-9 rounded-full border-2 overflow-hidden transition-colors';
+  'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-colors';
 const inactiveBorder = 'border-foreground/30 hover:border-foreground/60';
 
 export function BackgroundBaseSelector({
