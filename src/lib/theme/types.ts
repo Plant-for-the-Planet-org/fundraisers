@@ -79,6 +79,7 @@ export interface BgSettings {
   gradient: string; // preset/theme gradient as a Tailwind class ('' = none); set by the built-in themes and the preset picker
   background_color: string | null; // user-picked solid hex, null = none
   custom_gradient: CustomGradient | null; // user-built gradient, null = none
+  background_opacity?: number; // opacity of the solid/custom-gradient wash over the mode base (0.05–1, default 0.14)
   decoration: BgDecoration;
   pattern_id: string | null;
   image_url: string | null; // library key OR https URL
@@ -126,6 +127,7 @@ export interface FundraiserThemeSettings {
       angle?: number;
       stops?: Array<{ color?: string; position?: number }>;
     } | null;
+    background_opacity?: number;
     decoration?: string;
     pattern_id?: string | null;
     image_url?: string | null;

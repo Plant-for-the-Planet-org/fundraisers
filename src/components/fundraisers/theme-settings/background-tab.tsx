@@ -44,6 +44,7 @@ type Props = {
   colorOptions: AccentColor[];
   bgColorHex: string;
   onAccent: (accent: AccentColor) => void;
+  onBackgroundOpacity: (value: number) => void;
   onSelectNone: () => void;
   onSolidColor: (hex: string) => void;
   onGradientChange: (next: CustomGradient) => void;
@@ -66,6 +67,7 @@ export function BackgroundTab({
   colorOptions,
   bgColorHex,
   onAccent,
+  onBackgroundOpacity,
   onSelectNone,
   onSolidColor,
   onGradientChange,
@@ -93,6 +95,15 @@ export function BackgroundTab({
         onGradientChange={onGradientChange}
         onGradient={onGradient}
       />
+      {/* Only the user solid/custom-gradient wash is opacity-controlled; preset
+          gradient classes render at their authored alpha, so no slider for them. */}
+      {(bg.background_color || bg.custom_gradient) && (
+        <OpacitySlider
+          value={bg.background_opacity ?? 0.14}
+          onChange={onBackgroundOpacity}
+          label='Background opacity'
+        />
+      )}
       <AccentDotRow
         value={accent}
         colorOptions={colorOptions}

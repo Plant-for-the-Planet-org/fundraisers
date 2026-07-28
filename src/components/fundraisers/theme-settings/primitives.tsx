@@ -145,18 +145,19 @@ export function OpacitySlider({
   value,
   onChange,
   max = 1,
+  label,
 }: {
   value: number;
   onChange: (value: number) => void;
   max?: number;
+  label?: string;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const heading = label ?? tTheme('labelOpacity');
   return (
     <div>
       <div className='flex items-center justify-between'>
-        <SectionHeader showDivider={false}>
-          {tTheme('labelOpacity')}
-        </SectionHeader>
+        <SectionHeader showDivider={false}>{heading}</SectionHeader>
         <span className='text-xs tabular-nums text-muted-foreground'>
           {Math.round(value * 100)}%
         </span>
@@ -169,7 +170,7 @@ export function OpacitySlider({
         value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
         className='w-full accent-foreground mt-1'
-        aria-label={tTheme('labelOpacity')}
+        aria-label={heading}
       />
     </div>
   );

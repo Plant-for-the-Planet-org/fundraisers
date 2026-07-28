@@ -19,6 +19,7 @@ export const DEFAULT_GRADIENT_ANGLE = 135;
 export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   background_color: null,
   custom_gradient: null,
+  background_opacity: 0.14, // wash opacity of a solid/custom-gradient background
   decoration: 'none',
   pattern_id: null,
   image_url: null,

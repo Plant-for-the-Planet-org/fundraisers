@@ -98,6 +98,10 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     ? raw.background_color
     : (base.bg.background_color ?? null);
   const custom_gradient = buildCustomGradient(raw, base.bg.custom_gradient);
+  const background_opacity = clampOpacity(
+    raw.background_opacity,
+    base.bg.background_opacity ?? 0.14
+  );
   const pattern_id =
     raw.pattern_id !== undefined ? raw.pattern_id : base.bg.pattern_id;
   const image_url =
@@ -136,6 +140,7 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     gradient,
     background_color,
     custom_gradient,
+    background_opacity,
     decoration,
     pattern_id,
     image_url,

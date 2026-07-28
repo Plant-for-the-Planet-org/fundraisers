@@ -256,6 +256,9 @@ export function ThemeSettings() {
               colorOptions={activeTheme.colorOptions}
               bgColorHex={bgColorHex}
               onAccent={accent => syncFormAndPreview({ accent }, { accent })}
+              onBackgroundOpacity={background_opacity =>
+                patchBg({ background_opacity })
+              }
               // One base wash at a time: each setter clears the other two.
               // Colour selection does not change light/dark mode; in the layered
               // model the colour is only a tint over the mode base, so mode is a

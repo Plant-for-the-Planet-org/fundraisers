@@ -145,6 +145,7 @@ export const fundraiserFormSchema = z.object({
               .min(2),
           })
           .nullable(),
+        background_opacity: z.number().min(0.05).max(1).optional(),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
         // External URLs must use https and be from an allowed host (same list

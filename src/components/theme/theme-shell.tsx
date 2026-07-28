@@ -115,6 +115,9 @@ export function ThemeShell({
     !gradientClass && !customGradient && isValidHexColor(bg.background_color)
       ? bg.background_color
       : null;
+  // Wash opacity of the solid/custom-gradient background over the mode base.
+  // Falls back to the legacy constant for rows saved before it was adjustable.
+  const washOpacity = bg.background_opacity ?? TINT_OPACITY;
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
 
@@ -162,13 +165,13 @@ export function ThemeShell({
       {customGradient && (
         <div
           className='fixed inset-0 transition-opacity duration-300'
-          style={{ backgroundImage: customGradient, opacity: TINT_OPACITY }}
+          style={{ backgroundImage: customGradient, opacity: washOpacity }}
         />
       )}
       {solidColor && (
         <div
           className='fixed inset-0 transition-opacity duration-300'
-          style={{ backgroundColor: solidColor, opacity: TINT_OPACITY }}
+          style={{ backgroundColor: solidColor, opacity: washOpacity }}
         />
       )}
       {bg.decoration === 'image' && bg.image_url && (
