@@ -180,6 +180,7 @@ export function ThemeShell({
           mode={bg.image_mode}
           opacity={bg.opacity}
           tint={bg.image_tint}
+          imageColor={bg.image_color}
         />
       )}
       {bg.decoration === 'pattern' && bg.pattern_id && (
@@ -187,6 +188,7 @@ export function ThemeShell({
           patternId={bg.pattern_id}
           opacity={bg.opacity}
           tint={bg.pattern_tint}
+          patternColor={bg.pattern_color}
         />
       )}
       {bg.decoration === 'logo' && bg.logo_id && (
@@ -285,11 +287,13 @@ function ImageLayer({
   mode,
   opacity,
   tint = 'background',
+  imageColor,
 }: {
   imageUrl: string;
   mode: BgSettings['image_mode'];
   opacity: number;
   tint?: BgSettings['image_tint'];
+  imageColor?: string | null;
 }) {
   const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
@@ -305,11 +309,13 @@ function ImageLayer({
   // accent, or nothing (the image shows at its opacity and the base + tint
   // wash shows through). Capped so the image stays visible at high opacity.
   const overlayColor =
-    tint === 'accent'
-      ? 'var(--accent-color)'
-      : tint === 'background'
-        ? 'var(--theme-bg-color)'
-        : null;
+    tint === 'custom' && isValidHexColor(imageColor)
+      ? imageColor
+      : tint === 'accent'
+        ? 'var(--accent-color)'
+        : tint === 'background'
+          ? 'var(--theme-bg-color)'
+          : null;
   return (
     <>
       <div
@@ -342,10 +348,12 @@ function PatternLayer({
   patternId,
   opacity,
   tint = 'accent',
+  patternColor,
 }: {
   patternId: string;
   opacity: number;
   tint?: BgSettings['pattern_tint'];
+  patternColor?: string | null;
 }) {
   const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
@@ -360,12 +368,16 @@ function PatternLayer({
 
   // Monochrome mask: the theme colour is painted underneath and revealed only
   // where the stencil shapes are, so the colour appears to tint the pattern.
-  // The paint colour is the accent (default) or the background colour.
-  // Full-bleed designs cover the viewport once; the rest tile.
+  // The paint colour is the accent (default), the background colour, or a
+  // custom hex. Full-bleed designs cover the viewport once; the rest tile.
   if (masked) {
     const maskUrl = `url("${src}")`;
     const paintColor =
-      tint === 'background' ? 'var(--theme-bg-color)' : 'var(--accent-color)';
+      tint === 'custom' && isValidHexColor(patternColor)
+        ? patternColor
+        : tint === 'background'
+          ? 'var(--theme-bg-color)'
+          : 'var(--accent-color)';
     return (
       <div
         className='fixed inset-0 pointer-events-none transition-opacity duration-300'

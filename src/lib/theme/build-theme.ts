@@ -114,9 +114,15 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
   const image_tint = isValidImageTint(raw.image_tint)
     ? raw.image_tint
     : (base.bg.image_tint ?? 'background');
+  const image_color = isValidHexColor(raw.image_color)
+    ? raw.image_color
+    : (base.bg.image_color ?? null);
   const pattern_tint = isValidPatternTint(raw.pattern_tint)
     ? raw.pattern_tint
     : (base.bg.pattern_tint ?? 'accent');
+  const pattern_color = isValidHexColor(raw.pattern_color)
+    ? raw.pattern_color
+    : (base.bg.pattern_color ?? null);
 
   // Phase 2 reads bg.animation; Phase 1 records stored animation at the
   // top level (settings.animation). Fall back to the legacy field so
@@ -149,7 +155,9 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     opacity,
     animation,
     image_tint,
+    image_color,
     pattern_tint,
+    pattern_color,
   };
 }
 

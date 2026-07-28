@@ -28,7 +28,9 @@ export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   opacity: 0.2, // default decoration (pattern/image/logo) opacity — subtle by default
   animation: 'none',
   image_tint: 'background', // image overlay follows the background colour by default
+  image_color: null, // custom hex used only when image_tint is 'custom'
   pattern_tint: 'accent', // pattern stencil painted with the accent by default
+  pattern_color: null, // custom hex used only when pattern_tint is 'custom'
 };
 
 // Build a preset bg block from a gradient class plus optional overrides.

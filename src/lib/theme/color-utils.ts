@@ -10,6 +10,16 @@ export function isValidHexColor(value: unknown): value is string {
   return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
 }
 
+/**
+ * Normalises a picker input to a lowercase `#rrggbb`, or null if it is not a
+ * complete 6-digit hex (accepts values with or without the leading `#`). Colour
+ * pickers commit only complete values so a 3-digit value never snaps mid-type.
+ */
+export function normalizeHex(input: string): string | null {
+  const hex = (input.startsWith('#') ? input : `#${input}`).toLowerCase();
+  return isValidHexColor(hex) ? hex : null;
+}
+
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
   return {
     r: parseInt(hex.slice(1, 3), 16),

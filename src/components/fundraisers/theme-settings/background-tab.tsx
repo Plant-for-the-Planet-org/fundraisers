@@ -11,8 +11,14 @@ import type {
 } from '@/lib/theme/types';
 
 import { useTranslations } from 'next-intl';
+import { ChevronDown, Palette } from 'lucide-react';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { cn } from '@/lib/utils/cn';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { SectionHeader } from '../typography';
 import { BackgroundBaseSelector } from './background-base-selector';
 import {
@@ -20,10 +26,8 @@ import {
   type BgFormValue,
   DECORATIONS,
   IMAGE_MODES,
-  IMAGE_TINTS,
   IMAGES,
   LOGOS,
-  PATTERN_TINTS,
   PATTERNS,
 } from './constants';
 import {
@@ -32,6 +36,7 @@ import {
   OpacitySlider,
   ThemeChipRow,
 } from './primitives';
+import { SolidPicker } from './solid-picker';
 
 // Pattern/image opacity can go to full. Mode is a deliberate toggle (not derived
 // from the wash), so a strong decoration no longer risks flipping the effective
@@ -57,7 +62,9 @@ type Props = {
   onOpacity: (value: number) => void;
   onAnimation: (value: AnimationType) => void;
   onImageTint: (value: BgImageTint) => void;
+  onImageColor: (hex: string) => void;
   onPatternTint: (value: BgPatternTint) => void;
+  onPatternColor: (hex: string) => void;
   allowLogo: boolean;
 };
 
@@ -80,7 +87,9 @@ export function BackgroundTab({
   onOpacity,
   onAnimation,
   onImageTint,
+  onImageColor,
   onPatternTint,
+  onPatternColor,
   allowLogo,
 }: Props) {
   // Resolved hex of the accent, used only to seed the custom-gradient default.
@@ -121,9 +130,13 @@ export function BackgroundTab({
           patternId={bg.pattern_id}
           opacity={bg.opacity}
           tint={bg.pattern_tint}
+          color={bg.pattern_color}
+          accentColor={accentColor}
+          bgColorHex={bgColorHex}
           onPick={onPatternId}
           onOpacity={onOpacity}
           onTint={onPatternTint}
+          onColor={onPatternColor}
         />
       )}
       {bg.decoration === 'image' && (
@@ -132,10 +145,14 @@ export function BackgroundTab({
           imageMode={bg.image_mode}
           opacity={bg.opacity}
           tint={bg.image_tint}
+          color={bg.image_color}
+          accentColor={accentColor}
+          bgColorHex={bgColorHex}
           onPick={onImageUrl}
           onMode={onImageMode}
           onOpacity={onOpacity}
           onTint={onImageTint}
+          onColor={onImageColor}
         />
       )}
       {bg.decoration === 'logo' && allowLogo && (
@@ -230,44 +247,6 @@ function DecorationRow({
   );
 }
 
-// Chip row for a decoration tint choice (image or pattern). English-only
-// labels for now — POC exploratory controls.
-function TintRow<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: ReadonlyArray<{ id: T; label: string }>;
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <ThemeChipRow label={label}>
-      {options.map(({ id, label: optionLabel }) => {
-        const active = value === id;
-        return (
-          <button
-            type='button'
-            key={id}
-            onClick={() => onChange(id)}
-            aria-pressed={active}
-            className={cn(
-              'px-2 py-1 rounded-md border text-xs font-semibold',
-              active
-                ? 'border-foreground'
-                : 'border-border hover:border-foreground/40'
-            )}
-          >
-            {optionLabel}
-          </button>
-        );
-      })}
-    </ThemeChipRow>
-  );
-}
-
 function LogoPanel({
   logoId,
   opacity,
@@ -329,22 +308,162 @@ function LogoPanel({
   );
 }
 
+// Swatch used in the decoration colour controls. A null hex renders an empty
+// circle for the "None" option.
+function ColorSwatch({
+  hex,
+  sizeClass,
+  active,
+}: {
+  hex: string | null;
+  sizeClass: string;
+  active?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-block rounded-full border-2',
+        active ? 'border-foreground' : 'border-foreground/30',
+        sizeClass
+      )}
+      style={hex ? { backgroundColor: hex } : undefined}
+      aria-hidden
+    />
+  );
+}
+
+type ColorPreset = {
+  label: string;
+  hex: string | null;
+  active: boolean;
+  onSelect: () => void;
+};
+
+// Shared decoration colour picker (patterns + images): a palette pill on the
+// right of the decoration header that opens the solid picker. The preset row
+// (Accent / Background / Current, plus None for images) replaces the generic
+// quick picks; dragging or typing a colour switches to a custom tint.
+function DecorationColorControl({
+  label,
+  triggerHex,
+  pickerValue,
+  presets,
+  onPickCustom,
+}: {
+  label: string;
+  triggerHex: string | null;
+  pickerValue: string;
+  presets: ColorPreset[];
+  onPickCustom: (hex: string) => void;
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type='button'
+          aria-label={label}
+          title={label}
+          className='inline-flex items-center gap-1.5 h-7 px-2 rounded-md border-2 border-foreground/30 bg-transparent hover:border-foreground/60'
+        >
+          <Palette className='w-3.5 h-3.5 text-foreground/30' aria-hidden />
+          <ColorSwatch hex={triggerHex} sizeClass='h-3.5 w-3.5' />
+          <ChevronDown className='w-3.5 h-3.5 text-foreground/30' aria-hidden />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align='end' className='w-auto'>
+        <SolidPicker
+          value={pickerValue}
+          onChange={onPickCustom}
+          presets={
+            <div>
+              <div className='mb-1.5 text-[11px] font-semibold text-muted-foreground'>
+                {label}
+              </div>
+              <div className='flex gap-3'>
+                {presets.map(preset => (
+                  <button
+                    type='button'
+                    key={preset.label}
+                    onClick={preset.onSelect}
+                    aria-pressed={preset.active}
+                    className='flex flex-col items-center gap-1'
+                  >
+                    <ColorSwatch
+                      hex={preset.hex}
+                      sizeClass='h-7 w-7'
+                      active={preset.active}
+                    />
+                    <span className='text-[10px] text-muted-foreground'>
+                      {preset.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          }
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function PatternPanel({
   patternId,
   opacity,
   tint,
+  color,
+  accentColor,
+  bgColorHex,
   onPick,
   onOpacity,
   onTint,
+  onColor,
 }: {
   patternId: string | null;
   opacity: number;
   tint: BgPatternTint | undefined;
+  color: string | null | undefined;
+  accentColor: string;
+  bgColorHex: string;
   onPick: (id: string | null) => void;
   onOpacity: (value: number) => void;
   onTint: (value: BgPatternTint) => void;
+  onColor: (hex: string) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const activeTint = tint ?? 'accent';
+  const customDiffers =
+    !!color && color !== accentColor && color !== bgColorHex;
+  const triggerHex =
+    activeTint === 'custom' && color
+      ? color
+      : activeTint === 'background'
+        ? bgColorHex
+        : accentColor;
+  const presets: ColorPreset[] = [
+    {
+      label: 'Accent',
+      hex: accentColor,
+      active: activeTint === 'accent',
+      onSelect: () => onTint('accent'),
+    },
+    {
+      label: 'Background',
+      hex: bgColorHex,
+      active: activeTint === 'background',
+      onSelect: () => onTint('background'),
+    },
+    ...(customDiffers
+      ? [
+          {
+            label: 'Current',
+            hex: color as string,
+            active: activeTint === 'custom',
+            onSelect: () => onColor(color as string),
+          },
+        ]
+      : []),
+  ];
   return (
     <>
       <OpacitySlider
@@ -352,16 +471,19 @@ function PatternPanel({
         onChange={onOpacity}
         max={DECORATION_MAX_OPACITY}
       />
-      <TintRow
-        label='Pattern colour'
-        options={PATTERN_TINTS}
-        value={tint ?? 'accent'}
-        onChange={onTint}
-      />
       <div>
-        <SectionHeader showDivider={false}>
-          {tTheme('labelPattern')}
-        </SectionHeader>
+        <div className='flex items-center justify-between'>
+          <SectionHeader showDivider={false}>
+            {tTheme('labelPattern')}
+          </SectionHeader>
+          <DecorationColorControl
+            label='Pattern colour'
+            triggerHex={triggerHex}
+            pickerValue={triggerHex}
+            presets={presets}
+            onPickCustom={onColor}
+          />
+        </div>
         <AssetGrid
           items={PATTERNS}
           activeId={patternId}
@@ -378,21 +500,71 @@ function ImagePanel({
   imageMode,
   opacity,
   tint,
+  color,
+  accentColor,
+  bgColorHex,
   onPick,
   onMode,
   onOpacity,
   onTint,
+  onColor,
 }: {
   imageUrl: string | null;
   imageMode: BgImageMode;
   opacity: number;
   tint: BgImageTint | undefined;
+  color: string | null | undefined;
+  accentColor: string;
+  bgColorHex: string;
   onPick: (key: string | null) => void;
   onMode: (mode: BgImageMode) => void;
   onOpacity: (value: number) => void;
   onTint: (value: BgImageTint) => void;
+  onColor: (hex: string) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const activeTint = tint ?? 'background';
+  const customDiffers =
+    !!color && color !== accentColor && color !== bgColorHex;
+  const triggerHex =
+    activeTint === 'none'
+      ? null
+      : activeTint === 'custom' && color
+        ? color
+        : activeTint === 'background'
+          ? bgColorHex
+          : accentColor;
+  const pickerValue = triggerHex ?? color ?? accentColor;
+  const presets: ColorPreset[] = [
+    {
+      label: 'None',
+      hex: null,
+      active: activeTint === 'none',
+      onSelect: () => onTint('none'),
+    },
+    {
+      label: 'Accent',
+      hex: accentColor,
+      active: activeTint === 'accent',
+      onSelect: () => onTint('accent'),
+    },
+    {
+      label: 'Background',
+      hex: bgColorHex,
+      active: activeTint === 'background',
+      onSelect: () => onTint('background'),
+    },
+    ...(customDiffers
+      ? [
+          {
+            label: 'Current',
+            hex: color as string,
+            active: activeTint === 'custom',
+            onSelect: () => onColor(color as string),
+          },
+        ]
+      : []),
+  ];
   return (
     <>
       <ThemeChipRow label={tTheme('labelImageMode')}>
@@ -416,21 +588,24 @@ function ImagePanel({
           );
         })}
       </ThemeChipRow>
-      <TintRow
-        label='Image colour'
-        options={IMAGE_TINTS}
-        value={tint ?? 'background'}
-        onChange={onTint}
-      />
       <OpacitySlider
         value={opacity}
         onChange={onOpacity}
         max={DECORATION_MAX_OPACITY}
       />
       <div>
-        <SectionHeader showDivider={false}>
-          {tTheme('labelImage')}
-        </SectionHeader>
+        <div className='flex items-center justify-between'>
+          <SectionHeader showDivider={false}>
+            {tTheme('labelImage')}
+          </SectionHeader>
+          <DecorationColorControl
+            label='Image colour'
+            triggerHex={triggerHex}
+            pickerValue={pickerValue}
+            presets={presets}
+            onPickCustom={onColor}
+          />
+        </div>
         <AssetGrid
           items={IMAGES}
           activeId={imageUrl}

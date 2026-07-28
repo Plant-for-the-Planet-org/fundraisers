@@ -319,7 +319,13 @@ export function ThemeSettings() {
               onOpacity={opacity => patchBg({ opacity })}
               onAnimation={animation => patchBg({ animation })}
               onImageTint={image_tint => patchBg({ image_tint })}
+              onImageColor={image_color =>
+                patchBg({ image_color, image_tint: 'custom' })
+              }
               onPatternTint={pattern_tint => patchBg({ pattern_tint })}
+              onPatternColor={pattern_color =>
+                patchBg({ pattern_color, pattern_tint: 'custom' })
+              }
               allowLogo={allowLogo}
             />
           </TabsContent>
