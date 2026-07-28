@@ -1,6 +1,7 @@
 'use client';
 
 import type {
+  AccentColor,
   AnimationType,
   BgDecoration,
   BgImageMode,
@@ -10,6 +11,7 @@ import type {
 } from '@/lib/theme/types';
 
 import { useTranslations } from 'next-intl';
+import { getAccentColor } from '@/lib/theme/accent-utils';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { BackgroundBaseSelector } from './background-base-selector';
@@ -24,7 +26,12 @@ import {
   PATTERN_TINTS,
   PATTERNS,
 } from './constants';
-import { AssetGrid, OpacitySlider, ThemeChipRow } from './primitives';
+import {
+  AccentDotRow,
+  AssetGrid,
+  OpacitySlider,
+  ThemeChipRow,
+} from './primitives';
 
 // Pattern/image opacity can go to full. Mode is a deliberate toggle (not derived
 // from the wash), so a strong decoration no longer risks flipping the effective
@@ -33,7 +40,10 @@ const DECORATION_MAX_OPACITY = 1;
 
 type Props = {
   bg: BgFormValue;
-  accentColor: string;
+  accent: string;
+  colorOptions: AccentColor[];
+  bgColorHex: string;
+  onAccent: (accent: AccentColor) => void;
   onSelectNone: () => void;
   onSolidColor: (hex: string) => void;
   onGradientChange: (next: CustomGradient) => void;
@@ -52,7 +62,10 @@ type Props = {
 
 export function BackgroundTab({
   bg,
-  accentColor,
+  accent,
+  colorOptions,
+  bgColorHex,
+  onAccent,
   onSelectNone,
   onSolidColor,
   onGradientChange,
@@ -68,6 +81,8 @@ export function BackgroundTab({
   onPatternTint,
   allowLogo,
 }: Props) {
+  // Resolved hex of the accent, used only to seed the custom-gradient default.
+  const accentColor = getAccentColor(accent);
   return (
     <div className='flex flex-col gap-4'>
       <BackgroundBaseSelector
@@ -77,6 +92,12 @@ export function BackgroundTab({
         onSolidColor={onSolidColor}
         onGradientChange={onGradientChange}
         onGradient={onGradient}
+      />
+      <AccentDotRow
+        value={accent}
+        colorOptions={colorOptions}
+        onChange={onAccent}
+        extraSwatch={{ hex: bgColorHex, label: 'Background colour' }}
       />
       <DecorationRow
         value={bg.decoration}
