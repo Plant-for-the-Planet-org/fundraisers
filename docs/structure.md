@@ -21,6 +21,10 @@ fundraiser/
 │   │       │       └── not-found.tsx
 │   │       ├── dashboard/
 │   │       │   └── page.tsx
+│   │       ├── donate/               # Project page — /donate?projectSlug=<slug>
+│   │       │   ├── page.tsx
+│   │       │   ├── error.tsx
+│   │       │   └── not-found.tsx
 │   │       └── fundraisers/
 │   │           └── create/
 │   │               └── page.tsx
@@ -32,6 +36,7 @@ fundraiser/
 │   │   ├── footer/                 # Footer component and sub-components
 │   │   ├── explore/                # Explore feature components
 │   │   ├── dashboard/              # Dashboard feature components
+│   │   ├── projects/               # Project page components
 │   │   └── fundraisers/            # Create fundraiser flow components
 │   │
 │   ├── lib/
