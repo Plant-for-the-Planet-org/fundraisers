@@ -14,7 +14,7 @@ interface ProjectAboutProps {
  * Renders nothing if the description is empty.
  */
 export function ProjectAbout({ description }: ProjectAboutProps) {
-  const t = useTranslations('Projects.about');
+  const t = useTranslations('Project.about');
   const text = description?.trim();
 
   if (!text) {

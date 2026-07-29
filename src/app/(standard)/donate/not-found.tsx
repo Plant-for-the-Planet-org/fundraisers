@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
 export default async function ProjectNotFound() {
-  const t = await getTranslations('Projects.notFound');
+  const t = await getTranslations('Project.notFound');
 
   return (
     <div className='flex items-center justify-center py-24'>

@@ -36,7 +36,7 @@ fundraiser/
 │   │   ├── footer/                 # Footer component and sub-components
 │   │   ├── explore/                # Explore feature components
 │   │   ├── dashboard/              # Dashboard feature components
-│   │   ├── projects/               # Project page components
+│   │   ├── project/                # Project page components
 │   │   └── fundraisers/            # Create fundraiser flow components
 │   │
 │   ├── lib/

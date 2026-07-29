@@ -18,7 +18,7 @@ export function ProjectUnitCost({
   unit,
   currency,
 }: ProjectUnitCostProps) {
-  const t = useTranslations('Projects.hero');
+  const t = useTranslations('Project.hero');
   const locale = useLocale();
 
   return (

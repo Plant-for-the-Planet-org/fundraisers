@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
  * shifting.
  */
 export function ProjectSkeleton() {
-  const t = useTranslations('Projects');
+  const t = useTranslations('Project');
 
   return (
     <div

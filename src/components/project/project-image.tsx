@@ -14,7 +14,7 @@ interface ProjectImageProps {
  * frame, rounding, and the fallback icon match the fundraiser page.
  */
 export function ProjectImage({ image, name }: ProjectImageProps) {
-  const t = useTranslations('Projects.hero');
+  const t = useTranslations('Project.hero');
 
   return (
     <ImageComponentBase

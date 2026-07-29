@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { ProjectLoader } from '@/components/projects/project-loader';
-import { ProjectSkeleton } from '@/components/projects/project-skeleton';
+import { ProjectLoader } from '@/components/project/project-loader';
+import { ProjectSkeleton } from '@/components/project/project-skeleton';
 
 interface ProjectPageProps {
   searchParams: Promise<{ projectSlug?: string }>;

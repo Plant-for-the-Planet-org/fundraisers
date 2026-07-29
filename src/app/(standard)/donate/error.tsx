@@ -12,7 +12,7 @@ export default function ProjectError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = useTranslations('Projects.error');
+  const t = useTranslations('Project.error');
 
   useEffect(() => {
     console.error(error);

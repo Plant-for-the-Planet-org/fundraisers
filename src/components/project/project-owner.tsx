@@ -13,7 +13,7 @@ interface ProjectOwnerProps {
  * Organization running the project, shown as an avatar plus name.
  */
 export function ProjectOwner({ ownerName, ownerAvatar }: ProjectOwnerProps) {
-  const t = useTranslations('Projects.hero');
+  const t = useTranslations('Project.hero');
   const avatarUrl = getImageUrl('profile', 'thumb', ownerAvatar);
 
   return (

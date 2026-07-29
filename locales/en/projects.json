@@ -1,5 +1,5 @@
 {
-  "Projects": {
+  "Project": {
     "loadingAria": "Loading project",
     "hero": {
       "imageAlt": "Cover image for {name}",
