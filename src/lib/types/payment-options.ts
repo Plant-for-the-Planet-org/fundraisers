@@ -62,14 +62,16 @@ export interface PaymentOptions {
  * the single project page renders, so no second request is needed.
  *
  * Only the fields the page uses are typed here — the response also includes
- * `ownerAvatar`, `purpose`, `category`, `unitType`, `isGiftable`,
- * `taxDeductionCountries` and more.
+ * `purpose`, `category`, `unitType`, `isGiftable`, `taxDeductionCountries`
+ * and more.
  */
 export interface ProjectPaymentOptions extends PaymentOptions {
   /** Discriminates a project payload from a fundraiser one. */
   destination: 'project';
-  /** Project owner (the tree planting organization) shown as the project owner. */
+  /** Organization running the project, shown as the project owner. */
   ownerName: string;
+  /** CDN filename of the owner's logo, used for the avatar next to `ownerName`. */
+  ownerAvatar: string | null;
   /** Plain text, may contain line breaks. */
   description: string | null;
   /** CDN filename or absolute URL of the project's hero image. */
