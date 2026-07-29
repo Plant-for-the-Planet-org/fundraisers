@@ -3,6 +3,7 @@ import type { ProjectPaymentOptions } from '@/lib/types/payment-options';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
+import { ProjectAbout } from './project-about';
 import { ProjectHero } from './project-hero';
 import { ProjectImage } from './project-image';
 
@@ -23,7 +24,7 @@ export function ProjectView({ paymentOptions }: ProjectViewProps) {
       <MainPanel>
         <ProjectHero project={paymentOptions} />
         {/* Step 5: contribution */}
-        {/* Step 4: about */}
+        <ProjectAbout description={paymentOptions.description} />
       </MainPanel>
     </FundraiserLayout>
   );

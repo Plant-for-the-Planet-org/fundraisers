@@ -7,6 +7,9 @@
       "owner": "Von <owner>{name}</owner>",
       "unitCostLabel": "{unit, select, tree {Kosten pro Baum} m2 {Kosten pro m²} other {Kosten pro Einheit}}"
     },
+    "about": {
+      "title": "Über das Projekt"
+    },
     "notFound": {
       "title": "Projekt nicht gefunden",
       "description": "Das gesuchte Projekt existiert nicht oder wurde möglicherweise entfernt."
