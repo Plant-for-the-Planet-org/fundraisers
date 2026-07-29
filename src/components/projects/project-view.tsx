@@ -4,6 +4,7 @@ import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 import { ProjectAbout } from './project-about';
+import { ProjectContribution } from './project-contribution';
 import { ProjectHero } from './project-hero';
 import { ProjectImage } from './project-image';
 
@@ -23,7 +24,7 @@ export function ProjectView({ paymentOptions }: ProjectViewProps) {
       </SidebarPanel>
       <MainPanel>
         <ProjectHero project={paymentOptions} />
-        {/* Step 5: contribution */}
+        <ProjectContribution paymentOptions={paymentOptions} />
         <ProjectAbout description={paymentOptions.description} />
       </MainPanel>
     </FundraiserLayout>
