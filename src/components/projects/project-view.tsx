@@ -1,22 +1,23 @@
+import type { ProjectPaymentOptions } from '@/lib/types/payment-options';
+
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
 
-interface SingleProjectViewProps {
-  /** Project slug from the `projectSlug` query parameter. */
-  projectSlug: string;
+interface ProjectViewProps {
+  paymentOptions: ProjectPaymentOptions;
 }
 
 /**
- * Two-panel shell for the single project page. Reuses the same layout
- * primitives as `FundraiserView` so both pages stay visually aligned.
+ * Two-panel shell for the project page. Reuses the same layout primitives as
+ * `FundraiserView` so both pages stay visually aligned.
  *
- * `projectSlug` is not read yet — Step 2 uses it to load the project's payment
- * options and pass the data into the sections below.
+ * `paymentOptions` is not read yet — Steps 3 to 5 feed it into the sections
+ * below.
  */
-export function SingleProjectView({
-  projectSlug: _projectSlug,
-}: SingleProjectViewProps) {
+export function ProjectView({
+  paymentOptions: _paymentOptions,
+}: ProjectViewProps) {
   return (
     <FundraiserLayout>
       <SidebarPanel>

@@ -1,0 +1,14 @@
+{
+  "Projects": {
+    "loadingAria": "Projekt wird geladen",
+    "notFound": {
+      "title": "Projekt nicht gefunden",
+      "description": "Das gesuchte Projekt existiert nicht oder wurde möglicherweise entfernt."
+    },
+    "error": {
+      "title": "Etwas ist schief gelaufen",
+      "description": "Das Projekt konnte nicht geladen werden. Bitte versuche es erneut.",
+      "retry": "Erneut versuchen"
+    }
+  }
+}

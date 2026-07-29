@@ -55,3 +55,28 @@ export interface PaymentOptions {
     };
   };
 }
+
+/**
+ * `GET /paymentOptions/{projectSlug}` response. The endpoint serves both
+ * fundraisers and projects; for a project it also carries the project details
+ * the single project page renders, so no second request is needed.
+ *
+ * Only the fields the page uses are typed here — the response also includes
+ * `ownerAvatar`, `purpose`, `category`, `unitType`, `isGiftable`,
+ * `taxDeductionCountries` and more.
+ */
+export interface ProjectPaymentOptions extends PaymentOptions {
+  /** Discriminates a project payload from a fundraiser one. */
+  destination: 'project';
+  /** Project owner (the tree planting organization) shown as the project owner. */
+  ownerName: string;
+  /** Plain text, may contain line breaks. */
+  description: string | null;
+  /** CDN filename or absolute URL of the project's hero image. */
+  image: string | null;
+  isTopProject: boolean;
+  /** Cost of a single unit, in `currency`. */
+  unitCost: number;
+  /** The unit `unitCost` applies to, e.g. `"tree"` or `"m2"`. */
+  unit: string;
+}

@@ -8,6 +8,7 @@ const CORE_NAMESPACES = [
   'common',
   'explore',
   'fundraisers',
+  'projects',
   'bundles',
   'auth',
   'dashboard',

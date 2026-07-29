@@ -1,19 +1,19 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { SingleProjectView } from '@/components/projects/single-project-view';
+import { ProjectLoader } from '@/components/projects/project-loader';
+import { ProjectSkeleton } from '@/components/projects/project-skeleton';
 
-interface SingleProjectPageProps {
+interface ProjectPageProps {
   searchParams: Promise<{ projectSlug?: string }>;
 }
 
 /**
- * Single project page: `/donate?projectSlug=<slug>`.
+ * Project page: `/donate?projectSlug=<slug>`.
  *
  * Only `projectSlug` is read here. Other query parameters (`country`,
  * `tenant`, `token`, `callback_url`, `utm_campaign`, `s`) are out of scope.
  */
-export default async function SingleProjectPage({
-  searchParams,
-}: SingleProjectPageProps) {
+export default async function ProjectPage({ searchParams }: ProjectPageProps) {
   const { projectSlug } = await searchParams;
   const slug = projectSlug?.trim();
 
@@ -22,5 +22,9 @@ export default async function SingleProjectPage({
     notFound();
   }
 
-  return <SingleProjectView projectSlug={slug} />;
+  return (
+    <Suspense fallback={<ProjectSkeleton />}>
+      <ProjectLoader projectSlug={slug} />
+    </Suspense>
+  );
 }
