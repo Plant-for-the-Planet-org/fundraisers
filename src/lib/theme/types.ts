@@ -53,12 +53,19 @@ export const BG_IMAGE_MODES = ['cover', 'repeat'] as const;
 export type BgImageMode = (typeof BG_IMAGE_MODES)[number];
 
 // Colour overlay applied to an image decoration: none (background shows through
-// the image at its opacity), the background colour, or the accent colour.
-export const BG_IMAGE_TINTS = ['none', 'background', 'accent'] as const;
+// the image at its opacity), the background colour, the accent, or a custom hex
+// (stored in image_color).
+export const BG_IMAGE_TINTS = [
+  'none',
+  'background',
+  'accent',
+  'custom',
+] as const;
 export type BgImageTint = (typeof BG_IMAGE_TINTS)[number];
 
-// Colour a monochrome pattern stencil is painted with.
-export const BG_PATTERN_TINTS = ['accent', 'background'] as const;
+// Colour a monochrome pattern stencil is painted with: the accent, the
+// background colour, or a custom hex (stored in pattern_color).
+export const BG_PATTERN_TINTS = ['accent', 'background', 'custom'] as const;
 export type BgPatternTint = (typeof BG_PATTERN_TINTS)[number];
 
 export interface GradientStop {
@@ -79,6 +86,7 @@ export interface BgSettings {
   gradient: string; // preset/theme gradient as a Tailwind class ('' = none); set by the built-in themes and the preset picker
   background_color: string | null; // user-picked solid hex, null = none
   custom_gradient: CustomGradient | null; // user-built gradient, null = none
+  background_opacity?: number; // opacity of the solid/custom-gradient wash over the mode base (0.05–1, default 0.14)
   decoration: BgDecoration;
   pattern_id: string | null;
   image_url: string | null; // library key OR https URL
@@ -87,7 +95,9 @@ export interface BgSettings {
   opacity: number; // applies to pattern + image layers, 0.05–1
   animation: AnimationType; // overlay animation (snow, confetti, hearts, fireworks)
   image_tint?: BgImageTint; // colour overlay on an image decoration (default 'background')
+  image_color?: string | null; // custom hex used when image_tint is 'custom'
   pattern_tint?: BgPatternTint; // colour a pattern stencil is painted with (default 'accent')
+  pattern_color?: string | null; // custom hex used when pattern_tint is 'custom'
 }
 
 export interface Theme {
@@ -126,6 +136,7 @@ export interface FundraiserThemeSettings {
       angle?: number;
       stops?: Array<{ color?: string; position?: number }>;
     } | null;
+    background_opacity?: number;
     decoration?: string;
     pattern_id?: string | null;
     image_url?: string | null;
@@ -134,6 +145,8 @@ export interface FundraiserThemeSettings {
     opacity?: number;
     animation?: string;
     image_tint?: string;
+    image_color?: string | null;
     pattern_tint?: string;
+    pattern_color?: string | null;
   };
 }

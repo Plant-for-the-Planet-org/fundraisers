@@ -24,14 +24,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { BackgroundTab } from './background-tab';
 import {
-  ACCENT_BG,
   ANIMATION_OPTIONS,
   type BgFormValue,
   FEATURED_THEMES,
   FONT_OPTIONS,
   pickRandom,
 } from './constants';
-import { FontChipRow, ThemeChipRow } from './primitives';
+import { AccentDotRow, FontChipRow } from './primitives';
 import { ThemeBrowseGrid } from './theme-browse-grid';
 
 export function ThemeSettings() {
@@ -122,8 +121,17 @@ export function ThemeSettings() {
     field.value.mode === 'dark' ? 'switchToLight' : 'switchToDark'
   );
 
+  // The current background colour as a hex, offered as an extra accent dot in
+  // the Background tab so the accent can snap back to the background colour.
+  const bgColorHex =
+    field.value.bg.background_color ??
+    (field.value.bg.custom_gradient
+      ? getDominantStopColor(field.value.bg.custom_gradient.stops)
+      : null) ??
+    getAccentColor(activeTheme.accent);
+
   return (
-    <div className='theme-settings flex flex-col gap-3 rounded-xl bg-base/20 dark:bg-white/15 text-foreground p-4 shadow-none border-2 border-white dark:border-none'>
+    <div className='theme-settings flex flex-col gap-3 rounded-xl bg-base/10 dark:bg-white/10 text-foreground p-4'>
       <div className='theme-settings-toolbar flex items-center gap-2 pb-3 border-b border-border'>
         <div className='flex-1 min-w-0'>
           <SectionHeader showDivider={false}>
@@ -193,7 +201,13 @@ export function ThemeSettings() {
         <TabsContent value='background' className='flex flex-col gap-4'>
           <BackgroundTab
             bg={field.value.bg}
-            accentColor={getAccentColor(activeTheme.accent)}
+            accent={activeTheme.accent}
+            colorOptions={activeTheme.colorOptions}
+            bgColorHex={bgColorHex}
+            onAccent={accent => syncFormAndPreview({ accent }, { accent })}
+            onBackgroundOpacity={background_opacity =>
+              patchBg({ background_opacity })
+            }
             // One base wash at a time: each setter clears the other two.
             // Colour selection does not change light/dark mode; in the layered
             // model the colour is only a tint over the mode base, so mode is a
@@ -231,7 +245,10 @@ export function ThemeSettings() {
               const accent = getDominantStopColor(next.stops);
               syncFormAndPreview(
                 { bg: nextBg, ...(accent && { accent }) },
-                { bg: nextBg, ...(accent && { accent: accent as AccentColor }) }
+                {
+                  bg: nextBg,
+                  ...(accent && { accent: accent as AccentColor }),
+                }
               );
             }}
             onGradient={value => {
@@ -251,7 +268,13 @@ export function ThemeSettings() {
             onOpacity={opacity => patchBg({ opacity })}
             onAnimation={animation => patchBg({ animation })}
             onImageTint={image_tint => patchBg({ image_tint })}
+            onImageColor={image_color =>
+              patchBg({ image_color, image_tint: 'custom' })
+            }
             onPatternTint={pattern_tint => patchBg({ pattern_tint })}
+            onPatternColor={pattern_color =>
+              patchBg({ pattern_color, pattern_tint: 'custom' })
+            }
             allowLogo={allowLogo}
           />
         </TabsContent>
@@ -298,33 +321,11 @@ function CustomizePanels({
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
     <>
-      <ThemeChipRow
-        label={tTheme('labelAccentColor')}
-        aria-label={tTheme('labelAccentColor')}
-        role='radiogroup'
-      >
-        {activeTheme.colorOptions.map(accent => (
-          <button
-            type='button'
-            key={accent}
-            role='radio'
-            aria-checked={activeTheme.accent === accent}
-            onClick={() => onAccent(accent)}
-            className={cn(
-              'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
-              activeTheme.accent === accent
-                ? 'border-foreground shadow-md'
-                : 'border-border hover:border-foreground/40'
-            )}
-            title={tTheme('selectAccent', { accent })}
-            aria-label={tTheme('selectAccent', { accent })}
-          >
-            <div
-              className={cn('w-full h-full rounded-full', ACCENT_BG[accent])}
-            />
-          </button>
-        ))}
-      </ThemeChipRow>
+      <AccentDotRow
+        value={activeTheme.accent}
+        colorOptions={activeTheme.colorOptions}
+        onChange={onAccent}
+      />
 
       <FontChipRow
         label={tTheme('labelTitleFont')}

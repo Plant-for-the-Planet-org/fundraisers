@@ -45,12 +45,12 @@ The wrapper sets `--accent-color`, `--theme-bg-color` (the chosen background col
 
 ### Decoration tint (image + pattern)
 
-The background colour, not the accent, tints decorations. Two persisted, optional bg fields carry the choice (added the same way as `image_mode`/`animation`: TS type + `DEFAULT_BG` + validators + `buildBg` + the zod schema — the field must be in zod because `FundraiserFormValues` is `z.infer` and zod strips unknown keys):
+The background colour, not the accent, tints decorations. Persisted optional bg fields carry the choice (added the same way as `image_mode`/`animation`: TS type + `DEFAULT_BG` + validators + `buildBg` + the zod schema — the field must be in zod because `FundraiserFormValues` is `z.infer` and zod strips unknown keys):
 
-- `image_tint`: `none` (no overlay — the image shows at its opacity and the wash shows through), `background` (default), or `accent`.
-- `pattern_tint`: `accent` (default) or `background`.
+- `image_tint`: `none` (no overlay — the image shows at its opacity and the wash shows through), `background` (default), `accent`, or `custom` (a saved `image_color` hex).
+- `pattern_tint`: `accent` (default), `background`, or `custom` (a saved `pattern_color` hex).
 
-`ThemeShell` exposes `--theme-bg-color = solidColor ?? getDominantStopColor(cg.stops) ?? accentColor`. The fallback to the accent means a preset-gradient wash with no extractable hex renders as before until a solid/custom colour is picked. The editor shows these as chip rows ("Image colour" / "Pattern colour") under the image/pattern decoration — plain English labels, since they are exploratory controls for the design review.
+`ThemeShell` exposes `--theme-bg-color = solidColor ?? getDominantStopColor(cg.stops) ?? accentColor`. The fallback to the accent means a preset-gradient wash with no extractable hex renders as before until a solid/custom colour is picked. The editor uses one shared control (`DecorationColorControl`): a palette pill on the Pattern/Image header opens the solid picker (`SolidPicker`, extracted to its own file), whose preset row is Accent / Background / Current (plus None for images) in place of the generic quick picks — dragging or typing a colour switches to the `custom` tint. Labels come from the `en`/`de` translation files.
 
 ### Curated patterns (masked stencils) — `backgrounds.ts` + `AssetGrid`
 
@@ -62,7 +62,8 @@ The background colour, not the accent, tints decorations. Two persisted, optiona
 
 ### Editor legibility — `theme-settings/*`
 
-- The panel sits on its own base-colour scrim with a border, so token-based controls resolve against a stable surface instead of the live background.
+- The panel sits on a **quiet frosted box** (`bg-base/10 dark:bg-white/10`, rounded, padded, no border), chosen from a temporary original/quiet/none comparison (now removed). Background-colour swatches were shrunk (`h-9` → `h-8`) so the row stays on one line inside the box.
+- Accent selection is available in **both** the Theme tab and the Background tab (shared `AccentDotRow`); the Background tab adds a dot for the current background colour so the accent can snap back to it. It is one value (`settings.theme.accent`), two displays.
 - A reusable swatch-contrast helper (`getSwatchContrast` / `swatchSelectedStyle` in `color-utils.ts`) flips the swatch icon and halo by luminance.
 - The browse grid renders a real preview for every theme (gradient, solid, or decoration) instead of a blank cell.
 - The decoration opacity slider allows full opacity (`DECORATION_MAX_OPACITY = 1`). Mode is a deliberate toggle rather than derived from the wash, so a strong decoration no longer risks flipping the effective contrast.
@@ -70,7 +71,8 @@ The background colour, not the accent, tints decorations. Two persisted, optiona
 ### Defaults
 
 - New backgrounds default decoration opacity to **20%** (was 50%). Existing saved values are left alone.
-- `image_tint` defaults to `background`, `pattern_tint` to `accent`.
+- The background-colour wash opacity is user-adjustable (`background_opacity`, default **14%**) via a slider in the colour section, shown only for a user solid/custom gradient — presets keep their authored alpha. Existing fundraisers fall back to 14%.
+- `image_tint` defaults to `background`, `pattern_tint` to `accent`; `image_color`/`pattern_color` default to `null` (used only when the tint is `custom`).
 - The **Plant-for-the-Planet** preset overrides `image_tint` to `none`, so its botanical illustration shows in its own colours.
 
 ## Key files
@@ -122,8 +124,8 @@ Per project convention, no dev server. `npm run type-check`, `npm run lint`, and
 
 The tint controls are **exploratory** — they exist so the design team can compare looks. Once a direction is chosen, some of this changes:
 
-- **Keep the controls, or bake a default?** If the answer is a single fixed behaviour (e.g. "images always follow the background"), remove the chip rows and keep just the default value; the persisted fields can stay (harmless) or be dropped. If per-fundraiser choice stays, the controls remain.
-- **i18n.** The "Image colour" / "Pattern colour" labels and options are hardcoded English. Shipping as a real user setting needs `en`/`de` translation keys (Lingohub).
+- **Keep the controls, or bake a default?** If the answer is a single fixed behaviour (e.g. "images always follow the background"), remove the controls and keep just the default value; the persisted fields can stay (harmless) or be dropped. If per-fundraiser choice stays, the controls remain.
+- ~~i18n.~~ Resolved: the editor labels now use `en`/`de` translation keys (`labelBackgroundOpacity`, `labelPatternColor`, `labelImageColor`, `tintAccent`/`tintBackground`/`tintCurrent`, reusing `labelBackgroundColor` and `baseNone`). German values are provisional pending a Lingohub pass.
 - **Which options survive.** If images should never be accent-tinted, drop the `accent` option from `image_tint`. If patterns are always the accent, drop `pattern_tint` entirely.
 - **Default per theme.** `image_tint` defaults to `background` globally and `none` on the planet preset. Design may want other presets to override too (e.g. photo backgrounds set to `none`).
 - **`--theme-bg-color` fallback.** When the wash is a preset gradient class (no extractable hex) the tint falls back to the accent. If that is wrong for a chosen look, change the fallback (e.g. a neutral, or no overlay).
@@ -141,6 +143,6 @@ The cleaner long-term shape (option 2, **not done** — this whole POC may still
 - Staggered/offset logo tiling (original concept item 5).
 - A "surface" Tabs variant (built then reverted; needs its own pass).
 - Surface treatment for the other sidebar cards (ImageSelector, GoalSettings, DonorsPreview, Hosts).
-- Migrating the remaining legacy patterns and the presets to the base+tint model.
-- Per-theme background-tint-opacity control, a dedicated pattern/image tint colour, and a separate overlay-opacity slider.
+- Migrating the remaining legacy patterns and the presets to the base+tint model. (The background-opacity slider is scoped to the user solid/custom-gradient wash and hidden for presets, which keep their authored alpha until migrated.)
+- A separate decoration overlay-opacity slider, distinct from the layer opacity. (Background-colour wash opacity and custom pattern/image tint colours are now implemented, not deferred.)
 - Full-stack luminance-aware mode derivation.

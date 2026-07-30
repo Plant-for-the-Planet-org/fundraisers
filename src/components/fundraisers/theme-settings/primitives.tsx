@@ -1,12 +1,12 @@
 'use client';
 
-import type { FontId } from '@/lib/theme/types';
+import type { AccentColor, FontId } from '@/lib/theme/types';
 
 import { useTranslations } from 'next-intl';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
-import { FONT_OPTIONS } from './constants';
+import { ACCENT_BG, FONT_OPTIONS } from './constants';
 
 export function ThemeChipRow({
   label,
@@ -63,22 +63,101 @@ export function FontChipRow({
   );
 }
 
+function AccentDot({
+  active,
+  title,
+  onClick,
+  swatchClass,
+  swatchStyle,
+}: {
+  active: boolean;
+  title: string;
+  onClick: () => void;
+  swatchClass?: string;
+  swatchStyle?: React.CSSProperties;
+}) {
+  return (
+    <button
+      type='button'
+      role='radio'
+      aria-checked={active}
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className={cn(
+        'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+        active
+          ? 'border-foreground shadow-md'
+          : 'border-border hover:border-foreground/40'
+      )}
+    >
+      <div
+        className={cn('w-full h-full rounded-full', swatchClass)}
+        style={swatchStyle}
+      />
+    </button>
+  );
+}
+
+// Accent picker shared by the Theme and Background tabs. It writes one value
+// (`settings.theme.accent`), so both tabs stay in sync. The Background tab
+// passes `extraSwatch` to add a dot for the current background colour.
+export function AccentDotRow({
+  value,
+  colorOptions,
+  onChange,
+  extraSwatch,
+}: {
+  value: string;
+  colorOptions: AccentColor[];
+  onChange: (accent: AccentColor) => void;
+  extraSwatch?: { hex: string; label: string };
+}) {
+  const tTheme = useTranslations('Fundraisers.form.theme');
+  return (
+    <ThemeChipRow
+      label={tTheme('labelAccentColor')}
+      aria-label={tTheme('labelAccentColor')}
+      role='radiogroup'
+    >
+      {colorOptions.map(accent => (
+        <AccentDot
+          key={accent}
+          active={value === accent}
+          title={tTheme('selectAccent', { accent })}
+          onClick={() => onChange(accent)}
+          swatchClass={ACCENT_BG[accent]}
+        />
+      ))}
+      {extraSwatch && (
+        <AccentDot
+          active={value === extraSwatch.hex}
+          title={extraSwatch.label}
+          onClick={() => onChange(extraSwatch.hex as AccentColor)}
+          swatchStyle={{ backgroundColor: extraSwatch.hex }}
+        />
+      )}
+    </ThemeChipRow>
+  );
+}
+
 export function OpacitySlider({
   value,
   onChange,
   max = 1,
+  label,
 }: {
   value: number;
   onChange: (value: number) => void;
   max?: number;
+  label?: string;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const heading = label ?? tTheme('labelOpacity');
   return (
     <div>
       <div className='flex items-center justify-between'>
-        <SectionHeader showDivider={false}>
-          {tTheme('labelOpacity')}
-        </SectionHeader>
+        <SectionHeader showDivider={false}>{heading}</SectionHeader>
         <span className='text-xs tabular-nums text-muted-foreground'>
           {Math.round(value * 100)}%
         </span>
@@ -91,7 +170,7 @@ export function OpacitySlider({
         value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
         className='w-full accent-foreground mt-1'
-        aria-label={tTheme('labelOpacity')}
+        aria-label={heading}
       />
     </div>
   );
