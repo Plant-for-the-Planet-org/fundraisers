@@ -92,6 +92,7 @@ export function BackgroundTab({
   onPatternColor,
   allowLogo,
 }: Props) {
+  const tTheme = useTranslations('Fundraisers.form.theme');
   // Resolved hex of the accent, used only to seed the custom-gradient default.
   const accentColor = getAccentColor(accent);
   return (
@@ -110,14 +111,14 @@ export function BackgroundTab({
         <OpacitySlider
           value={bg.background_opacity ?? 0.14}
           onChange={onBackgroundOpacity}
-          label='Background opacity'
+          label={tTheme('labelBackgroundOpacity')}
         />
       )}
       <AccentDotRow
         value={accent}
         colorOptions={colorOptions}
         onChange={onAccent}
-        extraSwatch={{ hex: bgColorHex, label: 'Background colour' }}
+        extraSwatch={{ hex: bgColorHex, label: tTheme('labelBackgroundColor') }}
       />
       <DecorationRow
         value={bg.decoration}
@@ -442,13 +443,13 @@ function PatternPanel({
         : accentColor;
   const presets: ColorPreset[] = [
     {
-      label: 'Accent',
+      label: tTheme('tintAccent'),
       hex: accentColor,
       active: activeTint === 'accent',
       onSelect: () => onTint('accent'),
     },
     {
-      label: 'Background',
+      label: tTheme('tintBackground'),
       hex: bgColorHex,
       active: activeTint === 'background',
       onSelect: () => onTint('background'),
@@ -456,7 +457,7 @@ function PatternPanel({
     ...(customDiffers
       ? [
           {
-            label: 'Current',
+            label: tTheme('tintCurrent'),
             hex: color as string,
             active: activeTint === 'custom',
             onSelect: () => onColor(color as string),
@@ -477,7 +478,7 @@ function PatternPanel({
             {tTheme('labelPattern')}
           </SectionHeader>
           <DecorationColorControl
-            label='Pattern colour'
+            label={tTheme('labelPatternColor')}
             triggerHex={triggerHex}
             pickerValue={triggerHex}
             presets={presets}
@@ -537,19 +538,19 @@ function ImagePanel({
   const pickerValue = triggerHex ?? color ?? accentColor;
   const presets: ColorPreset[] = [
     {
-      label: 'None',
+      label: tTheme('baseNone'),
       hex: null,
       active: activeTint === 'none',
       onSelect: () => onTint('none'),
     },
     {
-      label: 'Accent',
+      label: tTheme('tintAccent'),
       hex: accentColor,
       active: activeTint === 'accent',
       onSelect: () => onTint('accent'),
     },
     {
-      label: 'Background',
+      label: tTheme('tintBackground'),
       hex: bgColorHex,
       active: activeTint === 'background',
       onSelect: () => onTint('background'),
@@ -557,7 +558,7 @@ function ImagePanel({
     ...(customDiffers
       ? [
           {
-            label: 'Current',
+            label: tTheme('tintCurrent'),
             hex: color as string,
             active: activeTint === 'custom',
             onSelect: () => onColor(color as string),
@@ -599,7 +600,7 @@ function ImagePanel({
             {tTheme('labelImage')}
           </SectionHeader>
           <DecorationColorControl
-            label='Image colour'
+            label={tTheme('labelImageColor')}
             triggerHex={triggerHex}
             pickerValue={pickerValue}
             presets={presets}
