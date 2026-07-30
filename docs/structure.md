@@ -21,10 +21,11 @@ fundraiser/
 │   │       │       └── not-found.tsx
 │   │       ├── dashboard/
 │   │       │   └── page.tsx
-│   │       ├── donate/               # Project page — /donate?projectSlug=<slug>
-│   │       │   ├── page.tsx
-│   │       │   ├── error.tsx
-│   │       │   └── not-found.tsx
+│   │       ├── projects/
+│   │       │   └── [slug]/           # Project page — /projects/<slug>
+│   │       │       ├── page.tsx
+│   │       │       ├── error.tsx
+│   │       │       └── not-found.tsx
 │   │       └── fundraisers/
 │   │           └── create/
 │   │               └── page.tsx
