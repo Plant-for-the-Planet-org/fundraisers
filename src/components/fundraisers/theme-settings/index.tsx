@@ -12,7 +12,6 @@ import { getAccentColor } from '@/lib/theme/accent-utils';
 import { getDominantStopColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { THEMES } from '@/lib/theme/themes';
-import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/stores/auth-store';
 import { useThemeStore } from '@/stores/theme-store';
 import {
@@ -158,13 +157,16 @@ export function ThemeSettings() {
         </IconButton>
         <Popover open={themePickerOpen} onOpenChange={setThemePickerOpen}>
           <PopoverTrigger
-            className='inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md border border-border text-xs font-semibold bg-transparent hover:bg-muted/20 data-[state=open]:bg-muted/40'
+            className='group inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md border border-border text-xs font-semibold bg-transparent hover:bg-muted/20 data-[state=open]:bg-muted/40'
             aria-label={tTheme('chooseTheme')}
           >
             {tTheme('chooseTheme')}
-            <ChevronDown className='w-3.5 h-3.5 opacity-60' />
+            <ChevronDown className='w-3.5 h-3.5 opacity-60 transition-transform group-data-[state=open]:rotate-180' />
           </PopoverTrigger>
-          <PopoverContent align='end' className='w-80'>
+          <PopoverContent
+            align='end'
+            className='w-80 max-h-[60vh] overflow-auto'
+          >
             <ThemeBrowseGrid
               activeId={field.value.base_id}
               onPick={applyTheme}
