@@ -65,7 +65,7 @@ The background colour, not the accent, tints decorations. Persisted optional bg 
 - The panel sits on a **quiet frosted box** (`bg-base/10 dark:bg-white/10`, rounded, padded, no border), chosen from a temporary original/quiet/none comparison (now removed). Background-colour swatches were shrunk (`h-9` → `h-8`) so the row stays on one line inside the box.
 - Accent selection is available in **both** the Theme tab and the Background tab (shared `AccentDotRow`); the Background tab adds a dot for the current background colour so the accent can snap back to it. It is one value (`settings.theme.accent`), two displays.
 - A reusable swatch-contrast helper (`getSwatchContrast` / `swatchSelectedStyle` in `color-utils.ts`) flips the swatch icon and halo by luminance.
-- The browse grid renders a real preview for every theme (gradient, solid, or decoration) instead of a blank cell.
+- Theme selection is a **"Change theme" dropdown** (Popover in the toolbar) rather than an inline browse/customize toggle; the Theme tab now always shows the customize panels (accent + fonts). The grid renders a real preview for every theme (gradient, solid, or decoration) instead of a blank cell, caps its height with an internal scroll, and highlights the active theme.
 - The decoration opacity slider allows full opacity (`DECORATION_MAX_OPACITY = 1`). Mode is a deliberate toggle rather than derived from the wash, so a strong decoration no longer risks flipping the effective contrast.
 
 ### Defaults
