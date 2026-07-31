@@ -21,7 +21,7 @@
       },
       "custom": {
         "label": "Custom",
-        "description": "Build your own bundle — pick projects one by one."
+        "description": "Build your own bouquet — pick projects one by one."
       }
     },
     "card": {
@@ -31,16 +31,16 @@
       "containsNonDonatable": "Contains a project that is currently not accepting donations"
     },
     "aria": {
-      "openBundle": "See inside the {name} bundle",
-      "selectBundle": "Select the {name} bundle",
-      "selectedBundle": "{name} bundle is currently selected",
+      "openBundle": "See inside the {name} bouquet",
+      "selectBundle": "Select the {name} bouquet",
+      "selectedBundle": "{name} bouquet is currently selected",
       "openProject": "Learn more about {name} (opens in a new tab)",
-      "closeModal": "Close bundle preview"
+      "closeModal": "Close bouquet preview"
     },
     "modal": {
       "projectsInside": "{count, plural, one {# project inside} other {# projects inside}}",
       "projectsRemoved": "{count, plural, one {# project was removed because it is no longer accepting donations.} other {# projects were removed because they are no longer accepting donations.}}",
-      "useBundle": "Use this bundle",
+      "useBundle": "Use this bouquet",
       "tag": {
         "rage": "RAGE",
         "wonder": "WONDER",
@@ -49,8 +49,8 @@
       }
     },
     "custom": {
-      "description": "Build your own bundle — pick projects one by one.",
-      "searchPlaceholder": "Search and pick projects to create your bundle",
+      "description": "Build your own bouquet — pick projects one by one.",
+      "searchPlaceholder": "Search and pick projects to create your bouquet",
       "maxReached": "6 projects selected. Remove one to add another.",
       "showingCount": "Top {shown, number} of {total, number} · Search to find more · ✨ top projects",
       "noResults": "No projects match \"{query}\"",
@@ -60,7 +60,7 @@
       "errorTitle": "Failed to load projects",
       "errorMessage": "Unable to load projects. Please try again.",
       "retry": "Try Again",
-      "yourBundle": "Your Custom Bundle",
+      "yourBundle": "Your Custom Bouquet",
       "projectCount": "{count, plural, =0 {No projects} one {# project} other {# projects}}",
       "emptyState": "Pick at least one project to support.",
       "allAddedTitle": "All projects added",
@@ -105,7 +105,7 @@
         "tagline": "Somewhere in this river basin, a tree is waiting for you."
       },
       "underdog-bundle": {
-        "label": "The Underdog Bundle",
+        "label": "The Underdog Bouquet",
         "tagline": "Small projects. Quiet work. Enormous hearts."
       },
       "undo-your-amazon-order": {
