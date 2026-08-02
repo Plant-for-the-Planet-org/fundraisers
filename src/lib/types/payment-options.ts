@@ -60,13 +60,9 @@ export interface PaymentOptions {
 }
 
 /**
- * `GET /paymentOptions/{projectSlug}` response. The endpoint serves both
- * fundraisers and projects; for a project it also carries the project details
- * the single project page renders, so no second request is needed.
- *
- * Only the fields the page uses are typed here — the response also includes
- * `purpose`, `category`, `unitType`, `isGiftable`, `taxDeductionCountries`
- * and more.
+ * `GET /paymentOptions/{projectSlug}` response.
+ * The endpoint serves both fundraisers and projects; for a project, it also
+ * includes the details required by the project page.
  */
 export interface ProjectPaymentOptions extends PaymentOptions {
   /** Discriminates a project payload from a fundraiser one. */
@@ -79,9 +75,19 @@ export interface ProjectPaymentOptions extends PaymentOptions {
   description: string | null;
   /** CDN filename or absolute URL of the project's hero image. */
   image: string | null;
+
+  isApproved: boolean;
   isTopProject: boolean;
-  /** Cost of a single unit, in `currency`. */
+  isGiftable: boolean;
+
+  purpose: string;
+  category: string;
+  classification: string;
+
   unitCost: number;
-  /** The unit `unitCost` applies to. */
   unit: ProjectUnit;
+  unitType: ProjectUnit;
+
+  taxDeductionCountries: string[];
+  supportProject: unknown;
 }
