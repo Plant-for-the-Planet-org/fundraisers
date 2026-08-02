@@ -1,3 +1,6 @@
+/** Unit a project's `unitCost` is denominated in. */
+export type ProjectUnit = 'tree' | 'm2';
+
 export interface PaymentOptionItem {
   id: string;
   caption: string | null;
@@ -79,6 +82,6 @@ export interface ProjectPaymentOptions extends PaymentOptions {
   isTopProject: boolean;
   /** Cost of a single unit, in `currency`. */
   unitCost: number;
-  /** The unit `unitCost` applies to, e.g. `"tree"` or `"m2"`. */
-  unit: string;
+  /** The unit `unitCost` applies to. */
+  unit: ProjectUnit;
 }

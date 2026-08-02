@@ -1,17 +1,19 @@
+import type { ProjectUnit } from '@/lib/types/payment-options';
+
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { SectionHeader } from '@/components/fundraisers/typography';
 
 interface ProjectUnitCostProps {
   /** Cost of one unit in major currency units, e.g. `1.5`. */
   unitCost: number;
-  /** Unit the cost applies to, e.g. `"tree"` or `"m2"`. */
-  unit: string;
+  /** Unit the cost applies to. */
+  unit: ProjectUnit;
   currency: string;
 }
 
 /**
- * Cost of a single unit, labelled by the project's unit ("Cost Per Tree").
+ * Cost of a single unit as one inline metadata item ("€1.50 per tree"), sized
+ * to sit next to the project owner in the hero row.
  */
 export function ProjectUnitCost({
   unitCost,
@@ -22,11 +24,19 @@ export function ProjectUnitCost({
   const locale = useLocale();
 
   return (
-    <div className='flex flex-col gap-3'>
-      <SectionHeader>{t('unitCostLabel', { unit })}</SectionHeader>
-      <p className='text-foreground'>
-        {formatCurrencyFromDecimal(unitCost, currency, locale)}
-      </p>
-    </div>
+    <p className='flex flex-row items-center gap-2 text-base leading-tight'>
+      <span>
+        {t.rich('unitCost', {
+          unit,
+          cost: formatCurrencyFromDecimal(unitCost, currency, locale),
+          amount: chunks => (
+            <strong className='font-semibold text-foreground'>{chunks}</strong>
+          ),
+          label: chunks => (
+            <span className='text-muted-foreground'>{chunks}</span>
+          ),
+        })}
+      </span>
+    </p>
   );
 }

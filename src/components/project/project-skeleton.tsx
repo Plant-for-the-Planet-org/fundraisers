@@ -24,21 +24,21 @@ export function ProjectSkeleton() {
           <Skeleton className='w-full h-80 rounded-2xl' />
         </SidebarPanel>
         <MainPanel>
-          {/* Hero: badge, title, owner, cost per unit */}
+          {/* Hero: badge, title, metadata row (owner + cost per unit) */}
           <div className='flex flex-col gap-4'>
             <Skeleton className='h-6 w-52 rounded-full' />
             <div className='flex flex-col gap-3'>
               <Skeleton className='h-10 w-3/4' />
-              <div className='flex flex-row items-center gap-2.5'>
-                <Skeleton className='h-6 w-6 rounded-full' />
-                <Skeleton className='h-5 w-56' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-              <div className='flex flex-col gap-3'>
-                <Skeleton className='h-4 w-28' />
-                <Skeleton className='h-px w-full' />
-                <Skeleton className='h-5 w-16' />
+              <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
+                <div className='flex flex-row items-center gap-2.5'>
+                  <Skeleton className='h-6 w-6 rounded-full' />
+                  <Skeleton className='h-5 w-56' />
+                </div>
+                <div className='hidden h-4 w-px shrink-0 bg-section-divider sm:block' />
+                <div className='flex flex-row items-center gap-2'>
+                  <Skeleton className='h-4 w-4 rounded-sm' />
+                  <Skeleton className='h-5 w-28' />
+                </div>
               </div>
             </div>
           </div>

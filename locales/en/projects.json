@@ -5,7 +5,7 @@
       "imageAlt": "Cover image for {name}",
       "topProject": "Featured in <highlight>Top Projects</highlight>",
       "owner": "By <owner>{name}</owner>",
-      "unitCostLabel": "{unit, select, tree {Cost Per Tree} m2 {Cost Per m²} other {Cost Per Unit}}"
+      "unitCost": "{unit, select, tree {<amount>{cost}</amount> <label>per tree</label>} m2 {<amount>{cost}</amount> <label>per m²</label>} other {<amount>{cost}</amount> <label>per unit</label>}}"
     },
     "about": {
       "title": "About Project"
