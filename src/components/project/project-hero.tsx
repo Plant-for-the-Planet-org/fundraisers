@@ -19,8 +19,8 @@ interface ProjectHeroProps {
 }
 
 /**
- * Top of the main panel: Top Project badge, title, and a single metadata row
- * pairing the owner with the cost per unit.
+ * Top of the main panel: Top Project badge, title, and the owner with the
+ * cost per unit stacked directly beneath it.
  */
 export function ProjectHero({ project }: ProjectHeroProps) {
   const {
@@ -38,16 +38,13 @@ export function ProjectHero({ project }: ProjectHeroProps) {
       {isTopProject && <TopProjectBadge />}
       <div className='flex flex-col gap-3'>
         <TitleDisplay value={name} />
-        <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
+        <div className='flex flex-col gap-2'>
           <ProjectOwner ownerName={ownerName} ownerAvatar={ownerAvatar} />
-          <span
-            aria-hidden='true'
-            className='hidden h-4 w-px shrink-0 bg-neutral-400/60 sm:block'
-          />
           <ProjectUnitCost
             unitCost={unitCost}
             unit={unit}
             currency={currency}
+            className='pl-8.5'
           />
         </div>
       </div>

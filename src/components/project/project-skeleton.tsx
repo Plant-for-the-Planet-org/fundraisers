@@ -29,13 +29,12 @@ export function ProjectSkeleton() {
             <Skeleton className='h-6 w-52 rounded-full' />
             <div className='flex flex-col gap-3'>
               <Skeleton className='h-10 w-3/4' />
-              <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
-                <div className='flex flex-row items-center gap-2.5'>
-                  <Skeleton className='h-6 w-6 rounded-full' />
+              <div className='flex flex-col gap-2'>
+                <div className='flex min-w-0 flex-row items-start gap-2.5'>
+                  <Skeleton className='h-6 w-6 shrink-0 rounded-full' />
                   <Skeleton className='h-5 w-56' />
                 </div>
-                <div className='hidden h-4 w-px shrink-0 bg-section-divider sm:block' />
-                <div className='flex flex-row items-center gap-2'>
+                <div className='flex flex-row items-center gap-2 pl-8.5'>
                   <Skeleton className='h-4 w-4 rounded-sm' />
                   <Skeleton className='h-5 w-28' />
                 </div>

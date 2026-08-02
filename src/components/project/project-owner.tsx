@@ -17,13 +17,13 @@ export function ProjectOwner({ ownerName, ownerAvatar }: ProjectOwnerProps) {
   const avatarUrl = getImageUrl('profile', 'thumb', ownerAvatar);
 
   return (
-    <div className='flex flex-row items-center gap-2.5'>
-      <Avatar className='h-6 w-6'>
+    <div className='flex min-w-0 flex-row items-start gap-2.5'>
+      <Avatar className='h-6 w-6 shrink-0 translate-y-px'>
         {/* The name sits right next to it, so the image itself is decorative. */}
         {avatarUrl && <AvatarImage src={avatarUrl} alt='' loading='lazy' />}
         <FallbackAvatar seed={ownerName} />
       </Avatar>
-      <p className='wrap-anywhere text-base leading-tight text-foreground'>
+      <p className='min-w-0 wrap-anywhere text-base leading-tight text-foreground'>
         {t.rich('owner', {
           name: ownerName,
           owner: chunks => <strong className='font-semibold'>{chunks}</strong>,

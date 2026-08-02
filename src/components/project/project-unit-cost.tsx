@@ -1,6 +1,7 @@
 import type { ProjectUnit } from '@/lib/types/payment-options';
 
 import { useLocale, useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils/cn';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 
 interface ProjectUnitCostProps {
@@ -9,22 +10,30 @@ interface ProjectUnitCostProps {
   /** Unit the cost applies to. */
   unit: ProjectUnit;
   currency: string;
+  className?: string;
 }
 
 /**
- * Cost of a single unit as one inline metadata item ("€1.50 per tree"), sized
- * to sit next to the project owner in the hero row.
+ * Cost of a single unit as one metadata item ("€1.50 per tree"), placed
+ * beneath the project owner in the hero. Always one line — it reads as a
+ * single figure, wrapping would break that.
  */
 export function ProjectUnitCost({
   unitCost,
   unit,
   currency,
+  className,
 }: ProjectUnitCostProps) {
   const t = useTranslations('Project.hero');
   const locale = useLocale();
 
   return (
-    <p className='flex flex-row items-center gap-2 text-base leading-tight'>
+    <p
+      className={cn(
+        'flex shrink-0 flex-row items-center gap-2 whitespace-nowrap text-base leading-tight',
+        className
+      )}
+    >
       <span>
         {t.rich('unitCost', {
           unit,
