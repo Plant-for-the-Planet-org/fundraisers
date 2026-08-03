@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { Button } from '@/components/ui/button';
 
 export default async function ProjectNotFound() {
   const t = await getTranslations('Project.notFound');
@@ -9,6 +11,9 @@ export default async function ProjectNotFound() {
         <h1 className='text-6xl font-bold mb-4'>404</h1>
         <h2 className='text-2xl font-semibold mb-2'>{t('title')}</h2>
         <p className='text-foreground/60 mb-8'>{t('description')}</p>
+        <Button asChild>
+          <Link href='/explore'>{t('exploreCta')}</Link>
+        </Button>
       </div>
     </div>
   );
