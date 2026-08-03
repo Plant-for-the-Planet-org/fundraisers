@@ -1,5 +1,6 @@
 import type { ProjectPaymentOptions } from '@/lib/types/payment-options';
 
+import { SecurityNotice } from '@/components/fundraisers/security-notice';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
@@ -21,6 +22,12 @@ export function ProjectView({ paymentOptions }: ProjectViewProps) {
     <FundraiserLayout>
       <SidebarPanel>
         <ProjectImage image={paymentOptions.image} name={paymentOptions.name} />
+        {/* TODO: Replace placeholder values with real organization and tax-deductibility data from the endpoint. */}
+        <SecurityNotice
+          organizationName='Plant-for-the-Planet'
+          countryCode='DE'
+          isTaxDeductible={true}
+        />
       </SidebarPanel>
       <MainPanel>
         <ProjectHero project={paymentOptions} />
