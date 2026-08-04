@@ -22,13 +22,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { AdvancedPanel } from './advanced-panel';
-import {
-  ANIMATION_OPTIONS,
-  type BgFormValue,
-  FEATURED_THEMES,
-  FONT_OPTIONS,
-  pickRandom,
-} from './constants';
+import { type BgFormValue, FEATURED_THEMES, pickRandom } from './constants';
 import { QuickPanel } from './quick-panel';
 import { ThemeBrowseGrid } from './theme-browse-grid';
 
@@ -101,14 +95,9 @@ export function ThemeSettings() {
   };
 
   const randomize = () => {
-    const theme = pickRandom(FEATURED_THEMES);
-    applyTheme({
-      ...theme,
-      accent: pickRandom(theme.colorOptions),
-      titleFont: pickRandom(FONT_OPTIONS).id,
-      bodyFont: pickRandom(FONT_OPTIONS).id,
-      bg: { ...theme.bg, animation: pickRandom(ANIMATION_OPTIONS).id },
-    });
+    // Apply a random featured preset exactly as authored (its own accent, fonts
+    // and animation), so the toolbar theme name always matches the look.
+    applyTheme(pickRandom(FEATURED_THEMES));
   };
 
   const toggleMode = () => {
