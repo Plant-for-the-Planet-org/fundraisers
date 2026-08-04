@@ -7,11 +7,7 @@ import { useState } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
 import { Palette } from 'lucide-react';
-import {
-  getSwatchContrast,
-  normalizeHex,
-  swatchSelectedStyle,
-} from '@/lib/theme/color-utils';
+import { getSwatchContrast, normalizeHex } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
   Popover,
@@ -34,8 +30,10 @@ function gradientCss(g: CustomGradient): string {
 }
 
 const circleBase =
-  'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-colors';
-const inactiveBorder = 'border-foreground/30 hover:border-foreground/60';
+  'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-all hover:scale-110';
+// Selection borders + hover mirror the accent dots (primitives.tsx AccentDot).
+const inactiveBorder = 'border-border hover:border-foreground/40';
+const activeBorder = 'border-foreground shadow-md';
 
 export function BackgroundBaseSelector({
   bg,
@@ -71,8 +69,11 @@ export function BackgroundBaseSelector({
           title={tTheme('baseNone')}
           aria-label={tTheme('baseNone')}
           aria-pressed={isNone}
-          className={cn(circleBase, 'bg-background', !isNone && inactiveBorder)}
-          style={isNone ? swatchSelectedStyle : undefined}
+          className={cn(
+            circleBase,
+            'bg-background',
+            isNone ? activeBorder : inactiveBorder
+          )}
         >
           <svg
             viewBox='0 0 24 24'
@@ -102,13 +103,14 @@ export function BackgroundBaseSelector({
               title={g.label}
               aria-label={g.label}
               aria-pressed={active}
-              className={cn(circleBase, g.value, !active && inactiveBorder)}
-              style={{
-                // Preview the gradient over the mode base (white in light, black
-                // in dark), matching how it renders on the page.
-                backgroundColor: 'rgb(var(--base-rgb))',
-                ...(active ? swatchSelectedStyle : {}),
-              }}
+              className={cn(
+                circleBase,
+                g.value,
+                active ? activeBorder : inactiveBorder
+              )}
+              // Preview the gradient over the mode base (white in light, black
+              // in dark), matching how it renders on the page.
+              style={{ backgroundColor: 'rgb(var(--base-rgb))' }}
             />
           );
         })}
@@ -171,11 +173,9 @@ function CustomColorButton({
           className={cn(
             circleBase,
             'flex items-center justify-center',
-            !active && inactiveBorder
+            active ? activeBorder : inactiveBorder
           )}
-          style={
-            active ? { ...previewStyle, ...swatchSelectedStyle } : previewStyle
-          }
+          style={previewStyle}
         >
           <Palette className={cn('h-4 w-4', iconClass)} aria-hidden />
         </button>

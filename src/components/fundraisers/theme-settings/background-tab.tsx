@@ -324,7 +324,7 @@ function ColorSwatch({
     <span
       className={cn(
         'inline-block rounded-full border-2',
-        active ? 'border-foreground' : 'border-foreground/30',
+        active ? 'border-foreground shadow-md' : 'border-border',
         sizeClass
       )}
       style={hex ? { backgroundColor: hex } : undefined}
