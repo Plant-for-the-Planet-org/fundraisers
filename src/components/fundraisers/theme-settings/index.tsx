@@ -97,7 +97,10 @@ export function ThemeSettings() {
   const randomize = () => {
     // Apply a random featured preset exactly as authored (its own accent, fonts
     // and animation), so the toolbar theme name always matches the look.
-    applyTheme(pickRandom(FEATURED_THEMES));
+    // Exclude the current theme so Shuffle always visibly changes something
+    // (fall back to the full list if it is the only featured theme).
+    const options = FEATURED_THEMES.filter(t => t.id !== field.value.base_id);
+    applyTheme(pickRandom(options.length ? options : FEATURED_THEMES));
   };
 
   const toggleMode = () => {
