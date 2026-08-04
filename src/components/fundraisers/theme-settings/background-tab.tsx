@@ -364,11 +364,14 @@ function DecorationColorControl({
           type='button'
           aria-label={label}
           title={label}
-          className='inline-flex items-center gap-1.5 h-7 px-2 rounded-md border-2 border-foreground/30 bg-transparent hover:border-foreground/60'
+          className='group inline-flex items-center gap-1.5 h-7 px-2 rounded-md border border-border bg-transparent hover:bg-muted/20 data-[state=open]:bg-muted/40'
         >
-          <Palette className='w-3.5 h-3.5 text-foreground/30' aria-hidden />
+          <Palette className='w-3.5 h-3.5 opacity-60' aria-hidden />
           <ColorSwatch hex={triggerHex} sizeClass='h-3.5 w-3.5' />
-          <ChevronDown className='w-3.5 h-3.5 text-foreground/30' aria-hidden />
+          <ChevronDown
+            className='w-3.5 h-3.5 opacity-60 transition-transform group-data-[state=open]:rotate-180'
+            aria-hidden
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent align='end' className='w-auto'>
