@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
-import { BackgroundTab } from './background-tab';
+import { AdvancedPanel } from './advanced-panel';
 import {
   ANIMATION_OPTIONS,
   type BgFormValue,
@@ -29,7 +29,7 @@ import {
   FONT_OPTIONS,
   pickRandom,
 } from './constants';
-import { AccentDotRow, FontChipRow } from './primitives';
+import { QuickPanel } from './quick-panel';
 import { ThemeBrowseGrid } from './theme-browse-grid';
 
 export function ThemeSettings() {
@@ -49,7 +49,7 @@ export function ThemeSettings() {
   const hasExistingLogo = !!field.value.bg.logo_id;
   const allowLogo = isPlanetStaff || hasExistingLogo;
 
-  const [tab, setTab] = useState<'theme' | 'background'>('theme');
+  const [tab, setTab] = useState<'quick' | 'advanced'>('quick');
   const [themePickerOpen, setThemePickerOpen] = useState(false);
 
   const baseFromForm = THEMES[field.value.base_id] ?? getThemeForPath(pathname);
@@ -177,38 +177,31 @@ export function ThemeSettings() {
 
       <Tabs
         value={tab}
-        onValueChange={value => setTab(value as 'theme' | 'background')}
+        onValueChange={value => setTab(value as 'quick' | 'advanced')}
         className='gap-3'
       >
         <TabsList className='w-full grid grid-cols-2'>
-          <TabsTrigger value='theme'>{tTheme('tabTheme')}</TabsTrigger>
-          <TabsTrigger value='background'>
-            {tTheme('tabBackground')}
-          </TabsTrigger>
+          <TabsTrigger value='quick'>{tTheme('tabQuick')}</TabsTrigger>
+          <TabsTrigger value='advanced'>{tTheme('tabAdvanced')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value='theme' className='flex flex-col gap-4'>
-          <CustomizePanels
-            activeTheme={activeTheme}
+        <TabsContent value='quick' className='flex flex-col gap-4'>
+          <QuickPanel
+            bg={field.value.bg}
+            accent={activeTheme.accent}
+            colorOptions={activeTheme.colorOptions}
+            bgColorHex={bgColorHex}
+            titleFont={activeTheme.titleFont}
+            bodyFont={activeTheme.bodyFont}
             onAccent={accent => syncFormAndPreview({ accent }, { accent })}
+            onBackgroundOpacity={background_opacity =>
+              patchBg({ background_opacity })
+            }
             onTitleFont={titleFont =>
               syncFormAndPreview({ title_font: titleFont }, { titleFont })
             }
             onBodyFont={bodyFont =>
               syncFormAndPreview({ body_font: bodyFont }, { bodyFont })
-            }
-          />
-        </TabsContent>
-
-        <TabsContent value='background' className='flex flex-col gap-4'>
-          <BackgroundTab
-            bg={field.value.bg}
-            accent={activeTheme.accent}
-            colorOptions={activeTheme.colorOptions}
-            bgColorHex={bgColorHex}
-            onAccent={accent => syncFormAndPreview({ accent }, { accent })}
-            onBackgroundOpacity={background_opacity =>
-              patchBg({ background_opacity })
             }
             // One base wash at a time: each setter clears the other two.
             // Colour selection does not change light/dark mode; in the layered
@@ -262,6 +255,14 @@ export function ThemeSettings() {
               };
               syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
             }}
+          />
+        </TabsContent>
+
+        <TabsContent value='advanced' className='flex flex-col gap-4'>
+          <AdvancedPanel
+            bg={field.value.bg}
+            accent={activeTheme.accent}
+            bgColorHex={bgColorHex}
             onDecoration={decoration => patchBg({ decoration })}
             onPatternId={pattern_id => patchBg({ pattern_id })}
             onImageUrl={image_url => patchBg({ image_url })}
@@ -306,39 +307,5 @@ function IconButton({
     >
       {children}
     </button>
-  );
-}
-
-function CustomizePanels({
-  activeTheme,
-  onAccent,
-  onTitleFont,
-  onBodyFont,
-}: {
-  activeTheme: Theme;
-  onAccent: (accent: AccentColor) => void;
-  onTitleFont: (font: FontId) => void;
-  onBodyFont: (font: FontId) => void;
-}) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
-  return (
-    <>
-      <AccentDotRow
-        value={activeTheme.accent}
-        colorOptions={activeTheme.colorOptions}
-        onChange={onAccent}
-      />
-
-      <FontChipRow
-        label={tTheme('labelTitleFont')}
-        value={activeTheme.titleFont}
-        onChange={onTitleFont}
-      />
-      <FontChipRow
-        label={tTheme('labelBodyFont')}
-        value={activeTheme.bodyFont}
-        onChange={onBodyFont}
-      />
-    </>
   );
 }

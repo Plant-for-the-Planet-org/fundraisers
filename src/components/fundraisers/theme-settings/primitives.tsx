@@ -1,12 +1,22 @@
 'use client';
 
-import type { AccentColor, FontId } from '@/lib/theme/types';
+import type {
+  AccentColor,
+  AnimationType,
+  BgDecoration,
+  FontId,
+} from '@/lib/theme/types';
 
 import { useTranslations } from 'next-intl';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
-import { ACCENT_BG, FONT_OPTIONS } from './constants';
+import {
+  ACCENT_BG,
+  ANIMATION_OPTIONS,
+  DECORATIONS,
+  FONT_OPTIONS,
+} from './constants';
 
 export function ThemeChipRow({
   label,
@@ -254,5 +264,107 @@ export function AssetGrid({
         );
       })}
     </div>
+  );
+}
+
+// Swatch used in the decoration colour controls. A null hex renders an empty
+// circle for the "None" option.
+export function ColorSwatch({
+  hex,
+  sizeClass,
+  active,
+}: {
+  hex: string | null;
+  sizeClass: string;
+  active?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-block rounded-full border-2',
+        active ? 'border-foreground shadow-md' : 'border-border',
+        sizeClass
+      )}
+      style={hex ? { backgroundColor: hex } : undefined}
+      aria-hidden
+    />
+  );
+}
+
+export function DecorationRow({
+  value,
+  onChange,
+  allowLogo,
+}: {
+  value: BgDecoration;
+  onChange: (value: BgDecoration) => void;
+  allowLogo: boolean;
+}) {
+  const tTheme = useTranslations('Fundraisers.form.theme');
+  const options = allowLogo
+    ? DECORATIONS
+    : DECORATIONS.filter(d => d.id !== 'logo');
+  return (
+    <div>
+      <SectionHeader showDivider={false}>
+        {tTheme('labelDecoration')}
+      </SectionHeader>
+      <div className='grid grid-cols-4 gap-1.5 mt-2'>
+        {options.map(({ id, icon: Icon }) => {
+          const active = value === id;
+          return (
+            <button
+              type='button'
+              key={id}
+              onClick={() => onChange(id)}
+              className={cn(
+                'inline-flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-md border text-[11px] font-semibold',
+                active
+                  ? 'border-foreground bg-muted/30'
+                  : 'border-border hover:border-foreground/40'
+              )}
+              aria-pressed={active}
+            >
+              <Icon className='w-3.5 h-3.5' />
+              <span>{tTheme(`decoration_${id}`)}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export function AnimationRow({
+  value,
+  onChange,
+}: {
+  value: AnimationType;
+  onChange: (value: AnimationType) => void;
+}) {
+  const tTheme = useTranslations('Fundraisers.form.theme');
+  return (
+    <ThemeChipRow label={tTheme('labelAnimation')}>
+      {ANIMATION_OPTIONS.map(({ id, icon: AnimIcon }) => {
+        const active = value === id;
+        return (
+          <button
+            type='button'
+            key={id}
+            onClick={() => onChange(id)}
+            aria-pressed={active}
+            className={cn(
+              'inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-semibold',
+              active
+                ? 'border-foreground'
+                : 'border-border hover:border-foreground/40'
+            )}
+          >
+            <AnimIcon className='w-3.5 h-3.5' />
+            <span>{tTheme(`animation_${id}`)}</span>
+          </button>
+        );
+      })}
+    </ThemeChipRow>
   );
 }
