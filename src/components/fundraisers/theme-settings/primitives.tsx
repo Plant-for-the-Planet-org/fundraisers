@@ -109,9 +109,8 @@ function AccentDot({
   );
 }
 
-// Accent picker shared by the Theme and Background tabs. It writes one value
-// (`settings.theme.accent`), so both tabs stay in sync. The Background tab
-// passes `extraSwatch` to add a dot for the current background colour.
+// Accent picker used by the Quick tab. QuickPanel passes `extraSwatch` to add
+// a dot for the current background color, letting the accent snap to it.
 export function AccentDotRow({
   value,
   colorOptions,
