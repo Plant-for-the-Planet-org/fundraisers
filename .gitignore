@@ -51,4 +51,13 @@ locales/**/*.d.json.ts
 .claude/settings.local.json
 .claude/worktrees/
 
+# Local-only agent skills and scratch output.
+# `.claude/launch.json` and `.claude/settings.json` stay tracked on purpose —
+# they are the shared dev-server preset and team settings.
+.claude/skills/
+.agents/
+skills-lock.json
+.full-review/
+.full-review-archive/
+
 certificates
