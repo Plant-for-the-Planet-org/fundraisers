@@ -96,8 +96,11 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
     resume: false,
     delete: true,
   },
+  // Completed fundraisers stay editable so hosts can still refine copy (e.g.
+  // description, thank-you message) after the campaign ends. Cancelled is a
+  // deliberate termination and remains locked.
   completed: {
-    edit: false,
+    edit: true,
     copyLink: true,
     pause: false,
     resume: false,

@@ -1,11 +1,11 @@
 'use client';
 
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 import type { FundraiserFormValues } from './fundraiser-form-schema';
 
 import { useController, useFormContext } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
 import {
-  type AllowedCountry,
   getAllowedCountries,
   getCurrencyForCountry,
 } from '@/lib/utils/country-currency';

@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import type { ThemeMode } from './types';
 
 /**
@@ -93,13 +92,3 @@ export function getSwatchContrast(
           : 'text-muted-foreground',
   };
 }
-
-/**
- * Selected-swatch marker: a high-contrast foreground border, then a mode-base
- * gap and an accent-coloured ring. The foreground border keeps selection legible
- * on any swatch colour; the accent stays present as the outer ring.
- */
-export const swatchSelectedStyle: CSSProperties = {
-  borderColor: 'hsl(var(--foreground))',
-  boxShadow: '0 0 0 2px rgb(var(--base-rgb)), 0 0 0 4px var(--accent-color)',
-};

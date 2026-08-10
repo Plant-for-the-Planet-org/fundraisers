@@ -10,6 +10,7 @@ export class PaymentError extends Error {
     public type: ErrorType,
     public code: string,
     public status?: number,
+    // Diagnostic only - no consumer reads this today. `originalError` may be an Error instance, so don't JSON.stringify `details` or pass it across the server/client boundary without first extracting fields (message/status/kind); an Error serializes to {}.
     public details?: Record<string, unknown>
   ) {
     super(message);
@@ -22,11 +23,13 @@ function toPaymentError(err: unknown): PaymentError {
 
   if (err instanceof PlatformAPIError) {
     if (err.kind === 'timeout') {
-      return new PaymentError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+      return new PaymentError(err.message, 'api', 'TIMEOUT_ERROR', 0, {
+        originalError: err,
+      });
     }
     if (err.kind === 'network') {
       return new PaymentError(err.message, 'api', 'NETWORK_ERROR', 0, {
-        originalError: err.message,
+        originalError: err,
       });
     }
     const { type, code } = classifyPlatformError(err.status);
@@ -40,7 +43,7 @@ function toPaymentError(err: unknown): PaymentError {
     'api',
     'NETWORK_ERROR',
     0,
-    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+    { originalError: err }
   );
 }
 
@@ -65,10 +68,10 @@ export class PaymentService {
         }
       );
 
-      // TODO: Confirm with backend that the following fields from the prior implementation
-      // are not returned by this API: success (boolean), paymentId, status 'completed',
-      // redirectUrl, message (on success), type (top-level). In real responses, type was
-      // nested inside data.response — the top-level field was never populated.
+      // PaymentResponse models all three shapes below (confirmed against backend)
+      //   success:                   { id, status: 'success', response? }
+      //   needs client action (3DS): { id, status: 'action_required', response }
+      //   failed:                    { id, status: 'failed', errorCode, message }
       return data;
     } catch (err) {
       throw toPaymentError(err);

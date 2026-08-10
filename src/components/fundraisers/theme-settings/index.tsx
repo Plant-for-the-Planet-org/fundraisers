@@ -130,7 +130,7 @@ export function ThemeSettings() {
     getAccentColor(activeTheme.accent);
 
   return (
-    <div className='theme-settings flex flex-col gap-3 rounded-xl bg-base/10 dark:bg-white/10 text-foreground p-4'>
+    <div className='theme-settings flex flex-col gap-3 text-foreground'>
       <div className='theme-settings-toolbar flex items-center gap-2 pb-3 border-b border-border'>
         <div className='flex-1 min-w-0'>
           <SectionHeader showDivider={false}>
