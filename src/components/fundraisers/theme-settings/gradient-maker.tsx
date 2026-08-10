@@ -74,6 +74,12 @@ export function GradientMaker({
   const stops = gradient.stops;
   const activeStop = stops[active] ?? stops[0];
 
+  // Latest gradient for the drag handlers, so the pointer effect can bind once per drag instead of re-subscribing on every position/angle change.
+  const gradientRef = useRef(gradient);
+  useEffect(() => {
+    gradientRef.current = gradient;
+  }, [gradient]);
+
   const patchStop = (index: number, patch: Partial<GradientStop>) =>
     onChange({
       ...gradient,
@@ -127,12 +133,19 @@ export function GradientMaker({
   useEffect(() => {
     if (dragStop === null && !dragAngle) return;
     const move = (e: PointerEvent) => {
+      const g = gradientRef.current;
       if (dragStop !== null) {
-        patchStop(dragStop, { position: posFromClientX(e.clientX) });
+        const position = posFromClientX(e.clientX);
+        onChange({
+          ...g,
+          stops: g.stops.map((s, i) =>
+            i === dragStop ? { ...s, position } : s
+          ),
+        });
       } else if (dragAngle && wheelRef.current) {
         const r = wheelRef.current.getBoundingClientRect();
         onChange({
-          ...gradient,
+          ...g,
           angle: angleFromPointer(
             r.left + r.width / 2,
             r.top + r.height / 2,
@@ -152,7 +165,7 @@ export function GradientMaker({
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
     };
-  }, [dragStop, dragAngle, gradient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dragStop, dragAngle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const angleRad = ((gradient.angle - 90) * Math.PI) / 180;
 
