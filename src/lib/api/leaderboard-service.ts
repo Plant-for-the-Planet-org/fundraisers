@@ -5,6 +5,7 @@ import type {
 
 import { cache } from 'react';
 import { platformFetch } from './platform-fetch';
+import { withRetry } from './utils';
 
 export async function getLeaderboard(
   idOrSlug: string,
@@ -21,21 +22,7 @@ export const getLeaderboardWithRetry = cache(
     idOrSlug: string,
     maxRetries: number = 2
   ): Promise<LeaderboardApiResponse> => {
-    let lastError: Error;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await getLeaderboard(idOrSlug);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-        if (attempt === maxRetries) break;
-        await new Promise(resolve =>
-          setTimeout(resolve, Math.pow(2, attempt) * 1000)
-        );
-      }
-    }
-
-    throw lastError!;
+    return withRetry(() => getLeaderboard(idOrSlug), maxRetries);
   }
 );
 

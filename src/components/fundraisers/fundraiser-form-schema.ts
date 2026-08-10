@@ -5,7 +5,7 @@ import type {
   LeaderboardModuleSettings,
 } from '@/lib/types/fundraiser';
 import type { SelectedImage } from '@/lib/types/image-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 
 import { z } from 'zod';
 import { BUNDLE_CONFIG } from '@/lib/constants/bundle-config';
@@ -19,15 +19,15 @@ import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
-import {
-  ALLOWED_COUNTRIES,
-  getCurrencyForCountry,
-  SUPPORTED_CURRENCIES,
-} from '@/lib/utils/country-currency';
+import { getCurrencyForCountry } from '@/lib/utils/country-currency';
 import { isAllowedImageUrl } from '@/lib/utils/image-url';
 import { getImageUrl } from '@/lib/utils/images';
 import { getDefaultCauseId } from '@/lib/utils/project-allocation';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
+import {
+  ALLOWED_COUNTRIES,
+  SUPPORTED_CURRENCIES,
+} from '@/lib/workspaces/countries';
 import { THANK_YOU_NOTE_LIMITS } from '@/components/thank-you-note/constants';
 import { parseStageFormValue, stageModeSchema } from '@/modules/stage';
 
@@ -213,10 +213,6 @@ export const fundraiserFormSchema = z.object({
 
 export type FundraiserFormValues = z.infer<typeof fundraiserFormSchema>;
 
-function isAllowedCountry(code: string): code is AllowedCountry {
-  return (ALLOWED_COUNTRIES as readonly string[]).includes(code);
-}
-
 export function buildDefaultCreateValues(
   pathname: string
 ): FundraiserFormValues {
@@ -306,10 +302,9 @@ export function fundraiserToFormValues(
   // so the editor and rendered page stay in sync.
   const builtTheme = buildTheme(fundraiser.settings?.theme);
 
-  const rawCountry = fundraiser.workspace?.country?.toUpperCase() ?? 'DE';
-  const country: AllowedCountry = isAllowedCountry(rawCountry)
-    ? rawCountry
-    : 'ROW';
+  // `workspace.country` is already normalized to an `AllowedCountry` at the API
+  // boundary (see `normalizeFundraiser`); a missing workspace defaults to DE.
+  const country: AllowedCountry = fundraiser.workspace?.country ?? 'DE';
 
   const storedBundleSlug = fundraiser.settings?.modules?.bundle?.slug;
   const bundleSlug = (BUNDLE_SLUGS as readonly string[]).includes(

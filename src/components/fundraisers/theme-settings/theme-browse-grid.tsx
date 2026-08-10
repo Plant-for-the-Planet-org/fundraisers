@@ -3,7 +3,7 @@
 import type { Theme } from '@/lib/theme/types';
 
 import { resolveBgAsset } from '@/lib/theme/backgrounds';
-import { isValidHexColor } from '@/lib/theme/color-utils';
+import { customGradientCss, isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { ACCENT_BG, FEATURED_THEMES } from './constants';
 
@@ -21,13 +21,7 @@ function swatchVisual(bg: Theme['bg']): {
     cg.stops.length >= 2 &&
     cg.stops.every(s => isValidHexColor(s.color))
   ) {
-    return {
-      style: {
-        backgroundImage: `linear-gradient(${cg.angle}deg, ${cg.stops
-          .map(s => `${s.color} ${s.position}%`)
-          .join(', ')})`,
-      },
-    };
+    return { style: { backgroundImage: customGradientCss(cg) } };
   }
   if (isValidHexColor(bg.background_color)) {
     return { style: { backgroundColor: bg.background_color } };

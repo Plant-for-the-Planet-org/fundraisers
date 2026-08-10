@@ -1,15 +1,7 @@
-import type { DefaultCauseIdByCountry } from '@/lib/types/project-selection';
-
 export const MIN_DEFAULT_CAUSE_PERCENT = 20;
 
-export const DEFAULT_NON_EARMARKED_CAUSE_ID = 'proj_3VU0xgw7jJLDVDkMTpc5FC2w';
-
-export const DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY: Readonly<DefaultCauseIdByCountry> =
-  {
-    DE: DEFAULT_NON_EARMARKED_CAUSE_ID,
-    ES: 'proj_zNQk6R8H1C2fCKwrHEUYRHnz',
-    CH: 'proj_YeAk6Y7E3Es2LgHzgQ0aqw8l',
-  };
+// Per-workspace default cause ids now live in the workspace registry
+// (`src/lib/workspaces/registry.ts`); read them via `getDefaultCauseId`.
 
 export const DEFAULT_NON_EARMARKED_CAUSE_FALLBACK = {
   name: 'Education for Climate Justice',

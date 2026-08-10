@@ -9,6 +9,7 @@ export class PaypalOrderError extends Error {
     public type: ErrorType,
     public code: string,
     public status?: number,
+    // Diagnostic only - no consumer reads this today. `originalError` may be an Error instance, so don't JSON.stringify `details` or pass it across the server/client boundary without first extracting fields (message/status/kind); an Error serializes to {}.
     public details?: Record<string, unknown>
   ) {
     super(message);
@@ -21,11 +22,13 @@ function toPaypalOrderError(err: unknown): PaypalOrderError {
 
   if (err instanceof PlatformAPIError) {
     if (err.kind === 'timeout') {
-      return new PaypalOrderError(err.message, 'api', 'TIMEOUT_ERROR', 0, {});
+      return new PaypalOrderError(err.message, 'api', 'TIMEOUT_ERROR', 0, {
+        originalError: err,
+      });
     }
     if (err.kind === 'network') {
       return new PaypalOrderError(err.message, 'api', 'NETWORK_ERROR', 0, {
-        originalError: err.message,
+        originalError: err,
       });
     }
     const { type, code } = classifyPlatformError(err.status);
@@ -39,7 +42,7 @@ function toPaypalOrderError(err: unknown): PaypalOrderError {
     'api',
     'NETWORK_ERROR',
     0,
-    { originalError: err instanceof Error ? err.message : 'Unknown error' }
+    { originalError: err }
   );
 }
 

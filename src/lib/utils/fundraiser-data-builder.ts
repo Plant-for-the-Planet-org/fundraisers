@@ -6,6 +6,7 @@ import type {
 } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
 
 export type UpdateDirtyFields = Partial<
@@ -101,6 +102,26 @@ function getDateOffsetString(days: number): string {
   return date.toISOString().split('T')[0]!;
 }
 
+// The gradient editor keeps stops in insertion order, but CSS linear-gradient
+// clamps a stop whose position dips below the previous one. Persist them sorted
+// so the saved fundraiser renders the same gradient the editor previewed.
+function themeWithSortedGradient(
+  theme: FundraiserFormValues['settings']['theme']
+): FundraiserFormValues['settings']['theme'] {
+  const cg = theme.bg?.custom_gradient;
+  if (!cg?.stops) return theme;
+  return {
+    ...theme,
+    bg: {
+      ...theme.bg,
+      custom_gradient: {
+        ...cg,
+        stops: [...cg.stops].sort((a, b) => a.position - b.position),
+      },
+    },
+  };
+}
+
 export function buildUpdateFundraiserRequest(
   values: FundraiserFormValues,
   dirtyFields: UpdateDirtyFields,
@@ -132,7 +153,7 @@ export function buildUpdateFundraiserRequest(
     // Where that's possible, merge the form value onto the stored one instead of replacing it, or those backend-set keys are dropped on save (see `stage`).
     // Nullable slots (null means "removed") must guard the merge: spreading null is a no-op that would resurrect the slot as `{}`.
     request.settings = {
-      theme: values.settings.theme,
+      theme: themeWithSortedGradient(values.settings.theme),
       modules: {
         // Spread server modules first to preserve non-form keys
         // (contribution, projects_supported, custom_fields).
@@ -167,14 +188,14 @@ export function buildCreateFundraiserRequest(
   return {
     title: values.title,
     description: values.description,
-    country: values.country === 'ROW' ? 'DE' : values.country, // ROW maps to DE (default workspace country) for the API
+    country: getWorkspaceProfile(values.country).apiCountry, // ROW is served by the DE workspace for the API
     currency: values.currency,
     goalAmount: values.goalAmount,
     visibility: values.visibility,
     status: values.status,
     projectAllocations: values.projectAllocations,
     settings: {
-      theme: values.settings.theme,
+      theme: themeWithSortedGradient(values.settings.theme),
       modules: {
         ...DEFAULT_MODULES,
         leaderboard: values.settings.modules.leaderboard,

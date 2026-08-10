@@ -7,7 +7,7 @@ import type {
   BundleWorkspace,
 } from '@/lib/types/bundle';
 import type { GetProject } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useCallback, useEffect, useRef, useState } from 'react';

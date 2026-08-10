@@ -1,4 +1,4 @@
-import type { ThemeMode } from './types';
+import type { CustomGradient, ThemeMode } from './types';
 
 /**
  * Strict 6-digit hex guard (e.g. `#1a2b3c`). Used by the form schema, buildBg,
@@ -25,6 +25,20 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
     g: parseInt(hex.slice(3, 5), 16),
     b: parseInt(hex.slice(5, 7), 16),
   };
+}
+
+/**
+ * CSS for a custom gradient, with stops sorted by position. CSS `linear-gradient`
+ * clamps a stop whose position is below the previous one, so the stops must be
+ * monotonic — the editor keeps them in insertion order, so sort here at emit
+ * time. Shared by ThemeShell, the base-selector preview, and the browse grid.
+ */
+export function customGradientCss(gradient: CustomGradient): string {
+  const stops = [...gradient.stops]
+    .sort((a, b) => a.position - b.position)
+    .map(s => `${s.color} ${s.position}%`)
+    .join(', ');
+  return `linear-gradient(${gradient.angle}deg, ${stops})`;
 }
 
 /** WCAG relative luminance, 0 (black) to 1 (white). */
