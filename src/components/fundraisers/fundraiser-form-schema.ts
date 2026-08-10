@@ -145,6 +145,7 @@ export const fundraiserFormSchema = z.object({
               .min(2),
           })
           .nullable(),
+        background_opacity: z.number().min(0.05).max(1).optional(),
         decoration: z.enum(['none', 'pattern', 'image', 'logo']),
         pattern_id: z.string().nullable(),
         // External URLs must use https and be from an allowed host (same list
@@ -165,6 +166,24 @@ export const fundraiserFormSchema = z.object({
         logo_id: z.string().nullable(),
         opacity: z.number().min(0.05).max(1),
         animation: z.enum(['none', 'snow', 'confetti', 'hearts', 'fireworks']),
+        image_tint: z
+          .enum(['none', 'background', 'accent', 'custom'])
+          .optional(),
+        image_color: z
+          .string()
+          .nullable()
+          .refine(value => value === null || isValidHexColor(value), {
+            message: 'invalidColor',
+          })
+          .optional(),
+        pattern_tint: z.enum(['accent', 'background', 'custom']).optional(),
+        pattern_color: z
+          .string()
+          .nullable()
+          .refine(value => value === null || isValidHexColor(value), {
+            message: 'invalidColor',
+          })
+          .optional(),
       }),
     }),
     modules: z.object({

@@ -9,6 +9,16 @@ export function isValidHexColor(value: unknown): value is string {
   return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
 }
 
+/**
+ * Normalises a picker input to a lowercase `#rrggbb`, or null if it is not a
+ * complete 6-digit hex (accepts values with or without the leading `#`). Colour
+ * pickers commit only complete values so a 3-digit value never snaps mid-type.
+ */
+export function normalizeHex(input: string): string | null {
+  const hex = (input.startsWith('#') ? input : `#${input}`).toLowerCase();
+  return isValidHexColor(hex) ? hex : null;
+}
+
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
   return {
     r: parseInt(hex.slice(1, 3), 16),
@@ -46,4 +56,39 @@ export function getReadableModeForStops(colors: string[]): ThemeMode {
   const avg =
     colors.reduce((sum, c) => sum + getRelativeLuminance(c), 0) / colors.length;
   return luminanceToMode(avg);
+}
+
+/** The gradient stop colour nearest position 50 — the visually dominant one. */
+export function getDominantStopColor(
+  stops: { color: string; position: number }[]
+): string | null {
+  if (stops.length === 0) return null;
+  return stops.reduce((best, s) =>
+    Math.abs(s.position - 50) < Math.abs(best.position - 50) ? s : best
+  ).color;
+}
+
+/**
+ * Foreground/icon class that stays legible on top of a solid or gradient swatch.
+ * `solid` takes priority; otherwise the gradient `stops` are averaged. Returns
+ * `text-muted-foreground` (and `mode: null`) when there is no colour to read on.
+ */
+export function getSwatchContrast(
+  solid: string | null,
+  stops?: string[] | null
+): { iconClass: string; mode: ThemeMode | null } {
+  const mode = solid
+    ? getReadableMode(solid)
+    : stops && stops.length > 0
+      ? getReadableModeForStops(stops)
+      : null;
+  return {
+    mode,
+    iconClass:
+      mode === 'dark'
+        ? 'text-white'
+        : mode === 'light'
+          ? 'text-zinc-900'
+          : 'text-muted-foreground',
+  };
 }

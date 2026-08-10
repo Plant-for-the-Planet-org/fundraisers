@@ -3,8 +3,12 @@ import {
   type AnimationType,
   BG_DECORATIONS,
   BG_IMAGE_MODES,
+  BG_IMAGE_TINTS,
+  BG_PATTERN_TINTS,
   type BgDecoration,
   type BgImageMode,
+  type BgImageTint,
+  type BgPatternTint,
   type BgSettings,
 } from './types';
 
@@ -15,13 +19,18 @@ export const DEFAULT_GRADIENT_ANGLE = 135;
 export const DEFAULT_BG: Omit<BgSettings, 'gradient'> = {
   background_color: null,
   custom_gradient: null,
+  background_opacity: 0.14, // wash opacity of a solid/custom-gradient background
   decoration: 'none',
   pattern_id: null,
   image_url: null,
   image_mode: 'cover',
   logo_id: null,
-  opacity: 0.5,
+  opacity: 0.2, // default decoration (pattern/image/logo) opacity — subtle by default
   animation: 'none',
+  image_tint: 'background', // image overlay follows the background colour by default
+  image_color: null, // custom hex used only when image_tint is 'custom'
+  pattern_tint: 'accent', // pattern stencil painted with the accent by default
+  pattern_color: null, // custom hex used only when pattern_tint is 'custom'
 };
 
 // Build a preset bg block from a gradient class plus optional overrides.
@@ -39,9 +48,12 @@ export interface BackgroundAsset {
   id: string; // Library key — currently persisted in settings.theme.bg.pattern_id or settings.theme.bg.image_url.
   label: string;
   type: BackgroundAssetType;
-  thumb: string; // Picker thumbnail (data URI today, real assets later).
-  src: string; // Full asset (rendered on the fundraiser page).
+  src: string; // Full asset (rendered on the fundraiser page). Also the mask source when `masked`.
+  thumb?: string; // Picker thumbnail; falls back to `src` when omitted.
   tileSize?: string; // Optional override for the rendered tile size, eg '138px 92px'.
+  masked?: boolean; // Render `src` as a monochrome stencil (white shapes on transparent) tinted by the theme colour, instead of a baked-in image.
+  fullBleed?: boolean; // Render as one full-bleed cover layer instead of a repeating tile (for large full-canvas designs).
+  thumbMaskSize?: string; // Per-asset zoom for a masked picker thumbnail (CSS mask-size); defaults to THUMB_MASK_SIZE.
 }
 
 export const DEFAULT_PATTERN_TILE = '115px 77px';
@@ -77,14 +89,90 @@ function svgThumb(
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+// Monochrome mask factory: white shapes on a transparent field. Used as a CSS
+// mask-image so the rendered pattern takes the theme colour (painted underneath)
+// and its gaps stay clear — the colour appears to tint the pattern.
+function svgMask(kind: string, { wide = false } = {}): string {
+  const shapes: Record<string, string> = {
+    grid: `<pattern id='m' width='8' height='8' patternUnits='userSpaceOnUse'><path d='M0 0 H8 M0 0 V8' stroke='#fff' stroke-width='0.5'/></pattern><rect width='100%' height='100%' fill='url(#m)'/>`,
+    dots: `<pattern id='m' width='8' height='8' patternUnits='userSpaceOnUse'><circle cx='4' cy='4' r='1.5' fill='#fff'/></pattern><rect width='100%' height='100%' fill='url(#m)'/>`,
+  };
+  const vb = wide ? '0 0 240 40' : '0 0 60 40';
+  const body = shapes[kind] ?? shapes.grid;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}' preserveAspectRatio='xMidYMid slice'>${body}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 export const BG_LIBRARY: BackgroundAsset[] = [
-  // Patterns
+  // Curated patterns — monochrome stencils (white shapes on a transparent
+  // field) tinted by the theme colour and rendered full-bleed. One file per
+  // pattern: it is the mask at render time and the source for the picker
+  // thumbnail (drawn through the same mask in AssetGrid).
+  {
+    id: 'bg-dots',
+    label: 'Dots',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-dots.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-grid-lines',
+    label: 'Grid',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-grid.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-trees',
+    label: 'Trees',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-trees.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-woodgrain',
+    label: 'Woodgrain',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-woodgrain.svg',
+    masked: true,
+    fullBleed: true,
+    thumbMaskSize: '400%',
+  },
+  // Curated images.
+  {
+    id: 'bg-forest',
+    label: 'Forest',
+    type: 'image',
+    src: '/theme-backgrounds/forest.jpg',
+  },
+  {
+    id: 'bg-forest-bw',
+    label: 'Forest BW',
+    type: 'image',
+    src: '/theme-backgrounds/forest-bw.jpg',
+  },
+  {
+    id: 'bg-academy',
+    label: 'Academy',
+    type: 'image',
+    src: '/theme-backgrounds/academy.jpg',
+  },
+  {
+    id: 'bg-academy-bw',
+    label: 'Academy BW',
+    type: 'image',
+    src: '/theme-backgrounds/academy-bw.jpg',
+  },
+  // Patterns (legacy placeholders — kept as resources, hidden from the picker)
   {
     id: 'bg-grid',
     label: 'Grid',
     type: 'pattern',
-    thumb: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
-    src: svgThumb('grid', ['#f8fafc', '#e2e8f0']),
+    src: svgMask('grid'),
+    masked: true,
     tileSize: '138px 92px',
   },
   {
@@ -159,6 +247,20 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     type: 'image',
     thumb: '/theme-backgrounds/planet-botanical.svg',
     src: '/theme-backgrounds/planet-botanical.svg',
+  },
+  {
+    id: 'bg-planet-light',
+    label: 'Planet light',
+    type: 'image',
+    thumb: '/theme-backgrounds/planet-light.svg',
+    src: '/theme-backgrounds/planet-light.svg',
+  },
+  {
+    id: 'bg-planet-dark',
+    label: 'Planet dark',
+    type: 'image',
+    thumb: '/theme-backgrounds/planet-dark.svg',
+    src: '/theme-backgrounds/planet-dark.svg',
   },
   // Videos (looping placeholder = static SVG until real assets land)
   {
@@ -250,5 +352,18 @@ export function isValidAnimation(value: unknown): value is AnimationType {
   return (
     typeof value === 'string' &&
     ANIMATION_TYPES.includes(value as AnimationType)
+  );
+}
+
+export function isValidImageTint(value: unknown): value is BgImageTint {
+  return (
+    typeof value === 'string' && BG_IMAGE_TINTS.includes(value as BgImageTint)
+  );
+}
+
+export function isValidPatternTint(value: unknown): value is BgPatternTint {
+  return (
+    typeof value === 'string' &&
+    BG_PATTERN_TINTS.includes(value as BgPatternTint)
   );
 }

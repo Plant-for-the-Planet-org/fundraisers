@@ -258,6 +258,7 @@ export const THEMES: Record<string, Theme> = {
       image_url: 'bg-planet-botanical',
       image_mode: 'cover',
       opacity: 1,
+      image_tint: 'none', // show the botanical illustration in its own colours
     }),
   },
   dark: {

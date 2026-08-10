@@ -60,6 +60,12 @@
   --color-heading: hsl(var(--heading));
   --color-section-divider: hsl(var(--section-divider));
 
+  /* Layered theme model — base/reverse colours for the mode base layer.
+     --base-rgb / --reverse-rgb flip by mode (:root / .light / .dark). Surfaces
+     use bg-base/N (recede); callouts use bg-reverse/N (pop) via opacity modifiers. */
+  --color-base: rgb(var(--base-rgb));
+  --color-reverse: rgb(var(--reverse-rgb));
+
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -119,6 +125,8 @@
   --neutral-foreground: 220 14% 34%;
   --heading: 240 3.8% 15.9%;
   --section-divider: 220 13% 91%;
+  --base-rgb: 255 255 255;
+  --reverse-rgb: 0 0 0;
 }
 
 /* When adding variables here, also add them to .light in the block below */
@@ -144,6 +152,8 @@
   --neutral-foreground: 220 13% 84%;
   --heading: 220 14.3% 95.9%;
   --section-divider: 217 19% 27%;
+  --base-rgb: 0 0 0;
+  --reverse-rgb: 255 255 255;
 }
 
 .light {
@@ -168,6 +178,8 @@
   --neutral-foreground: 220 14% 34%;
   --heading: 240 3.8% 15.9%;
   --section-divider: 220 13% 91%;
+  --base-rgb: 255 255 255;
+  --reverse-rgb: 0 0 0;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -190,6 +202,8 @@
   --color-tab-border: var(--tab-border-color);
   --color-heading: hsl(var(--heading));
   --color-section-divider: hsl(var(--section-divider));
+  --color-base: rgb(var(--base-rgb));
+  --color-reverse: rgb(var(--reverse-rgb));
 }
 
 body {

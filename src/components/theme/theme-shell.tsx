@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { BgSettings, Theme } from '@/lib/theme/types';
+import type { BgSettings, Theme, ThemeMode } from '@/lib/theme/types';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -13,7 +13,11 @@ import {
   LOGO_LIBRARY,
   resolveBgAsset,
 } from '@/lib/theme/backgrounds';
-import { isValidHexColor } from '@/lib/theme/color-utils';
+import {
+  getDominantStopColor,
+  getReadableMode,
+  isValidHexColor,
+} from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
@@ -33,6 +37,18 @@ const INITIAL_BLUR_STYLE = {
   left: 'max(0px, calc((100vw - 60rem) / 2))',
   right: 'max(0px, calc((100vw - 60rem) / 2))',
 } as React.CSSProperties;
+
+// Opacity of the user colour selection (solid or custom gradient) painted as a
+// tint over the mode base layer. Preset gradient classes keep their authored alpha.
+const TINT_OPACITY = 0.14;
+
+const CTA_TEXT_ON_LIGHT = '#111111';
+const CTA_TEXT_ON_DARK = '#ffffff';
+
+// 'light' means the CTA surface is light, so it needs dark text; 'dark' needs white text.
+function ctaTextFor(mode: ThemeMode): string {
+  return mode === 'light' ? CTA_TEXT_ON_LIGHT : CTA_TEXT_ON_DARK;
+}
 
 /**
  * Guard against CSS injection via url("...") interpolation.
@@ -99,8 +115,23 @@ export function ThemeShell({
     !gradientClass && !customGradient && isValidHexColor(bg.background_color)
       ? bg.background_color
       : null;
+  // Wash opacity of the solid/custom-gradient background over the mode base.
+  // Falls back to the legacy constant for rows saved before it was adjustable.
+  const washOpacity = bg.background_opacity ?? TINT_OPACITY;
   const shouldBlurMainContentBackdrop =
     blurMainContentBackdrop || shouldBlurForPathname(pathname);
+
+  // The accent colour drives the CTA (solid), progress fill, and the nav logo;
+  // the CTA text colour is picked for contrast against it.
+  const accentColor = getAccentColor(activeTheme.accent);
+
+  // A single colour representing the chosen background, at full strength (not
+  // the 14% wash). Used to tint image/pattern decorations. Falls back to the
+  // accent when the wash is a preset gradient class with no extractable hex.
+  const bgTintColor =
+    solidColor ??
+    (customGradient && cg ? getDominantStopColor(cg.stops) : null) ??
+    accentColor;
 
   return (
     <div
@@ -110,14 +141,22 @@ export function ThemeShell({
         {
           fontFamily: getFontStack(activeTheme.bodyFont),
           '--theme-title-font': getFontStack(activeTheme.titleFont),
-          '--accent-color': getAccentColor(activeTheme.accent),
+          '--accent-color': accentColor,
+          '--theme-bg-color': bgTintColor,
+          '--cta-foreground': ctaTextFor(getReadableMode(accentColor)),
         } as React.CSSProperties
       }
     >
-      {/* Layer stack, back → front: gradient · image · pattern · logo · content.
-          The gradient is the base wash; image/pattern/logo are decorations that
-          sit on top of it. A transparent-based image (e.g. foliage) shows the
-          gradient through its gaps instead of being hidden behind it. */}
+      {/* Layer stack, back → front: base · colour tint · image · pattern · logo · content.
+          The mode base layer (black in dark, white in light) is always painted at
+          100%. The user colour selection sits over it at TINT_OPACITY, so the page
+          reads as a subtle tint of the base. Preset gradient classes keep their own
+          authored alpha. Decorations (image/pattern/logo) sit on top and show the
+          tinted base through their gaps. */}
+      <div
+        className='fixed inset-0 transition-colors duration-300'
+        style={{ backgroundColor: 'rgb(var(--base-rgb))' }}
+      />
       {gradientClass && (
         <div
           className={`fixed inset-0 ${gradientClass} transition-colors duration-300`}
@@ -125,14 +164,14 @@ export function ThemeShell({
       )}
       {customGradient && (
         <div
-          className='fixed inset-0 transition-colors duration-300'
-          style={{ backgroundImage: customGradient }}
+          className='fixed inset-0 transition-opacity duration-300'
+          style={{ backgroundImage: customGradient, opacity: washOpacity }}
         />
       )}
       {solidColor && (
         <div
-          className='fixed inset-0 transition-colors duration-300'
-          style={{ backgroundColor: solidColor }}
+          className='fixed inset-0 transition-opacity duration-300'
+          style={{ backgroundColor: solidColor, opacity: washOpacity }}
         />
       )}
       {bg.decoration === 'image' && bg.image_url && (
@@ -140,10 +179,17 @@ export function ThemeShell({
           imageUrl={bg.image_url}
           mode={bg.image_mode}
           opacity={bg.opacity}
+          tint={bg.image_tint}
+          imageColor={bg.image_color}
         />
       )}
       {bg.decoration === 'pattern' && bg.pattern_id && (
-        <PatternLayer patternId={bg.pattern_id} opacity={bg.opacity} />
+        <PatternLayer
+          patternId={bg.pattern_id}
+          opacity={bg.opacity}
+          tint={bg.pattern_tint}
+          patternColor={bg.pattern_color}
+        />
       )}
       {bg.decoration === 'logo' && bg.logo_id && (
         <LogoLayer
@@ -240,10 +286,14 @@ function ImageLayer({
   imageUrl,
   mode,
   opacity,
+  tint = 'background',
+  imageColor,
 }: {
   imageUrl: string;
   mode: BgSettings['image_mode'];
   opacity: number;
+  tint?: BgSettings['image_tint'];
+  imageColor?: string | null;
 }) {
   const resolved = resolveBgAsset(imageUrl);
   if (!resolved) return null;
@@ -255,41 +305,107 @@ function ImageLayer({
     resolved.kind === 'library'
       ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
       : DEFAULT_PATTERN_TILE;
+  // The overlay colour: the background colour tints the image (default), the
+  // accent, or nothing (the image shows at its opacity and the base + tint
+  // wash shows through). Capped so the image stays visible at high opacity.
+  const overlayColor =
+    tint === 'custom' && isValidHexColor(imageColor)
+      ? imageColor
+      : tint === 'accent'
+        ? 'var(--accent-color)'
+        : tint === 'background'
+          ? 'var(--theme-bg-color)'
+          : null;
   return (
-    <div
-      className='fixed inset-0 pointer-events-none transition-opacity duration-300'
-      style={{
-        backgroundImage: `url("${src}")`,
-        backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
-        backgroundSize: mode === 'repeat' ? tileSize : 'cover',
-        backgroundPosition: 'center',
-        opacity,
-      }}
-      aria-hidden
-    />
+    <>
+      <div
+        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+        style={{
+          backgroundImage: `url("${src}")`,
+          backgroundRepeat: mode === 'repeat' ? 'repeat' : 'no-repeat',
+          backgroundSize: mode === 'repeat' ? tileSize : 'cover',
+          backgroundPosition: 'center',
+          opacity,
+        }}
+        aria-hidden
+      />
+      {overlayColor && (
+        <div
+          className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+          style={{
+            backgroundColor: overlayColor,
+            mixBlendMode: 'multiply',
+            opacity: Math.min(opacity, 0.55),
+          }}
+          aria-hidden
+        />
+      )}
+    </>
   );
 }
 
 function PatternLayer({
   patternId,
   opacity,
+  tint = 'accent',
+  patternColor,
 }: {
   patternId: string;
   opacity: number;
+  tint?: BgSettings['pattern_tint'];
+  patternColor?: string | null;
 }) {
   const resolved = resolveBgAsset(patternId);
   if (!resolved) return null;
-  const src = resolved.kind === 'library' ? resolved.asset.src : resolved.src;
-  const tileSize =
-    resolved.kind === 'library'
-      ? (resolved.asset.tileSize ?? DEFAULT_PATTERN_TILE)
-      : DEFAULT_PATTERN_TILE;
+  const asset = resolved.kind === 'library' ? resolved.asset : null;
+  const tileSize = asset?.tileSize ?? DEFAULT_PATTERN_TILE;
+  const fullBleed = asset?.fullBleed ?? false;
+  const masked = asset?.masked ?? false;
+  const rawSrc =
+    resolved.kind === 'library' ? resolved.asset.src : resolved.src;
+  const src = safeCssUrl(rawSrc);
+  if (!src) return null;
+
+  // Monochrome mask: the theme colour is painted underneath and revealed only
+  // where the stencil shapes are, so the colour appears to tint the pattern.
+  // The paint colour is the accent (default), the background colour, or a
+  // custom hex. Full-bleed designs cover the viewport once; the rest tile.
+  if (masked) {
+    const maskUrl = `url("${src}")`;
+    const paintColor =
+      tint === 'custom' && isValidHexColor(patternColor)
+        ? patternColor
+        : tint === 'background'
+          ? 'var(--theme-bg-color)'
+          : 'var(--accent-color)';
+    return (
+      <div
+        className='fixed inset-0 pointer-events-none transition-opacity duration-300'
+        style={{
+          backgroundColor: paintColor,
+          WebkitMaskImage: maskUrl,
+          maskImage: maskUrl,
+          WebkitMaskRepeat: fullBleed ? 'no-repeat' : 'repeat',
+          maskRepeat: fullBleed ? 'no-repeat' : 'repeat',
+          WebkitMaskSize: fullBleed ? 'cover' : tileSize,
+          maskSize: fullBleed ? 'cover' : tileSize,
+          WebkitMaskPosition: fullBleed ? 'center' : 'top left',
+          maskPosition: fullBleed ? 'center' : 'top left',
+          opacity,
+        }}
+        aria-hidden
+      />
+    );
+  }
+
   return (
     <div
-      className='fixed inset-0 bg-repeat bg-top-left pointer-events-none transition-opacity duration-300'
+      className='fixed inset-0 pointer-events-none transition-opacity duration-300'
       style={{
         backgroundImage: `url("${src}")`,
-        backgroundSize: tileSize,
+        backgroundRepeat: fullBleed ? 'no-repeat' : 'repeat',
+        backgroundSize: fullBleed ? 'cover' : tileSize,
+        backgroundPosition: fullBleed ? 'center' : 'top left',
         opacity,
       }}
       aria-hidden

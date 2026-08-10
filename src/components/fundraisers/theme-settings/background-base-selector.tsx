@@ -7,11 +7,7 @@ import { useState } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
 import { Palette } from 'lucide-react';
-import {
-  getReadableMode,
-  getReadableModeForStops,
-  isValidHexColor,
-} from '@/lib/theme/color-utils';
+import { getSwatchContrast, normalizeHex } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
   Popover,
@@ -20,22 +16,12 @@ import {
 } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
-import {
-  DEFAULT_SOLID_COLOR,
-  defaultCustomGradient,
-  GRADIENT_OPTIONS,
-  QUICK_PICK_COLORS,
-} from './constants';
+import { defaultCustomGradient, GRADIENT_OPTIONS } from './constants';
+import { SolidPicker } from './solid-picker';
 
 // The theme gradient swatches shown as circles, skipping the leading "None"
 // entry (which gets its own dedicated circle here).
 const THEME_GRADIENTS = GRADIENT_OPTIONS.filter(g => g.value).slice(0, 5);
-
-// Only commit a complete 6-digit hex; a 3-digit value would snap mid-type.
-function normalizeHex(input: string): string | null {
-  const hex = (input.startsWith('#') ? input : `#${input}`).toLowerCase();
-  return isValidHexColor(hex) ? hex : null;
-}
 
 function gradientCss(g: CustomGradient): string {
   return `linear-gradient(${g.angle}deg, ${g.stops
@@ -44,17 +30,10 @@ function gradientCss(g: CustomGradient): string {
 }
 
 const circleBase =
-  'relative h-9 w-9 rounded-full border-2 overflow-hidden transition-colors';
+  'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-all hover:scale-110';
+// Selection borders + hover mirror the accent dots (primitives.tsx AccentDot).
 const inactiveBorder = 'border-border hover:border-foreground/40';
-
-// Selected state uses the live theme accent (raw var — the Tailwind `accent`
-// token bakes in the default green) with a soft halo ring so it reads clearly
-// on any swatch colour.
-const selectedStyle: React.CSSProperties = {
-  borderColor: 'var(--accent-color)',
-  boxShadow:
-    '0 0 0 2px color-mix(in srgb, var(--accent-color) 30%, transparent)',
-};
+const activeBorder = 'border-foreground shadow-md';
 
 export function BackgroundBaseSelector({
   bg,
@@ -69,7 +48,7 @@ export function BackgroundBaseSelector({
   onSelectNone: () => void;
   onSolidColor: (hex: string) => void;
   onGradientChange: (next: CustomGradient) => void;
-  onGradient: (value: string, mode: 'light' | 'dark') => void;
+  onGradient: (value: string) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
 
@@ -90,8 +69,11 @@ export function BackgroundBaseSelector({
           title={tTheme('baseNone')}
           aria-label={tTheme('baseNone')}
           aria-pressed={isNone}
-          className={cn(circleBase, 'bg-background', !isNone && inactiveBorder)}
-          style={isNone ? selectedStyle : undefined}
+          className={cn(
+            circleBase,
+            'bg-background',
+            isNone ? activeBorder : inactiveBorder
+          )}
         >
           <svg
             viewBox='0 0 24 24'
@@ -117,15 +99,18 @@ export function BackgroundBaseSelector({
             <button
               type='button'
               key={g.id}
-              onClick={() => onGradient(g.value, g.mode)}
+              onClick={() => onGradient(g.value)}
               title={g.label}
               aria-label={g.label}
               aria-pressed={active}
-              className={cn(circleBase, g.value, !active && inactiveBorder)}
-              style={{
-                backgroundColor: '#fff',
-                ...(active ? selectedStyle : {}),
-              }}
+              className={cn(
+                circleBase,
+                g.value,
+                active ? activeBorder : inactiveBorder
+              )}
+              // Preview the gradient over the mode base (white in light, black
+              // in dark), matching how it renders on the page.
+              style={{ backgroundColor: 'rgb(var(--base-rgb))' }}
             />
           );
         })}
@@ -172,17 +157,10 @@ function CustomColorButton({
 
   // The palette icon always sits on top of the chosen colour; flip it light or
   // dark to stay legible against whatever solid / gradient is behind it.
-  const contrastMode = bg.background_color
-    ? getReadableMode(bg.background_color)
-    : bg.custom_gradient
-      ? getReadableModeForStops(bg.custom_gradient.stops.map(s => s.color))
-      : null;
-  const iconColor =
-    contrastMode === 'dark'
-      ? 'text-white'
-      : contrastMode === 'light'
-        ? 'text-zinc-900'
-        : 'text-muted-foreground';
+  const { iconClass } = getSwatchContrast(
+    bg.background_color,
+    bg.custom_gradient?.stops.map(s => s.color)
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -195,11 +173,11 @@ function CustomColorButton({
           className={cn(
             circleBase,
             'flex items-center justify-center',
-            !active && inactiveBorder
+            active ? activeBorder : inactiveBorder
           )}
-          style={active ? { ...previewStyle, ...selectedStyle } : previewStyle}
+          style={previewStyle}
         >
-          <Palette className={cn('h-4 w-4', iconColor)} aria-hidden />
+          <Palette className={cn('h-4 w-4', iconClass)} aria-hidden />
         </button>
       </PopoverTrigger>
       <PopoverContent align='start' className='w-auto'>
@@ -220,55 +198,6 @@ function CustomColorButton({
         </Tabs>
       </PopoverContent>
     </Popover>
-  );
-}
-
-function SolidPicker({
-  value,
-  onChange,
-}: {
-  value: string | null;
-  onChange: (hex: string) => void;
-}) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
-  const current = value ?? DEFAULT_SOLID_COLOR;
-
-  const commit = (input: string) => {
-    const hex = normalizeHex(input);
-    if (hex) onChange(hex);
-  };
-
-  return (
-    <div className='flex flex-col gap-3'>
-      <HexColorPicker color={current} onChange={commit} />
-      <div>
-        <div className='mb-1.5 text-[11px] font-semibold text-muted-foreground'>
-          {tTheme('quickPicks')}
-        </div>
-        <div className='grid grid-cols-5 gap-1.5'>
-          {QUICK_PICK_COLORS.map(hex => (
-            <button
-              key={hex}
-              type='button'
-              onClick={() => onChange(hex)}
-              title={hex}
-              aria-label={hex}
-              className='aspect-square rounded-[5px] border border-border transition-transform hover:scale-110'
-              style={{ backgroundColor: hex }}
-            />
-          ))}
-        </div>
-      </div>
-      <div className='flex items-center gap-1'>
-        <span className='text-xs font-semibold text-muted-foreground'>#</span>
-        <HexColorInput
-          color={value ?? ''}
-          onChange={commit}
-          placeholder='RRGGBB'
-          className='w-24 rounded-md border border-border bg-background px-2 py-1 text-xs uppercase'
-        />
-      </div>
-    </div>
   );
 }
 

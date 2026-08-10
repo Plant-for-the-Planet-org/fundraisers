@@ -12,6 +12,8 @@ import {
   isValidAnimation,
   isValidDecoration,
   isValidImageMode,
+  isValidImageTint,
+  isValidPatternTint,
 } from './backgrounds';
 import { isValidHexColor } from './color-utils';
 import { DEFAULT_THEME, THEMES } from './themes';
@@ -96,6 +98,10 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     ? raw.background_color
     : (base.bg.background_color ?? null);
   const custom_gradient = buildCustomGradient(raw, base.bg.custom_gradient);
+  const background_opacity = clampOpacity(
+    raw.background_opacity,
+    base.bg.background_opacity ?? 0.14
+  );
   const pattern_id =
     raw.pattern_id !== undefined ? raw.pattern_id : base.bg.pattern_id;
   const image_url =
@@ -105,6 +111,18 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     : base.bg.image_mode;
   const logo_id = raw.logo_id !== undefined ? raw.logo_id : base.bg.logo_id;
   const opacity = clampOpacity(raw.opacity, base.bg.opacity);
+  const image_tint = isValidImageTint(raw.image_tint)
+    ? raw.image_tint
+    : (base.bg.image_tint ?? 'background');
+  const image_color = isValidHexColor(raw.image_color)
+    ? raw.image_color
+    : (base.bg.image_color ?? null);
+  const pattern_tint = isValidPatternTint(raw.pattern_tint)
+    ? raw.pattern_tint
+    : (base.bg.pattern_tint ?? 'accent');
+  const pattern_color = isValidHexColor(raw.pattern_color)
+    ? raw.pattern_color
+    : (base.bg.pattern_color ?? null);
 
   // Phase 2 reads bg.animation; Phase 1 records stored animation at the
   // top level (settings.animation). Fall back to the legacy field so
@@ -128,6 +146,7 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     gradient,
     background_color,
     custom_gradient,
+    background_opacity,
     decoration,
     pattern_id,
     image_url,
@@ -135,6 +154,10 @@ function buildBg(settings: FundraiserThemeSettings, base: Theme): BgSettings {
     logo_id,
     opacity,
     animation,
+    image_tint,
+    image_color,
+    pattern_tint,
+    pattern_color,
   };
 }
 
@@ -148,9 +171,11 @@ export function buildTheme(settings?: FundraiserThemeSettings | null): Theme {
     ...base,
     id: 'fundraiser-custom',
     name: 'Custom',
-    accent: VALID_ACCENTS.has(settings.accent ?? '')
-      ? (settings.accent as AccentColor)
-      : base.accent,
+    accent:
+      VALID_ACCENTS.has(settings.accent ?? '') ||
+      isValidHexColor(settings.accent)
+        ? (settings.accent as AccentColor)
+        : base.accent,
     mode: isValidMode(settings.mode) ? settings.mode : base.mode,
     bodyFont: VALID_FONTS.has(settings.body_font ?? '')
       ? (settings.body_font as FontId)
