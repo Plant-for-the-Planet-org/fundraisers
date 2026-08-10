@@ -90,8 +90,7 @@ function AccentDot({
   return (
     <button
       type='button'
-      role='radio'
-      aria-checked={active}
+      aria-pressed={active}
       onClick={onClick}
       title={title}
       aria-label={title}
@@ -128,7 +127,6 @@ export function AccentDotRow({
     <ThemeChipRow
       label={tTheme('labelAccentColor')}
       aria-label={tTheme('labelAccentColor')}
-      role='radiogroup'
     >
       {colorOptions.map(accent => (
         <AccentDot
