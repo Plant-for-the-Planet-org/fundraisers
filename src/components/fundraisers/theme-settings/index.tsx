@@ -181,8 +181,10 @@ export function ThemeSettings() {
         className='gap-3'
       >
         <TabsList className='w-full grid grid-cols-2'>
-          <TabsTrigger value='quick'>{tTheme('tabQuick')}</TabsTrigger>
-          <TabsTrigger value='advanced'>{tTheme('tabAdvanced')}</TabsTrigger>
+          <TabsTrigger value='quick'>{tTheme('tabQuickSettings')}</TabsTrigger>
+          <TabsTrigger value='advanced'>
+            {tTheme('tabAdvancedSettings')}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value='quick' className='flex flex-col gap-4'>
