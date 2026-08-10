@@ -4,6 +4,7 @@ import type { DonationFormValues } from './donation-form-context';
 import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 import { useAuthStore } from '@/stores/auth-store';
 import { Input } from '../ui/input';
 import { useDonationForm } from './donation-form-context';
@@ -12,7 +13,10 @@ import { useFieldError } from './use-field-error';
 
 export const TinField = () => {
   const { fundraiser } = useDonationForm();
-  const isSpain = fundraiser.workspace?.country === 'ES';
+  const workspaceCountry = fundraiser.workspace?.country;
+  const requiresTin = workspaceCountry
+    ? getWorkspaceProfile(workspaceCountry).requiresTin
+    : false;
 
   const profileTin = useAuthStore(state => state.user?.profile?.tin);
 
@@ -25,12 +29,12 @@ export const TinField = () => {
   } = useFormContext<DonationFormValues>();
 
   useEffect(() => {
-    if (isSpain && profileTin) {
+    if (requiresTin && profileTin) {
       setValue('tin', profileTin, { shouldDirty: false });
     }
-  }, [isSpain, profileTin, setValue]);
+  }, [requiresTin, profileTin, setValue]);
 
-  if (!isSpain) return null;
+  if (!requiresTin) return null;
 
   return (
     <FormField

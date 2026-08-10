@@ -1,7 +1,7 @@
 'use client';
 
 import type { SelectedProject } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { useEffect, useMemo, useRef, useState } from 'react';

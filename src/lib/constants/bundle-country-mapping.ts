@@ -1,26 +1,22 @@
 import type { BundleWorkspace } from '@/lib/types/bundle';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
+import type { AllowedCountry } from '@/lib/workspaces/countries';
+
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 
 /**
  * Maps a fundraiser's selected country to a bundle workspace.
  *
- * - `DE` and `ROW` (Rest of the World — uses DE as default) → `'DE'` workspace, all bundle tabs available.
+ * - `DE` and `ROW` (Rest of the World — served by the DE workspace) → `'DE'`
+ *   workspace, all bundle tabs available.
  * - `ES`, `CH` → `null`, only the Custom tab is exposed.
  *
- * Add new entries here when more workspaces ship.
+ * Backed by `bundleWorkspace` in the workspace registry.
  */
-const COUNTRY_TO_WORKSPACE: Record<AllowedCountry, BundleWorkspace | null> = {
-  DE: 'DE',
-  ROW: 'DE',
-  ES: null,
-  CH: null,
-};
-
 export function getWorkspaceForCountry(
   country: AllowedCountry | undefined
 ): BundleWorkspace | null {
   if (!country) {
     return null;
   }
-  return COUNTRY_TO_WORKSPACE[country] ?? null;
+  return getWorkspaceProfile(country).bundleWorkspace;
 }

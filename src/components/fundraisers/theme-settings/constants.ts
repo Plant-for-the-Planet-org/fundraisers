@@ -132,6 +132,8 @@ const PICKABLE_BG_IDS = new Set([
   'bg-academy',
   'bg-academy-bw',
   'bg-planet-botanical',
+  'bg-planet-light',
+  'bg-planet-dark',
 ]);
 
 export const PATTERNS = BG_LIBRARY.filter(

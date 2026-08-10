@@ -13,7 +13,20 @@ This POC proves that model end to end (editor + page) so text and controls stay 
 
 ## What this delivers
 
-A background is now built as **layers** instead of one opaque fill, and **one accent colour** drives every themed element. Surfaces are the mode base colour at a low opacity (frosted), callouts are the reverse colour, and patterns are monochrome stencils tinted by the accent. The editor panel sits on its own scrim so its controls stay readable on any background.
+A background is now built as **layers** instead of one opaque fill, and **one accent colour** drives every themed element. Surfaces are the mode base colour at a low opacity (frosted), callouts are the reverse colour, and patterns are monochrome stencils tinted by the accent. The editor controls stay readable directly on the layered backdrop — the panel no longer needs its own scrim (removed in round 7, see below).
+
+## Round 7 — editor refinements (in review, split across PRs)
+
+A design review of the POC produced editor refinements, split across stacked PRs so each is reviewable on its own. This PR (#304) carries the small polish; the larger changes sit in PRs stacked on top.
+
+- **On this PR (#304):**
+  - The editor **box/scrim is removed** — controls sit directly on the panel. This reverses the "panel sits on its own scrim" decision below (the layered model keeps the backdrop near the mode base, so the scrim is no longer needed).
+  - The decoration colour button matches the "Change theme" button (1px border, hover/open background, rotating chevron).
+  - Background-colour swatches match the accent dots — one shared selected/unselected + hover treatment. The old accent-ring selection marker (`swatchSelectedStyle`) is gone.
+  - The colour-picker popovers already match the app's overlay chrome (`bg-popover` / `rounded-md` / `shadow-md`, same as the leaderboard dropdown and donation-frequency select) — verified, no change.
+- **#317 — `feature/theme-quick-advanced-tabs`** (stacked on #304): the Theme/Background tabs become **Quick** (background colour, opacity, accent, fonts) and **Advanced** (decoration, animation); accent now shows in Quick only. The `background-tab.tsx` monolith is split into one file per component (`quick-panel`, `advanced-panel`, `pattern-panel`, `image-panel`, `logo-panel`, `decoration-color-control`), with the leaf-level `ColorSwatch` / `DecorationRow` / `AnimationRow` moved into `primitives`. Also fixes: the background-colour accent dot now shows only when a custom colour/gradient is set.
+- **#318 — `feature/theme-shuffle-preset`** (stacked on #317): Shuffle applies a random featured preset **as authored** (no more re-randomised accent/fonts/animation on top) and never re-picks the current theme, so the toolbar name always matches the look.
+- **#313 — `feature/advanced-theme-color-picker`**: advanced gradient maker + native eyedropper in the custom-colour popover; rebases onto the updated #304 tip once these land (it only touches `background-base-selector.tsx` / `solid-picker.tsx`).
 
 ## How it works (current implementation)
 
@@ -62,9 +75,9 @@ The background colour, not the accent, tints decorations. Persisted optional bg 
 
 ### Editor legibility — `theme-settings/*`
 
-- The panel sits on a **quiet frosted box** (`bg-base/10 dark:bg-white/10`, rounded, padded, no border), chosen from a temporary original/quiet/none comparison (now removed). Background-colour swatches were shrunk (`h-9` → `h-8`) so the row stays on one line inside the box.
-- Accent selection is available in **both** the Theme tab and the Background tab (shared `AccentDotRow`); the Background tab adds a dot for the current background colour so the accent can snap back to it. It is one value (`settings.theme.accent`), two displays.
-- A reusable swatch-contrast helper (`getSwatchContrast` / `swatchSelectedStyle` in `color-utils.ts`) flips the swatch icon and halo by luminance.
+- The panel box/scrim was **removed in round 7** (see above); controls sit directly on the panel. A quiet frosted box (`bg-base/10 dark:bg-white/10`) was tried in the interim and then dropped. Background-colour swatches are `h-8`.
+- Accent selection is available in **both** the Theme tab and the Background tab (shared `AccentDotRow`); the Background tab adds a dot for the current background colour so the accent can snap back to it. It is one value (`settings.theme.accent`), two displays. (Round 7 / #317 collapses this to Quick-only.)
+- A reusable swatch-contrast helper (`getSwatchContrast` in `color-utils.ts`) flips the custom-colour button's palette icon by luminance. (Round 7 removed the separate `swatchSelectedStyle` selection ring — background swatches now use the accent-dot border treatment.)
 - Theme selection is a **"Change theme" dropdown** (Popover in the toolbar) rather than an inline browse/customize toggle; the Theme tab now always shows the customize panels (accent + fonts). The grid renders a real preview for every theme (gradient, solid, or decoration) instead of a blank cell, caps its height with an internal scroll, and highlights the active theme.
 - The decoration opacity slider allows full opacity (`DECORATION_MAX_OPACITY = 1`). Mode is a deliberate toggle rather than derived from the wash, so a strong decoration no longer risks flipping the effective contrast.
 
@@ -95,7 +108,7 @@ The final shape is quite different from the first plan. What changed and why:
 - **Separate mask file per pattern (`maskSrc`) — introduced, then replaced.** Once patterns became single stencils, a `masked` boolean on `src` does the job; the redundant `maskSrc` field was removed.
 - **Two files per pattern (artwork thumbnail + mask) — collapsed to one.** The thumbnail now renders through the same stencil, so each pattern is a single file.
 - **A plain-vs-masked comparison entry (`bg-sample-3-plain`) — temporary, removed** once masking was confirmed as the approach.
-- **Fully opaque editor panel (`bg-popover`) — softened** to a base-colour scrim with a border.
+- **Fully opaque editor panel (`bg-popover`) — softened** to a base-colour scrim with a border, then a quiet frosted box, and finally **removed entirely in round 7** (controls sit on the layered backdrop).
 - **A "surface" Tabs variant — built then reverted, deferred.** Tabs are a shared primitive and several sit on opaque surfaces; bundle-selection is a custom segmented control. Needs its own pass.
 - **Higher woodgrain thumbnail zoom — tried, reversed.** Zooming *in* collapsed it to a few plain lines and cut out the knots, so it reads better at a lower zoom. This is why the per-asset `thumbMaskSize` override exists.
 - **Accent tinting every decoration — reversed.** Round 2 pointed the image overlay and pattern paint at the accent. That meant changing the accent recoloured a full-cover image (very visible on the Plant-for-the-Planet theme). Now the background colour tints decorations and the accent is reserved for the CTA, progress, and nav logo, with the per-decoration overrides above.

@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -5,6 +7,10 @@ import { getTranslations } from 'next-intl/server';
 import { EMAIL_VERIFICATION_PENDING_COOKIE } from '@/lib/constants/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+  robots: 'noindex, nofollow',
+};
 
 export default async function VerifyEmailPage() {
   const cookieStore = await cookies();

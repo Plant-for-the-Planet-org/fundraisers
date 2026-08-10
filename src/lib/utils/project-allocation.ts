@@ -2,27 +2,13 @@ import type {
   ProjectAllocationPreview,
   SelectedProject,
 } from '@/lib/types/project-selection';
-import type { AllowedCountry } from '@/lib/utils/country-currency';
 
-import {
-  DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY,
-  DEFAULT_NON_EARMARKED_CAUSE_ID,
-  MIN_DEFAULT_CAUSE_PERCENT,
-} from '@/lib/constants/project-selection';
-
-function resolveCauseCountry(countryCode: string): string {
-  const normalized = countryCode.trim().toUpperCase();
-  return normalized === 'ROW' ? 'DE' : normalized;
-}
+import { MIN_DEFAULT_CAUSE_PERCENT } from '@/lib/constants/project-selection';
+import { toAllowedCountry } from '@/lib/utils/country-currency';
+import { getWorkspaceProfile } from '@/lib/workspaces/registry';
 
 export function getDefaultCauseId(countryCode: string): string {
-  const resolvedCountry = resolveCauseCountry(countryCode) as AllowedCountry;
-
-  return (
-    DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY[resolvedCountry] ??
-    DEFAULT_NON_EARMARKED_CAUSE_BY_COUNTRY.DE ??
-    DEFAULT_NON_EARMARKED_CAUSE_ID
-  );
+  return getWorkspaceProfile(toAllowedCountry(countryCode)).defaultCauseId;
 }
 
 function equalSplitAllocations(

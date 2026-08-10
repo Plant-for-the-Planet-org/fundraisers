@@ -248,6 +248,20 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     thumb: '/theme-backgrounds/planet-botanical.svg',
     src: '/theme-backgrounds/planet-botanical.svg',
   },
+  {
+    id: 'bg-planet-light',
+    label: 'Planet light',
+    type: 'image',
+    thumb: '/theme-backgrounds/planet-light.svg',
+    src: '/theme-backgrounds/planet-light.svg',
+  },
+  {
+    id: 'bg-planet-dark',
+    label: 'Planet dark',
+    type: 'image',
+    thumb: '/theme-backgrounds/planet-dark.svg',
+    src: '/theme-backgrounds/planet-dark.svg',
+  },
   // Videos (looping placeholder = static SVG until real assets land)
   {
     id: 'bg-cake-loop',

@@ -2,8 +2,10 @@ import type {
   Fundraiser,
   UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
+import type { RawFundraiser } from './normalize-fundraiser';
 
 import { cache } from 'react';
+import { normalizeFundraiser } from './normalize-fundraiser';
 import { platformFetch } from './platform-fetch';
 
 function fundraiserPath(slug: string, locale?: string): string {
@@ -19,16 +21,21 @@ export async function getFundraiser(
   slug: string,
   locale?: string
 ): Promise<Fundraiser> {
-  return platformFetch<Fundraiser>(fundraiserPath(slug, locale));
+  return normalizeFundraiser(
+    await platformFetch<RawFundraiser>(fundraiserPath(slug, locale))
+  );
 }
 
 export async function getFundraiserAuthenticated(
   slug: string,
   token: string
 ): Promise<Fundraiser> {
-  return platformFetch<Fundraiser>(`/fundraisers/${encodeURIComponent(slug)}`, {
-    token,
-  });
+  return normalizeFundraiser(
+    await platformFetch<RawFundraiser>(
+      `/fundraisers/${encodeURIComponent(slug)}`,
+      { token }
+    )
+  );
 }
 
 export const getCachedFundraiser = cache(
@@ -42,11 +49,13 @@ export async function updateFundraiser(
   data: UpdateFundraiserRequest,
   token: string
 ): Promise<Fundraiser> {
-  return platformFetch<Fundraiser>(`/fundraisers/${id}`, {
-    method: 'PUT',
-    body: data,
-    token,
-  });
+  return normalizeFundraiser(
+    await platformFetch<RawFundraiser>(`/fundraisers/${id}`, {
+      method: 'PUT',
+      body: data,
+      token,
+    })
+  );
 }
 
 export function pauseFundraiser(
