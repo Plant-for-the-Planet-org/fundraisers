@@ -4,10 +4,9 @@ import type { CustomGradient } from '@/lib/theme/types';
 import type { BgFormValue } from './constants';
 
 import { useState } from 'react';
-import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
 import { Palette } from 'lucide-react';
-import { getSwatchContrast, normalizeHex } from '@/lib/theme/color-utils';
+import { customGradientCss, getSwatchContrast } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
   Popover,
@@ -17,17 +16,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { defaultCustomGradient, GRADIENT_OPTIONS } from './constants';
+import { GradientMaker } from './gradient-maker';
 import { SolidPicker } from './solid-picker';
 
 // The theme gradient swatches shown as circles, skipping the leading "None"
 // entry (which gets its own dedicated circle here).
 const THEME_GRADIENTS = GRADIENT_OPTIONS.filter(g => g.value).slice(0, 5);
-
-function gradientCss(g: CustomGradient): string {
-  return `linear-gradient(${g.angle}deg, ${g.stops
-    .map(s => `${s.color} ${s.position}%`)
-    .join(', ')})`;
-}
 
 const circleBase =
   'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-all hover:scale-110';
@@ -152,7 +146,7 @@ function CustomColorButton({
   const previewStyle: React.CSSProperties | undefined = bg.background_color
     ? { backgroundColor: bg.background_color }
     : bg.custom_gradient
-      ? { backgroundImage: gradientCss(bg.custom_gradient) }
+      ? { backgroundImage: customGradientCss(bg.custom_gradient) }
       : undefined;
 
   // The palette icon always sits on top of the chosen colour; flip it light or
@@ -193,108 +187,10 @@ function CustomColorButton({
             <SolidPicker value={bg.background_color} onChange={onSolidColor} />
           </TabsContent>
           <TabsContent value='gradient'>
-            <GradientEditor gradient={gradient} onChange={onGradientChange} />
+            <GradientMaker gradient={gradient} onChange={onGradientChange} />
           </TabsContent>
         </Tabs>
       </PopoverContent>
     </Popover>
   );
-}
-
-// Editing happens against one selected stop at a time, so the picker lives
-// inline here rather than in a nested Popover (a Popover inside this Popover
-// dismisses the parent on open).
-function GradientEditor({
-  gradient,
-  onChange,
-}: {
-  gradient: CustomGradient;
-  onChange: (next: CustomGradient) => void;
-}) {
-  const tTheme = useTranslations('Fundraisers.form.theme');
-  const [active, setActive] = useState(0);
-
-  const patchStop = (
-    index: number,
-    patch: Partial<CustomGradient['stops'][number]>
-  ) =>
-    onChange({
-      ...gradient,
-      stops: gradient.stops.map((s, i) =>
-        i === index ? { ...s, ...patch } : s
-      ),
-    });
-
-  const activeStop = gradient.stops[active] ?? gradient.stops[0];
-  const commit = (input: string) => {
-    const hex = normalizeHex(input);
-    if (hex) patchStop(active, { color: hex });
-  };
-
-  return (
-    <div className='flex w-56 flex-col gap-3'>
-      <div className='flex gap-2'>
-        {gradient.stops.slice(0, 2).map((stop, i) => {
-          const label = tTheme(i === 0 ? 'gradientStart' : 'gradientEnd');
-          const selected = active === i;
-          return (
-            <button
-              key={i}
-              type='button'
-              onClick={() => setActive(i)}
-              aria-pressed={selected}
-              className={cn(
-                'flex flex-1 items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-semibold',
-                selected
-                  ? 'border-foreground'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              <span
-                className='h-4 w-4 rounded-sm border border-border/60'
-                style={{ backgroundColor: stop.color }}
-              />
-              {label}
-            </button>
-          );
-        })}
-      </div>
-
-      <HexColorPicker color={activeStop.color} onChange={commit} />
-
-      <div className='flex items-center gap-2'>
-        <span className='text-xs font-semibold text-muted-foreground'>#</span>
-        <HexColorInput
-          color={activeStop.color}
-          onChange={commit}
-          placeholder='RRGGBB'
-          className='w-20 rounded-md border border-border bg-background px-2 py-1 text-xs uppercase'
-        />
-        <span className='flex-1' />
-        <input
-          type='number'
-          min={0}
-          max={100}
-          value={activeStop.position}
-          onChange={e =>
-            patchStop(active, { position: clampPercent(e.target.value) })
-          }
-          aria-label={tTheme(active === 0 ? 'gradientStart' : 'gradientEnd')}
-          className='h-8 w-14 rounded-md border border-border bg-background px-2 text-right text-xs'
-        />
-        <span className='text-xs text-muted-foreground'>%</span>
-      </div>
-
-      <div
-        className='h-8 rounded-md border border-border'
-        style={{ backgroundImage: gradientCss(gradient) }}
-      />
-    </div>
-  );
-}
-
-function clampPercent(raw: string): number {
-  const n = Number(raw);
-  if (!Number.isFinite(n)) return 0;
-  return Math.min(100, Math.max(0, Math.round(n)));
 }

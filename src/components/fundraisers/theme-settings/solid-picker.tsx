@@ -6,6 +6,7 @@ import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useTranslations } from 'next-intl';
 import { normalizeHex } from '@/lib/theme/color-utils';
 import { DEFAULT_SOLID_COLOR, QUICK_PICK_COLORS } from './constants';
+import { EyedropperButton } from './eyedropper-button';
 
 // Solid colour picker: a hue/lightness field, a preset row, and a hex input.
 // Shared by the background base selector and the pattern colour control. Pass
@@ -59,6 +60,7 @@ export function SolidPicker({
           placeholder='RRGGBB'
           className='w-24 rounded-md border border-border bg-background px-2 py-1 text-xs uppercase'
         />
+        <EyedropperButton onPick={onChange} className='ml-auto' />
       </div>
     </div>
   );

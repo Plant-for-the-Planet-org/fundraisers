@@ -14,6 +14,7 @@ import {
   resolveBgAsset,
 } from '@/lib/theme/backgrounds';
 import {
+  customGradientCss,
   getDominantStopColor,
   getReadableMode,
   isValidHexColor,
@@ -109,7 +110,7 @@ export function ThemeShell({
     cg &&
     cg.stops.length >= 2 &&
     cg.stops.every(s => isValidHexColor(s.color))
-      ? `linear-gradient(${cg.angle}deg, ${cg.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+      ? customGradientCss(cg)
       : null;
   const solidColor =
     !gradientClass && !customGradient && isValidHexColor(bg.background_color)
