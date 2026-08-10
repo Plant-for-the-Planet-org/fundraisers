@@ -191,6 +191,8 @@ export function GradientMaker({
               <button
                 key={i}
                 type='button'
+                // Drag-only; the numeric position input is the keyboard path.
+                tabIndex={-1}
                 aria-label={`${tTheme('gradientStop')} ${i + 1}`}
                 onPointerDown={e => {
                   e.stopPropagation();
@@ -227,6 +229,8 @@ export function GradientMaker({
           <button
             ref={wheelRef}
             type='button'
+            // Drag-only; the numeric angle input is the keyboard path.
+            tabIndex={-1}
             aria-label={tTheme('gradientAngle')}
             onPointerDown={() => setDragAngle(true)}
             className='relative size-8 shrink-0 cursor-grab rounded-full border-2 border-border touch-none'
