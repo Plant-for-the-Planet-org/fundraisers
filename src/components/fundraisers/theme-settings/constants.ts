@@ -82,6 +82,11 @@ export const DECORATIONS: Array<{ id: BgDecoration; icon: LucideIcon }> = [
 
 export const IMAGE_MODES: BgImageMode[] = ['cover', 'repeat'];
 
+// Pattern/image opacity can go to full. Mode is a deliberate toggle (not derived
+// from the wash), so a strong decoration no longer risks flipping the effective
+// surface luminance that text contrast relies on.
+export const DECORATION_MAX_OPACITY = 1;
+
 export const THEME_LIST: Theme[] = Object.values(THEMES);
 export const FEATURED_THEMES = THEME_LIST.filter(t => t.featured);
 
