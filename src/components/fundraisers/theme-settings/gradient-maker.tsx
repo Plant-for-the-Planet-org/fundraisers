@@ -87,20 +87,20 @@ export function GradientMaker({
     setActive(next.length - 1);
   };
 
-  // "+ Add stop" drops a stop at a random point inside the widest gap between
-  // existing stops (so repeated clicks spread out instead of stacking), taking
-  // the interpolated colour there.
+  // "+ Add stop" drops a stop at a random point inside the widest gap (so repeated clicks spread out instead of stacking), taking the interpolated colour there.
+  // Boundaries include the 0 and 100 edges, so the leading and trailing space counts too and stops don't crowd into a tiny middle gap.
   const addStopInGap = () => {
-    const sorted = [...stops].sort((a, b) => a.position - b.position);
+    const positions = stops.map(s => s.position).sort((a, b) => a - b);
+    const bounds = [0, ...positions, 100];
     let start = 0;
     let end = 100;
     let widest = -1;
-    for (let i = 0; i < sorted.length - 1; i++) {
-      const gap = sorted[i + 1].position - sorted[i].position;
+    for (let i = 0; i < bounds.length - 1; i++) {
+      const gap = bounds[i + 1] - bounds[i];
       if (gap > widest) {
         widest = gap;
-        start = sorted[i].position;
-        end = sorted[i + 1].position;
+        start = bounds[i];
+        end = bounds[i + 1];
       }
     }
     // Random point kept off the exact edges so it never lands on a neighbour.
