@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
+import { AccentColorControl } from './accent-color-control';
 import {
   ACCENT_BG,
   ANIMATION_OPTIONS,
@@ -109,18 +110,18 @@ function AccentDot({
   );
 }
 
-// Accent picker used by the Quick tab. QuickPanel passes `extraSwatch` to add
-// a dot for the current background color, letting the accent snap to it.
+// Accent picker used by the Quick tab: the palette tokens plus a trailing
+// custom-colour picker dot (always shown), seeded to `bgColorHex`.
 export function AccentDotRow({
   value,
   colorOptions,
   onChange,
-  extraSwatch,
+  bgColorHex,
 }: {
   value: string;
   colorOptions: AccentColor[];
   onChange: (accent: AccentColor) => void;
-  extraSwatch?: { hex: string; label: string };
+  bgColorHex: string;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   return (
@@ -138,14 +139,12 @@ export function AccentDotRow({
           swatchClass={ACCENT_BG[accent]}
         />
       ))}
-      {extraSwatch && (
-        <AccentDot
-          active={value === extraSwatch.hex}
-          title={extraSwatch.label}
-          onClick={() => onChange(extraSwatch.hex as AccentColor)}
-          swatchStyle={{ backgroundColor: extraSwatch.hex }}
-        />
-      )}
+      <AccentColorControl
+        accent={value}
+        bgColorHex={bgColorHex}
+        label={tTheme('customAccentColor')}
+        onPick={hex => onChange(hex as AccentColor)}
+      />
     </ThemeChipRow>
   );
 }

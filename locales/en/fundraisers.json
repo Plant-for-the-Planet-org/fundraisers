@@ -149,6 +149,7 @@
         "sectionHeading": "Theme",
         "labelAccentColor": "Accent color",
         "selectAccent": "Select {accent} accent color",
+        "customAccentColor": "Select custom accent color",
         "tabQuick": "Quick",
         "tabAdvanced": "Advanced",
         "browse": "Browse",

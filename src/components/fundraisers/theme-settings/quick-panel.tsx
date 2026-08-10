@@ -67,14 +67,7 @@ export function QuickPanel({
         value={accent}
         colorOptions={colorOptions}
         onChange={onAccent}
-        // Offer the "snap accent to the background colour" dot only when a custom
-        // colour/gradient is actually set; otherwise bgColorHex falls back to the
-        // accent and the dot would just duplicate it.
-        extraSwatch={
-          bg.background_color || bg.custom_gradient
-            ? { hex: bgColorHex, label: tTheme('labelBackgroundColor') }
-            : undefined
-        }
+        bgColorHex={bgColorHex}
       />
       <FontChipRow
         label={tTheme('labelTitleFont')}

@@ -149,6 +149,7 @@
         "sectionHeading": "Thema",
         "labelAccentColor": "Akzentfarbe",
         "selectAccent": "Wähle {accent} als Akzentfarbe",
+        "customAccentColor": "Eigene Akzentfarbe wählen",
         "tabQuick": "Schnell",
         "tabAdvanced": "Erweitert",
         "browse": "Stöbern",
