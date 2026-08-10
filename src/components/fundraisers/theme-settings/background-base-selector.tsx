@@ -6,7 +6,7 @@ import type { BgFormValue } from './constants';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Palette } from 'lucide-react';
-import { getSwatchContrast } from '@/lib/theme/color-utils';
+import { customGradientCss, getSwatchContrast } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
   Popover,
@@ -22,12 +22,6 @@ import { SolidPicker } from './solid-picker';
 // The theme gradient swatches shown as circles, skipping the leading "None"
 // entry (which gets its own dedicated circle here).
 const THEME_GRADIENTS = GRADIENT_OPTIONS.filter(g => g.value).slice(0, 5);
-
-function gradientCss(g: CustomGradient): string {
-  return `linear-gradient(${g.angle}deg, ${g.stops
-    .map(s => `${s.color} ${s.position}%`)
-    .join(', ')})`;
-}
 
 const circleBase =
   'relative h-8 w-8 rounded-full border-2 overflow-hidden transition-all hover:scale-110';
@@ -152,7 +146,7 @@ function CustomColorButton({
   const previewStyle: React.CSSProperties | undefined = bg.background_color
     ? { backgroundColor: bg.background_color }
     : bg.custom_gradient
-      ? { backgroundImage: gradientCss(bg.custom_gradient) }
+      ? { backgroundImage: customGradientCss(bg.custom_gradient) }
       : undefined;
 
   // The palette icon always sits on top of the chosen colour; flip it light or
