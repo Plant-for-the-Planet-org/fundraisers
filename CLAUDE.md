@@ -94,6 +94,15 @@ When a translation string contains an inline element (link, bold, etc.), use `t.
 
 Translation key: `"photoBy": "Photo by <photographerLink>{name}</photographerLink>"`
 
+### Authored text: don't hard-wrap
+
+This applies to all authored text — code comments, commit messages, PR descriptions, and markdown.
+
+- Never break a line mid-sentence to hit a column width. Let the editor soft-wrap; each line stays unbroken however long it runs.
+- Put each sentence or distinct point on its own line. Only start a new line at a sentence or point boundary.
+- Keep the wording in simple, plain English. Avoid jargon when a plainer phrasing works.
+- Write fewer comments. Skip anything that restates the code; keep only non-obvious intent or a guard against a likely regression.
+
 ## Auth
 
 <!-- Auth0 setup, token flow, how to test authenticated paths locally. -->
