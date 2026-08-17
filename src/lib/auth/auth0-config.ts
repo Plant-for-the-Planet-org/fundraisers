@@ -39,13 +39,19 @@ export interface Auth0TokenResponse {
   refresh_token?: string;
 }
 
-/** Returns the OAuth callback URL based on current environment (browser vs server). */
+/**
+ * Returns the OAuth callback URL for the current browser origin.
+ * This whole PKCE flow (see pkce.ts) is browser-only, so there is no
+ * server-side origin to fall back to.
+ */
 function getRedirectUri(): string {
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}/api/auth/callback`;
+  if (typeof window === 'undefined') {
+    throw new Error(
+      'getRedirectUri() was called outside the browser. The Auth0 PKCE flow only runs client-side.'
+    );
   }
 
-  return `${process.env.BASE_URL}/api/auth/callback`;
+  return `${window.location.origin}/api/auth/callback`;
 }
 
 /**
