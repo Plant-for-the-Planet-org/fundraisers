@@ -18,11 +18,12 @@ export interface Address {
 export interface UserProfileResponse {
   slug: string;
   type: UserType;
-  currency: string;
+  // Nullable on the platform: org and tpo profiles carry `name` and leave firstname/lastname null.
+  currency: string | null;
   name: string | null;
-  firstname: string;
-  lastname: string;
-  country: string;
+  firstname: string | null;
+  lastname: string | null;
+  country: string | null;
   email: string;
   image: string | null;
   url: string | null;
