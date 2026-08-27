@@ -1,4 +1,5 @@
 import type { UserType } from '@planet-sdk/common';
+import type { Auth0TokenClaims } from '../types/auth';
 import type { Nullable } from '../types/utility';
 
 import { PlatformAPIError, platformFetch } from './platform-fetch';
@@ -106,11 +107,29 @@ export interface ProfilePaymentMethod {
   isDefault: boolean;
 }
 
+/**
+ * Outcome of a profile lookup.
+ * `needs-signup` is the platform's 303: the token is valid but no profile exists for its email.
+ */
+export type ProfileLookupResult =
+  | { status: 'ok'; profile: UserProfileResponse }
+  | { status: 'needs-signup'; tokenClaims: Auth0TokenClaims }
+  | { status: 'unauthorized' };
+
+/** Pull the token claims out of a 303 body, tolerating a shape we did not expect. */
+function readTokenClaims(body: unknown): Auth0TokenClaims {
+  if (body && typeof body === 'object' && 'userInfo' in body) {
+    const { userInfo } = body as { userInfo: unknown };
+    if (userInfo && typeof userInfo === 'object')
+      return userInfo as Auth0TokenClaims;
+  }
+  return {};
+}
+
 export class UserService {
   /**
-   * Get user profile
-   * Replaces: /api/user/profile
-   * Note: This endpoint requires authentication and will create user if doesn't exist
+   * Get user profile.
+   * Requires authentication. It never creates the profile: the platform answers 303 when the user has not signed up.
    */
   async getProfile(token: string): Promise<UserProfileResponse> {
     return platformFetch<UserProfileResponse>('/profile', { token });
@@ -155,17 +174,28 @@ export class UserService {
   }
 
   /**
-   * Get profile and handle authentication errors gracefully
-   * Returns null if authentication fails instead of throwing
+   * Get the profile, separating the two expected non-success outcomes from real failures.
+   * Anything else still throws.
    */
-  async getProfileSafe(token: string): Promise<UserProfileResponse | null> {
+  async getProfileSafe(token: string): Promise<ProfileLookupResult> {
     try {
-      return await this.getProfile(token);
+      return { status: 'ok', profile: await this.getProfile(token) };
     } catch (error) {
-      // Only 401 (unauthenticated) means "no profile". A 403 on /profile is an authorization denial (a denied impersonation switch, e.g. a stale support pin), not an invalid session, so let it throw rather than clear the impersonator's own auth.
-      if (error instanceof PlatformAPIError && error.status === 401) {
-        return null;
+      if (!(error instanceof PlatformAPIError)) throw error;
+
+      // The platform signals "authenticated, but no profile yet" with a 303 carrying the access token claims. There is no Location header, so fetch surfaces it as a status rather than following it.
+      if (error.status === 303) {
+        return {
+          status: 'needs-signup',
+          tokenClaims: readTokenClaims(error.body),
+        };
       }
+
+      // A 403 here is an authorization denial (a denied impersonation switch, e.g. a stale support pin), not an invalid session, so let it throw rather than clear the impersonator's own auth.
+      if (error.status === 401) {
+        return { status: 'unauthorized' };
+      }
+
       throw error;
     }
   }

@@ -84,9 +84,11 @@ export const useAuthStore = create<AuthStore>()(
         if (!accessToken) throw new Error('Missing access token');
 
         try {
-          const profile = await userService.getProfileSafe(accessToken);
+          const result = await userService.getProfileSafe(accessToken);
 
-          if (!profile) throw new Error('Invalid token');
+          // `needs-signup` still fails here, as it always has. Implicit signup handles it in a later change.
+          if (result.status !== 'ok') throw new Error('Invalid token');
+          const { profile } = result;
 
           const user: User = {
             sub: profile.id,
@@ -166,14 +168,14 @@ export const useAuthStore = create<AuthStore>()(
         if (!accessToken || !user) return;
 
         try {
-          const profile = await userService.getProfileSafe(accessToken);
-          if (!profile) {
+          const result = await userService.getProfileSafe(accessToken);
+          if (result.status !== 'ok') {
             get().clearAuth();
             return;
           }
 
           set(
-            { user: { ...user, profile }, error: null },
+            { user: { ...user, profile: result.profile }, error: null },
             undefined,
             'auth/refresh_profile'
           );
