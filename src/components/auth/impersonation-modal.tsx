@@ -46,7 +46,7 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
       setError(t('impersonation.errors.invalidEmail'));
       return;
     }
-    if (!/^\d{4}$/.test(pin)) {
+    if (!/^[A-Za-z0-9]{4}$/.test(pin)) {
       setError(t('impersonation.errors.invalidPin'));
       return;
     }
@@ -120,12 +120,13 @@ export function ImpersonationModal({ open, onClose }: ImpersonationModalProps) {
             <Input
               id='impersonate-pin'
               type='text'
-              inputMode='numeric'
               autoComplete='off'
               maxLength={4}
               placeholder={t('impersonation.pinPlaceholder')}
               value={pin}
-              onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
+              onChange={e =>
+                setPin(e.target.value.replace(/[^A-Za-z0-9]/g, ''))
+              }
               disabled={isSubmitting}
               required
             />
