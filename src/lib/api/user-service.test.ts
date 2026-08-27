@@ -110,3 +110,33 @@ describe('userService.getProfileSafe', () => {
     await expect(userService.getProfileSafe(TOKEN)).rejects.toBe(error);
   });
 });
+
+describe('userService.createProfile', () => {
+  beforeEach(() => {
+    mockedPlatformFetch.mockReset();
+  });
+
+  // The platform's firewall answers 303 whenever an Authorization header is present, so this call must stay unauthenticated and carry the token in the body instead.
+  it('posts without a token so no Authorization header is sent', async () => {
+    mockedPlatformFetch.mockResolvedValueOnce(profile);
+
+    const payload = {
+      type: 'individual',
+      firstname: 'Ana',
+      lastname: 'Silva',
+      country: 'DE',
+      locale: 'en',
+      isPrivate: true,
+      getNews: false,
+      oAuthAccessToken: TOKEN,
+    } as const;
+
+    await expect(userService.createProfile(payload)).resolves.toBe(profile);
+
+    const [path, options] = mockedPlatformFetch.mock.calls[0];
+    expect(path).toBe('/profile');
+    expect(options.method).toBe('POST');
+    expect(options.body).toEqual(payload);
+    expect(options.token).toBeUndefined();
+  });
+});

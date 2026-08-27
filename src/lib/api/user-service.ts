@@ -126,6 +126,23 @@ function readTokenClaims(body: unknown): Auth0TokenClaims {
   return {};
 }
 
+/**
+ * Body for `POST /profile`.
+ *
+ * Not `CreateUserRequest` from @planet-sdk/common: that type has no `locale`, and its `CountryCode` union is stale (no SS, CW, SX or BQ, still carrying retired AN and TP), so it would reject codes the platform accepts.
+ * The platform rejects any field it does not know with a 400, so keep this to fields the registration form maps.
+ */
+export interface CreateProfileRequest {
+  type: 'individual';
+  firstname: string;
+  lastname: string;
+  country: string;
+  locale: string;
+  isPrivate: boolean;
+  getNews: boolean;
+  oAuthAccessToken: string;
+}
+
 export class UserService {
   /**
    * Get user profile.
@@ -170,6 +187,20 @@ export class UserService {
         'x-switch-user': email,
         'x-user-support-pin': pin,
       },
+    });
+  }
+
+  /**
+   * Create the profile for an already-authenticated Auth0 user.
+   *
+   * Deliberately unauthenticated: the platform's firewall runs whenever an Authorization header is present, which answers 303 before this endpoint is reached. The token goes in the body as `oAuthAccessToken`, where the platform verifies it against Auth0.
+   */
+  async createProfile(
+    payload: CreateProfileRequest
+  ): Promise<UserProfileResponse> {
+    return platformFetch<UserProfileResponse>('/profile', {
+      method: 'POST',
+      body: payload,
     });
   }
 
