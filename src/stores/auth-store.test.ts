@@ -164,6 +164,18 @@ describe('useAuthStore.retryProfileSetup', () => {
     expect(useAuthStore.getState().profileStatus).toBe('error');
   });
 
+  // A retry can turn up a different reason than the one that caused the degraded state, such as an account deleted since the last attempt.
+  it.each(['identity-revoked', 'unverified-email', 'no-email'])(
+    'signs the user out when the retry returns a %s failure',
+    async reason => {
+      mockedEnsureProfile.mockResolvedValueOnce(failed(reason));
+
+      await useAuthStore.getState().retryProfileSetup();
+
+      expect(useAuthStore.getState()).toMatchObject(signedOut());
+    }
+  );
+
   it('signs the user out if the session has since expired', async () => {
     mockedEnsureProfile.mockResolvedValueOnce({ status: 'unauthorized' });
 

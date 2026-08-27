@@ -224,7 +224,11 @@ export const useAuthStore = create<AuthStore>()(
 
         const result = await ensureProfile(accessToken, getClientLocale());
 
-        if (result.status === 'unauthorized') {
+        // Same rule as the initial load: stay signed in only while trying again could still work. A retry can turn up a new reason, such as an account deleted since the last attempt.
+        if (
+          result.status === 'unauthorized' ||
+          (result.status === 'failed' && !isRetryable(result.reason))
+        ) {
           get().clearAuth();
           return;
         }
