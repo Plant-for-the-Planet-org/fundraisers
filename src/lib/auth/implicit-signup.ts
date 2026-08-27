@@ -10,6 +10,7 @@ import { resolveSignupCountry } from './signup-country';
 export type SignupFailureReason =
   | 'unverified-email'
   | 'no-email'
+  | 'identity-revoked'
   | 'create-failed';
 
 /** Enough to keep a session usable without a profile: who the user is, as far as Auth0 told us. */
@@ -72,13 +73,19 @@ async function createProfile(
   locale: string,
   tokenClaims: Auth0TokenClaims
 ): Promise<EnsureProfileResult> {
-  const userInfo = await fetchUserInfo(accessToken);
+  const result = await fetchUserInfo(accessToken);
+  const userInfo = result.status === 'ok' ? result.userInfo : null;
   const identity = deriveIdentity(tokenClaims, userInfo);
   const partial: PartialIdentity = {
     sub: tokenClaims.sub ?? null,
     email: identity.email,
     name: userInfo?.name?.trim() || identity.email,
   };
+
+  // The platform verifies tokens offline, so it still honours a token whose Auth0 user has been deleted. Creating a profile here would resurrect an erased account for the rest of the token's life.
+  if (result.status === 'revoked') {
+    return { status: 'failed', reason: 'identity-revoked', identity: partial };
+  }
 
   // The platform takes the email from the token itself and refuses a token without one, so there is nothing to send.
   if (!identity.email) {

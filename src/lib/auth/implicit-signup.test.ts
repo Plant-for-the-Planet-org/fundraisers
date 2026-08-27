@@ -44,7 +44,7 @@ describe('ensureProfile', () => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     mockedResolveCountry.mockResolvedValue('DE');
-    mockedFetchUserInfo.mockResolvedValue(null);
+    mockedFetchUserInfo.mockResolvedValue({ status: 'unavailable' });
   });
 
   it('returns an existing profile without creating one', async () => {
@@ -70,8 +70,8 @@ describe('ensureProfile', () => {
   it('creates a profile from the derived identity', async () => {
     getProfileSafe.mockResolvedValueOnce(needsSignup());
     mockedFetchUserInfo.mockResolvedValueOnce({
-      given_name: 'Ana',
-      family_name: 'Silva',
+      status: 'ok',
+      userInfo: { given_name: 'Ana', family_name: 'Silva' },
     });
     mockedResolveCountry.mockResolvedValueOnce('IN');
     createProfile.mockResolvedValueOnce(profile);
@@ -94,7 +94,7 @@ describe('ensureProfile', () => {
 
   it('still creates a profile when /userinfo is unavailable', async () => {
     getProfileSafe.mockResolvedValueOnce(needsSignup());
-    mockedFetchUserInfo.mockResolvedValueOnce(null);
+    mockedFetchUserInfo.mockResolvedValueOnce({ status: 'unavailable' });
     createProfile.mockResolvedValueOnce(profile);
 
     await expect(ensureProfile(TOKEN, 'en')).resolves.toMatchObject({
@@ -103,6 +103,18 @@ describe('ensureProfile', () => {
     expect(createProfile).toHaveBeenCalledWith(
       expect.objectContaining({ firstname: 'Ana', lastname: 'Silva' })
     );
+  });
+
+  // The platform verifies tokens offline, so a deleted Auth0 user's token still passes there. Only /userinfo knows the identity is gone.
+  it('creates nothing when Auth0 no longer recognises the user', async () => {
+    getProfileSafe.mockResolvedValueOnce(needsSignup());
+    mockedFetchUserInfo.mockResolvedValueOnce({ status: 'revoked' });
+
+    await expect(ensureProfile(TOKEN, 'en')).resolves.toMatchObject({
+      status: 'failed',
+      reason: 'identity-revoked',
+    });
+    expect(createProfile).not.toHaveBeenCalled();
   });
 
   it('creates nothing when the email is unverified', async () => {
@@ -173,6 +185,7 @@ describe('isRetryable', () => {
   it('only a failed create is worth trying again', () => {
     expect(isRetryable('create-failed')).toBe(true);
     expect(isRetryable('unverified-email')).toBe(false);
+    expect(isRetryable('identity-revoked')).toBe(false);
     expect(isRetryable('no-email')).toBe(false);
   });
 });
