@@ -8,8 +8,8 @@ const PLANET_EMAIL_VERIFIED_CLAIM =
 const FIRSTNAME_ALLOWED = /[^\p{L}\p{N}\sß.'-]/gu;
 const LASTNAME_ALLOWED = /[^\p{L}\p{N}\sß'-]/gu;
 
-/** Stands in for a last name we could not derive. The platform requires a non-blank value and its regex allows a hyphen. */
-export const LASTNAME_PLACEHOLDER = '-';
+/** Stands in for a name we could not derive. The backend requires a non-blank value on both fields, and its regex allows a hyphen. */
+export const NAME_PLACEHOLDER = '-';
 
 export interface Auth0Identity {
   email: string | null;
@@ -34,8 +34,9 @@ export function deriveIdentity(
   return {
     email,
     emailVerified: readEmailVerified(tokenClaims),
-    firstname: sanitize(firstname, FIRSTNAME_ALLOWED),
-    lastname: sanitize(lastname, LASTNAME_ALLOWED) || LASTNAME_PLACEHOLDER,
+    // Neither may be blank. An address whose local part is all separators, such as `...@example.org`, derives nothing at all.
+    firstname: sanitize(firstname, FIRSTNAME_ALLOWED) || NAME_PLACEHOLDER,
+    lastname: sanitize(lastname, LASTNAME_ALLOWED) || NAME_PLACEHOLDER,
   };
 }
 

@@ -45,7 +45,7 @@ The `POST` deliberately carries **no `Authorization` header**. The backend's fir
 | `isPrivate`, `getNews`  | `true` and `false`. No form means no consent was given, so we opt into nothing |
 | `currency`              | Not sent. The backend fills it in from the first donation                      |
 
-Names are cleaned to match what the backend accepts. Its rules differ between the two fields: a dot is allowed in a first name but not in a last name. When no surname can be worked out, we send `-`, because the backend requires a value.
+Names are cleaned to match what the backend accepts. Its rules differ between the two fields: a dot is allowed in a first name but not in a last name. Neither may be blank, so when a name cannot be worked out we send `-` in its place. That covers a missing surname, and also an address whose local part is nothing but separators.
 
 ## Every outcome
 
@@ -132,7 +132,7 @@ Remember to remove the hook afterwards.
 
 **11. A denied impersonation.** Use support pin `1234` on a non-production system, which the backend treats as always wrong. Impersonating an email with no profile gives the same 403 for a different reason. Either way the staffer should stay signed in as themselves.
 
-**12. A name derived from the email.** Sign up with an address whose local part has no separator, such as `testuser@example.com`. The profile should get that as a first name and `-` as a last name.
+**12. A name derived from the email.** Sign up with an address whose local part has no separator, such as `testuser@example.com`. The profile should get that as a first name and `-` as a last name. An address made only of separators, such as `...@example.com`, should give `-` for both.
 
 ## Files
 

@@ -163,6 +163,25 @@ describe('deriveIdentity: name from the email address', () => {
 
     expect(result).toMatchObject({ firstname: 'Ana', lastname: '-' });
   });
+
+  // The backend rejects a blank first name, and an address made only of separators derives nothing at all.
+  it.each(['...@example.org', '+++@example.org', '---@example.org'])(
+    'uses the placeholder for both names when %s derives nothing',
+    email => {
+      const result = deriveIdentity({ [EMAIL_CLAIM]: email }, null);
+
+      expect(result).toMatchObject({ firstname: '-', lastname: '-' });
+    }
+  );
+
+  it('uses the placeholder when sanitising empties the first name', () => {
+    const result = deriveIdentity(
+      claims(),
+      userInfo({ given_name: '<<<', family_name: 'Silva' })
+    );
+
+    expect(result).toMatchObject({ firstname: '-', lastname: 'Silva' });
+  });
 });
 
 describe('deriveIdentity: sanitising for the platform', () => {
