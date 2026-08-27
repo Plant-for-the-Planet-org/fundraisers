@@ -119,10 +119,10 @@ export const useAuthStore = create<AuthStore>()(
           const result = await ensureProfile(accessToken, getClientLocale());
 
           // A profile we could not create is worth staying signed in for, since a retry may well succeed.
-          // A bad session or a deleted Auth0 account is not: nothing the user does will make this session work, so keeping them signed in only hides that.
+          // Everything else is a dead end: nothing the user does will make this session work, so keeping them signed in only hides that.
           if (
             result.status === 'unauthorized' ||
-            (result.status === 'failed' && result.reason === 'identity-revoked')
+            (result.status === 'failed' && !isRetryable(result.reason))
           ) {
             throw new Error('Invalid token');
           }
