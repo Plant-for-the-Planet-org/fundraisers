@@ -12,15 +12,14 @@ import { useAuthStore } from '@/stores/auth-store';
  */
 export function ProfileSetupRetry() {
   const pathname = usePathname();
-  const profileStatus = useAuthStore(state => state.profileStatus);
-  const retryProfileSetup = useAuthStore(state => state.retryProfileSetup);
 
   useEffect(() => {
+    // Read the store at call time rather than subscribing to it. Subscribing would make the status change its own trigger, so a failure would immediately retry itself with no backoff.
+    const { profileStatus, retryProfileSetup } = useAuthStore.getState();
     if (profileStatus === 'ready') return;
 
     void retryProfileSetup();
-    // `pathname` is the trigger: one attempt per navigation, not per render.
-  }, [pathname, profileStatus, retryProfileSetup]);
+  }, [pathname]);
 
   return null;
 }
