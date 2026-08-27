@@ -13,9 +13,9 @@ const FALLBACK_COUNTRY = 'DE';
  */
 export async function resolveSignupCountry(locale: string): Promise<string> {
   const config = await getPlatformConfig();
-  const geolocated = normalize(config?.country ?? config?.loc?.countryCode);
+  const ipCountry = normalize(config?.country ?? config?.loc?.countryCode);
 
-  return geolocated ?? localeCountry(locale) ?? FALLBACK_COUNTRY;
+  return ipCountry ?? localeCountry(locale) ?? FALLBACK_COUNTRY;
 }
 
 function localeCountry(locale: string): string | null {

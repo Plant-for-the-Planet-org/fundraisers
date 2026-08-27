@@ -4,12 +4,14 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
+import { ensureProfile } from '@/lib/auth/implicit-signup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
 import {
   IMPERSONATION_STORAGE_KEY,
   useImpersonationStore,
 } from '@/stores/impersonation-store';
+import { getClientLocale } from '@/i18n/locale-cookie';
 
 interface User {
   sub: string;
@@ -84,10 +86,10 @@ export const useAuthStore = create<AuthStore>()(
         if (!accessToken) throw new Error('Missing access token');
 
         try {
-          const result = await userService.getProfileSafe(accessToken);
+          // Creates the profile if this is the user's first sign-in. Fundraisers has no signup form, so this is where an account becomes usable.
+          const result = await ensureProfile(accessToken, getClientLocale());
 
-          // `needs-signup` still fails here, as it always has. Implicit signup handles it in a later change.
-          if (result.status !== 'ok') throw new Error('Invalid token');
+          if (result.status !== 'ready') throw new Error('Invalid token');
           const { profile } = result;
 
           const user: User = {
