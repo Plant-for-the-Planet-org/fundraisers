@@ -1,10 +1,14 @@
 import type { UserProfile } from '@/lib/api/user-service';
+import type {
+  PartialIdentity,
+  SignupFailureReason,
+} from '@/lib/auth/implicit-signup';
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
-import { ensureProfile } from '@/lib/auth/implicit-signup';
+import { ensureProfile, isRetryable } from '@/lib/auth/implicit-signup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
 import {
@@ -27,6 +31,9 @@ interface AuthStore {
   isAuthenticated: boolean;
   isAuthInitializing: boolean;
   error: string | null;
+  /** `error` means the user is signed in but has no profile yet, so anything that needs one must fall back. */
+  profileStatus: 'ready' | 'error';
+  profileFailureReason: SignupFailureReason | null;
 
   setAccessToken: (token: string | null) => Promise<void>;
   setIsAuthInitializing: (value: boolean) => void;
@@ -34,9 +41,29 @@ interface AuthStore {
   logout: (customReturnTo?: string | undefined) => void;
   clearAuth: () => void;
   refreshProfile: () => Promise<void>;
+  retryProfileSetup: () => Promise<void>;
 }
 
 const isBrowser = typeof window !== 'undefined';
+
+function userFromProfile(profile: UserProfile): User {
+  return {
+    sub: profile.id,
+    email: profile.email,
+    name: profile.displayName,
+    picture: profile.image || undefined,
+    profile,
+  };
+}
+
+// Stands in until the profile exists. Enough for the header to show who is signed in; anything needing a profile checks `profileStatus`.
+function userFromIdentity(identity: PartialIdentity): User {
+  return {
+    sub: identity.sub ?? '',
+    email: identity.email ?? undefined,
+    name: identity.name ?? undefined,
+  };
+}
 
 export const useAuthStore = create<AuthStore>()(
   devtools(
@@ -46,6 +73,8 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isAuthInitializing: true,
       error: null,
+      profileStatus: 'ready',
+      profileFailureReason: null,
 
       setIsAuthInitializing: (value: boolean) =>
         set({ isAuthInitializing: value }, undefined, {
@@ -89,18 +118,35 @@ export const useAuthStore = create<AuthStore>()(
           // Creates the profile if this is the user's first sign-in. Fundraisers has no signup form, so this is where an account becomes usable.
           const result = await ensureProfile(accessToken, getClientLocale());
 
-          if (result.status !== 'ready') throw new Error('Invalid token');
-          const { profile } = result;
+          // Only a bad session signs the user out. A profile we could not create is worth staying signed in for, since a retry may well succeed.
+          if (result.status === 'unauthorized') {
+            throw new Error('Invalid token');
+          }
 
-          const user: User = {
-            sub: profile.id,
-            email: profile.email,
-            name: profile.displayName,
-            picture: profile.image || undefined,
-            profile,
-          };
+          if (result.status === 'failed') {
+            set(
+              {
+                user: userFromIdentity(result.identity),
+                profileStatus: 'error',
+                profileFailureReason: result.reason,
+                error: null,
+              },
+              undefined,
+              'auth/load_user_profile_degraded'
+            );
+            return;
+          }
 
-          set({ user, error: null }, undefined, 'auth/load_user_profile');
+          set(
+            {
+              user: userFromProfile(result.profile),
+              profileStatus: 'ready',
+              profileFailureReason: null,
+              error: null,
+            },
+            undefined,
+            'auth/load_user_profile'
+          );
         } catch (err) {
           console.error('Profile load failed:', err);
           set(
@@ -158,9 +204,44 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: false,
             isAuthInitializing: false,
             error: null,
+            profileStatus: 'ready',
+            profileFailureReason: null,
           },
           undefined,
           'auth/clear_auth'
+        );
+      },
+
+      retryProfileSetup: async () => {
+        const { accessToken, profileStatus, profileFailureReason } = get();
+
+        if (!accessToken || profileStatus === 'ready') return;
+        if (!profileFailureReason || !isRetryable(profileFailureReason)) return;
+
+        const result = await ensureProfile(accessToken, getClientLocale());
+
+        if (result.status === 'unauthorized') {
+          get().clearAuth();
+          return;
+        }
+
+        if (result.status === 'failed') {
+          set(
+            { profileFailureReason: result.reason },
+            undefined,
+            'auth/retry_profile_setup_failed'
+          );
+          return;
+        }
+
+        set(
+          {
+            user: userFromProfile(result.profile),
+            profileStatus: 'ready',
+            profileFailureReason: null,
+          },
+          undefined,
+          'auth/retry_profile_setup'
         );
       },
 
@@ -176,8 +257,9 @@ export const useAuthStore = create<AuthStore>()(
             return;
           }
 
+          // Rebuild from the profile rather than merging, so a changed name or email reaches `user` too.
           set(
-            { user: { ...user, profile: result.profile }, error: null },
+            { user: userFromProfile(result.profile), error: null },
             undefined,
             'auth/refresh_profile'
           );

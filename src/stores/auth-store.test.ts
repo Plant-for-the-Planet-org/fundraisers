@@ -1,8 +1,12 @@
 import type { UserProfile } from '@/lib/api/user-service';
+import type * as ImplicitSignupModule from '@/lib/auth/implicit-signup';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/auth/implicit-signup', () => ({ ensureProfile: vi.fn() }));
+vi.mock('@/lib/auth/implicit-signup', async importOriginal => {
+  const actual = await importOriginal<typeof ImplicitSignupModule>();
+  return { ...actual, ensureProfile: vi.fn() };
+});
 vi.mock('@/i18n/locale-cookie', () => ({ getClientLocale: () => 'de' }));
 
 import { ensureProfile } from '@/lib/auth/implicit-signup';
@@ -23,11 +27,26 @@ function signedOut() {
   return { user: null, accessToken: null, isAuthenticated: false };
 }
 
+const identity = {
+  sub: 'auth0|123',
+  email: 'ana@example.org',
+  name: 'Ana Silva',
+};
+
+function failed(reason: string) {
+  return { status: 'failed', reason, identity };
+}
+
 describe('useAuthStore.setAccessToken', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    useAuthStore.setState({ ...signedOut(), error: null });
+    useAuthStore.setState({
+      ...signedOut(),
+      error: null,
+      profileStatus: 'ready',
+      profileFailureReason: null,
+    });
   });
 
   it('signs the user in once the profile is ready', async () => {
@@ -61,16 +80,18 @@ describe('useAuthStore.setAccessToken', () => {
     expect(useAuthStore.getState()).toMatchObject(signedOut());
   });
 
-  // Stage 7 replaces this: a failed creation should leave the user signed in and retry later.
-  it('signs the user out when the profile could not be created', async () => {
-    mockedEnsureProfile.mockResolvedValueOnce({
-      status: 'failed',
-      reason: 'error',
-    });
+  // A failed creation is not a failed sign-in. Signing the user out would lose a working session over something a retry may fix.
+  it('keeps the user signed in when the profile could not be created', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce(failed('create-failed'));
 
     await useAuthStore.getState().setAccessToken(TOKEN);
 
-    expect(useAuthStore.getState()).toMatchObject(signedOut());
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.profileStatus).toBe('error');
+    expect(state.profileFailureReason).toBe('create-failed');
+    expect(state.user).toMatchObject({ email: 'ana@example.org' });
+    expect(state.user?.profile).toBeUndefined();
   });
 
   it('signs the user out when signup throws outright', async () => {
@@ -95,5 +116,75 @@ describe('useAuthStore.setAccessToken', () => {
     await useAuthStore.getState().setAccessToken(TOKEN);
 
     expect(mockedEnsureProfile).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useAuthStore.retryProfileSetup', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    useAuthStore.setState({
+      user: null,
+      accessToken: TOKEN,
+      isAuthenticated: true,
+      profileStatus: 'error',
+      profileFailureReason: 'create-failed',
+      error: null,
+    });
+  });
+
+  it('completes the signup and clears the degraded state', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce({ status: 'ready', profile });
+
+    await useAuthStore.getState().retryProfileSetup();
+
+    const state = useAuthStore.getState();
+    expect(state.profileStatus).toBe('ready');
+    expect(state.profileFailureReason).toBeNull();
+    expect(state.user).toMatchObject({ profile });
+  });
+
+  it('stays degraded when the retry fails again', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce(failed('create-failed'));
+
+    await useAuthStore.getState().retryProfileSetup();
+
+    expect(useAuthStore.getState().profileStatus).toBe('error');
+  });
+
+  it('signs the user out if the session has since expired', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce({ status: 'unauthorized' });
+
+    await useAuthStore.getState().retryProfileSetup();
+
+    expect(useAuthStore.getState()).toMatchObject(signedOut());
+  });
+
+  it('does nothing once the profile is ready', async () => {
+    useAuthStore.setState({ profileStatus: 'ready' });
+
+    await useAuthStore.getState().retryProfileSetup();
+
+    expect(mockedEnsureProfile).not.toHaveBeenCalled();
+  });
+
+  // Retrying cannot fix these; the user has to verify their email or sign in with an account that has one.
+  it.each(['unverified-email', 'no-email'] as const)(
+    'does not retry a %s failure',
+    async reason => {
+      useAuthStore.setState({ profileFailureReason: reason });
+
+      await useAuthStore.getState().retryProfileSetup();
+
+      expect(mockedEnsureProfile).not.toHaveBeenCalled();
+    }
+  );
+
+  it('does nothing without a token', async () => {
+    useAuthStore.setState({ accessToken: null });
+
+    await useAuthStore.getState().retryProfileSetup();
+
+    expect(mockedEnsureProfile).not.toHaveBeenCalled();
   });
 });

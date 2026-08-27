@@ -15,7 +15,7 @@ vi.mock('./signup-country', () => ({ resolveSignupCountry: vi.fn() }));
 
 import { userService } from '../api/user-service';
 import { fetchUserInfo } from './auth0-userinfo';
-import { ensureProfile } from './implicit-signup';
+import { ensureProfile, isRetryable } from './implicit-signup';
 import { resolveSignupCountry } from './signup-country';
 
 const getProfileSafe = userService.getProfileSafe as ReturnType<typeof vi.fn>;
@@ -110,9 +110,10 @@ describe('ensureProfile', () => {
       needsSignup({ ...verifiedClaims, [VERIFIED_CLAIM]: false })
     );
 
-    await expect(ensureProfile(TOKEN, 'en')).resolves.toEqual({
+    await expect(ensureProfile(TOKEN, 'en')).resolves.toMatchObject({
       status: 'failed',
       reason: 'unverified-email',
+      identity: { email: 'ana.silva@example.org', sub: 'auth0|123' },
     });
     expect(createProfile).not.toHaveBeenCalled();
   });
@@ -120,9 +121,10 @@ describe('ensureProfile', () => {
   it('creates nothing when there is no email to identify the user', async () => {
     getProfileSafe.mockResolvedValueOnce(needsSignup({ sub: 'auth0|123' }));
 
-    await expect(ensureProfile(TOKEN, 'en')).resolves.toEqual({
+    await expect(ensureProfile(TOKEN, 'en')).resolves.toMatchObject({
       status: 'failed',
       reason: 'no-email',
+      identity: { email: null },
     });
     expect(createProfile).not.toHaveBeenCalled();
   });
@@ -131,9 +133,10 @@ describe('ensureProfile', () => {
     getProfileSafe.mockResolvedValueOnce(needsSignup());
     createProfile.mockRejectedValueOnce(new Error('400'));
 
-    await expect(ensureProfile(TOKEN, 'en')).resolves.toEqual({
+    await expect(ensureProfile(TOKEN, 'en')).resolves.toMatchObject({
       status: 'failed',
-      reason: 'error',
+      reason: 'create-failed',
+      identity: { email: 'ana.silva@example.org' },
     });
   });
 
@@ -163,5 +166,13 @@ describe('ensureProfile', () => {
       status: 'ready',
     });
     expect(createProfile).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('isRetryable', () => {
+  it('only a failed create is worth trying again', () => {
+    expect(isRetryable('create-failed')).toBe(true);
+    expect(isRetryable('unverified-email')).toBe(false);
+    expect(isRetryable('no-email')).toBe(false);
   });
 });
