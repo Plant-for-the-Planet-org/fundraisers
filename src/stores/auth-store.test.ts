@@ -94,6 +94,15 @@ describe('useAuthStore.setAccessToken', () => {
     expect(state.user?.profile).toBeUndefined();
   });
 
+  // The Auth0 account is gone, so no retry and no navigation can make this session work. Keeping the user signed in would only hide that.
+  it('signs the user out when Auth0 no longer recognises the identity', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce(failed('identity-revoked'));
+
+    await useAuthStore.getState().setAccessToken(TOKEN);
+
+    expect(useAuthStore.getState()).toMatchObject(signedOut());
+  });
+
   it('signs the user out when signup throws outright', async () => {
     mockedEnsureProfile.mockRejectedValueOnce(new Error('boom'));
 

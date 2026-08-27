@@ -118,8 +118,12 @@ export const useAuthStore = create<AuthStore>()(
           // Creates the profile if this is the user's first sign-in. Fundraisers has no signup form, so this is where an account becomes usable.
           const result = await ensureProfile(accessToken, getClientLocale());
 
-          // Only a bad session signs the user out. A profile we could not create is worth staying signed in for, since a retry may well succeed.
-          if (result.status === 'unauthorized') {
+          // A profile we could not create is worth staying signed in for, since a retry may well succeed.
+          // A bad session or a deleted Auth0 account is not: nothing the user does will make this session work, so keeping them signed in only hides that.
+          if (
+            result.status === 'unauthorized' ||
+            (result.status === 'failed' && result.reason === 'identity-revoked')
+          ) {
             throw new Error('Invalid token');
           }
 

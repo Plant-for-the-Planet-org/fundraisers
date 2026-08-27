@@ -222,10 +222,12 @@ export class UserService {
         };
       }
 
-      // A 403 here is an authorization denial (a denied impersonation switch, e.g. a stale support pin), not an invalid session, so let it throw rather than clear the impersonator's own auth.
       if (error.status === 401) {
         return { status: 'unauthorized' };
       }
+
+      // Everything else throws, and 403 is the one to be careful about: it means the impersonation switch was denied, either by a bad support pin or because the target email has no profile. It never means "needs signup".
+      // Creating a profile here would use the staffer's own token, since createProfile sends no impersonation headers.
 
       throw error;
     }
