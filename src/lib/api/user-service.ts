@@ -1,4 +1,5 @@
 import type { UserType } from '@planet-sdk/common';
+import type { Auth0TokenClaims } from '../types/auth';
 import type { Nullable } from '../types/utility';
 
 import { PlatformAPIError, platformFetch } from './platform-fetch';
@@ -18,11 +19,12 @@ export interface Address {
 export interface UserProfileResponse {
   slug: string;
   type: UserType;
-  currency: string;
+  // Nullable on the platform: org and tpo profiles carry `name` and leave firstname/lastname null.
+  currency: string | null;
   name: string | null;
-  firstname: string;
-  lastname: string;
-  country: string;
+  firstname: string | null;
+  lastname: string | null;
+  country: string | null;
   email: string;
   image: string | null;
   url: string | null;
@@ -105,11 +107,46 @@ export interface ProfilePaymentMethod {
   isDefault: boolean;
 }
 
+/**
+ * Outcome of a profile lookup.
+ * `needs-signup` is the platform's 303: the token is valid but no profile exists for its email.
+ */
+export type ProfileLookupResult =
+  | { status: 'ok'; profile: UserProfileResponse }
+  | { status: 'needs-signup'; tokenClaims: Auth0TokenClaims }
+  | { status: 'unauthorized' };
+
+/** Pull the token claims out of a 303 body, tolerating a shape we did not expect. */
+function readTokenClaims(body: unknown): Auth0TokenClaims {
+  if (body && typeof body === 'object' && 'userInfo' in body) {
+    const { userInfo } = body as { userInfo: unknown };
+    if (userInfo && typeof userInfo === 'object')
+      return userInfo as Auth0TokenClaims;
+  }
+  return {};
+}
+
+/**
+ * Body for `POST /profile`.
+ *
+ * Not `CreateUserRequest` from @planet-sdk/common: that type has no `locale`, and its `CountryCode` union is stale (no SS, CW, SX or BQ, still carrying retired AN and TP), so it would reject codes the platform accepts.
+ * The platform rejects any field it does not know with a 400, so keep this to fields the registration form maps.
+ */
+export interface CreateProfileRequest {
+  type: 'individual';
+  firstname: string;
+  lastname: string;
+  country: string;
+  locale: string;
+  isPrivate: boolean;
+  getNews: boolean;
+  oAuthAccessToken: string;
+}
+
 export class UserService {
   /**
-   * Get user profile
-   * Replaces: /api/user/profile
-   * Note: This endpoint requires authentication and will create user if doesn't exist
+   * Get user profile.
+   * Requires authentication. It never creates the profile: the platform answers 303 when the user has not signed up.
    */
   async getProfile(token: string): Promise<UserProfileResponse> {
     return platformFetch<UserProfileResponse>('/profile', { token });
@@ -154,17 +191,44 @@ export class UserService {
   }
 
   /**
-   * Get profile and handle authentication errors gracefully
-   * Returns null if authentication fails instead of throwing
+   * Create the profile for an already-authenticated Auth0 user.
+   *
+   * Deliberately unauthenticated: the platform's firewall runs whenever an Authorization header is present, which answers 303 before this endpoint is reached. The token goes in the body as `oAuthAccessToken`, where the platform verifies it against Auth0.
    */
-  async getProfileSafe(token: string): Promise<UserProfileResponse | null> {
+  async createProfile(
+    payload: CreateProfileRequest
+  ): Promise<UserProfileResponse> {
+    return platformFetch<UserProfileResponse>('/profile', {
+      method: 'POST',
+      body: payload,
+    });
+  }
+
+  /**
+   * Get the profile, separating the two expected non-success outcomes from real failures.
+   * Anything else still throws.
+   */
+  async getProfileSafe(token: string): Promise<ProfileLookupResult> {
     try {
-      return await this.getProfile(token);
+      return { status: 'ok', profile: await this.getProfile(token) };
     } catch (error) {
-      // Only 401 (unauthenticated) means "no profile". A 403 on /profile is an authorization denial (a denied impersonation switch, e.g. a stale support pin), not an invalid session, so let it throw rather than clear the impersonator's own auth.
-      if (error instanceof PlatformAPIError && error.status === 401) {
-        return null;
+      if (!(error instanceof PlatformAPIError)) throw error;
+
+      // The platform signals "authenticated, but no profile yet" with a 303 carrying the access token claims. There is no Location header, so fetch surfaces it as a status rather than following it.
+      if (error.status === 303) {
+        return {
+          status: 'needs-signup',
+          tokenClaims: readTokenClaims(error.body),
+        };
       }
+
+      if (error.status === 401) {
+        return { status: 'unauthorized' };
+      }
+
+      // Everything else throws, and 403 is the one to be careful about: it means the impersonation switch was denied, either by a bad support pin or because the target email has no profile. It never means "needs signup".
+      // Creating a profile here would use the staffer's own token, since createProfile sends no impersonation headers.
+
       throw error;
     }
   }

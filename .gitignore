@@ -52,3 +52,6 @@ locales/**/*.d.json.ts
 .claude/worktrees/
 
 certificates
+
+# HAR captures from devtools; Can contain sensitive information
+*.har
