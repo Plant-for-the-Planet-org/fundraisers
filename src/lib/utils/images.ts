@@ -32,3 +32,17 @@ export function resolveProjectImageSource(image?: string): string | null {
   if (/^https?:\/\//i.test(image)) return image;
   return getImageUrl('project', 'small', image);
 }
+
+/**
+ * Resolves a fundraiser's `image` field to a renderable URL. Accepts either a
+ * full http(s) URL (returned as-is) or a CDN filename. Returns `null` for
+ * empty input.
+ */
+export function resolveFundraiserImageSource(
+  image: string | null | undefined,
+  size: ImageSize = 'large'
+): string | null {
+  if (!image) return null;
+  if (/^https?:\/\//i.test(image)) return image;
+  return getImageUrl('fundraiser', size, image);
+}

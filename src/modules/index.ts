@@ -29,6 +29,14 @@ export interface ModuleDescriptor {
   readonly settingsKey: string;
   readonly localeNamespace?: string;
   readonly route?: { readonly segment: string };
+  /**
+   * What happens to this module's settings when a fundraiser is cloned.
+   * `copy` (the default) carries them over as they are; `reset` drops the slot
+   * so the clone falls back to the module's own defaults. Pick `reset` for
+   * settings that only make sense for the original, such as anything tied to
+   * donations already received.
+   */
+  readonly clone?: 'copy' | 'reset';
 }
 
 /**

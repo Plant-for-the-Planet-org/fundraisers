@@ -13,6 +13,7 @@ import { getWorkspaceForCountry } from '@/lib/constants/bundle-country-mapping';
 import {
   DESCRIPTION_MAX_LENGTH,
   GOAL_AMOUNT_MIN,
+  TITLE_MAX_LENGTH,
 } from '@/lib/constants/fundraiser-creation';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { isValidHexColor } from '@/lib/theme/color-utils';
@@ -89,7 +90,7 @@ export const SLUG_MAX_LENGTH = 32;
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 export const fundraiserFormSchema = z.object({
-  title: z.string().trim().min(1).max(50),
+  title: z.string().trim().min(1).max(TITLE_MAX_LENGTH),
   // Edit-only. The create flow never renders a slug field, so this stays
   // optional and is validated only when present.
   slug: z

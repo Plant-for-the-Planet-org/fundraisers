@@ -1,3 +1,4 @@
+export { CloneFundraiserDialog } from './clone-fundraiser-dialog';
 export { DashboardHeader } from './dashboard-header';
 export { DashboardStatsError } from './dashboard-stats-error';
 export { DashboardSummary } from './dashboard-summary';

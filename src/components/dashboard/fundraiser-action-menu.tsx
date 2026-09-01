@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
+  Copy,
   Link as LinkIcon,
   Loader2,
   Monitor,
@@ -45,6 +46,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { openStageWindow } from '@/modules/stage';
+import { CloneFundraiserDialog } from './clone-fundraiser-dialog';
 
 interface FundraiserActionMenuProps {
   fundraiser: Fundraiser;
@@ -54,6 +56,7 @@ interface FundraiserActionMenuProps {
 
 interface ActionVisibility {
   edit: boolean;
+  clone: boolean;
   copyLink: boolean;
   pause: boolean;
   resume: boolean;
@@ -63,6 +66,7 @@ interface ActionVisibility {
 
 const NON_OWNER_ACTIONS: ActionVisibility = {
   edit: false,
+  clone: false,
   copyLink: true,
   pause: false,
   resume: false,
@@ -77,6 +81,7 @@ type StatusActions = Omit<ActionVisibility, 'stageMode'>;
 const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   active: {
     edit: true,
+    clone: true,
     copyLink: true,
     pause: true,
     resume: false,
@@ -84,6 +89,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   },
   paused: {
     edit: true,
+    clone: true,
     copyLink: true,
     pause: false,
     resume: true,
@@ -91,6 +97,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   },
   draft: {
     edit: true,
+    clone: true,
     copyLink: true,
     pause: false,
     resume: false,
@@ -101,13 +108,17 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   // deliberate termination and remains locked.
   completed: {
     edit: true,
+    clone: true,
     copyLink: true,
     pause: false,
     resume: false,
     delete: true,
   },
+  // Cloning stays available on a cancelled fundraiser: the original is locked,
+  // but its setup is still the fastest way to start the campaign again.
   cancelled: {
     edit: false,
+    clone: true,
     copyLink: true,
     pause: false,
     resume: false,
@@ -116,6 +127,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   // Archived fundraisers are not returned by the list API, so this is a defensive check.
   archived: {
     edit: false,
+    clone: false,
     copyLink: true,
     pause: false,
     resume: false,
@@ -152,10 +164,12 @@ export function FundraiserActionMenu({
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
     actions.edit ||
+    actions.clone ||
     actions.copyLink ||
     actions.pause ||
     actions.resume ||
@@ -163,7 +177,8 @@ export function FundraiserActionMenu({
     actions.delete;
   const showStatusGroup = actions.pause || actions.resume;
   const showSeparator =
-    showStatusGroup && (actions.edit || actions.copyLink || actions.stageMode);
+    showStatusGroup &&
+    (actions.edit || actions.clone || actions.copyLink || actions.stageMode);
 
   if (!hasAnyAction) return null;
 
@@ -251,6 +266,20 @@ export function FundraiserActionMenu({
               <Pencil aria-hidden='true' />
               {t('edit')}
             </Link>
+          </DropdownMenuItem>
+        )}
+
+        {actions.clone && (
+          <DropdownMenuItem
+            className='cursor-pointer rounded-lg py-2'
+            onSelect={event => {
+              event.preventDefault();
+              setOpen(false);
+              setCloneDialogOpen(true);
+            }}
+          >
+            <Copy aria-hidden='true' />
+            {t('clone')}
           </DropdownMenuItem>
         )}
 
@@ -342,6 +371,12 @@ export function FundraiserActionMenu({
           </>
         )}
       </DropdownMenuContent>
+
+      <CloneFundraiserDialog
+        fundraiser={fundraiser}
+        open={cloneDialogOpen}
+        onOpenChange={setCloneDialogOpen}
+      />
 
       <Dialog
         open={deleteDialogOpen}
