@@ -61,7 +61,7 @@ const RICH_TEXT_ALLOWED_STYLES: IOptions['allowedStyles'] = {
 };
 
 const DESCRIPTION_ALLOWED_ATTR: IOptions['allowedAttributes'] = {
-  a: ['href', 'title', 'rel'],
+  a: ['href', 'title', 'rel', 'target'],
   p: ['style'],
   span: ['style'],
   [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
@@ -111,7 +111,7 @@ export function sanitizeThankYouHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: THANK_YOU_ALLOWED_TAGS,
     allowedAttributes: {
-      a: ['href', 'title', 'rel'],
+      a: ['href', 'title', 'rel', 'target'],
       p: ['style'],
       span: ['style'],
       [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,

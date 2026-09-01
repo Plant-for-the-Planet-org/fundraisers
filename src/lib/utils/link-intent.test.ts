@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isAllowedEditorLinkHref,
   isValidExternalHref,
+  isWhitelistedHref,
   normalizeLinkHref,
   shouldAutoLinkHref,
 } from './link-intent';
@@ -68,5 +69,20 @@ describe('TipTap link validation', () => {
     'not-a-domain',
   ])('rejects automatic or pasted unsupported link %s', href => {
     expect(shouldAutoLinkHref(href)).toBe(false);
+  });
+});
+
+describe('isWhitelistedHref', () => {
+  it('allows trusted HTTPS links to bypass the warning', () => {
+    expect(isWhitelistedHref('https://plant-for-the-planet.org')).toBe(true);
+  });
+
+  it('routes trusted HTTP links through the warning', () => {
+    expect(isWhitelistedHref('http://plant-for-the-planet.org')).toBe(false);
+  });
+
+  it('does not bypass the warning for untrusted or mail links', () => {
+    expect(isWhitelistedHref('https://example.com')).toBe(false);
+    expect(isWhitelistedHref('mailto:hello@example.com')).toBe(false);
   });
 });

@@ -50,13 +50,13 @@
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
-    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-decoration-color: color-mix(in srgb, currentcolor 35%, transparent);
     transition: text-decoration-color 150ms ease;
   }
 
   .rich-links a:hover,
   .quiet-link:hover {
-    text-decoration-color: currentColor;
+    text-decoration-color: currentcolor;
   }
 
   /*

@@ -35,7 +35,7 @@ export function RichTextClickCapture({
   className,
 }: RichTextClickCaptureProps) {
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    // Right-click still needs the native context menu; only primary and middle (aux) clicks should go through the /external gate.
+    // Primary and middle (aux) clicks go through the same trust gate.
     if (event.button === 2) return;
     const anchor = (event.target as HTMLElement).closest('a');
     const href = anchor?.getAttribute('href');
@@ -54,6 +54,16 @@ export function RichTextClickCapture({
     if (!openInNewTab(externalUrl)) showPopupBlockedToast(externalUrl);
   };
 
+  const handleContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    const href = anchor?.getAttribute('href');
+    if (!href || isWhitelistedHref(href)) return;
+
+    // The browser's "open link" actions navigate to the raw href and bypass
+    // our click handler, so untrusted links cannot expose a native link menu.
+    event.preventDefault();
+  };
+
   // Fast path: no embed markers → single node, byte-identical to before.
   if (!hasEmbedMarker(safeHtml)) {
     return (
@@ -61,13 +71,19 @@ export function RichTextClickCapture({
         className={cn(className)}
         onClick={handleClick}
         onAuxClick={handleClick}
+        onContextMenu={handleContextMenu}
         dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
       />
     );
   }
 
   return (
-    <div className={className} onClick={handleClick} onAuxClick={handleClick}>
+    <div
+      className={className}
+      onClick={handleClick}
+      onAuxClick={handleClick}
+      onContextMenu={handleContextMenu}
+    >
       {splitEmbedMarkers(safeHtml).map((segment, index) => {
         if (segment.kind === 'video') {
           return (

@@ -42,10 +42,12 @@ import {
   isAllowedEditorLinkHref,
   isValidExternalHref,
   normalizeLinkHref,
+  openInNewTab,
   shouldAutoLinkHref,
 } from '@/lib/utils/link-intent';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
 import { ImageEmbedNode } from '@/components/ui/image-embed-node';
+import { showPopupBlockedToast } from '@/components/ui/popup-blocked-toast';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
@@ -556,6 +558,9 @@ export function RichTextEditor({
     } else {
       closeLinkInput();
     }
+    // This blur already happened, so closeLinkInput's suppression flag has no
+    // follow-on blur to consume it. Do not leak it into the next edit session.
+    suppressNextLinkBlurRef.current = false;
   };
 
   const removeLink = () => {
@@ -565,11 +570,9 @@ export function RichTextEditor({
 
   const openLinkInNewTab = () => {
     if (!toolbarState.linkHref) return;
-    const anchor = document.createElement('a');
-    anchor.href = toolbarState.linkHref;
-    anchor.target = '_blank';
-    anchor.rel = 'noopener noreferrer';
-    anchor.click();
+    if (!openInNewTab(toolbarState.linkHref)) {
+      showPopupBlockedToast(toolbarState.linkHref);
+    }
   };
 
   return (

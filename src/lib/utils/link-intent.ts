@@ -31,15 +31,16 @@ export function getLinkIntent(href: string): LinkIntent {
 
 /**
  * Whether a link can skip the `/external` warning gate and open directly.
- * Only `http`/`https` links to a domain Plant-for-the-Planet owns qualify —
- * `mailto:` has no domain to check, so it never does.
+ * Only HTTPS links to a domain Plant-for-the-Planet owns qualify. Plain HTTP
+ * still works, but must go through the `/external` warning first.
  */
 export function isWhitelistedHref(href: string): boolean {
   const intent = getLinkIntent(href);
   if (intent.scheme !== 'web') return false;
 
   try {
-    return isWhitelistedHostname(new URL(href).hostname);
+    const url = new URL(href);
+    return url.protocol === 'https:' && isWhitelistedHostname(url.hostname);
   } catch {
     return false;
   }
