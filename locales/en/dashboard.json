@@ -16,8 +16,7 @@
       },
       "totalRaised": {
         "label": "Total Raised",
-        "helper": "across all time",
-        "empty": "No funds raised yet"
+        "helper": "across all time"
       },
       "donations": {
         "label": "Donations",

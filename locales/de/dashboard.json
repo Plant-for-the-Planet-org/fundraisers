@@ -16,8 +16,7 @@
       },
       "totalRaised": {
         "label": "Insgesamt gesammelt",
-        "helper": "über die ganze Zeit",
-        "empty": "Noch keine Gelder gesammelt"
+        "helper": "über die ganze Zeit"
       },
       "donations": {
         "label": "Spenden",

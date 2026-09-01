@@ -45,6 +45,7 @@ export function DashboardSummary({
 
   const { consolidatedTotalRaised } = summary;
 
+  // Until a fundraiser has a currency set there is nothing to format against, so fall back to a plain zero.
   const totalRaisedValue = consolidatedTotalRaised
     ? formatCurrencyFromDecimal(
         consolidatedTotalRaised.amount,
@@ -52,7 +53,7 @@ export function DashboardSummary({
         locale,
         { compact: true }
       )
-    : t('totalRaised.empty');
+    : formatCompactNumber(0, locale);
 
   const fundraisersHelper = t.rich('fundraisers.activeStatus', {
     count: summary.activeFundraiserCount,
