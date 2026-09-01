@@ -11,6 +11,7 @@
       "label": "Auf dieser Seite",
       "law": "Die Regel",
       "store": "Was wir speichern",
+      "visits": "Besuche zählen",
       "video": "Video",
       "monitoring": "Fehlererfassung",
       "payments": "Zahlung",
@@ -38,6 +39,10 @@
           "body": "Wenn du ein Video laden möchtest, merken wir uns das. Vorher speichern wir nichts."
         }
       }
+    },
+    "visits": {
+      "title": "Besuche zählen",
+      "body": "Wir nutzen Umami, ein Open-Source-Werkzeug auf unseren eigenen Servern, um zu sehen, ob eine Seite Menschen erreicht. Es speichert nichts auf deinem Gerät und sendet nichts an Dritte. Deine IP-Adresse wird einen Moment lang genutzt, um einen ungefähren Ort und einen Besuchscode zu ermitteln, und danach verworfen statt gespeichert. Außerdem erfassen wir, wo Menschen klicken und wie weit sie scrollen, als reine Koordinaten, die über alle Besuche zusammengefasst werden, damit wir sehen, welche Teile einer Seite funktionieren. Wir zeichnen weder deinen Bildschirm auf noch, was du tippst, und wir verknüpfen damit nie deinen Namen, deine E-Mail-Adresse oder dein Konto."
     },
     "video": {
       "title": "Das Einzige, wonach wir fragen: Video",
