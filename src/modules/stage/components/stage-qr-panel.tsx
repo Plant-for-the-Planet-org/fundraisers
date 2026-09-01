@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
 import {
@@ -15,30 +16,43 @@ interface StageQRPanelProps {
 
 export function StageQRPanel({ slug, className }: StageQRPanelProps) {
   const t = useTranslations('Stage');
-  const donateUrl = `${STAGE_SHORT_URL_DOMAIN}/${encodeURIComponent(slug)}`;
+  const [qrSrc, setQrSrc] = useState<string | null>(null);
+  const donateUrl = `${STAGE_SHORT_URL_DOMAIN}/${slug}`;
 
-  // The QR encodes the same short URL printed below it, which halves the payload
-  // against the full domain and gives a denser, easier-to-scan code from a distance.
-  // `stage.pp.eco/X` is a 301 to `/raise/X` that carries the query through, so the
-  // campaign params survive the hop. If it ever appends them itself, drop them here.
-  //
-  // Slug, not the GUID: Umami keys pageviews by URL, so pointing at the path the rest
-  // of the app links to keeps scans and organic visits counted as one page.
-  //
-  // No utm_campaign. It would only repeat the source, and it leaves the field free
-  // for a real event name later.
-  const params = new URLSearchParams({
-    utm_source: 'stage',
-    utm_medium: 'qr',
-  });
-  // QR_CODE_BASE_URL encodes whatever follows `?` verbatim, e.g.
-  // https://qr.pp.eco/?https://example.com — no named param, no encoding.
-  const qrSrc = `${QR_CODE_BASE_URL}/?https://${donateUrl}?${params.toString()}`;
+  useEffect(() => {
+    // Built from the current origin rather than the short domain, so the QR is
+    // scannable on dev and preview deployments too. Routing it through
+    // stage.pp.eco would pin every environment to production, and measured against
+    // qr.pp.eco it does not even shrink the code: both payloads land on the same
+    // grid. That only changes if stage.pp.eco starts appending the params itself.
+    //
+    // Slug, not the GUID: Umami keys pageviews by URL, so pointing at the path the
+    // rest of the app links to keeps scans and organic visits counted as one page.
+    //
+    // No utm_campaign. It would only repeat the source, and it leaves the field
+    // free for a real event name later.
+    const params = new URLSearchParams({
+      utm_source: 'stage',
+      utm_medium: 'qr',
+    });
+    const target = `${window.location.origin}/raise/${encodeURIComponent(slug)}?${params.toString()}`;
+    // ponytail: window.location.origin is unavailable during SSR, so this
+    // value can only be computed client-side after mount — the effect is
+    // intentional here, not an oversight the lint rule assumes.
+    // QR_CODE_BASE_URL encodes whatever follows `?` verbatim, e.g.
+    // https://qr.pp.eco/?https://example.com — no named param, no encoding.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQrSrc(`${QR_CODE_BASE_URL}/?${target}`);
+  }, [slug]);
 
   return (
     <GlassPanel className={`p-[18px] ${className ?? ''}`}>
       <div className='flex aspect-square items-center justify-center rounded-2xl bg-white p-2.5'>
-        <img src={qrSrc} alt={t('scanToDonate')} className='h-full w-full' />
+        {qrSrc ? (
+          <img src={qrSrc} alt={t('scanToDonate')} className='h-full w-full' />
+        ) : (
+          <div className='h-full w-full rounded-xl bg-[#0B1220]/5' />
+        )}
       </div>
 
       <div className='mt-3 flex flex-col items-center gap-0.5 text-center'>

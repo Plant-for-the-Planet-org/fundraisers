@@ -117,8 +117,8 @@ Toast notifications overlay top-right when a new donation lands.
 | Partner logo                                   | `modules.stage.partner_logo_url`                                                                                                                  | Top bar                     |
 | Goal, raised, trees, days left, donation count | `GET /fundraisers/{slug}/alltime-stats?stagehash=` via `useAlltimeStats` (polls 15s; uses [`getAlltimeStats`](./alltime-stats.ts) under the hood) | Counter                     |
 | Donation feed + leaderboard                    | Leaderboard module endpoint (polled every 15s)                                                                                                    | Ticker, toasts, leaderboard |
-| QR code                                        | `https://qr.pp.eco/?https://stage.pp.eco/{slug}?utm_source=stage&utm_medium=qr`                                                                   | QR panel                    |
-| Short URL display                              | `stage.pp.eco/{slug}` — same URL the QR encodes                                                                                                   | QR panel label              |
+| QR code                                        | `https://qr.pp.eco/?{origin}/raise/{slug}?utm_source=stage&utm_medium=qr`                                                                         | QR panel                    |
+| Short URL display                              | `stage.pp.eco/{slug}` — 301s to `/raise/{slug}`, no UTM params                                                                                    | QR panel label              |
 | Slide content                                  | `modules.stage.slides`                                                                                                                            | Story panel                 |
 | Theme, fonts, accent                           | `fundraiser.settings.theme`                                                                                                                       | All styling                 |
 
