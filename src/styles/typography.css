@@ -31,18 +31,32 @@
 
   /*
    * Links inside rich-text surfaces (editor + displays). Separate from
-   * .rich-quote — quotes and links are independent features. Uniform link
-   * style: same colors as the footer links (text-muted-foreground +
-   * hover:text-foreground); underline stays specific to rich-text links.
+   * .rich-quote — quotes and links are independent features.
+   *
+   * A link keeps the colour of the text around it. Recolouring it to
+   * muted-foreground made links read as washed out against the body copy, so
+   * the underline is the only affordance: a hairline, faint at rest so a
+   * paragraph full of links stays calm, and the full text colour on hover.
+   * Both states derive from `currentColor`, so this works on any surface
+   * (description, host message, thank-you card) without per-surface rules.
+   *
+   * `.quiet-link` is the same treatment for something that behaves like a link
+   * but isn't an anchor — today the project "Read more" toggle. Shared so the
+   * two can't drift apart, which is what `.rich-links` was split out for.
    */
-  .rich-links a {
-    color: hsl(var(--muted-foreground));
+  .rich-links a,
+  .quiet-link {
+    color: inherit;
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    transition: text-decoration-color 150ms ease;
   }
 
-  .rich-links a:hover {
-    color: hsl(var(--foreground));
+  .rich-links a:hover,
+  .quiet-link:hover {
+    text-decoration-color: currentColor;
   }
 
   /*
