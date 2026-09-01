@@ -59,17 +59,7 @@
       "invalidUrl": "Gib einen gültigen Link ein (eine Webadresse oder E-Mail)."
     },
     "externalLinkWarning": {
-      "webTitle": "Du verlässt startplanting.org",
-      "webBody": "Dieser Link führt zu <strong>{domain}</strong>. Du wirst in {seconds}s weitergeleitet.",
-      "mailTitle": "Dies öffnet deine Mail-App",
-      "mailBody": "Du sendest gleich eine E-Mail an <strong>{address}</strong>.",
-      "telTitle": "Dies öffnet deine Telefon-App",
-      "telBody": "Du rufst gleich <strong>{number}</strong> an.",
-      "stayHere": "Hierbleiben",
       "goBack": "Zurück",
-      "goToLink": "Zum Link",
-      "goToMail": "Zur Mail",
-      "goToPhone": "Zum Anruf",
       "invalidTitle": "Ungültiger Link",
       "invalidBody": "Dieser Link ist ungültig und kann nicht geöffnet werden.",
       "leavingTitle": "Du verlässt startplanting.org",
