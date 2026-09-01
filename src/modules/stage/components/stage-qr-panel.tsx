@@ -10,27 +10,27 @@ import {
 import { GlassPanel } from './glass-panel';
 
 interface StageQRPanelProps {
-  fundraiserId: string;
   slug: string;
   className?: string;
 }
 
-export function StageQRPanel({
-  fundraiserId,
-  slug,
-  className,
-}: StageQRPanelProps) {
+export function StageQRPanel({ slug, className }: StageQRPanelProps) {
   const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
   const donateUrl = `${STAGE_SHORT_URL_DOMAIN}/${slug}`;
 
   useEffect(() => {
+    // Slug, not the GUID: Umami keys pageviews by URL, so targeting the same path
+    // the rest of the app links to keeps scans and organic visits on one page
+    // instead of splitting the fundraiser across two.
+    //
+    // No utm_campaign here. It would only repeat the source, and it leaves the
+    // field free for a real event name later.
     const params = new URLSearchParams({
       utm_source: 'stage',
       utm_medium: 'qr',
-      utm_campaign: 'stage-mode',
     });
-    const target = `${window.location.origin}/raise/${encodeURIComponent(fundraiserId)}?${params.toString()}`;
+    const target = `${window.location.origin}/raise/${encodeURIComponent(slug)}?${params.toString()}`;
     // ponytail: window.location.origin is unavailable during SSR, so this
     // value can only be computed client-side after mount — the effect is
     // intentional here, not an oversight the lint rule assumes.
@@ -38,7 +38,7 @@ export function StageQRPanel({
     // https://qr.pp.eco/?https://example.com — no named param, no encoding.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQrSrc(`${QR_CODE_BASE_URL}/?${target}`);
-  }, [fundraiserId, slug]);
+  }, [slug]);
 
   return (
     <GlassPanel className={`p-[18px] ${className ?? ''}`}>
