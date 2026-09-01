@@ -11,6 +11,7 @@
       "label": "On this page",
       "law": "The rule",
       "store": "What we store",
+      "visits": "Counting visits",
       "video": "Video",
       "monitoring": "Error reporting",
       "payments": "Payments",
@@ -38,6 +39,10 @@
           "body": "If you choose to load a video, we remember that. We store nothing until you do."
         }
       }
+    },
+    "visits": {
+      "title": "Counting visits",
+      "body": "We use Umami, an open-source tool running on our own servers, to see whether a page is reaching people. It writes nothing to your device and sends nothing to a third party. Your IP address is used for a moment, to work out a rough location and a visit code, and is then discarded rather than stored. We also collect where people click and how far they scroll, as plain coordinates pooled across every visit, so we can see which parts of a page work. We never record your screen or what you type, and we never attach your name, email or account to any of it."
     },
     "video": {
       "title": "The one thing we ask about: video",
