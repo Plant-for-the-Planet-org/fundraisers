@@ -20,7 +20,7 @@ const VIDEO_EMBED_ATTR = [
 // the content, so `data-image-src` does hold a full URL. `sanitize-html` cannot
 // pattern-check a `data-*` value (its scheme checks cover only href/src/cite),
 // so the real gate is `normalizeImageSrc` at render time in `ImageEmbed` —
-// https on an allowed host and not an SVG, or nothing renders.
+// https on an allowed host, or nothing renders.
 const IMAGE_EMBED_TAG = 'image-embed';
 const IMAGE_EMBED_ATTR = ['data-image-src', 'data-image-alt'];
 

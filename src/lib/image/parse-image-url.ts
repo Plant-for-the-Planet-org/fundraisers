@@ -35,16 +35,6 @@ const IMAGE_HOSTS = ['plant-for-the-planet.org'] as const;
 // serve an image from an extensionless path.
 const IMAGE_EXT_PATTERN = /\.(png|jpe?g|gif|webp|avif)$/i;
 
-// SVG is rejected on every path, including an explicit toolbar insert. An SVG
-// loaded through `<img>` cannot run script, so this is not closing an XSS hole
-// — it keeps embedded images to raster formats, which is all a fundraiser
-// description needs.
-//
-// The limit of this check: it can only see the path. An extensionless URL that
-// happens to serve `image/svg+xml` still gets through, because deciding that
-// would mean fetching the URL. Detecting what we can see is the trade.
-const SVG_EXT_PATTERN = /\.svgz?$/i;
-
 export interface ParsedImage {
   /** The validated, absolute https URL. */
   src: string;
@@ -57,7 +47,7 @@ function hostMatches(host: string, allowedHosts: readonly string[]): boolean {
 
 /**
  * The single gate: returns the URL to actually use if it may be shown as an
- * embedded image (absolute `https`, on an allowed host, not an SVG), or `null`.
+ * embedded image (absolute `https`, on an allowed host), or `null`.
  *
  * It returns the *parsed* URL rather than a boolean on purpose, so callers
  * render the exact string that was validated. A boolean check invites the
@@ -79,7 +69,6 @@ export function normalizeImageSrc(src: string): string | null {
 
   if (url.protocol !== 'https:') return null;
   if (!hostMatches(url.hostname, IMAGE_HOSTS)) return null;
-  if (SVG_EXT_PATTERN.test(url.pathname)) return null;
   return url.href;
 }
 
