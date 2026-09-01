@@ -435,7 +435,7 @@
       }
     },
     "edit": {
-      "title": "Spendenaufruf bearbeiten",
+      "title": "Bearbeiten",
       "subtitle": "Aktualisiere die Details und Einstellungen deines Spendenaufrufs.",
       "loading": "Spendenaufruf laden...",
       "notFoundTitle": "Spendenaufruf wurde nicht gefunden",

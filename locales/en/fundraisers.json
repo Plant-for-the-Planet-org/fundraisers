@@ -435,7 +435,7 @@
       }
     },
     "edit": {
-      "title": "Edit Fundraiser",
+      "title": "Edit",
       "subtitle": "Update your fundraiser's details and settings.",
       "loading": "Loading fundraiser...",
       "notFoundTitle": "Fundraiser not found",
