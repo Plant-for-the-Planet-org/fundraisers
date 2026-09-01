@@ -62,11 +62,10 @@ export function CloneFundraiserDialog({
     try {
       // The API stores images by filename but only accepts them as base64, so
       // the copy gets its own upload. It is independent from then on: replacing
-      // the original's image leaves the copy untouched.
-      const imageUrl = resolveFundraiserImageSource(
-        fundraiser.image,
-        'original'
-      );
+      // the original's image leaves the copy untouched. `large` is the biggest
+      // variant the platform generates for a fundraiser (640px); the untouched
+      // upload it was built from is not part of the documented CDN path.
+      const imageUrl = resolveFundraiserImageSource(fundraiser.image, 'large');
       const imageFile = imageUrl
         ? await fetchImageAsBase64(imageUrl)
         : undefined;

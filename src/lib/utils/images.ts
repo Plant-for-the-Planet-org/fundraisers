@@ -1,6 +1,11 @@
 import { CDN_BASE_URL } from '@/lib/constants/app-config';
 
-export type ImageSize = 'thumb' | 'small' | 'medium' | 'large' | 'original';
+/**
+ * A size is a LiipImagine filter on the platform, named `<type>_<size>`, and
+ * every type defines its own set. Fundraisers have thumb (80), small (320) and
+ * large (640) only; asking for a size a type does not define returns a 403.
+ */
+export type ImageSize = 'thumb' | 'small' | 'medium' | 'large';
 export type ImageType = 'profile' | 'project' | 'fundraiser';
 
 /**
