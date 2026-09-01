@@ -47,8 +47,10 @@ export function buildDonationMetadata(
     willAbsorbFee && processingFeeCents && processingFeeCents > 0;
 
   return {
-    utm_campaign: fundraiserData.id,
+    // Spread first so a wider object can never displace `utm_campaign`, which the
+    // platform matches on to attach the donation to this fundraiser.
     ...campaign,
+    utm_campaign: fundraiserData.id,
     fundraiser: {
       id: fundraiserData.id,
       ...(source && { source }),
