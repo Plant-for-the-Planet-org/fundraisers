@@ -64,9 +64,11 @@ interface ActionVisibility {
   delete: boolean;
 }
 
+// Viewers can clone. It only reads the original and creates a separate
+// fundraiser they own, so it is not the write access their role withholds.
 const NON_OWNER_ACTIONS: ActionVisibility = {
   edit: false,
-  clone: false,
+  clone: true,
   copyLink: true,
   pause: false,
   resume: false,
