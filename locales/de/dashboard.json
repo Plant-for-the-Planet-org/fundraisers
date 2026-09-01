@@ -67,6 +67,7 @@
     "actions": {
       "menuLabel": "Aktionen öffnen",
       "edit": "Bearbeiten",
+      "clone": "Duplizieren",
       "stageMode": "Bühnenmodus",
       "stageModeBlocked": "Dein Browser hat das Pop-up für den Bühnenmodus blockiert. Erlaube Pop-ups für diese Seite und versuche es erneut.",
       "copyLink": "Link kopieren",
@@ -85,6 +86,17 @@
       "description": "Möchtest du diesen Spendenaufruf wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "confirm": "Löschen"
+    },
+    "cloneDialog": {
+      "title": "Fundraiser duplizieren",
+      "description": "Erstellt eine Kopie als Entwurf, mit derselben Beschreibung, demselben Design, denselben Projekten und Einstellungen. Spenden, Organisator*innen und der Link werden nicht kopiert.",
+      "titleLabel": "Titel",
+      "titleHelp": "Gib der Kopie einen eigenen Namen, damit du beide auseinanderhalten kannst.",
+      "cancel": "Abbrechen",
+      "confirm": "Duplizieren",
+      "success": "Entwurfskopie erstellt",
+      "imageWarning": "Das Titelbild konnte nicht kopiert werden. Füge auf dem nächsten Bildschirm eins hinzu.",
+      "error": "Der Fundraiser konnte nicht dupliziert werden. Versuche es noch einmal."
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",

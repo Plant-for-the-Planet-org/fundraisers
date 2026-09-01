@@ -56,7 +56,7 @@ const DESCRIPTION_ALLOWED_TAGS = [
 const RICH_TEXT_ALLOWED_STYLES: IOptions['allowedStyles'] = {
   '*': {
     'text-align': [/^(left|right|center)$/],
-    'font-size': [/^(12|14|16|18|20|24|30)px$/],
+    'font-size': [/^(12|14|15|16|18|20|24|30)px$/],
   },
 };
 

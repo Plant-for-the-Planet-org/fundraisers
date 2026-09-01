@@ -1,13 +1,16 @@
 import type { FieldNamesMarkedBoolean } from 'react-hook-form';
 import type {
   CreateFundraiserRequest,
+  Fundraiser,
   FundraiserSettings,
   UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
 
 import { getWorkspaceProfile } from '@/lib/workspaces/registry';
+import { registeredModules } from '@/modules';
 import { DEFAULT_FUNDRAISER_DURATION_DAYS } from '../constants/fundraiser-creation';
+import { getCurrencyForCountry, toAllowedCountry } from './country-currency';
 
 export type UpdateDirtyFields = Partial<
   Readonly<FieldNamesMarkedBoolean<FundraiserFormValues>>
@@ -213,6 +216,71 @@ export function buildCreateFundraiserRequest(
     tags: [],
     content: {},
     metadata: {},
+    ...(imageFile && { imageFile }),
+  };
+}
+
+/** Drops the settings of every registered module that opted out of cloning. */
+function applyModuleClonePolicy(
+  modules: FundraiserSettings['modules']
+): FundraiserSettings['modules'] {
+  const cloned: Record<string, unknown> = { ...modules };
+
+  for (const descriptor of registeredModules) {
+    if (descriptor.clone === 'reset') {
+      delete cloned[descriptor.settingsKey];
+    }
+  }
+
+  return cloned as FundraiserSettings['modules'];
+}
+
+/**
+ * Builds the create payload for a copy of an existing fundraiser.
+ *
+ * Everything the host configured carries over: description, theme, projects,
+ * goal, module settings, content and metadata. What identifies the original
+ * does not: id, hid, slug, donations and hosts are left to the API, and the
+ * copy always starts as a draft so it can be reviewed before it goes live.
+ * `title` comes from the clone dialog, and `imageFile` is the re-uploaded
+ * cover image (the API takes base64 only, never a reference to a stored file).
+ */
+export function buildCloneFundraiserRequest(
+  source: Fundraiser,
+  title: string,
+  imageFile?: string
+): CreateFundraiserRequest {
+  const country = toAllowedCountry(source.workspace?.country);
+
+  return {
+    title,
+    description: source.description ?? '',
+    country: getWorkspaceProfile(country).apiCountry,
+    currency: source.currency?.toUpperCase() ?? getCurrencyForCountry(country),
+    goalAmount: source.goalAmount,
+    visibility: source.visibility,
+    status: 'draft',
+    projectAllocations: source.projectAllocations.map(allocation => ({
+      project_id: allocation.project.id,
+      percentage: allocation.percentage,
+    })),
+    settings: {
+      // Every field of the stored theme is optional, so an empty object is a
+      // valid theme: buildTheme falls back to DEFAULT_THEME.
+      theme: source.settings?.theme ?? {},
+      modules: applyModuleClonePolicy({
+        ...DEFAULT_MODULES,
+        ...source.settings?.modules,
+      }),
+    },
+    // A copy always opens a fresh window rather than inheriting the source's.
+    // The form has no date fields, so an inherited window could never be
+    // corrected, and a copy of a finished campaign would be born expired.
+    startDate: getTodayString(),
+    endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),
+    tags: [],
+    content: source.content ?? {},
+    metadata: source.metadata ?? {},
     ...(imageFile && { imageFile }),
   };
 }

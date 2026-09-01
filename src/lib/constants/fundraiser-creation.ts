@@ -3,4 +3,6 @@ export const GOAL_AMOUNT_MIN = 50;
 
 export const DEFAULT_FUNDRAISER_DURATION_DAYS = 60;
 
+export const TITLE_MAX_LENGTH = 50;
+
 export const DESCRIPTION_MAX_LENGTH = 5000;

@@ -70,6 +70,29 @@ export function ThemeSettings() {
     syncFormAndPreview({ bg: merged }, { bg: merged });
   };
 
+  // Patterns/images using the default 'accent' tint are colored with --accent-color.
+  // When the background color changes, the accent color also changes to match it.
+  // This can make the decoration the same color as the background, so it appears to disappear.
+  // Save the decoration's current color as a custom tint first, so it stays visible
+  // while the CTA/accent color can still update with the new background.
+  const freezeAccentTintedDecoration = (bg: BgFormValue): BgFormValue => {
+    const currentAccentColor = getAccentColor(field.value.accent);
+    if (
+      bg.decoration === 'pattern' &&
+      (bg.pattern_tint ?? 'accent') === 'accent'
+    ) {
+      return {
+        ...bg,
+        pattern_tint: 'custom',
+        pattern_color: currentAccentColor,
+      };
+    }
+    if (bg.decoration === 'image' && bg.image_tint === 'accent') {
+      return { ...bg, image_tint: 'custom', image_color: currentAccentColor };
+    }
+    return bg;
+  };
+
   const applyTheme = (theme: Theme) => {
     // Each preset ships its own bg (decoration, gradient, opacity, animation…).
     // Picking the theme applies them; the user can still tweak afterwards.
@@ -211,12 +234,12 @@ export function ThemeSettings() {
               syncFormAndPreview({ bg: nextBg }, { bg: nextBg });
             }}
             onSolidColor={hex => {
-              const nextBg = {
+              const nextBg = freezeAccentTintedDecoration({
                 ...field.value.bg,
                 background_color: hex,
                 gradient: '',
                 custom_gradient: null,
-              };
+              });
               // A new background colour re-seeds the accent (the selected colour).
               syncFormAndPreview(
                 { bg: nextBg, accent: hex },
@@ -224,12 +247,12 @@ export function ThemeSettings() {
               );
             }}
             onGradientChange={next => {
-              const nextBg = {
+              const nextBg = freezeAccentTintedDecoration({
                 ...field.value.bg,
                 custom_gradient: next,
                 background_color: null,
                 gradient: '',
-              };
+              });
               // Re-seed the accent from the gradient's dominant stop.
               const accent = getDominantStopColor(next.stops);
               syncFormAndPreview(

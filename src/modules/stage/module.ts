@@ -8,6 +8,7 @@ export const stageModule = {
   settingsKey: 'stage',
   localeNamespace: 'stage',
   route: { segment: 'stage' },
+  clone: 'copy',
 } as const satisfies ModuleDescriptor;
 
 // Currently unused, is this needed?
