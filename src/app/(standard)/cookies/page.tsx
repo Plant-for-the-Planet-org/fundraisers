@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import {
   Activity,
+  BarChart3,
   HeartHandshake,
   KeyRound,
   Languages,
@@ -86,6 +87,7 @@ export default async function CookiesPage() {
   const tocItems: TocItem[] = [
     { id: 'law', label: t('toc.law') },
     { id: 'store', label: t('toc.store') },
+    { id: 'visits', label: t('toc.visits') },
     { id: 'video', label: t('toc.video') },
     { id: 'monitoring', label: t('toc.monitoring') },
     { id: 'payments', label: t('toc.payments') },
@@ -146,6 +148,12 @@ export default async function CookiesPage() {
                 </li>
               ))}
             </ul>
+          </Section>
+
+          <Section id='visits' icon={BarChart3} title={t('visits.title')}>
+            <p className='leading-relaxed text-muted-foreground'>
+              {t('visits.body')}
+            </p>
           </Section>
 
           <Section id='video' icon={PlayCircle} title={t('video.title')}>

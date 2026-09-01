@@ -380,7 +380,7 @@
         },
         "cardHeader": "Contribution",
         "giftTitle": "Dedicate this donation",
-        "giftSubtitle": "Celebrate, gift or remember someone by dedicating your trees.",
+        "giftSubtitle": "Celebrate, gift or remember someone by dedicating your contribution.",
         "donateNow": "Donate Now",
         "donateMonthly": "Donate Monthly",
         "donateQuarterly": "Donate Quarterly",
@@ -435,7 +435,7 @@
       }
     },
     "edit": {
-      "title": "Edit Fundraiser",
+      "title": "Edit",
       "subtitle": "Update your fundraiser's details and settings.",
       "loading": "Loading fundraiser...",
       "notFoundTitle": "Fundraiser not found",

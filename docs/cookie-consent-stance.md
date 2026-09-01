@@ -4,6 +4,8 @@ This app shows **no cookie consent banner on purpose**. Under EU law (GDPR + ePr
 
 - Only strictly-necessary cookies on load (auth/session, `ui-locale`).
 - The one third-party embed (YouTube) is gated behind inline contextual consent in `src/components/ui/video-embed.tsx`.
+- Analytics is self-hosted Umami and needs no consent gate: the tracker writes nothing to the device and reads no cookie, and the server hashes IP + user agent into a session id without ever storing the raw IP (`src/components/analytics/umami-analytics.tsx`). This depends on the instance running `SALT_ROTATION=day`.
+- Heatmaps run through Umami's recorder, which also writes nothing to the device. Heatmap payloads are click coordinates and scroll depth only, and the server strips query and hash from the URL. Session replay shares that script but is a separate toggle on the instance and must stay **off**: it records behaviour in a way that needs its own legal basis, and turning it on is a DPO decision, not a code change.
 - Client Sentry is error-only — no cookie, no performance tracing, no log forwarding (`src/instrumentation-client.ts`).
 - Stripe/PayPal load only when the user opens the donation flow, never on a normal visit.
 

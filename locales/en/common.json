@@ -48,6 +48,14 @@
         "aspectSquare": "Square (1:1)",
         "removeVideo": "Remove video"
       }
+    },
+    "imageEmbed": {
+      "editor": {
+        "invalidUrl": "Images can only be embedded from plant-for-the-planet.org over https. SVG is not supported.",
+        "altLabel": "Image description",
+        "altPlaceholder": "Describe this image for screen readers (optional)",
+        "removeImage": "Remove image"
+      }
     }
   }
 }

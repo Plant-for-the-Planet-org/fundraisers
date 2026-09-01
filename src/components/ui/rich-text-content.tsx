@@ -1,10 +1,11 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
-import { cn } from '@/lib/utils';
 import {
-  hasVideoMarker,
-  splitVideoMarkers,
-} from '@/lib/video/split-video-markers';
+  hasEmbedMarker,
+  splitEmbedMarkers,
+} from '@/lib/rich-text/split-embed-markers';
+import { cn } from '@/lib/utils';
+import { ImageEmbed } from '@/components/ui/image-embed';
 import { VideoEmbed } from '@/components/ui/video-embed';
 
 // Discriminated for safety: a raw string without a `sanitize` fn is a compile error, not a silent XSS vulnerability
@@ -24,12 +25,13 @@ type RichTextContentProps = {
 );
 
 /**
- * Renders sanitized rich-text HTML, replacing each `<video-embed>` marker with
- * a live `<VideoEmbed>` player. HTML segments render via `dangerouslySetInnerHTML`
- * so the markup is SSR-friendly (and so plain descriptions stay byte-identical
- * to before this feature). The iframe is built by `VideoEmbed` from the
- * re-validated id — never from stored HTML. Splitting lives in
- * `splitVideoMarkers`.
+ * Renders sanitized rich-text HTML, replacing each embed marker with a live
+ * component: `<video-embed>` becomes a `<VideoEmbed>` player, `<image-embed>` an
+ * `<ImageEmbed>`. HTML segments render via `dangerouslySetInnerHTML` so the
+ * markup is SSR-friendly (and so plain descriptions stay byte-identical to
+ * before this feature). The iframe is built by `VideoEmbed` from the
+ * re-validated id and the `<img>` by `ImageEmbed` from the re-validated src —
+ * never from stored HTML. Splitting lives in `splitEmbedMarkers`.
  */
 export function RichTextContent({
   html,
@@ -40,8 +42,8 @@ export function RichTextContent({
 
   const safeHtml = sanitize ? sanitize(html) : (html as string);
 
-  // Fast path: no video markers → single node, byte-identical to before.
-  if (!hasVideoMarker(safeHtml)) {
+  // Fast path: no embed markers → single node, byte-identical to before.
+  if (!hasEmbedMarker(safeHtml)) {
     return (
       <div
         className={cn(className)}
@@ -52,21 +54,27 @@ export function RichTextContent({
 
   return (
     <div className={className}>
-      {splitVideoMarkers(safeHtml).map((segment, index) =>
-        segment.kind === 'video' ? (
-          <VideoEmbed
-            key={index}
-            provider={segment.provider}
-            id={segment.id}
-            aspect={segment.aspect}
-          />
-        ) : (
+      {splitEmbedMarkers(safeHtml).map((segment, index) => {
+        if (segment.kind === 'video') {
+          return (
+            <VideoEmbed
+              key={index}
+              provider={segment.provider}
+              id={segment.id}
+              aspect={segment.aspect}
+            />
+          );
+        }
+        if (segment.kind === 'image') {
+          return <ImageEmbed key={index} src={segment.src} alt={segment.alt} />;
+        }
+        return (
           <div
             key={index}
             dangerouslySetInnerHTML={{ __html: segment.html as TrustedHTML }}
           />
-        )
-      )}
+        );
+      })}
     </div>
   );
 }

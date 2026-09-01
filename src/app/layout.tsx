@@ -12,6 +12,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { UmamiAnalytics } from '@/components/analytics/umami-analytics';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
 import { ProfileSetupRetry } from '@/components/auth/profile-setup-retry';
@@ -101,6 +102,7 @@ export default async function RootLayout({
           <AuthInitializer />
           <ProfileSetupRetry />
           <CookieConsentProvider />
+          <UmamiAnalytics />
           <ImpersonationBanner />
           {children}
         </NextIntlClientProvider>

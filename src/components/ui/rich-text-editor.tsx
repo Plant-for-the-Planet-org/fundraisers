@@ -31,6 +31,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
+import { ImageEmbedNode } from '@/components/ui/image-embed-node';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
 
 interface RichTextEditorProps {
@@ -180,6 +181,7 @@ export function RichTextEditor({
         types: ['paragraph'],
       }),
       VideoEmbedNode,
+      ImageEmbedNode,
     ],
     content: value,
     onUpdate: ({ editor: currentEditor }) => {

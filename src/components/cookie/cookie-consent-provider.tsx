@@ -16,27 +16,7 @@ export function CookieConsentProvider(): null {
     if (pathname.endsWith('/stage')) return;
     import('vanilla-cookieconsent')
       .then(cc => {
-        cc.run({
-          ...COOKIE_CONSENT_CONFIG,
-
-          // analytics hooks commented out — no service wired up yet.
-          // onConsent: () => {
-          //   if (cc.acceptedCategory('analytics')) {
-          //     import('@/lib/analytics').then(({ initializeAnalytics }) => {
-          //       initializeAnalytics();
-          //     });
-          //   }
-          // },
-          // onChange: ({ changedCategories }) => {
-          //   if (changedCategories.includes('analytics')) {
-          //     if (cc.acceptedCategory('analytics')) {
-          //       import('@/lib/analytics').then(({ initializeAnalytics }) => {
-          //         initializeAnalytics();
-          //       });
-          //     }
-          //   }
-          // },
-        });
+        cc.run(COOKIE_CONSENT_CONFIG);
       })
       .catch(err => {
         console.error('[CookieConsent] Failed to load cookie consent:', err);

@@ -1,7 +1,7 @@
 {
   "consentModal": {
     "title": "Hat jemand Kekse gesagt?",
-    "description": "Wir nutzen Cookies auf unserer Website. Mit deiner Zustimmung verwenden wir auch Analyse-Cookies. Du kannst die Zusage jederzeit ändern.",
+    "description": "Wir nutzen nur Cookies, ohne die diese Website nicht funktioniert. Das Einzige, wonach wir fragen, sind eingebettete Videos, und du kannst diese Wahl jederzeit ändern.",
     "acceptAllBtn": "Alle akzeptieren",
     "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Präferenzen verwalten",
@@ -24,11 +24,6 @@
         "title": "Notwendige Cookies <span class=\"pm__badge\">Immer aktiviert</span>",
         "description": "Diese Cookies sind für den ordnungsgemäßen Betrieb der Website erforderlich, einschließlich der Speicherung deiner Spracheinstellung.",
         "linkedCategory": "Notwendig"
-      },
-      "analytics": {
-        "title": "Analyse-Cookies",
-        "description": "Diese Cookies helfen uns zu verstehen, wie Besucher*innen mit unserer Website interagieren, indem sie Informationen anonym sammeln und melden.",
-        "linkedCategory": "Analyse"
       },
       "externalMedia": {
         "title": "Externe Video-Cookies",
