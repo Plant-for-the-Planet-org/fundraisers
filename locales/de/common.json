@@ -48,6 +48,14 @@
         "aspectSquare": "Quadratisch (1:1)",
         "removeVideo": "Video entfernen"
       }
+    },
+    "imageEmbed": {
+      "editor": {
+        "invalidUrl": "Bilder können nur von plant-for-the-planet.org über https eingebettet werden. SVG wird nicht unterstützt.",
+        "altLabel": "Bildbeschreibung",
+        "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
+        "removeImage": "Bild entfernen"
+      }
     }
   }
 }
