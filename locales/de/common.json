@@ -57,7 +57,7 @@
         "add": "Hinzufügen",
         "invalidUrl": "Bilder können nur von einem zugelassenen Host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) über https eingebettet werden.",
         "altLabel": "Bildbeschreibung",
-        "altPlaceholder": "Beschreibe dieses Bild für Screenreader",
+        "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
         "removeImage": "Bild entfernen"
       }
     }

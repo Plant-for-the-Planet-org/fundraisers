@@ -57,7 +57,7 @@
         "add": "Add",
         "invalidUrl": "Images can only be embedded from an approved host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) over https.",
         "altLabel": "Image description",
-        "altPlaceholder": "Describe this image for screen readers",
+        "altPlaceholder": "Describe this image for screen readers (optional)",
         "removeImage": "Remove image"
       }
     }

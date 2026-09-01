@@ -3,7 +3,7 @@
 import type { NodeViewProps } from '@tiptap/react';
 
 import { useTranslations } from 'next-intl';
-import { ImageOff, X } from 'lucide-react';
+import { ImageOff, Trash2 } from 'lucide-react';
 import { Node } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
@@ -39,7 +39,7 @@ function ImageEmbedNodeView({
 
   return (
     <NodeViewWrapper className='my-3' data-drag-handle contentEditable={false}>
-      <div className='group relative flex flex-col gap-2'>
+      <div className='flex flex-col gap-2'>
         <div
           className={cn(
             'relative w-full overflow-hidden rounded-xl border border-border bg-muted',
@@ -65,26 +65,31 @@ function ImageEmbedNodeView({
               </span>
             </div>
           )}
+        </div>
 
+        {/* Controls sit under the image rather than floating over it, so nothing
+            covers the picture the host is judging. Remove lives here too — an
+            atom node can also be deleted by selecting it and pressing
+            Backspace, but that is not discoverable enough to be the only way. */}
+        <div className='flex items-center gap-2'>
+          <input
+            type='text'
+            value={alt}
+            onChange={event => updateAttributes({ alt: event.target.value })}
+            placeholder={t('altPlaceholder')}
+            aria-label={t('altLabel')}
+            className='flex-1 rounded-md border border-input bg-transparent px-2 py-1 text-xs text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring'
+          />
           <button
             type='button'
             onClick={() => deleteNode()}
             title={t('removeImage')}
             aria-label={t('removeImage')}
-            className='absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/60 text-white opacity-0 transition-opacity hover:bg-black/80 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white group-hover:opacity-100'
+            className='flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-input text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
           >
-            <X className='h-4 w-4' aria-hidden='true' />
+            <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
           </button>
         </div>
-
-        <input
-          type='text'
-          value={alt}
-          onChange={event => updateAttributes({ alt: event.target.value })}
-          placeholder={t('altPlaceholder')}
-          aria-label={t('altLabel')}
-          className='w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring'
-        />
       </div>
     </NodeViewWrapper>
   );
