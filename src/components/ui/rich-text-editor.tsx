@@ -260,6 +260,12 @@ export function RichTextEditor({
           keepAttributes: false,
         },
         heading: false,
+        // StarterKit bundles its own Link and registers it unless this is
+        // false. `linkExtension` below is the configured one we actually want
+        // (openOnClick off, Mod-k shortcut) — leaving both on registers two
+        // marks named `link`, which TipTap warns about and which double-binds
+        // the autolink/paste plugins.
+        link: false,
       }),
       Placeholder.configure({
         placeholder,
