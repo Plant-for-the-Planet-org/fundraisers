@@ -15,6 +15,15 @@ const VIDEO_EMBED_ATTR = [
   'data-video-aspect',
 ];
 
+// Inert marker element for embedded images — never an `<img>` or `src`. Unlike
+// video, whose URL is rebuilt from a hardcoded template, an image's URL *is*
+// the content, so `data-image-src` does hold a full URL. `sanitize-html` cannot
+// pattern-check a `data-*` value (its scheme checks cover only href/src/cite),
+// so the real gate is `normalizeImageSrc` at render time in `ImageEmbed` —
+// https on an approved image host, or nothing renders.
+const IMAGE_EMBED_TAG = 'image-embed';
+const IMAGE_EMBED_ATTR = ['data-image-src', 'data-image-alt'];
+
 const DESCRIPTION_ALLOWED_TAGS = [
   'p',
   'ul',
@@ -35,6 +44,7 @@ const DESCRIPTION_ALLOWED_TAGS = [
   'h2',
   'h3',
   VIDEO_EMBED_TAG,
+  IMAGE_EMBED_TAG,
 ];
 
 // The rich-text editor (shared by descriptions and thank-you notes) emits two
@@ -55,6 +65,7 @@ const DESCRIPTION_ALLOWED_ATTR: IOptions['allowedAttributes'] = {
   p: ['style'],
   span: ['style'],
   [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
+  [IMAGE_EMBED_TAG]: IMAGE_EMBED_ATTR,
 };
 
 function toSafeHtml(html: string): SafeHtml {
@@ -78,6 +89,7 @@ const THANK_YOU_ALLOWED_TAGS = [
   'span',
   'blockquote',
   VIDEO_EMBED_TAG,
+  IMAGE_EMBED_TAG,
 ];
 
 export function sanitizeThankYouHtml(dirty: string): SafeHtml {
@@ -87,6 +99,7 @@ export function sanitizeThankYouHtml(dirty: string): SafeHtml {
       p: ['style'],
       span: ['style'],
       [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
+      [IMAGE_EMBED_TAG]: IMAGE_EMBED_ATTR,
     },
     allowedStyles: RICH_TEXT_ALLOWED_STYLES,
     allowedSchemes: [],

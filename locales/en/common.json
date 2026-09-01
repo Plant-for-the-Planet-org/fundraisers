@@ -48,6 +48,18 @@
         "aspectSquare": "Square (1:1)",
         "removeVideo": "Remove video"
       }
+    },
+    "imageEmbed": {
+      "editor": {
+        "toolbarButton": "Embed image",
+        "urlLabel": "Image URL",
+        "urlPlaceholder": "Paste an image link from an approved host",
+        "add": "Add",
+        "invalidUrl": "Images can only be embedded from an approved host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) over https.",
+        "altLabel": "Image description",
+        "altPlaceholder": "Describe this image for screen readers",
+        "removeImage": "Remove image"
+      }
     }
   }
 }

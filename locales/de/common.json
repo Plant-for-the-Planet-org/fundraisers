@@ -48,6 +48,18 @@
         "aspectSquare": "Quadratisch (1:1)",
         "removeVideo": "Video entfernen"
       }
+    },
+    "imageEmbed": {
+      "editor": {
+        "toolbarButton": "Bild einbetten",
+        "urlLabel": "Bild-URL",
+        "urlPlaceholder": "Füge einen Bildlink von einem zugelassenen Host ein",
+        "add": "Hinzufügen",
+        "invalidUrl": "Bilder können nur von einem zugelassenen Host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) über https eingebettet werden.",
+        "altLabel": "Bildbeschreibung",
+        "altPlaceholder": "Beschreibe dieses Bild für Screenreader",
+        "removeImage": "Bild entfernen"
+      }
     }
   }
 }
