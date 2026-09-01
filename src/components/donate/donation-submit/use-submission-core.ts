@@ -1,3 +1,4 @@
+import type { DonationFormData } from '@/lib/types/donation';
 import type {
   DonationSubmitState,
   ThankYouState,
@@ -76,6 +77,28 @@ export function useSubmissionCore(
     submittingRef.current = false;
   }, []);
 
+  // Records a donation attempt that is actually going out to the API.
+  //
+  // Deliberately not fired from `buildPayload`: the Stripe path validates the card
+  // after building the payload and bails out without a request when the fields are
+  // incomplete, and PlanetCash bails on a missing token. Each flow calls this
+  // immediately before its own create-donation call instead.
+  //
+  // Fires on submit, not on settlement: a bank transfer counts here while the money
+  // is still pending, which is why the method rides along as a dimension.
+  const trackDonationSubmitted = useCallback(
+    (formData: DonationFormData, paymentMethod: PaymentMethodId) => {
+      trackEvent('donation_submitted', {
+        fundraiser: fundraiser.slug,
+        amount: formData.amountCents / 100,
+        currency: formData.currency,
+        frequency: formData.frequency,
+        method: paymentMethod,
+      });
+    },
+    [fundraiser.slug]
+  );
+
   // Resolves the thank-you state for a settled donation and applies it as success.
   const finalizeDonation = useCallback(
     async (
@@ -120,17 +143,6 @@ export function useSubmissionCore(
         processingFeeCents
       );
 
-      // Every gateway flow routes through here exactly once per attempt, so this is
-      // the one place that sees all of them. Fires on submit, not on settlement:
-      // a bank transfer counts here while the money is still pending.
-      trackEvent('donation_submitted', {
-        fundraiser: fundraiser.slug,
-        amount: formData.amountCents / 100,
-        currency: formData.currency,
-        frequency: formData.frequency,
-        method: paymentMethod,
-      });
-
       return { formData, payload };
     },
     [donationData, fundraiser, paymentOptions, isAuthenticated, donorProfile]
@@ -171,6 +183,7 @@ export function useSubmissionCore(
     paymentKeyRef,
     rotateIdempotencyKeys,
     failSubmission,
+    trackDonationSubmitted,
     finalizeDonation,
     buildPayload,
     confirmCardActionPayment,

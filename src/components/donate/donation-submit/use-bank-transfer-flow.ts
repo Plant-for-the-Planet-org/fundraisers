@@ -35,6 +35,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
     rotateIdempotencyKeys,
     finalizeDonation,
     buildPayload,
+    trackDonationSubmitted,
     token,
     paymentOptions,
   } = core;
@@ -47,12 +48,17 @@ export function useBankTransferFlow(core: SubmissionCore) {
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayload(values, values.selectedPaymentMethod);
+      const { formData, payload } = buildPayload(
+        values,
+        values.selectedPaymentMethod
+      );
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
+        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
             payload,
@@ -110,6 +116,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
       rotateIdempotencyKeys,
       finalizeDonation,
       buildPayload,
+      trackDonationSubmitted,
       submittingRef,
       setDonationState,
       donationKeyRef,
