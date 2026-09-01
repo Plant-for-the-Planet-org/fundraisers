@@ -59,7 +59,7 @@ function ProjectItem({ project }: ProjectItemProps) {
                 onClick={() => setIsExpanded(prev => !prev)}
                 aria-expanded={isExpanded}
                 aria-controls={descriptionId}
-                className='text-sm font-medium text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors'
+                className='quiet-link text-sm font-medium'
               >
                 {isExpanded ? t('collapseDescription') : t('expandDescription')}
               </button>
