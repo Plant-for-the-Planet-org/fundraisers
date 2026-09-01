@@ -157,9 +157,11 @@ export default async function FundraiserPage({
     throw e;
   }
 
-  // The platform resolves a fundraiser by GUID, HID or slug, so one fundraiser can be
-  // reached at several URLs. Umami keys pageviews by URL, which splits its visit count.
-  // Send everything to the slug, keeping the query so campaign params survive the hop.
+  // A fundraiser resolves by GUID as well as by its exact slug, so one fundraiser is
+  // reachable at two URLs. Umami keys pageviews by URL, which splits its visit count.
+  // Send the GUID form to the slug, keeping the query so campaign params survive.
+  // Verified live: the HID does not resolve here, and the slug is case-sensitive, so
+  // neither reaches this check.
   //
   // Temporary on purpose: hosts can rename a slug, and a cached permanent redirect
   // would strand visitors on the old one. Must stay outside the try above, since
