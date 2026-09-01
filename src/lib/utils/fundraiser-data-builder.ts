@@ -220,32 +220,6 @@ export function buildCreateFundraiserRequest(
   };
 }
 
-/** `2026-03-03T00:00:00+00:00` -> `2026-03-03`. Null when unparseable. */
-function toDateOnly(value: string | null | undefined): string | null {
-  const datePart = value?.slice(0, 10);
-  return datePart && /^\d{4}-\d{2}-\d{2}$/.test(datePart) ? datePart : null;
-}
-
-// The fundraiser form has no date fields, so a clone that inherited an
-// already-finished window could never be corrected. Keep the source window
-// while it still runs; otherwise start a fresh one like the create flow does.
-function buildCloneDateWindow(source: Fundraiser): {
-  startDate: string;
-  endDate: string;
-} {
-  const startDate = toDateOnly(source.startDate);
-  const endDate = toDateOnly(source.endDate);
-
-  if (startDate && endDate && endDate >= getTodayString()) {
-    return { startDate, endDate };
-  }
-
-  return {
-    startDate: getTodayString(),
-    endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),
-  };
-}
-
 /** Drops the settings of every registered module that opted out of cloning. */
 function applyModuleClonePolicy(
   modules: FundraiserSettings['modules']
@@ -299,7 +273,11 @@ export function buildCloneFundraiserRequest(
         ...source.settings?.modules,
       }),
     },
-    ...buildCloneDateWindow(source),
+    // A copy always opens a fresh window rather than inheriting the source's.
+    // The form has no date fields, so an inherited window could never be
+    // corrected, and a copy of a finished campaign would be born expired.
+    startDate: getTodayString(),
+    endDate: getDateOffsetString(DEFAULT_FUNDRAISER_DURATION_DAYS),
     tags: [],
     content: source.content ?? {},
     metadata: source.metadata ?? {},

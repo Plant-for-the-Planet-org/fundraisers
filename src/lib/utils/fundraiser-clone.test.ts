@@ -134,19 +134,15 @@ describe('buildCloneFundraiserRequest', () => {
     ]);
   });
 
-  it('keeps a date window that is still running', () => {
-    const endDate = daysFromToday(30);
-    const request = buildCloneFundraiserRequest(
-      makeFundraiser({ startDate: '2026-03-03T00:00:00+00:00', endDate }),
+  it('opens a fresh window instead of inheriting the source dates', () => {
+    const running = buildCloneFundraiserRequest(
+      makeFundraiser({
+        startDate: '2026-03-03T00:00:00+00:00',
+        endDate: daysFromToday(30),
+      }),
       'Copy'
     );
-
-    expect(request.startDate).toBe('2026-03-03');
-    expect(request.endDate).toBe(endDate);
-  });
-
-  it('starts a fresh window when the source has already ended', () => {
-    const request = buildCloneFundraiserRequest(
+    const finished = buildCloneFundraiserRequest(
       makeFundraiser({
         startDate: '2020-01-01T00:00:00+00:00',
         endDate: '2020-03-01T00:00:00+00:00',
@@ -154,8 +150,10 @@ describe('buildCloneFundraiserRequest', () => {
       'Copy'
     );
 
-    expect(request.startDate).toBe(daysFromToday(0));
-    expect(request.endDate).toBe(daysFromToday(60));
+    for (const request of [running, finished]) {
+      expect(request.startDate).toBe(daysFromToday(0));
+      expect(request.endDate).toBe(daysFromToday(60));
+    }
   });
 
   it('drops the settings of modules that opted out of cloning', () => {
