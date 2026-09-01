@@ -10,6 +10,9 @@ export const TRUSTED_DOMAINS = [
   'salesforce.com',
   'startplanting.org',
   'pp.eco',
+  // Government domains a fundraiser may legitimately cite. Entries are bare
+  // hostname suffixes, so this covers `gov.np` and every `*.gov.np`.
+  'gov.np',
 ] as const;
 
 export function isWhitelistedHostname(hostname: string): boolean {
