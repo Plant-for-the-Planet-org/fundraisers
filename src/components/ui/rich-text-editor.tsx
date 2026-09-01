@@ -11,7 +11,6 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  Image as ImageIcon,
   Italic,
   List,
   ListOrdered,
@@ -30,7 +29,6 @@ import { TextAlign } from '@tiptap/extension-text-align';
 import { FontSize, TextStyle } from '@tiptap/extension-text-style';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { parseImageUrl } from '@/lib/image/parse-image-url';
 import { cn } from '@/lib/utils/cn';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
 import { ImageEmbedNode } from '@/components/ui/image-embed-node';
@@ -236,15 +234,10 @@ export function RichTextEditor({
   const toolbarState = activeState ?? INACTIVE_EDITOR_STATE;
 
   const t = useTranslations('Common.videoEmbed.editor');
-  const tImage = useTranslations('Common.imageEmbed.editor');
   const videoErrorId = useId();
-  const imageErrorId = useId();
   const [isVideoInputOpen, setIsVideoInputOpen] = useState(false);
   const [videoUrl, setVideoUrl] = useState('');
   const [hasVideoError, setHasVideoError] = useState(false);
-  const [isImageInputOpen, setIsImageInputOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
-  const [hasImageError, setHasImageError] = useState(false);
 
   const closeVideoInput = () => {
     setVideoUrl('');
@@ -268,22 +261,6 @@ export function RichTextEditor({
       })
       .run();
     closeVideoInput();
-  };
-
-  const closeImageInput = () => {
-    setImageUrl('');
-    setHasImageError(false);
-    setIsImageInputOpen(false);
-  };
-
-  const insertImage = () => {
-    const parsed = parseImageUrl(imageUrl);
-    if (!parsed || !editor) {
-      setHasImageError(true);
-      return;
-    }
-    editor.chain().focus().setImageEmbed({ src: parsed.src }).run();
-    closeImageInput();
   };
 
   useEffect(() => {
@@ -459,15 +436,6 @@ export function RichTextEditor({
         >
           <Video className='h-4 w-4' />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() =>
-            isImageInputOpen ? closeImageInput() : setIsImageInputOpen(true)
-          }
-          isActive={isImageInputOpen}
-          title={tImage('toolbarButton')}
-        >
-          <ImageIcon className='h-4 w-4' />
-        </ToolbarButton>
 
         {extraToolbarActions && (
           <div className='ml-auto flex items-center gap-1'>
@@ -518,53 +486,6 @@ export function RichTextEditor({
           {hasVideoError && (
             <span id={videoErrorId} className='text-xs text-destructive'>
               {t('invalidUrl')}
-            </span>
-          )}
-        </div>
-      )}
-
-      {isImageInputOpen && (
-        <div className='flex flex-col gap-1 border-b border-input bg-muted/10 p-2'>
-          <div className='flex items-center gap-2'>
-            <input
-              type='url'
-              autoFocus
-              value={imageUrl}
-              onChange={event => {
-                setImageUrl(event.target.value);
-                setHasImageError(false);
-              }}
-              onKeyDown={event => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  insertImage();
-                } else if (event.key === 'Escape') {
-                  closeImageInput();
-                }
-              }}
-              placeholder={tImage('urlPlaceholder')}
-              aria-label={tImage('urlLabel')}
-              aria-invalid={hasImageError}
-              aria-describedby={hasImageError ? imageErrorId : undefined}
-              className={cn(
-                'flex-1 rounded-md border bg-transparent px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring',
-                hasImageError ? 'border-destructive' : 'border-input'
-              )}
-            />
-            <button
-              type='button'
-              onMouseDown={event => {
-                event.preventDefault();
-                insertImage();
-              }}
-              className='inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-            >
-              {tImage('add')}
-            </button>
-          </div>
-          {hasImageError && (
-            <span id={imageErrorId} className='text-xs text-destructive'>
-              {tImage('invalidUrl')}
             </span>
           )}
         </div>

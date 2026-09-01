@@ -51,10 +51,6 @@
     },
     "imageEmbed": {
       "editor": {
-        "toolbarButton": "Bild einbetten",
-        "urlLabel": "Bild-URL",
-        "urlPlaceholder": "Füge einen plant-for-the-planet.org Bildlink ein",
-        "add": "Hinzufügen",
         "invalidUrl": "Bilder können nur von plant-for-the-planet.org über https eingebettet werden. SVG wird nicht unterstützt.",
         "altLabel": "Bildbeschreibung",
         "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
