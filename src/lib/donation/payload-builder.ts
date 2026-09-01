@@ -7,6 +7,7 @@ import type {
   DonationFrequency,
   DonationPayload,
   DonationPayloadBase,
+  DonationUtm,
   DonorInfo,
   GuestFormData,
 } from '../types/donation';
@@ -15,6 +16,7 @@ import type { PaymentMethodId } from '../types/payment-methods';
 
 import { getDefaultCauseId } from '../utils/project-allocation';
 import { calculateLineItems } from './line-item-calculator';
+import { getUtmParams } from './utm';
 
 export function calculateFrequency(
   frequency: DonationFrequency,
@@ -36,14 +38,17 @@ export function buildDonationMetadata(
   sourceUrl?: string,
   referrer?: string,
   willAbsorbFee?: boolean,
-  processingFeeCents?: number
+  processingFeeCents?: number,
+  utm?: DonationUtm
 ): DonationPayload['metadata'] {
   const source = sourceUrl || getSourceUrl(fundraiserData.id);
+  const campaign = utm ?? getUtmParams(fundraiserData);
   const isAbsorbingFee =
     willAbsorbFee && processingFeeCents && processingFeeCents > 0;
 
   return {
     utm_campaign: fundraiserData.id,
+    ...campaign,
     fundraiser: {
       id: fundraiserData.id,
       ...(source && { source }),
@@ -205,6 +210,7 @@ export function buildDonationPayload(
 ): DonationPayload {
   const sourceUrl = getSourceUrl(fundraiser.id);
   const referrer = getReferrer();
+  const utm = getUtmParams(fundraiser);
 
   const lineItems = calculateLineItems(
     formData.amountCents,
@@ -218,7 +224,8 @@ export function buildDonationPayload(
     sourceUrl,
     referrer,
     willAbsorbFee,
-    processingFeeCents
+    processingFeeCents,
+    utm
   );
   const donorAlias = buildDonorAlias(formData, donorProfile);
   const baseDonationPayload: DonationPayloadBase = {

@@ -5,6 +5,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { DonationData } from '../donate/donate-overlay';
 
 import { useState } from 'react';
+import { trackEvent } from '@/lib/analytics/track';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
 import { DonateOverlay } from '../donate/donate-overlay';
 import { usePaymentOptions } from '../donate/use-payment-options';
@@ -48,6 +49,12 @@ export function DonationSection({
         contributionSettings={contributionSettings}
         frequencies={resolvedPaymentOptions.frequencies}
         onDonate={(amountCents, isDedicated, frequency, gift) => {
+          trackEvent('donate_clicked', {
+            fundraiser: fundraiser.slug,
+            amount: amountCents / 100,
+            currency,
+            frequency,
+          });
           setDonationData({
             amountCents,
             currency,

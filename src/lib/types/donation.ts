@@ -71,8 +71,27 @@ export interface CustomFieldValue {
   value: string | number | boolean;
 }
 
-export interface DonationMetadata {
-  utm_campaign: string; // fundraiser ID
+/**
+ * Campaign the donor arrived on, read off the landing URL.
+ *
+ * Flat at the metadata top level to match the legacy donate app, which the platform
+ * already queries as `metadata->>'utm_source'`.
+ */
+export interface DonationUtm {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_content?: string;
+  utm_term?: string;
+  /** The URL's own campaign. `utm_campaign` itself is reserved, see below. */
+  utm_campaign_name?: string;
+}
+
+export interface DonationMetadata extends DonationUtm {
+  /**
+   * Fundraiser GUID (`fr_*`) or legacy HID, not a campaign name despite the key.
+   * The platform's FundraiserSubscriber matches on this to attach the donation.
+   */
+  utm_campaign: string;
   fundraiser: {
     id: string;
     source?: string;
