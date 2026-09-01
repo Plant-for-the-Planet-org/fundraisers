@@ -15,6 +15,7 @@ import type {
 } from './donation-submit-flow-types';
 
 import { useCallback, useRef, useState } from 'react';
+import { trackEvent } from '@/lib/analytics/track';
 import { paymentService } from '@/lib/api/payment-service';
 import { withError, withSuccess } from '@/lib/donation/donation-submit-state';
 import {
@@ -118,6 +119,17 @@ export function useSubmissionCore(
         values.willAbsorbFee,
         processingFeeCents
       );
+
+      // Every gateway flow routes through here exactly once per attempt, so this is
+      // the one place that sees all of them. Fires on submit, not on settlement:
+      // a bank transfer counts here while the money is still pending.
+      trackEvent('donation_submitted', {
+        fundraiser: fundraiser.slug,
+        amount: formData.amountCents / 100,
+        currency: formData.currency,
+        frequency: formData.frequency,
+        method: paymentMethod,
+      });
 
       return { formData, payload };
     },
