@@ -35,6 +35,8 @@ export function RichTextClickCapture({
   className,
 }: RichTextClickCaptureProps) {
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    // Right-click still needs the native context menu; only primary and middle (aux) clicks should go through the /external gate.
+    if (event.button === 2) return;
     const anchor = (event.target as HTMLElement).closest('a');
     const href = anchor?.getAttribute('href');
     if (!href) return;
@@ -58,13 +60,14 @@ export function RichTextClickCapture({
       <div
         className={cn(className)}
         onClick={handleClick}
+        onAuxClick={handleClick}
         dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
       />
     );
   }
 
   return (
-    <div className={className} onClick={handleClick}>
+    <div className={className} onClick={handleClick} onAuxClick={handleClick}>
       {splitEmbedMarkers(safeHtml).map((segment, index) => {
         if (segment.kind === 'video') {
           return (

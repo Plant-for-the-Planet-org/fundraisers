@@ -1,6 +1,6 @@
 import type { SafeHtml } from '@/lib/types/safe-html';
 
-import { RichTextClickCapture } from '@/components/ui/rich-text-click-capture';
+import { RichTextClickCapture } from '@/components/rich-text/rich-text-click-capture';
 
 // Discriminated for safety: a raw string without a `sanitize` fn is a compile error, not a silent XSS vulnerability
 type RichTextContentProps = {

@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { sanitizeDescriptionHtml } from '@/lib/utils/sanitize-html';
 import { SectionHeader } from '@/components/fundraisers/typography';
-import { RichTextContent } from '@/components/ui/rich-text-content';
+import { RichTextContent } from '@/components/rich-text/rich-text-content';
 
 interface DescriptionDisplayProps {
   value: string | null;

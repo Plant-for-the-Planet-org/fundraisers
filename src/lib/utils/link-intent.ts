@@ -55,6 +55,17 @@ function looksLikeADomain(hostname: string): boolean {
 }
 
 /**
+ * Normalizes a link entered without a scheme to an HTTPS URL. Explicit
+ * schemes are preserved so the validator can decide whether they are
+ * supported.
+ */
+export function normalizeLinkHref(value: string): string {
+  const href = value.trim();
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return href;
+  return `https://${href}`;
+}
+
+/**
  * Whether a link is a type this app supports at all, with a destination that
  * actually looks real — `http:`/`https:` to a domain-shaped hostname, or
  * `mailto:` to an address whose domain is domain-shaped. Anything else
@@ -80,6 +91,19 @@ export function isValidExternalHref(href: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * TipTap applies this gate to both candidate and stored links. Bare domains
+ * must pass here so its defaultProtocol can normalize them before storage.
+ */
+export function isAllowedEditorLinkHref(href: string): boolean {
+  return isValidExternalHref(normalizeLinkHref(href));
+}
+
+/** Automatic and pasted links may be bare domains before TipTap stores them. */
+export function shouldAutoLinkHref(href: string): boolean {
+  return isValidExternalHref(normalizeLinkHref(href));
 }
 
 /**

@@ -5,7 +5,7 @@ import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { useFormatter, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { RichTextContent } from '@/components/ui/rich-text-content';
+import { RichTextContent } from '@/components/rich-text/rich-text-content';
 
 const MAX_NAMED_HOSTS = 3;
 

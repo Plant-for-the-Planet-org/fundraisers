@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { twMerge } from 'tailwind-merge';
 import { getLinkIntent, isValidExternalHref } from '@/lib/utils/link-intent';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +35,7 @@ function truncateForDisplay(value: string): string {
     : value;
 }
 
-export function ExternalPageClient() {
+export function ExternalLinkWarning() {
   const t = useTranslations('Common.externalLinkWarning');
   const searchParams = useSearchParams();
   const href = searchParams.get('url');
@@ -58,6 +59,11 @@ export function ExternalPageClient() {
     // (window.open from the fundraiser page), so closing it is reliable and
     // returns focus to whichever tab opened it.
     window.close();
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/';
+    }
   };
 
   const strong = (chunks: React.ReactNode) => <strong>{chunks}</strong>;
@@ -86,7 +92,12 @@ export function ExternalPageClient() {
           <CardTitle className='text-xl lg:text-2xl'>{title}</CardTitle>
         </CardHeader>
         <CardContent className='mb-4'>
-          <CardDescription className='text-sm lg:text-base'>
+          <CardDescription
+            className={twMerge(
+              'text-sm text-card-foreground lg:text-base',
+              'lg:text-card-foreground'
+            )}
+          >
             {body}
           </CardDescription>
           {destinationUrl && (

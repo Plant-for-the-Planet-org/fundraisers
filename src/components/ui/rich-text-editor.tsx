@@ -38,7 +38,12 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
-import { isValidExternalHref } from '@/lib/utils/link-intent';
+import {
+  isAllowedEditorLinkHref,
+  isValidExternalHref,
+  normalizeLinkHref,
+  shouldAutoLinkHref,
+} from '@/lib/utils/link-intent';
 import { parseVideoUrl } from '@/lib/video/parse-video-url';
 import { ImageEmbedNode } from '@/components/ui/image-embed-node';
 import { VideoEmbedNode } from '@/components/ui/video-embed-node';
@@ -122,16 +127,6 @@ function nextFontSize(current: number, direction: 1 | -1): number {
   }
   const clamped = Math.min(Math.max(nextIndex, 0), FONT_SIZE_STEPS.length - 1);
   return FONT_SIZE_STEPS[clamped];
-}
-
-// TipTap's `defaultProtocol` only prepends a scheme for autolink/paste, never
-// for `setLink` — so a typed bare domain would be stored as a relative href.
-// Prepend https for anything without a scheme; leave http/https/mailto/etc.
-// exactly as typed.
-function normalizeLinkHref(value: string): string {
-  const v = value.trim();
-  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(v)) return v;
-  return `https://${v}`;
 }
 
 /**
@@ -242,6 +237,8 @@ export function RichTextEditor({
     autolink: true,
     linkOnPaste: true,
     defaultProtocol: 'https',
+    isAllowedUri: isAllowedEditorLinkHref,
+    shouldAutoLink: shouldAutoLinkHref,
     HTMLAttributes: {
       target: '_blank',
       rel: 'noopener noreferrer nofollow',
@@ -538,6 +535,7 @@ export function RichTextEditor({
       .extendMarkRange('link')
       .setLink({ href: normalized })
       .run();
+    setLastSeenLink({ isLink: true, href: normalized });
     closeLinkInput();
   };
 

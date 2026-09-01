@@ -51,9 +51,14 @@ function PopupBlockedToastContent({
           )}
         >
           {copied ? (
-            <Check className='size-4 text-green-500' />
+            <>
+              <Check className='size-4 text-green-500' aria-hidden='true' />
+              <span className='sr-only' role='status' aria-live='polite'>
+                {t('copied')}
+              </span>
+            </>
           ) : (
-            <Copy className='size-4' />
+            <Copy className='size-4' aria-hidden='true' />
           )}
         </button>
       </div>
