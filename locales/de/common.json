@@ -53,9 +53,9 @@
       "editor": {
         "toolbarButton": "Bild einbetten",
         "urlLabel": "Bild-URL",
-        "urlPlaceholder": "Füge einen Bildlink von einem zugelassenen Host ein",
+        "urlPlaceholder": "Füge einen plant-for-the-planet.org Bildlink ein",
         "add": "Hinzufügen",
-        "invalidUrl": "Bilder können nur von einem zugelassenen Host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) über https eingebettet werden.",
+        "invalidUrl": "Bilder können nur von plant-for-the-planet.org über https eingebettet werden. SVG wird nicht unterstützt.",
         "altLabel": "Bildbeschreibung",
         "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
         "removeImage": "Bild entfernen"

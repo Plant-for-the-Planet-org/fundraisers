@@ -103,7 +103,7 @@ function ImageEmbedNodeView({
  *   `ImageEmbed` at display time from the re-validated src.
  * - Auto-converts a pasted approved-host image URL into the node, using the
  *   stricter `looksLikeImageUrl` (extension required) rather than the toolbar's
- *   `parseImageUrl`, so pasting an ordinary approved-host link still behaves
+ *   `parseImageUrl`, so pasting an ordinary allowed-host page link still behaves
  *   like a link. StarterKit's Link extension declares `priority: 1000` against
  *   this node's default 100, so its `linkOnPaste` runs first and wins whenever
  *   there is a selection — pasting a URL over selected text links that text,

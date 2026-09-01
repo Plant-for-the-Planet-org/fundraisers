@@ -53,9 +53,9 @@
       "editor": {
         "toolbarButton": "Embed image",
         "urlLabel": "Image URL",
-        "urlPlaceholder": "Paste an image link from an approved host",
+        "urlPlaceholder": "Paste a plant-for-the-planet.org image link",
         "add": "Add",
-        "invalidUrl": "Images can only be embedded from an approved host (plant-for-the-planet.org, Unsplash, Cloudinary, imgix, Google, AWS) over https.",
+        "invalidUrl": "Images can only be embedded from plant-for-the-planet.org over https. SVG is not supported.",
         "altLabel": "Image description",
         "altPlaceholder": "Describe this image for screen readers (optional)",
         "removeImage": "Remove image"
