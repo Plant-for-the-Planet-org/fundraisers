@@ -51,7 +51,7 @@
     },
     "imageEmbed": {
       "editor": {
-        "invalidUrl": "Images can only be embedded from plant-for-the-planet.org over https. SVG is not supported.",
+        "invalidUrl": "Images can only be embedded from a trusted domain (such as plant-for-the-planet.org) over https. SVG is not supported.",
         "altLabel": "Image description",
         "altPlaceholder": "Describe this image for screen readers (optional)",
         "removeImage": "Remove image"
