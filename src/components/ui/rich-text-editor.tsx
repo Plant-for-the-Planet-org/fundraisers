@@ -60,7 +60,7 @@ interface ToolbarButtonProps {
 // no inline size at all, so untouched content stays byte-identical. The stepper
 // walks this ladder and is capped at the first/last entry. Keep these values in
 // sync with the `font-size` allow-list in `sanitize-html.ts`.
-const FONT_SIZE_STEPS = [12, 14, 16, 18, 20, 24, 30] as const;
+const FONT_SIZE_STEPS = [12, 14, 15, 16, 18, 20, 24, 30] as const;
 const DEFAULT_FONT_SIZE = 16;
 const MIN_FONT_SIZE = FONT_SIZE_STEPS[0];
 const MAX_FONT_SIZE = FONT_SIZE_STEPS[FONT_SIZE_STEPS.length - 1];
