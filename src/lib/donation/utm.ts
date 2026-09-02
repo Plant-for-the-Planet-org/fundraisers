@@ -2,13 +2,17 @@ import type { DonationUtm } from '../types/donation';
 import type { Fundraiser } from '../types/fundraiser';
 
 /**
- * `utm_campaign` is deliberately absent: the platform reserves that key for the
- * fundraiser GUID and matches donations on it, so the URL's own campaign is kept
- * under `utm_campaign_name` instead.
+ * `utm_id` is standard and unclaimed, so it is stored under its own name. Planet
+ * widgets already forward it (see planet-widgets/utils/utmParams.js).
+ *
+ * `utm_campaign` is the exception: the platform reserves that key for the fundraiser
+ * GUID and matches donations on it, so the URL's own campaign is kept under
+ * `utm_campaign_name` instead.
  */
 const UTM_PARAMS = [
   ['utm_source', 'utm_source'],
   ['utm_medium', 'utm_medium'],
+  ['utm_id', 'utm_id'],
   ['utm_content', 'utm_content'],
   ['utm_term', 'utm_term'],
   ['utm_campaign', 'utm_campaign_name'],
@@ -52,8 +56,9 @@ export function parseUtmParams(
   for (const [param, key] of UTM_PARAMS) {
     const value = params.get(param)?.trim();
     if (!value) continue;
+    // Both carry a campaign identity, so both can arrive holding a fundraiser.
     if (
-      key === 'utm_campaign_name' &&
+      (key === 'utm_campaign_name' || key === 'utm_id') &&
       isFundraiserReference(value, fundraiser)
     ) {
       continue;

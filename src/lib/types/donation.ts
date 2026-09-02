@@ -80,6 +80,8 @@ export interface CustomFieldValue {
 export interface DonationUtm {
   utm_source?: string;
   utm_medium?: string;
+  /** The sender's own campaign ID, e.g. from an ad platform or a Planet widget. */
+  utm_id?: string;
   utm_content?: string;
   utm_term?: string;
   /** The URL's own campaign. `utm_campaign` itself is reserved, see below. */

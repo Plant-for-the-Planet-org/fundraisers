@@ -7,12 +7,13 @@ describe('parseUtmParams', () => {
   it('reads every campaign param off the query string', () => {
     expect(
       parseUtmParams(
-        '?utm_source=stage&utm_medium=qr&utm_campaign=stage-mode&utm_content=panel&utm_term=trees',
+        '?utm_source=stage&utm_medium=qr&utm_id=abc123&utm_campaign=stage-mode&utm_content=panel&utm_term=trees',
         fundraiser
       )
     ).toEqual({
       utm_source: 'stage',
       utm_medium: 'qr',
+      utm_id: 'abc123',
       utm_content: 'panel',
       utm_term: 'trees',
       utm_campaign_name: 'stage-mode',
@@ -74,6 +75,21 @@ describe('parseUtmParams', () => {
         fundraiser
       )
     ).toEqual({ utm_source: 'qr' });
+  });
+
+  it('keeps utm_id, which ad platforms and Planet widgets send', () => {
+    expect(parseUtmParams('?utm_id=summer_2026', fundraiser)).toEqual({
+      utm_id: 'summer_2026',
+    });
+  });
+
+  it('drops a fundraiser reference arriving as utm_id too', () => {
+    expect(
+      parseUtmParams(`?utm_id=${fundraiser.id}`, fundraiser)
+    ).toBeUndefined();
+    expect(
+      parseUtmParams('?utm_id=fr_aBcDeFgHiJkL', fundraiser)
+    ).toBeUndefined();
   });
 
   it('caps a value a crafted link could make arbitrarily long', () => {
