@@ -84,8 +84,6 @@ export interface DonationUtm {
   utm_id?: string;
   utm_content?: string;
   utm_term?: string;
-  /** The URL's own campaign. `utm_campaign` itself is reserved, see below. */
-  utm_campaign_name?: string;
 }
 
 export interface DonationMetadata extends DonationUtm {
