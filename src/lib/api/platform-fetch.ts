@@ -11,6 +11,7 @@
 import { useImpersonationStore } from '@/stores/impersonation-store';
 import { API_BASE_URL } from '../constants/app-config';
 import { getSessionId } from '../utils/session-id';
+import { needsTrackingId, signTrackingId } from './donation-tracking';
 
 export type PlatformAPIErrorKind =
   | 'http' // non-2xx with parsed body
@@ -33,7 +34,8 @@ type ManagedHeader =
   | 'X-SESSION-ID' // always from getSessionId()
   | 'Authorization' // always from opts.token
   | 'Content-Type' // auto-set from body type
-  | 'Idempotency-Key'; // always from opts.idempotencyKey
+  | 'Idempotency-Key' // always from opts.idempotencyKey
+  | 'TRACKING-ID'; // always signed here, see ./donation-tracking
 
 type ExtraHeaders = Record<string, string> &
   Partial<Record<ManagedHeader, never>>;
@@ -96,10 +98,23 @@ export async function platformFetch<T>(
       opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body);
   }
 
+  const method = opts.method ?? 'GET';
+  // Signed over `requestBody` itself, the exact string handed to fetch below.
+  // Re-serialising the body here would produce a different digest.
+  if (
+    typeof requestBody === 'string' &&
+    needsTrackingId(path, method, Boolean(opts.token))
+  ) {
+    const trackingId = await signTrackingId(requestBody);
+    if (trackingId) {
+      headers['TRACKING-ID'] = trackingId;
+    }
+  }
+
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
-      method: opts.method ?? 'GET',
+      method,
       headers,
       body: requestBody,
       signal: opts.timeoutMs ? AbortSignal.timeout(opts.timeoutMs) : undefined,
