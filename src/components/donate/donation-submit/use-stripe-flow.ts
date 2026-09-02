@@ -42,6 +42,7 @@ export function useStripeFlow(
     rotateIdempotencyKeys,
     finalizeDonation,
     buildPayload,
+    trackDonationSubmitted,
     confirmCardActionPayment,
     token,
     donorProfile,
@@ -135,6 +136,8 @@ export function useStripeFlow(
           if (!resolved) return;
           paymentDetails = resolved;
         }
+
+        trackDonationSubmitted(formData, values.selectedPaymentMethod);
 
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
@@ -264,6 +267,7 @@ export function useStripeFlow(
       rotateIdempotencyKeys,
       finalizeDonation,
       buildPayload,
+      trackDonationSubmitted,
       submittingRef,
       setDonationState,
       donationKeyRef,
