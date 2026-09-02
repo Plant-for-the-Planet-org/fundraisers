@@ -3,6 +3,7 @@ export const ALLOWED_REDIRECT_ROOTS = [
   '/dashboard',
   '/fundraisers',
   '/raise',
+  '/projects',
 ] as const;
 
 type AllowedRoot = (typeof ALLOWED_REDIRECT_ROOTS)[number];

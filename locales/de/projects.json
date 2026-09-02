@@ -1,0 +1,24 @@
+{
+  "Project": {
+    "loadingAria": "Projekt wird geladen",
+    "hero": {
+      "imageAlt": "Titelbild für {name}",
+      "topProject": "Vorgestellt in <highlight>Top-Projekten</highlight>",
+      "owner": "Von <owner>{name}</owner>",
+      "unitCost": "{unit, select, tree {<amount>{cost}</amount> <label>pro Baum</label>} m2 {<amount>{cost}</amount> <label>pro m²</label>} other {<amount>{cost}</amount> <label>pro Einheit</label>}}"
+    },
+    "about": {
+      "title": "Über das Projekt"
+    },
+    "notFound": {
+      "title": "Projekt nicht gefunden",
+      "description": "Das gesuchte Projekt existiert nicht oder wurde möglicherweise entfernt.",
+      "exploreCta": "Zurück zur Startseite"
+    },
+    "error": {
+      "title": "Etwas ist schief gelaufen",
+      "description": "Das Projekt konnte nicht geladen werden. Bitte versuche es erneut.",
+      "retry": "Erneut versuchen"
+    }
+  }
+}

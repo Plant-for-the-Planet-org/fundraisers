@@ -1,0 +1,24 @@
+{
+  "Project": {
+    "loadingAria": "Loading project",
+    "hero": {
+      "imageAlt": "Cover image for {name}",
+      "topProject": "Featured in <highlight>Top Projects</highlight>",
+      "owner": "By <owner>{name}</owner>",
+      "unitCost": "{unit, select, tree {<amount>{cost}</amount> <label>per tree</label>} m2 {<amount>{cost}</amount> <label>per m²</label>} other {<amount>{cost}</amount> <label>per unit</label>}}"
+    },
+    "about": {
+      "title": "About Project"
+    },
+    "notFound": {
+      "title": "Project Not Found",
+      "description": "The project you're looking for doesn't exist or may have been removed.",
+      "exploreCta": "Go to Home"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "This project could not be loaded. Please try again.",
+      "retry": "Try again"
+    }
+  }
+}

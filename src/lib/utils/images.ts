@@ -30,12 +30,18 @@ export function getImageUrl(
 /**
  * Resolves a project's image field to a renderable URL. Accepts either a
  * full http(s) URL (returned as-is) or a CDN filename (resolved via
- * `getImageUrl('project', 'small', …)`). Returns `null` for empty input.
+ * `getImageUrl('project', size, …)`). Returns `null` for empty input.
+ *
+ * @param size - CDN size to request. Defaults to `'small'`, which suits the
+ * thumbnails most callers render; pass `'large'` for hero-sized images.
  */
-export function resolveProjectImageSource(image?: string): string | null {
+export function resolveProjectImageSource(
+  image?: string | null,
+  size: ImageSize = 'small'
+): string | null {
   if (!image) return null;
   if (/^https?:\/\//i.test(image)) return image;
-  return getImageUrl('project', 'small', image);
+  return getImageUrl('project', size, image);
 }
 
 /**

@@ -1,3 +1,6 @@
+/** Unit a project's `unitCost` is denominated in. */
+export type ProjectUnit = 'tree' | 'm2';
+
 export interface PaymentOptionItem {
   id: string;
   caption: string | null;
@@ -54,4 +57,37 @@ export interface PaymentOptions {
       available: number;
     };
   };
+}
+
+/**
+ * `GET /paymentOptions/{projectSlug}` response.
+ * The endpoint serves both fundraisers and projects; for a project, it also
+ * includes the details required by the project page.
+ */
+export interface ProjectPaymentOptions extends PaymentOptions {
+  /** Discriminates a project payload from a fundraiser one. */
+  destination: 'project';
+  /** Organization running the project, shown as the project owner. */
+  ownerName: string;
+  /** CDN filename of the owner's logo, used for the avatar next to `ownerName`. */
+  ownerAvatar: string | null;
+  /** Plain text, may contain line breaks. */
+  description: string | null;
+  /** CDN filename or absolute URL of the project's hero image. */
+  image: string | null;
+
+  isApproved: boolean;
+  isTopProject: boolean;
+  isGiftable: boolean;
+
+  purpose: string;
+  category: string;
+  classification: string;
+
+  unitCost: number;
+  unit: ProjectUnit;
+  unitType: ProjectUnit;
+
+  taxDeductionCountries: string[];
+  supportProject: unknown;
 }
