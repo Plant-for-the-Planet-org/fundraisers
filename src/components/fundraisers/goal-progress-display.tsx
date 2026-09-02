@@ -32,7 +32,7 @@ export function GoalProgressDisplay({
       </div>
 
       <div className='mt-2'>
-        <div className='h-2 w-full rounded-full bg-reverse/20 overflow-hidden'>
+        <div className='h-2 w-full rounded-full bg-mode-reverse/20 overflow-hidden'>
           <div
             className='h-full bg-accent-color'
             style={{ width: `${progressPercentage}%` }}
