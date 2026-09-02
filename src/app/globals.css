@@ -14,7 +14,7 @@
    but NOT inside a .light boundary (used by the donation overlay to force light mode). */
 @variant dark (&:is(.dark *):not(:is(.light *)));
 
-@theme {
+@theme inline {
   /* Fonts — referencing Next.js font CSS variables set in layout.tsx */
   --font-open-sans: var(--font-open-sans-var), 'Open Sans', sans-serif;
   --font-inter: var(--font-inter-var), 'Inter', sans-serif;
@@ -62,9 +62,11 @@
 
   /* Layered theme model — base/reverse colours for the mode base layer.
      --base-rgb / --reverse-rgb flip by mode (:root / .light / .dark). Surfaces
-     use bg-base/N (recede); callouts use bg-reverse/N (pop) via opacity modifiers. */
-  --color-base: rgb(var(--base-rgb));
-  --color-reverse: rgb(var(--reverse-rgb));
+     use bg-mode-base/N (recede); callouts use bg-mode-reverse/N (pop) via opacity
+     modifiers. The `mode-` prefix is required: a colour named `base` would shadow
+     Tailwind's built-in `text-base` font-size utility. */
+  --color-mode-base: rgb(var(--base-rgb));
+  --color-mode-reverse: rgb(var(--reverse-rgb));
 
   /* Border radius */
   --radius-sm: calc(var(--radius) - 4px);
@@ -129,7 +131,6 @@
   --reverse-rgb: 0 0 0;
 }
 
-/* When adding variables here, also add them to .light in the block below */
 .dark {
   --tab-border-color: rgb(255 255 255 / 0.5);
   --background: 224 71.4% 4.1%;
@@ -180,30 +181,6 @@
   --section-divider: 220 13% 91%;
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
-
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-destructive: hsl(var(--destructive));
-  --color-warning: hsl(var(--warning));
-  --color-success: hsl(var(--success));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-neutral: hsl(var(--neutral));
-  --color-neutral-foreground: hsl(var(--neutral-foreground));
-  --color-tab-border: var(--tab-border-color);
-  --color-heading: hsl(var(--heading));
-  --color-section-divider: hsl(var(--section-divider));
-  --color-base: rgb(var(--base-rgb));
-  --color-reverse: rgb(var(--reverse-rgb));
 }
 
 body {
