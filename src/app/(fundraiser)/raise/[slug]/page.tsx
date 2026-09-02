@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
@@ -115,10 +115,29 @@ export async function generateMetadata({
   }
 }
 
+/** Rebuilds the incoming query string so a canonical redirect keeps its campaign params. */
+function buildQueryString(
+  searchParams: Record<string, string | string[] | undefined>
+): string {
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (Array.isArray(value)) {
+      value.forEach(entry => query.append(key, entry));
+    } else if (value !== undefined) {
+      query.append(key, value);
+    }
+  }
+
+  return query.toString();
+}
+
 export default async function FundraiserPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
   const locale = await getLocale();
@@ -136,6 +155,25 @@ export default async function FundraiserPage({
       }
     }
     throw e;
+  }
+
+  // A fundraiser resolves by GUID as well as by its exact slug, so one fundraiser is
+  // reachable at two URLs. Umami keys pageviews by URL, which splits its visit count.
+  // Send the GUID form to the slug, keeping the query so campaign params survive.
+  // Verified live: the HID does not resolve here, and the slug is case-sensitive, so
+  // neither reaches this check.
+  //
+  // Temporary on purpose: hosts can rename a slug, and a cached permanent redirect
+  // would strand visitors on the old one. Must stay outside the try above, since
+  // `redirect` signals by throwing.
+  if (fundraiser.slug && fundraiser.slug !== slug) {
+    const query = buildQueryString(await searchParams);
+    const canonicalPath = getFundraiserUrl({
+      id: fundraiser.id,
+      slug: fundraiser.slug,
+    });
+
+    redirect(query ? `${canonicalPath}?${query}` : canonicalPath);
   }
 
   let paymentOptions;

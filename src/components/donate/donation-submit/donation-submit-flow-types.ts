@@ -57,6 +57,15 @@ export interface SubmissionCore {
     token?: string,
     fallbackThankYouState?: ThankYouState
   ) => Promise<void>;
+  /**
+   * Records a donation attempt that is actually reaching the API. Call it right
+   * before the create-donation request, never straight after `buildPayload`: the
+   * Stripe and PlanetCash paths can still bail out in between.
+   */
+  trackDonationSubmitted: (
+    formData: DonationFormData,
+    paymentMethod: PaymentMethodId
+  ) => void;
   /** Assembles form data and the donation payload for a given payment method. */
   buildPayload: (
     values: DonationFormValues,

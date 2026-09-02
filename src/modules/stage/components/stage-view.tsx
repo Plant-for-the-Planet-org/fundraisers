@@ -104,7 +104,6 @@ export function StageView({
 
         {/* QR panel — bottom left */}
         <StageQRPanel
-          fundraiserId={fundraiser.id}
           slug={slug}
           className='absolute bottom-[170px] left-12 z-[18] w-[300px]'
         />

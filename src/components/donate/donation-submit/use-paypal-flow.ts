@@ -50,6 +50,7 @@ export function usePayPalFlow(core: SubmissionCore) {
     failSubmission,
     finalizeDonation,
     buildPayload,
+    trackDonationSubmitted,
     token,
     paymentOptions,
   } = core;
@@ -65,9 +66,14 @@ export function usePayPalFlow(core: SubmissionCore) {
 
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayload(values, values.selectedPaymentMethod);
+      const { formData, payload } = buildPayload(
+        values,
+        values.selectedPaymentMethod
+      );
 
       try {
+        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+
         const donationResponse = await donationService.createDonation(
           payload,
           token || undefined,
@@ -105,6 +111,7 @@ export function usePayPalFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       buildPayload,
+      trackDonationSubmitted,
       submittingRef,
       setDonationState,
       donationKeyRef,

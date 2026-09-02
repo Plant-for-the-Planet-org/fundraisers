@@ -35,6 +35,7 @@ export function useWalletFlow(core: SubmissionCore) {
     failSubmission,
     finalizeDonation,
     buildPayload,
+    trackDonationSubmitted,
     confirmCardActionPayment,
     token,
     paymentOptions,
@@ -52,12 +53,14 @@ export function useWalletFlow(core: SubmissionCore) {
 
       setDonationState(beginSubmission);
 
-      const { payload } = buildPayload(values, wallet);
+      const { formData, payload } = buildPayload(values, wallet);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
+        trackDonationSubmitted(formData, wallet);
+
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
             payload,
@@ -135,6 +138,7 @@ export function useWalletFlow(core: SubmissionCore) {
       rotateIdempotencyKeys,
       finalizeDonation,
       buildPayload,
+      trackDonationSubmitted,
       confirmCardActionPayment,
       submittingRef,
       setDonationState,
