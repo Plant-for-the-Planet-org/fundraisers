@@ -8,7 +8,11 @@ import {
   splitEmbedMarkers,
 } from '@/lib/rich-text/split-embed-markers';
 import { cn } from '@/lib/utils';
-import { isWhitelistedHref, openInNewTab } from '@/lib/utils/link-intent';
+import {
+  getLinkOpenHref,
+  isWhitelistedHref,
+  openInNewTab,
+} from '@/lib/utils/link-intent';
 import { ImageEmbed } from '@/components/ui/image-embed';
 import { showPopupBlockedToast } from '@/components/ui/popup-blocked-toast';
 import { VideoEmbed } from '@/components/ui/video-embed';
@@ -42,16 +46,11 @@ export function RichTextClickCapture({
     if (!href) return;
     event.preventDefault();
 
-    if (isWhitelistedHref(href)) {
-      if (!openInNewTab(href)) showPopupBlockedToast(href);
-      return;
-    }
-
-    // Not trusted (or mailto/tel, which have no domain to trust) — route
-    // through the warning page instead of the raw destination, so the
-    // popup-blocked fallback link still goes through the same gate.
-    const externalUrl = `/external?url=${encodeURIComponent(href)}`;
-    if (!openInNewTab(externalUrl)) showPopupBlockedToast(externalUrl);
+    // The shared resolver keeps this visitor flow aligned with the editor's
+    // explicit open-link action. If the popup is blocked, show the original
+    // destination in the fallback so it can be copied and shared directly.
+    const openHref = getLinkOpenHref(href);
+    if (!openInNewTab(openHref)) showPopupBlockedToast(href, openHref);
   };
 
   const handleContextMenu = (event: MouseEvent<HTMLDivElement>) => {

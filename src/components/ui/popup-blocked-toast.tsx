@@ -5,14 +5,21 @@ import { useTranslations } from 'next-intl';
 import { Check, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils/cn';
+import {
+  getPopupBlockedToastLinkTargets,
+  POPUP_BLOCKED_TOAST_OPTIONS,
+  stopPopupBlockedToastPointerDown,
+} from '@/components/ui/popup-blocked-toast-options';
 
 interface PopupBlockedToastContentProps {
-  href: string;
+  displayHref: string;
+  openHref: string;
   toastId: string | number;
 }
 
 function PopupBlockedToastContent({
-  href,
+  displayHref,
+  openHref,
   toastId,
 }: PopupBlockedToastContentProps) {
   const t = useTranslations('Common.popupBlocked');
@@ -20,7 +27,7 @@ function PopupBlockedToastContent({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(href);
+      await navigator.clipboard.writeText(displayHref);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -29,25 +36,29 @@ function PopupBlockedToastContent({
   };
 
   return (
-    <div className='flex w-full flex-col gap-2 rounded-lg border border-border bg-background p-4 shadow-lg'>
+    <div
+      onPointerDown={stopPopupBlockedToastPointerDown}
+      className='pointer-events-auto flex w-full max-w-full flex-col gap-2 overflow-hidden rounded-lg border border-border bg-background p-4 shadow-lg'
+    >
       <p className='text-sm font-medium text-foreground'>{t('title')}</p>
       <p className='text-sm text-muted-foreground'>{t('description')}</p>
-      <div className='flex items-center justify-between gap-2'>
+      <div className='flex min-w-0 items-center justify-between gap-2'>
         <a
-          href={href}
+          href={openHref}
           target='_blank'
           rel='noopener noreferrer nofollow'
           onClick={() => toast.dismiss(toastId)}
-          className='min-w-0 flex-1 truncate text-sm font-medium text-primary underline underline-offset-2'
+          title={displayHref}
+          className='block min-w-0 flex-1 truncate text-sm font-medium text-primary underline underline-offset-2'
         >
-          {href}
+          {displayHref}
         </a>
         <button
           type='button'
           onClick={handleCopy}
           aria-label={t('copy')}
           className={cn(
-            'shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+            'shrink-0 cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
           )}
         >
           {copied ? (
@@ -66,8 +77,11 @@ function PopupBlockedToastContent({
   );
 }
 
-export function showPopupBlockedToast(href: string) {
-  toast.custom(toastId => (
-    <PopupBlockedToastContent href={href} toastId={toastId} />
-  ));
+export function showPopupBlockedToast(displayHref: string, openHref: string) {
+  const linkTargets = getPopupBlockedToastLinkTargets(displayHref, openHref);
+
+  toast.custom(
+    toastId => <PopupBlockedToastContent {...linkTargets} toastId={toastId} />,
+    POPUP_BLOCKED_TOAST_OPTIONS
+  );
 }

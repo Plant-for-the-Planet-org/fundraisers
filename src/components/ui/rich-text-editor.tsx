@@ -39,6 +39,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { cn } from '@/lib/utils/cn';
 import {
+  getLinkOpenHref,
   isAllowedEditorLinkHref,
   isValidExternalHref,
   normalizeLinkHref,
@@ -570,8 +571,9 @@ export function RichTextEditor({
 
   const openLinkInNewTab = () => {
     if (!toolbarState.linkHref) return;
-    if (!openInNewTab(toolbarState.linkHref)) {
-      showPopupBlockedToast(toolbarState.linkHref);
+    const openHref = getLinkOpenHref(toolbarState.linkHref);
+    if (!openInNewTab(openHref)) {
+      showPopupBlockedToast(toolbarState.linkHref, openHref);
     }
   };
 

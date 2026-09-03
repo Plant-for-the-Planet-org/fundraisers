@@ -1,11 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getLinkOpenHref,
   isAllowedEditorLinkHref,
   isValidExternalHref,
   isWhitelistedHref,
   normalizeLinkHref,
   shouldAutoLinkHref,
 } from './link-intent';
+
+describe('getLinkOpenHref', () => {
+  it('opens trusted HTTPS destinations directly', () => {
+    expect(getLinkOpenHref('https://plant-for-the-planet.org/about')).toBe(
+      'https://plant-for-the-planet.org/about'
+    );
+  });
+
+  it.each([
+    'https://example.com/donate?id=123',
+    'http://plant-for-the-planet.org/about',
+    'mailto:hello@example.com',
+  ])('routes non-whitelisted destination %s through the warning', href => {
+    expect(getLinkOpenHref(href)).toBe(
+      `/external?url=${encodeURIComponent(href)}`
+    );
+  });
+});
 
 describe('normalizeLinkHref', () => {
   it('adds HTTPS to a bare domain', () => {

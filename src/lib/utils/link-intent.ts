@@ -46,6 +46,17 @@ export function isWhitelistedHref(href: string): boolean {
   }
 }
 
+/**
+ * Resolves the URL that should be opened when a stored rich-text link is
+ * followed. Keeping this decision here makes owner/editor and visitor views
+ * use the same trusted-domain policy.
+ */
+export function getLinkOpenHref(href: string): string {
+  return isWhitelistedHref(href)
+    ? href
+    : `/external?url=${encodeURIComponent(href)}`;
+}
+
 // Requires at least one label + a dot + a letters-only TLD, e.g. "example.com"
 // or "sub.example.co.uk" — rejects a bare word like "asdfasdf" with no dot,
 // which `new URL()` alone happily accepts as a "valid" hostname.
