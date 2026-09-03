@@ -2,6 +2,7 @@
 
 import type { ReactNode, RefObject } from 'react';
 import type { Control } from 'react-hook-form';
+import type { DonationFieldErrors } from '@/lib/donation/donation-field-errors';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { AllowedCountry } from '@/lib/workspaces/countries';
@@ -181,6 +182,8 @@ interface DonationFormProviderProps {
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
   isOpen: boolean;
+  /** Field errors the platform rejected the donation with, applied on top of the client-side schema. */
+  serverFieldErrors?: DonationFieldErrors;
   children: ReactNode;
 }
 
@@ -198,6 +201,7 @@ export function DonationFormProvider({
   sepaFormRef,
   cardFormRef,
   isOpen,
+  serverFieldErrors,
   children,
 }: DonationFormProviderProps) {
   const schema = useMemo(
@@ -245,6 +249,20 @@ export function DonationFormProvider({
   useEffect(() => {
     if (!isOpen) methods.reset();
   }, [isOpen, methods]);
+
+  // Marks the fields the platform rejected. Runs after submit, so `handleSubmit`
+  // has already cleared the previous round of errors via the resolver; the donor
+  // editing the field clears the mark again on the next revalidation.
+  useEffect(() => {
+    if (!serverFieldErrors) return;
+    for (const [field, errorKey] of Object.entries(serverFieldErrors)) {
+      if (!errorKey) continue;
+      methods.setError(field as keyof DonationFormValues, {
+        type: 'server',
+        message: errorKey,
+      });
+    }
+  }, [serverFieldErrors, methods]);
 
   return (
     <DonationFormContext.Provider

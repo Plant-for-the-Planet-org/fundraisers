@@ -164,10 +164,22 @@ function DonateOverlayInner({
 
   const errorBannerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (error?.code && errorBannerRef.current) {
+    if (!error?.code) return;
+
+    // Field-level rejections are marked on the inputs by DonationFormProvider,
+    // which is a child, so its setError has run but the markers are not painted
+    // yet. Wait a frame, then scroll to the field rather than to the banner.
+    if (error.fieldErrors) {
+      const frame = requestAnimationFrame(() => {
+        scrollToFirstError()?.focus?.();
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    if (errorBannerRef.current) {
       scrollElementIntoView(errorBannerRef.current);
     }
-  }, [error?.code]);
+  }, [error]);
 
   const thankYouModule = fundraiser.settings?.modules?.thankYouNote;
   const hostMessageConfig = useMemo(() => {
@@ -231,6 +243,7 @@ function DonateOverlayInner({
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
         isOpen={isOpen}
+        serverFieldErrors={error?.fieldErrors}
       >
         <DonateOverlayLayout
           onClose={onClose}

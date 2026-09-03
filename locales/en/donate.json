@@ -96,35 +96,49 @@
     },
     "errors": {
       "zipCode": {
-        "required": "Zip code is required"
+        "required": "Zip code is required",
+        "invalid": "Please enter a valid zip code"
       },
       "address": {
-        "required": "Address is required"
+        "required": "Address is required",
+        "invalid": "Please enter a valid address"
       },
       "city": {
-        "required": "City is required"
+        "required": "City is required",
+        "invalid": "Please enter a valid city"
       },
       "country": {
-        "required": "Country is required"
+        "required": "Country is required",
+        "invalid": "Please enter a valid country"
       },
       "firstName": {
-        "required": "First name is required"
+        "required": "First name is required",
+        "invalid": "Please enter a valid first name"
       },
       "lastName": {
-        "required": "Last name is required"
+        "required": "Last name is required",
+        "invalid": "Please enter a valid last name"
       },
       "companyName": {
-        "required": "Company name is required"
+        "required": "Company name is required",
+        "invalid": "Please enter a valid company name"
       },
       "email": {
         "required": "Email is required",
         "invalid": "Please enter a valid email address"
       },
       "tin": {
-        "required": "TIN is required"
+        "required": "TIN is required",
+        "invalid": "Please enter a valid TIN"
       },
       "paymentMethod": {
         "required": "Please select a payment method"
+      },
+      "address2": {
+        "invalid": "Please enter a valid address"
+      },
+      "state": {
+        "invalid": "Please enter a valid state"
       }
     },
     "sepa": {

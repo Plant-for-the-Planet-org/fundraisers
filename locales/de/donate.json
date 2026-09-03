@@ -96,35 +96,49 @@
     },
     "errors": {
       "zipCode": {
-        "required": "Postleitzahl ist erforderlich"
+        "required": "Postleitzahl ist erforderlich",
+        "invalid": "Bitte gib eine gültige Postleitzahl an"
       },
       "address": {
-        "required": "Adresse ist erforderlich"
+        "required": "Adresse ist erforderlich",
+        "invalid": "Bitte gib eine gültige Adresse an"
       },
       "city": {
-        "required": "Stadt ist erforderlich"
+        "required": "Stadt ist erforderlich",
+        "invalid": "Bitte gib eine gültige Stadt an"
       },
       "country": {
-        "required": "Land ist erforderlich"
+        "required": "Land ist erforderlich",
+        "invalid": "Bitte gib ein gültiges Land an"
       },
       "firstName": {
-        "required": "Vorname ist erforderlich"
+        "required": "Vorname ist erforderlich",
+        "invalid": "Bitte gib einen gültigen Vornamen an"
       },
       "lastName": {
-        "required": "Nachname ist erforderlich"
+        "required": "Nachname ist erforderlich",
+        "invalid": "Bitte gib einen gültigen Nachnamen an"
       },
       "companyName": {
-        "required": "Firmen-/Organisationsname ist erforderlich"
+        "required": "Firmen-/Organisationsname ist erforderlich",
+        "invalid": "Bitte gib einen gültigen Firmen-/Organisationsnamen an"
       },
       "email": {
         "required": "E-Mail ist erforderlich",
         "invalid": "Bitte gib eine gültige E-Mail Adresse an"
       },
       "tin": {
-        "required": "TIN ist erforderlich"
+        "required": "TIN ist erforderlich",
+        "invalid": "Bitte gib eine gültige TIN an"
       },
       "paymentMethod": {
         "required": "Bitte wähle eine Zahlungsart aus"
+      },
+      "address2": {
+        "invalid": "Bitte gib eine gültige Adresse an"
+      },
+      "state": {
+        "invalid": "Bitte gib ein gültiges Bundesland an"
       }
     },
     "sepa": {
