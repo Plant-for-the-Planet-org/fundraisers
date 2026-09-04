@@ -133,7 +133,7 @@ export const AddressForm = () => {
         <div className='sm:col-span-2'>
           <FormField
             label={tDonate('address2.label')}
-            error={errors.address2?.message}
+            error={translateError(errors.address2?.message)}
           >
             <Input
               {...register('address2')}
@@ -142,7 +142,10 @@ export const AddressForm = () => {
             />
           </FormField>
         </div>
-        <FormField label={tDonate('state.label')} error={errors.state?.message}>
+        <FormField
+          label={tDonate('state.label')}
+          error={translateError(errors.state?.message)}
+        >
           <Input
             {...register('state')}
             placeholder={tDonate('state.placeholder')}

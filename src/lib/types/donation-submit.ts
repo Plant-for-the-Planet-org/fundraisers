@@ -1,3 +1,4 @@
+import type { DonationFieldErrors } from '@/lib/donation/donation-field-errors';
 import type {
   DonationFrequency,
   DonationPaymentStatus,
@@ -32,6 +33,8 @@ export interface DonationSubmitState {
 export interface DonationSubmitError {
   /** Maps directly to a key under Donate.submissionErrors in locale JSON */
   code: SubmissionErrorKey;
+  /** Per-field errors the platform reported, keyed by form field name. Absent unless the platform sent a field-error map we could map onto form fields. */
+  fieldErrors?: DonationFieldErrors;
 }
 
 export const INITIAL_DONATION_STATE: DonationSubmitState = {
