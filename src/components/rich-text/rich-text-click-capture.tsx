@@ -1,0 +1,109 @@
+'use client';
+
+import type { MouseEvent } from 'react';
+import type { SafeHtml } from '@/lib/types/safe-html';
+
+import {
+  hasEmbedMarker,
+  splitEmbedMarkers,
+} from '@/lib/rich-text/split-embed-markers';
+import { cn } from '@/lib/utils';
+import {
+  getLinkOpenHref,
+  isWhitelistedHref,
+  openInNewTab,
+} from '@/lib/utils/link-intent';
+import { ImageEmbed } from '@/components/ui/image-embed';
+import { showPopupBlockedToast } from '@/components/ui/popup-blocked-toast';
+import { VideoEmbed } from '@/components/ui/video-embed';
+
+interface RichTextClickCaptureProps {
+  safeHtml: SafeHtml;
+  className?: string;
+}
+
+/**
+ * Renders already-sanitized rich-text HTML and intercepts clicks on any `<a>`.
+ * A trusted-domain link opens directly in a new tab; everything else (an
+ * untrusted domain, `mailto:`, `tel:`) opens the `/external` warning page in a
+ * new tab instead, so the fundraiser page itself is never interrupted. Split
+ * out from `RichTextContent` because it needs client-side interactivity,
+ * while `RichTextContent` itself must stay usable from Server Components that
+ * pass a plain `sanitize` function prop.
+ *
+ * Embed markers are replaced with live components here for the same reason:
+ * the split has to happen wherever the HTML is actually rendered.
+ */
+export function RichTextClickCapture({
+  safeHtml,
+  className,
+}: RichTextClickCaptureProps) {
+  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    // Primary and middle (aux) clicks go through the same trust gate.
+    if (event.button === 2) return;
+    const anchor = (event.target as HTMLElement).closest('a');
+    const href = anchor?.getAttribute('href');
+    if (!href) return;
+    event.preventDefault();
+
+    // The shared resolver keeps this visitor flow aligned with the editor's
+    // explicit open-link action. If the popup is blocked, show the original
+    // destination in the fallback so it can be copied and shared directly.
+    const openHref = getLinkOpenHref(href);
+    if (!openInNewTab(openHref)) showPopupBlockedToast(href, openHref);
+  };
+
+  const handleContextMenu = (event: MouseEvent<HTMLDivElement>) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    const href = anchor?.getAttribute('href');
+    if (!href || isWhitelistedHref(href)) return;
+
+    // The browser's "open link" actions navigate to the raw href and bypass
+    // our click handler, so untrusted links cannot expose a native link menu.
+    event.preventDefault();
+  };
+
+  // Fast path: no embed markers → single node, byte-identical to before.
+  if (!hasEmbedMarker(safeHtml)) {
+    return (
+      <div
+        className={cn(className)}
+        onClick={handleClick}
+        onAuxClick={handleClick}
+        onContextMenu={handleContextMenu}
+        dangerouslySetInnerHTML={{ __html: safeHtml as TrustedHTML }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={className}
+      onClick={handleClick}
+      onAuxClick={handleClick}
+      onContextMenu={handleContextMenu}
+    >
+      {splitEmbedMarkers(safeHtml).map((segment, index) => {
+        if (segment.kind === 'video') {
+          return (
+            <VideoEmbed
+              key={index}
+              provider={segment.provider}
+              id={segment.id}
+              aspect={segment.aspect}
+            />
+          );
+        }
+        if (segment.kind === 'image') {
+          return <ImageEmbed key={index} src={segment.src} alt={segment.alt} />;
+        }
+        return (
+          <div
+            key={index}
+            dangerouslySetInnerHTML={{ __html: segment.html as TrustedHTML }}
+          />
+        );
+      })}
+    </div>
+  );
+}

@@ -51,11 +51,36 @@
     },
     "imageEmbed": {
       "editor": {
-        "invalidUrl": "Bilder können nur von plant-for-the-planet.org über https eingebettet werden. SVG wird nicht unterstützt.",
+        "invalidUrl": "Bilder können nur von einer vertrauenswürdigen Domain (z. B. plant-for-the-planet.org) über https eingebettet werden. SVG wird nicht unterstützt.",
         "altLabel": "Bildbeschreibung",
         "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
         "removeImage": "Bild entfernen"
       }
+    },
+    "linkEditor": {
+      "toolbarButton": "Link hinzufügen",
+      "urlLabel": "Link-URL",
+      "urlPlaceholder": "Link einfügen oder eingeben",
+      "setLink": "Link setzen",
+      "unlink": "Link entfernen",
+      "openInNewTab": "In neuem Tab öffnen",
+      "invalidUrl": "Gib einen gültigen Link ein (eine Webadresse oder E-Mail)."
+    },
+    "externalLinkWarning": {
+      "goBack": "Zurück",
+      "invalidTitle": "Ungültiger Link",
+      "invalidBody": "Dieser Link ist ungültig und kann nicht geöffnet werden.",
+      "leavingTitle": "Du verlässt startplanting.org",
+      "leavingBody": "Dieser Link führt zu einer externen Website, die wir nicht kontrollieren oder prüfen. Stelle sicher, dass du ihr vertraust, bevor du fortfährst - die Nutzung erfolgt auf eigenes Risiko.",
+      "mailPromptTitle": "Mail-App öffnen?",
+      "mailPromptBody": "Dies öffnet deine Mail-App, um eine Nachricht an <strong>{address}</strong> zu senden.",
+      "continue": "Fortfahren"
+    },
+    "popupBlocked": {
+      "title": "Popup blockiert",
+      "description": "Dein Browser hat den neuen Tab blockiert. Öffne ihn hier:",
+      "copy": "Link kopieren",
+      "copied": "Link kopiert"
     }
   }
 }
