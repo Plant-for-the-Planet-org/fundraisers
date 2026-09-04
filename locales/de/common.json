@@ -32,6 +32,16 @@
       "explore": "Entdecken",
       "startFundraiser": "Erstellen"
     },
+    "appSwitcher": {
+      "triggerLabel": "ForestCloud Apps",
+      "title": "ForestCloud",
+      "subtitle": "von Plant-for-the-Planet",
+      "favourites": "Favoriten",
+      "apps": "Apps",
+      "more": "Mehr von ForestCloud",
+      "pin": "{name} anheften",
+      "unpin": "{name} nicht mehr anheften"
+    },
     "videoEmbed": {
       "gatedDescription": "Um dieses Video abzuspielen muss der Verwendung von Cookies von YouTube zugestimmt werden.",
       "allowButton": "Video-Cookies zulassen.",

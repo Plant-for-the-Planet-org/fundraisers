@@ -32,6 +32,16 @@
       "explore": "Explore",
       "startFundraiser": "Start Fundraiser"
     },
+    "appSwitcher": {
+      "triggerLabel": "ForestCloud apps",
+      "title": "ForestCloud",
+      "subtitle": "by Plant-for-the-Planet",
+      "favourites": "Favourites",
+      "apps": "Apps",
+      "more": "More from ForestCloud",
+      "pin": "Pin {name}",
+      "unpin": "Unpin {name}"
+    },
     "videoEmbed": {
       "gatedDescription": "To play this video we need your consent to set cookies from YouTube.",
       "allowButton": "Allow video cookies",
