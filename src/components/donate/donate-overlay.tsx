@@ -14,6 +14,7 @@ import { getStripe } from '@/lib/utils/get-stripe';
 import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
 import {
   scrollElementIntoView,
+  scrollToField,
   scrollToFirstError,
 } from '@/lib/utils/scroll-into-view';
 import {
@@ -133,7 +134,7 @@ function DonateOverlayInner({
   // the DOM before we scroll to the first one.
   const handlePaymentValidationFailed = useCallback(() => {
     requestAnimationFrame(() => {
-      scrollToFirstError()?.focus?.();
+      scrollToFirstError()?.focus?.({ preventScroll: true });
     });
   }, []);
 
@@ -166,12 +167,20 @@ function DonateOverlayInner({
   useEffect(() => {
     if (!error?.code) return;
 
-    // Field-level rejections are marked on the inputs by DonationFormProvider,
-    // which is a child, so its setError has run but the markers are not painted
-    // yet. Wait a frame, then scroll to the field rather than to the banner.
     if (error.fieldErrors) {
+      // The field is already on the page, so find it by its name and scroll
+      // to it directly. This avoids waiting for the error styling to appear.
+      const [firstField] = Object.keys(error.fieldErrors);
+      const target = firstField ? scrollToField(firstField) : null;
+      if (target) {
+        target.focus({ preventScroll: true });
+        return;
+      }
+
+      // Some fields cannot be found by name, so wait for their error marker
+      // to appear and then scroll to the first field with an error.
       const frame = requestAnimationFrame(() => {
-        scrollToFirstError()?.focus?.();
+        scrollToFirstError()?.focus?.({ preventScroll: true });
       });
       return () => cancelAnimationFrame(frame);
     }
