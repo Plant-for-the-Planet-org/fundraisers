@@ -74,6 +74,14 @@ describe('toDonationFieldErrors', () => {
     ).toBeUndefined();
   });
 
+  it('drops paths with extra segments instead of matching a truncated field', () => {
+    expect(
+      toDonationFieldErrors({
+        'donor.city.extra': ['form.city.invalid'],
+      })
+    ).toBeUndefined();
+  });
+
   it('keeps what maps when only some entries resolve', () => {
     expect(
       toDonationFieldErrors({

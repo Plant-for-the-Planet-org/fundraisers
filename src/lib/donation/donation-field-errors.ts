@@ -44,8 +44,8 @@ export function toDonationFieldErrors(
 
   const mapped: DonationFieldErrors = {};
   for (const [path, messages] of Object.entries(raw)) {
-    const [scope, name] = path.split('.');
-    if (scope !== 'donor') continue;
+    const [scope, name, ...rest] = path.split('.');
+    if (scope !== 'donor' || !name || rest.length > 0) continue;
 
     const target = DONOR_FIELDS[name as keyof typeof DONOR_FIELDS];
     if (!target) continue;
