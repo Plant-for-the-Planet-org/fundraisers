@@ -23,7 +23,6 @@ import {
 import {
   assembleFormData,
   buildDonationPayload,
-  resolveDonorCountry,
 } from '@/lib/donation/payload-builder';
 import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
@@ -73,17 +72,10 @@ export function useSubmissionCore(
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  const failSubmission = useCallback(
-    (code: SubmissionErrorKey) => {
-      trackEvent('donation_failed', {
-        fundraiser: fundraiser.slug,
-        error: code,
-      });
-      setDonationState(withError(code));
-      submittingRef.current = false;
-    },
-    [fundraiser.slug]
-  );
+  const failSubmission = useCallback((code: SubmissionErrorKey) => {
+    setDonationState(withError(code));
+    submittingRef.current = false;
+  }, []);
 
   const createAttempt = useCallback(
     (
@@ -114,38 +106,39 @@ export function useSubmissionCore(
         processingFeeCents
       );
 
-      const country = resolveDonorCountry(formData, donorProfile);
-      const amount = formData.amountCents / 100;
-      // `amount` is a plain dimension. Umami sums `revenue` across every event,
-      // so only the settled event sends it, or one donation counts three times.
+      // `amount` is a plain dimension. Umami sums `revenue` across every event, so only the settled event sends it, or one donation counts three times.
       const track = (name: string, extra?: Record<string, unknown>) =>
         trackEvent(name, {
           fundraiser: fundraiser.slug,
-          amount,
-          currency: formData.currency,
-          frequency: formData.frequency,
+          amount: payload.amount,
+          currency: payload.currency,
+          frequency: payload.frequency,
           method: paymentMethod,
-          country,
+          country: 'donor' in payload ? payload.donor.country : undefined,
           signedIn: isAuthenticated,
           coversFee: values.willAbsorbFee && processingFeeCents > 0,
           // The "make it monthly" upsell on a one-off donation.
           upgradedToMonthly:
             donationData.frequency === 'once' &&
-            formData.frequency === 'monthly',
+            payload.frequency === 'monthly',
           ...extra,
         });
+
+      // Only a failure after the request went out is a donation failure. Form validation bail-outs and a dismissed wallet sheet stay out, so failures never exceed submissions and every donation_failed carries the full dimensions.
+      let submitted = false;
 
       return {
         formData,
         payload,
         paymentMethod,
-        // Fires on submit, not on settlement: a bank transfer counts here while
-        // the money is still pending.
-        submitted: () => track('donation_submitted'),
+        // Fires on submit, not on settlement: a bank transfer counts here while the money is still pending.
+        submitted: () => {
+          submitted = true;
+          track('donation_submitted');
+        },
         fail: code => {
-          track('donation_failed', { error: code });
-          setDonationState(withError(code));
-          submittingRef.current = false;
+          if (submitted) track('donation_failed', { error: code });
+          failSubmission(code);
         },
         complete: async (donationId, fallbackThankYouState) => {
           const thankYouState = await resolveThankYouStateFromDonation(
@@ -154,24 +147,19 @@ export function useSubmissionCore(
             fallbackThankYouState
           );
           setDonationState(withSuccess(thankYouState));
-          // Revenue counts when paid. A confirmed SEPA mandate also counts:
-          // the platform holds it at initiated/pending until the debit
-          // settles days later, and the client never sees that. A pending
-          // bank transfer is only a promise and stays out.
-          const settled =
-            thankYouState.status === 'completed' ||
-            (paymentMethod === 'sepa_debit' &&
-              thankYouState.status === 'paymentProcessing' &&
-              (thankYouState.paymentResult === 'initiated' ||
-                thankYouState.paymentResult === 'pending'));
-          if (settled) {
-            track('donation_completed', {
-              revenue: amount,
-              status:
-                thankYouState.status === 'completed'
-                  ? 'paid'
-                  : thankYouState.paymentResult,
-            });
+          // Revenue counts when paid. A confirmed SEPA mandate also counts: the platform holds it at initiated/pending until the debit settles days later, and the client never sees that. A pending bank transfer is only a promise and stays out, as is a status the client could not read.
+          const status =
+            thankYouState.status === 'completed'
+              ? 'paid'
+              : paymentMethod === 'sepa_debit' &&
+                  thankYouState.status === 'paymentProcessing' &&
+                  !thankYouState.unverified &&
+                  (thankYouState.paymentResult === 'initiated' ||
+                    thankYouState.paymentResult === 'pending')
+                ? thankYouState.paymentResult
+                : null;
+          if (status) {
+            track('donation_completed', { revenue: payload.amount, status });
           }
         },
       };
@@ -183,12 +171,11 @@ export function useSubmissionCore(
       isAuthenticated,
       donorProfile,
       token,
+      failSubmission,
     ]
   );
 
-  // Confirms a Stripe cardAction payment intent with the platform. The
-  // cardAction call itself stays with the caller since each obtains the
-  // paymentIntentId differently.
+  // Confirms a Stripe cardAction payment intent with the platform. The cardAction call itself stays with the caller since each obtains the paymentIntentId differently.
   const confirmCardActionPayment = useCallback(
     async (
       attempt: DonationAttempt,

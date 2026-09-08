@@ -58,6 +58,8 @@ export function usePayPalFlow(core: SubmissionCore) {
     attempt: DonationAttempt;
     donationId: string;
   } | null>(null);
+  // A createOrder rejection is also surfaced by the SDK through onError. Set when the catch below already reported it, so onPayPalError does not report the same failure twice.
+  const failureReportedRef = useRef(false);
 
   const onPayPalCreateOrder = useCallback(
     async (values: DonationFormValues): Promise<string> => {
@@ -66,9 +68,9 @@ export function usePayPalFlow(core: SubmissionCore) {
       submittingRef.current = true;
 
       setDonationState(beginSubmission);
-      // Until this attempt's donation exists, onPayPalError must not report
-      // through the previous attempt.
+      // Until this attempt's donation exists, onPayPalError must not report through the previous attempt.
       paypalOrderRef.current = null;
+      failureReportedRef.current = false;
 
       const attempt = createAttempt(values, values.selectedPaymentMethod);
 
@@ -102,6 +104,7 @@ export function usePayPalFlow(core: SubmissionCore) {
         return orderId;
       } catch (error) {
         attempt.fail(toSubmitError(error).code);
+        failureReportedRef.current = true;
         throw error;
       } finally {
         setDonationState(stopLoading);
@@ -159,6 +162,8 @@ export function usePayPalFlow(core: SubmissionCore) {
       } catch (error) {
         attempt.fail(toSubmitError(error).code);
       } finally {
+        // The handshake is over either way; a late SDK onError must not fail this attempt.
+        paypalOrderRef.current = null;
         submittingRef.current = false;
       }
     },
@@ -173,6 +178,10 @@ export function usePayPalFlow(core: SubmissionCore) {
   );
 
   const onPayPalError = useCallback(() => {
+    if (failureReportedRef.current) {
+      failureReportedRef.current = false;
+      return;
+    }
     const attempt = paypalOrderRef.current?.attempt;
     if (attempt) attempt.fail('paypalPaymentError');
     else failSubmission('paypalPaymentError');

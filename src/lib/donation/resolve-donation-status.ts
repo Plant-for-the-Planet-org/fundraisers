@@ -45,6 +45,7 @@ export async function resolveThankYouStateFromDonation(
         status: 'paymentProcessing',
         donationId,
         paymentResult: 'pending',
+        unverified: true,
       }
     );
   }

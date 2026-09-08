@@ -1,5 +1,6 @@
 'use client';
 
+import type { RefObject } from 'react';
 import type { SentInvitationGift } from '@planet-sdk/common';
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
@@ -64,12 +65,30 @@ export function DonateOverlay({
 }: DonateOverlayProps) {
   const tDonate = useTranslations('Donate');
   const dialogContentRef = useRef<HTMLDivElement>(null);
+  const signedIn = useAuthStore(s => s.isAuthenticated);
+  // Set by the inner form once a result screen (thank-you, pending) is showing.
+  const hasResultRef = useRef(false);
+
+  // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route goes through here so none is left untracked.
+  const handleClose = () => {
+    if (donationData && !hasResultRef.current) {
+      trackEvent('donation_exited', {
+        fundraiser: fundraiser.slug,
+        amount: donationData.amountCents / 100,
+        currency: donationData.currency,
+        frequency: donationData.frequency,
+        signedIn,
+      });
+    }
+    hasResultRef.current = false;
+    onClose();
+  };
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={open => {
-        if (!open) onClose();
+        if (!open) handleClose();
       }}
     >
       <DialogContentFullScreen
@@ -92,11 +111,12 @@ export function DonateOverlay({
             fundraiser={fundraiser}
             paymentOptions={paymentOptions}
             paymentOptionsReady={paymentOptionsReady}
-            onClose={onClose}
+            onClose={handleClose}
+            hasResultRef={hasResultRef}
             isOpen={isOpen}
           />
         ) : (
-          <DonateOverlaySkeleton onClose={onClose} />
+          <DonateOverlaySkeleton onClose={handleClose} />
         )}
       </DialogContentFullScreen>
     </Dialog>
@@ -109,6 +129,7 @@ interface DonateOverlayInnerProps {
   paymentOptions: PaymentOptions;
   paymentOptionsReady: boolean;
   onClose: () => void;
+  hasResultRef: RefObject<boolean>;
   isOpen: boolean;
 }
 
@@ -119,6 +140,7 @@ function DonateOverlayInner({
   paymentOptions,
   paymentOptionsReady,
   onClose,
+  hasResultRef,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
@@ -158,22 +180,10 @@ function DonateOverlayInner({
     handlePaymentValidationFailed
   );
   const { thankYouState, error, isLoading } = donationState;
-  const signedIn = useAuthStore(s => s.isAuthenticated);
 
-  // Closing before a thank-you state exists is an abandoned donation. Closing
-  // the thank-you screen is not.
-  const handleClose = () => {
-    if (!thankYouState) {
-      trackEvent('donation_exited', {
-        fundraiser: fundraiser.slug,
-        amount: donationData.amountCents / 100,
-        currency: donationData.currency,
-        frequency: donationData.frequency,
-        signedIn,
-      });
-    }
-    onClose();
-  };
+  useEffect(() => {
+    hasResultRef.current = thankYouState !== null;
+  }, [thankYouState, hasResultRef]);
 
   // Reset donation state (backend errors) when overlay closes
   useEffect(() => {
@@ -251,7 +261,7 @@ function DonateOverlayInner({
         isOpen={isOpen}
       >
         <DonateOverlayLayout
-          onClose={handleClose}
+          onClose={onClose}
           leftColumn={leftColumn}
           rightColumn={rightColumn}
         />

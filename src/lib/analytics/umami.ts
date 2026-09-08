@@ -36,9 +36,8 @@ export function isTrackedPath(pathname: string): boolean {
 /**
  * Decides whether to load the Umami tracker and its recorder.
  *
- * Reports from any host the env vars are set on, so a preview or staging box can
- * point at its own Umami website for testing. Returns null when analytics should
- * stay off: no instance configured (the default locally) or an untracked path.
+ * Reports from any host the env vars are set on, so a preview or staging box can point at its own Umami website for testing.
+ * Returns null when analytics should stay off: no instance configured (the default locally) or an untracked path.
  */
 export function resolveUmamiConfig({
   baseUrl,
