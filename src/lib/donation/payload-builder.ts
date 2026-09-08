@@ -116,6 +116,22 @@ export function buildAuthenticatedDonorInfo(
 }
 
 /**
+ * Donor address country for analytics, using the same lookup as the payload
+ * builders: guests supply it directly, signed-in donors have it on the
+ * selected saved address, falling back to the profile.
+ */
+export function resolveDonorCountry(
+  formData: DonationFormData,
+  userProfile?: UserProfileResponse
+): string | undefined {
+  if (formData.type === 'guest') return formData.donor.country || undefined;
+  const address = userProfile?.addresses.find(
+    addr => addr.id === formData.receiptAddress
+  );
+  return address?.country || userProfile?.country || undefined;
+}
+
+/**
  * Builds donor alias (display name) for the donation.
  * Guest donors use form-supplied names; authenticated donors use their profile.
  */

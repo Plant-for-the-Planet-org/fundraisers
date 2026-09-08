@@ -66,6 +66,9 @@ export function usePayPalFlow(core: SubmissionCore) {
       submittingRef.current = true;
 
       setDonationState(beginSubmission);
+      // Until this attempt's donation exists, onPayPalError must not report
+      // through the previous attempt.
+      paypalOrderRef.current = null;
 
       const attempt = createAttempt(values, values.selectedPaymentMethod);
 

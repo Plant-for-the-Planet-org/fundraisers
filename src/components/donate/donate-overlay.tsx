@@ -10,12 +10,14 @@ import type { StripeSepaFormHandle } from './stripe-sepa-form';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
+import { trackEvent } from '@/lib/analytics/track';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
 import {
   scrollElementIntoView,
   scrollToFirstError,
 } from '@/lib/utils/scroll-into-view';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   Dialog,
   DialogContentFullScreen,
@@ -156,6 +158,22 @@ function DonateOverlayInner({
     handlePaymentValidationFailed
   );
   const { thankYouState, error, isLoading } = donationState;
+  const signedIn = useAuthStore(s => s.isAuthenticated);
+
+  // Closing before a thank-you state exists is an abandoned donation. Closing
+  // the thank-you screen is not.
+  const handleClose = () => {
+    if (!thankYouState) {
+      trackEvent('donation_exited', {
+        fundraiser: fundraiser.slug,
+        amount: donationData.amountCents / 100,
+        currency: donationData.currency,
+        frequency: donationData.frequency,
+        signedIn,
+      });
+    }
+    onClose();
+  };
 
   // Reset donation state (backend errors) when overlay closes
   useEffect(() => {
@@ -233,7 +251,7 @@ function DonateOverlayInner({
         isOpen={isOpen}
       >
         <DonateOverlayLayout
-          onClose={onClose}
+          onClose={handleClose}
           leftColumn={leftColumn}
           rightColumn={rightColumn}
         />

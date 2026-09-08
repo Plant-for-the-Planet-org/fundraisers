@@ -15,10 +15,15 @@ import type {
 import { useCallback, useRef, useState } from 'react';
 import { trackEvent } from '@/lib/analytics/track';
 import { paymentService } from '@/lib/api/payment-service';
-import { withError, withSuccess } from '@/lib/donation/donation-submit-state';
+import {
+  mapPaymentErrorCode,
+  withError,
+  withSuccess,
+} from '@/lib/donation/donation-submit-state';
 import {
   assembleFormData,
   buildDonationPayload,
+  resolveDonorCountry,
 } from '@/lib/donation/payload-builder';
 import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
@@ -68,10 +73,17 @@ export function useSubmissionCore(
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  const failSubmission = useCallback((code: SubmissionErrorKey) => {
-    setDonationState(withError(code));
-    submittingRef.current = false;
-  }, []);
+  const failSubmission = useCallback(
+    (code: SubmissionErrorKey) => {
+      trackEvent('donation_failed', {
+        fundraiser: fundraiser.slug,
+        error: code,
+      });
+      setDonationState(withError(code));
+      submittingRef.current = false;
+    },
+    [fundraiser.slug]
+  );
 
   const createAttempt = useCallback(
     (
@@ -102,21 +114,39 @@ export function useSubmissionCore(
         processingFeeCents
       );
 
+      const country = resolveDonorCountry(formData, donorProfile);
+      const amount = formData.amountCents / 100;
+      // `amount` is a plain dimension. Umami sums `revenue` across every event,
+      // so only the settled event sends it, or one donation counts three times.
+      const track = (name: string, extra?: Record<string, unknown>) =>
+        trackEvent(name, {
+          fundraiser: fundraiser.slug,
+          amount,
+          currency: formData.currency,
+          frequency: formData.frequency,
+          method: paymentMethod,
+          country,
+          signedIn: isAuthenticated,
+          coversFee: values.willAbsorbFee && processingFeeCents > 0,
+          // The "make it monthly" upsell on a one-off donation.
+          upgradedToMonthly:
+            donationData.frequency === 'once' &&
+            formData.frequency === 'monthly',
+          ...extra,
+        });
+
       return {
         formData,
         payload,
         paymentMethod,
         // Fires on submit, not on settlement: a bank transfer counts here while
-        // the money is still pending, which is why the method rides along.
-        submitted: () =>
-          trackEvent('donation_submitted', {
-            fundraiser: fundraiser.slug,
-            amount: formData.amountCents / 100,
-            currency: formData.currency,
-            frequency: formData.frequency,
-            method: paymentMethod,
-          }),
-        fail: failSubmission,
+        // the money is still pending.
+        submitted: () => track('donation_submitted'),
+        fail: code => {
+          track('donation_failed', { error: code });
+          setDonationState(withError(code));
+          submittingRef.current = false;
+        },
         complete: async (donationId, fallbackThankYouState) => {
           const thankYouState = await resolveThankYouStateFromDonation(
             donationId,
@@ -124,6 +154,25 @@ export function useSubmissionCore(
             fallbackThankYouState
           );
           setDonationState(withSuccess(thankYouState));
+          // Revenue counts when paid. A confirmed SEPA mandate also counts:
+          // the platform holds it at initiated/pending until the debit
+          // settles days later, and the client never sees that. A pending
+          // bank transfer is only a promise and stays out.
+          const settled =
+            thankYouState.status === 'completed' ||
+            (paymentMethod === 'sepa_debit' &&
+              thankYouState.status === 'paymentProcessing' &&
+              (thankYouState.paymentResult === 'initiated' ||
+                thankYouState.paymentResult === 'pending'));
+          if (settled) {
+            track('donation_completed', {
+              revenue: amount,
+              status:
+                thankYouState.status === 'completed'
+                  ? 'paid'
+                  : thankYouState.paymentResult,
+            });
+          }
         },
       };
     },
@@ -134,7 +183,6 @@ export function useSubmissionCore(
       isAuthenticated,
       donorProfile,
       token,
-      failSubmission,
     ]
   );
 
@@ -158,7 +206,7 @@ export function useSubmissionCore(
         params.paymentIdempotencyKey
       );
       if (finalResponse.status === 'failed') {
-        attempt.fail('paymentFailed');
+        attempt.fail(mapPaymentErrorCode(finalResponse.errorCode));
         return false;
       }
       return true;
