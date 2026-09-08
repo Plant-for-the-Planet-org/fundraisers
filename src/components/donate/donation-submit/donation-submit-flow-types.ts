@@ -31,7 +31,7 @@ import type { StripeSepaFormHandle } from '../stripe-sepa-form';
  *    same value identity in its dependency arrays.
  *
  * `isAuthenticated` is intentionally absent: it is only consumed by
- * `buildPayload` inside the core and is not exposed.
+ * `createAttempt` inside the core and is not exposed.
  */
 export interface SubmissionCore {
   // --- Lifecycle state -----------------------------------------------------
@@ -49,30 +49,24 @@ export interface SubmissionCore {
   rotateIdempotencyKeys: () => void;
 
   // --- Shared helpers (memoized once in the core) --------------------------
-  /** Surfaces an error and clears the in-flight guard so the donor can retry. */
-  failSubmission: (code: SubmissionErrorKey) => void;
-  /** Resolves the thank-you state for a settled donation and applies success. */
-  finalizeDonation: (
-    donationId: string,
-    token?: string,
-    fallbackThankYouState?: ThankYouState
-  ) => Promise<void>;
   /**
-   * Records a donation attempt that is actually reaching the API. Call it right
-   * before the create-donation request, never straight after `buildPayload`: the
-   * Stripe and PlanetCash paths can still bail out in between.
+   * Starts a donation attempt for the given form values and payment method:
+   * assembles the form data and API payload and returns the outcome helpers
+   * bound to them. Flows report every result through the returned attempt.
    */
-  trackDonationSubmitted: (
-    formData: DonationFormData,
-    paymentMethod: PaymentMethodId
-  ) => void;
-  /** Assembles form data and the donation payload for a given payment method. */
-  buildPayload: (
+  createAttempt: (
     values: DonationFormValues,
     paymentMethod: PaymentMethodId
-  ) => BuiltDonationPayload;
-  /** Confirms a Stripe cardAction payment intent; true on success. */
+  ) => DonationAttempt;
+  /**
+   * Surfaces an error and clears the in-flight guard so the donor can retry.
+   * Only for callbacks that fire outside any attempt (e.g. a wallet sheet
+   * dismissed before submission); inside a flow use `attempt.fail`.
+   */
+  failSubmission: (code: SubmissionErrorKey) => void;
+  /** Confirms a Stripe cardAction payment intent; fails the attempt and returns false on error. */
   confirmCardActionPayment: (
+    attempt: DonationAttempt,
     params: ConfirmCardActionPaymentParams
   ) => Promise<boolean>;
 
@@ -82,10 +76,28 @@ export interface SubmissionCore {
   paymentOptions: PaymentOptions;
 }
 
-/** Return shape of `buildPayload`. */
-export interface BuiltDonationPayload {
+/**
+ * One donation attempt: the data going to the API plus the outcome helpers
+ * bound to it. Every flow reports its result through these, so the core owns
+ * state transitions and measurement in one place.
+ */
+export interface DonationAttempt {
   formData: DonationFormData;
   payload: DonationPayload;
+  paymentMethod: PaymentMethodId;
+  /**
+   * Records that the create-donation request is actually going out. Call it
+   * right before that request, never straight after `createAttempt`: the
+   * Stripe and PlanetCash paths can still bail out in between.
+   */
+  submitted: () => void;
+  /** Surfaces an error and clears the in-flight guard so the donor can retry. */
+  fail: (code: SubmissionErrorKey) => void;
+  /** Resolves the thank-you state for a settled donation and applies success. */
+  complete: (
+    donationId: string,
+    fallbackThankYouState?: ThankYouState
+  ) => Promise<void>;
 }
 
 /** Parameters for `confirmCardActionPayment`. */
@@ -93,7 +105,6 @@ export interface ConfirmCardActionPaymentParams {
   donationId: string;
   account: string;
   paymentIntentId: string;
-  token?: string;
   paymentIdempotencyKey: string;
 }
 
