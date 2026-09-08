@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { getSepaCreditor } from '@/lib/constants/sepa-creditors';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
@@ -58,8 +57,6 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const [ibanError, setIbanError] = useState<string | null>(null);
     const [accountHolderName, setAccountHolderName] = useState('');
     const [nameError, setNameError] = useState<string | null>(null);
-    const [mandateAccepted, setMandateAccepted] = useState(false);
-    const [mandateError, setMandateError] = useState<string | null>(null);
 
     // The IBAN iframe is not focusable until Stripe finishes mounting it. When
     // `focus()` is called before then (e.g. right after switching to "use a
@@ -77,10 +74,6 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
         }
         if (!accountHolderName.trim()) {
           setNameError(t('accountHolderNameRequired'));
-          hasError = true;
-        }
-        if (!mandateAccepted) {
-          setMandateError(t('mandateRequired'));
           hasError = true;
         }
         if (hasError) return { validationFailed: true as const };
@@ -172,7 +165,9 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
             <Info className='h-4 w-4 shrink-0 text-muted-foreground' />
             <p className='font-semibold'>{t('mandateTitle')}</p>
           </div>
-          <p className='text-sm'>{t('mandateIntro')}</p>
+          <p className='text-sm'>
+            {t('mandateIntro', { creditor: creditor.name })}
+          </p>
 
           <div className='grid grid-cols-2 gap-4 text-sm'>
             <div>
@@ -189,28 +184,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
 
           <p className='text-sm'>{t('mandateRights')}</p>
 
-          <div className='space-y-1'>
-            <div className='flex items-start gap-2'>
-              <Checkbox
-                id='sepa-mandate'
-                checked={mandateAccepted}
-                onCheckedChange={checked => {
-                  setMandateAccepted(checked === true);
-                  if (checked) setMandateError(null);
-                }}
-                className='mt-0.5'
-              />
-              <label
-                htmlFor='sepa-mandate'
-                className='text-sm cursor-pointer leading-relaxed'
-              >
-                {t('mandateConsent')}
-              </label>
-            </div>
-            {mandateError && (
-              <p className='text-sm text-destructive'>{mandateError}</p>
-            )}
-          </div>
+          <p className='text-sm text-muted-foreground'>{t('mandateConsent')}</p>
         </div>
       </div>
     );
