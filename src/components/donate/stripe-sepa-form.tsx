@@ -1,12 +1,21 @@
 'use client';
 
 import type { StripeIbanElementChangeEvent } from '@stripe/stripe-js';
+import type { DonationFormValues } from './donation-form-context';
 
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { getSepaCreditor } from '@/lib/constants/sepa-creditors';
+import { useAuthStore } from '@/stores/auth-store';
 import { Input } from '@/components/ui/input';
 import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
@@ -53,10 +62,27 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const { fundraiser } = useDonationForm();
     const creditor = getSepaCreditor(fundraiser.workspace?.country);
 
+    const { control } = useFormContext<DonationFormValues>();
+    const [firstname, lastname] = useWatch({
+      control,
+      name: ['firstname', 'lastname'],
+    });
+    const profileDisplayName = useAuthStore(
+      state => state.user?.profile?.displayName
+    );
+
     const [ibanComplete, setIbanComplete] = useState(false);
     const [ibanError, setIbanError] = useState<string | null>(null);
     const [accountHolderName, setAccountHolderName] = useState('');
     const [nameError, setNameError] = useState<string | null>(null);
+    const accountHolderNameEditedRef = useRef(false);
+
+    // Track the donor name until the donor edits the account holder field manually. Same rule as the cardholder name on the card form.
+    useEffect(() => {
+      if (accountHolderNameEditedRef.current) return;
+      const fromForm = `${firstname ?? ''} ${lastname ?? ''}`.trim();
+      setAccountHolderName(fromForm || profileDisplayName?.trim() || '');
+    }, [firstname, lastname, profileDisplayName]);
 
     // The IBAN iframe is not focusable until Stripe finishes mounting it. When
     // `focus()` is called before then (e.g. right after switching to "use a
@@ -153,6 +179,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           <Input
             value={accountHolderName}
             onChange={e => {
+              accountHolderNameEditedRef.current = true;
               setAccountHolderName(e.target.value);
               if (nameError) setNameError(null);
             }}
