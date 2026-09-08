@@ -31,10 +31,14 @@ const payload: PrepaidDonationPayload = {
 };
 
 describe('toDonationError (via donationService.createDonation)', () => {
-  it('preserves field-level errors on a 400 response', async () => {
-    const fieldErrors = { email: 'is required' };
+  it('extracts platform field errors on a 400 response', async () => {
     mockedPlatformFetch.mockRejectedValueOnce(
-      new PlatformAPIError('http', 400, { errors: fieldErrors })
+      new PlatformAPIError('http', 400, {
+        error_type: 'validation_failed',
+        error_code: 'field_validation_failed',
+        message: 'Validation failed with field errors.',
+        parameters: { errors: { 'donor.city': ['form.city.invalid'] } },
+      })
     );
 
     await expect(donationService.createDonation(payload)).rejects.toMatchObject(
@@ -43,18 +47,16 @@ describe('toDonationError (via donationService.createDonation)', () => {
         type: 'validation',
         code: 'VALIDATION_ERROR',
         status: 400,
-        details: {
-          body: { errors: fieldErrors },
-          errors: fieldErrors,
-        },
+        fieldErrors: { 'donor.city': ['form.city.invalid'] },
       } satisfies Partial<DonationError>
     );
   });
 
-  it('preserves field-level errors on a 422 response', async () => {
-    const fieldErrors = { amount: 'must be positive' };
+  it('extracts platform field errors on a 422 response', async () => {
     mockedPlatformFetch.mockRejectedValueOnce(
-      new PlatformAPIError('http', 422, { errors: fieldErrors })
+      new PlatformAPIError('http', 422, {
+        parameters: { errors: { 'donor.zipCode': ['form.zipCode.invalid'] } },
+      })
     );
 
     await expect(donationService.createDonation(payload)).rejects.toMatchObject(
@@ -63,15 +65,12 @@ describe('toDonationError (via donationService.createDonation)', () => {
         type: 'business',
         code: 'BUSINESS_LOGIC_ERROR',
         status: 422,
-        details: {
-          body: { errors: fieldErrors },
-          errors: fieldErrors,
-        },
+        fieldErrors: { 'donor.zipCode': ['form.zipCode.invalid'] },
       } satisfies Partial<DonationError>
     );
   });
 
-  it('does not synthesize errors on a 400 response with no errors key', async () => {
+  it('leaves fieldErrors unset when the body carries no parameters.errors map', async () => {
     mockedPlatformFetch.mockRejectedValueOnce(
       new PlatformAPIError('http', 400, { message: 'bad request' })
     );
@@ -85,12 +84,29 @@ describe('toDonationError (via donationService.createDonation)', () => {
 
     expect(caught?.status).toBe(400);
     expect(caught?.details).toMatchObject({ body: { message: 'bad request' } });
-    expect(caught?.details).not.toHaveProperty('errors');
+    expect(caught?.fieldErrors).toBeUndefined();
   });
 
-  it('does not extract errors for a non-400/422 status even if the body has an errors key', async () => {
+  it('ignores a top-level errors key, which the platform does not send', async () => {
     mockedPlatformFetch.mockRejectedValueOnce(
-      new PlatformAPIError('http', 500, { errors: { oops: 'server' } })
+      new PlatformAPIError('http', 400, { errors: { 'donor.city': ['nope'] } })
+    );
+
+    let caught: DonationError | undefined;
+    try {
+      await donationService.createDonation(payload);
+    } catch (err) {
+      caught = err as DonationError;
+    }
+
+    expect(caught?.fieldErrors).toBeUndefined();
+  });
+
+  it('does not extract field errors for a non-400/422 status', async () => {
+    mockedPlatformFetch.mockRejectedValueOnce(
+      new PlatformAPIError('http', 500, {
+        parameters: { errors: { 'donor.city': ['form.city.invalid'] } },
+      })
     );
 
     let caught: DonationError | undefined;
@@ -101,6 +117,6 @@ describe('toDonationError (via donationService.createDonation)', () => {
     }
 
     expect(caught?.status).toBe(500);
-    expect(caught?.details).not.toHaveProperty('errors');
+    expect(caught?.fieldErrors).toBeUndefined();
   });
 });
