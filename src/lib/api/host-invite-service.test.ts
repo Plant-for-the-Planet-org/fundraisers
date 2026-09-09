@@ -10,7 +10,6 @@ vi.mock('./platform-fetch', async importOriginal => {
 import type { PendingHostInvite } from '@/lib/types/host-invite';
 
 import {
-  acceptHostInvite,
   declineHostInvite,
   getHostInvite,
   listMyHostInvites,
@@ -82,33 +81,22 @@ describe('getHostInvite', () => {
   });
 });
 
-describe('acceptHostInvite', () => {
-  it('posts to the accept route without a token header', async () => {
+describe('declineHostInvite', () => {
+  it('posts to the decline route without a token header, whoever is signed in', async () => {
     mockedPlatformFetch.mockResolvedValueOnce(invite);
 
-    await acceptHostInvite('tok_abc');
+    await declineHostInvite('tok_abc');
 
     expect(mockedPlatformFetch).toHaveBeenCalledWith(
-      '/fundraiser-host-invites/tok_abc/accept',
+      '/fundraiser-host-invites/tok_abc/decline',
       { method: 'POST' }
-    );
-  });
-
-  it('sends the bearer token when the visitor is signed in', async () => {
-    mockedPlatformFetch.mockResolvedValueOnce(invite);
-
-    await acceptHostInvite('tok_abc', TOKEN);
-
-    expect(mockedPlatformFetch).toHaveBeenCalledWith(
-      '/fundraiser-host-invites/tok_abc/accept',
-      { method: 'POST', token: TOKEN }
     );
   });
 
   it('reports an unauthorized answer so the page can send the visitor to sign in', async () => {
     mockedPlatformFetch.mockRejectedValueOnce(httpError(401));
 
-    await expect(acceptHostInvite('tok_abc')).resolves.toEqual({
+    await expect(declineHostInvite('tok_abc')).resolves.toEqual({
       kind: 'unauthorized',
     });
   });
@@ -122,7 +110,7 @@ describe('acceptHostInvite', () => {
       })
     );
 
-    await expect(acceptHostInvite('tok_abc', TOKEN)).resolves.toEqual({
+    await expect(declineHostInvite('tok_abc')).resolves.toEqual({
       kind: 'forbidden',
     });
   });
@@ -134,7 +122,7 @@ describe('acceptHostInvite', () => {
       .mockRejectedValueOnce(httpError(409))
       .mockResolvedValueOnce({ ...invite, state: 'accepted' });
 
-    await expect(acceptHostInvite('tok_abc')).resolves.toEqual({
+    await expect(declineHostInvite('tok_abc')).resolves.toEqual({
       kind: 'conflict',
       invite: { ...invite, state: 'accepted' },
     });
@@ -145,23 +133,10 @@ describe('acceptHostInvite', () => {
       .mockRejectedValueOnce(httpError(409))
       .mockRejectedValueOnce(httpError(500));
 
-    await expect(acceptHostInvite('tok_abc')).resolves.toEqual({
+    await expect(declineHostInvite('tok_abc')).resolves.toEqual({
       kind: 'conflict',
       invite: null,
     });
-  });
-});
-
-describe('declineHostInvite', () => {
-  it('posts to the decline route without a token header, whoever is signed in', async () => {
-    mockedPlatformFetch.mockResolvedValueOnce(invite);
-
-    await declineHostInvite('tok_abc');
-
-    expect(mockedPlatformFetch).toHaveBeenCalledWith(
-      '/fundraiser-host-invites/tok_abc/decline',
-      { method: 'POST' }
-    );
   });
 });
 

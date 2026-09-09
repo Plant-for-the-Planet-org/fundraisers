@@ -6,9 +6,9 @@ import { PlatformAPIError, platformFetch } from './platform-fetch';
 /**
  * Answering a co-host invitation.
  *
- * Reading is separate from answering because mail clients and corporate gateways fetch every link in an incoming message before a human sees it. The accept link therefore opens a page, that page reads the invitation with `getHostInvite`, and a real click calls `acceptHostInvite`.
+ * Reading is separate from answering because mail clients and corporate gateways fetch every link in an incoming message before a human sees it. The invitation link therefore opens a page, that page reads the invitation with `getHostInvite`, and only a real click answers it.
  *
- * These endpoints are public: the token is the proof, and no access token is sent.
+ * Two doors, by design of the platform. Reading and declining are public: the token is the proof and no access token is sent. Accepting binds a person to the fundraiser, so it goes through the session with `respondToHostInvite`; there is no token accept on this side.
  *
  * A 404 is not exceptional here. It is what an unknown token, a token replaced by a resend, and a platform that has not enabled co-host opt-in yet all look like, and the three are indistinguishable by design. So results are returned as values rather than thrown, and the page renders its "not a valid invitation" state for all of them.
  */
@@ -95,29 +95,15 @@ export async function getHostInvite(token: string): Promise<HostInviteLookup> {
 /** The layout reads the invitation to theme the page and the page reads it again to render it, so both go through this and the token is only looked up once per request. */
 export const getCachedHostInvite = cache(getHostInvite);
 
-export function acceptHostInvite(
-  token: string,
-  accessToken?: string
-): Promise<HostInviteAnswer> {
-  return answerHostInvite(token, 'accept', accessToken);
-}
-
 /** Declining needs no account, so no bearer token goes with it: a session the platform rejects would otherwise turn a valid decline into a 401. */
-export function declineHostInvite(token: string): Promise<HostInviteAnswer> {
-  return answerHostInvite(token, 'decline');
-}
-
-async function answerHostInvite(
-  token: string,
-  action: 'accept' | 'decline',
-  accessToken?: string
+export async function declineHostInvite(
+  token: string
 ): Promise<HostInviteAnswer> {
   try {
-    // Accepting needs the invited account, so the bearer token goes along; declining sends none.
-    const invite = await platformFetch<HostInvite>(invitePath(token, action), {
-      method: 'POST',
-      token: accessToken,
-    });
+    const invite = await platformFetch<HostInvite>(
+      invitePath(token, 'decline'),
+      { method: 'POST' }
+    );
     return { kind: 'answered', invite };
   } catch (err) {
     if (isNotFound(err)) {
