@@ -154,12 +154,13 @@
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
       },
       "mandateTitle": "SEPA-Lastschriftmandat",
-      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) Rocketship Inc. und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von Rocketship Inc. und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
+      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) {creditor} und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von {creditor} und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
       "creditorId": "Gläubiger-ID",
-      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
-      "mandateConsent": "Ich erkläre mich mit dem SEPA-Lastschriftmandat einverstanden und ermächtige die Abbuchung von meinem Konto",
-      "mandateRequired": "Du musst das SEPA-Lastschriftmandat akzeptieren, um fortzufahren."
+      "paymentType": "Zahlungsart",
+      "paymentTypeRecurrent": "Wiederkehrende Zahlung",
+      "paymentTypeOneOff": "Einmalige Zahlung",
+      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen."
     },
     "card": {
       "cardNumberLabel": "Kartennummer",
