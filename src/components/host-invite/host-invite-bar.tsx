@@ -160,7 +160,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         !invite?.invitedEmail ||
         !userEmail ||
         maskedEmailMayMatch(invite.invitedEmail, userEmail);
-      // Same fundraiser is not enough: the row must also carry the same role, visibility and deadline as the link, so a different invitation for the same fundraiser is never answered in its place. A stable id on the token lookup would replace this; that is a platform change.
+      // The platform allows one host row per address and fundraiser, so for the signed-in account the fundraiser identifies the row. Role, visibility and deadline are compared as well as a cheap guard; both reads are live, so they agree for the same row.
       const own =
         addressedToMe && invite
           ? mine.find(
