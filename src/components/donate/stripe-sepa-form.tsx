@@ -88,7 +88,12 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     useEffect(() => {
       if (accountHolderNameEditedRef.current) return;
       const fromForm = `${firstname ?? ''} ${lastname ?? ''}`.trim();
-      setAccountHolderName(fromForm || profileDisplayName?.trim() || '');
+      const nextName = fromForm || profileDisplayName?.trim() || '';
+      setAccountHolderName(nextName);
+      // Filling the donor name after a failed submit satisfies the field, so
+      // drop the stale "required" error the way editing the field does. An
+      // empty derived name keeps it.
+      if (nextName) setNameError(null);
     }, [firstname, lastname, profileDisplayName]);
 
     // The IBAN iframe is not focusable until Stripe finishes mounting it. When
