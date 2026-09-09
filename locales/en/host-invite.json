@@ -32,8 +32,8 @@
       "description": "If you still want to join, ask a host of the fundraiser to invite you again."
     },
     "invalid": {
-      "title": "This invitation link is not valid",
-      "description": "The link may have been replaced by a newer invitation, or copied incompletely. Ask whoever invited you to send it again."
+      "title": "This invitation is no longer available",
+      "description": "The host may have withdrawn it, or a newer link replaced it. Check with the host if you still want to join."
     },
     "error": {
       "title": "We could not open your invitation",

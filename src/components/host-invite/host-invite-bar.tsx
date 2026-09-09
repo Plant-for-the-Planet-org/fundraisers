@@ -303,9 +303,9 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
     );
   }
 
-  // Everything left is a link that resolves to nothing: an unknown token, one replaced by a
-  // resend, or a platform where co-host invitations are not switched on yet. A reader cannot act
-  // on the difference, so all three read the same.
+  // Everything left is a link that resolves to nothing: a host removed the invitation, a resend
+  // replaced the token, or co-host invitations are not switched on yet. The platform does not say
+  // which, so the copy names the likely reasons and points at the host.
   return (
     <Outcome
       icon={<Link2Off size={20} />}

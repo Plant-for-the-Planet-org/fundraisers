@@ -32,8 +32,8 @@
       "description": "Wenn du noch mitmachen möchtest, bitte eine*n Organisator*in des Spendenaufrufs, dich erneut einzuladen."
     },
     "invalid": {
-      "title": "Dieser Einladungslink ist nicht gültig",
-      "description": "Vielleicht wurde er durch eine neuere Einladung ersetzt oder nicht vollständig kopiert. Bitte die Person, die dich eingeladen hat, sie noch einmal zu schicken."
+      "title": "Diese Einladung ist nicht mehr verfügbar",
+      "description": "Vielleicht wurde sie zurückgezogen oder durch einen neueren Link ersetzt. Frag bei der*dem Organisator*in nach, wenn du noch mitmachen möchtest."
     },
     "error": {
       "title": "Wir konnten deine Einladung nicht öffnen",
