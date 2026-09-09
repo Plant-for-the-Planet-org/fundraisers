@@ -216,6 +216,15 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         </div>
         <div className='flex shrink-0 flex-wrap gap-2 lg:w-52 lg:flex-col'>
           <Button
+            ref={declineRef}
+            variant='outline'
+            className='min-w-40 lg:w-full'
+            disabled={isAnswering}
+            onClick={() => void answer('decline')}
+          >
+            {t('pending.decline')}
+          </Button>
+          <Button
             className='min-w-40 text-white hover:opacity-90 lg:w-full'
             // Same as the video consent button: the fundraiser's accent, falling back to the primary colour outside a theme.
             style={{
@@ -226,15 +235,6 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
           >
             {isAnswering && <Loader2 className='animate-spin' size={16} />}
             {isAnswering ? t('pending.answering') : t('pending.accept')}
-          </Button>
-          <Button
-            ref={declineRef}
-            variant='outline'
-            className='min-w-40 lg:w-full'
-            disabled={isAnswering}
-            onClick={() => void answer('decline')}
-          >
-            {t('pending.decline')}
           </Button>
         </div>
       </Shell>
