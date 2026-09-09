@@ -16,7 +16,6 @@ import {
 import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 /**
  * What the reader is shown. `pending` is the only one with anything to decide; the rest are
@@ -48,23 +47,38 @@ function viewForInvite(invite: HostInvite): View {
   return isHostInviteLapsed(invite) ? 'expired' : invite.state;
 }
 
-interface HostInviteCardProps {
+interface HostInviteBarProps {
   token: string;
-  /** Read on the server, so the invitation is in the first HTML rather than behind a spinner. */
+  /**
+   * Read on the server and already resolved for the fundraiser this bar sits on: a found
+   * invitation for a different fundraiser reads the same as one that was never found.
+   */
   lookup: HostInviteLookup;
   /** `decline` comes from the smaller link in the email. It moves focus, nothing more. */
   intent?: string;
+  /** Where the fundraiser this invitation is about actually lives, once known. */
+  fundraiserSlug: string | null;
 }
 
-export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
+/**
+ * A full-width bar for answering a co-host invitation, shown above the fundraiser it invites to.
+ * The fundraiser's own cover and title already sit right below it, so this only carries what the
+ * invitation itself adds: who is asking, what the role means, and the deadline.
+ */
+export function HostInviteBar({
+  token,
+  lookup,
+  intent,
+  fundraiserSlug,
+}: HostInviteBarProps) {
   const t = useTranslations('HostInvite');
   const format = useFormatter();
   const router = useRouter();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
-  // What the server sent is the truth until this page learns otherwise, which only happens when the
-  // platform refuses an answer because the invitation had already moved on. Held as an override
-  // rather than copied into state, so a router.refresh() flows straight through.
+  // What the server sent is the truth until this page learns otherwise, which only happens when
+  // the platform refuses an answer because the invitation had already moved on. Held as an
+  // override rather than copied into state, so a router.refresh() flows straight through.
   const [answered, setAnswered] = useState<{
     view: View;
     invite: HostInvite | null;
@@ -138,84 +152,72 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
     toast.error(t('error.title'));
   };
 
-  const fundraiserTitle = invite?.fundraiser.title ?? '';
-  const fundraiserHref = invite?.fundraiser.slug
-    ? `/raise/${invite.fundraiser.slug}`
-    : '/explore';
+  const fundraiserHref = fundraiserSlug ? `/raise/${fundraiserSlug}` : null;
 
   if (view === 'pending' && invite) {
     return (
       <Shell>
-        <CardHeader className='gap-1.5 text-center'>
-          <p className='text-sm font-medium text-primary'>
+        <div className='flex flex-col gap-1.5'>
+          <p
+            className='text-sm font-medium'
+            style={{ color: 'var(--accent-color)' }}
+          >
             {invite.inviterName
               ? t('pending.eyebrowWithInviter', { inviter: invite.inviterName })
               : t('pending.eyebrow')}
           </p>
-          <CardTitle className='text-xl lg:text-2xl'>
-            {t('pending.title', { fundraiser: fundraiserTitle })}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='flex flex-col gap-5'>
-          <ul className='flex flex-col gap-2.5 text-sm text-muted-foreground'>
-            <li className='flex items-start gap-2.5'>
+          <div className='flex flex-col gap-1 text-sm text-muted-foreground'>
+            <span className='flex items-start gap-2'>
               {invite.isPublic ? (
                 <Eye size={16} className='mt-0.5 shrink-0' />
               ) : (
                 <EyeOff size={16} className='mt-0.5 shrink-0' />
               )}
-              <span>
-                {invite.role === 'viewer'
-                  ? t('pending.roleViewer')
-                  : t('pending.roleAdmin')}{' '}
-                {invite.isPublic
-                  ? t('pending.publicYes')
-                  : t('pending.publicNo')}
-              </span>
-            </li>
+              {invite.role === 'viewer'
+                ? t('pending.roleViewer')
+                : t('pending.roleAdmin')}{' '}
+              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
+            </span>
             {invite.expiresAt && (
-              <li className='flex items-start gap-2.5'>
+              <span className='flex items-start gap-2'>
                 <CalendarClock size={16} className='mt-0.5 shrink-0' />
-                <span>
-                  {t('pending.expires', {
-                    date: format.dateTime(new Date(invite.expiresAt), {
-                      dateStyle: 'long',
-                    }),
-                  })}
-                </span>
-              </li>
+                {t('pending.expires', {
+                  date: format.dateTime(new Date(invite.expiresAt), {
+                    dateStyle: 'long',
+                  }),
+                })}
+              </span>
             )}
-          </ul>
-
-          <div className='flex flex-col gap-2.5'>
-            <Button
-              className='w-full'
-              disabled={isAnswering}
-              onClick={() => void answer('accept')}
-            >
-              {isAnswering && <Loader2 className='animate-spin' size={16} />}
-              {isAnswering ? t('pending.answering') : t('pending.accept')}
-            </Button>
-            <Button
-              ref={declineRef}
-              variant='outline'
-              className='w-full'
-              disabled={isAnswering}
-              onClick={() => void answer('decline')}
-            >
-              {t('pending.decline')}
-            </Button>
-            <Button variant='text' asChild className='w-full'>
-              <Link href={fundraiserHref}>{t('pending.viewFundraiser')}</Link>
-            </Button>
+            {invite.invitedEmail && (
+              <span>
+                {t('pending.invitedAs', { email: invite.invitedEmail })}
+              </span>
+            )}
           </div>
-
-          {invite.invitedEmail && (
-            <p className='text-center text-xs text-muted-foreground'>
-              {t('pending.invitedAs', { email: invite.invitedEmail })}
-            </p>
-          )}
-        </CardContent>
+        </div>
+        <div className='flex shrink-0 gap-2.5'>
+          <Button
+            ref={declineRef}
+            variant='outline'
+            disabled={isAnswering}
+            onClick={() => void answer('decline')}
+          >
+            {t('pending.decline')}
+          </Button>
+          <Button
+            className='hover:brightness-90'
+            // Same pair as the donate button: the fundraiser's accent with a foreground the theme shell picked for it.
+            style={{
+              backgroundColor: 'var(--accent-color)',
+              color: 'var(--cta-foreground, #ffffff)',
+            }}
+            disabled={isAnswering}
+            onClick={() => void answer('accept')}
+          >
+            {isAnswering && <Loader2 className='animate-spin' size={16} />}
+            {isAnswering ? t('pending.answering') : t('pending.accept')}
+          </Button>
+        </div>
       </Shell>
     );
   }
@@ -226,7 +228,7 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
         title={t('error.title')}
         description={t('error.description')}
         action={
-          <Button className='w-full' disabled={isRetrying} onClick={retry}>
+          <Button disabled={isRetrying} onClick={retry}>
             {isRetrying && <Loader2 className='animate-spin' size={16} />}
             {isRetrying ? t('loading') : t('error.cta')}
           </Button>
@@ -239,9 +241,9 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
     return (
       <Outcome
         title={t('accepted.title')}
-        description={t('accepted.description', { fundraiser: fundraiserTitle })}
+        description={t('accepted.description')}
         action={
-          <Button asChild className='w-full'>
+          <Button asChild>
             <Link
               href={
                 isAuthenticated ? '/dashboard' : '/login?redirectTo=/dashboard'
@@ -259,11 +261,13 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
     return (
       <Outcome
         title={t('declined.title')}
-        description={t('declined.description', { fundraiser: fundraiserTitle })}
+        description={t('declined.description')}
         action={
-          <Button variant='outline' asChild className='w-full'>
-            <Link href={fundraiserHref}>{t('declined.cta')}</Link>
-          </Button>
+          fundraiserHref && (
+            <Button variant='outline' asChild>
+              <Link href={fundraiserHref}>{t('declined.cta')}</Link>
+            </Button>
+          )
         }
       />
     );
@@ -273,11 +277,13 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
     return (
       <Outcome
         title={t('expired.title')}
-        description={t('expired.description', { fundraiser: fundraiserTitle })}
+        description={t('expired.description')}
         action={
-          <Button variant='outline' asChild className='w-full'>
-            <Link href={fundraiserHref}>{t('expired.cta')}</Link>
-          </Button>
+          fundraiserHref && (
+            <Button variant='outline' asChild>
+              <Link href={fundraiserHref}>{t('expired.cta')}</Link>
+            </Button>
+          )
         }
       />
     );
@@ -291,7 +297,7 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
       title={t('invalid.title')}
       description={t('invalid.description')}
       action={
-        <Button variant='outline' asChild className='w-full'>
+        <Button variant='outline' asChild>
           <Link href='/explore'>{t('invalid.cta')}</Link>
         </Button>
       }
@@ -301,9 +307,9 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <Card className='w-full max-w-md border-2 border-card shadow rounded-2xl'>
+    <div className='flex w-full flex-col gap-4 rounded-2xl border-2 border-white bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-none dark:bg-white/10'>
       {children}
-    </Card>
+    </div>
   );
 }
 
@@ -318,15 +324,11 @@ function Outcome({
 }) {
   return (
     <Shell>
-      <CardHeader className='text-center'>
-        <CardTitle className='text-xl lg:text-2xl'>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className='flex flex-col gap-4'>
-        <p className='text-center text-sm text-muted-foreground lg:text-base'>
-          {description}
-        </p>
-        {action}
-      </CardContent>
+      <div className='flex flex-col gap-1'>
+        <p className='font-medium'>{title}</p>
+        <p className='text-sm text-muted-foreground'>{description}</p>
+      </div>
+      {action && <div className='shrink-0'>{action}</div>}
     </Shell>
   );
 }

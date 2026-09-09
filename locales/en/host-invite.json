@@ -7,7 +7,6 @@
     "pending": {
       "eyebrowWithInviter": "{inviter} invited you",
       "eyebrow": "You have been invited",
-      "title": "Co-host \"{fundraiser}\"",
       "roleAdmin": "You would be able to edit the fundraiser and manage its hosts.",
       "roleViewer": "You would be able to follow the fundraiser's progress.",
       "publicYes": "Your name would be shown on the fundraiser's page.",
@@ -16,23 +15,22 @@
       "expires": "This invitation expires on {date}.",
       "accept": "Accept invitation",
       "decline": "Decline",
-      "viewFundraiser": "Look at the fundraiser first",
       "answering": "Saving your answer"
     },
     "accepted": {
       "title": "You are already a host",
-      "description": "You accepted this invitation to co-host \"{fundraiser}\".",
+      "description": "You accepted this invitation to co-host this fundraiser.",
       "cta": "Go to your dashboard",
       "ctaSignedOut": "Sign in to your dashboard"
     },
     "declined": {
       "title": "Invitation declined",
-      "description": "You have not been added as a host of \"{fundraiser}\".",
+      "description": "You have not been added as a host of this fundraiser.",
       "cta": "Look at the fundraiser"
     },
     "expired": {
       "title": "This invitation has expired",
-      "description": "Invitations are good for one week. Ask a host of \"{fundraiser}\" to send you a new one.",
+      "description": "Invitations are good for one week. Ask a host of this fundraiser to send you a new one.",
       "cta": "Look at the fundraiser"
     },
     "invalid": {

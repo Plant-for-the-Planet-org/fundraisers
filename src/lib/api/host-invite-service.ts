@@ -1,5 +1,6 @@
 import type { HostInvite, PendingHostInvite } from '@/lib/types/host-invite';
 
+import { cache } from 'react';
 import { PlatformAPIError, platformFetch } from './platform-fetch';
 
 /**
@@ -86,6 +87,9 @@ export async function getHostInvite(token: string): Promise<HostInviteLookup> {
     return isNotFound(err) ? { kind: 'not-found' } : { kind: 'error' };
   }
 }
+
+/** The layout reads the invitation to theme the page and the page reads it again to render it, so both go through this and the token is only looked up once per request. */
+export const getCachedHostInvite = cache(getHostInvite);
 
 export function acceptHostInvite(token: string): Promise<HostInviteAnswer> {
   return answerHostInvite(token, 'accept');

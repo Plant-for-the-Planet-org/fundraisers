@@ -1,3 +1,5 @@
+import type { HostInviteLookup } from '@/lib/api/host-invite-service';
+import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { HostInvite } from '@/lib/types/host-invite';
 
 /**
@@ -43,4 +45,52 @@ export function isHostInviteLapsed(
 
   const deadline = new Date(invite.expiresAt).getTime();
   return Number.isFinite(deadline) && deadline <= Date.now();
+}
+
+/**
+ * The slug the invite page should redirect to when a found invitation names a fundraiser at a
+ * different slug than the one in the URL, because a host renamed it after the invite went out.
+ * Null when there is nothing to redirect for: the invitation did not load, or already agrees.
+ */
+export function getHostInviteRedirectSlug(
+  lookup: HostInviteLookup,
+  currentSlug: string
+): string | null {
+  if (lookup.kind !== 'found') return null;
+
+  const slug = lookup.invite.fundraiser.slug;
+  return slug && slug !== currentSlug ? slug : null;
+}
+
+/**
+ * Whether a found invitation is actually for the given fundraiser. This should always hold once
+ * `getHostInviteRedirectSlug` has sent the visitor to the right slug — it exists to render the
+ * invite bar's invalid state instead of trusting that redirect blindly.
+ */
+export function hostInviteMatchesFundraiser(
+  invite: HostInvite,
+  fundraiser: Pick<Fundraiser, 'id' | 'slug'>
+): boolean {
+  const { id, slug } = invite.fundraiser;
+  if (id && id !== fundraiser.id) return false;
+  if (slug && slug !== fundraiser.slug) return false;
+  return true;
+}
+
+/**
+ * The lookup the invite bar should actually render: a found invitation for the wrong fundraiser
+ * reads the same as one that was never found, since there is nothing correct to answer here.
+ */
+export function resolveHostInviteBarLookup(
+  lookup: HostInviteLookup,
+  fundraiser: Pick<Fundraiser, 'id' | 'slug'>
+): HostInviteLookup {
+  if (
+    lookup.kind === 'found' &&
+    !hostInviteMatchesFundraiser(lookup.invite, fundraiser)
+  ) {
+    return { kind: 'not-found' };
+  }
+
+  return lookup;
 }

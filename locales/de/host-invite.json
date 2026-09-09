@@ -7,7 +7,6 @@
     "pending": {
       "eyebrowWithInviter": "{inviter} hat dich eingeladen",
       "eyebrow": "Du bist eingeladen",
-      "title": "Organisator*in von „{fundraiser}“ werden",
       "roleAdmin": "Du könntest die Spendenaktion bearbeiten und ihre Organisator*innen verwalten.",
       "roleViewer": "Du könntest den Fortschritt der Spendenaktion verfolgen.",
       "publicYes": "Dein Name würde auf der Seite der Spendenaktion gezeigt.",
@@ -16,23 +15,22 @@
       "expires": "Diese Einladung läuft am {date} ab.",
       "accept": "Einladung annehmen",
       "decline": "Ablehnen",
-      "viewFundraiser": "Erst die Spendenaktion ansehen",
       "answering": "Deine Antwort wird gespeichert"
     },
     "accepted": {
       "title": "Du bist bereits Organisator*in",
-      "description": "Du hast die Einladung angenommen, „{fundraiser}“ mitzugestalten.",
+      "description": "Du hast die Einladung angenommen, diese Spendenaktion mitzugestalten.",
       "cta": "Zu deinem Dashboard",
       "ctaSignedOut": "Anmelden und zum Dashboard"
     },
     "declined": {
       "title": "Einladung abgelehnt",
-      "description": "Du wurdest nicht als Organisator*in von „{fundraiser}“ hinzugefügt.",
+      "description": "Du wurdest nicht als Organisator*in dieser Spendenaktion hinzugefügt.",
       "cta": "Spendenaktion ansehen"
     },
     "expired": {
       "title": "Diese Einladung ist abgelaufen",
-      "description": "Einladungen gelten eine Woche. Bitte eine*n Organisator*in von „{fundraiser}“, dir eine neue zu schicken.",
+      "description": "Einladungen gelten eine Woche. Bitte eine*n Organisator*in dieser Spendenaktion, dir eine neue zu schicken.",
       "cta": "Spendenaktion ansehen"
     },
     "invalid": {

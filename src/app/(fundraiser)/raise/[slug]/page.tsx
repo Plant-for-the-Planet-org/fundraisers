@@ -4,14 +4,13 @@ import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
-import { getPaymentOptions } from '@/lib/api/payment-options-service';
-import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
 import { HostInviteNotice } from '@/components/host-invite/host-invite-notice';
+import { loadFundraiserForRoute } from './load-fundraiser';
 
 const MAX_METADATA_DESCRIPTION_LENGTH = 200;
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
@@ -144,19 +143,14 @@ export default async function FundraiserPage({
   const { slug } = await params;
   const locale = await getLocale();
 
-  let fundraiser;
-  try {
-    fundraiser = await getCachedFundraiser(slug, locale);
-  } catch (e) {
-    if (e instanceof PlatformAPIError && e.status) {
-      if ([401, 403, 404].includes(e.status)) {
-        return <FundraiserAuthRetry slug={slug} />;
-      }
-      if (e.status === 405) {
-        notFound();
-      }
-    }
-    throw e;
+  const result = await loadFundraiserForRoute(slug, locale);
+
+  if (result.kind === 'auth-retry') {
+    return <FundraiserAuthRetry slug={slug} />;
+  }
+
+  if (result.kind === 'not-found') {
+    notFound();
   }
 
   // A fundraiser resolves by GUID as well as by its exact slug, so one fundraiser is
@@ -166,26 +160,18 @@ export default async function FundraiserPage({
   // neither reaches this check.
   //
   // Temporary on purpose: hosts can rename a slug, and a cached permanent redirect
-  // would strand visitors on the old one. Must stay outside the try above, since
-  // `redirect` signals by throwing.
-  if (fundraiser.slug && fundraiser.slug !== slug) {
+  // would strand visitors on the old one.
+  if (result.kind === 'canonical-slug') {
     const query = buildQueryString(await searchParams);
     const canonicalPath = getFundraiserUrl({
-      id: fundraiser.id,
-      slug: fundraiser.slug,
+      id: result.fundraiser.id,
+      slug: result.fundraiser.slug,
     });
 
     redirect(query ? `${canonicalPath}?${query}` : canonicalPath);
   }
 
-  let paymentOptions;
-  if (fundraiser.canDonate) {
-    try {
-      paymentOptions = await getPaymentOptions(fundraiser.id);
-    } catch (e) {
-      if (!(e instanceof PlatformAPIError)) throw e;
-    }
-  }
+  const { fundraiser, paymentOptions } = result;
 
   return (
     <>
