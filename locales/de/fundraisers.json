@@ -137,7 +137,7 @@
         "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen.",
         "declined": "Abgelehnt",
         "expired": "Abgelaufen",
-        "inviteExpires": "Einladung läuft am {date} ab",
+        "inviteExpires": "Läuft am {date} ab",
         "inviteLapsed": "Einladung am {date} abgelaufen",
         "resend": "Einladung erneut senden",
         "resendDeclinedHint": "Diese Person hat abgelehnt. Entferne sie und lade sie erneut ein, falls das ein Versehen war.",

@@ -137,7 +137,7 @@
         "toastReorderError": "Reorder partially saved. Reload to see current order.",
         "declined": "Declined",
         "expired": "Expired",
-        "inviteExpires": "Invitation expires {date}",
+        "inviteExpires": "Expires {date}",
         "inviteLapsed": "Invitation expired {date}",
         "resend": "Send the invitation again",
         "resendDeclinedHint": "This person declined. Remove them and invite again if that was a mistake.",
