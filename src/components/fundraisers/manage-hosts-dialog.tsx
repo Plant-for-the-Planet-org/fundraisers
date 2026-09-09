@@ -4,11 +4,20 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import type {
   FundraiserHost,
   FundraiserHostRole,
+  FundraiserHostStatus,
 } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Eye, EyeOff, GripVertical, Loader2, Plus, Trash2 } from 'lucide-react';
+import { useFormatter, useTranslations } from 'next-intl';
+import {
+  Eye,
+  EyeOff,
+  GripVertical,
+  Loader2,
+  Plus,
+  Send,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import {
   closestCenter,
@@ -29,6 +38,7 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   addFundraiserHost,
   removeFundraiserHost,
+  resendFundraiserHostInvite,
   updateFundraiserHost,
 } from '@/lib/api/fundraiser-hosts-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
@@ -73,6 +83,41 @@ function countPublicHosts(hosts: FundraiserHost[]): number {
   // Match the backend's last-public guard (countActivePublicHosts): an invited
   // host is not publicly displayable, so it does not count toward the guarantee.
   return hosts.filter(h => h.isPublic && h.status === 'active').length;
+}
+
+/**
+ * The host's standing, when it is anything other than a plain active host.
+ *
+ * Colour carries the same meaning as the platform's own backend table: amber is waiting on an
+ * answer, red is a no, grey is a deadline that ran out.
+ */
+function StatusBadge({
+  status,
+  label,
+}: {
+  status: FundraiserHostStatus;
+  label: string | null;
+}) {
+  if (!label || status === 'active') return null;
+
+  const tone = {
+    invited:
+      'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400',
+    declined: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400',
+    expired:
+      'bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground',
+  }[status];
+
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-md px-1.5 py-0.5 text-xs font-medium',
+        tone
+      )}
+    >
+      {label}
+    </span>
+  );
 }
 
 /** Name comes from the linked profile; invited hosts show their email. */
@@ -200,6 +245,7 @@ function HostRow({
   onHostsChange: (hosts: FundraiserHost[]) => void;
 }) {
   const t = useTranslations('Fundraisers.form.hosts');
+  const format = useFormatter();
   const [isSaving, setIsSaving] = useState(false);
 
   const {
@@ -224,6 +270,19 @@ function HostRow({
   // - last public: a fundraiser must keep at least one public host (any role).
   const isLastAdmin = role === 'admin' && countActiveAdmins(hosts) <= 1;
   const isLastPublic = host.isPublic && countPublicHosts(hosts) <= 1;
+
+  // The platform allows a resend from `invited` and `expired` only. A decline is final until the
+  // row is removed, and an active host has nothing left to accept.
+  const canResend = host.status === 'invited' || host.status === 'expired';
+  const statusLabel = {
+    active: null,
+    invited: t('invited'),
+    declined: t('declined'),
+    expired: t('expired'),
+  }[host.status];
+  const inviteDeadline = host.inviteExpiresAt
+    ? format.dateTime(new Date(host.inviteExpiresAt), { dateStyle: 'medium' })
+    : null;
 
   const replaceHost = (updated: FundraiserHost) =>
     onHostsChange(hosts.map(h => (h.id === host.id ? updated : h)));
@@ -273,6 +332,33 @@ function HostRow({
     }
   };
 
+  const handleResend = async () => {
+    if (!token) return;
+    setIsSaving(true);
+    try {
+      const updated = await resendFundraiserHostInvite(
+        fundraiserId,
+        host.id,
+        token
+      );
+      replaceHost(updated);
+      toast.success(
+        t('toastResent', {
+          email: updated.invitedEmail ?? host.invitedEmail ?? '',
+        })
+      );
+    } catch (err) {
+      console.error('Resending a host invitation failed:', err);
+      toast.error(
+        err instanceof PlatformAPIError && err.status === 409
+          ? t('toastResendRefused')
+          : t('toastError')
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleRemove = async () => {
     if (!token) return;
     setIsSaving(true);
@@ -314,18 +400,28 @@ function HostRow({
         <FallbackAvatar seed={host.id} />
       </Avatar>
 
-      <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <span className='truncate text-sm font-medium text-foreground'>
-          {name}
-        </span>
-        {isSelf && (
-          <span className='shrink-0 text-xs text-muted-foreground'>
-            {t('you')}
+      <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+        <div className='flex min-w-0 items-center gap-2'>
+          <span className='truncate text-sm font-medium text-foreground'>
+            {name}
+          </span>
+          {isSelf && (
+            <span className='shrink-0 text-xs text-muted-foreground'>
+              {t('you')}
+            </span>
+          )}
+          <StatusBadge status={host.status} label={statusLabel} />
+        </div>
+        {inviteDeadline && canResend && (
+          <span className='truncate text-xs text-muted-foreground'>
+            {host.status === 'expired'
+              ? t('inviteLapsed', { date: inviteDeadline })
+              : t('inviteExpires', { date: inviteDeadline })}
           </span>
         )}
-        {host.status === 'invited' && (
-          <span className='shrink-0 rounded-md bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400'>
-            {t('invited')}
+        {host.status === 'declined' && (
+          <span className='truncate text-xs text-muted-foreground'>
+            {t('resendDeclinedHint')}
           </span>
         )}
       </div>
@@ -359,6 +455,19 @@ function HostRow({
       >
         {host.isPublic ? <Eye size={16} /> : <EyeOff size={16} />}
       </button>
+
+      {canResend && (
+        <button
+          type='button'
+          disabled={isSaving}
+          aria-label={t('resend')}
+          title={t('resend')}
+          onClick={handleResend}
+          className='shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed'
+        >
+          <Send size={16} />
+        </button>
+      )}
 
       <button
         type='button'

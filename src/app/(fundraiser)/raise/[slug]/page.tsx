@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
@@ -10,6 +11,7 @@ import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
+import { HostInviteNotice } from '@/components/host-invite/host-invite-notice';
 
 const MAX_METADATA_DESCRIPTION_LENGTH = 200;
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
@@ -186,6 +188,12 @@ export default async function FundraiserPage({
   }
 
   return (
-    <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+    <>
+      {/* Reads ?hostInvite to confirm a co-host invitation that was just answered. In Suspense because it uses useSearchParams, which would otherwise pull this page's whole client tree out of prerendering. */}
+      <Suspense fallback={null}>
+        <HostInviteNotice />
+      </Suspense>
+      <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+    </>
   );
 }

@@ -53,6 +53,22 @@ export async function updateFundraiserHost(
   });
 }
 
+/**
+ * Sends a pending or lapsed invitation again, with a new token and a new deadline.
+ *
+ * The previous link stops working, so an invitation that was forwarded cannot be accepted by whoever it reached after the admin nudged the real recipient. A declined invitation is refused (409) — the platform treats a no as final until the host row is removed.
+ */
+export async function resendFundraiserHostInvite(
+  fundraiserId: string,
+  hostId: string,
+  token: string
+): Promise<FundraiserHost> {
+  return platformFetch<FundraiserHost>(
+    `${hostPath(fundraiserId, hostId)}/resend`,
+    { method: 'POST', token }
+  );
+}
+
 export async function removeFundraiserHost(
   fundraiserId: string,
   hostId: string,

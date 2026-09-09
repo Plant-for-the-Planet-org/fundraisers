@@ -1,0 +1,61 @@
+{
+  "HostInvite": {
+    "metadata": {
+      "title": "Deine Einladung als Organisator*in"
+    },
+    "loading": "Deine Einladung wird geöffnet",
+    "pending": {
+      "eyebrowWithInviter": "{inviter} hat dich eingeladen",
+      "eyebrow": "Du bist eingeladen",
+      "title": "Organisator*in von „{fundraiser}“ werden",
+      "roleAdmin": "Du könntest die Spendenaktion bearbeiten und ihre Organisator*innen verwalten.",
+      "roleViewer": "Du könntest den Fortschritt der Spendenaktion verfolgen.",
+      "publicYes": "Dein Name würde auf der Seite der Spendenaktion gezeigt.",
+      "publicNo": "Dein Name würde nicht öffentlich gezeigt.",
+      "invitedAs": "Eingeladen als {email}",
+      "expires": "Diese Einladung läuft am {date} ab.",
+      "accept": "Einladung annehmen",
+      "decline": "Ablehnen",
+      "viewFundraiser": "Erst die Spendenaktion ansehen",
+      "answering": "Deine Antwort wird gespeichert"
+    },
+    "accepted": {
+      "title": "Du bist bereits Organisator*in",
+      "description": "Du hast die Einladung angenommen, „{fundraiser}“ mitzugestalten.",
+      "cta": "Zu deinem Dashboard",
+      "ctaSignedOut": "Anmelden und zum Dashboard"
+    },
+    "declined": {
+      "title": "Einladung abgelehnt",
+      "description": "Du wurdest nicht als Organisator*in von „{fundraiser}“ hinzugefügt.",
+      "cta": "Spendenaktion ansehen"
+    },
+    "expired": {
+      "title": "Diese Einladung ist abgelaufen",
+      "description": "Einladungen gelten eine Woche. Bitte eine*n Organisator*in von „{fundraiser}“, dir eine neue zu schicken.",
+      "cta": "Spendenaktion ansehen"
+    },
+    "invalid": {
+      "title": "Dieser Einladungslink ist nicht gültig",
+      "description": "Vielleicht wurde er durch eine neuere Einladung ersetzt oder nicht vollständig kopiert. Bitte die Person, die dich eingeladen hat, sie noch einmal zu schicken.",
+      "cta": "Spendenaktionen entdecken"
+    },
+    "error": {
+      "title": "Wir konnten deine Einladung nicht öffnen",
+      "description": "Bei uns ist etwas schiefgelaufen. Deine Einladung gibt es weiterhin.",
+      "cta": "Erneut versuchen"
+    },
+    "notice": {
+      "acceptedTitle": "Du bist jetzt Organisator*in",
+      "acceptedBody": "Du kannst diese Spendenaktion über dein Dashboard verfolgen.",
+      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diese Spendenaktion zu verwalten.",
+      "acceptedCta": "Zu deinem Dashboard",
+      "acceptedCtaSignedOut": "Konto erstellen",
+      "acceptedDismiss": "Später",
+      "declined": "Einladung abgelehnt. Du wurdest nicht als Organisator*in hinzugefügt.",
+      "expired": "Diese Einladung ist abgelaufen. Bitte die*den Organisator*in der Spendenaktion um eine neue.",
+      "invalid": "Dieser Einladungslink ist nicht gültig.",
+      "alreadyHost": "Du bist bereits Organisator*in dieser Spendenaktion."
+    }
+  }
+}

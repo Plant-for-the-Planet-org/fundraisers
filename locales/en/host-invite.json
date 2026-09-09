@@ -1,0 +1,61 @@
+{
+  "HostInvite": {
+    "metadata": {
+      "title": "Your co-host invitation"
+    },
+    "loading": "Opening your invitation",
+    "pending": {
+      "eyebrowWithInviter": "{inviter} invited you",
+      "eyebrow": "You have been invited",
+      "title": "Co-host \"{fundraiser}\"",
+      "roleAdmin": "You would be able to edit the fundraiser and manage its hosts.",
+      "roleViewer": "You would be able to follow the fundraiser's progress.",
+      "publicYes": "Your name would be shown on the fundraiser's page.",
+      "publicNo": "Your name would not be shown publicly.",
+      "invitedAs": "Invited as {email}",
+      "expires": "This invitation expires on {date}.",
+      "accept": "Accept invitation",
+      "decline": "Decline",
+      "viewFundraiser": "Look at the fundraiser first",
+      "answering": "Saving your answer"
+    },
+    "accepted": {
+      "title": "You are already a host",
+      "description": "You accepted this invitation to co-host \"{fundraiser}\".",
+      "cta": "Go to your dashboard",
+      "ctaSignedOut": "Sign in to your dashboard"
+    },
+    "declined": {
+      "title": "Invitation declined",
+      "description": "You have not been added as a host of \"{fundraiser}\".",
+      "cta": "Look at the fundraiser"
+    },
+    "expired": {
+      "title": "This invitation has expired",
+      "description": "Invitations are good for one week. Ask a host of \"{fundraiser}\" to send you a new one.",
+      "cta": "Look at the fundraiser"
+    },
+    "invalid": {
+      "title": "This invitation link is not valid",
+      "description": "The link may have been replaced by a newer invitation, or copied incompletely. Ask whoever invited you to send it again.",
+      "cta": "Explore fundraisers"
+    },
+    "error": {
+      "title": "We could not open your invitation",
+      "description": "Something went wrong on our side. Your invitation is still there.",
+      "cta": "Try again"
+    },
+    "notice": {
+      "acceptedTitle": "You are now a host",
+      "acceptedBody": "You can follow this fundraiser from your dashboard.",
+      "acceptedBodySignedOut": "Create an account with the address you were invited at to manage this fundraiser.",
+      "acceptedCta": "Go to your dashboard",
+      "acceptedCtaSignedOut": "Create your account",
+      "acceptedDismiss": "Not now",
+      "declined": "Invitation declined. You have not been added as a host.",
+      "expired": "That invitation has expired. Ask the fundraiser's host to send a new one.",
+      "invalid": "That invitation link is not valid.",
+      "alreadyHost": "You are already a host of this fundraiser."
+    }
+  }
+}
