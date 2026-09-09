@@ -113,7 +113,13 @@ describe('acceptHostInvite', () => {
   });
 
   it('reports a forbidden answer when the session is not the invited account', async () => {
-    mockedPlatformFetch.mockRejectedValueOnce(httpError(403));
+    // The platform sends 401 here as well; the body's error_code is what says "wrong account".
+    mockedPlatformFetch.mockRejectedValueOnce(
+      new PlatformAPIError('http', 401, {
+        error_type: 'unauthorized',
+        error_code: 'no_access_to_resource',
+      })
+    );
 
     await expect(acceptHostInvite('tok_abc', TOKEN)).resolves.toEqual({
       kind: 'forbidden',

@@ -126,12 +126,16 @@ async function answerHostInvite(
       return { kind: 'not-found' };
     }
 
-    if (err instanceof PlatformAPIError && err.status === 401) {
-      return { kind: 'unauthorized' };
+    // The platform answers 401 for both cases and tells them apart in the body: `authentication_required` for a missing session, `no_access_to_resource` when the session is not the invited account.
+    if (
+      (err instanceof PlatformAPIError && err.status === 403) ||
+      platformErrorCode(err) === 'no_access_to_resource'
+    ) {
+      return { kind: 'forbidden' };
     }
 
-    if (err instanceof PlatformAPIError && err.status === 403) {
-      return { kind: 'forbidden' };
+    if (err instanceof PlatformAPIError && err.status === 401) {
+      return { kind: 'unauthorized' };
     }
 
     // 409 means the invitation was already answered, or its deadline passed. The message the platform sends is not shown: re-reading the invitation gives the state the page needs to render, in the reader's own language.
@@ -141,6 +145,12 @@ async function answerHostInvite(
 
     return { kind: 'error' };
   }
+}
+
+function platformErrorCode(err: unknown): string | null {
+  if (!(err instanceof PlatformAPIError)) return null;
+  const body = err.body as { error_code?: unknown } | null;
+  return typeof body?.error_code === 'string' ? body.error_code : null;
 }
 
 function fetchInvite(token: string): Promise<HostInvite> {
