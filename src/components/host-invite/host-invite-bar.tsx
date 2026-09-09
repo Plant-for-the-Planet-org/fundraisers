@@ -168,7 +168,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   if (view === 'pending' && invite) {
     return (
       <Shell>
-        <div className='flex flex-col gap-1.5'>
+        <div className='flex flex-col gap-2.5'>
           <p
             className='text-sm font-medium'
             style={{ color: 'var(--accent-color)' }}
@@ -177,7 +177,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
               ? t('pending.eyebrowWithInviter', { inviter: invite.inviterName })
               : t('pending.eyebrow')}
           </p>
-          <ul className='grid gap-x-6 gap-y-1 text-sm text-muted-foreground sm:grid-cols-2'>
+          <ul className='grid gap-x-6 gap-y-1.5 text-sm text-muted-foreground sm:grid-cols-2'>
             {invite.invitedEmail && (
               <li className='flex items-center gap-2'>
                 <Mail size={16} className='shrink-0' />
@@ -214,9 +214,9 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
             </li>
           </ul>
         </div>
-        <div className='flex w-full shrink-0 gap-2 lg:w-52 lg:flex-col'>
+        <div className='flex shrink-0 flex-wrap gap-2 lg:w-52 lg:flex-col'>
           <Button
-            className='flex-1 text-white hover:opacity-90 lg:w-full lg:flex-none'
+            className='min-w-40 text-white hover:opacity-90 lg:w-full'
             // Same as the video consent button: the fundraiser's accent, falling back to the primary colour outside a theme.
             style={{
               backgroundColor: 'var(--accent-color, hsl(var(--primary)))',
@@ -229,8 +229,8 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
           </Button>
           <Button
             ref={declineRef}
-            variant='secondary'
-            className='flex-1 lg:w-full lg:flex-none'
+            variant='outline'
+            className='min-w-40 lg:w-full'
             disabled={isAnswering}
             onClick={() => void answer('decline')}
           >
@@ -326,7 +326,7 @@ function Shell({
   return (
     <div
       className={cn(
-        'relative flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 lg:flex-row lg:items-center lg:justify-between dark:bg-white/10',
+        'relative flex w-full flex-col gap-5 rounded-2xl border-2 bg-mode-base/40 p-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8 dark:bg-white/10',
         tone === 'destructive'
           ? 'border-destructive/40'
           : 'border-white dark:border-none'
