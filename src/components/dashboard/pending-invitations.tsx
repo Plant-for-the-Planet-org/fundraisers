@@ -107,7 +107,7 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
         {invites.map(invite => (
           <li
             key={invite.id}
-            className='flex flex-col gap-3 rounded-xl border-2 border-card bg-card p-4 sm:flex-row sm:items-center sm:justify-between'
+            className='flex flex-col gap-4 rounded-xl border-2 border-card bg-card p-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8'
           >
             <HostInvitePending
               layout='card'
