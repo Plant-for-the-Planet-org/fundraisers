@@ -184,24 +184,6 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
                 {t('pending.invitedAs', { email: invite.invitedEmail })}
               </li>
             )}
-            {invite.expiresAt && (
-              <li className='flex items-center gap-2'>
-                <CalendarClock size={16} className='shrink-0' />
-                {t('pending.expires', {
-                  date: format.dateTime(new Date(invite.expiresAt), {
-                    dateStyle: 'medium',
-                  }),
-                })}
-              </li>
-            )}
-            <li className='flex items-center gap-2'>
-              {invite.isPublic ? (
-                <Eye size={16} className='shrink-0' />
-              ) : (
-                <EyeOff size={16} className='shrink-0' />
-              )}
-              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
-            </li>
             <li className='flex items-center gap-2'>
               {invite.role === 'viewer' ? (
                 <User size={16} className='shrink-0' />
@@ -212,6 +194,24 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
                 ? t('pending.roleViewer')
                 : t('pending.roleAdmin')}
             </li>
+            <li className='flex items-center gap-2'>
+              {invite.isPublic ? (
+                <Eye size={16} className='shrink-0' />
+              ) : (
+                <EyeOff size={16} className='shrink-0' />
+              )}
+              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
+            </li>
+            {invite.expiresAt && (
+              <li className='flex items-center gap-2'>
+                <CalendarClock size={16} className='shrink-0' />
+                {t('pending.expires', {
+                  date: format.dateTime(new Date(invite.expiresAt), {
+                    dateStyle: 'medium',
+                  }),
+                })}
+              </li>
+            )}
           </ul>
         </div>
         <div className='flex shrink-0 flex-wrap gap-2 lg:w-52 lg:flex-col'>
