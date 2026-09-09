@@ -7,12 +7,23 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
-import { CalendarClock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  CalendarClock,
+  CheckCircle2,
+  Clock,
+  Eye,
+  EyeOff,
+  Link2Off,
+  Loader2,
+  XCircle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import {
   acceptHostInvite,
   declineHostInvite,
 } from '@/lib/api/host-invite-service';
+import { cn } from '@/lib/utils';
 import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
@@ -57,7 +68,6 @@ interface HostInviteBarProps {
   /** `decline` comes from the smaller link in the email. It moves focus, nothing more. */
   intent?: string;
   /** Where the fundraiser this invitation is about actually lives, once known. */
-  fundraiserSlug: string | null;
 }
 
 /**
@@ -65,14 +75,11 @@ interface HostInviteBarProps {
  * The fundraiser's own cover and title already sit right below it, so this only carries what the
  * invitation itself adds: who is asking, what the role means, and the deadline.
  */
-export function HostInviteBar({
-  token,
-  lookup,
-  intent,
-  fundraiserSlug,
-}: HostInviteBarProps) {
+export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const t = useTranslations('HostInvite');
   const format = useFormatter();
+  // A declined, expired or invalid invitation has nothing left to do here; the fundraiser is right below, so the bar just goes away.
+  const [dismissed, setDismissed] = useState(false);
   const router = useRouter();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
@@ -152,7 +159,7 @@ export function HostInviteBar({
     toast.error(t('error.title'));
   };
 
-  const fundraiserHref = fundraiserSlug ? `/raise/${fundraiserSlug}` : null;
+  if (dismissed) return null;
 
   if (view === 'pending' && invite) {
     return (
@@ -225,6 +232,7 @@ export function HostInviteBar({
   if (view === 'error') {
     return (
       <Outcome
+        icon={<AlertTriangle size={20} />}
         title={t('error.title')}
         description={t('error.description')}
         action={
@@ -240,6 +248,9 @@ export function HostInviteBar({
   if (view === 'accepted') {
     return (
       <Outcome
+        icon={
+          <CheckCircle2 size={20} style={{ color: 'var(--accent-color)' }} />
+        }
         title={t('accepted.title')}
         description={t('accepted.description')}
         action={
@@ -260,14 +271,13 @@ export function HostInviteBar({
   if (view === 'declined') {
     return (
       <Outcome
+        icon={<XCircle size={20} />}
         title={t('declined.title')}
         description={t('declined.description')}
         action={
-          fundraiserHref && (
-            <Button variant='outline' asChild>
-              <Link href={fundraiserHref}>{t('declined.cta')}</Link>
-            </Button>
-          )
+          <Button variant='outline' onClick={() => setDismissed(true)}>
+            {t('close')}
+          </Button>
         }
       />
     );
@@ -276,14 +286,14 @@ export function HostInviteBar({
   if (view === 'expired') {
     return (
       <Outcome
+        tone='destructive'
+        icon={<Clock size={20} />}
         title={t('expired.title')}
         description={t('expired.description')}
         action={
-          fundraiserHref && (
-            <Button variant='outline' asChild>
-              <Link href={fundraiserHref}>{t('expired.cta')}</Link>
-            </Button>
-          )
+          <Button variant='outline' onClick={() => setDismissed(true)}>
+            {t('close')}
+          </Button>
         }
       />
     );
@@ -294,39 +304,76 @@ export function HostInviteBar({
   // on the difference, so all three read the same.
   return (
     <Outcome
+      icon={<Link2Off size={20} />}
       title={t('invalid.title')}
       description={t('invalid.description')}
       action={
-        <Button variant='outline' asChild>
-          <Link href='/explore'>{t('invalid.cta')}</Link>
+        <Button variant='outline' onClick={() => setDismissed(true)}>
+          {t('close')}
         </Button>
       }
     />
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({
+  children,
+  tone = 'default',
+}: {
+  children: React.ReactNode;
+  tone?: 'default' | 'destructive';
+}) {
   return (
-    <div className='flex w-full flex-col gap-4 rounded-2xl border-2 border-white bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-none dark:bg-white/10'>
+    <div
+      className={cn(
+        'flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:bg-white/10',
+        tone === 'destructive'
+          ? 'border-destructive/40'
+          : 'border-white dark:border-none'
+      )}
+    >
       {children}
     </div>
   );
 }
 
 function Outcome({
+  icon,
   title,
   description,
   action,
+  tone = 'default',
 }: {
+  icon: React.ReactNode;
   title: string;
   description: string;
   action: React.ReactNode;
+  /** `destructive` marks an outcome that closed the door, like an expired link. */
+  tone?: 'default' | 'destructive';
 }) {
   return (
-    <Shell>
-      <div className='flex flex-col gap-1'>
-        <p className='font-medium'>{title}</p>
-        <p className='text-sm text-muted-foreground'>{description}</p>
+    <Shell tone={tone}>
+      <div className='flex items-start gap-3'>
+        <span
+          className={cn(
+            'mt-0.5 shrink-0',
+            tone === 'destructive' ? 'text-destructive' : 'text-foreground'
+          )}
+          aria-hidden='true'
+        >
+          {icon}
+        </span>
+        <div className='flex flex-col gap-1'>
+          <p
+            className={cn(
+              'font-medium',
+              tone === 'destructive' && 'text-destructive'
+            )}
+          >
+            {title}
+          </p>
+          <p className='text-sm text-muted-foreground'>{description}</p>
+        </div>
       </div>
       {action && <div className='shrink-0'>{action}</div>}
     </Shell>

@@ -24,19 +24,16 @@
       "ctaSignedOut": "Sign in to your dashboard"
     },
     "declined": {
-      "title": "Invitation declined",
-      "description": "You have not been added as a host of this fundraiser.",
-      "cta": "Look at the fundraiser"
+      "title": "You declined this invitation",
+      "description": "You are not a host of this fundraiser. If you change your mind, ask a host to invite you again."
     },
     "expired": {
       "title": "This invitation has expired",
-      "description": "Invitations are good for one week. Ask a host of this fundraiser to send you a new one.",
-      "cta": "Look at the fundraiser"
+      "description": "If you still want to join, ask a host of the fundraiser to invite you again."
     },
     "invalid": {
       "title": "This invitation link is not valid",
-      "description": "The link may have been replaced by a newer invitation, or copied incompletely. Ask whoever invited you to send it again.",
-      "cta": "Explore fundraisers"
+      "description": "The link may have been replaced by a newer invitation, or copied incompletely. Ask whoever invited you to send it again."
     },
     "error": {
       "title": "We could not open your invitation",
@@ -69,6 +66,7 @@
       "acceptedToast": "You are now a host of {fundraiser}",
       "declinedToast": "Invitation declined.",
       "answerFailed": "We could not save your answer. Please try again."
-    }
+    },
+    "close": "Close"
   }
 }

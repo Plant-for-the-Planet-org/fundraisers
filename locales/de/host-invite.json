@@ -24,19 +24,16 @@
       "ctaSignedOut": "Anmelden und zum Dashboard"
     },
     "declined": {
-      "title": "Einladung abgelehnt",
-      "description": "Du wurdest nicht als Organisator*in dieser Spendenaktion hinzugefügt.",
-      "cta": "Spendenaktion ansehen"
+      "title": "Du hast diese Einladung abgelehnt",
+      "description": "Du bist kein*e Organisator*in dieses Spendenaufrufs. Wenn du es dir anders überlegst, bitte eine*n Organisator*in, dich erneut einzuladen."
     },
     "expired": {
       "title": "Diese Einladung ist abgelaufen",
-      "description": "Einladungen gelten eine Woche. Bitte eine*n Organisator*in dieser Spendenaktion, dir eine neue zu schicken.",
-      "cta": "Spendenaktion ansehen"
+      "description": "Wenn du noch mitmachen möchtest, bitte eine*n Organisator*in des Spendenaufrufs, dich erneut einzuladen."
     },
     "invalid": {
       "title": "Dieser Einladungslink ist nicht gültig",
-      "description": "Vielleicht wurde er durch eine neuere Einladung ersetzt oder nicht vollständig kopiert. Bitte die Person, die dich eingeladen hat, sie noch einmal zu schicken.",
-      "cta": "Spendenaktionen entdecken"
+      "description": "Vielleicht wurde er durch eine neuere Einladung ersetzt oder nicht vollständig kopiert. Bitte die Person, die dich eingeladen hat, sie noch einmal zu schicken."
     },
     "error": {
       "title": "Wir konnten deine Einladung nicht öffnen",
@@ -69,6 +66,7 @@
       "acceptedToast": "Du bist jetzt Organisator*in von {fundraiser}",
       "declinedToast": "Einladung abgelehnt.",
       "answerFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut."
-    }
+    },
+    "close": "Schließen"
   }
 }
