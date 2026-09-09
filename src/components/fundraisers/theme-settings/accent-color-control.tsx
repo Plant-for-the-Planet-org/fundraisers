@@ -44,14 +44,14 @@ export function AccentColorControl({
           title={label}
           aria-pressed={isActive}
           className={cn(
-            'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all hover:scale-110',
+            'flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all hover:scale-110',
             isActive
               ? 'border-foreground shadow-md'
               : 'border-border hover:border-foreground/40'
           )}
           style={swatchHex ? { backgroundColor: swatchHex } : undefined}
         >
-          <Palette className={cn('h-3 w-3', iconClass)} aria-hidden />
+          <Palette className={cn('h-4 w-4', iconClass)} aria-hidden />
         </button>
       </PopoverTrigger>
       <PopoverContent align='end' className='w-auto'>
