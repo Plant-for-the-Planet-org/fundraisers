@@ -121,6 +121,8 @@
         "visibilityOff": "Öffentlich verborgen",
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
+        "revoke": "Einladung zurückziehen",
+        "revokeHint": "Einladung zurückziehen. Der Link in der E-Mail funktioniert dann nicht mehr.",
         "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
         "lastPublicHint": "Ein Spendenaufruf braucht mindestens eine*n öffentliche*n Organisator*in.",
         "emailPlaceholder": "E-Mail-Adresse",

@@ -121,6 +121,8 @@
         "visibilityOff": "Hidden from public",
         "reorder": "Drag to reorder",
         "remove": "Remove",
+        "revoke": "Revoke invitation",
+        "revokeHint": "Revoke invitation. The link in the email will stop working.",
         "lastAdminHint": "A fundraiser needs at least one admin.",
         "lastPublicHint": "A fundraiser needs at least one public host.",
         "emailPlaceholder": "Email address",

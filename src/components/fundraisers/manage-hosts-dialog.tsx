@@ -1,6 +1,6 @@
 'use client';
 
-import type { DragEndEvent } from '@dnd-kit/core';
+import type { DragEndEvent, Modifier } from '@dnd-kit/core';
 import type {
   FundraiserHost,
   FundraiserHostRole,
@@ -75,6 +75,12 @@ interface ManageHostsDialogProps {
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// The list scrolls vertically, and a scroll container turns sideways movement into a horizontal scrollbar. Rows only ever swap up and down, so drop the x offset.
+const restrictToVerticalAxis: Modifier = ({ transform }) => ({
+  ...transform,
+  x: 0,
+});
 
 function countActiveAdmins(hosts: FundraiserHost[]): number {
   return hosts.filter(h => h.status === 'active' && h.role === 'admin').length;
@@ -192,10 +198,11 @@ export function ManageHostsDialog({
           <DialogDescription>{t('dialogDescription')}</DialogDescription>
         </DialogHeader>
 
-        <div className='-mr-2 flex max-h-[55vh] flex-col gap-0.5 overflow-y-auto pr-2'>
+        <div className='-mr-2 flex max-h-[55vh] flex-col gap-0.5 overflow-y-auto overflow-x-hidden pr-2'>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
@@ -269,12 +276,19 @@ function HostRow({
   // would reject. The backend remains the source of truth.
   // - last admin: a fundraiser must keep at least one admin.
   // - last public: a fundraiser must keep at least one public host (any role).
-  const isLastAdmin = role === 'admin' && countActiveAdmins(hosts) <= 1;
-  const isLastPublic = host.isPublic && countPublicHosts(hosts) <= 1;
+  // Both counts only look at active hosts, so both guards only apply to an active row. An invited, expired or declined row is not counted as public or as an admin, so hiding or removing it can never break the guarantee.
+  const isActive = host.status === 'active';
+  const isLastAdmin =
+    isActive && role === 'admin' && countActiveAdmins(hosts) <= 1;
+  const isLastPublic =
+    isActive && host.isPublic && countPublicHosts(hosts) <= 1;
 
   // The platform allows a resend from `invited` and `expired` only. A decline is final until the
   // row is removed, and an active host has nothing left to accept.
   const canResend = host.status === 'invited' || host.status === 'expired';
+  // Same DELETE either way, but for a pending invitation "revoke" is what actually happens.
+  const removeDisabled = isSaving || isLastAdmin || isLastPublic;
+  const removeLabel = canResend ? t('revoke') : t('remove');
   const statusLabel = {
     active: null,
     invited: t('invited'),
@@ -417,6 +431,18 @@ function HostRow({
             </span>
           )}
           <StatusBadge status={host.status} label={statusLabel} />
+          {canResend && (
+            <button
+              type='button'
+              disabled={isSaving}
+              aria-label={t('resend')}
+              title={t('resend')}
+              onClick={handleResend}
+              className='shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40'
+            >
+              <Send size={16} />
+            </button>
+          )}
         </div>
         {inviteDeadline && canResend && (
           <span className='truncate text-xs text-muted-foreground'>
@@ -453,7 +479,7 @@ function HostRow({
         title={isLastPublic ? t('lastPublicHint') : undefined}
         onClick={() => handlePublicChange(!host.isPublic)}
         className={cn(
-          'shrink-0 rounded-md p-1 transition-colors disabled:cursor-not-allowed',
+          'shrink-0 rounded-md p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-40',
           host.isPublic
             ? 'text-blue-500'
             : 'text-muted-foreground hover:text-foreground'
@@ -462,32 +488,26 @@ function HostRow({
         {host.isPublic ? <Eye size={16} /> : <EyeOff size={16} />}
       </button>
 
-      {canResend && (
-        <button
-          type='button'
-          disabled={isSaving}
-          aria-label={t('resend')}
-          title={t('resend')}
-          onClick={handleResend}
-          className='shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed'
-        >
-          <Send size={16} />
-        </button>
-      )}
-
       <button
         type='button'
-        disabled={isSaving || isLastAdmin || isLastPublic}
-        aria-label={t('remove')}
+        disabled={removeDisabled}
+        aria-label={removeLabel}
         title={
           isLastAdmin
             ? t('lastAdminHint')
             : isLastPublic
               ? t('lastPublicHint')
-              : t('remove')
+              : canResend
+                ? t('revokeHint')
+                : removeLabel
         }
         onClick={handleRemove}
-        className='shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100 disabled:opacity-0'
+        className={cn(
+          'shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100',
+          // A disabled action stays visible but dimmed, so its tooltip explaining why is still reachable.
+          removeDisabled &&
+            'cursor-not-allowed group-hover:opacity-40 focus-visible:opacity-40'
+        )}
       >
         {isSaving ? (
           <Loader2 className='animate-spin' size={16} />
