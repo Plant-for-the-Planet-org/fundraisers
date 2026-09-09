@@ -11,6 +11,7 @@ export { FundraiserSearchInput } from './fundraiser-search-input';
 export { FundraiserSortMenu } from './fundraiser-sort-menu';
 export { FundraiserStatusBadge } from './fundraiser-status-badge';
 export { FundraiserStatusFilter } from './fundraiser-status-filter';
+export { PendingInvitations } from './pending-invitations';
 export { SummaryStatCard } from './summary-stat-card';
 export { SummaryStatCardSkeleton } from './summary-stat-card-skeleton';
 export { useFundraiserListFilters } from './use-fundraiser-list-filters';

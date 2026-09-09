@@ -15,6 +15,7 @@ import {
   DashboardHeader,
   DashboardSummary,
   FundraiserListSection,
+  PendingInvitations,
 } from '@/components/dashboard';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
 
@@ -124,6 +125,9 @@ export default function DashboardPage() {
           hasError={hasError}
           onRetry={retryAfterError}
         />
+
+        {/* Accepting adds a fundraiser to the list below and changes the summary tiles, so this refetches rather than patching local state: the platform only lists fundraisers where you are already an active host. */}
+        <PendingInvitations onAccepted={retryAfterError} />
 
         {!hasError && (
           <FundraiserListSection

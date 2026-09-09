@@ -56,6 +56,21 @@
       "expired": "That invitation has expired. Ask the fundraiser's host to send a new one.",
       "invalid": "That invitation link is not valid.",
       "alreadyHost": "You are already a host of this fundraiser."
+    },
+    "dashboard": {
+      "title": "{count, plural, =1 {You have an invitation} other {You have # invitations}}",
+      "subtitle": "Someone invited you to co-host their fundraiser. You are not a host until you accept.",
+      "invitedBy": "Invited by {inviter}",
+      "invited": "You have been invited",
+      "roleAdmin": "Can edit the fundraiser",
+      "roleViewer": "Can follow the progress",
+      "nameShown": "your name would be shown on the page",
+      "expires": "Expires {date}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedToast": "You are now a host of {fundraiser}",
+      "declinedToast": "Invitation declined.",
+      "answerFailed": "We could not save your answer. Please try again."
     }
   }
 }

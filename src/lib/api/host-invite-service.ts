@@ -1,4 +1,4 @@
-import type { HostInvite } from '@/lib/types/host-invite';
+import type { HostInvite, PendingHostInvite } from '@/lib/types/host-invite';
 
 import { PlatformAPIError, platformFetch } from './platform-fetch';
 
@@ -23,6 +23,56 @@ export type HostInviteAnswer =
   | { kind: 'conflict'; invite: HostInvite | null }
   | { kind: 'not-found' }
   | { kind: 'error' };
+
+/**
+ * Pending invitations addressed to the signed-in person, for the dashboard.
+ *
+ * An empty list and a 404 are the same answer here, and the 404 is the common one for now: the platform's co-host opt-in is behind a flag, and a dark route there is indistinguishable from one that was never deployed. Neither is worth telling anybody about, so both come back as "nothing pending" and only a real failure is distinguishable.
+ */
+export async function listMyHostInvites(
+  token: string
+): Promise<PendingHostInvite[] | null> {
+  try {
+    const body = await platformFetch<{ items?: PendingHostInvite[] }>(
+      '/fundraiser-host-invites',
+      { token }
+    );
+    return body?.items ?? [];
+  } catch (err) {
+    if (isNotFound(err)) return [];
+
+    // Null, not an empty array: the caller shows nothing either way, but a failure should not be
+    // logged as "this person has no invitations".
+    return null;
+  }
+}
+
+/**
+ * Answers an invitation from inside the app, where the session is the proof instead of a token.
+ */
+export async function respondToHostInvite(
+  hostId: string,
+  answer: 'accept' | 'decline',
+  token: string
+): Promise<HostInviteAnswer> {
+  try {
+    const invite = await platformFetch<PendingHostInvite>(
+      `/fundraiser-host-invites/${encodeURIComponent(hostId)}/respond`,
+      { method: 'POST', body: { answer }, token }
+    );
+    return { kind: 'answered', invite };
+  } catch (err) {
+    if (isNotFound(err)) return { kind: 'not-found' };
+
+    // 409 means it was answered elsewhere, or its deadline passed while the dashboard was open.
+    // The row is dropped from the strip either way, so there is nothing to re-read.
+    if (err instanceof PlatformAPIError && err.status === 409) {
+      return { kind: 'conflict', invite: null };
+    }
+
+    return { kind: 'error' };
+  }
+}
 
 function invitePath(token: string, action?: 'accept' | 'decline'): string {
   const base = `/fundraiser-host-invites/${encodeURIComponent(token)}`;
