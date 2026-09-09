@@ -160,15 +160,20 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         !invite?.invitedEmail ||
         !userEmail ||
         maskedEmailMayMatch(invite.invitedEmail, userEmail);
-      const own = addressedToMe
-        ? mine.find(
-            candidate =>
-              (invite?.fundraiser.id != null &&
-                candidate.fundraiser.id === invite.fundraiser.id) ||
-              (invite?.fundraiser.slug != null &&
-                candidate.fundraiser.slug === invite.fundraiser.slug)
-          )
-        : undefined;
+      // Same fundraiser is not enough: the row must also carry the same role, visibility and deadline as the link, so a different invitation for the same fundraiser is never answered in its place. A stable id on the token lookup would replace this; that is a platform change.
+      const own =
+        addressedToMe && invite
+          ? mine.find(
+              candidate =>
+                ((invite.fundraiser.id != null &&
+                  candidate.fundraiser.id === invite.fundraiser.id) ||
+                  (invite.fundraiser.slug != null &&
+                    candidate.fundraiser.slug === invite.fundraiser.slug)) &&
+                candidate.role === invite.role &&
+                candidate.isPublic === invite.isPublic &&
+                candidate.expiresAt === invite.expiresAt
+            )
+          : undefined;
       if (!own) {
         setIsAnswering(false);
         setAnswered({ view: 'wrongAccount', invite });
