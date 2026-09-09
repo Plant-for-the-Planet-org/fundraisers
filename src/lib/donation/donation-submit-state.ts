@@ -7,7 +7,6 @@ import type {
   SubmissionErrorKey,
 } from '@/lib/types/submission-errors';
 
-import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import { SUBMISSION_ERROR_CODES } from '@/lib/types/submission-errors';
 
 /**
@@ -59,15 +58,6 @@ export const withSuccess =
     ...prev,
     isLoading: false,
     thankYouState,
-  });
-
-/** Leave loading and surface a thrown error, normalized via toSubmitError. */
-export const withSubmitError =
-  (error: unknown): DonationStateUpdater =>
-  prev => ({
-    ...prev,
-    isLoading: false,
-    error: toSubmitError(error),
   });
 
 /** Map a service-layer payment error code to a submission error key. */

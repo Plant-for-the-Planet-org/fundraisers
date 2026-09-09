@@ -1,5 +1,6 @@
 'use client';
 
+import type { RefObject } from 'react';
 import type { SentInvitationGift } from '@planet-sdk/common';
 import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
@@ -10,6 +11,7 @@ import type { StripeSepaFormHandle } from './stripe-sepa-form';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
+import { trackEvent } from '@/lib/analytics/track';
 import { getStripe } from '@/lib/utils/get-stripe';
 import { sanitizeThankYouHtml } from '@/lib/utils/sanitize-html';
 import {
@@ -17,6 +19,7 @@ import {
   scrollToField,
   scrollToFirstError,
 } from '@/lib/utils/scroll-into-view';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   Dialog,
   DialogContentFullScreen,
@@ -63,12 +66,30 @@ export function DonateOverlay({
 }: DonateOverlayProps) {
   const tDonate = useTranslations('Donate');
   const dialogContentRef = useRef<HTMLDivElement>(null);
+  const signedIn = useAuthStore(s => s.isAuthenticated);
+  // Set by the inner form once a result screen (thank-you, pending) is showing.
+  const hasResultRef = useRef(false);
+
+  // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route goes through here so none is left untracked.
+  const handleClose = () => {
+    if (donationData && !hasResultRef.current) {
+      trackEvent('donation_exited', {
+        fundraiser: fundraiser.slug,
+        amount: donationData.amountCents / 100,
+        currency: donationData.currency,
+        frequency: donationData.frequency,
+        signedIn,
+      });
+    }
+    hasResultRef.current = false;
+    onClose();
+  };
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={open => {
-        if (!open) onClose();
+        if (!open) handleClose();
       }}
     >
       <DialogContentFullScreen
@@ -91,11 +112,12 @@ export function DonateOverlay({
             fundraiser={fundraiser}
             paymentOptions={paymentOptions}
             paymentOptionsReady={paymentOptionsReady}
-            onClose={onClose}
+            onClose={handleClose}
+            hasResultRef={hasResultRef}
             isOpen={isOpen}
           />
         ) : (
-          <DonateOverlaySkeleton onClose={onClose} />
+          <DonateOverlaySkeleton onClose={handleClose} />
         )}
       </DialogContentFullScreen>
     </Dialog>
@@ -108,6 +130,7 @@ interface DonateOverlayInnerProps {
   paymentOptions: PaymentOptions;
   paymentOptionsReady: boolean;
   onClose: () => void;
+  hasResultRef: RefObject<boolean>;
   isOpen: boolean;
 }
 
@@ -118,6 +141,7 @@ function DonateOverlayInner({
   paymentOptions,
   paymentOptionsReady,
   onClose,
+  hasResultRef,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
@@ -157,6 +181,10 @@ function DonateOverlayInner({
     handlePaymentValidationFailed
   );
   const { thankYouState, error, isLoading } = donationState;
+
+  useEffect(() => {
+    hasResultRef.current = thankYouState !== null;
+  }, [thankYouState, hasResultRef]);
 
   // Reset donation state (backend errors) when overlay closes
   useEffect(() => {

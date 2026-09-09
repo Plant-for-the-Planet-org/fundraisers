@@ -1,7 +1,10 @@
 import type { OnApproveData } from '@paypal/paypal-js';
 import type { PaymentData } from '@/lib/types/payment';
 import type { DonationFormValues } from '../donation-form-context';
-import type { SubmissionCore } from './donation-submit-flow-types';
+import type {
+  DonationAttempt,
+  SubmissionCore,
+} from './donation-submit-flow-types';
 
 import { useCallback, useRef } from 'react';
 import { donationService } from '@/lib/api/donation-service';
@@ -15,27 +18,25 @@ import {
   beginSubmission,
   mapPaymentErrorCode,
   stopLoading,
-  withError,
-  withSubmitError,
 } from '@/lib/donation/donation-submit-state';
 import { buildPaymentRequest } from '@/lib/utils/payment-request-builder';
 
 /**
  * PayPal submission flow.
  *
- * Owns the three PayPal callbacks and `paypalDonationIdRef`, the ref that
- * bridges the two-step PayPal handshake: `onPayPalCreateOrder` writes the
- * donationId after creating the donation, and `onPayPalApproved` reads it back
- * once the donor approves. Because it is only used within this flow, the ref is
- * created here rather than in the core.
+ * Owns the three PayPal callbacks and `paypalOrderRef`, the ref that bridges
+ * the two-step PayPal handshake: `onPayPalCreateOrder` writes the attempt and
+ * its donationId after creating the donation, and `onPayPalApproved` reads
+ * them back once the donor approves. Because it is only used within this flow,
+ * the ref is created here rather than in the core.
  *
  * Three asymmetric key-rotation policies are preserved verbatim:
  * - `onPayPalCreateOrder` never rotates (only clears the guard + `stopLoading`),
  *   so its donation key survives into the approve step.
  * - `onPayPalApproved` rotates mid-flow, only after a non-failed payment, with
  *   no rotation in its `finally`.
- * - `onPayPalCreateOrder`'s catch is bespoke: it sets the error state manually
- *   and re-throws, because the PayPal SDK needs the throw to abort the order.
+ * - `onPayPalCreateOrder`'s catch re-throws after failing the attempt, because
+ *   the PayPal SDK needs the throw to abort the order.
  *
  * Shares `submittingRef`, the idempotency-key refs, and the other helpers with
  * the remaining flows via `core`.
@@ -47,16 +48,18 @@ export function usePayPalFlow(core: SubmissionCore) {
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
+    createAttempt,
     failSubmission,
-    finalizeDonation,
-    buildPayload,
-    trackDonationSubmitted,
     token,
     paymentOptions,
   } = core;
 
-  // Shares donationId between the two PayPal callbacks
-  const paypalDonationIdRef = useRef<string | null>(null);
+  const paypalOrderRef = useRef<{
+    attempt: DonationAttempt;
+    donationId: string;
+  } | null>(null);
+  // A createOrder rejection is also surfaced by the SDK through onError. Set when the catch below already reported it, so onPayPalError does not report the same failure twice.
+  const failureReportedRef = useRef(false);
 
   const onPayPalCreateOrder = useCallback(
     async (values: DonationFormValues): Promise<string> => {
@@ -65,21 +68,24 @@ export function usePayPalFlow(core: SubmissionCore) {
       submittingRef.current = true;
 
       setDonationState(beginSubmission);
+      // Until this attempt's donation exists, onPayPalError must not report through the previous attempt.
+      paypalOrderRef.current = null;
+      failureReportedRef.current = false;
 
-      const { formData, payload } = buildPayload(
-        values,
-        values.selectedPaymentMethod
-      );
+      const attempt = createAttempt(values, values.selectedPaymentMethod);
 
       try {
-        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+        attempt.submitted();
 
         const donationResponse = await donationService.createDonation(
-          payload,
+          attempt.payload,
           token || undefined,
           donationKeyRef.current
         );
-        paypalDonationIdRef.current = donationResponse.donationId;
+        paypalOrderRef.current = {
+          attempt,
+          donationId: donationResponse.donationId,
+        };
 
         const paypalAccount = paymentOptions.gateways.paypal?.account;
         if (!paypalAccount) {
@@ -97,10 +103,8 @@ export function usePayPalFlow(core: SubmissionCore) {
 
         return orderId;
       } catch (error) {
-        setDonationState(prev => ({
-          ...prev,
-          error: toSubmitError(error),
-        }));
+        attempt.fail(toSubmitError(error).code);
+        failureReportedRef.current = true;
         throw error;
       } finally {
         setDonationState(stopLoading);
@@ -110,8 +114,7 @@ export function usePayPalFlow(core: SubmissionCore) {
     [
       paymentOptions,
       token,
-      buildPayload,
-      trackDonationSubmitted,
+      createAttempt,
       submittingRef,
       setDonationState,
       donationKeyRef,
@@ -120,11 +123,12 @@ export function usePayPalFlow(core: SubmissionCore) {
 
   const onPayPalApproved = useCallback(
     async (data: OnApproveData): Promise<void> => {
-      const donationId = paypalDonationIdRef.current;
-      if (!donationId) {
+      const order = paypalOrderRef.current;
+      if (!order) {
         failSubmission('unexpected');
         return;
       }
+      const { attempt, donationId } = order;
 
       const paymentData: PaymentData = {
         donationId,
@@ -148,18 +152,18 @@ export function usePayPalFlow(core: SubmissionCore) {
         );
 
         if (paymentResponse.status === 'failed') {
-          setDonationState(
-            withError(mapPaymentErrorCode(paymentResponse.errorCode))
-          );
+          attempt.fail(mapPaymentErrorCode(paymentResponse.errorCode));
           return;
         }
 
         rotateIdempotencyKeys();
 
-        await finalizeDonation(donationId, token ?? undefined);
+        await attempt.complete(donationId);
       } catch (error) {
-        setDonationState(withSubmitError(error));
+        attempt.fail(toSubmitError(error).code);
       } finally {
+        // The handshake is over either way; a late SDK onError must not fail this attempt.
+        paypalOrderRef.current = null;
         submittingRef.current = false;
       }
     },
@@ -167,16 +171,20 @@ export function usePayPalFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeDonation,
       failSubmission,
       submittingRef,
-      setDonationState,
       paymentKeyRef,
     ]
   );
 
   const onPayPalError = useCallback(() => {
-    failSubmission('paypalPaymentError');
+    if (failureReportedRef.current) {
+      failureReportedRef.current = false;
+      return;
+    }
+    const attempt = paypalOrderRef.current?.attempt;
+    if (attempt) attempt.fail('paypalPaymentError');
+    else failSubmission('paypalPaymentError');
   }, [failSubmission]);
 
   return { onPayPalCreateOrder, onPayPalApproved, onPayPalError };

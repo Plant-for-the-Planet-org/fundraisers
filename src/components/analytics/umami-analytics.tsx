@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import Script from 'next/script';
 import { resolveUmamiConfig } from '@/lib/analytics/umami';
-import { isProductionHost } from '@/lib/utils/site-url';
 
 /**
  * Loads our self-hosted Umami tracker and its recorder, which we run for heatmaps.
@@ -18,13 +17,10 @@ import { isProductionHost } from '@/lib/utils/site-url';
  */
 export async function UmamiAnalytics() {
   const headersList = await headers();
-  const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
 
   const config = resolveUmamiConfig({
     baseUrl: process.env.NEXT_PUBLIC_UMAMI_URL,
     websiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
-    productionHost: process.env.NEXT_PUBLIC_APP_HOST,
-    isProduction: isProductionHost(host),
     pathname: headersList.get('x-pathname') ?? '/',
   });
 
@@ -36,7 +32,6 @@ export async function UmamiAnalytics() {
         src={config.src}
         strategy='afterInteractive'
         data-website-id={config.websiteId}
-        data-domains={config.domains}
       />
       <Script
         src={config.recorderSrc}

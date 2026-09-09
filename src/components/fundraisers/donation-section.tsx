@@ -7,6 +7,7 @@ import type { DonationData } from '../donate/donate-overlay';
 import { useState } from 'react';
 import { trackEvent } from '@/lib/analytics/track';
 import { mapPaymentOptionsToContributionSettings } from '@/lib/utils/contribution-utils';
+import { useAuthStore } from '@/stores/auth-store';
 import { DonateOverlay } from '../donate/donate-overlay';
 import { usePaymentOptions } from '../donate/use-payment-options';
 import { DonationForm } from './donation-form';
@@ -24,6 +25,7 @@ export function DonationSection({
 }: DonationSectionProps) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [donationData, setDonationData] = useState<DonationData | null>(null);
+  const signedIn = useAuthStore(s => s.isAuthenticated);
   const {
     paymentOptions: resolvedPaymentOptions,
     isReady: paymentOptionsReady, // renamed for clarity when passed as a prop
@@ -54,6 +56,7 @@ export function DonationSection({
             amount: amountCents / 100,
             currency,
             frequency,
+            signedIn,
           });
           setDonationData({
             amountCents,

@@ -4,8 +4,6 @@ import { isTrackedPath, resolveUmamiConfig } from './umami';
 const base = {
   baseUrl: 'https://umami.example',
   websiteId: 'website-id',
-  productionHost: 'www.startplanting.org',
-  isProduction: true,
   pathname: '/raise/tree-drive',
 };
 
@@ -31,17 +29,12 @@ describe('isTrackedPath', () => {
 });
 
 describe('resolveUmamiConfig', () => {
-  it('loads the tracker and the heatmap recorder on the production host', () => {
+  it('loads the tracker and the heatmap recorder when configured', () => {
     expect(resolveUmamiConfig(base)).toEqual({
       src: 'https://umami.example/script.js',
       recorderSrc: 'https://umami.example/recorder.js',
       websiteId: 'website-id',
-      domains: 'www.startplanting.org',
     });
-  });
-
-  it('stays off anywhere but the production host', () => {
-    expect(resolveUmamiConfig({ ...base, isProduction: false })).toBeNull();
   });
 
   it('tolerates a trailing slash on the instance url', () => {

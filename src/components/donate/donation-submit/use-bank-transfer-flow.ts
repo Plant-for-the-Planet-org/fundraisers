@@ -3,12 +3,11 @@ import type { SubmissionCore } from './donation-submit-flow-types';
 
 import { useCallback } from 'react';
 import { submitStandardPostpaidDonation } from '@/lib/donation/donation-submission';
+import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   beginSubmission,
   mapPaymentErrorCode,
   stopLoading,
-  withError,
-  withSubmitError,
 } from '@/lib/donation/donation-submit-state';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 
@@ -33,9 +32,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
-    finalizeDonation,
-    buildPayload,
-    trackDonationSubmitted,
+    createAttempt,
     token,
     paymentOptions,
   } = core;
@@ -48,20 +45,17 @@ export function useBankTransferFlow(core: SubmissionCore) {
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { formData, payload } = buildPayload(
-        values,
-        values.selectedPaymentMethod
-      );
+      const attempt = createAttempt(values, values.selectedPaymentMethod);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
-        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+        attempt.submitted();
 
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
-            payload,
+            payload: attempt.payload,
             token: token || undefined,
             donationIdempotencyKey: donationAttemptKey,
             paymentIdempotencyKey: paymentAttemptKey,
@@ -71,9 +65,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
           });
 
         if (paymentResponse.status === 'failed') {
-          setDonationState(
-            withError(mapPaymentErrorCode(paymentResponse.errorCode))
-          );
+          attempt.fail(mapPaymentErrorCode(paymentResponse.errorCode));
           return;
         }
 
@@ -84,26 +76,22 @@ export function useBankTransferFlow(core: SubmissionCore) {
           );
 
           if (initialThankYouState?.status === 'bankTransferPending') {
-            await finalizeDonation(
+            await attempt.complete(
               donationResponse.donationId,
-              token ?? undefined,
               initialThankYouState
             );
             return;
           }
 
           if (initialThankYouState?.status === 'completed') {
-            await finalizeDonation(
-              donationResponse.donationId,
-              token ?? undefined
-            );
+            await attempt.complete(donationResponse.donationId);
             return;
           }
         }
 
         setDonationState(stopLoading);
       } catch (error) {
-        setDonationState(withSubmitError(error));
+        attempt.fail(toSubmitError(error).code);
       } finally {
         // Rotate keys once per completed submit attempt.
         rotateIdempotencyKeys();
@@ -114,9 +102,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeDonation,
-      buildPayload,
-      trackDonationSubmitted,
+      createAttempt,
       submittingRef,
       setDonationState,
       donationKeyRef,

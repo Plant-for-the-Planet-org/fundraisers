@@ -1,8 +1,4 @@
-import type { DonationFormData } from '@/lib/types/donation';
-import type {
-  DonationSubmitState,
-  ThankYouState,
-} from '@/lib/types/donation-submit';
+import type { DonationSubmitState } from '@/lib/types/donation-submit';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { StripeCardActionConfirmRequest } from '@/lib/types/payment';
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
@@ -12,13 +8,18 @@ import type { DonationData } from '../donate-overlay';
 import type { DonationFormValues } from '../donation-form-context';
 import type {
   ConfirmCardActionPaymentParams,
+  DonationAttempt,
   SubmissionCore,
 } from './donation-submit-flow-types';
 
 import { useCallback, useRef, useState } from 'react';
 import { trackEvent } from '@/lib/analytics/track';
 import { paymentService } from '@/lib/api/payment-service';
-import { withError, withSuccess } from '@/lib/donation/donation-submit-state';
+import {
+  mapPaymentErrorCode,
+  withError,
+  withSuccess,
+} from '@/lib/donation/donation-submit-state';
 import {
   assembleFormData,
   buildDonationPayload,
@@ -42,9 +43,9 @@ import { useAuthStore } from '@/stores/auth-store';
  *
  * Reads `useAuthStore` once and re-exposes the auth/config values the flows read
  * directly (`token`, `donorProfile`, `paymentOptions`). `isAuthenticated` stays
- * internal — only `buildPayload` consumes it.
+ * internal — only `createAttempt` consumes it.
  *
- * Intentionally does NOT own `paypalDonationIdRef` (PayPal-only) or
+ * Intentionally does NOT own `paypalOrderRef` (PayPal-only) or
  * `classifyPaymentMethodResult` (card + sepa); those live in their owning flows.
  */
 export function useSubmissionCore(
@@ -71,54 +72,16 @@ export function useSubmissionCore(
     paymentKeyRef.current = generateIdempotencyKeyWithPrefix('payment');
   }, []);
 
-  // Surfaces an error and clears the in-flight guard so the donor can retry.
   const failSubmission = useCallback((code: SubmissionErrorKey) => {
     setDonationState(withError(code));
     submittingRef.current = false;
   }, []);
 
-  // Records a donation attempt that is actually going out to the API.
-  //
-  // Deliberately not fired from `buildPayload`: the Stripe path validates the card
-  // after building the payload and bails out without a request when the fields are
-  // incomplete, and PlanetCash bails on a missing token. Each flow calls this
-  // immediately before its own create-donation call instead.
-  //
-  // Fires on submit, not on settlement: a bank transfer counts here while the money
-  // is still pending, which is why the method rides along as a dimension.
-  const trackDonationSubmitted = useCallback(
-    (formData: DonationFormData, paymentMethod: PaymentMethodId) => {
-      trackEvent('donation_submitted', {
-        fundraiser: fundraiser.slug,
-        amount: formData.amountCents / 100,
-        currency: formData.currency,
-        frequency: formData.frequency,
-        method: paymentMethod,
-      });
-    },
-    [fundraiser.slug]
-  );
-
-  // Resolves the thank-you state for a settled donation and applies it as success.
-  const finalizeDonation = useCallback(
-    async (
-      donationId: string,
-      token?: string,
-      fallbackThankYouState?: ThankYouState
-    ) => {
-      const thankYouState = await resolveThankYouStateFromDonation(
-        donationId,
-        token,
-        fallbackThankYouState
-      );
-      setDonationState(withSuccess(thankYouState));
-    },
-    []
-  );
-
-  // Assembles form data and the donation payload for a given payment method.
-  const buildPayload = useCallback(
-    (values: DonationFormValues, paymentMethod: PaymentMethodId) => {
+  const createAttempt = useCallback(
+    (
+      values: DonationFormValues,
+      paymentMethod: PaymentMethodId
+    ): DonationAttempt => {
       const formData = assembleFormData(
         donationData,
         fundraiser,
@@ -143,18 +106,81 @@ export function useSubmissionCore(
         processingFeeCents
       );
 
-      return { formData, payload };
+      // `amount` is a plain dimension. Umami sums `revenue` across every event, so only the settled event sends it, or one donation counts three times.
+      const track = (name: string, extra?: Record<string, unknown>) =>
+        trackEvent(name, {
+          fundraiser: fundraiser.slug,
+          amount: payload.amount,
+          currency: payload.currency,
+          frequency: payload.frequency,
+          method: paymentMethod,
+          country: 'donor' in payload ? payload.donor.country : undefined,
+          signedIn: isAuthenticated,
+          coversFee: values.willAbsorbFee && processingFeeCents > 0,
+          // The "make it monthly" upsell on a one-off donation.
+          upgradedToMonthly:
+            donationData.frequency === 'once' &&
+            payload.frequency === 'monthly',
+          ...extra,
+        });
+
+      // Only a failure after the request went out is a donation failure. Form validation bail-outs and a dismissed wallet sheet stay out, so failures never exceed submissions and every donation_failed carries the full dimensions.
+      let submitted = false;
+
+      return {
+        formData,
+        payload,
+        paymentMethod,
+        // Fires on submit, not on settlement: a bank transfer counts here while the money is still pending.
+        submitted: () => {
+          submitted = true;
+          track('donation_submitted');
+        },
+        fail: code => {
+          if (submitted) track('donation_failed', { error: code });
+          failSubmission(code);
+        },
+        complete: async (donationId, fallbackThankYouState) => {
+          const thankYouState = await resolveThankYouStateFromDonation(
+            donationId,
+            token ?? undefined,
+            fallbackThankYouState
+          );
+          setDonationState(withSuccess(thankYouState));
+          // Revenue counts when paid. A confirmed SEPA mandate also counts: the platform holds it at initiated/pending until the debit settles days later, and the client never sees that. A pending bank transfer is only a promise and stays out, as is a status the client could not read.
+          const status =
+            thankYouState.status === 'completed'
+              ? 'paid'
+              : paymentMethod === 'sepa_debit' &&
+                  thankYouState.status === 'paymentProcessing' &&
+                  !thankYouState.unverified &&
+                  (thankYouState.paymentResult === 'initiated' ||
+                    thankYouState.paymentResult === 'pending')
+                ? thankYouState.paymentResult
+                : null;
+          if (status) {
+            track('donation_completed', { revenue: payload.amount, status });
+          }
+        },
+      };
     },
-    [donationData, fundraiser, paymentOptions, isAuthenticated, donorProfile]
+    [
+      donationData,
+      fundraiser,
+      paymentOptions,
+      isAuthenticated,
+      donorProfile,
+      token,
+      failSubmission,
+    ]
   );
 
-  // Confirms a Stripe cardAction payment intent with the platform: builds the
-  // confirm request, processes it, and surfaces failure. Returns true when the
-  // confirm succeeded (caller proceeds to finalize), false when it failed
-  // (state already set; caller should stop). The cardAction call itself stays
-  // with the caller since each obtains the paymentIntentId differently.
+  // Confirms a Stripe cardAction payment intent with the platform. The cardAction call itself stays with the caller since each obtains the paymentIntentId differently.
   const confirmCardActionPayment = useCallback(
-    async (params: ConfirmCardActionPaymentParams): Promise<boolean> => {
+    async (
+      attempt: DonationAttempt,
+      params: ConfirmCardActionPaymentParams
+    ): Promise<boolean> => {
       const confirmRequest: StripeCardActionConfirmRequest = {
         gateway: 'stripe',
         account: params.account,
@@ -163,16 +189,16 @@ export function useSubmissionCore(
       const finalResponse = await paymentService.processPayment(
         params.donationId,
         confirmRequest,
-        params.token,
+        token ?? undefined,
         params.paymentIdempotencyKey
       );
       if (finalResponse.status === 'failed') {
-        setDonationState(withError('paymentFailed'));
+        attempt.fail(mapPaymentErrorCode(finalResponse.errorCode));
         return false;
       }
       return true;
     },
-    []
+    [token]
   );
 
   return {
@@ -182,10 +208,8 @@ export function useSubmissionCore(
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
+    createAttempt,
     failSubmission,
-    trackDonationSubmitted,
-    finalizeDonation,
-    buildPayload,
     confirmCardActionPayment,
     token,
     donorProfile,

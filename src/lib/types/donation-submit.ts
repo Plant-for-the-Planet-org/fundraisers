@@ -22,6 +22,8 @@ export type ThankYouState =
       status: 'paymentProcessing';
       donationId: string;
       paymentResult: DonationPaymentStatus;
+      /** Set when the status could not be read and `paymentResult` is a placeholder, not the platform's answer. */
+      unverified?: true;
     };
 
 export interface DonationSubmitState {
