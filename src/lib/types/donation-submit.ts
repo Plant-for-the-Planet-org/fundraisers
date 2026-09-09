@@ -1,3 +1,4 @@
+import type { DonationFieldErrors } from '@/lib/donation/donation-field-errors';
 import type {
   DonationFrequency,
   DonationPaymentStatus,
@@ -21,6 +22,8 @@ export type ThankYouState =
       status: 'paymentProcessing';
       donationId: string;
       paymentResult: DonationPaymentStatus;
+      /** Set when the status could not be read and `paymentResult` is a placeholder, not the platform's answer. */
+      unverified?: true;
     };
 
 export interface DonationSubmitState {
@@ -32,6 +35,8 @@ export interface DonationSubmitState {
 export interface DonationSubmitError {
   /** Maps directly to a key under Donate.submissionErrors in locale JSON */
   code: SubmissionErrorKey;
+  /** Per-field errors the platform reported, keyed by form field name. Absent unless the platform sent a field-error map we could map onto form fields. */
+  fieldErrors?: DonationFieldErrors;
 }
 
 export const INITIAL_DONATION_STATE: DonationSubmitState = {

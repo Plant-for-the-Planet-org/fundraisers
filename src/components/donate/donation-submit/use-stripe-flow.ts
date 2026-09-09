@@ -2,6 +2,7 @@ import type { StripePaymentMethodResult } from '@/lib/donation/donation-submit-s
 import type { PaymentData } from '@/lib/types/payment';
 import type { DonationFormValues } from '../donation-form-context';
 import type {
+  DonationAttempt,
   StripeFlowDeps,
   SubmissionCore,
 } from './donation-submit-flow-types';
@@ -9,12 +10,11 @@ import type {
 import { useCallback } from 'react';
 import { buildDonorBillingAddress } from '@/lib/donation/donation-address';
 import { submitStandardPostpaidDonation } from '@/lib/donation/donation-submission';
+import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   beginSubmission,
   mapPaymentErrorCode,
   stopLoading,
-  withError,
-  withSubmitError,
 } from '@/lib/donation/donation-submit-state';
 import { resolveThankYouState } from '@/lib/donation/resolve-thank-you-state';
 
@@ -40,9 +40,7 @@ export function useStripeFlow(
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
-    finalizeDonation,
-    buildPayload,
-    trackDonationSubmitted,
+    createAttempt,
     confirmCardActionPayment,
     token,
     donorProfile,
@@ -54,10 +52,11 @@ export function useStripeFlow(
   // result was handled (error/validation) and the caller should stop.
   const classifyPaymentMethodResult = useCallback(
     (
+      attempt: DonationAttempt,
       result: StripePaymentMethodResult | undefined
     ): { paymentMethodId: string } | null => {
       if (!result) {
-        setDonationState(withError('paymentFailed'));
+        attempt.fail('paymentFailed');
         return null;
       }
       if ('validationFailed' in result) {
@@ -66,7 +65,7 @@ export function useStripeFlow(
         return null;
       }
       if ('error' in result) {
-        setDonationState(withError('paymentFailed'));
+        attempt.fail('paymentFailed');
         return null;
       }
       return { paymentMethodId: result.paymentMethodId };
@@ -92,10 +91,8 @@ export function useStripeFlow(
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { formData, payload } = buildPayload(
-        values,
-        values.selectedPaymentMethod
-      );
+      const attempt = createAttempt(values, values.selectedPaymentMethod);
+      const { formData, payload } = attempt;
 
       let paymentDetails: PaymentData['paymentDetails'] = {};
       const donationAttemptKey = donationKeyRef.current;
@@ -118,7 +115,7 @@ export function useStripeFlow(
             ),
           });
 
-          const resolved = classifyPaymentMethodResult(sepaResult);
+          const resolved = classifyPaymentMethodResult(attempt, sepaResult);
           if (!resolved) return;
           paymentDetails = resolved;
         } else if (values.selectedPaymentMethod === 'card') {
@@ -132,12 +129,12 @@ export function useStripeFlow(
             ),
           });
 
-          const resolved = classifyPaymentMethodResult(cardResult);
+          const resolved = classifyPaymentMethodResult(attempt, cardResult);
           if (!resolved) return;
           paymentDetails = resolved;
         }
 
-        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+        attempt.submitted();
 
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
@@ -151,9 +148,7 @@ export function useStripeFlow(
           });
 
         if (paymentResponse.status === 'failed') {
-          setDonationState(
-            withError(mapPaymentErrorCode(paymentResponse.errorCode))
-          );
+          attempt.fail(mapPaymentErrorCode(paymentResponse.errorCode));
           return;
         }
 
@@ -167,10 +162,7 @@ export function useStripeFlow(
           );
 
           if (initialThankYouState?.status === 'completed') {
-            await finalizeDonation(
-              donationResponse.donationId,
-              token ?? undefined
-            );
+            await attempt.complete(donationResponse.donationId);
             return;
           }
         }
@@ -187,23 +179,19 @@ export function useStripeFlow(
             )) ?? { error: 'No card form available' };
 
             if ('error' in actionResult) {
-              setDonationState(withError('authenticationFailed'));
+              attempt.fail('authenticationFailed');
               return;
             }
 
-            const confirmed = await confirmCardActionPayment({
+            const confirmed = await confirmCardActionPayment(attempt, {
               donationId: donationResponse.donationId,
               account: paymentResponse.response.account,
               paymentIntentId: actionResult.paymentIntentId,
-              token: token || undefined,
               paymentIdempotencyKey: paymentAttemptKey,
             });
             if (!confirmed) return;
 
-            await finalizeDonation(
-              donationResponse.donationId,
-              token ?? undefined
-            );
+            await attempt.complete(donationResponse.donationId);
             return;
           }
 
@@ -218,14 +206,11 @@ export function useStripeFlow(
               )) ?? { error: 'No card form available' };
 
             if (confirmResult.error) {
-              setDonationState(withError('authenticationFailed'));
+              attempt.fail('authenticationFailed');
               return;
             }
 
-            await finalizeDonation(
-              donationResponse.donationId,
-              token ?? undefined
-            );
+            await attempt.complete(donationResponse.donationId);
             return;
           }
 
@@ -236,12 +221,9 @@ export function useStripeFlow(
               )) ?? { error: 'No SEPA form available' };
 
             if (sepaResult.error) {
-              setDonationState(withError('authenticationFailed'));
+              attempt.fail('authenticationFailed');
             } else {
-              await finalizeDonation(
-                donationResponse.donationId,
-                token ?? undefined
-              );
+              await attempt.complete(donationResponse.donationId);
             }
             return;
           }
@@ -249,7 +231,7 @@ export function useStripeFlow(
 
         setDonationState(stopLoading);
       } catch (error) {
-        setDonationState(withSubmitError(error));
+        attempt.fail(toSubmitError(error).code);
       } finally {
         // Rotate keys once per completed submit attempt.
         rotateIdempotencyKeys();
@@ -265,9 +247,7 @@ export function useStripeFlow(
       classifyPaymentMethodResult,
       confirmCardActionPayment,
       rotateIdempotencyKeys,
-      finalizeDonation,
-      buildPayload,
-      trackDonationSubmitted,
+      createAttempt,
       submittingRef,
       setDonationState,
       donationKeyRef,

@@ -43,3 +43,18 @@ export function scrollToFirstError(): HTMLElement | null {
   scrollElementIntoView(field);
   return field;
 }
+
+/**
+ * Finds a form field by its `name`, scrolls it into view, and returns it.
+ *
+ * This targets the actual input directly, so it does not need to wait for
+ * error styling or error markers to appear.
+ */
+export function scrollToField(name: string): HTMLElement | null {
+  const root =
+    document.querySelector<HTMLElement>('[data-scroll-container]') ?? document;
+  const field = root.querySelector<HTMLElement>(`[name="${CSS.escape(name)}"]`);
+  if (!field) return null;
+  scrollElementIntoView(field);
+  return field;
+}

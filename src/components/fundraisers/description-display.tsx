@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { sanitizeDescriptionHtml } from '@/lib/utils/sanitize-html';
 import { SectionHeader } from '@/components/fundraisers/typography';
-import { RichTextContent } from '@/components/ui/rich-text-content';
+import { RichTextContent } from '@/components/rich-text/rich-text-content';
 
 interface DescriptionDisplayProps {
   value: string | null;
@@ -26,7 +26,7 @@ export default function DescriptionDisplay({
         html={value}
         sanitize={sanitizeDescriptionHtml}
         className={cn(
-          'rich-quote text-foreground leading-relaxed ',
+          'rich-quote rich-links text-foreground leading-relaxed ',
           '[&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 ',
           '[&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_s]:line-through ',
           '[&_ul]:my-3 [&_ul]:pl-6 [&_ul]:list-disc ',

@@ -20,7 +20,7 @@ const VIDEO_EMBED_ATTR = [
 // the content, so `data-image-src` does hold a full URL. `sanitize-html` cannot
 // pattern-check a `data-*` value (its scheme checks cover only href/src/cite),
 // so the real gate is `normalizeImageSrc` at render time in `ImageEmbed` —
-// https on an allowed host, or nothing renders.
+// https on a domain in TRUSTED_DOMAINS and not an SVG, or nothing renders.
 const IMAGE_EMBED_TAG = 'image-embed';
 const IMAGE_EMBED_ATTR = ['data-image-src', 'data-image-alt'];
 
@@ -61,7 +61,7 @@ const RICH_TEXT_ALLOWED_STYLES: IOptions['allowedStyles'] = {
 };
 
 const DESCRIPTION_ALLOWED_ATTR: IOptions['allowedAttributes'] = {
-  a: ['href', 'title', 'rel'],
+  a: ['href', 'title', 'rel', 'target'],
   p: ['style'],
   span: ['style'],
   [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
@@ -88,22 +88,39 @@ const THANK_YOU_ALLOWED_TAGS = [
   'br',
   'span',
   'blockquote',
+  'a',
   VIDEO_EMBED_TAG,
   IMAGE_EMBED_TAG,
 ];
+
+// Links behave identically in descriptions and thank-you notes — same allowed
+// schemes and the same forced target/rel — so both sanitizers share them.
+const LINK_ALLOWED_SCHEMES = ['http', 'https', 'mailto'];
+const LINK_TRANSFORM_TAGS: IOptions['transformTags'] = {
+  a: (tagName, attribs) => ({
+    tagName,
+    attribs: {
+      ...attribs,
+      target: '_blank',
+      rel: 'nofollow ugc noopener noreferrer',
+    },
+  }),
+};
 
 export function sanitizeThankYouHtml(dirty: string): SafeHtml {
   const clean = sanitizeHtml(dirty, {
     allowedTags: THANK_YOU_ALLOWED_TAGS,
     allowedAttributes: {
+      a: ['href', 'title', 'rel', 'target'],
       p: ['style'],
       span: ['style'],
       [VIDEO_EMBED_TAG]: VIDEO_EMBED_ATTR,
       [IMAGE_EMBED_TAG]: IMAGE_EMBED_ATTR,
     },
     allowedStyles: RICH_TEXT_ALLOWED_STYLES,
-    allowedSchemes: [],
+    allowedSchemes: LINK_ALLOWED_SCHEMES,
     allowProtocolRelative: false,
+    transformTags: LINK_TRANSFORM_TAGS,
   });
   return toSafeHtml(clean);
 }
@@ -113,18 +130,9 @@ export function sanitizeDescriptionHtml(dirty: string): SafeHtml {
     allowedTags: DESCRIPTION_ALLOWED_TAGS,
     allowedAttributes: DESCRIPTION_ALLOWED_ATTR,
     allowedStyles: RICH_TEXT_ALLOWED_STYLES,
-    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemes: LINK_ALLOWED_SCHEMES,
     allowProtocolRelative: false,
-    transformTags: {
-      a: (tagName, attribs) => ({
-        tagName,
-        attribs: {
-          ...attribs,
-          target: '_blank',
-          rel: 'nofollow ugc noopener noreferrer',
-        },
-      }),
-    },
+    transformTags: LINK_TRANSFORM_TAGS,
   });
 
   return toSafeHtml(clean);

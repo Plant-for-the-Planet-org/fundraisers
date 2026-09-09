@@ -28,4 +28,45 @@
   :lang(de) .rich-quote blockquote p:first-child::before {
     content: '\201E';
   }
+
+  /*
+   * Links inside rich-text surfaces (editor + displays). Separate from
+   * .rich-quote — quotes and links are independent features.
+   *
+   * A link keeps the colour of the text around it. Recolouring it to
+   * muted-foreground made links read as washed out against the body copy, so
+   * the underline is the only affordance: a hairline, faint at rest so a
+   * paragraph full of links stays calm, and the full text colour on hover.
+   * Both states derive from `currentColor`, so this works on any surface
+   * (description, host message, thank-you card) without per-surface rules.
+   *
+   * `.quiet-link` is the same treatment for something that behaves like a link
+   * but isn't an anchor — today the project "Read more" toggle. Shared so the
+   * two can't drift apart, which is what `.rich-links` was split out for.
+   */
+  .rich-links a,
+  .quiet-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in srgb, currentcolor 35%, transparent);
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .rich-links a:hover,
+  .quiet-link:hover {
+    text-decoration-color: currentcolor;
+  }
+
+  /*
+   * Editor-only: a ProseMirror decoration (not a Tailwind utility, so it
+   * can't be a JIT class — see SelectionHighlight in rich-text-editor.tsx)
+   * that keeps the text being linked visibly highlighted while the link
+   * input row has keyboard focus and the browser's own selection is gone.
+   */
+  .link-target-highlight {
+    background-color: hsl(var(--primary) / 0.25);
+    border-radius: 2px;
+  }
 }

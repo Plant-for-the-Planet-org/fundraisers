@@ -98,9 +98,9 @@ function ImageEmbedNodeView({
  * - Serializes to an inert `<image-embed data-image-src data-image-alt>` marker
  *   (never an `<img>`), which both sanitizers allow. The `<img>` is built by
  *   `ImageEmbed` at display time from the re-validated src.
- * - Pasting an allowed-host image URL is the only way to add an image: there is
+ * - Pasting a trusted-domain image URL is the only way to add an image: there is
  *   no toolbar button. `looksLikeImageUrl` requires a raster extension, so
- *   pasting an ordinary allowed-host page link still behaves like a link.
+ *   pasting an ordinary trusted-domain page link still behaves like a link.
  *   StarterKit's Link extension declares `priority: 1000` against
  *   this node's default 100, so its `linkOnPaste` runs first and wins whenever
  *   there is a selection — pasting a URL over selected text links that text,

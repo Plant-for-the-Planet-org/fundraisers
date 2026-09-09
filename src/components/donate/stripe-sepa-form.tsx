@@ -1,13 +1,21 @@
 'use client';
 
 import type { StripeIbanElementChangeEvent } from '@stripe/stripe-js';
+import type { DonationFormValues } from './donation-form-context';
 
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Info } from 'lucide-react';
 import { IbanElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { getSepaCreditor } from '@/lib/constants/sepa-creditors';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useAuthStore } from '@/stores/auth-store';
 import { Input } from '@/components/ui/input';
 import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
@@ -51,15 +59,42 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
-    const { fundraiser } = useDonationForm();
+    const { fundraiser, donationData } = useDonationForm();
     const creditor = getSepaCreditor(fundraiser.workspace?.country);
+
+    const { control } = useFormContext<DonationFormValues>();
+    const [firstname, lastname, makeMonthly] = useWatch({
+      control,
+      name: ['firstname', 'lastname', 'makeMonthly'],
+    });
+
+    // A SEPA mandate must state whether it covers recurrent or one-off
+    // collections. Same recurring test the summary and the CTA use.
+    const isRecurring =
+      donationData.frequency === 'monthly' ||
+      donationData.frequency === 'yearly' ||
+      makeMonthly;
+    const profileDisplayName = useAuthStore(
+      state => state.user?.profile?.displayName
+    );
 
     const [ibanComplete, setIbanComplete] = useState(false);
     const [ibanError, setIbanError] = useState<string | null>(null);
     const [accountHolderName, setAccountHolderName] = useState('');
     const [nameError, setNameError] = useState<string | null>(null);
-    const [mandateAccepted, setMandateAccepted] = useState(false);
-    const [mandateError, setMandateError] = useState<string | null>(null);
+    const accountHolderNameEditedRef = useRef(false);
+
+    // Track the donor name until the donor edits the account holder field manually. Same rule as the cardholder name on the card form.
+    useEffect(() => {
+      if (accountHolderNameEditedRef.current) return;
+      const fromForm = `${firstname ?? ''} ${lastname ?? ''}`.trim();
+      const nextName = fromForm || profileDisplayName?.trim() || '';
+      setAccountHolderName(nextName);
+      // Filling the donor name after a failed submit satisfies the field, so
+      // drop the stale "required" error the way editing the field does. An
+      // empty derived name keeps it.
+      if (nextName) setNameError(null);
+    }, [firstname, lastname, profileDisplayName]);
 
     // The IBAN iframe is not focusable until Stripe finishes mounting it. When
     // `focus()` is called before then (e.g. right after switching to "use a
@@ -77,10 +112,6 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
         }
         if (!accountHolderName.trim()) {
           setNameError(t('accountHolderNameRequired'));
-          hasError = true;
-        }
-        if (!mandateAccepted) {
-          setMandateError(t('mandateRequired'));
           hasError = true;
         }
         if (hasError) return { validationFailed: true as const };
@@ -160,6 +191,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           <Input
             value={accountHolderName}
             onChange={e => {
+              accountHolderNameEditedRef.current = true;
               setAccountHolderName(e.target.value);
               if (nameError) setNameError(null);
             }}
@@ -172,7 +204,9 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
             <Info className='h-4 w-4 shrink-0 text-muted-foreground' />
             <p className='font-semibold'>{t('mandateTitle')}</p>
           </div>
-          <p className='text-sm'>{t('mandateIntro')}</p>
+          <p className='text-sm'>
+            {t('mandateIntro', { creditor: creditor.name })}
+          </p>
 
           <div className='grid grid-cols-2 gap-4 text-sm'>
             <div>
@@ -185,32 +219,14 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
               <br />
               {creditor.id}
             </div>
+            <div>
+              <span className='font-medium'>{t('paymentType')}</span>
+              <br />
+              {isRecurring ? t('paymentTypeRecurrent') : t('paymentTypeOneOff')}
+            </div>
           </div>
 
           <p className='text-sm'>{t('mandateRights')}</p>
-
-          <div className='space-y-1'>
-            <div className='flex items-start gap-2'>
-              <Checkbox
-                id='sepa-mandate'
-                checked={mandateAccepted}
-                onCheckedChange={checked => {
-                  setMandateAccepted(checked === true);
-                  if (checked) setMandateError(null);
-                }}
-                className='mt-0.5'
-              />
-              <label
-                htmlFor='sepa-mandate'
-                className='text-sm cursor-pointer leading-relaxed'
-              >
-                {t('mandateConsent')}
-              </label>
-            </div>
-            {mandateError && (
-              <p className='text-sm text-destructive'>{mandateError}</p>
-            )}
-          </div>
         </div>
       </div>
     );

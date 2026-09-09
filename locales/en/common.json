@@ -51,11 +51,36 @@
     },
     "imageEmbed": {
       "editor": {
-        "invalidUrl": "Images can only be embedded from plant-for-the-planet.org over https. SVG is not supported.",
+        "invalidUrl": "Images can only be embedded from a trusted domain (such as plant-for-the-planet.org) over https. SVG is not supported.",
         "altLabel": "Image description",
         "altPlaceholder": "Describe this image for screen readers (optional)",
         "removeImage": "Remove image"
       }
+    },
+    "linkEditor": {
+      "toolbarButton": "Add link",
+      "urlLabel": "Link URL",
+      "urlPlaceholder": "Paste or type a link",
+      "setLink": "Set link",
+      "unlink": "Remove link",
+      "openInNewTab": "Open in new tab",
+      "invalidUrl": "Enter a valid link (a web address or an email)."
+    },
+    "externalLinkWarning": {
+      "goBack": "Go back",
+      "invalidTitle": "Invalid link",
+      "invalidBody": "This link isn't valid, so it can't be opened.",
+      "leavingTitle": "You're leaving startplanting.org",
+      "leavingBody": "This link leads to an external website that we don't control or verify. Please make sure you trust it before continuing - proceed at your own risk.",
+      "mailPromptTitle": "Open your mail app?",
+      "mailPromptBody": "This will open your email app to send a message to <strong>{address}</strong>.",
+      "continue": "Continue"
+    },
+    "popupBlocked": {
+      "title": "Popup blocked",
+      "description": "Your browser blocked the new tab. Open it here:",
+      "copy": "Copy link",
+      "copied": "Link copied"
     }
   }
 }

@@ -4,11 +4,10 @@ import type { SubmissionCore } from './donation-submit-flow-types';
 
 import { useCallback } from 'react';
 import { submitStandardPostpaidDonation } from '@/lib/donation/donation-submission';
+import { toSubmitError } from '@/lib/donation/donation-submit-errors';
 import {
   beginSubmission,
   mapPaymentErrorCode,
-  withError,
-  withSubmitError,
 } from '@/lib/donation/donation-submit-state';
 
 /**
@@ -32,10 +31,8 @@ export function useWalletFlow(core: SubmissionCore) {
     donationKeyRef,
     paymentKeyRef,
     rotateIdempotencyKeys,
+    createAttempt,
     failSubmission,
-    finalizeDonation,
-    buildPayload,
-    trackDonationSubmitted,
     confirmCardActionPayment,
     token,
     paymentOptions,
@@ -53,17 +50,17 @@ export function useWalletFlow(core: SubmissionCore) {
 
       setDonationState(beginSubmission);
 
-      const { formData, payload } = buildPayload(values, wallet);
+      const attempt = createAttempt(values, wallet);
 
       const donationAttemptKey = donationKeyRef.current;
       const paymentAttemptKey = paymentKeyRef.current;
 
       try {
-        trackDonationSubmitted(formData, wallet);
+        attempt.submitted();
 
         const { donationResponse, paymentResponse } =
           await submitStandardPostpaidDonation({
-            payload,
+            payload: attempt.payload,
             token: token || undefined,
             donationIdempotencyKey: donationAttemptKey,
             paymentIdempotencyKey: paymentAttemptKey,
@@ -73,17 +70,12 @@ export function useWalletFlow(core: SubmissionCore) {
           });
 
         if (paymentResponse.status === 'failed') {
-          setDonationState(
-            withError(mapPaymentErrorCode(paymentResponse.errorCode))
-          );
+          attempt.fail(mapPaymentErrorCode(paymentResponse.errorCode));
           return;
         }
 
         if (paymentResponse.status === 'success') {
-          await finalizeDonation(
-            donationResponse.donationId,
-            token ?? undefined
-          );
+          await attempt.complete(donationResponse.donationId);
           return;
         }
 
@@ -93,15 +85,14 @@ export function useWalletFlow(core: SubmissionCore) {
               paymentResponse.response.payment_intent_client_secret
             );
             if (error || !paymentIntent) {
-              setDonationState(withError('authenticationFailed'));
+              attempt.fail('authenticationFailed');
               return;
             }
 
-            const confirmed = await confirmCardActionPayment({
+            const confirmed = await confirmCardActionPayment(attempt, {
               donationId: donationResponse.donationId,
               account: paymentResponse.response.account,
               paymentIntentId: paymentIntent.id,
-              token: token || undefined,
               paymentIdempotencyKey: paymentAttemptKey,
             });
             if (!confirmed) return;
@@ -111,22 +102,19 @@ export function useWalletFlow(core: SubmissionCore) {
               { payment_method: paymentResponse.response.payment_method }
             );
             if (error) {
-              setDonationState(withError('authenticationFailed'));
+              attempt.fail('authenticationFailed');
               return;
             }
           } else {
             // Unknown action_required type — payment status indeterminate.
-            setDonationState(withError('unexpected'));
+            attempt.fail('unexpected');
             return;
           }
 
-          await finalizeDonation(
-            donationResponse.donationId,
-            token ?? undefined
-          );
+          await attempt.complete(donationResponse.donationId);
         }
       } catch (error) {
-        setDonationState(withSubmitError(error));
+        attempt.fail(toSubmitError(error).code);
       } finally {
         rotateIdempotencyKeys();
         submittingRef.current = false;
@@ -136,9 +124,7 @@ export function useWalletFlow(core: SubmissionCore) {
       paymentOptions,
       token,
       rotateIdempotencyKeys,
-      finalizeDonation,
-      buildPayload,
-      trackDonationSubmitted,
+      createAttempt,
       confirmCardActionPayment,
       submittingRef,
       setDonationState,

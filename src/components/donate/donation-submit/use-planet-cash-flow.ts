@@ -3,11 +3,8 @@ import type { SubmissionCore } from './donation-submit-flow-types';
 
 import { useCallback } from 'react';
 import { submitPrepaidDonation } from '@/lib/donation/donation-submission';
-import {
-  beginSubmission,
-  withError,
-  withSubmitError,
-} from '@/lib/donation/donation-submit-state';
+import { toSubmitError } from '@/lib/donation/donation-submit-errors';
+import { beginSubmission } from '@/lib/donation/donation-submit-state';
 
 /**
  * PlanetCash submission flow.
@@ -27,9 +24,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     submittingRef,
     donationKeyRef,
     rotateIdempotencyKeys,
-    finalizeDonation,
-    buildPayload,
-    trackDonationSubmitted,
+    createAttempt,
     token,
   } = core;
 
@@ -41,29 +36,26 @@ export function usePlanetCashFlow(core: SubmissionCore) {
       // Reset stale success state on new submit
       setDonationState(beginSubmission);
 
-      const { formData, payload } = buildPayload(
-        values,
-        values.selectedPaymentMethod
-      );
+      const attempt = createAttempt(values, values.selectedPaymentMethod);
 
       const donationAttemptKey = donationKeyRef.current;
 
       try {
         // PlanetCash: single POST, balance deducted immediately — no PUT step needed.
         if (!token) {
-          setDonationState(withError('unexpected'));
+          attempt.fail('unexpected');
           return;
         }
-        trackDonationSubmitted(formData, values.selectedPaymentMethod);
+        attempt.submitted();
 
         const donationResponse = await submitPrepaidDonation(
-          payload,
+          attempt.payload,
           token,
           donationAttemptKey
         );
-        await finalizeDonation(donationResponse.donationId, token);
+        await attempt.complete(donationResponse.donationId);
       } catch (error) {
-        setDonationState(withSubmitError(error));
+        attempt.fail(toSubmitError(error).code);
       } finally {
         // Rotate keys once per completed submit attempt.
         rotateIdempotencyKeys();
@@ -73,9 +65,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     [
       token,
       rotateIdempotencyKeys,
-      finalizeDonation,
-      buildPayload,
-      trackDonationSubmitted,
+      createAttempt,
       submittingRef,
       setDonationState,
       donationKeyRef,

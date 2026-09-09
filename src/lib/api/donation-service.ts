@@ -7,6 +7,7 @@ import type { ErrorType } from './http-error-classifier';
 
 import { classifyPlatformError } from './http-error-classifier';
 import { PlatformAPIError, platformFetch } from './platform-fetch';
+import { readPlatformFieldErrors } from './platform-field-errors';
 
 export class DonationError extends Error {
   constructor(
@@ -15,7 +16,9 @@ export class DonationError extends Error {
     public code: string,
     public status?: number,
     // Diagnostic only - no consumer reads this today. `originalError` may be an Error instance, so don't JSON.stringify `details` or pass it across the server/client boundary without first extracting fields (message/status/kind); an Error serializes to {}.
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
+    /** Platform field errors as sent, keyed by API path (e.g. `donor.city`). Mapped onto form fields by `toDonationFieldErrors`. */
+    public fieldErrors?: Record<string, string[]>
   ) {
     super(message);
     this.name = 'DonationError';
@@ -39,17 +42,19 @@ function toDonationError(err: unknown, timeoutMessage: string): DonationError {
       });
     }
     const { type, code } = classifyPlatformError(err.status);
-    const details: Record<string, unknown> = { body: err.body };
     // Preserve field-level errors for validation/business statuses
-    if (
-      (err.status === 400 || err.status === 422) &&
-      err.body &&
-      typeof err.body === 'object' &&
-      'errors' in err.body
-    ) {
-      details.errors = (err.body as { errors: unknown }).errors;
-    }
-    return new DonationError(err.message, type, code, err.status, details);
+    const fieldErrors =
+      err.status === 400 || err.status === 422
+        ? (readPlatformFieldErrors(err.body) ?? undefined)
+        : undefined;
+    return new DonationError(
+      err.message,
+      type,
+      code,
+      err.status,
+      { body: err.body },
+      fieldErrors
+    );
   }
 
   return new DonationError(
