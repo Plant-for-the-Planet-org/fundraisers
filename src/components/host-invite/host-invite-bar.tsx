@@ -17,6 +17,9 @@ import {
   Info,
   Link2Off,
   Loader2,
+  Mail,
+  User,
+  UserCog,
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -174,42 +177,49 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
               ? t('pending.eyebrowWithInviter', { inviter: invite.inviterName })
               : t('pending.eyebrow')}
           </p>
-          <div className='flex flex-col gap-1 text-sm text-muted-foreground'>
-            <span className='flex items-start gap-2'>
-              {invite.isPublic ? (
-                <Eye size={16} className='mt-0.5 shrink-0' />
-              ) : (
-                <EyeOff size={16} className='mt-0.5 shrink-0' />
-              )}
-              {invite.role === 'viewer'
-                ? t('pending.roleViewer')
-                : t('pending.roleAdmin')}{' '}
-              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
-            </span>
+          <ul className='grid gap-x-6 gap-y-1 text-sm text-muted-foreground sm:grid-cols-2'>
+            {invite.invitedEmail && (
+              <li className='flex items-center gap-2'>
+                <Mail size={16} className='shrink-0' />
+                {t('pending.invitedAs', { email: invite.invitedEmail })}
+              </li>
+            )}
             {invite.expiresAt && (
-              <span className='flex items-start gap-2'>
-                <CalendarClock size={16} className='mt-0.5 shrink-0' />
+              <li className='flex items-center gap-2'>
+                <CalendarClock size={16} className='shrink-0' />
                 {t('pending.expires', {
                   date: format.dateTime(new Date(invite.expiresAt), {
                     dateStyle: 'medium',
                   }),
                 })}
-              </span>
+              </li>
             )}
-            {invite.invitedEmail && (
-              <span>
-                {t('pending.invitedAs', { email: invite.invitedEmail })}
-              </span>
-            )}
-          </div>
+            <li className='flex items-center gap-2'>
+              {invite.isPublic ? (
+                <Eye size={16} className='shrink-0' />
+              ) : (
+                <EyeOff size={16} className='shrink-0' />
+              )}
+              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
+            </li>
+            <li className='flex items-center gap-2'>
+              {invite.role === 'viewer' ? (
+                <User size={16} className='shrink-0' />
+              ) : (
+                <UserCog size={16} className='shrink-0' />
+              )}
+              {invite.role === 'viewer'
+                ? t('pending.roleViewer')
+                : t('pending.roleAdmin')}
+            </li>
+          </ul>
         </div>
-        <div className='flex w-full shrink-0 flex-col gap-2 sm:w-52'>
+        <div className='flex w-full shrink-0 gap-2 lg:w-52 lg:flex-col'>
           <Button
-            className='w-full hover:opacity-90'
-            // Same pair as the donate button and the video consent button: the fundraiser's accent with a foreground the theme shell picked for it.
+            className='flex-1 text-white hover:opacity-90 lg:w-full lg:flex-none'
+            // Same as the video consent button: the fundraiser's accent, falling back to the primary colour outside a theme.
             style={{
-              backgroundColor: 'var(--accent-color)',
-              color: 'var(--cta-foreground, #ffffff)',
+              backgroundColor: 'var(--accent-color, hsl(var(--primary)))',
             }}
             disabled={isAnswering}
             onClick={() => void answer('accept')}
@@ -220,7 +230,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
           <Button
             ref={declineRef}
             variant='secondary'
-            className='w-full'
+            className='flex-1 lg:w-full lg:flex-none'
             disabled={isAnswering}
             onClick={() => void answer('decline')}
           >
@@ -316,7 +326,7 @@ function Shell({
   return (
     <div
       className={cn(
-        'relative flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:bg-white/10',
+        'relative flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 lg:flex-row lg:items-center lg:justify-between dark:bg-white/10',
         tone === 'destructive'
           ? 'border-destructive/40'
           : 'border-white dark:border-none'
