@@ -5,14 +5,14 @@
     },
     "loading": "Opening your invitation",
     "pending": {
-      "eyebrowWithInviter": "{inviter} invited you",
-      "eyebrow": "You have been invited",
+      "eyebrowWithInviter": "{inviter} invited you to be one of the hosts!",
+      "eyebrow": "You have been invited to be one of the hosts!",
       "roleAdmin": "You would be able to edit the fundraiser and manage its hosts.",
       "roleViewer": "You would be able to follow the fundraiser's progress.",
       "publicYes": "Your name would be shown on the fundraiser's page.",
       "publicNo": "Your name would not be shown publicly.",
       "invitedAs": "Invited as {email}",
-      "expires": "This invitation expires on {date}.",
+      "expires": "Expires {date}",
       "accept": "Accept invitation",
       "decline": "Decline",
       "answering": "Saving your answer"
