@@ -25,7 +25,7 @@
     },
     "declined": {
       "title": "Du hast diese Einladung abgelehnt",
-      "description": "Du bist kein*e Organisator*in dieses Spendenaufrufs. Wenn du es dir anders überlegst, bitte eine*n Organisator*in, dich erneut einzuladen."
+      "description": "Wenn du es dir anders überlegst, bitte eine*n Organisator*in, dich erneut einzuladen."
     },
     "expired": {
       "title": "Diese Einladung ist abgelaufen",

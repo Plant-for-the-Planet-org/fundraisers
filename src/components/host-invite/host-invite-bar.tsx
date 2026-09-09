@@ -17,6 +17,7 @@ import {
   Info,
   Link2Off,
   Loader2,
+  X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -274,11 +275,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         icon={<Info size={20} />}
         title={t('declined.title')}
         description={t('declined.description')}
-        action={
-          <Button variant='outline' onClick={() => setDismissed(true)}>
-            {t('close')}
-          </Button>
-        }
+        onDismiss={() => setDismissed(true)}
       />
     );
   }
@@ -290,11 +287,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         icon={<Clock size={20} />}
         title={t('expired.title')}
         description={t('expired.description')}
-        action={
-          <Button variant='outline' onClick={() => setDismissed(true)}>
-            {t('close')}
-          </Button>
-        }
+        onDismiss={() => setDismissed(true)}
       />
     );
   }
@@ -307,11 +300,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
       icon={<Link2Off size={20} />}
       title={t('invalid.title')}
       description={t('invalid.description')}
-      action={
-        <Button variant='outline' onClick={() => setDismissed(true)}>
-          {t('close')}
-        </Button>
-      }
+      onDismiss={() => setDismissed(true)}
     />
   );
 }
@@ -326,7 +315,7 @@ function Shell({
   return (
     <div
       className={cn(
-        'flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:bg-white/10',
+        'relative flex w-full flex-col gap-4 rounded-2xl border-2 bg-mode-base/40 p-5 sm:flex-row sm:items-center sm:justify-between dark:bg-white/10',
         tone === 'destructive'
           ? 'border-destructive/40'
           : 'border-white dark:border-none'
@@ -342,18 +331,33 @@ function Outcome({
   title,
   description,
   action,
+  onDismiss,
   tone = 'default',
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
-  action: React.ReactNode;
+  action?: React.ReactNode;
+  /** Shows a small close control in the corner; the fundraiser below is the natural next thing to look at. */
+  onDismiss?: () => void;
   /** `destructive` marks an outcome that closed the door, like an expired link. */
   tone?: 'default' | 'destructive';
 }) {
+  const t = useTranslations('HostInvite');
+
   return (
     <Shell tone={tone}>
-      <div className='flex items-start gap-3'>
+      {onDismiss && (
+        <button
+          type='button'
+          aria-label={t('close')}
+          onClick={onDismiss}
+          className='absolute top-2 right-2 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-mode-reverse/10 hover:text-foreground'
+        >
+          <X size={16} />
+        </button>
+      )}
+      <div className='flex items-start gap-3 pr-8'>
         <span
           className={cn(
             'mt-0.5 shrink-0',

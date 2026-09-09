@@ -25,7 +25,7 @@
     },
     "declined": {
       "title": "You declined this invitation",
-      "description": "You are not a host of this fundraiser. If you change your mind, ask a host to invite you again."
+      "description": "If you change your mind, ask a host to invite you again."
     },
     "expired": {
       "title": "This invitation has expired",
