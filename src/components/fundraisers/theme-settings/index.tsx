@@ -180,7 +180,7 @@ export function ThemeSettings() {
           </PopoverTrigger>
           <PopoverContent
             align='end'
-            className='w-80 max-h-[60vh] overflow-auto'
+            className='w-80 max-h-[60vh] overflow-auto p-2'
           >
             <ThemeBrowseGrid
               activeId={field.value.base_id}

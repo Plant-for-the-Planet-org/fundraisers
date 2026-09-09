@@ -59,6 +59,7 @@ export function ThemeBrowseGrid({
             key={theme.id}
             onClick={() => onPick(theme)}
             aria-pressed={active}
+            title={theme.name}
             className={cn(
               'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left',
               active
