@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createFundraiser } from '@/lib/api/create-fundraiser-service';
+import { publishFundraiser } from '@/lib/api/fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
 import { buildCreateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
 import { imageToBase64 } from '@/lib/utils/image-processor';
@@ -49,6 +50,12 @@ export function CreateFundraiserButton() {
       const fundraiser = await createFundraiser(request, accessToken);
       if (!fundraiser.slug) {
         throw new Error('Invalid response from server - missing slug');
+      }
+
+      // Every fundraiser is created as a draft; the status switch decides whether it goes live
+      // right away. Publishing is a separate call because the status is not writable on create.
+      if (values.status === 'active') {
+        await publishFundraiser(fundraiser.id, accessToken);
       }
       // Drop the hosted-fundraisers cache: the user now owns a fundraiser it does not know about, so its public-page edit shortcut would stay hidden until the cache refetches.
       useHostedFundraisersStore.getState().reset();

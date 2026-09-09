@@ -1,5 +1,6 @@
 import type {
   Fundraiser,
+  FundraiserTransition,
   UpdateFundraiserRequest,
 } from '@/lib/types/fundraiser';
 import type { RawFundraiser } from './normalize-fundraiser';
@@ -58,18 +59,54 @@ export async function updateFundraiser(
   );
 }
 
+/**
+ * Applies one `fundraiser_lifecycle` transition.
+ *
+ * The status is not writable through PUT: the platform's state machine owns it, and this is the
+ * only way to change it. A transition the current status forbids comes back as a 400 whose
+ * `details.allowedTransitions` lists what the fundraiser would accept instead.
+ *
+ * Only `reactivate` takes a payload (a future `endDate`).
+ */
+export async function applyFundraiserTransition(
+  id: string,
+  transition: FundraiserTransition,
+  token: string,
+  payload?: Record<string, unknown>
+): Promise<Fundraiser> {
+  return normalizeFundraiser(
+    await platformFetch<RawFundraiser>(
+      `/fundraisers/${id}/transition/${transition}`,
+      {
+        method: 'POST',
+        body: payload ?? {},
+        token,
+      }
+    )
+  );
+}
+
+/** Takes a draft live. */
+export function publishFundraiser(
+  id: string,
+  token: string
+): Promise<Fundraiser> {
+  return applyFundraiserTransition(id, 'publish', token);
+}
+
 export function pauseFundraiser(
   id: string,
   token: string
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { status: 'paused' }, token);
+  return applyFundraiserTransition(id, 'pause', token);
 }
 
+/** Brings a paused fundraiser back. A draft is published, not resumed. */
 export function resumeFundraiser(
   id: string,
   token: string
 ): Promise<Fundraiser> {
-  return updateFundraiser(id, { status: 'active' }, token);
+  return applyFundraiserTransition(id, 'resume', token);
 }
 
 /**

@@ -2,7 +2,11 @@
  * Utility functions for fundraisers
  */
 
-import type { Fundraiser } from '../types/fundraiser';
+import type {
+  Fundraiser,
+  FundraiserStatus,
+  FundraiserTransition,
+} from '../types/fundraiser';
 import type { Nullable } from '../types/utility';
 
 export interface FundraiserUrlData {
@@ -24,6 +28,31 @@ export function isFundraiserOwnerOrAdmin(
       host.user?.id === userId &&
       (host.role === 'owner' || host.role === 'admin')
   );
+}
+
+/**
+ * The lifecycle transition behind the form's on/off status switch, or null when the switch asks
+ * for something the fundraiser is already at or cannot do.
+ *
+ * The switch has two positions while the platform has six statuses, so the mapping is not
+ * symmetric:
+ * - on, from a draft, publishes it; from a paused fundraiser, resumes it.
+ * - off pauses a live fundraiser. There is no way back to `draft` once published — `pause` is what
+ *   "stop taking donations" means for a fundraiser that is already out in the world.
+ * - a completed or cancelled fundraiser is not reopened by the switch. Completed is reopened by
+ *   `reactivate`, which needs a new end date and belongs to its own flow.
+ */
+export function transitionForStatusToggle(
+  current: FundraiserStatus,
+  desired: 'draft' | 'active'
+): FundraiserTransition | null {
+  if (desired === 'active') {
+    if (current === 'draft') return 'publish';
+    if (current === 'paused') return 'resume';
+    return null;
+  }
+
+  return current === 'active' ? 'pause' : null;
 }
 
 /**

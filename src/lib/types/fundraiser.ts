@@ -171,6 +171,22 @@ export type FundraiserStatus =
   // Terminal state returned by DELETE /fundraisers/{id} when the fundraiser
   // has donations and cannot be hard-deleted. Read-only from the client.
   | 'archived';
+
+/**
+ * A move in the platform's `fundraiser_lifecycle` state machine.
+ *
+ * The status itself is read-only: it is never sent on create or update, and changes only through
+ * POST /fundraisers/{id}/transition/{transition}. Which transitions are legal depends on the
+ * current status, and the platform refuses the rest with the allowed set in the error.
+ */
+export type FundraiserTransition =
+  | 'publish'
+  | 'pause'
+  | 'resume'
+  | 'complete'
+  | 'reactivate'
+  | 'cancel'
+  | 'archive';
 export type FundraiserVisibility = 'public' | 'unlisted';
 
 // From API response - response structure for a single fundraiser in the list response (GET /fundraisers) and the details response (GET /fundraisers/{id}) is the same
@@ -205,7 +221,6 @@ export interface UpdateFundraiserRequest {
   description?: string;
   goalAmount?: number;
   visibility?: FundraiserVisibility;
-  status?: FundraiserStatus;
   projectAllocations?: Array<{
     percentage: number;
     project_id: string;
@@ -228,7 +243,8 @@ export interface CreateFundraiserRequest {
   goalAmount: number; // send as integer value. NOT IN CENTS. No decimals possible.
   currency: string; //TODO: update with possible value type
   visibility: FundraiserVisibility;
-  status: FundraiserStatus;
+  // No `status`: a new fundraiser is always created as a draft and published with the
+  // `publish` transition. See FundraiserTransition.
   projectAllocations: Array<{
     percentage: number;
     project_id: string;
