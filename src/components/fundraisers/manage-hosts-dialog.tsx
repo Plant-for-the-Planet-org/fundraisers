@@ -288,8 +288,10 @@ function HostRow({
   // The platform allows a resend from `invited` and `expired` only. A decline is final until the
   // row is removed, and an active host has nothing left to accept.
   const canResend = host.status === 'invited' || host.status === 'expired';
+  // Blocked by a guard rather than by a request in flight. The button stays focusable in this case, so a keyboard reader can reach the tooltip that says why; the click is what gets refused.
+  const removeBlocked = isLastAdmin || isLastPublic;
+  const removeDisabled = isSaving || removeBlocked;
   // Same DELETE either way, but for a pending invitation "revoke" is what actually happens.
-  const removeDisabled = isSaving || isLastAdmin || isLastPublic;
   const removeLabel = canResend ? t('revoke') : t('remove');
   const statusLabel = {
     active: null,
@@ -493,7 +495,8 @@ function HostRow({
 
       <button
         type='button'
-        disabled={removeDisabled}
+        disabled={isSaving}
+        aria-disabled={removeBlocked || undefined}
         aria-label={removeLabel}
         title={
           isLastAdmin
@@ -504,7 +507,9 @@ function HostRow({
                 ? t('revokeHint')
                 : removeLabel
         }
-        onClick={handleRemove}
+        onClick={() => {
+          if (!removeBlocked) void handleRemove();
+        }}
         className={cn(
           // Hover is lost while the pointer is captured for a drag, so the dragging row reveals its actions too.
           'shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-data-dragging:opacity-100 hover:text-destructive focus-visible:opacity-100',

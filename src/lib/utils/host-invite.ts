@@ -1,3 +1,5 @@
+import type { HostInvite } from '@/lib/types/host-invite';
+
 /**
  * The confirmation the fundraiser page shows after someone answers a co-host invitation.
  *
@@ -27,4 +29,18 @@ export function parseHostInviteNotice(
 /** Accepting is the one outcome worth interrupting for; the rest are told in passing. */
 export function isHostInviteNoticeProminent(notice: HostInviteNotice): boolean {
   return notice === 'accepted';
+}
+
+/**
+ * Whether a pending invitation has already run out of time.
+ *
+ * The platform writes the `expired` state in a daily sweep, so between the deadline and the sweep an invitation still reads as `pending` while answering it returns 409. Callers use this to show the expired outcome instead of actions that cannot work.
+ */
+export function isHostInviteLapsed(
+  invite: Pick<HostInvite, 'state' | 'expiresAt'>
+): boolean {
+  if (invite.state !== 'pending' || !invite.expiresAt) return false;
+
+  const deadline = new Date(invite.expiresAt).getTime();
+  return Number.isFinite(deadline) && deadline <= Date.now();
 }

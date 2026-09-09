@@ -13,6 +13,7 @@ import {
   acceptHostInvite,
   declineHostInvite,
 } from '@/lib/api/host-invite-service';
+import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,11 +32,20 @@ type View =
   | 'error';
 
 function viewFor(lookup: HostInviteLookup): View {
-  if (lookup.kind === 'found') return lookup.invite.state;
+  if (lookup.kind === 'found') return viewForInvite(lookup.invite);
 
   // A 404 is the ordinary case for a token replaced by a newer invitation, a link copied short, or
   // a platform where co-host invitations are not switched on yet — not an outage.
   return lookup.kind === 'not-found' ? 'invalid' : 'error';
+}
+
+/**
+ * A pending invitation whose deadline has passed is shown as expired: the platform only writes the
+ * `expired` state in a daily sweep, so until then answering it fails with a 409 and the actions
+ * would lead nowhere.
+ */
+function viewForInvite(invite: HostInvite): View {
+  return isHostInviteLapsed(invite) ? 'expired' : invite.state;
 }
 
 interface HostInviteCardProps {
@@ -106,7 +116,15 @@ export function HostInviteCard({ token, lookup, intent }: HostInviteCardProps) {
     if (result.kind === 'conflict') {
       setAnswered(
         result.invite
-          ? { view: result.invite.state, invite: result.invite }
+          ? {
+              // A refusal on an invitation that still reads as pending means its deadline passed
+              // before the sweep caught up, so it is expired rather than answerable.
+              view:
+                result.invite.state === 'pending'
+                  ? 'expired'
+                  : result.invite.state,
+              invite: result.invite,
+            }
           : { view: 'error', invite: null }
       );
       return;

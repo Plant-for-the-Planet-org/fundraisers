@@ -11,6 +11,7 @@ import {
   listMyHostInvites,
   respondToHostInvite,
 } from '@/lib/api/host-invite-service';
+import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,8 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
     async (token: string, signal: { aborted: boolean }) => {
       const result = await listMyHostInvites(token);
       if (signal.aborted || result === null) return;
-      setInvites(result);
+      // An invitation past its deadline still reads as pending until the platform's daily sweep, and answering it would only fail. Leave those out rather than offering actions that lead nowhere.
+      setInvites(result.filter(invite => !isHostInviteLapsed(invite)));
     },
     []
   );
