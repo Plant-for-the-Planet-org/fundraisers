@@ -1,6 +1,9 @@
 'use client';
 
-import type { HostInviteLookup } from '@/lib/api/host-invite-service';
+import type {
+  HostInviteAnswer,
+  HostInviteLookup,
+} from '@/lib/api/host-invite-service';
 import type { HostInvite } from '@/lib/types/host-invite';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
@@ -25,8 +28,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  acceptHostInvite,
   declineHostInvite,
+  listMyHostInvites,
+  respondToHostInvite,
 } from '@/lib/api/host-invite-service';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { cn } from '@/lib/utils';
@@ -124,15 +128,51 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const query = searchParams.toString();
   const currentPath = query ? `${pathname}?${query}` : pathname;
 
+  // Accepting needs a session. When the platform asks for one, the visitor goes to sign in and comes back here with `intent=accept`, and the acceptance they already asked for is finished for them. Once only: a second refusal is shown, not looped back to sign-in.
+  const resumedAccept = useRef(false);
+  const signInToAccept = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('intent', 'accept');
+    router.push(getSignInPath(`${pathname}?${params.toString()}`));
+  };
+
   const answer = async (choice: 'accept' | 'decline') => {
     setIsAnswering(true);
 
-    // Accepting binds a person to the fundraiser, so the platform wants the invited account for it; declining needs none. The session arrives asynchronously on this page, so the platform's answer is the source of truth rather than the store: a missing session goes to sign-in, a different account gets told so.
-    const result = await (choice === 'accept'
-      ? acceptHostInvite(token, accessToken ?? undefined)
-      : declineHostInvite(token));
+    // Two doors, by design of the platform. Declining needs no account and goes through the token route with no bearer. Accepting binds a person to the fundraiser, so it goes through the session: the signed-in visitor's own pending invitations name the row to answer, and an invitation for this fundraiser that is not in that list belongs to another account.
+    let result: HostInviteAnswer;
+    if (choice === 'decline') {
+      result = await declineHostInvite(token);
+    } else {
+      if (!accessToken) {
+        setIsAnswering(false);
+        signInToAccept();
+        return;
+      }
 
-    // Only the platform's own refusal code means the wrong account. A bare 401 means it rejected the session, whether missing or stale, and signing in again is the remedy either way.
+      const mine = await listMyHostInvites(accessToken);
+      if (mine === null) {
+        setIsAnswering(false);
+        toast.error(t('error.title'));
+        return;
+      }
+
+      const own = mine.find(
+        candidate =>
+          (invite?.fundraiser.id != null &&
+            candidate.fundraiser.id === invite.fundraiser.id) ||
+          (invite?.fundraiser.slug != null &&
+            candidate.fundraiser.slug === invite.fundraiser.slug)
+      );
+      if (!own) {
+        setIsAnswering(false);
+        setAnswered({ view: 'wrongAccount', invite });
+        return;
+      }
+
+      result = await respondToHostInvite(own.id, 'accept', accessToken);
+    }
+
     if (result.kind === 'forbidden') {
       setIsAnswering(false);
       setAnswered({ view: 'wrongAccount', invite });
@@ -141,7 +181,11 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
 
     if (result.kind === 'unauthorized') {
       setIsAnswering(false);
-      router.push(getSignInPath(currentPath));
+      if (choice === 'accept' && !resumedAccept.current) {
+        signInToAccept();
+        return;
+      }
+      toast.error(t('error.title'));
       return;
     }
 
@@ -185,6 +229,22 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
 
     toast.error(t('error.title'));
   };
+
+  useEffect(() => {
+    if (
+      view !== 'pending' ||
+      intent !== 'accept' ||
+      !isAuthenticated ||
+      !accessToken ||
+      resumedAccept.current
+    ) {
+      return;
+    }
+    resumedAccept.current = true;
+    void answer('accept');
+    // `answer` is recreated every render; the ref makes this a single attempt per page load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, intent, isAuthenticated, accessToken]);
 
   if (dismissed) return null;
 

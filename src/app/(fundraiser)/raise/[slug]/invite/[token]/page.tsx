@@ -48,7 +48,8 @@ export default async function HostInvitePage({
   const locale = await getLocale();
 
   const lookup = await getCachedHostInvite(token);
-  const declineSuffix = intent === 'decline' ? '?intent=decline' : '';
+  const declineSuffix =
+    intent === 'decline' || intent === 'accept' ? `?intent=${intent}` : '';
 
   // Hosts can rename a slug after an invitation is sent. The token names the fundraiser, so an
   // invitation that disagrees with the URL wins and the visitor is sent to the current slug.
