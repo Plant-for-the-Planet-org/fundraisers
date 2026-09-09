@@ -74,7 +74,6 @@ interface HostInviteBarProps {
   lookup: HostInviteLookup;
   /** `decline` comes from the smaller link in the email. It moves focus, nothing more. */
   intent?: string;
-  /** Where the fundraiser this invitation is about actually lives, once known. */
 }
 
 /**
@@ -126,23 +125,14 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const currentPath = query ? `${pathname}?${query}` : pathname;
 
   const answer = async (choice: 'accept' | 'decline') => {
-    // Accepting binds a person to the fundraiser, so it needs the invited account. The platform checks the address; this only saves a round trip for someone who is not signed in at all. Declining needs no account.
-    if (choice === 'accept' && !isAuthenticated) {
-      router.push(getSignInPath(currentPath));
-      return;
-    }
-
     setIsAnswering(true);
 
+    // Accepting binds a person to the fundraiser, so the platform wants the invited account for it; declining needs none. The session arrives asynchronously on this page, so the platform's answer is the source of truth rather than the store: a missing session goes to sign-in, a different account gets told so.
     const result = await (choice === 'accept'
       ? acceptHostInvite(token, accessToken ?? undefined)
       : declineHostInvite(token, accessToken ?? undefined));
 
-    // The platform answers 401 both for a missing session and for a session that is not the invited account. Signed in and refused therefore means the wrong account.
-    if (
-      result.kind === 'forbidden' ||
-      (result.kind === 'unauthorized' && isAuthenticated)
-    ) {
+    if (result.kind === 'forbidden') {
       setIsAnswering(false);
       setAnswered({ view: 'wrongAccount', invite });
       return;
