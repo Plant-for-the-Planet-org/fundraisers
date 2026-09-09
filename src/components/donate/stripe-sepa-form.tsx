@@ -59,14 +59,21 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
-    const { fundraiser } = useDonationForm();
+    const { fundraiser, donationData } = useDonationForm();
     const creditor = getSepaCreditor(fundraiser.workspace?.country);
 
     const { control } = useFormContext<DonationFormValues>();
-    const [firstname, lastname] = useWatch({
+    const [firstname, lastname, makeMonthly] = useWatch({
       control,
-      name: ['firstname', 'lastname'],
+      name: ['firstname', 'lastname', 'makeMonthly'],
     });
+
+    // A SEPA mandate must state whether it covers recurrent or one-off
+    // collections. Same recurring test the summary and the CTA use.
+    const isRecurring =
+      donationData.frequency === 'monthly' ||
+      donationData.frequency === 'yearly' ||
+      makeMonthly;
     const profileDisplayName = useAuthStore(
       state => state.user?.profile?.displayName
     );
@@ -207,11 +214,14 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
               <br />
               {creditor.id}
             </div>
+            <div>
+              <span className='font-medium'>{t('paymentType')}</span>
+              <br />
+              {isRecurring ? t('paymentTypeRecurrent') : t('paymentTypeOneOff')}
+            </div>
           </div>
 
           <p className='text-sm'>{t('mandateRights')}</p>
-
-          <p className='text-sm text-muted-foreground'>{t('mandateConsent')}</p>
         </div>
       </div>
     );

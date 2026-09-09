@@ -143,8 +143,10 @@
       "mandateIntro": "By providing your IBAN and confirming this payment, you authorise (A) {creditor} and Stripe, our payment service provider, to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with those instructions.",
       "creditor": "Creditor",
       "creditorId": "Creditor ID",
-      "mandateRights": "Your rights: You’re entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited.",
-      "mandateConsent": "By clicking “Donate”, you agree to the SEPA Direct Debit mandate and authorise the debit of your account."
+      "paymentType": "Type of payment",
+      "paymentTypeRecurrent": "Recurrent payment",
+      "paymentTypeOneOff": "One-off payment",
+      "mandateRights": "Your rights: You’re entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited."
     },
     "card": {
       "cardNumberLabel": "Card Number",

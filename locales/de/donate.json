@@ -143,8 +143,10 @@
       "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) {creditor} und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von {creditor} und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
       "creditorId": "Gläubiger-ID",
-      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen.",
-      "mandateConsent": "Mit Klick auf „Spenden“ stimmst du dem SEPA-Lastschriftmandat zu und ermächtigst die Abbuchung von deinem Konto."
+      "paymentType": "Zahlungsart",
+      "paymentTypeRecurrent": "Wiederkehrende Zahlung",
+      "paymentTypeOneOff": "Einmalige Zahlung",
+      "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen."
     },
     "card": {
       "cardNumberLabel": "Kartennummer",
