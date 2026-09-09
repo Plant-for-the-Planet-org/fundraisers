@@ -20,6 +20,7 @@ import {
   Mail,
   User,
   UserCog,
+  UserX,
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -27,6 +28,7 @@ import {
   acceptHostInvite,
   declineHostInvite,
 } from '@/lib/api/host-invite-service';
+import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { cn } from '@/lib/utils';
 import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
@@ -42,6 +44,7 @@ type View =
   | 'accepted'
   | 'declined'
   | 'expired'
+  | 'wrongAccount'
   | 'invalid'
   | 'error';
 
@@ -87,6 +90,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const accessToken = useAuthStore(state => state.accessToken);
+  const logout = useAuthStore(state => state.logout);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -118,17 +122,35 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
     }
   }, [view, intent]);
 
+  const query = searchParams.toString();
+  const currentPath = query ? `${pathname}?${query}` : pathname;
+
   const answer = async (choice: 'accept' | 'decline') => {
+    // Accepting binds a person to the fundraiser, so it needs the invited account. The platform checks the address; this only saves a round trip for someone who is not signed in at all. Declining needs no account.
+    if (choice === 'accept' && !isAuthenticated) {
+      router.push(getSignInPath(currentPath));
+      return;
+    }
+
     setIsAnswering(true);
 
     const result = await (choice === 'accept'
       ? acceptHostInvite(token, accessToken ?? undefined)
       : declineHostInvite(token, accessToken ?? undefined));
 
+    // The platform answers 401 both for a missing session and for a session that is not the invited account. Signed in and refused therefore means the wrong account.
+    if (
+      result.kind === 'forbidden' ||
+      (result.kind === 'unauthorized' && isAuthenticated)
+    ) {
+      setIsAnswering(false);
+      setAnswered({ view: 'wrongAccount', invite });
+      return;
+    }
+
     if (result.kind === 'unauthorized') {
-      const query = searchParams.toString();
-      const returnTo = query ? `${pathname}?${query}` : pathname;
-      router.push(`/login?redirectTo=${encodeURIComponent(returnTo)}`);
+      setIsAnswering(false);
+      router.push(getSignInPath(currentPath));
       return;
     }
 
@@ -303,6 +325,26 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         title={t('declined.title')}
         description={t('declined.description')}
         onDismiss={() => setDismissed(true)}
+      />
+    );
+  }
+
+  if (view === 'wrongAccount') {
+    return (
+      <Outcome
+        tone='destructive'
+        icon={<UserX size={20} />}
+        title={
+          invite?.invitedEmail
+            ? t('wrongAccount.title', { email: invite.invitedEmail })
+            : t('wrongAccount.titleNoEmail')
+        }
+        description={t('wrongAccount.description')}
+        action={
+          <Button variant='outline' onClick={() => logout(currentPath)}>
+            {t('wrongAccount.cta')}
+          </Button>
+        }
       />
     );
   }

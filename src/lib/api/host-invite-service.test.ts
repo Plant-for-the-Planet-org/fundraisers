@@ -112,6 +112,14 @@ describe('acceptHostInvite', () => {
     });
   });
 
+  it('reports a forbidden answer when the session is not the invited account', async () => {
+    mockedPlatformFetch.mockRejectedValueOnce(httpError(403));
+
+    await expect(acceptHostInvite('tok_abc', TOKEN)).resolves.toEqual({
+      kind: 'forbidden',
+    });
+  });
+
   it('re-reads the invitation when the platform refuses with a conflict', async () => {
     // 409 means it was already answered or has lapsed. The message is not shown; the fresh state is
     // what the page needs, and in the reader's own language.

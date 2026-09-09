@@ -25,6 +25,8 @@ export type HostInviteAnswer =
   | { kind: 'not-found' }
   /** The platform wants a session for this answer. The visitor signs in and comes back to the same link. */
   | { kind: 'unauthorized' }
+  /** The session belongs to someone other than the invited address. */
+  | { kind: 'forbidden' }
   | { kind: 'error' };
 
 /**
@@ -126,6 +128,10 @@ async function answerHostInvite(
 
     if (err instanceof PlatformAPIError && err.status === 401) {
       return { kind: 'unauthorized' };
+    }
+
+    if (err instanceof PlatformAPIError && err.status === 403) {
+      return { kind: 'forbidden' };
     }
 
     // 409 means the invitation was already answered, or its deadline passed. The message the platform sends is not shown: re-reading the invitation gives the state the page needs to render, in the reader's own language.

@@ -31,6 +31,12 @@
       "title": "Diese Einladung ist abgelaufen",
       "description": "Wenn du noch mitmachen möchtest, bitte eine*n Organisator*in des Spendenaufrufs, dich erneut einzuladen."
     },
+    "wrongAccount": {
+      "title": "Diese Einladung gilt für {email}",
+      "titleNoEmail": "Diese Einladung gilt für ein anderes Konto",
+      "description": "Du bist mit einem anderen Konto angemeldet. Wechsle zur eingeladenen Adresse, um anzunehmen.",
+      "cta": "Konto wechseln"
+    },
     "invalid": {
       "title": "Diese Einladung ist nicht mehr verfügbar",
       "description": "Vielleicht wurde sie zurückgezogen oder durch einen neueren Link ersetzt. Frag bei der*dem Organisator*in nach, wenn du noch mitmachen möchtest."

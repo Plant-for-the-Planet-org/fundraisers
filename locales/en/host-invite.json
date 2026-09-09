@@ -31,6 +31,12 @@
       "title": "This invitation has expired",
       "description": "If you still want to join, ask a host of the fundraiser to invite you again."
     },
+    "wrongAccount": {
+      "title": "This invitation is for {email}",
+      "titleNoEmail": "This invitation is for another account",
+      "description": "You are signed in with a different account. Switch to the invited address to accept.",
+      "cta": "Switch account"
+    },
     "invalid": {
       "title": "This invitation is no longer available",
       "description": "The host may have withdrawn it, or a newer link replaced it. Check with the host if you still want to join."
