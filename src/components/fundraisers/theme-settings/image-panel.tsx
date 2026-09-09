@@ -127,7 +127,7 @@ export function ImagePanel({
           items={IMAGES}
           activeId={imageUrl}
           onPick={onPick}
-          cols={3}
+          cols={4}
         />
       </div>
     </>
