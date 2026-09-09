@@ -1,4 +1,4 @@
-import { platformFetch } from '@/lib/api/platform-fetch';
+import { platformFetch } from './platform-fetch';
 
 export type HighlightImpactUnit = 'funding' | 'trees' | 'restoredM2';
 
