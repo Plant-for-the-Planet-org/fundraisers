@@ -4,8 +4,7 @@ import type { PendingHostInvite } from '@/lib/types/host-invite';
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useFormatter, useTranslations } from 'next-intl';
-import { CalendarClock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import {
   listMyHostInvites,
@@ -14,7 +13,7 @@ import {
 import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
-import { Button } from '@/components/ui/button';
+import { HostInvitePending } from '@/components/host-invite/host-invite-pending';
 
 interface PendingInvitationsProps {
   /** Called after an acceptance, because the fundraiser list below only contains fundraisers where you are already an active host. */
@@ -30,7 +29,6 @@ interface PendingInvitationsProps {
  */
 export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
   const t = useTranslations('HostInvite.dashboard');
-  const format = useFormatter();
   const accessToken = useAuthStore(state => state.accessToken);
 
   const [invites, setInvites] = useState<PendingHostInvite[]>([]);
@@ -111,63 +109,27 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
             key={invite.id}
             className='flex flex-col gap-3 rounded-xl border-2 border-card bg-card p-4 sm:flex-row sm:items-center sm:justify-between'
           >
-            <div className='flex min-w-0 flex-col gap-1'>
-              <p className='truncate font-medium text-foreground'>
-                {invite.fundraiser.slug ? (
-                  <Link
-                    href={`/raise/${invite.fundraiser.slug}`}
-                    className='hover:underline'
-                  >
-                    {invite.fundraiser.title}
-                  </Link>
-                ) : (
-                  invite.fundraiser.title
-                )}
-              </p>
-              <p className='text-sm text-muted-foreground'>
-                {invite.inviterName
-                  ? t('invitedBy', { inviter: invite.inviterName })
-                  : t('invited')}
-              </p>
-              <div className='flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground'>
-                <span className='inline-flex items-center gap-1.5'>
-                  {invite.isPublic ? <Eye size={13} /> : <EyeOff size={13} />}
-                  {invite.role === 'viewer' ? t('roleViewer') : t('roleAdmin')}
-                  {invite.isPublic ? ` · ${t('nameShown')}` : ''}
-                </span>
-                {invite.expiresAt && (
-                  <span className='inline-flex items-center gap-1.5'>
-                    <CalendarClock size={13} />
-                    {t('expires', {
-                      date: format.dateTime(new Date(invite.expiresAt), {
-                        dateStyle: 'medium',
-                      }),
-                    })}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className='flex shrink-0 gap-2'>
-              <Button
-                size='sm'
-                disabled={answering === invite.id}
-                onClick={() => void answer(invite, 'accept')}
-              >
-                {answering === invite.id && (
-                  <Loader2 className='animate-spin' size={14} />
-                )}
-                {t('accept')}
-              </Button>
-              <Button
-                size='sm'
-                variant='outline'
-                disabled={answering === invite.id}
-                onClick={() => void answer(invite, 'decline')}
-              >
-                {t('decline')}
-              </Button>
-            </div>
+            <HostInvitePending
+              layout='card'
+              invite={invite}
+              heading={
+                <p className='truncate font-medium text-foreground'>
+                  {invite.fundraiser.slug ? (
+                    <Link
+                      href={`/raise/${invite.fundraiser.slug}`}
+                      className='hover:underline'
+                    >
+                      {invite.fundraiser.title}
+                    </Link>
+                  ) : (
+                    invite.fundraiser.title
+                  )}
+                </p>
+              }
+              isAnswering={answering === invite.id}
+              onAccept={() => void answer(invite, 'accept')}
+              onDecline={() => void answer(invite, 'decline')}
+            />
           </li>
         ))}
       </ul>

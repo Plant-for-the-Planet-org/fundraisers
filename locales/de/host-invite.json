@@ -61,14 +61,6 @@
     "dashboard": {
       "title": "{count, plural, =1 {Du hast eine Einladung} other {Du hast # Einladungen}}",
       "subtitle": "Jemand hat dich eingeladen, seine Spendenaktion mitzugestalten. Du bist erst Organisator*in, wenn du zustimmst.",
-      "invitedBy": "Eingeladen von {inviter}",
-      "invited": "Du wurdest eingeladen",
-      "roleAdmin": "Kann die Spendenaktion bearbeiten",
-      "roleViewer": "Kann den Fortschritt verfolgen",
-      "nameShown": "dein Name würde auf der Seite gezeigt",
-      "expires": "Läuft am {date} ab",
-      "accept": "Annehmen",
-      "decline": "Ablehnen",
       "acceptedToast": "Du bist jetzt Organisator*in von {fundraiser}",
       "declinedToast": "Einladung abgelehnt.",
       "answerFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut."

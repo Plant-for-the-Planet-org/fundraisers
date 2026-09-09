@@ -9,20 +9,14 @@ import type { HostInvite } from '@/lib/types/host-invite';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useFormatter, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import {
   AlertTriangle,
-  CalendarClock,
   CheckCircle2,
   Clock,
-  Eye,
-  EyeOff,
   Info,
   Link2Off,
   Loader2,
-  Mail,
-  User,
-  UserCog,
   UserX,
   X,
 } from 'lucide-react';
@@ -36,6 +30,7 @@ import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { cn } from '@/lib/utils';
 import { isHostInviteLapsed } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
+import { HostInvitePending } from '@/components/host-invite/host-invite-pending';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -87,7 +82,6 @@ interface HostInviteBarProps {
  */
 export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const t = useTranslations('HostInvite');
-  const format = useFormatter();
   // A declined, expired or invalid invitation has nothing left to do here; the fundraiser is right below, so the bar just goes away.
   const [dismissed, setDismissed] = useState(false);
   const router = useRouter();
@@ -251,75 +245,14 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   if (view === 'pending' && invite) {
     return (
       <Shell>
-        <div className='flex flex-col gap-2.5'>
-          <p
-            className='text-sm font-medium'
-            style={{ color: 'var(--accent-color)' }}
-          >
-            {invite.inviterName
-              ? t('pending.eyebrowWithInviter', { inviter: invite.inviterName })
-              : t('pending.eyebrow')}
-          </p>
-          <ul className='grid gap-x-6 gap-y-1.5 text-sm text-muted-foreground sm:grid-cols-2'>
-            {invite.invitedEmail && (
-              <li className='flex items-center gap-2'>
-                <Mail size={16} className='shrink-0' />
-                {t('pending.invitedAs', { email: invite.invitedEmail })}
-              </li>
-            )}
-            <li className='flex items-center gap-2'>
-              {invite.role === 'viewer' ? (
-                <User size={16} className='shrink-0' />
-              ) : (
-                <UserCog size={16} className='shrink-0' />
-              )}
-              {invite.role === 'viewer'
-                ? t('pending.roleViewer')
-                : t('pending.roleAdmin')}
-            </li>
-            <li className='flex items-center gap-2'>
-              {invite.isPublic ? (
-                <Eye size={16} className='shrink-0' />
-              ) : (
-                <EyeOff size={16} className='shrink-0' />
-              )}
-              {invite.isPublic ? t('pending.publicYes') : t('pending.publicNo')}
-            </li>
-            {invite.expiresAt && (
-              <li className='flex items-center gap-2'>
-                <CalendarClock size={16} className='shrink-0' />
-                {t('pending.expires', {
-                  date: format.dateTime(new Date(invite.expiresAt), {
-                    dateStyle: 'medium',
-                  }),
-                })}
-              </li>
-            )}
-          </ul>
-        </div>
-        <div className='flex shrink-0 flex-wrap gap-2 lg:w-52 lg:flex-col'>
-          <Button
-            ref={declineRef}
-            variant='outline'
-            className='min-w-40 lg:w-full'
-            disabled={isAnswering}
-            onClick={() => void answer('decline')}
-          >
-            {t('pending.decline')}
-          </Button>
-          <Button
-            className='min-w-40 text-white hover:opacity-90 lg:w-full'
-            // Same as the video consent button: the fundraiser's accent, falling back to the primary colour outside a theme.
-            style={{
-              backgroundColor: 'var(--accent-color, hsl(var(--primary)))',
-            }}
-            disabled={isAnswering}
-            onClick={() => void answer('accept')}
-          >
-            {isAnswering && <Loader2 className='animate-spin' size={16} />}
-            {isAnswering ? t('pending.answering') : t('pending.accept')}
-          </Button>
-        </div>
+        <HostInvitePending
+          invite={invite}
+          showEmail
+          isAnswering={isAnswering}
+          onAccept={() => void answer('accept')}
+          onDecline={() => void answer('decline')}
+          declineRef={declineRef}
+        />
       </Shell>
     );
   }
