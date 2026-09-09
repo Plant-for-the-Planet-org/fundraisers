@@ -95,7 +95,7 @@ function AccentDot({
       title={title}
       aria-label={title}
       className={cn(
-        'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+        'w-8 h-8 rounded-full border-2 transition-all hover:scale-110',
         active
           ? 'border-foreground shadow-md'
           : 'border-border hover:border-foreground/40'
@@ -108,6 +108,10 @@ function AccentDot({
     </button>
   );
 }
+
+// Cap on palette dots shown, so the row's total dot count (palette + the
+// trailing custom dot) matches the background selector's 7 circles.
+const MAX_ACCENT_OPTIONS = 6;
 
 // Accent picker used by the Quick tab: the palette tokens plus a trailing
 // custom-colour picker dot (always shown), seeded to `bgColorHex`.
@@ -123,12 +127,13 @@ export function AccentDotRow({
   bgColorHex: string;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
   return (
     <ThemeChipRow
       label={tTheme('labelAccentColor')}
       aria-label={tTheme('labelAccentColor')}
     >
-      {colorOptions.map(accent => (
+      {displayedColorOptions.map(accent => (
         <AccentDot
           key={accent}
           active={value === accent}
