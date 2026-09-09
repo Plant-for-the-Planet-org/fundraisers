@@ -14,9 +14,9 @@ import {
   Clock,
   Eye,
   EyeOff,
+  Info,
   Link2Off,
   Loader2,
-  XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -271,7 +271,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   if (view === 'declined') {
     return (
       <Outcome
-        icon={<XCircle size={20} />}
+        icon={<Info size={20} />}
         title={t('declined.title')}
         description={t('declined.description')}
         action={
