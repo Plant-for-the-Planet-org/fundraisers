@@ -28,7 +28,10 @@ import {
 } from '@/lib/api/host-invite-service';
 import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { cn } from '@/lib/utils';
-import { isHostInviteLapsed } from '@/lib/utils/host-invite';
+import {
+  isHostInviteLapsed,
+  maskedEmailMayMatch,
+} from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
 import { HostInvitePending } from '@/components/host-invite/host-invite-pending';
 import { Button } from '@/components/ui/button';
@@ -87,6 +90,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const router = useRouter();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const accessToken = useAuthStore(state => state.accessToken);
+  const userEmail = useAuthStore(state => state.user?.email);
   const logout = useAuthStore(state => state.logout);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -151,13 +155,20 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         return;
       }
 
-      const own = mine.find(
-        candidate =>
-          (invite?.fundraiser.id != null &&
-            candidate.fundraiser.id === invite.fundraiser.id) ||
-          (invite?.fundraiser.slug != null &&
-            candidate.fundraiser.slug === invite.fundraiser.slug)
-      );
+      // The token lookup carries no row id, so the signed-in visitor's own pending row for this fundraiser stands in for it. The masked address on the token rules out the case where this account holds a different invitation for the same fundraiser than the link was sent for.
+      const addressedToMe =
+        !invite?.invitedEmail ||
+        !userEmail ||
+        maskedEmailMayMatch(invite.invitedEmail, userEmail);
+      const own = addressedToMe
+        ? mine.find(
+            candidate =>
+              (invite?.fundraiser.id != null &&
+                candidate.fundraiser.id === invite.fundraiser.id) ||
+              (invite?.fundraiser.slug != null &&
+                candidate.fundraiser.slug === invite.fundraiser.slug)
+          )
+        : undefined;
       if (!own) {
         setIsAnswering(false);
         setAnswered({ view: 'wrongAccount', invite });

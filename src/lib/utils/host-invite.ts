@@ -94,3 +94,17 @@ export function resolveHostInviteBarLookup(
 
   return lookup;
 }
+
+/**
+ * Whether a masked invitation address (`m***@example.org`, as the platform serves it) can belong to a full address.
+ *
+ * The mask keeps the first character and the domain, so those are compared, case-insensitively. A match is not proof; the platform makes the real check. A mismatch is proof enough to tell the visitor the invitation is for someone else without a round trip.
+ */
+export function maskedEmailMayMatch(masked: string, email: string): boolean {
+  const [maskedLocal = '', maskedDomain = ''] = masked.toLowerCase().split('@');
+  const [local = '', domain = ''] = email.toLowerCase().split('@');
+  if (!maskedDomain || !domain || maskedDomain !== domain) return false;
+
+  const visible = maskedLocal.replace(/\*+$/, '');
+  return local.startsWith(visible);
+}

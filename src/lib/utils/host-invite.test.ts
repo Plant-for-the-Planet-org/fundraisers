@@ -9,6 +9,7 @@ import {
   hostInviteMatchesFundraiser,
   isHostInviteLapsed,
   isHostInviteNoticeProminent,
+  maskedEmailMayMatch,
   parseHostInviteNotice,
   resolveHostInviteBarLookup,
 } from './host-invite';
@@ -169,5 +170,24 @@ describe('resolveHostInviteBarLookup', () => {
     expect(
       resolveHostInviteBarLookup({ kind: 'error' }, fundraiser('fr_1', 't'))
     ).toEqual({ kind: 'error' });
+  });
+});
+
+describe('maskedEmailMayMatch', () => {
+  it('accepts the same first letter and domain', () => {
+    expect(maskedEmailMayMatch('s***@aryal.me', 'sagar@aryal.me')).toBe(true);
+    expect(maskedEmailMayMatch('S***@Aryal.me', 'sagar@aryal.me')).toBe(true);
+  });
+
+  it('rejects another domain or another first letter', () => {
+    expect(maskedEmailMayMatch('s***@aryal.me', 'sagar@example.org')).toBe(
+      false
+    );
+    expect(maskedEmailMayMatch('m***@aryal.me', 'sagar@aryal.me')).toBe(false);
+  });
+
+  it('rejects malformed input rather than guessing', () => {
+    expect(maskedEmailMayMatch('s***', 'sagar@aryal.me')).toBe(false);
+    expect(maskedEmailMayMatch('s***@aryal.me', 'sagar')).toBe(false);
   });
 });

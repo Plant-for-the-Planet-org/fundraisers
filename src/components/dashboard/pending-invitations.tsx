@@ -37,7 +37,12 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
   const load = useCallback(
     async (token: string, signal: { aborted: boolean }) => {
       const result = await listMyHostInvites(token);
-      if (signal.aborted || result === null) return;
+      if (signal.aborted) return;
+      // A failed read shows nothing rather than a stale list that may belong to a previous session.
+      if (result === null) {
+        setInvites([]);
+        return;
+      }
       // An invitation past its deadline still reads as pending until the platform's daily sweep, and answering it would only fail. Leave those out rather than offering actions that lead nowhere.
       setInvites(result.filter(invite => !isHostInviteLapsed(invite)));
     },
@@ -45,6 +50,9 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
   );
 
   useEffect(() => {
+    // The list belongs to one identity. Whoever is signed in now starts from an empty list, so nothing from a previous session shows while theirs loads, and a sign-out clears it.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInvites([]);
     if (!accessToken) return;
 
     const signal = { aborted: false };
@@ -63,6 +71,12 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
     invite: PendingHostInvite,
     choice: 'accept' | 'decline'
   ) => {
+    // The deadline can pass while the dashboard stays open. Answering then only fails, so the row goes instead.
+    if (isHostInviteLapsed(invite)) {
+      setInvites(current => current.filter(row => row.id !== invite.id));
+      toast.error(t('expiredToast'));
+      return;
+    }
     if (!accessToken) return;
     setAnswering(invite.id);
 
@@ -91,6 +105,23 @@ export function PendingInvitations({ onAccepted }: PendingInvitationsProps) {
       toast.success(t('declinedToast'));
     }
   };
+
+  // Drop each row the moment its deadline passes, so no dead buttons stay on screen while the dashboard is open.
+  useEffect(() => {
+    const next = invites
+      .map(invite =>
+        invite.expiresAt ? new Date(invite.expiresAt).getTime() : NaN
+      )
+      .filter(time => Number.isFinite(time) && time > Date.now())
+      .sort((a, b) => a - b)[0];
+    if (next === undefined) return;
+    const timer = setTimeout(
+      () =>
+        setInvites(current => current.filter(row => !isHostInviteLapsed(row))),
+      Math.min(next - Date.now() + 1000, 2 ** 31 - 1)
+    );
+    return () => clearTimeout(timer);
+  }, [invites]);
 
   if (invites.length === 0) return null;
 

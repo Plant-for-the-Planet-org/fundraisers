@@ -63,7 +63,8 @@
       "subtitle": "Someone invited you to co-host their fundraiser. You are not a host until you accept.",
       "acceptedToast": "You are now a host of {fundraiser}",
       "declinedToast": "Invitation declined.",
-      "answerFailed": "We could not save your answer. Please try again."
+      "answerFailed": "We could not save your answer. Please try again.",
+      "expiredToast": "This invitation has expired."
     },
     "close": "Close"
   }

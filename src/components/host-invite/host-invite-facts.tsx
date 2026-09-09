@@ -23,6 +23,9 @@ export function HostInviteFacts({
 }: HostInviteFactsProps) {
   const t = useTranslations('HostInvite.pending');
   const format = useFormatter();
+  // A deadline the platform sends in a form Date cannot read is left out rather than rendered as "Invalid Date".
+  const deadline = invite.expiresAt ? new Date(invite.expiresAt) : null;
+  const hasDeadline = deadline !== null && Number.isFinite(deadline.getTime());
 
   return (
     <ul
@@ -53,13 +56,11 @@ export function HostInviteFacts({
         )}
         {invite.isPublic ? t('publicYes') : t('publicNo')}
       </li>
-      {invite.expiresAt && (
+      {hasDeadline && (
         <li className='flex items-center gap-2'>
           <CalendarClock size={16} className='shrink-0' />
           {t('expires', {
-            date: format.dateTime(new Date(invite.expiresAt), {
-              dateStyle: 'medium',
-            }),
+            date: format.dateTime(deadline, { dateStyle: 'medium' }),
           })}
         </li>
       )}
