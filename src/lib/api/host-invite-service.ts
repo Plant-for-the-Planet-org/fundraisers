@@ -102,11 +102,9 @@ export function acceptHostInvite(
   return answerHostInvite(token, 'accept', accessToken);
 }
 
-export function declineHostInvite(
-  token: string,
-  accessToken?: string
-): Promise<HostInviteAnswer> {
-  return answerHostInvite(token, 'decline', accessToken);
+/** Declining needs no account, so no bearer token goes with it: a session the platform rejects would otherwise turn a valid decline into a 401. */
+export function declineHostInvite(token: string): Promise<HostInviteAnswer> {
+  return answerHostInvite(token, 'decline');
 }
 
 async function answerHostInvite(
@@ -115,7 +113,7 @@ async function answerHostInvite(
   accessToken?: string
 ): Promise<HostInviteAnswer> {
   try {
-    // The token alone is enough to answer. A signed-in visitor sends their bearer token as well, so the platform can link the answer to their profile.
+    // Accepting needs the invited account, so the bearer token goes along; declining sends none.
     const invite = await platformFetch<HostInvite>(invitePath(token, action), {
       method: 'POST',
       token: accessToken,

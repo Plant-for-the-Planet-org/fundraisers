@@ -11,6 +11,7 @@ import type { PendingHostInvite } from '@/lib/types/host-invite';
 
 import {
   acceptHostInvite,
+  declineHostInvite,
   getHostInvite,
   listMyHostInvites,
   respondToHostInvite,
@@ -148,6 +149,19 @@ describe('acceptHostInvite', () => {
       kind: 'conflict',
       invite: null,
     });
+  });
+});
+
+describe('declineHostInvite', () => {
+  it('posts to the decline route without a token header, whoever is signed in', async () => {
+    mockedPlatformFetch.mockResolvedValueOnce(invite);
+
+    await declineHostInvite('tok_abc');
+
+    expect(mockedPlatformFetch).toHaveBeenCalledWith(
+      '/fundraiser-host-invites/tok_abc/decline',
+      { method: 'POST' }
+    );
   });
 });
 

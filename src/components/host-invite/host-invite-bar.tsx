@@ -130,8 +130,9 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
     // Accepting binds a person to the fundraiser, so the platform wants the invited account for it; declining needs none. The session arrives asynchronously on this page, so the platform's answer is the source of truth rather than the store: a missing session goes to sign-in, a different account gets told so.
     const result = await (choice === 'accept'
       ? acceptHostInvite(token, accessToken ?? undefined)
-      : declineHostInvite(token, accessToken ?? undefined));
+      : declineHostInvite(token));
 
+    // Only the platform's own refusal code means the wrong account. A bare 401 means it rejected the session, whether missing or stale, and signing in again is the remedy either way.
     if (result.kind === 'forbidden') {
       setIsAnswering(false);
       setAnswered({ view: 'wrongAccount', invite });
