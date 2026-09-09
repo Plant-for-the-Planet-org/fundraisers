@@ -1,6 +1,6 @@
 'use client';
 
-import type { DragEndEvent, Modifier } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import type {
   FundraiserHost,
   FundraiserHostRole,
@@ -27,6 +27,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import {
+  restrictToFirstScrollableAncestor,
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
@@ -75,12 +79,6 @@ interface ManageHostsDialogProps {
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// The list scrolls vertically, and a scroll container turns sideways movement into a horizontal scrollbar. Rows only ever swap up and down, so drop the x offset.
-const restrictToVerticalAxis: Modifier = ({ transform }) => ({
-  ...transform,
-  x: 0,
-});
 
 function countActiveAdmins(hosts: FundraiserHost[]): number {
   return hosts.filter(h => h.status === 'active' && h.role === 'admin').length;
@@ -202,7 +200,11 @@ export function ManageHostsDialog({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
+            // Rows only swap up and down, and the list is the scroll container: keep the dragged row on its axis and inside the list.
+            modifiers={[
+              restrictToVerticalAxis,
+              restrictToFirstScrollableAncestor,
+            ]}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
@@ -399,6 +401,7 @@ function HostRow({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
+      data-dragging={isDragging || undefined}
       className={cn(
         'group flex items-center gap-2.5 rounded-md px-1.5 py-2 hover:bg-accent',
         isDragging && 'bg-accent opacity-80'
@@ -408,7 +411,7 @@ function HostRow({
         ref={setActivatorNodeRef}
         type='button'
         aria-label={t('reorder')}
-        className='cursor-grab text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100'
+        className='cursor-grab text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100 group-data-dragging:opacity-100 focus-visible:opacity-100'
         {...attributes}
         {...listeners}
       >
@@ -503,10 +506,11 @@ function HostRow({
         }
         onClick={handleRemove}
         className={cn(
-          'shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100',
+          // Hover is lost while the pointer is captured for a drag, so the dragging row reveals its actions too.
+          'shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-data-dragging:opacity-100 hover:text-destructive focus-visible:opacity-100',
           // A disabled action stays visible but dimmed, so its tooltip explaining why is still reachable.
           removeDisabled &&
-            'cursor-not-allowed group-hover:opacity-40 focus-visible:opacity-40'
+            'cursor-not-allowed group-hover:opacity-40 group-data-dragging:opacity-40 focus-visible:opacity-40'
         )}
       >
         {isSaving ? (
