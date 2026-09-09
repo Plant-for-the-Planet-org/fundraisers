@@ -18,7 +18,7 @@ interface HostInvitePendingProps {
   heading?: ReactNode;
   /** The dashboard already is the invited person's own account, so it leaves the address out. */
   showEmail?: boolean;
-  /** `bar` puts the buttons in a column beside the text on desktop; `card` keeps a compact row. */
+  /** Both stack the buttons beside the text on desktop; `card` uses the smaller size for a list. */
   layout?: 'bar' | 'card';
   isAnswering: boolean;
   onAccept: () => void;
@@ -63,15 +63,15 @@ export function HostInvitePending({
 
       <div
         className={cn(
-          'flex shrink-0 flex-wrap gap-2',
-          !compact && 'lg:w-52 lg:flex-col'
+          'flex shrink-0 flex-wrap gap-2 lg:flex-col',
+          compact ? 'lg:w-44' : 'lg:w-52'
         )}
       >
         <Button
           ref={declineRef}
           variant='outline'
           size={compact ? 'sm' : 'default'}
-          className={cn(compact ? 'min-w-28' : 'min-w-40 lg:w-full')}
+          className={cn(compact ? 'min-w-28' : 'min-w-40', 'lg:w-full')}
           disabled={isAnswering}
           onClick={onDecline}
         >
@@ -80,8 +80,8 @@ export function HostInvitePending({
         <Button
           size={compact ? 'sm' : 'default'}
           className={cn(
-            'text-white hover:opacity-90',
-            compact ? 'min-w-28' : 'min-w-40 lg:w-full'
+            'text-white hover:opacity-90 lg:w-full',
+            compact ? 'min-w-28' : 'min-w-40'
           )}
           // Same as the video consent button: the fundraiser's accent, falling back to the app colour outside a theme.
           style={{
