@@ -31,7 +31,23 @@
     },
     "closedForContribution": {
       "title": "Vielen Dank für die Unterstützung!",
-      "defaultMessage": "Dieser Spendenaufruf wurde archiviert und sammelt keine Spenden mehr."
+      "titleGoalReached": "Ziel erreicht, dank {count, plural, one {# Spende} other {# Spenden}}",
+      "fundedBadge": "{percent, number} % finanziert",
+      "raised": "Gemeinsam habt ihr {amount} gesammelt.",
+      "raisedForProject": "Gemeinsam habt ihr {amount} für {project} gesammelt.",
+      "impactLine": "Eure Spenden {impact}.",
+      "impactTrees": "pflanzen {count, plural, one {# Baum} other {# Bäume}}",
+      "impactRestored": "renaturieren {area} Wald",
+      "impactConserved": "schützen {area} Wald",
+      "impactFunding": "unterstützen die Mission von Plant-for-the-Planet",
+      "areaHa": "{area} ha",
+      "areaM2": "{area} m²",
+      "closedNote": "Dieser Spendenaufruf nimmt keine neuen Spenden mehr an.",
+      "exploreCta": "Weitere Spendenaufrufe entdecken",
+      "shareCta": "Teilen",
+      "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",
+      "shareCopied": "Link kopiert!",
+      "shareFailed": "Der Link konnte nicht geteilt werden. Bitte erneut versuchen."
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",

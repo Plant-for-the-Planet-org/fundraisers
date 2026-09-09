@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
+import type { AlltimeStats } from '@/lib/api/alltime-stats';
 
 import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { getAlltimeStats } from '@/lib/api/alltime-stats';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
@@ -185,7 +187,26 @@ export default async function FundraiserPage({
     }
   }
 
+  // Closed fundraisers show their impact instead of the donation form. Stats are optional: a failed call only drops the impact line.
+  let impact: AlltimeStats['stats']['impact'] | undefined;
+  if (!fundraiser.canDonate) {
+    try {
+      const { stats, settings } = await getAlltimeStats(
+        fundraiser.slug || fundraiser.id
+      );
+      if (settings.show_impact) {
+        impact = stats?.impact;
+      }
+    } catch (e) {
+      if (!(e instanceof PlatformAPIError)) throw e;
+    }
+  }
+
   return (
-    <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+    <FundraiserView
+      fundraiser={fundraiser}
+      paymentOptions={paymentOptions}
+      impact={impact}
+    />
   );
 }
