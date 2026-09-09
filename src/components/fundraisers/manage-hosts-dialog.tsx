@@ -41,6 +41,7 @@ import {
   resendFundraiserHostInvite,
   updateFundraiserHost,
 } from '@/lib/api/fundraiser-hosts-service';
+import { platformUserMessage } from '@/lib/api/http-error-classifier';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
@@ -289,10 +290,14 @@ function HostRow({
 
   const handleError = (err: unknown) => {
     console.error('Host update failed:', err);
+    // The platform explains its own refusals, and a status code cannot tell them apart: the caps,
+    // the draft rule and the resend cooldown all arrive as 409 with the same code, and only the
+    // sentence says which one happened.
     toast.error(
-      err instanceof PlatformAPIError && err.status === 409
-        ? t('toastDuplicate')
-        : t('toastError')
+      platformUserMessage(err) ??
+        (err instanceof PlatformAPIError && err.status === 409
+          ? t('toastDuplicate')
+          : t('toastError'))
     );
   };
 
@@ -350,9 +355,10 @@ function HostRow({
     } catch (err) {
       console.error('Resending a host invitation failed:', err);
       toast.error(
-        err instanceof PlatformAPIError && err.status === 409
-          ? t('toastResendRefused')
-          : t('toastError')
+        platformUserMessage(err) ??
+          (err instanceof PlatformAPIError && err.status === 409
+            ? t('toastResendRefused')
+            : t('toastError'))
       );
     } finally {
       setIsSaving(false);
@@ -536,13 +542,22 @@ function AddHostForm({
       );
     } catch (err) {
       console.error('Add host failed:', err);
-      // A duplicate host is rejected as a validation error (HTTP 400), which —
-      // given the email is already format-checked client-side — is the only
-      // realistic validation failure on add. 409 is kept for forward-compat.
+      // The platform's own sentence first, where it wrote one. Adding a host can be refused for
+      // several reasons that all arrive as 409 — the fundraiser is still a draft, it already has 20
+      // invitations waiting, this person has hit their daily limit — and telling all of them "this
+      // person is already a host" would be wrong for every one of them.
+      //
+      // A duplicate is the case with no sentence: it is raised as a validation failure (HTTP 400),
+      // whose text sits under `parameters.errors` and reads like an assertion rather than something
+      // to show somebody. Since the email is already format-checked client-side, it is the only
+      // realistic validation failure on add.
       const isDuplicate =
         err instanceof PlatformAPIError &&
         (err.status === 400 || err.status === 409);
-      toast.error(isDuplicate ? t('toastDuplicate') : t('toastError'));
+      toast.error(
+        platformUserMessage(err) ??
+          (isDuplicate ? t('toastDuplicate') : t('toastError'))
+      );
     } finally {
       setIsSubmitting(false);
     }
