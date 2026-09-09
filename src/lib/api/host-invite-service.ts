@@ -23,6 +23,8 @@ export type HostInviteAnswer =
   /** The platform refused because the invitation had already moved on. Carries the authoritative state where it could be re-read. */
   | { kind: 'conflict'; invite: HostInvite | null }
   | { kind: 'not-found' }
+  /** The platform wants a session for this answer. The visitor signs in and comes back to the same link. */
+  | { kind: 'unauthorized' }
   | { kind: 'error' };
 
 /**
@@ -91,26 +93,39 @@ export async function getHostInvite(token: string): Promise<HostInviteLookup> {
 /** The layout reads the invitation to theme the page and the page reads it again to render it, so both go through this and the token is only looked up once per request. */
 export const getCachedHostInvite = cache(getHostInvite);
 
-export function acceptHostInvite(token: string): Promise<HostInviteAnswer> {
-  return answerHostInvite(token, 'accept');
+export function acceptHostInvite(
+  token: string,
+  accessToken?: string
+): Promise<HostInviteAnswer> {
+  return answerHostInvite(token, 'accept', accessToken);
 }
 
-export function declineHostInvite(token: string): Promise<HostInviteAnswer> {
-  return answerHostInvite(token, 'decline');
+export function declineHostInvite(
+  token: string,
+  accessToken?: string
+): Promise<HostInviteAnswer> {
+  return answerHostInvite(token, 'decline', accessToken);
 }
 
 async function answerHostInvite(
   token: string,
-  action: 'accept' | 'decline'
+  action: 'accept' | 'decline',
+  accessToken?: string
 ): Promise<HostInviteAnswer> {
   try {
+    // The token alone is enough to answer. A signed-in visitor sends their bearer token as well, so the platform can link the answer to their profile.
     const invite = await platformFetch<HostInvite>(invitePath(token, action), {
       method: 'POST',
+      token: accessToken,
     });
     return { kind: 'answered', invite };
   } catch (err) {
     if (isNotFound(err)) {
       return { kind: 'not-found' };
+    }
+
+    if (err instanceof PlatformAPIError && err.status === 401) {
+      return { kind: 'unauthorized' };
     }
 
     // 409 means the invitation was already answered, or its deadline passed. The message the platform sends is not shown: re-reading the invitation gives the state the page needs to render, in the reader's own language.

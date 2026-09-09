@@ -5,7 +5,7 @@ import type { HostInvite } from '@/lib/types/host-invite';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import {
   AlertTriangle,
@@ -86,6 +86,9 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const [dismissed, setDismissed] = useState(false);
   const router = useRouter();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const accessToken = useAuthStore(state => state.accessToken);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // What the server sent is the truth until this page learns otherwise, which only happens when
   // the platform refuses an answer because the invitation had already moved on. Held as an
@@ -119,8 +122,15 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
     setIsAnswering(true);
 
     const result = await (choice === 'accept'
-      ? acceptHostInvite(token)
-      : declineHostInvite(token));
+      ? acceptHostInvite(token, accessToken ?? undefined)
+      : declineHostInvite(token, accessToken ?? undefined));
+
+    if (result.kind === 'unauthorized') {
+      const query = searchParams.toString();
+      const returnTo = query ? `${pathname}?${query}` : pathname;
+      router.push(`/login?redirectTo=${encodeURIComponent(returnTo)}`);
+      return;
+    }
 
     if (result.kind === 'answered') {
       const slug = result.invite.fundraiser.slug;
@@ -266,7 +276,13 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
         title={t('accepted.title')}
         description={t('accepted.description')}
         action={
-          <Button asChild>
+          <Button
+            asChild
+            className='text-white hover:opacity-90'
+            style={{
+              backgroundColor: 'var(--accent-color, hsl(var(--primary)))',
+            }}
+          >
             <Link
               href={
                 isAuthenticated ? '/dashboard' : '/login?redirectTo=/dashboard'

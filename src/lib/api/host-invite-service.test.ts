@@ -93,6 +93,25 @@ describe('acceptHostInvite', () => {
     );
   });
 
+  it('sends the bearer token when the visitor is signed in', async () => {
+    mockedPlatformFetch.mockResolvedValueOnce(invite);
+
+    await acceptHostInvite('tok_abc', TOKEN);
+
+    expect(mockedPlatformFetch).toHaveBeenCalledWith(
+      '/fundraiser-host-invites/tok_abc/accept',
+      { method: 'POST', token: TOKEN }
+    );
+  });
+
+  it('reports an unauthorized answer so the page can send the visitor to sign in', async () => {
+    mockedPlatformFetch.mockRejectedValueOnce(httpError(401));
+
+    await expect(acceptHostInvite('tok_abc')).resolves.toEqual({
+      kind: 'unauthorized',
+    });
+  });
+
   it('re-reads the invitation when the platform refuses with a conflict', async () => {
     // 409 means it was already answered or has lapsed. The message is not shown; the fresh state is
     // what the page needs, and in the reader's own language.
