@@ -27,3 +27,12 @@ export interface HostInvite {
     slug: Nullable<string>;
   };
 }
+
+/**
+ * An invitation read while signed in, which carries the host row's id as well.
+ *
+ * Only the authenticated routes return it: the token routes name an invitation by its token and have no use for an id, so the public payload stays as narrow as it was. Answering from the dashboard needs it, because that is what `/respond` addresses an invitation by.
+ */
+export interface PendingHostInvite extends HostInvite {
+  id: string;
+}
