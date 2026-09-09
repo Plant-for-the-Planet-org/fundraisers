@@ -71,7 +71,7 @@ export default async function HostInvitePage({
 
   if (result.kind === 'auth-retry') {
     return (
-      <>
+      <div className='flex flex-col gap-6'>
         <HostInviteBar
           token={token}
           lookup={lookup}
@@ -79,7 +79,7 @@ export default async function HostInvitePage({
           fundraiserSlug={slug}
         />
         <FundraiserAuthRetry slug={slug} />
-      </>
+      </div>
     );
   }
 
@@ -87,7 +87,7 @@ export default async function HostInvitePage({
   const barLookup = resolveHostInviteBarLookup(lookup, fundraiser);
 
   return (
-    <>
+    <div className='flex flex-col gap-6'>
       <HostInviteBar
         token={token}
         lookup={barLookup}
@@ -95,6 +95,6 @@ export default async function HostInvitePage({
         fundraiserSlug={fundraiser.slug}
       />
       <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
-    </>
+    </div>
   );
 }
