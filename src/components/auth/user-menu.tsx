@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, Compass, CreditCard, Plus, UserCog } from 'lucide-react';
+import { useHeaderVisibility } from '@/lib/hooks/use-header-visibility';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
@@ -35,7 +35,7 @@ export function UserMenu() {
   const tHeaderLinks = useTranslations('Common.headerLinks');
   const tAuth = useTranslations('Auth');
 
-  const pathname = usePathname();
+  const visibility = useHeaderVisibility();
   // store: state
   const user = useAuthStore(state => state.user);
   const profile = useAuthStore(state => state.user?.profile);
@@ -46,16 +46,9 @@ export function UserMenu() {
     return <div className='w-14 h-8 bg-gray-200 rounded-full animate-pulse' />;
   }
 
-  // Auth-flow pages have their own sign-in entry point, so the header button
-  // is redundant there (and would capture the page itself as redirectTo).
-  const isAuthFlowPage =
-    pathname.startsWith('/login') || pathname.startsWith('/verify-email');
-
-  if (!isAuthInitializing && !isAuthenticated && !isAuthFlowPage) {
-    return <SignInButton />;
+  if (!isAuthenticated) {
+    return visibility.signInButton ? <SignInButton /> : null;
   }
-
-  if (!isAuthenticated) return null;
 
   const profileImage = profile?.image || user?.picture;
   const profileImageUrl = getImageUrl('profile', 'thumb', profileImage);
@@ -106,24 +99,32 @@ export function UserMenu() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
-            <Link href='/explore' className='flex items-center'>
-              <Compass className='mr-2 h-4 w-4' />
-              <span>{tHeaderLinks('explore')}</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
-            <Link href='/fundraisers/create' className='flex items-center'>
-              <Plus className='mr-2 h-4 w-4' />
-              <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild className='cursor-pointer'>
-            <Link href='/dashboard' className='flex items-center'>
-              <CreditCard className='mr-2 h-4 w-4' />
-              <span>{tDashboard('breadcrumb.dashboard')}</span>
-            </Link>
-          </DropdownMenuItem>
+          {/* `xs:hidden`: these two mirror the primary nav, which takes over at
+              that breakpoint — so a route that hides the nav hides them too. */}
+          {visibility.exploreMenuItem && (
+            <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
+              <Link href='/explore' className='flex items-center'>
+                <Compass className='mr-2 h-4 w-4' />
+                <span>{tHeaderLinks('explore')}</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {visibility.startFundraiserMenuItem && (
+            <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
+              <Link href='/fundraisers/create' className='flex items-center'>
+                <Plus className='mr-2 h-4 w-4' />
+                <span>{tFundraiser('startFundraiser')}</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          {visibility.dashboardMenuItem && (
+            <DropdownMenuItem asChild className='cursor-pointer'>
+              <Link href='/dashboard' className='flex items-center'>
+                <CreditCard className='mr-2 h-4 w-4' />
+                <span>{tDashboard('breadcrumb.dashboard')}</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           {canImpersonate && (
             <DropdownMenuItem
               className='cursor-pointer'
