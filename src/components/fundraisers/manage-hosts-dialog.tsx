@@ -48,6 +48,7 @@ import {
 import { platformUserMessage } from '@/lib/api/http-error-classifier';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { cn } from '@/lib/utils';
+import { isValidEmail, normalizeEmail } from '@/lib/utils/email';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
@@ -77,8 +78,6 @@ interface ManageHostsDialogProps {
   hosts: FundraiserHost[];
   onHostsChange: (hosts: FundraiserHost[]) => void;
 }
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function countActiveAdmins(hosts: FundraiserHost[]): number {
   return hosts.filter(h => h.status === 'active' && h.role === 'admin').length;
@@ -544,7 +543,7 @@ function AddHostForm({
   const [role, setRole] = useState<FundraiserHostRole>('viewer');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const emailIsValid = EMAIL_PATTERN.test(email.trim());
+  const emailIsValid = isValidEmail(email);
 
   const handleAdd = async () => {
     if (!token || !emailIsValid || isSubmitting) return;
@@ -553,7 +552,7 @@ function AddHostForm({
       const created = await addFundraiserHost(
         fundraiserId,
         {
-          email: email.trim(),
+          email,
           role,
           // New hosts are public by default so they appear on the fundraiser
           // page right away; togglable per row afterwards.
@@ -566,7 +565,7 @@ function AddHostForm({
       setRole('viewer');
       toast.success(
         created.status === 'invited'
-          ? t('toastInvited', { email: created.invitedEmail ?? email.trim() })
+          ? t('toastInvited', { email: created.invitedEmail ?? email })
           : t('toastAdded')
       );
     } catch (err) {
@@ -600,7 +599,8 @@ function AddHostForm({
         value={email}
         placeholder={t('emailPlaceholder')}
         className='flex-1'
-        onChange={event => setEmail(event.target.value)}
+        aria-invalid={email.length > 0 && !emailIsValid}
+        onChange={event => setEmail(normalizeEmail(event.target.value))}
         onKeyDown={event => {
           if (event.key === 'Enter') handleAdd();
         }}
