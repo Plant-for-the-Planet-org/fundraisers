@@ -32,6 +32,7 @@
     "closedForContribution": {
       "title": "Thank you for your support!",
       "titleGoalReached": "Goal reached, thanks to {count, plural, one {# donation} other {# donations}}",
+      "titleNotAvailable": "Donations are not available",
       "fundedBadge": "{percent, number}% funded",
       "raised": "Together you raised {amount}.",
       "raisedForProject": "Together you raised {amount} for {project}.",
@@ -43,6 +44,7 @@
       "areaHa": "{area} ha",
       "areaM2": "{area} m²",
       "closedNote": "This fundraiser no longer accepts new donations.",
+      "notAvailableNote": "Check with the host.",
       "exploreCta": "Explore other fundraisers",
       "shareCta": "Share",
       "shareText": "{title} raised {amount}. Thank you to everyone who gave!",

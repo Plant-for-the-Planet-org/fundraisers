@@ -32,6 +32,7 @@
     "closedForContribution": {
       "title": "Vielen Dank für die Unterstützung!",
       "titleGoalReached": "Ziel erreicht, dank {count, plural, one {# Spende} other {# Spenden}}",
+      "titleNotAvailable": "Spenden sind nicht möglich",
       "fundedBadge": "{percent, number} % finanziert",
       "raised": "Gemeinsam habt ihr {amount} gesammelt.",
       "raisedForProject": "Gemeinsam habt ihr {amount} für {project} gesammelt.",
@@ -43,6 +44,7 @@
       "areaHa": "{area} ha",
       "areaM2": "{area} m²",
       "closedNote": "Dieser Spendenaufruf nimmt keine neuen Spenden mehr an.",
+      "notAvailableNote": "Wende dich an die Organisator*innen.",
       "exploreCta": "Weitere Spendenaufrufe entdecken",
       "shareCta": "Teilen",
       "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",

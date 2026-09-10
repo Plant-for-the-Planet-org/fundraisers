@@ -19,6 +19,8 @@ export interface FundraiserImpact {
 
 interface ClosedForContributionProps {
   title: string;
+  /** True once the fundraiser has run its course. Only then is the celebratory copy true. */
+  concluded: boolean;
   raisedAmount: number;
   goalAmount: number;
   currency: string | null | undefined;
@@ -32,6 +34,7 @@ interface ClosedForContributionProps {
 
 export function ClosedForContribution({
   title,
+  concluded,
   raisedAmount,
   goalAmount,
   currency,
@@ -43,19 +46,21 @@ export function ClosedForContribution({
   const t = useTranslations('Fundraisers.closedForContribution');
   const locale = useLocale();
 
-  const goalReached = goalAmount > 0 && raisedAmount >= goalAmount;
+  // A paused or cancelled fundraiser can sit above its goal without having ended, so the badge and the goal-reached heading are held back until it has actually concluded.
+  const goalReached = concluded && goalAmount > 0 && raisedAmount >= goalAmount;
   const fundedPercent = goalReached
     ? Math.round((raisedAmount / goalAmount) * 100)
     : 0;
   const amount = formatCurrencyFromDecimal(raisedAmount, currency, locale);
 
-  const heading =
-    goalReached && donationCount > 0
+  const heading = !concluded
+    ? t('titleNotAvailable')
+    : goalReached && donationCount > 0
       ? t('titleGoalReached', { count: donationCount })
       : t('title');
 
   const raisedSentence =
-    raisedAmount <= 0
+    !concluded || raisedAmount <= 0
       ? null
       : projectNames.length === 1
         ? t('raisedForProject', { amount, project: projectNames[0] })
@@ -82,7 +87,8 @@ export function ClosedForContribution({
     return parts;
   }
 
-  const impactParts = SHOW_IMPACT_LINE ? buildImpactParts(impact) : [];
+  const impactParts =
+    SHOW_IMPACT_LINE && concluded ? buildImpactParts(impact) : [];
   const impactSentence =
     raisedAmount > 0 && impactParts.length > 0
       ? t('impactLine', {
@@ -93,7 +99,11 @@ export function ClosedForContribution({
         })
       : null;
 
-  const body = [raisedSentence, impactSentence, t('closedNote')]
+  const body = [
+    raisedSentence,
+    impactSentence,
+    concluded ? t('closedNote') : t('notAvailableNote'),
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -101,8 +111,8 @@ export function ClosedForContribution({
     if (!sharePath) return;
     // Built from the canonical path, so the sharer's own landing params never travel with the link. Tokens are listed in docs/naming.md.
     const url = new URL(sharePath, window.location.origin);
-    url.searchParams.set('utm_source', 'fr');
-    url.searchParams.set('utm_medium', 'cl_bnr');
+    url.searchParams.set('utm_source', 'fundraiser');
+    url.searchParams.set('utm_medium', 'closed_banner');
     const shareUrl = url.toString();
     const text = t('shareText', { title, amount });
 
@@ -139,7 +149,7 @@ export function ClosedForContribution({
         >
           {heading}
         </h2>
-        <p className='text-muted-foreground text-sm'>{body}</p>
+        {body && <p className='text-muted-foreground text-sm'>{body}</p>}
       </div>
 
       <div className='flex flex-wrap gap-2'>
@@ -149,7 +159,7 @@ export function ClosedForContribution({
             {t('exploreCta')}
           </Link>
         </Button>
-        {sharePath && (
+        {concluded && sharePath && (
           <Button variant='ghost' size='sm' onClick={handleShare}>
             <Share2 aria-hidden='true' />
             {t('shareCta')}

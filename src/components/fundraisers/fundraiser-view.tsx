@@ -9,6 +9,7 @@ import {
   convertTotalRaisedToSingleCurrency,
   getDaysLeft,
   getFundraiserUrl,
+  hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
 import {
   ClosedForContribution,
@@ -184,6 +185,7 @@ export function FundraiserView({
         ) : (
           <ClosedForContribution
             title={fundraiser.title}
+            concluded={hasFundraiserConcluded(fundraiser)}
             raisedAmount={totalRaisedAmount}
             goalAmount={fundraiser.goalAmount}
             currency={fundraiser.currency}
