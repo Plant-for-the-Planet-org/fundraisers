@@ -73,13 +73,8 @@ export async function generateMetadata({
   try {
     const fundraiser = await getCachedFundraiser(slug, locale);
 
-    if (fundraiser.visibility !== 'public') {
-      return {
-        title: fundraiser.title,
-        robots: 'noindex, nofollow',
-      };
-    }
-
+    // Unlisted fundraisers keep their share tags so a link pasted into chat still previews properly. Only the crawler directives change; `robots` alone keeps them out of search.
+    const isPublic = fundraiser.visibility === 'public';
     const description = getMetadataDescription(fundraiser.description);
     const canonicalUrl = getFundraiserUrl({
       id: fundraiser.id,
@@ -90,9 +85,9 @@ export async function generateMetadata({
     return {
       title: fundraiser.title,
       description,
-      alternates: {
-        canonical: canonicalUrl,
-      },
+      ...(isPublic
+        ? { alternates: { canonical: canonicalUrl } }
+        : { robots: 'noindex, nofollow' }),
       openGraph: {
         title: fundraiser.title,
         description,
