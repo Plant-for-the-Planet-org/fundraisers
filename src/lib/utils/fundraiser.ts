@@ -130,3 +130,25 @@ export function getDaysLeft(endDate: string): number {
     Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   );
 }
+
+/**
+ * True when the fundraiser has run its course, which is the only state that earns celebratory copy.
+ *
+ * Everything else that cannot take a donation is either temporary, never launched, or broken, so saying "goal reached" there would tell the visitor the fundraiser ended well when it did not end at all.
+ */
+export function hasFundraiserConcluded(
+  fundraiser: Pick<Fundraiser, 'status' | 'canDonate' | 'endDate'>
+): boolean {
+  switch (fundraiser.status) {
+    case 'completed':
+    case 'archived':
+      return true;
+    case 'cancelled':
+    case 'paused':
+    case 'draft':
+      return false;
+  }
+  // Still 'active'. The API turns off canDonate once the end date passes, so an active fundraiser that can no longer take donations has run its course.
+  // Anything else here is a live fundraiser we simply cannot collect for: payment options failed to load, or the workspace is missing.
+  return !fundraiser.canDonate && getDaysLeft(fundraiser.endDate) === 0;
+}

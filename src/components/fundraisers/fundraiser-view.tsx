@@ -8,8 +8,13 @@ import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import {
   convertTotalRaisedToSingleCurrency,
   getDaysLeft,
+  getFundraiserUrl,
+  hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
-import { ClosedForContribution } from '@/components/fundraisers/closed-for-contribution';
+import {
+  ClosedForContribution,
+  type FundraiserImpact,
+} from '@/components/fundraisers/closed-for-contribution';
 import DescriptionDisplay from '@/components/fundraisers/description-display';
 import { DonationSection } from '@/components/fundraisers/donation-section';
 import { DonorsStripSkeleton } from '@/components/fundraisers/donors-strip';
@@ -36,11 +41,14 @@ export function FundraiserView({
   paymentOptions,
   paymentOptionsAreAuthenticated = false,
   leaderboardFetchStrategy = 'ssr',
+  impact,
 }: {
   fundraiser: Fundraiser;
   paymentOptions?: PaymentOptions;
   paymentOptionsAreAuthenticated?: boolean;
   leaderboardFetchStrategy?: 'ssr' | 'client';
+  /** Impact units from alltime-stats. Only fetched for closed fundraisers. */
+  impact?: FundraiserImpact;
 }) {
   const t = useTranslations('Fundraisers');
   const locale = useLocale();
@@ -176,9 +184,22 @@ export function FundraiserView({
           </>
         ) : (
           <ClosedForContribution
-            message={
-              typeof fundraiser.metadata?.closedMessage === 'string'
-                ? fundraiser.metadata.closedMessage
+            title={fundraiser.title}
+            concluded={hasFundraiserConcluded(fundraiser)}
+            raisedAmount={totalRaisedAmount}
+            goalAmount={fundraiser.goalAmount}
+            currency={fundraiser.currency}
+            donationCount={fundraiser.donationCount}
+            impact={impact}
+            projectNames={fundraiser.projectAllocations.map(
+              allocation => allocation.project.name
+            )}
+            sharePath={
+              fundraiser.visibility === 'public'
+                ? getFundraiserUrl({
+                    id: fundraiser.id,
+                    slug: fundraiser.slug || fundraiser.hid,
+                  })
                 : undefined
             }
           />
