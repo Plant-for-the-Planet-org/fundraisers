@@ -133,7 +133,7 @@ Stage is the only surface that polls live data. `?stagehash=Math.floor(Date.now(
 | `GET /fundraisers/{slug}/alltime-stats` | 15s      | Wired  |
 | `GET /fundraisers/{slug}/leaderboard`   | 15s      | Wired  |
 
-The `alltime-stats` type and fetch are stage-owned, in [`alltime-stats.ts`](./alltime-stats.ts). They stay inside the module until a non-stage consumer needs them, at which point the type + service move to `src/lib/` per the "wait for a second consumer" rule.
+The `alltime-stats` type and fetch live in core at [`src/lib/api/alltime-stats.ts`](../../lib/api/alltime-stats.ts). They moved out of the module once the closed-fundraiser block became a second consumer, per the "wait for a second consumer" rule.
 
 ---
 

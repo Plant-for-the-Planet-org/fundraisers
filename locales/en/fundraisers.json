@@ -31,7 +31,25 @@
     },
     "closedForContribution": {
       "title": "Thank you for your support!",
-      "defaultMessage": "This fundraiser has been archived and no longer accepts new donations."
+      "titleGoalReached": "Goal reached, thanks to {count, plural, one {# donation} other {# donations}}",
+      "titleNotAvailable": "Donations are not available",
+      "fundedBadge": "{percent, number}% funded",
+      "raised": "Together you raised {amount}.",
+      "raisedForProject": "Together you raised {amount} for {project}.",
+      "impactLine": "Your donations are {impact}.",
+      "impactTrees": "planting {count, plural, one {# tree} other {# trees}}",
+      "impactRestored": "restoring {area} of forest",
+      "impactConserved": "protecting {area} of forest",
+      "impactFunding": "supporting Plant-for-the-Planet's mission",
+      "areaHa": "{area} ha",
+      "areaM2": "{area} m²",
+      "closedNote": "This fundraiser no longer accepts new donations.",
+      "notAvailableNote": "Check with the host.",
+      "exploreCta": "Explore other fundraisers",
+      "shareCta": "Share",
+      "shareText": "{title} raised {amount}. Thank you to everyone who gave!",
+      "shareCopied": "Link copied!",
+      "shareFailed": "Could not share the link. Try again."
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
@@ -121,6 +139,8 @@
         "visibilityOff": "Hidden from public",
         "reorder": "Drag to reorder",
         "remove": "Remove",
+        "revoke": "Revoke invitation",
+        "revokeHint": "Revoke invitation. The link in the email will stop working.",
         "lastAdminHint": "A fundraiser needs at least one admin.",
         "lastPublicHint": "A fundraiser needs at least one public host.",
         "emailPlaceholder": "Email address",
@@ -132,7 +152,15 @@
         "toastDuplicate": "That person is already a host.",
         "toastError": "Something went wrong. Please try again.",
         "toastHostsLoadFailed": "Could not load full host list. Some hosts may not be shown.",
-        "toastReorderError": "Reorder partially saved. Reload to see current order."
+        "toastReorderError": "Reorder partially saved. Reload to see current order.",
+        "declined": "Declined",
+        "expired": "Expired",
+        "inviteExpires": "Expires {date}",
+        "inviteLapsed": "Invitation expired {date}",
+        "resend": "Send the invitation again",
+        "resendDeclinedHint": "This person declined. Remove them and invite again if that was a mistake.",
+        "toastResent": "Invitation sent again to {email}",
+        "toastResendRefused": "That invitation cannot be sent again."
       },
       "goalPreview": {
         "raised": "{amount} raised",
