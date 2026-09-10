@@ -128,21 +128,22 @@ import { cn } from '@/lib/utils/cn';
 
 ## UTM Parameters
 
-Short tokens win. UTM values show up as labels in Umami and in the donation `metadata`, and they travel on links people copy, so keep them short and stable. Rules:
+Readable tokens win. UTM values show up as labels in Umami and in the donation `metadata`, and the person reading those numbers is usually not the person who set the token, so a value has to be decodable on sight without this file open. Rules:
 
-- Lowercase `snake_case`, ASCII only, no spaces. Aim for 8 characters or fewer.
-- `utm_source` names the surface the link was made on: `fr` (fundraiser page), `stage` (Stage Mode).
-- `utm_medium` names the placement or mechanism on that surface: `qr`, `cl_bnr` (closed fundraiser banner share).
+- Lowercase `snake_case`, ASCII only, no spaces. Whole words, no dropped vowels.
+- Avoid values that read as something else in an analytics column. `fr` looks like the French locale before it looks like a fundraiser.
+- `utm_source` names the surface the link was made on: `fundraiser` (fundraiser page), `stage` (Stage Mode).
+- `utm_medium` names the placement or mechanism on that surface: `qr`, `closed_banner` (closed fundraiser banner share).
 - `utm_campaign` is reserved by the platform for the fundraiser GUID. Never set it from this app (see `src/lib/donation/utm.ts`).
 - `utm_id` carries a fundraiser GUID only on links that leave the fundraiser, so the destination knows who sent the donor. Never on internal links.
 - Internal navigation gets no UTM at all. Umami records page flow on its own, and rewriting a visitor's UTM would steal attribution from the channel that brought them.
 - Third-party attribution formats (for example the Unsplash `utm_source=plant-for-the-planet&utm_medium=referral` links) follow the third party's spec, not this list.
 
-Every token in use lives in this table. Add a row before using a new one so abbreviations stay decodable.
+Every token in use lives in this table. Add a row before using a new one, so a reader can see the whole vocabulary in one place.
 
-| Parameter    | Token    | Meaning                                 | Set in                                               |
-| ------------ | -------- | --------------------------------------- | ---------------------------------------------------- |
-| `utm_source` | `fr`     | Public fundraiser page                  | `components/fundraisers/closed-for-contribution.tsx` |
-| `utm_source` | `stage`  | Stage Mode screen                       | `modules/stage/components/stage-qr-panel.tsx`        |
-| `utm_medium` | `qr`     | QR code scan                            | `modules/stage/components/stage-qr-panel.tsx`        |
-| `utm_medium` | `cl_bnr` | Share from the closed fundraiser banner | `components/fundraisers/closed-for-contribution.tsx` |
+| Parameter    | Token           | Meaning                                 | Set in                                               |
+| ------------ | --------------- | --------------------------------------- | ---------------------------------------------------- |
+| `utm_source` | `fundraiser`    | Public fundraiser page                  | `components/fundraisers/closed-for-contribution.tsx` |
+| `utm_source` | `stage`         | Stage Mode screen                       | `modules/stage/components/stage-qr-panel.tsx`        |
+| `utm_medium` | `qr`            | QR code scan                            | `modules/stage/components/stage-qr-panel.tsx`        |
+| `utm_medium` | `closed_banner` | Share from the closed fundraiser banner | `components/fundraisers/closed-for-contribution.tsx` |
