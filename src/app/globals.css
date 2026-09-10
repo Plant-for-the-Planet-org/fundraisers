@@ -231,3 +231,48 @@ h6 {
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
+
+/* Closed fundraiser block: the accent colour travels around the border like a snake.
+   A conic gradient rotates on a pseudo-element that is masked down to the 2px border ring,
+   so the card's own white border stays as the base and as the fallback without animation. */
+@property --snake-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.snake-border {
+  position: relative;
+}
+.snake-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  padding: 2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--snake-angle),
+    transparent 0 62%,
+    var(--accent-color) 88%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: snake-border-spin 5s linear infinite;
+}
+@keyframes snake-border-spin {
+  to {
+    --snake-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .snake-border::before {
+    display: none;
+  }
+}

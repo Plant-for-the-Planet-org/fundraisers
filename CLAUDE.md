@@ -118,6 +118,24 @@ Do not start a dev server or verify changes in the browser. A dev session is usu
 
 <!-- Non-obvious traps: SSR/CSR boundaries, stale .next types, env quirks. -->
 
+### Stale locale types after editing a translation file
+
+`locales/**/*.d.json.ts` are next-intl's generated message declarations. They are gitignored, and TypeScript resolves `fundraisers.json` to `fundraisers.d.json.ts` in preference to the JSON itself.
+
+So after editing any file under `locales/`, the sidecar is stale until `next dev` or `next build` regenerates it, and `npm run type-check` checks your new code against the old messages.
+
+The symptom is a key you can see in the JSON being reported as missing:
+
+```
+closed-for-contribution.tsx(57,7): error TS2345: Argument of type '"titleNotAvailable"' is not assignable to parameter of type 'NamespacedMessageKeys<...>'
+```
+
+It also shows up as `TS2554: Expected 2-3 arguments, but got 1` on a `t('key')` call, and it is not limited to the file you edited: a stale `donate.d.json.ts` once reported three phantom errors in `stripe-sepa-form.tsx`.
+
+Clearing `tsconfig.tsbuildinfo` does nothing. This is a shadowing file, not a cache.
+
+Run `npm run build` (or let the dev server recompile) before trusting `npm run type-check` after a locale edit.
+
 ## Deployment
 
 <!-- Where it deploys, how releases work, env vars, feature flags. -->

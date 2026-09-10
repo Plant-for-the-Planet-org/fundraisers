@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
+import type { AlltimeStats } from '@/lib/api/alltime-stats';
 
 import { Suspense } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { getAlltimeStats } from '@/lib/api/alltime-stats';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
+import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
@@ -173,13 +176,32 @@ export default async function FundraiserPage({
 
   const { fundraiser, paymentOptions } = result;
 
+  // Closed fundraisers show their impact instead of the donation form. Stats are optional: a failed call only drops the impact line.
+  let impact: AlltimeStats['stats']['impact'] | undefined;
+  if (!fundraiser.canDonate) {
+    try {
+      const { stats, settings } = await getAlltimeStats(
+        fundraiser.slug || fundraiser.id
+      );
+      if (settings.show_impact) {
+        impact = stats?.impact;
+      }
+    } catch (e) {
+      if (!(e instanceof PlatformAPIError)) throw e;
+    }
+  }
+
   return (
     <>
       {/* Reads ?hostInvite to confirm a co-host invitation that was just answered. In Suspense because it uses useSearchParams, which would otherwise pull this page's whole client tree out of prerendering. */}
       <Suspense fallback={null}>
         <HostInviteNotice />
       </Suspense>
-      <FundraiserView fundraiser={fundraiser} paymentOptions={paymentOptions} />
+      <FundraiserView
+        fundraiser={fundraiser}
+        paymentOptions={paymentOptions}
+        impact={impact}
+      />
     </>
   );
 }
