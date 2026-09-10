@@ -338,8 +338,8 @@
           "description": "Aktiviere das Sammeln von Spenden und schalte den Aufruf frei"
         },
         "visibility": {
-          "label": "Mache den Aufruf auffindbar",
-          "description": "Ermögliche es anderen, diesen Aufruf über die Suche zu finden und zu entdecken"
+          "label": "Diesen Spendenaufruf öffentlich listen",
+          "description": "Wenn aus, erscheint er nicht in der Suche oder unter Entdecken. Wer den Link hat, kann ihn weiterhin öffnen und spenden."
         },
         "addModule": "Modul hinzufügen",
         "stage": {

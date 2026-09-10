@@ -338,8 +338,8 @@
           "description": "Enable donation collection and make the fundraiser active"
         },
         "visibility": {
-          "label": "Make the fundraiser discoverable",
-          "description": "Allow people to find this fundraiser in search and browse"
+          "label": "List this fundraiser publicly",
+          "description": "When off, it won't show up in search or on Explore. Anyone with the link can still open it and donate."
         },
         "addModule": "Add a module",
         "stage": {
