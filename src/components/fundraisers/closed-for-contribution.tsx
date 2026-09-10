@@ -7,8 +7,8 @@ import { toast } from 'sonner';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 
-// Keep off until the backend fixes the alltime-stats unit aggregation (values are ~100x too high for older fundraisers; reported to Jorgo on 2026-09-09). Flip to true once confirmed.
-const SHOW_IMPACT_LINE = false;
+// On. The alltime-stats unit aggregation once returned values ~100x too high for older fundraisers; flip to false if those numbers show up again.
+const SHOW_IMPACT_LINE = true;
 
 export interface FundraiserImpact {
   trees: number;
