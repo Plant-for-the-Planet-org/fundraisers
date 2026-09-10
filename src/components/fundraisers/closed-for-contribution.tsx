@@ -8,7 +8,7 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 
 // Keep off until the backend fixes the alltime-stats unit aggregation (values are ~100x too high for older fundraisers; reported to Jorgo on 2026-09-09). Flip to true once confirmed.
-const SHOW_IMPACT_LINE = true;
+const SHOW_IMPACT_LINE = false;
 
 export interface FundraiserImpact {
   trees: number;
