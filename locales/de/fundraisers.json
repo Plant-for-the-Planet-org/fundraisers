@@ -431,7 +431,9 @@
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler",
-        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut."
+        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut.",
+        "publishFailedMessage": "Als Entwurf gespeichert",
+        "publishFailedDescription": "Dein Spendenaufruf wurde erstellt, konnte aber nicht veröffentlicht werden. Schalte den Status hier ein, um ihn live zu stellen."
       }
     },
     "edit": {
@@ -453,7 +455,10 @@
         "successMessage": "Spendenaufruf aktualisiert!",
         "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
-        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
+        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut.",
+        "statusChangeFailedMessage": "Status nicht geändert",
+        "statusChangeFailedDescription": "Der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut."
       }
     },
     "copyLinkButton": {
