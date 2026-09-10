@@ -29,15 +29,28 @@ import { Button } from '@/components/ui/button';
 /**
  * The submitted values with the status switch put back where the server has it.
  *
- * The switch position comes from `canDonate`, the same way the form derives it on load. Taking it
- * from the response rather than from `values` keeps the switch honest when the status did not move
- * the way the host asked — a failed transition, or a completed fundraiser the switch cannot reopen.
+ * `toggle` is worked out from the server's own answer, not from what the host asked for, so the
+ * switch cannot sit in a position the fundraiser never reached — a failed transition, or a
+ * completed one the switch cannot reopen.
  */
 function baselineFor(
   values: FundraiserFormValues,
-  saved: Fundraiser
+  toggle: 'draft' | 'active'
 ): FundraiserFormValues {
-  return { ...values, status: saved.canDonate ? 'active' : 'draft' };
+  return { ...values, status: toggle };
+}
+
+/** Where the switch sits for a saved fundraiser. Mirrors how the form derives it on load. */
+function toggleFor(saved: Fundraiser): 'draft' | 'active' {
+  return saved.canDonate ? 'active' : 'draft';
+}
+
+/**
+ * The same question when all that is known is the status — the transition failed, so there is no
+ * fresh fundraiser to read `canDonate` from. Only a live fundraiser takes donations.
+ */
+function toggleForStatus(status: FundraiserStatus): 'draft' | 'active' {
+  return status === 'active' ? 'active' : 'draft';
 }
 
 interface UpdateFundraiserButtonProps {
@@ -132,8 +145,15 @@ export function UpdateFundraiserButton({
           setSavedStatus(updated.status);
         } catch (transitionError) {
           console.error('Failed to change fundraiser status:', transitionError);
-          // Keep whatever the update saved, and put the switch back where the server has it.
-          if (updated) reset(baselineFor(values, updated));
+          // Keep whatever the update saved, and put the switch back where the server has it. On a
+          // status-only submit nothing was saved, so the status is the only baseline to go on —
+          // the switch still has to snap back rather than claim a status the fundraiser never took.
+          reset(
+            baselineFor(
+              values,
+              updated ? toggleFor(updated) : toggleForStatus(savedStatus)
+            )
+          );
           toast.error(t('statusChangeFailedMessage'), {
             description: updated
               ? t('statusChangeFailedWithSavedChanges')
@@ -145,7 +165,7 @@ export function UpdateFundraiserButton({
 
       if (!updated) return;
 
-      reset(baselineFor(values, updated));
+      reset(baselineFor(values, toggleFor(updated)));
 
       // The backend appends a suffix when the chosen link collides with an existing one, so the saved slug can differ from what was submitted.
       const slugWasAdjusted =
