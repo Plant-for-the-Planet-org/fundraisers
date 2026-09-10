@@ -9,6 +9,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useUnsavedChangesWarning } from '@/lib/hooks/use-unsaved-changes-warning';
 import {
   buildDefaultCreateValues,
   fundraiserFormSchema,
@@ -42,6 +43,8 @@ export function CreateFundraiserFormProvider({
     methods.register('currency');
     methods.register('projectAllocations');
   }, [methods]);
+
+  useUnsavedChangesWarning(methods.formState.isDirty);
 
   {
     /* TODO: wrap children in a <form> tag for accessibility (Enter key submission, screen reader semantics).
