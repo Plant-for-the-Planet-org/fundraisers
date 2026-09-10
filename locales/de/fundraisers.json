@@ -139,6 +139,8 @@
         "visibilityOff": "Öffentlich verborgen",
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
+        "revoke": "Einladung zurückziehen",
+        "revokeHint": "Einladung zurückziehen. Der Link in der E-Mail funktioniert dann nicht mehr.",
         "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
         "lastPublicHint": "Ein Spendenaufruf braucht mindestens eine*n öffentliche*n Organisator*in.",
         "emailPlaceholder": "E-Mail-Adresse",
@@ -150,7 +152,15 @@
         "toastDuplicate": "Diese Person ist bereits Organisator*in.",
         "toastError": "Etwas ist schiefgelaufen, versuche es erneut.",
         "toastHostsLoadFailed": "Vollständige Organisator*innenliste konnte nicht geladen werden. Einige werden möglicherweise nicht angezeigt.",
-        "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen."
+        "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen.",
+        "declined": "Abgelehnt",
+        "expired": "Abgelaufen",
+        "inviteExpires": "Läuft am {date} ab",
+        "inviteLapsed": "Einladung am {date} abgelaufen",
+        "resend": "Einladung erneut senden",
+        "resendDeclinedHint": "Diese Person hat abgelehnt. Entferne sie und lade sie erneut ein, falls das ein Versehen war.",
+        "toastResent": "Einladung erneut an {email} gesendet",
+        "toastResendRefused": "Diese Einladung kann nicht erneut gesendet werden."
       },
       "goalPreview": {
         "raised": "{amount} gesammelt",

@@ -139,6 +139,8 @@
         "visibilityOff": "Hidden from public",
         "reorder": "Drag to reorder",
         "remove": "Remove",
+        "revoke": "Revoke invitation",
+        "revokeHint": "Revoke invitation. The link in the email will stop working.",
         "lastAdminHint": "A fundraiser needs at least one admin.",
         "lastPublicHint": "A fundraiser needs at least one public host.",
         "emailPlaceholder": "Email address",
@@ -150,7 +152,15 @@
         "toastDuplicate": "That person is already a host.",
         "toastError": "Something went wrong. Please try again.",
         "toastHostsLoadFailed": "Could not load full host list. Some hosts may not be shown.",
-        "toastReorderError": "Reorder partially saved. Reload to see current order."
+        "toastReorderError": "Reorder partially saved. Reload to see current order.",
+        "declined": "Declined",
+        "expired": "Expired",
+        "inviteExpires": "Expires {date}",
+        "inviteLapsed": "Invitation expired {date}",
+        "resend": "Send the invitation again",
+        "resendDeclinedHint": "This person declined. Remove them and invite again if that was a mistake.",
+        "toastResent": "Invitation sent again to {email}",
+        "toastResendRefused": "That invitation cannot be sent again."
       },
       "goalPreview": {
         "raised": "{amount} raised",

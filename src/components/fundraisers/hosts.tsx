@@ -4,6 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useFormatter, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { selectPublicHosts } from '@/lib/utils/fundraiser-hosts';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
@@ -134,10 +135,7 @@ function HostsStripDisplay({
 function FundraiserHosts({ fundraiser }: { fundraiser: Fundraiser }) {
   const t = useTranslations('Fundraisers');
 
-  const publicHosts = fundraiser.hosts.filter(host => host.isPublic);
-  const hostsToShow = publicHosts.length > 0 ? publicHosts : fundraiser.hosts;
-
-  const hosts = hostsToShow.map(host => ({
+  const hosts = selectPublicHosts(fundraiser.hosts).map(host => ({
     id: host.id,
     name: host.displayName ?? host.user?.name ?? t('unknownHost'),
     avatarUrl: host.user?.avatar

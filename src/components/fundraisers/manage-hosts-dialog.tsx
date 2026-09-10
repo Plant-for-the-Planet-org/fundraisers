@@ -4,11 +4,20 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import type {
   FundraiserHost,
   FundraiserHostRole,
+  FundraiserHostStatus,
 } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Eye, EyeOff, GripVertical, Loader2, Plus, Trash2 } from 'lucide-react';
+import { useFormatter, useTranslations } from 'next-intl';
+import {
+  Eye,
+  EyeOff,
+  GripVertical,
+  Loader2,
+  Plus,
+  Send,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import {
   closestCenter,
@@ -18,6 +27,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import {
+  restrictToFirstScrollableAncestor,
+  restrictToVerticalAxis,
+} from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
@@ -29,8 +42,10 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   addFundraiserHost,
   removeFundraiserHost,
+  resendFundraiserHostInvite,
   updateFundraiserHost,
 } from '@/lib/api/fundraiser-hosts-service';
+import { platformUserMessage } from '@/lib/api/http-error-classifier';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
@@ -73,6 +88,41 @@ function countPublicHosts(hosts: FundraiserHost[]): number {
   // Match the backend's last-public guard (countActivePublicHosts): an invited
   // host is not publicly displayable, so it does not count toward the guarantee.
   return hosts.filter(h => h.isPublic && h.status === 'active').length;
+}
+
+/**
+ * The host's standing, when it is anything other than a plain active host.
+ *
+ * Colour carries the same meaning as the platform's own backend table: amber is waiting on an
+ * answer, red is a no, grey is a deadline that ran out.
+ */
+function StatusBadge({
+  status,
+  label,
+}: {
+  status: FundraiserHostStatus;
+  label: string | null;
+}) {
+  if (!label || status === 'active') return null;
+
+  const tone = {
+    invited:
+      'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400',
+    declined: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400',
+    expired:
+      'bg-muted text-muted-foreground dark:bg-muted dark:text-muted-foreground',
+  }[status];
+
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-md px-1.5 py-0.5 text-xs font-medium',
+        tone
+      )}
+    >
+      {label}
+    </span>
+  );
 }
 
 /** Name comes from the linked profile; invited hosts show their email. */
@@ -146,10 +196,15 @@ export function ManageHostsDialog({
           <DialogDescription>{t('dialogDescription')}</DialogDescription>
         </DialogHeader>
 
-        <div className='-mr-2 flex max-h-[55vh] flex-col gap-0.5 overflow-y-auto pr-2'>
+        <div className='-mr-2 flex max-h-[55vh] flex-col gap-0.5 overflow-y-auto overflow-x-hidden pr-2'>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
+            // Rows only swap up and down, and the list is the scroll container: keep the dragged row on its axis and inside the list.
+            modifiers={[
+              restrictToVerticalAxis,
+              restrictToFirstScrollableAncestor,
+            ]}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
@@ -200,6 +255,7 @@ function HostRow({
   onHostsChange: (hosts: FundraiserHost[]) => void;
 }) {
   const t = useTranslations('Fundraisers.form.hosts');
+  const format = useFormatter();
   const [isSaving, setIsSaving] = useState(false);
 
   const {
@@ -222,18 +278,44 @@ function HostRow({
   // would reject. The backend remains the source of truth.
   // - last admin: a fundraiser must keep at least one admin.
   // - last public: a fundraiser must keep at least one public host (any role).
-  const isLastAdmin = role === 'admin' && countActiveAdmins(hosts) <= 1;
-  const isLastPublic = host.isPublic && countPublicHosts(hosts) <= 1;
+  // Both counts only look at active hosts, so both guards only apply to an active row. An invited, expired or declined row is not counted as public or as an admin, so hiding or removing it can never break the guarantee.
+  const isActive = host.status === 'active';
+  const isLastAdmin =
+    isActive && role === 'admin' && countActiveAdmins(hosts) <= 1;
+  const isLastPublic =
+    isActive && host.isPublic && countPublicHosts(hosts) <= 1;
+
+  // The platform allows a resend from `invited` and `expired` only. A decline is final until the
+  // row is removed, and an active host has nothing left to accept.
+  const canResend = host.status === 'invited' || host.status === 'expired';
+  // Blocked by a guard rather than by a request in flight. The button stays focusable in this case, so a keyboard reader can reach the tooltip that says why; the click is what gets refused.
+  const removeBlocked = isLastAdmin || isLastPublic;
+  const removeDisabled = isSaving || removeBlocked;
+  // Same DELETE either way, but for a pending invitation "revoke" is what actually happens.
+  const removeLabel = canResend ? t('revoke') : t('remove');
+  const statusLabel = {
+    active: null,
+    invited: t('invited'),
+    declined: t('declined'),
+    expired: t('expired'),
+  }[host.status];
+  const inviteDeadline = host.inviteExpiresAt
+    ? format.dateTime(new Date(host.inviteExpiresAt), { dateStyle: 'medium' })
+    : null;
 
   const replaceHost = (updated: FundraiserHost) =>
     onHostsChange(hosts.map(h => (h.id === host.id ? updated : h)));
 
   const handleError = (err: unknown) => {
     console.error('Host update failed:', err);
+    // The platform explains its own refusals, and a status code cannot tell them apart: the caps,
+    // the draft rule and the resend cooldown all arrive as 409 with the same code, and only the
+    // sentence says which one happened.
     toast.error(
-      err instanceof PlatformAPIError && err.status === 409
-        ? t('toastDuplicate')
-        : t('toastError')
+      platformUserMessage(err) ??
+        (err instanceof PlatformAPIError && err.status === 409
+          ? t('toastDuplicate')
+          : t('toastError'))
     );
   };
 
@@ -273,6 +355,34 @@ function HostRow({
     }
   };
 
+  const handleResend = async () => {
+    if (!token) return;
+    setIsSaving(true);
+    try {
+      const updated = await resendFundraiserHostInvite(
+        fundraiserId,
+        host.id,
+        token
+      );
+      replaceHost(updated);
+      toast.success(
+        t('toastResent', {
+          email: updated.invitedEmail ?? host.invitedEmail ?? '',
+        })
+      );
+    } catch (err) {
+      console.error('Resending a host invitation failed:', err);
+      toast.error(
+        platformUserMessage(err) ??
+          (err instanceof PlatformAPIError && err.status === 409
+            ? t('toastResendRefused')
+            : t('toastError'))
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleRemove = async () => {
     if (!token) return;
     setIsSaving(true);
@@ -293,6 +403,7 @@ function HostRow({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
+      data-dragging={isDragging || undefined}
       className={cn(
         'group flex items-center gap-2.5 rounded-md px-1.5 py-2 hover:bg-accent',
         isDragging && 'bg-accent opacity-80'
@@ -302,7 +413,7 @@ function HostRow({
         ref={setActivatorNodeRef}
         type='button'
         aria-label={t('reorder')}
-        className='cursor-grab text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100'
+        className='cursor-grab text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100 group-data-dragging:opacity-100 focus-visible:opacity-100'
         {...attributes}
         {...listeners}
       >
@@ -314,18 +425,40 @@ function HostRow({
         <FallbackAvatar seed={host.id} />
       </Avatar>
 
-      <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <span className='truncate text-sm font-medium text-foreground'>
-          {name}
-        </span>
-        {isSelf && (
-          <span className='shrink-0 text-xs text-muted-foreground'>
-            {t('you')}
+      <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+        <div className='flex min-w-0 items-center gap-2'>
+          <span className='truncate text-sm font-medium text-foreground'>
+            {name}
+          </span>
+          {isSelf && (
+            <span className='shrink-0 text-xs text-muted-foreground'>
+              {t('you')}
+            </span>
+          )}
+          <StatusBadge status={host.status} label={statusLabel} />
+          {canResend && (
+            <button
+              type='button'
+              disabled={isSaving}
+              aria-label={t('resend')}
+              title={t('resend')}
+              onClick={handleResend}
+              className='shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40'
+            >
+              <Send size={16} />
+            </button>
+          )}
+        </div>
+        {inviteDeadline && canResend && (
+          <span className='truncate text-xs text-muted-foreground'>
+            {host.status === 'expired'
+              ? t('inviteLapsed', { date: inviteDeadline })
+              : t('inviteExpires', { date: inviteDeadline })}
           </span>
         )}
-        {host.status === 'invited' && (
-          <span className='shrink-0 rounded-md bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400'>
-            {t('invited')}
+        {host.status === 'declined' && (
+          <span className='truncate text-xs text-muted-foreground'>
+            {t('resendDeclinedHint')}
           </span>
         )}
       </div>
@@ -351,7 +484,7 @@ function HostRow({
         title={isLastPublic ? t('lastPublicHint') : undefined}
         onClick={() => handlePublicChange(!host.isPublic)}
         className={cn(
-          'shrink-0 rounded-md p-1 transition-colors disabled:cursor-not-allowed',
+          'shrink-0 rounded-md p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-40',
           host.isPublic
             ? 'text-blue-500'
             : 'text-muted-foreground hover:text-foreground'
@@ -362,17 +495,28 @@ function HostRow({
 
       <button
         type='button'
-        disabled={isSaving || isLastAdmin || isLastPublic}
-        aria-label={t('remove')}
+        disabled={isSaving}
+        aria-disabled={removeBlocked || undefined}
+        aria-label={removeLabel}
         title={
           isLastAdmin
             ? t('lastAdminHint')
             : isLastPublic
               ? t('lastPublicHint')
-              : t('remove')
+              : canResend
+                ? t('revokeHint')
+                : removeLabel
         }
-        onClick={handleRemove}
-        className='shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100 disabled:opacity-0'
+        onClick={() => {
+          if (!removeBlocked) void handleRemove();
+        }}
+        className={cn(
+          // Hover is lost while the pointer is captured for a drag, so the dragging row reveals its actions too.
+          'shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-data-dragging:opacity-100 hover:text-destructive focus-visible:opacity-100',
+          // A disabled action stays visible but dimmed, so its tooltip explaining why is still reachable.
+          removeDisabled &&
+            'cursor-not-allowed group-hover:opacity-40 group-data-dragging:opacity-40 focus-visible:opacity-40'
+        )}
       >
         {isSaving ? (
           <Loader2 className='animate-spin' size={16} />
@@ -427,13 +571,22 @@ function AddHostForm({
       );
     } catch (err) {
       console.error('Add host failed:', err);
-      // A duplicate host is rejected as a validation error (HTTP 400), which —
-      // given the email is already format-checked client-side — is the only
-      // realistic validation failure on add. 409 is kept for forward-compat.
+      // The platform's own sentence first, where it wrote one. Adding a host can be refused for
+      // several reasons that all arrive as 409 — the fundraiser is still a draft, it already has 20
+      // invitations waiting, this person has hit their daily limit — and telling all of them "this
+      // person is already a host" would be wrong for every one of them.
+      //
+      // A duplicate is the case with no sentence: it is raised as a validation failure (HTTP 400),
+      // whose text sits under `parameters.errors` and reads like an assertion rather than something
+      // to show somebody. Since the email is already format-checked client-side, it is the only
+      // realistic validation failure on add.
       const isDuplicate =
         err instanceof PlatformAPIError &&
         (err.status === 400 || err.status === 409);
-      toast.error(isDuplicate ? t('toastDuplicate') : t('toastError'));
+      toast.error(
+        platformUserMessage(err) ??
+          (isDuplicate ? t('toastDuplicate') : t('toastError'))
+      );
     } finally {
       setIsSubmitting(false);
     }

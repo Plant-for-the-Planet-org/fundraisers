@@ -33,8 +33,15 @@ export type FundraiserHostType = 'user' | 'team';
  * supported roles.
  */
 export type FundraiserHostRole = 'admin' | 'viewer' | 'owner'; //owner is for backward compatibility, and can be removed once the API no longer returns it.
-/** 'invited' hosts have no profile yet; claimed to 'active' on first login. */
-export type FundraiserHostStatus = 'active' | 'invited';
+/**
+ * Co-hosting is by invitation: only 'active' carries host rights or public display.
+ * 'invited' is waiting on an answer, 'declined' said no, 'expired' ran out of time after a week.
+ */
+export type FundraiserHostStatus =
+  | 'active'
+  | 'invited'
+  | 'declined'
+  | 'expired';
 export interface FundraiserHost {
   id: string;
   user: Nullable<FundraiserUser>;
@@ -44,12 +51,14 @@ export interface FundraiserHost {
   displayName: Nullable<string>;
   displayOrder: Nullable<number>;
   status: FundraiserHostStatus;
-  // Invariant: invitedEmail is non-null only when status === 'invited' (user is
-  // null). When status === 'active', user is non-null and invitedEmail is null.
-  // Not enforced as a discriminated union (YAGNI — all call sites guard via ??
-  // chains or status checks). Refactor to discriminated union if this type
-  // spreads beyond host management components.
+  // The address the invitation went to. It survives acceptance as the record of who agreed, so it can be set alongside a non-null `user` — do not read it as "this host is still invited"; check `status` for that.
+  // It is null only for a host that was never invited, such as the fundraiser's creator.
   invitedEmail: Nullable<string>;
+  // Invitation timestamps, ISO 8601. Serialized for fundraiser admins only, so they are absent from the public fundraiser payload and null on a host who was never invited.
+  inviteSentAt?: Nullable<string>;
+  inviteExpiresAt?: Nullable<string>;
+  inviteAnsweredAt?: Nullable<string>;
+  inviteSendCount?: number;
 }
 
 export interface AddFundraiserHostRequest {
