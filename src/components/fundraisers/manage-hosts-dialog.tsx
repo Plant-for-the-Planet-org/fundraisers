@@ -241,6 +241,7 @@ export function ManageHostsDialog({
   );
 }
 
+/** Renders one host and manages role, visibility, invitation, and removal actions for that row. */
 function HostRow({
   host,
   fundraiserId,
@@ -387,6 +388,7 @@ function HostRow({
     }
   };
 
+  /** Removes this host and redirects self-removing users away from the now-inaccessible edit page. */
   const handleRemove = async () => {
     if (!token) return;
     setIsSaving(true);
