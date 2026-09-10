@@ -9,6 +9,7 @@ import { useEffect, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useUnsavedChangesWarning } from '@/lib/hooks/use-unsaved-changes-warning';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useThemeStore } from '@/stores/theme-store';
 import { EditProjectDetailsProvider } from './bundle-selection/edit-project-details-context';
@@ -56,19 +57,7 @@ export function EditFundraiserFormProvider({
     setSelectedTheme(buildTheme(fundraiser.settings?.theme ?? null));
   }, [fundraiser.settings?.theme, setSelectedTheme]);
 
-  const isDirty = methods.formState.isDirty;
-
-  // Warn the user before leaving the page if the form has unsaved changes.
-  useEffect(() => {
-    if (!isDirty) return;
-
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isDirty]);
+  useUnsavedChangesWarning(methods.formState.isDirty);
 
   return (
     <FormProvider {...methods}>
