@@ -341,8 +341,9 @@ function HostRow({
     }
   };
 
-  const handlePublicChange = async (next: boolean) => {
-    if (!token) return;
+  /** Resolves to whether the change was persisted, so a caller can keep its own UI open on failure. */
+  const handlePublicChange = async (next: boolean): Promise<boolean> => {
+    if (!token) return false;
     setIsSaving(true);
     try {
       replaceHost(
@@ -353,8 +354,10 @@ function HostRow({
           token
         )
       );
+      return true;
     } catch (err) {
       handleError(err);
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -544,8 +547,8 @@ function HostRow({
         canHide={host.isPublic}
         isSaving={isSaving}
         onHide={async () => {
-          await handlePublicChange(false);
-          setSelfRemoveOpen(false);
+          // Stay open if hiding failed, so the toast's advice has something to act on.
+          if (await handlePublicChange(false)) setSelfRemoveOpen(false);
         }}
         onRemove={() => void handleRemove()}
       />
