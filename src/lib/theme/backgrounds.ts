@@ -166,6 +166,30 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     type: 'image',
     src: '/theme-backgrounds/academy-bw.jpg',
   },
+  {
+    id: 'bg-forest-bw-2',
+    label: 'Forest BW 2',
+    type: 'image',
+    src: '/theme-backgrounds/forest-bw-2.jpg',
+  },
+  {
+    id: 'bg-academy-bw-2',
+    label: 'Academy BW 2',
+    type: 'image',
+    src: '/theme-backgrounds/academy-bw-2.jpg',
+  },
+  {
+    id: 'bg-planting-bw',
+    label: 'Planting BW',
+    type: 'image',
+    src: '/theme-backgrounds/planting-bw.jpg',
+  },
+  {
+    id: 'bg-rangers-bw',
+    label: 'Rangers BW',
+    type: 'image',
+    src: '/theme-backgrounds/rangers-bw.jpg',
+  },
   // Patterns (legacy placeholders — kept as resources, hidden from the picker)
   {
     id: 'bg-grid',
