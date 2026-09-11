@@ -49,7 +49,7 @@
     "notice": {
       "acceptedTitle": "Du bist jetzt Organisator*in",
       "acceptedBody": "Du kannst diesen Spendenaufruf über dein Dashboard verfolgen.",
-      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diese Spendenaufruf zu verwalten.",
+      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diesen Spendenaufruf zu verwalten.",
       "acceptedCta": "Zu deinem Dashboard",
       "acceptedCtaSignedOut": "Konto erstellen",
       "acceptedDismiss": "Später",

@@ -74,7 +74,7 @@
       "leavingBody": "Dieser Link führt zu einer externen Website, die wir nicht kontrollieren oder prüfen. Stelle sicher, dass du ihr vertraust, bevor du fortfährst - die Nutzung erfolgt auf eigenes Risiko.",
       "mailPromptTitle": "Mail-App öffnen?",
       "mailPromptBody": "Dies öffnet deine Mail-App, um eine Nachricht an <strong>{address}</strong> zu senden.",
-      "continue": "Weiter"
+      "continue": "Fortfahren"
     },
     "popupBlocked": {
       "title": "Popup blockiert",
