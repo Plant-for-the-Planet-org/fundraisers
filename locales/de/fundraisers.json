@@ -139,6 +139,14 @@
         "visibilityOff": "Öffentlich verborgen",
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
+        "selfRemove": {
+          "title": "Dich selbst als Gastgeber entfernen?",
+          "description": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
+          "descriptionHidden": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen.",
+          "hide": "Namen ausblenden",
+          "confirm": "Mich entfernen",
+          "cancel": "Abbrechen"
+        },
         "revoke": "Einladung zurückziehen",
         "revokeHint": "Einladung zurückziehen. Der Link in der E-Mail funktioniert dann nicht mehr.",
         "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
