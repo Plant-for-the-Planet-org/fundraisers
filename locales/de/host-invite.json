@@ -1,71 +1,71 @@
 {
   "HostInvite": {
     "metadata": {
-      "title": "Deine Einladung als Co-Gastgeber:in"
+      "title": "Deine Einladung als Organisator*in"
     },
-    "loading": "Deine Einladung wird geöffnet.",
+    "loading": "Deine Einladung wird geöffnet",
     "pending": {
-      "eyebrowWithInviter": "{inviter} hat dich eingeladen Gastgeber:in zu sein!",
-      "eyebrow": "Du wurdest als ein/eine Gastgeber:in eingeladen!",
+      "eyebrowWithInviter": "{inviter} hat dich eingeladen, Organisator*in zu werden!",
+      "eyebrow": "Du bist eingeladen, Organisator*in zu werden!",
       "roleAdmin": "Admin",
-      "roleViewer": "Betrachter",
+      "roleViewer": "Betrachter*in",
       "publicYes": "Dein Name ist öffentlich",
-      "publicNo": "Dein Name ist unsichtbar",
+      "publicNo": "Dein Name ist privat",
       "invitedAs": "Einladung für {email}",
       "expires": "Läuft am {date} ab",
       "accept": "Einladung annehmen",
       "decline": "Ablehnen",
-      "answering": "Deine Antwort speichern"
+      "answering": "Deine Antwort wird gespeichert"
     },
     "accepted": {
-      "title": "Du bist bereits Gastgeber:in",
-      "description": "Du hast diese Einladung als Co-Gastgeber:in für diese Spendenaufruf angenommen.",
-      "cta": "Gehe zu deinem Dashboard.",
-      "ctaSignedOut": "Logge dich in dein Dashboard ein."
+      "title": "Du bist bereits Organisator*in",
+      "description": "Du hast die Einladung angenommen, diesen Spendenaufruf mitzugestalten.",
+      "cta": "Zu deinem Dashboard",
+      "ctaSignedOut": "Anmelden und zum Dashboard"
     },
     "declined": {
-      "title": "Du hast diese Einladung abgelehnt.",
-      "description": "Wenn du es dir anders überlegst, dann bitte einen/eine anderen/andere Gastgeber:in dich erneut einzuladen."
+      "title": "Du hast diese Einladung abgelehnt",
+      "description": "Wenn du es dir anders überlegst, bitte eine*n Organisator*in, dich erneut einzuladen."
     },
     "expired": {
-      "title": "Die Einladung ist abgelaufen",
-      "description": "Wenn du trotzdem teilnehmen möchtest, dann bitte einen/ein der Gastgeber:innen, dich erneut einzuladen."
+      "title": "Diese Einladung ist abgelaufen",
+      "description": "Wenn du noch mitmachen möchtest, bitte eine*n Organisator*in des Spendenaufrufs, dich erneut einzuladen."
     },
     "wrongAccount": {
-      "title": "Diese Einladung ist für {email}",
-      "titleNoEmail": "Diese Einladung ist für einen anderen Account",
-      "description": "Du bist mit einem anderen Account angemeldet. Wechsle zur eingeladenen E-Mail-Adresse, um die Einladung anzunehmen.",
-      "cta": "Account wechseln"
+      "title": "Diese Einladung gilt für {email}",
+      "titleNoEmail": "Diese Einladung gilt für ein anderes Konto",
+      "description": "Du bist mit einem anderen Konto angemeldet. Wechsle zur eingeladenen Adresse, um anzunehmen.",
+      "cta": "Konto wechseln"
     },
     "invalid": {
-      "title": "Diese Einladung ist nicht länger verfügbar",
-      "description": "Möglicherweise hat der/die Gastgeber:in den Link entfernt oder durch einen neueren ersetzt. Erkundige dich bei dem/der Gastgeber:in, wenn du weiterhin teilnehmen möchtest."
+      "title": "Diese Einladung ist nicht mehr verfügbar",
+      "description": "Vielleicht wurde sie zurückgezogen oder durch einen neueren Link ersetzt. Frag bei der*dem Organisator*in nach, wenn du noch mitmachen möchtest."
     },
     "error": {
-      "title": "Wir konnten deine Einladung nicht öffnen.",
-      "description": "Bei uns ist etwas schief gelaufen. Deine Einladung ist nach wie vor vorhanden.",
+      "title": "Wir konnten deine Einladung nicht öffnen",
+      "description": "Bei uns ist etwas schiefgelaufen. Deine Einladung gibt es weiterhin.",
       "cta": "Nochmal versuchen"
     },
     "notice": {
-      "acceptedTitle": "Du bist jetzt Gastgeber:in",
-      "acceptedBody": "Du kannst diesen Spendenaufruf in deinem Dashboard verfolgen.",
-      "acceptedBodySignedOut": "Lege einen Account mit der E-Mail-Adresse an, an die die Einladung geschickt wurde, um diesen Spendenaufruf zu verwalten.",
-      "acceptedCta": "Gehe zu deinem Dashboard",
-      "acceptedCtaSignedOut": "Account erstellen",
-      "acceptedDismiss": "Nicht jetzt",
-      "declined": "Einladung abgelehnt. Du wurdest nicht als Gastgeber:in hinzugefügt.",
-      "expired": "Diese Einladung ist abgelaufen. Bitte den/die Gastgeber:in des Spendenaufrufs, dir eine neue zu schicken.",
-      "invalid": "Dieser Einladungslink ist ungültig.",
-      "alreadyHost": "Du bist bereits Gastgeber:in dieses Spendenaufrufs."
+      "acceptedTitle": "Du bist jetzt Organisator*in",
+      "acceptedBody": "Du kannst diesen Spendenaufruf über dein Dashboard verfolgen.",
+      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diese Spendenaufruf zu verwalten.",
+      "acceptedCta": "Zu deinem Dashboard",
+      "acceptedCtaSignedOut": "Konto erstellen",
+      "acceptedDismiss": "Später",
+      "declined": "Einladung abgelehnt. Du wurdest nicht als Organisator*in hinzugefügt.",
+      "expired": "Diese Einladung ist abgelaufen. Bitte die*den Organisator*in des Spendenaufrufs um eine neue.",
+      "invalid": "Dieser Einladungslink ist nicht gültig.",
+      "alreadyHost": "Du bist bereits Organisator*in dieses Spendenaufrufs."
     },
     "dashboard": {
       "title": "{count, plural, =1 {Du hast eine Einladung} other {Du hast # Einladungen}}",
-      "subtitle": "Jemand hat dich als Co-Gastgeber:in zu ihrem Spendenaufruf eingeladen. Du bist kein/e Gastgeber:in, bis du die Einladung angenommen hast.",
-      "acceptedToast": "Du bist jetzt Gastgeber:in von {fundraiser}",
+      "subtitle": "Jemand hat dich eingeladen, seinen Spendenaufruf mitzugestalten. Du bist erst Organisator*in, wenn du zustimmst.",
+      "acceptedToast": "Du bist jetzt Organisator*in von {fundraiser}",
       "declinedToast": "Einladung abgelehnt.",
-      "answerFailed": "Wir konnten deine Antwort nicht speichern. Bitte versuche es erneut.",
+      "answerFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "expiredToast": "Diese Einladung ist abgelaufen."
     },
-    "close": "Schließen."
+    "close": "Schließen"
   }
 }

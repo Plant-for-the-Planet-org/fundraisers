@@ -42,7 +42,7 @@
     },
     "visits": {
       "title": "Besuche zählen",
-      "body": "Wir nutzen Umami, ein Open-Source-Tool, das auf unseren eigenen Servern läuft, um festzustellen, ob eine Seite Nutzer erreicht. Es speichert keine daten auf deinem Gerät und übermittelt keine Informationen an Dritte. Deine IP-Adresse wird kurzzeitig verwendet, um einen ungefähren Standort und einen Besuchscode zu ermitteln, und anschließend verworfen, anstatt gespeichert zu werden. Außerdem erfassen wir, wo Nutzer klicken und wie weit sie scrollen, als reine Koordinaten, die über alle Besuche hinweg zusammengefasst werden, damit wir erkennen können, welche Teile einer Seite gut funktionieren. Wir zeichnen niemals deinen Bildschirm oder deine Tastatureingaben auf und verknüpfen diese Daten niemals mit deinem Namen, deiner E-Mail-Adresse oder deinem Konto."
+      "body": "Wir nutzen Umami, ein Open-Source-Werkzeug auf unseren eigenen Servern, um zu sehen, ob eine Seite Menschen erreicht. Es speichert nichts auf deinem Gerät und sendet nichts an Dritte. Deine IP-Adresse wird einen Moment lang genutzt, um einen ungefähren Ort und einen Besuchscode zu ermitteln, und danach verworfen statt gespeichert. Außerdem erfassen wir, wo Menschen klicken und wie weit sie scrollen, als reine Koordinaten, die über alle Besuche zusammengefasst werden, damit wir sehen, welche Teile einer Seite funktionieren. Wir zeichnen weder deinen Bildschirm auf noch, was du tippst, und wir verknüpfen damit nie deinen Namen, deine E-Mail-Adresse oder dein Konto."
     },
     "video": {
       "title": "Das Einzige, wonach wir fragen: Video",

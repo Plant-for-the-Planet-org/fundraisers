@@ -51,34 +51,34 @@
     },
     "imageEmbed": {
       "editor": {
-        "invalidUrl": "Bilder können nur von einer vertrauenswürdigen Domain ( wie beispielsweise plant-for-the-planet.org) über HTTPS eingebettet werden. SVG wird nicht unterstützt.",
+        "invalidUrl": "Bilder können nur von einer vertrauenswürdigen Domain (z. B. plant-for-the-planet.org) über https eingebettet werden. SVG wird nicht unterstützt.",
         "altLabel": "Bildbeschreibung",
-        "altPlaceholder": "Beschreibe das Bild für Bildschirmleser (optional).",
+        "altPlaceholder": "Beschreibe dieses Bild für Screenreader (optional)",
         "removeImage": "Bild entfernen"
       }
     },
     "linkEditor": {
       "toolbarButton": "Link hinzufügen",
       "urlLabel": "Link-URL",
-      "urlPlaceholder": "Füge einen Link ein oder gib ihn ein",
+      "urlPlaceholder": "Link einfügen oder eingeben",
       "setLink": "Link setzen",
       "unlink": "Link entfernen",
       "openInNewTab": "In neuem Tab öffnen",
-      "invalidUrl": "Gib einen gültigen Link ein (eine URL oder eine E-Mail-Adresse)."
+      "invalidUrl": "Gib einen gültigen Link ein (eine Webadresse oder E-Mail)."
     },
     "externalLinkWarning": {
       "goBack": "Zurück",
       "invalidTitle": "Ungültiger Link",
-      "invalidBody": "Der Link ist ungültig und kann nicht geöffnet werden.",
+      "invalidBody": "Dieser Link ist ungültig und kann nicht geöffnet werden.",
       "leavingTitle": "Du verlässt startplanting.org",
-      "leavingBody": "Dieser Link führt zu einer externen Website, auf die wir keinen Einfluss haben und die wir nicht überprüpfen. Bitte vergewissere dich, dass du dieser Website vertraust, bevor du fortfährst - die Nutzung erfolgt auf eigene Gefahr.",
+      "leavingBody": "Dieser Link führt zu einer externen Website, die wir nicht kontrollieren oder prüfen. Stelle sicher, dass du ihr vertraust, bevor du fortfährst - die Nutzung erfolgt auf eigenes Risiko.",
       "mailPromptTitle": "Mail-App öffnen?",
-      "mailPromptBody": "Dadurch wird deine Mail-App geöffnet und eine Nachricht an <strong>{address}</strong> geschickt.",
+      "mailPromptBody": "Dies öffnet deine Mail-App, um eine Nachricht an <strong>{address}</strong> zu senden.",
       "continue": "Weiter"
     },
     "popupBlocked": {
       "title": "Popup blockiert",
-      "description": "Dein Browser hat den neuen Tab blockiert. Öffnen ihn hier:",
+      "description": "Dein Browser hat den neuen Tab blockiert. Öffne ihn hier:",
       "copy": "Link kopieren",
       "copied": "Link kopiert"
     }
