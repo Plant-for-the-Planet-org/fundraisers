@@ -84,7 +84,7 @@
       "dedicatedTo": "{recipientName} gewidmet",
       "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
       "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailNoticeNoEmail": "Deine Bestätigungs-E-Mail enthält einen Link zur Widmungsurkunde.",
       "emailPreview": {
         "greeting": "Hallo {recipientName},",
         "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",
@@ -97,31 +97,31 @@
     "errors": {
       "zipCode": {
         "required": "Postleitzahl ist erforderlich",
-        "invalid": "Bitte gib eine gültige Postleitzahl an"
+        "invalid": "Bitte gebe eine gültige Postleitzahl ein."
       },
       "address": {
         "required": "Adresse ist erforderlich",
-        "invalid": "Bitte gib eine gültige Adresse an"
+        "invalid": "Bitte gebe eine gültige Adresse ein."
       },
       "city": {
         "required": "Stadt ist erforderlich",
-        "invalid": "Bitte gib eine gültige Stadt an"
+        "invalid": "Bitte gebe eine gültige Stadt ein."
       },
       "country": {
         "required": "Land ist erforderlich",
-        "invalid": "Bitte gib ein gültiges Land an"
+        "invalid": "Bitte gebe eine gültige Stadt ein."
       },
       "firstName": {
         "required": "Vorname ist erforderlich",
-        "invalid": "Bitte gib einen gültigen Vornamen an"
+        "invalid": "Bitte gebe einen gültigen Vornamen ein."
       },
       "lastName": {
         "required": "Nachname ist erforderlich",
-        "invalid": "Bitte gib einen gültigen Nachnamen an"
+        "invalid": "Bitte gebe einen gültigen Nachnamen ein."
       },
       "companyName": {
         "required": "Firmen-/Organisationsname ist erforderlich",
-        "invalid": "Bitte gib einen gültigen Firmen-/Organisationsnamen an"
+        "invalid": "Bitte gebe einen gültigen Vornamen ein."
       },
       "email": {
         "required": "E-Mail ist erforderlich",
@@ -129,16 +129,16 @@
       },
       "tin": {
         "required": "TIN ist erforderlich",
-        "invalid": "Bitte gib eine gültige TIN an"
+        "invalid": "Bitte gebe eine gültige TIN ein."
       },
       "paymentMethod": {
         "required": "Bitte wähle eine Zahlungsart aus"
       },
       "address2": {
-        "invalid": "Bitte gib eine gültige Adresse an"
+        "invalid": "Bitte gebe eine gültige Adresse ein."
       },
       "state": {
-        "invalid": "Bitte gib ein gültiges Bundesland an"
+        "invalid": "Bitte gebe ein gültiges Land ein."
       }
     },
     "sepa": {
@@ -154,12 +154,12 @@
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
       },
       "mandateTitle": "SEPA-Lastschriftmandat",
-      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) {creditor} und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von {creditor} und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
+      "mandateIntro": "Ich ermächtige/ Wir ermächtigen (A) {creditor} und Stripe, unseren Zahlungsdienstleister, Zahlungen von meinem/ unserem Konto mittels Lastschrift einzuziehen. Zugleich (B) weise ich mein/ weisen wir unser Kreditinstitut an, die von Rocketship Inc. und Stripe auf mein/ unser Konto gezogenen Lastschriften einzulösen.",
       "creditor": "Gläubiger",
       "creditorId": "Gläubiger-ID",
       "paymentType": "Zahlungsart",
-      "paymentTypeRecurrent": "Wiederkehrende Zahlung",
-      "paymentTypeOneOff": "Einmalige Zahlung",
+      "paymentTypeRecurrent": "Dauerauftrag",
+      "paymentTypeOneOff": "Einmalzahlung",
       "mandateRights": "Hinweis: Ich kann/ Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem/ unserem Kreditinstitut vereinbarten Bedingungen."
     },
     "card": {

@@ -1,7 +1,7 @@
 {
   "consentModal": {
     "title": "Hat jemand Kekse gesagt?",
-    "description": "Wir nutzen nur Cookies, ohne die diese Website nicht funktioniert. Das Einzige, wonach wir fragen, sind eingebettete Videos, und du kannst diese Wahl jederzeit ändern.",
+    "description": "Wir verwenden ausschließlich Cookies, ohne die diese Website nicht funktioniert. Die einzige Einstellung, um die wir dich bitten, betrifft eingebettete Videos, und diese Einstellung kann jederzeit geändert werden.",
     "acceptAllBtn": "Alle akzeptieren",
     "acceptNecessaryBtn": "Optionale ablehnen",
     "showPreferencesBtn": "Präferenzen verwalten",

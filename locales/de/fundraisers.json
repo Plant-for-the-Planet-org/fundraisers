@@ -35,21 +35,21 @@
       "titleNotAvailable": "Spenden sind nicht möglich",
       "fundedBadge": "{percent, number} % finanziert",
       "raised": "Gemeinsam habt ihr {amount} gesammelt.",
-      "raisedForProject": "Gemeinsam habt ihr {amount} für {project} gesammelt.",
-      "impactLine": "Eure Spenden {impact}.",
-      "impactTrees": "pflanzen {count, plural, one {# Baum} other {# Bäume}}",
-      "impactRestored": "renaturieren {area} Wald",
+      "raisedForProject": "Zusammen habt ihr {amount} für {project} gesammelt.",
+      "impactLine": "Die Spenden sind {impact}.",
+      "impactTrees": "planzen {count, plural, one {# Baum} other {# Bäume}}",
+      "impactRestored": "stellen {area} Wald wieder her",
       "impactConserved": "schützen {area} Wald",
-      "impactFunding": "unterstützen die Mission von Plant-for-the-Planet",
+      "impactFunding": "unterstützt die Mission von Plant-for-the-Planet",
       "areaHa": "{area} ha",
       "areaM2": "{area} m²",
-      "closedNote": "Dieser Spendenaufruf nimmt keine neuen Spenden mehr an.",
-      "notAvailableNote": "Wende dich an die Organisator*innen.",
-      "exploreCta": "Weitere Spendenaufrufe entdecken",
+      "closedNote": "Dieser Spendenaufruf nimmt keine neuen Spenden mehr entgegen.",
+      "notAvailableNote": "Bitte wende dich an den/die Organisator:in",
+      "exploreCta": "Andere Spendenaufrufe entdecken.",
       "shareCta": "Teilen",
-      "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",
+      "shareText": "{title} hat {amount} gesammelt. Vielen Dank an alle, die gespendet haben.",
       "shareCopied": "Link kopiert!",
-      "shareFailed": "Der Link konnte nicht geteilt werden. Bitte erneut versuchen."
+      "shareFailed": "Der Link konnte nicht geteilt werden. Versuche es erneut."
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
@@ -140,15 +140,15 @@
         "reorder": "Zum Sortieren ziehen",
         "remove": "Entfernen",
         "selfRemove": {
-          "title": "Dich selbst als Gastgeber entfernen?",
-          "description": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
-          "descriptionHidden": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen.",
-          "hide": "Namen ausblenden",
+          "title": "Dich selbst als Organisator:in entfernen?",
+          "description": "Du verlierst den Zugriff auf den Spendenaufruf, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du deinen Namen von der öffentlichen Seite entfernen, aber den Zugriff behalten möchtest, blende ihn stattdessen aus.",
+          "descriptionHidden": "Du verlierst den Zugriff auf die Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen.",
+          "hide": "Meinen Namen ausblenden.",
           "confirm": "Mich entfernen",
           "cancel": "Abbrechen"
         },
-        "revoke": "Einladung zurückziehen",
-        "revokeHint": "Einladung zurückziehen. Der Link in der E-Mail funktioniert dann nicht mehr.",
+        "revoke": "Einladung widerrufen.",
+        "revokeHint": "Einladung widerrufen. Der Link in der E-Mail funktioniert dann nicht mehr.",
         "lastAdminHint": "Ein Spendenaufruf braucht mindestens einen Admin.",
         "lastPublicHint": "Ein Spendenaufruf braucht mindestens eine*n öffentliche*n Organisator*in.",
         "emailPlaceholder": "E-Mail-Adresse",
@@ -161,14 +161,14 @@
         "toastError": "Etwas ist schiefgelaufen, versuche es erneut.",
         "toastHostsLoadFailed": "Vollständige Organisator*innenliste konnte nicht geladen werden. Einige werden möglicherweise nicht angezeigt.",
         "toastReorderError": "Reihenfolge teilweise gespeichert. Neu laden, um die aktuelle Reihenfolge zu sehen.",
-        "declined": "Abgelehnt",
-        "expired": "Abgelaufen",
-        "inviteExpires": "Läuft am {date} ab",
-        "inviteLapsed": "Einladung am {date} abgelaufen",
-        "resend": "Einladung erneut senden",
-        "resendDeclinedHint": "Diese Person hat abgelehnt. Entferne sie und lade sie erneut ein, falls das ein Versehen war.",
-        "toastResent": "Einladung erneut an {email} gesendet",
-        "toastResendRefused": "Diese Einladung kann nicht erneut gesendet werden."
+        "declined": "Abgelehnt.",
+        "expired": "Abgelaufen.",
+        "inviteExpires": "Läuft am {date} ab.",
+        "inviteLapsed": "Einladung ist am {date} abgelaufen.",
+        "resend": "Einladung erneut verschicken.",
+        "resendDeclinedHint": "Diese Person hat abgelehnt. Entferne sie und lade sie erneut ein, falls es sich um einen Fehler gehandelt hat.",
+        "toastResent": "Einladung erneut an {email} verschickt.",
+        "toastResendRefused": "Die Einladung konnte nicht nochmal gesendet werden."
       },
       "goalPreview": {
         "raised": "{amount} gesammelt",
@@ -346,8 +346,8 @@
           "description": "Aktiviere das Sammeln von Spenden und schalte den Aufruf frei"
         },
         "visibility": {
-          "label": "Diesen Spendenaufruf öffentlich listen",
-          "description": "Wenn aus, erscheint er nicht in der Suche oder unter Entdecken. Wer den Link hat, kann ihn weiterhin öffnen und spenden."
+          "label": "Liste diesen Spendenaufruf öffentlich.",
+          "description": "Wenn die Funktion deaktiviert ist, erscheint der Aufruf wder in den Suchergebnissen, noch unter \"Entdecken\". Jeder, der den Link hat, kann ihn weiterhin öffnen und spenden."
         },
         "addModule": "Modul hinzufügen",
         "stage": {
