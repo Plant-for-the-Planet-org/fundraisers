@@ -8,6 +8,7 @@ import type {
 } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
 import {
   Eye,
@@ -48,6 +49,7 @@ import {
 import { platformUserMessage } from '@/lib/api/http-error-classifier';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { cn } from '@/lib/utils';
+import { isValidEmail, normalizeEmail } from '@/lib/utils/email';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
@@ -57,6 +59,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -77,8 +80,6 @@ interface ManageHostsDialogProps {
   hosts: FundraiserHost[];
   onHostsChange: (hosts: FundraiserHost[]) => void;
 }
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function countActiveAdmins(hosts: FundraiserHost[]): number {
   return hosts.filter(h => h.status === 'active' && h.role === 'admin').length;
@@ -239,6 +240,7 @@ export function ManageHostsDialog({
   );
 }
 
+/** Renders one host and manages role, visibility, invitation, and removal actions for that row. */
 function HostRow({
   host,
   fundraiserId,
@@ -256,7 +258,9 @@ function HostRow({
 }) {
   const t = useTranslations('Fundraisers.form.hosts');
   const format = useFormatter();
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [selfRemoveOpen, setSelfRemoveOpen] = useState(false);
 
   const {
     attributes,
@@ -336,8 +340,9 @@ function HostRow({
     }
   };
 
-  const handlePublicChange = async (next: boolean) => {
-    if (!token) return;
+  /** Resolves to whether the change was persisted, so a caller can keep its own UI open on failure. */
+  const handlePublicChange = async (next: boolean): Promise<boolean> => {
+    if (!token) return false;
     setIsSaving(true);
     try {
       replaceHost(
@@ -348,8 +353,10 @@ function HostRow({
           token
         )
       );
+      return true;
     } catch (err) {
       handleError(err);
+      return false;
     } finally {
       setIsSaving(false);
     }
@@ -383,6 +390,7 @@ function HostRow({
     }
   };
 
+  /** Removes this host and redirects self-removing users away from the now-inaccessible edit page. */
   const handleRemove = async () => {
     if (!token) return;
     setIsSaving(true);
@@ -392,6 +400,8 @@ function HostRow({
       useHostedFundraisersStore.getState().reset();
       onHostsChange(hosts.filter(h => h.id !== host.id));
       toast.success(t('toastRemoved'));
+      // Self-removal takes the edit page's own rights with it, so don't leave the user sitting on it. Replace, so Back does not return to a page they can no longer load.
+      if (isSelf) router.replace('/dashboard');
     } catch (err) {
       handleError(err);
     } finally {
@@ -508,7 +518,10 @@ function HostRow({
                 : removeLabel
         }
         onClick={() => {
-          if (!removeBlocked) void handleRemove();
+          if (removeBlocked) return;
+          // Self-removal is the one action in this dialog the user cannot undo alone.
+          if (isSelf) setSelfRemoveOpen(true);
+          else void handleRemove();
         }}
         className={cn(
           // Hover is lost while the pointer is captured for a drag, so the dragging row reveals its actions too.
@@ -524,7 +537,99 @@ function HostRow({
           <Trash2 size={16} />
         )}
       </button>
+
+      <SelfRemoveDialog
+        open={selfRemoveOpen}
+        onOpenChange={next => {
+          if (!isSaving) setSelfRemoveOpen(next);
+        }}
+        canHide={host.isPublic}
+        isSaving={isSaving}
+        onHide={async () => {
+          // Stay open if hiding failed, so the toast's advice has something to act on.
+          if (await handlePublicChange(false)) setSelfRemoveOpen(false);
+        }}
+        onRemove={() => void handleRemove()}
+      />
     </div>
+  );
+}
+
+/**
+ * Confirmation for removing your own host row.
+ *
+ * Hiding is the action we lead with: it is what most hosts actually want (name off the public page,
+ * access kept) and it is reversible. It is offered only while the row is still public.
+ */
+function SelfRemoveDialog({
+  open,
+  onOpenChange,
+  canHide,
+  isSaving,
+  onHide,
+  onRemove,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  canHide: boolean;
+  isSaving: boolean;
+  onHide: () => void;
+  onRemove: () => void;
+}) {
+  const t = useTranslations('Fundraisers.form.hosts.selfRemove');
+
+  const cancelButton = (
+    <Button
+      type='button'
+      variant='outline'
+      disabled={isSaving}
+      onClick={() => onOpenChange(false)}
+    >
+      {t('cancel')}
+    </Button>
+  );
+
+  const removeButton = (
+    <Button
+      type='button'
+      variant={canHide ? 'ghost' : 'destructive'}
+      className={cn(canHide && 'text-destructive hover:text-destructive')}
+      disabled={isSaving}
+      onClick={onRemove}
+    >
+      {isSaving && <Loader2 className='animate-spin' size={16} />}
+      {t('confirm')}
+    </Button>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className='sm:max-w-md' showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>
+            {canHide ? t('description') : t('descriptionHidden')}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          {/* Hiding leads, so removal steps back to a quiet ghost button on the left. Without a hide option there is nothing to step back from, and removal becomes the dialog's own confirm action on the right. */}
+          {canHide ? (
+            <>
+              {removeButton}
+              {cancelButton}
+              <Button type='button' disabled={isSaving} onClick={onHide}>
+                {t('hide')}
+              </Button>
+            </>
+          ) : (
+            <>
+              {cancelButton}
+              {removeButton}
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -544,7 +649,7 @@ function AddHostForm({
   const [role, setRole] = useState<FundraiserHostRole>('viewer');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const emailIsValid = EMAIL_PATTERN.test(email.trim());
+  const emailIsValid = isValidEmail(email);
 
   const handleAdd = async () => {
     if (!token || !emailIsValid || isSubmitting) return;
@@ -553,7 +658,7 @@ function AddHostForm({
       const created = await addFundraiserHost(
         fundraiserId,
         {
-          email: email.trim(),
+          email,
           role,
           // New hosts are public by default so they appear on the fundraiser
           // page right away; togglable per row afterwards.
@@ -566,7 +671,7 @@ function AddHostForm({
       setRole('viewer');
       toast.success(
         created.status === 'invited'
-          ? t('toastInvited', { email: created.invitedEmail ?? email.trim() })
+          ? t('toastInvited', { email: created.invitedEmail ?? email })
           : t('toastAdded')
       );
     } catch (err) {
@@ -600,7 +705,8 @@ function AddHostForm({
         value={email}
         placeholder={t('emailPlaceholder')}
         className='flex-1'
-        onChange={event => setEmail(event.target.value)}
+        aria-invalid={email.length > 0 && !emailIsValid}
+        onChange={event => setEmail(normalizeEmail(event.target.value))}
         onKeyDown={event => {
           if (event.key === 'Enter') handleAdd();
         }}

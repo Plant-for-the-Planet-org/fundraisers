@@ -139,6 +139,14 @@
         "visibilityOff": "Hidden from public",
         "reorder": "Drag to reorder",
         "remove": "Remove",
+        "selfRemove": {
+          "title": "Remove yourself as host?",
+          "description": "You'll lose access to this fundraiser, and only another admin can add you back. To take your name off the public page but keep access, hide it instead.",
+          "descriptionHidden": "You'll lose access to this fundraiser, and only another admin can add you back.",
+          "hide": "Hide my name",
+          "confirm": "Remove me",
+          "cancel": "Cancel"
+        },
         "revoke": "Revoke invitation",
         "revokeHint": "Revoke invitation. The link in the email will stop working.",
         "lastAdminHint": "A fundraiser needs at least one admin.",
@@ -338,8 +346,8 @@
           "description": "Enable donation collection and make the fundraiser active"
         },
         "visibility": {
-          "label": "Make the fundraiser discoverable",
-          "description": "Allow people to find this fundraiser in search and browse"
+          "label": "List this fundraiser publicly",
+          "description": "When off, it won't show up in search or on Explore. Anyone with the link can still open it and donate."
         },
         "addModule": "Add a module",
         "stage": {
