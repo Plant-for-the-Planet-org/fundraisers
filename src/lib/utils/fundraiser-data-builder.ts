@@ -138,7 +138,6 @@ export function buildUpdateFundraiserRequest(
   if (dirtyFields.description) request.description = values.description;
   if (dirtyFields.goalAmount) request.goalAmount = values.goalAmount;
   if (dirtyFields.visibility) request.visibility = values.visibility;
-  if (dirtyFields.status) request.status = values.status;
   if (isProjectAllocationsDirty(dirtyFields)) {
     request.projectAllocations = values.projectAllocations;
   }
@@ -195,7 +194,6 @@ export function buildCreateFundraiserRequest(
     currency: values.currency,
     goalAmount: values.goalAmount,
     visibility: values.visibility,
-    status: values.status,
     projectAllocations: values.projectAllocations,
     settings: {
       theme: themeWithSortedGradient(values.settings.theme),
@@ -259,7 +257,6 @@ export function buildCloneFundraiserRequest(
     currency: source.currency?.toUpperCase() ?? getCurrencyForCountry(country),
     goalAmount: source.goalAmount,
     visibility: source.visibility,
-    status: 'draft',
     projectAllocations: source.projectAllocations.map(allocation => ({
       project_id: allocation.project.id,
       percentage: allocation.percentage,
