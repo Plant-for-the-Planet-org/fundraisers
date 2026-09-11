@@ -38,7 +38,7 @@
       "emptyState": "Keine Spenden zum anzeigen",
       "viewAllOverlay": {
         "title": "Alle Spenden",
-        "subtitle": "Schaue dir die tollen Menschen an, die diese Spendenaktion unterstützt haben",
+        "subtitle": "Schaue dir die tollen Menschen an, die diesen Spendenaufruf unterstützt haben",
         "emptyState": "Noch keine Spenden",
         "closeAria": "Spendenliste schließen",
         "loadingMore": "Weitere Spenden laden...",
