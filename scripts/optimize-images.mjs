@@ -31,11 +31,23 @@ if (targets.length === 0) {
   process.exit(1);
 }
 
+const isSupported = name => EXTENSIONS.has(extname(name).toLowerCase());
+
+// An explicit file is checked too, not just folder contents. sharp happily reads an SVG and would
+// write JPEG bytes back under the .svg name, which destroys the alpha the masked patterns depend on.
 function collect(target) {
-  if (!statSync(target).isDirectory()) return [target];
-  return readdirSync(target)
-    .filter(name => EXTENSIONS.has(extname(name).toLowerCase()))
-    .map(name => join(target, name));
+  if (statSync(target).isDirectory()) {
+    return readdirSync(target)
+      .filter(isSupported)
+      .map(name => join(target, name));
+  }
+  if (!isSupported(target)) {
+    console.error(
+      `Skipping ${target} — only ${[...EXTENSIONS].join(', ')} are supported.`
+    );
+    return [];
+  }
+  return [target];
 }
 
 const files = targets.flatMap(collect).sort();
