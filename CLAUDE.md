@@ -16,16 +16,17 @@ Requires a `.env.local` file in the project root before running locally.
 
 Node 24 is required (Next.js needs ≥20.9). The dev server may already be running on port 3000 — check first. If not, `nvm use 24` then `npm run dev`. The `.claude/launch.json` `fundraisers-dev` preset handles this automatically via `bash -lc`.
 
-| Command                | When to use                                                      |
-| ---------------------- | ---------------------------------------------------------------- |
-| `npm run dev`          | Start the local dev server                                       |
-| `npm run build`        | Production build — run before pushing to catch type/build errors |
-| `npm run lint`         | ESLint checks                                                    |
-| `npm run type-check`   | TypeScript checks without emitting files                         |
-| `npm run format`       | Auto-format code style issues                                    |
-| `npm run imports:sort` | Sort import order                                                |
-| `npm run test`         | Run unit tests once (Vitest)                                     |
-| `npm run test:watch`   | Run unit tests in watch mode                                     |
+| Command                   | When to use                                                      |
+| ------------------------- | ---------------------------------------------------------------- |
+| `npm run dev`             | Start the local dev server                                       |
+| `npm run build`           | Production build — run before pushing to catch type/build errors |
+| `npm run lint`            | ESLint checks                                                    |
+| `npm run type-check`      | TypeScript checks without emitting files                         |
+| `npm run format`          | Auto-format code style issues                                    |
+| `npm run imports:sort`    | Sort import order                                                |
+| `npm run optimize:images` | Re-encode images added under `public/` before committing them    |
+| `npm run test`            | Run unit tests once (Vitest)                                     |
+| `npm run test:watch`      | Run unit tests in watch mode                                     |
 
 ## Project structure
 
