@@ -3,11 +3,14 @@
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 
 import { Plus, TriangleAlert } from 'lucide-react';
+import { RadioGroup } from 'radix-ui';
 import { cn } from '@/lib/utils';
+import { savedMethodRadioValue } from '@/components/donate/payment-methods-helpers';
 import { CardBrandIcon } from '@/components/icons/donation';
 import { RadioDot } from './payment-method-option';
 
 type SavedPaymentMethodOptionProps = {
+  savedMethodId: string;
   typeId: PaymentMethodId;
   brand?: string | null;
   last4: string;
@@ -16,10 +19,10 @@ type SavedPaymentMethodOptionProps = {
   expiringSoonLabel?: string;
   ariaLabel: string;
   isSelected: boolean;
-  onSelect: () => void;
 };
 
 export function SavedPaymentMethodOption({
+  savedMethodId,
   typeId,
   brand,
   last4,
@@ -28,23 +31,18 @@ export function SavedPaymentMethodOption({
   expiringSoonLabel,
   ariaLabel,
   isSelected,
-  onSelect,
 }: SavedPaymentMethodOptionProps) {
   const showBrand = typeId === 'card';
   return (
-    <button
-      type='button'
-      role='radio'
-      aria-checked={isSelected}
-      tabIndex={isSelected ? 0 : -1}
-      onClick={onSelect}
+    <RadioGroup.Item
+      value={savedMethodRadioValue(savedMethodId)}
       aria-label={
         isExpiringSoon && expiringSoonLabel
           ? `${ariaLabel}, ${expiringSoonLabel}`
           : ariaLabel
       }
       className={cn(
-        'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
+        'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isSelected
           ? 'border-foreground bg-muted'
           : 'border-border/60 bg-transparent hover:border-gray-400'
@@ -77,14 +75,14 @@ export function SavedPaymentMethodOption({
         </div>
         <RadioDot isSelected={isSelected} />
       </div>
-    </button>
+    </RadioGroup.Item>
   );
 }
 
 type NewMethodOptionProps = {
+  methodId: PaymentMethodId;
   label: string;
   isSelected: boolean;
-  onSelect: () => void;
 };
 
 // "Use a new ..." option shown below saved payment methods.
@@ -95,20 +93,16 @@ type NewMethodOptionProps = {
 // The layout intentionally matches saved payment rows so it feels like part
 // of the same selection group.
 export function NewMethodOption({
+  methodId,
   label,
   isSelected,
-  onSelect,
 }: NewMethodOptionProps) {
   return (
     <div className='border-t border-border pt-2'>
-      <button
-        type='button'
-        role='radio'
-        aria-checked={isSelected}
-        tabIndex={isSelected ? 0 : -1}
-        onClick={onSelect}
+      <RadioGroup.Item
+        value={methodId}
         className={cn(
-          'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
+          'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           isSelected
             ? 'border-foreground bg-muted'
             : 'border-border/60 bg-transparent hover:border-gray-400'
@@ -126,7 +120,7 @@ export function NewMethodOption({
           <span className='flex-1 text-sm font-medium'>{label}</span>
           <RadioDot isSelected={isSelected} />
         </div>
-      </button>
+      </RadioGroup.Item>
     </div>
   );
 }

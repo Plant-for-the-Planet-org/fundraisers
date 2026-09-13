@@ -1,5 +1,6 @@
 'use client';
 
+import type { KeyboardEvent } from 'react';
 import type { SetValueConfig } from 'react-hook-form';
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
@@ -7,17 +8,30 @@ import type { DonationFormValues } from '@/components/donate/donation-form-conte
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { RadioGroup } from 'radix-ui';
 import { useDonationForm } from '@/components/donate/donation-form-context';
 import { PaymentEntryForms } from '@/components/donate/payment-entry-forms';
 import { PaymentMethodOption } from '@/components/donate/payment-method-option';
+import {
+  parseSavedMethodRadioValue,
+  savedMethodRadioValue,
+} from '@/components/donate/payment-methods-helpers';
 import { PaymentMethodsSkeleton } from '@/components/donate/payment-methods-skeleton';
 import { SavedMethodGroup } from '@/components/donate/saved-method-group';
 import { useFieldError } from '@/components/donate/use-field-error';
 import { usePaymentMethodOptions } from '@/components/donate/use-payment-method-options';
-import { useRadioGroupKeyboard } from '@/components/donate/use-radio-group-keyboard';
 
 // Programmatic syncs (initial selection, stale-method cleanup) are not user
 // edits, so they must not mark the field dirty/touched or trigger validation.
+const NAVIGATION_KEYS = new Set([
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'Home',
+  'End',
+]);
+
 const SILENT_SYNC: SetValueConfig = {
   shouldDirty: false,
   shouldTouch: false,
@@ -55,7 +69,6 @@ export function PaymentMethods() {
   } = usePaymentMethodOptions();
 
   const headingId = useId();
-  const handleRadioKeyDown = useRadioGroupKeyboard();
 
   // Reference to the form section so we can scroll to it.
   const formSectionRef = useRef<HTMLDivElement>(null);
@@ -194,6 +207,55 @@ export function PaymentMethods() {
     [handleMethodSelect, cardFormRef, sepaFormRef]
   );
 
+  // One radio group value for the whole list. Saved methods are prefixed, see payment-methods-helpers.
+  const radioGroupValue = selectedSavedMethodId
+    ? savedMethodRadioValue(selectedSavedMethodId)
+    : selectedPaymentMethod;
+
+  // Radix selects the row an arrow key lands on. That happens between keydown and keyup, so this flag tells the value handler the selection came from browsing, not from an explicit choice.
+  const isArrowSelectionRef = useRef(false);
+
+  const handleRadioValueChange = useCallback(
+    (value: string) => {
+      const savedMethodId = parseSavedMethodRadioValue(value);
+      if (savedMethodId) {
+        const saved = savedMethodOptions.find(s => s.id === savedMethodId);
+        if (saved) handleSavedMethodSelect(saved.id, saved.typeId);
+        return;
+      }
+      const methodId = value as PaymentMethodId;
+      // Card and SEPA open an entry form. An explicit choice, by click, Enter or Space, also moves focus into its first field. Arrow keys select as they pass, like native radios, so they must not pull focus away.
+      const opensEntryForm = methodId === 'card' || methodId === 'sepa_debit';
+      if (opensEntryForm && !isArrowSelectionRef.current) {
+        handleNewMethodSelect(methodId);
+      } else {
+        handleMethodSelect(methodId);
+      }
+    },
+    [
+      savedMethodOptions,
+      handleSavedMethodSelect,
+      handleNewMethodSelect,
+      handleMethodSelect,
+    ]
+  );
+
+  const handleRadioGroupKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (NAVIGATION_KEYS.has(event.key)) {
+      isArrowSelectionRef.current = true;
+      return;
+    }
+    // Radix blocks Enter on radios. Treat it like Space: select the focused row.
+    if (event.key !== 'Enter') return;
+    const target = event.target as HTMLButtonElement;
+    if (target.getAttribute('role') !== 'radio' || target.disabled) return;
+    event.preventDefault();
+    target.click();
+  };
+  const handleRadioGroupKeyUp = () => {
+    isArrowSelectionRef.current = false;
+  };
+
   if (!paymentOptionsReady) return <PaymentMethodsSkeleton />;
 
   if (visibleMethodOptions.length === 0) {
@@ -225,11 +287,13 @@ export function PaymentMethods() {
         )}
       </div>
 
-      {/* One radio group for every selectable row, including saved cards and IBANs nested in their type group. The type header inside a group is a shortcut button, not a choice of its own. */}
-      <div
-        role='radiogroup'
+      {/* One radio group for every selectable row, including saved cards and IBANs nested in their type group. Radix owns the roles, the roving Tab stop and the arrow keys. The type header inside a group is a shortcut button, not a choice of its own. */}
+      <RadioGroup.Root
+        value={radioGroupValue}
+        onValueChange={handleRadioValueChange}
+        onKeyDown={handleRadioGroupKeyDown}
+        onKeyUp={handleRadioGroupKeyUp}
         aria-labelledby={headingId}
-        onKeyDown={handleRadioKeyDown}
         className='border border-border rounded-lg'
       >
         <div className='space-y-3 p-4'>
@@ -256,7 +320,6 @@ export function PaymentMethods() {
                   lastUsedLabel={method.lastUsedLabel}
                   remark={method.remark}
                   disabled={method.disabled}
-                  onSelect={handleMethodSelect}
                 />
               );
             }
@@ -270,14 +333,12 @@ export function PaymentMethods() {
                 selectedPaymentMethod={selectedPaymentMethod}
                 isSubscription={isSubscription}
                 showFeeDetails={showMethodFees}
-                onSavedMethodSelect={handleSavedMethodSelect}
-                onNewMethodSelect={handleNewMethodSelect}
                 onSavedGroupSelect={handleSavedGroupSelect}
               />
             );
           })}
         </div>
-      </div>
+      </RadioGroup.Root>
 
       {paymentMethodError && (
         <p className='text-sm text-destructive'>{paymentMethodError}</p>

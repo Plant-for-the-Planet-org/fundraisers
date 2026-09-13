@@ -4,6 +4,7 @@ import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { SavedMethodOption } from '@/components/donate/saved-method-option';
 import type { VisibleMethodOption } from '@/components/donate/use-payment-method-options';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 import { TriangleAlert } from 'lucide-react';
 import {
@@ -29,10 +30,6 @@ interface SavedMethodGroupProps {
   isSubscription: boolean;
   /** Whether processing-fee details should be shown for this donation. */
   showFeeDetails: boolean;
-  /** Called when a saved method row is chosen. */
-  onSavedMethodSelect: (savedMethodId: string, typeId: PaymentMethodId) => void;
-  /** Called when the "use a new …" row is chosen. */
-  onNewMethodSelect: (methodId: PaymentMethodId) => void;
   /** Called when the group header/container is chosen, selecting the preferred saved method. */
   onSavedGroupSelect: (methodId: PaymentMethodId) => void;
 }
@@ -49,11 +46,12 @@ export function SavedMethodGroup({
   selectedPaymentMethod,
   isSubscription,
   showFeeDetails,
-  onSavedMethodSelect,
-  onNewMethodSelect,
   onSavedGroupSelect,
 }: SavedMethodGroupProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
+  const feeDescriptionId = useId();
+  const hasFeeTooltip =
+    showFeeDetails && !!method.feeText && !!method.feeTooltip;
 
   // A generic option is only "selected" when no saved method is active — a
   // saved card and the generic card share the same id.
@@ -91,6 +89,7 @@ export function SavedMethodGroup({
           type='button'
           onClick={handleHeaderSelect}
           aria-pressed={selectedPaymentMethod === method.id}
+          aria-describedby={hasFeeTooltip ? feeDescriptionId : undefined}
           className='flex flex-1 items-center gap-3 text-left'
         >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
@@ -112,7 +111,13 @@ export function SavedMethodGroup({
           <MethodFeeDetails
             feeText={method.feeText}
             feeTooltip={method.feeTooltip}
+            tooltipFocusable={false}
           />
+        )}
+        {hasFeeTooltip && (
+          <span id={feeDescriptionId} className='sr-only'>
+            {method.feeTooltip}
+          </span>
         )}
       </div>
       <div className='space-y-2 p-3'>
@@ -128,6 +133,7 @@ export function SavedMethodGroup({
             return (
               <div key={saved.id} className='space-y-2'>
                 <SavedPaymentMethodOption
+                  savedMethodId={saved.id}
                   typeId={saved.typeId}
                   brand={saved.brand}
                   last4={saved.last4}
@@ -136,7 +142,6 @@ export function SavedMethodGroup({
                   expiringSoonLabel={saved.expiringSoonLabel}
                   ariaLabel={saved.ariaLabel}
                   isSelected={selectedSavedMethodId === saved.id}
-                  onSelect={() => onSavedMethodSelect(saved.id, saved.typeId)}
                 />
                 {showRecurringHint && (
                   <p className='flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-5 text-amber-700'>
@@ -154,9 +159,9 @@ export function SavedMethodGroup({
           })}
         </div>
         <NewMethodOption
+          methodId={method.id}
           label={newMethodLabel}
           isSelected={isGenericSelected}
-          onSelect={() => onNewMethodSelect(method.id)}
         />
       </div>
     </div>

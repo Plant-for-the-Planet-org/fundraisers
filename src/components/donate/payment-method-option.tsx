@@ -4,8 +4,9 @@ import type { ComponentType } from 'react';
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { PaymentLogoProps } from '@/components/donate/payment-methods-helpers';
 
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import { Check } from 'lucide-react';
+import { RadioGroup } from 'radix-ui';
 import { cn } from '@/lib/utils';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -15,6 +16,8 @@ type MethodFeeDetailsProps = {
   containerClassName?: string;
   textClassName?: string;
   iconClassName?: string;
+  /** See InfoTooltip. Rows pass false and describe themselves with the tooltip text instead. */
+  tooltipFocusable?: boolean;
 };
 
 export const MethodFeeDetails = memo(function MethodFeeDetails({
@@ -23,6 +26,7 @@ export const MethodFeeDetails = memo(function MethodFeeDetails({
   containerClassName,
   textClassName,
   iconClassName,
+  tooltipFocusable = true,
 }: MethodFeeDetailsProps) {
   return (
     <div className={cn('flex items-center gap-1', containerClassName)}>
@@ -32,6 +36,7 @@ export const MethodFeeDetails = memo(function MethodFeeDetails({
           content={feeTooltip}
           className='inline-flex'
           iconClassName={iconClassName}
+          focusable={tooltipFocusable}
         />
       )}
     </div>
@@ -66,7 +71,6 @@ type PaymentMethodOptionProps = {
   lastUsedLabel?: string;
   remark?: string;
   disabled?: boolean;
-  onSelect: (methodId: PaymentMethodId) => void;
 };
 
 export const PaymentMethodOption = memo(function PaymentMethodOption({
@@ -80,20 +84,16 @@ export const PaymentMethodOption = memo(function PaymentMethodOption({
   lastUsedLabel,
   remark,
   disabled,
-  onSelect,
 }: PaymentMethodOptionProps) {
   const MethodLogo = methodLogo;
+  const feeDescriptionId = useId();
+  const hasFeeTooltip = showFeeDetails && !!methodFeeText && !!methodFeeTooltip;
 
+  // The fee info icon sits next to the radio, not inside it. A focusable control inside a button is invalid, and it would become a Tab stop ahead of the checked row.
   return (
-    <button
-      type='button'
-      role='radio'
-      aria-checked={isSelected}
-      aria-disabled={disabled}
-      tabIndex={isSelected ? 0 : -1}
-      onClick={() => !disabled && onSelect(methodId)}
+    <div
       className={cn(
-        'w-full rounded-lg border p-3 text-left transition-all',
+        'flex items-center gap-3 rounded-lg border p-3 transition-all has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-1',
         disabled && 'cursor-not-allowed border-border bg-muted opacity-70',
         !disabled &&
           (isSelected
@@ -101,41 +101,47 @@ export const PaymentMethodOption = memo(function PaymentMethodOption({
             : 'border-border bg-white hover:border-gray-400')
       )}
     >
-      <div className='flex items-center justify-between'>
-        <div className='flex flex-1 items-center gap-3'>
-          <div>
-            <RadioDot isSelected={isSelected} />
+      <RadioGroup.Item
+        value={methodId}
+        disabled={disabled}
+        aria-describedby={hasFeeTooltip ? feeDescriptionId : undefined}
+        className='flex flex-1 items-center gap-3 text-left outline-none disabled:cursor-not-allowed'
+      >
+        <RadioDot isSelected={isSelected} />
+
+        {MethodLogo && (
+          <div className='flex h-4 w-12 shrink-0 items-center justify-center text-muted-foreground'>
+            <MethodLogo textColor='currentColor' />
           </div>
-
-          {MethodLogo && (
-            <div className='flex h-4 w-12 shrink-0 items-center justify-center text-muted-foreground'>
-              <MethodLogo textColor='currentColor' />
-            </div>
-          )}
-
-          <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
-            <span className='text-sm font-medium'>{methodLabel}</span>
-            {lastUsedLabel && (
-              <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
-                {lastUsedLabel}
-              </span>
-            )}
-            {remark && (
-              <span className='w-full text-xs text-muted-foreground'>
-                {remark}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {showFeeDetails && methodFeeText && (
-          <MethodFeeDetails
-            feeText={methodFeeText}
-            feeTooltip={methodFeeTooltip}
-            containerClassName='ml-3'
-          />
         )}
-      </div>
-    </button>
+
+        <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
+          <span className='text-sm font-medium'>{methodLabel}</span>
+          {lastUsedLabel && (
+            <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
+              {lastUsedLabel}
+            </span>
+          )}
+          {remark && (
+            <span className='w-full text-xs text-muted-foreground'>
+              {remark}
+            </span>
+          )}
+        </div>
+      </RadioGroup.Item>
+
+      {showFeeDetails && methodFeeText && (
+        <MethodFeeDetails
+          feeText={methodFeeText}
+          feeTooltip={methodFeeTooltip}
+          tooltipFocusable={false}
+        />
+      )}
+      {hasFeeTooltip && (
+        <span id={feeDescriptionId} className='sr-only'>
+          {methodFeeTooltip}
+        </span>
+      )}
+    </div>
   );
 });

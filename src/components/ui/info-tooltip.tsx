@@ -11,6 +11,8 @@ interface InfoTooltipProps {
   triggerLabel?: string;
   className?: string;
   iconClassName?: string;
+  /** False keeps the icon out of the Tab order. Pair it with `aria-describedby` on the control the tooltip explains, so keyboard users still get the text. */
+  focusable?: boolean;
 }
 // Uses Radix Popover to automatically handle viewport collisions and positioning.
 // Tooltip content is rendered in a portal and repositions when space is limited,
@@ -20,6 +22,7 @@ export function InfoTooltip({
   triggerLabel,
   className,
   iconClassName,
+  focusable = true,
 }: InfoTooltipProps) {
   const t = useTranslations('Common.aria');
   const tooltipId = useId();
@@ -31,7 +34,7 @@ export function InfoTooltip({
       <PopoverPrimitive.Trigger asChild>
         <span
           role='button'
-          tabIndex={0}
+          tabIndex={focusable ? 0 : -1}
           aria-label={triggerLabel ?? t('moreInformation')}
           aria-describedby={open ? tooltipId : undefined}
           className={cn(
