@@ -90,6 +90,7 @@ export const PaymentMethodOption = memo(function PaymentMethodOption({
       role='radio'
       aria-checked={isSelected}
       aria-disabled={disabled}
+      tabIndex={isSelected ? 0 : -1}
       onClick={() => !disabled && onSelect(methodId)}
       className={cn(
         'w-full rounded-lg border p-3 text-left transition-all',

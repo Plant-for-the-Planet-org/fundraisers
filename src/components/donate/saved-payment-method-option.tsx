@@ -36,6 +36,7 @@ export function SavedPaymentMethodOption({
       type='button'
       role='radio'
       aria-checked={isSelected}
+      tabIndex={isSelected ? 0 : -1}
       onClick={onSelect}
       aria-label={
         isExpiringSoon && expiringSoonLabel
@@ -104,6 +105,7 @@ export function NewMethodOption({
         type='button'
         role='radio'
         aria-checked={isSelected}
+        tabIndex={isSelected ? 0 : -1}
         onClick={onSelect}
         className={cn(
           'w-full rounded-lg border px-3 py-2.5 text-left transition-all',

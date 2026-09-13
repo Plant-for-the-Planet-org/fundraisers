@@ -14,6 +14,7 @@ import { PaymentMethodsSkeleton } from '@/components/donate/payment-methods-skel
 import { SavedMethodGroup } from '@/components/donate/saved-method-group';
 import { useFieldError } from '@/components/donate/use-field-error';
 import { usePaymentMethodOptions } from '@/components/donate/use-payment-method-options';
+import { useRadioGroupKeyboard } from '@/components/donate/use-radio-group-keyboard';
 
 // Programmatic syncs (initial selection, stale-method cleanup) are not user
 // edits, so they must not mark the field dirty/touched or trigger validation.
@@ -54,6 +55,7 @@ export function PaymentMethods() {
   } = usePaymentMethodOptions();
 
   const headingId = useId();
+  const handleRadioKeyDown = useRadioGroupKeyboard();
 
   // Reference to the form section so we can scroll to it.
   const formSectionRef = useRef<HTMLDivElement>(null);
@@ -227,6 +229,7 @@ export function PaymentMethods() {
       <div
         role='radiogroup'
         aria-labelledby={headingId}
+        onKeyDown={handleRadioKeyDown}
         className='border border-border rounded-lg'
       >
         <div className='space-y-3 p-4'>
