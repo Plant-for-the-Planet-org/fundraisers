@@ -6,8 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { signInWithPopup, signInWithRedirect } from '@/lib/auth/start-sign-in';
-import { useMediaQuery } from '@/lib/hooks/use-media-query';
+import { signInWithPopup } from '@/lib/auth/start-sign-in';
 import { getSafeRedirectPath } from '@/lib/utils/auth';
 
 interface UseSignInOptions {
@@ -19,12 +18,11 @@ interface UseSignInOptions {
 
 /**
  * Shared start logic for the sign-in modal and the /login page.
- * Desktop uses the popup so the current page keeps its state. Small screens would open the popup as a new tab, so they use the redirect flow.
+ * Auth0 runs in a popup so the current page keeps its state. On phones the popup is a new tab, which works the same way: it posts the code back and closes itself. Only a blocked window falls back to the redirect flow.
  */
 export function useSignIn({ returnTo, onSignedIn }: UseSignInOptions) {
   const t = useTranslations('Auth');
   const router = useRouter();
-  const isSmallScreen = useMediaQuery('(max-width: 767px)');
   const [isPending, setIsPending] = useState(false);
 
   const start = async (request: SignInRequest) => {
@@ -34,11 +32,6 @@ export function useSignIn({ returnTo, onSignedIn }: UseSignInOptions) {
     const redirectTo = getSafeRedirectPath(returnTo);
 
     try {
-      if (isSmallScreen) {
-        await signInWithRedirect(request, redirectTo);
-        return;
-      }
-
       const outcome = await signInWithPopup(request, redirectTo);
 
       if (outcome === 'signed-in') {

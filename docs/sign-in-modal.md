@@ -22,10 +22,14 @@ Error callbacks never reach `/redirecting`. The opener polls the popup URL, whic
 
 ## Fallbacks
 
-- Below 768px a popup would open as a new tab, so the redirect flow is used.
+- On phones the popup opens as a new tab. It posts the code back and closes itself the same way. Only a blocked window falls back to the redirect flow, which loses page state such as an open donation overlay.
 - Closing the popup keeps the modal open.
 - After a popup sign-in the modal navigates to `returnTo` only when it differs from the current page and is an allowed path. The host-invite bar relies on this to resume an accept.
 
 ## Theming
 
 Dialogs portal to `<body>`, outside the theme wrapper. `ThemeShell` mirrors `--accent-color` and `--cta-foreground` on the root element so the modal follows the fundraiser's accent.
+
+## Donation nudge
+
+The donor section of the donation overlay shows "Already have an account? Sign in" while signed out. It opens the same modal. Signing in swaps the typed donor details for the account's profile and saved addresses, and keeps amount, frequency and payment choice. The nudge hides once the donor has started typing card or IBAN details, tracked by `hasPaymentInput` in the donation form context.

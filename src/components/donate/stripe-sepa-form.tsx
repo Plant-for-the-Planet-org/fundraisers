@@ -59,7 +59,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
-    const { fundraiser, donationData } = useDonationForm();
+    const { fundraiser, donationData, markPaymentInput } = useDonationForm();
     const creditor = getSepaCreditor(fundraiser.workspace?.country);
 
     const { control } = useFormContext<DonationFormValues>();
@@ -168,6 +168,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     };
 
     const handleIbanChange = (event: StripeIbanElementChangeEvent) => {
+      if (!event.empty) markPaymentInput();
       setIbanComplete(event.complete);
       setIbanError(event.error?.message ?? null);
     };
