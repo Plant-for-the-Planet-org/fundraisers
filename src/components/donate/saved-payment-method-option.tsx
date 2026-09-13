@@ -34,8 +34,9 @@ export function SavedPaymentMethodOption({
   return (
     <button
       type='button'
+      role='radio'
+      aria-checked={isSelected}
       onClick={onSelect}
-      aria-pressed={isSelected}
       aria-label={
         isExpiringSoon && expiringSoonLabel
           ? `${ariaLabel}, ${expiringSoonLabel}`
@@ -44,7 +45,7 @@ export function SavedPaymentMethodOption({
       className={cn(
         'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
         isSelected
-          ? 'border-foreground bg-muted hover:border-gray-400'
+          ? 'border-foreground bg-muted'
           : 'border-border/60 bg-transparent hover:border-gray-400'
       )}
     >
@@ -101,8 +102,9 @@ export function NewMethodOption({
     <div className='border-t border-border pt-2'>
       <button
         type='button'
+        role='radio'
+        aria-checked={isSelected}
         onClick={onSelect}
-        aria-pressed={isSelected}
         className={cn(
           'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
           isSelected

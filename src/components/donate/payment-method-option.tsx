@@ -42,6 +42,7 @@ export const MethodFeeDetails = memo(function MethodFeeDetails({
 export function RadioDot({ isSelected }: { isSelected: boolean }) {
   return (
     <div
+      aria-hidden='true'
       className={cn(
         'flex h-4 w-4 items-center justify-center rounded-full border-2 transition-all',
         isSelected
@@ -86,16 +87,17 @@ export const PaymentMethodOption = memo(function PaymentMethodOption({
   return (
     <button
       type='button'
-      onClick={() => !disabled && onSelect(methodId)}
-      aria-pressed={isSelected}
+      role='radio'
+      aria-checked={isSelected}
       aria-disabled={disabled}
+      onClick={() => !disabled && onSelect(methodId)}
       className={cn(
         'w-full rounded-lg border p-3 text-left transition-all',
-        disabled
-          ? 'cursor-not-allowed border-border bg-muted opacity-70'
-          : 'hover:border-gray-400',
+        disabled && 'cursor-not-allowed border-border bg-muted opacity-70',
         !disabled &&
-          (isSelected ? 'border-foreground bg-muted' : 'border-border bg-white')
+          (isSelected
+            ? 'border-foreground bg-muted'
+            : 'border-border bg-white hover:border-gray-400')
       )}
     >
       <div className='flex items-center justify-between'>

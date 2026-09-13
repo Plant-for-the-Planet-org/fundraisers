@@ -4,7 +4,7 @@ import type { SetValueConfig } from 'react-hook-form';
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { DonationFormValues } from '@/components/donate/donation-form-context';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useDonationForm } from '@/components/donate/donation-form-context';
@@ -52,6 +52,8 @@ export function PaymentMethods() {
     showMethodFees,
     isSubscription,
   } = usePaymentMethodOptions();
+
+  const headingId = useId();
 
   // Reference to the form section so we can scroll to it.
   const formSectionRef = useRef<HTMLDivElement>(null);
@@ -213,13 +215,20 @@ export function PaymentMethods() {
   return (
     <div className='space-y-3'>
       <div className='space-y-2'>
-        <h2 className='text-foreground font-medium'>{t('title')}</h2>
+        <h2 id={headingId} className='text-foreground font-medium'>
+          {t('title')}
+        </h2>
         {showMethodFees && (
           <p className='text-muted-foreground text-sm'>{t('description')}</p>
         )}
       </div>
 
-      <div className='border border-border rounded-lg'>
+      {/* One radio group for every selectable row, including saved cards and IBANs nested in their type group. The type header inside a group is a shortcut button, not a choice of its own. */}
+      <div
+        role='radiogroup'
+        aria-labelledby={headingId}
+        className='border border-border rounded-lg'
+      >
         <div className='space-y-3 p-4'>
           {visibleMethodOptions.map(method => {
             const savedInstancesForMethod = savedByType.get(method.id);
