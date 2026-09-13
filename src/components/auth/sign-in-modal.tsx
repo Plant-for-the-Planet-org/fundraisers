@@ -24,12 +24,15 @@ export function SignInModal() {
   const router = useRouter();
   const isOpen = useSignInModalStore(state => state.isOpen);
   const returnTo = useSignInModalStore(state => state.returnTo);
+  const mode = useSignInModalStore(state => state.mode);
   const close = useSignInModalStore(state => state.close);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isSwitching = mode === 'switch-account';
 
+  // Someone switching accounts is signed in the whole time, so only the plain sign-in closes on auth.
   useEffect(() => {
-    if (isOpen && isAuthenticated) close();
-  }, [isOpen, isAuthenticated, close]);
+    if (isOpen && isAuthenticated && !isSwitching) close();
+  }, [isOpen, isAuthenticated, isSwitching, close]);
 
   const handleSignedIn = () => {
     close();
@@ -46,6 +49,7 @@ export function SignInModal() {
         <SignInCard
           returnTo={returnTo}
           onSignedIn={handleSignedIn}
+          forceLogin={isSwitching}
           header={
             <DialogHeader className='text-left sm:text-left gap-1.5'>
               <DialogTitle className='text-xl'>{t('form.title')}</DialogTitle>

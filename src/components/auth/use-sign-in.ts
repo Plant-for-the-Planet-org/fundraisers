@@ -14,13 +14,19 @@ interface UseSignInOptions {
   returnTo: string | null;
   /** Runs after a successful popup sign-in. The redirect flow never gets here, the tab has left by then. */
   onSignedIn?: () => void;
+  /** Ask Auth0 for credentials even though a session exists. Set when switching accounts. */
+  forceLogin?: boolean;
 }
 
 /**
  * Shared start logic for the sign-in modal and the /login page.
  * Auth0 runs in a popup so the current page keeps its state. On phones the popup is a new tab, which works the same way: it posts the code back and closes itself. Only a blocked window falls back to the redirect flow.
  */
-export function useSignIn({ returnTo, onSignedIn }: UseSignInOptions) {
+export function useSignIn({
+  returnTo,
+  onSignedIn,
+  forceLogin = false,
+}: UseSignInOptions) {
   const t = useTranslations('Auth');
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
@@ -32,7 +38,9 @@ export function useSignIn({ returnTo, onSignedIn }: UseSignInOptions) {
     const redirectTo = getSafeRedirectPath(returnTo);
 
     try {
-      const outcome = await signInWithPopup(request, redirectTo);
+      const outcome = await signInWithPopup(request, redirectTo, {
+        forceLogin,
+      });
 
       if (outcome === 'signed-in') {
         onSignedIn?.();

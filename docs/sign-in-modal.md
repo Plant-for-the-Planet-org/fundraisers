@@ -33,3 +33,11 @@ Dialogs portal to `<body>`, outside the theme wrapper. `ThemeShell` mirrors `--a
 ## Donation nudge
 
 The donor section of the donation overlay shows "Already have an account? Sign in" while signed out. It opens the same modal. Signing in swaps the typed donor details for the account's profile and saved addresses, and keeps amount, frequency and payment choice. The nudge hides once the donor has started typing card or IBAN details, tracked by `hasPaymentInput` in the donation form context.
+
+## Switch account
+
+While signed in, the same slot shows "Not {name}? Switch account" once the last interactive sign-in is more than four hours old (`RECENT_SIGN_IN_MAX_AGE_MS` in `src/lib/auth/auth-time.ts`, overridable with `NEXT_PUBLIC_SWITCH_ACCOUNT_AFTER_MS`, set it to `0` to always show the link while testing). A sign-in from minutes ago is almost always the right person. Hours later, on a shared laptop or an event tablet, it may not be. The link hides under the same `hasPaymentInput` rule as the nudge, and while impersonating.
+
+The link opens the modal in `switch-account` mode. The authorize URL gets `prompt=login`, so Auth0 asks for credentials even though a session exists. The new token replaces the old one without a logout round trip, and the donor section swaps to the new profile. Closing the popup changes nothing. The modal does not auto-close on auth in this mode, since the person is signed in the whole time.
+
+The sign-in time is our own timestamp, written when an interactive token exchange succeeds. It lives in localStorage as `auth_time` next to `access_token` and is mirrored as `authTime` in the auth store. Silent refreshes pass their PKCE verifier in memory, and that marker is what keeps them from touching it. A session that arrived only through silent auth, for example after signing in on another Planet app, has no value and counts as old. Sign-out clears it with the token.

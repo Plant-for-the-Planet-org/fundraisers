@@ -17,6 +17,8 @@ interface SignInCardProps {
   header: ReactNode;
   /** `dialog` has padded sections and a muted footer. `plain` sits directly on the page background. */
   variant?: 'dialog' | 'plain';
+  /** Ask Auth0 for credentials even though a session exists. The modal sets this when switching accounts. */
+  forceLogin?: boolean;
 }
 
 /** The one sign-in form. Rendered inside the dialog on fundraiser pages and next to the picture on /login. */
@@ -25,8 +27,9 @@ export function SignInCard({
   onSignedIn,
   header,
   variant = 'dialog',
+  forceLogin = false,
 }: SignInCardProps) {
-  const { start, isPending } = useSignIn({ returnTo, onSignedIn });
+  const { start, isPending } = useSignIn({ returnTo, onSignedIn, forceLogin });
   const isDialog = variant === 'dialog';
 
   return (
