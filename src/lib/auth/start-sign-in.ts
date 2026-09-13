@@ -6,7 +6,7 @@ import {
   buildUniversalLoginAuthorizeUrl,
   exchangeCodeForTokens,
 } from '@/lib/auth/auth0-config';
-import { clearOAuthState } from '@/lib/auth/oauth-state';
+import { clearOAuthState, getStoredOAuthState } from '@/lib/auth/oauth-state';
 import { openSignInPopup, waitForSignInPopup } from '@/lib/auth/sign-in-popup';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -70,8 +70,14 @@ export async function signInWithPopup(
     return result.destination === '/verify-email' ? 'verify-email' : 'failed';
   }
 
+  // Only exchange a code for an attempt this tab started. The nonce was stored when the authorize URL was built. A stale or foreign callback would otherwise burn the active PKCE verifier, since a failed exchange clears it.
+  if (!result.state || getStoredOAuthState(result.state) === null) {
+    console.warn('Sign-in popup returned an unknown state, ignoring.');
+    return 'failed';
+  }
+
   const tokens = await exchangeCodeForTokens(result.code);
-  if (result.state) clearOAuthState(result.state);
+  clearOAuthState(result.state);
 
   const auth = useAuthStore.getState();
   await auth.setAccessToken(tokens.access_token);
