@@ -1,0 +1,31 @@
+# Sign-in modal and popup
+
+Sign-in on fundraiser pages opens a modal instead of leaving for `/login`. The Auth0 hosted page runs in a popup window, so the page underneath keeps its state. The same form is shown on `/login` next to a picture, for guarded routes and deep links.
+
+## Pieces
+
+- `src/components/auth/sign-in-card.tsx`: the one form. Header slot, email section, social buttons. `dialog` and `plain` variants.
+- `src/components/auth/sign-in-modal.tsx`: mounts the card in a Dialog. Lives in the root layout, opened through `openSignInModal(returnTo)` from `src/stores/sign-in-modal-store.ts`.
+- `src/components/auth/use-sign-in.ts`: decides popup or redirect and handles the outcome.
+- `src/lib/auth/start-sign-in.ts`: builds the authorize URL for email, sign-up or a social connection, and runs either flow.
+- `src/lib/auth/sign-in-popup.ts`: opens the popup, waits for it, and lets the popup hand its code to the opener.
+
+## Popup flow
+
+1. The click handler opens a blank popup synchronously, before any `await`, or the browser blocks it. If it is blocked, the redirect flow runs instead.
+2. The authorize URL is built as before. The PKCE verifier and the `state` nonce land in the opener's sessionStorage.
+3. The popup navigates to Auth0 and comes back through `/api/auth/callback` to `/redirecting?code=...&state=...`. No new callback URL is needed in the Auth0 tenant.
+4. On `/redirecting`, the popup recognises itself by its window name, posts the code to the opener with `postMessage`, and closes. `AuthInitializer` stays idle in the popup, since a failed exchange there would clear the shared `access_token` in localStorage.
+5. The opener checks the message origin and source, exchanges the code with its own verifier, and updates the auth store. The modal closes.
+
+Error callbacks never reach `/redirecting`. The opener polls the popup URL, which is readable once it is back on our origin, and treats `/verify-email` and `?error=` as outcomes.
+
+## Fallbacks
+
+- Below 768px a popup would open as a new tab, so the redirect flow is used.
+- Closing the popup keeps the modal open.
+- After a popup sign-in the modal navigates to `returnTo` only when it differs from the current page and is an allowed path. The host-invite bar relies on this to resume an accept.
+
+## Theming
+
+Dialogs portal to `<body>`, outside the theme wrapper. `ThemeShell` mirrors `--accent-color` and `--cta-foreground` on the root element so the modal follows the fundraiser's accent.
