@@ -458,7 +458,8 @@
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut.",
         "statusChangeFailedMessage": "Status nicht geändert",
         "statusChangeFailedDescription": "Der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
-        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut."
+        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeUnavailableDescription": "Der Status dieses Spendenaufrufs kann hier nicht geändert werden."
       }
     },
     "copyLinkButton": {

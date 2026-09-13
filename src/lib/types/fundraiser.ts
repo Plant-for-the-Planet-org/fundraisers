@@ -175,9 +175,8 @@ export type FundraiserStatus =
 /**
  * A move in the platform's `fundraiser_lifecycle` state machine.
  *
- * The status itself is read-only: it is never sent on create or update, and changes only through
- * POST /fundraisers/{id}/transition/{transition}. Which transitions are legal depends on the
- * current status, and the platform refuses the rest with the allowed set in the error.
+ * The status itself is read-only: it is never sent on create or update, and changes only through POST /fundraisers/{id}/transition/{transition}.
+ * Which transitions are legal depends on the current status, and the platform refuses the rest with the allowed set in the error.
  */
 export type FundraiserTransition =
   | 'publish'
@@ -243,8 +242,7 @@ export interface CreateFundraiserRequest {
   goalAmount: number; // send as integer value. NOT IN CENTS. No decimals possible.
   currency: string; //TODO: update with possible value type
   visibility: FundraiserVisibility;
-  // No `status`: a new fundraiser is always created as a draft and published with the
-  // `publish` transition. See FundraiserTransition.
+  // No `status`: a new fundraiser is always created as a draft and published with the `publish` transition. See FundraiserTransition.
   projectAllocations: Array<{
     percentage: number;
     project_id: string;

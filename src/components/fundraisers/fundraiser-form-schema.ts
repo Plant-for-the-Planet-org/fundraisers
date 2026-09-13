@@ -323,7 +323,8 @@ export function fundraiserToFormValues(
     currency: getCurrencyForCountry(country),
     goalAmount: fundraiser.goalAmount,
     visibility: fundraiser.visibility,
-    status: fundraiser.canDonate ? 'active' : 'draft',
+    // From `status`, not `canDonate`: the switch drives lifecycle transitions, which are chosen from the status. An active fundraiser past its end date stays switched on so it can still be paused.
+    status: fundraiser.status === 'active' ? 'active' : 'draft',
     // Drop non-donatable projects so they are never carried back into the
     // payload on save. Fundraisers saved under the earlier scheme stored these
     // at 0%, so the remaining donatable shares still sum to 100.

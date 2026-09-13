@@ -458,7 +458,8 @@
         "errorDescription": "Your changes could not be saved. Please try again.",
         "statusChangeFailedMessage": "Status not changed",
         "statusChangeFailedDescription": "The fundraiser's status could not be changed. Please try again.",
-        "statusChangeFailedWithSavedChanges": "Your other changes were saved, but the fundraiser's status could not be changed. Please try again."
+        "statusChangeFailedWithSavedChanges": "Your other changes were saved, but the fundraiser's status could not be changed. Please try again.",
+        "statusChangeUnavailableDescription": "This fundraiser's status cannot be changed from here."
       }
     },
     "copyLinkButton": {

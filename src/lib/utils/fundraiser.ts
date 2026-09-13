@@ -31,16 +31,12 @@ export function isFundraiserOwnerOrAdmin(
 }
 
 /**
- * The lifecycle transition behind the form's on/off status switch, or null when the switch asks
- * for something the fundraiser is already at or cannot do.
+ * The lifecycle transition behind the form's on/off status switch, or null when the switch asks for something the fundraiser is already at or cannot do.
  *
- * The switch has two positions while the platform has six statuses, so the mapping is not
- * symmetric:
+ * The switch has two positions while the platform has six statuses, so the mapping is not symmetric:
  * - on, from a draft, publishes it; from a paused fundraiser, resumes it.
- * - off pauses a live fundraiser. There is no way back to `draft` once published — `pause` is what
- *   "stop taking donations" means for a fundraiser that is already out in the world.
- * - a completed or cancelled fundraiser is not reopened by the switch. Completed is reopened by
- *   `reactivate`, which needs a new end date and belongs to its own flow.
+ * - off pauses a live fundraiser. There is no way back to `draft` once published. `pause` is what "stop taking donations" means for a fundraiser that is already out in the world.
+ * - a completed or cancelled fundraiser is not reopened by the switch. Completed is reopened by `reactivate`, which needs a new end date and belongs to its own flow.
  */
 export function transitionForStatusToggle(
   current: FundraiserStatus,

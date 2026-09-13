@@ -62,9 +62,8 @@ export async function updateFundraiser(
 /**
  * Applies one `fundraiser_lifecycle` transition.
  *
- * The status is not writable through PUT: the platform's state machine owns it, and this is the
- * only way to change it. A transition the current status forbids comes back as a 400 whose
- * `details.allowedTransitions` lists what the fundraiser would accept instead.
+ * The status is not writable through PUT: the platform's state machine owns it, and this is the only way to change it.
+ * A transition the current status forbids comes back as a 400 whose `details.allowedTransitions` lists what the fundraiser would accept instead.
  *
  * Only `reactivate` takes a payload (a future `endDate`).
  */
