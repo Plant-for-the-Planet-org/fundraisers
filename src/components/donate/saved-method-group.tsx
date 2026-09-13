@@ -50,6 +50,7 @@ export function SavedMethodGroup({
 }: SavedMethodGroupProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const feeDescriptionId = useId();
+  const headerLabelId = useId();
   const hasFeeTooltip =
     showFeeDetails && !!method.feeText && !!method.feeTooltip;
 
@@ -85,11 +86,12 @@ export function SavedMethodGroup({
           The saved instances and the "use a new …" row below select a
           specific option; the radio dot mirrors whichever is active. */}
       <div className='flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'>
+        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this is not a Tab stop and stays out of the accessibility tree. The saved rows below are a group named by this label. */}
         <button
           type='button'
+          tabIndex={-1}
+          aria-hidden='true'
           onClick={handleHeaderSelect}
-          aria-pressed={selectedPaymentMethod === method.id}
-          aria-describedby={hasFeeTooltip ? feeDescriptionId : undefined}
           className='flex flex-1 items-center gap-3 text-left'
         >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
@@ -99,7 +101,9 @@ export function SavedMethodGroup({
             </div>
           )}
           <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
-            <span className='text-sm font-medium'>{method.label}</span>
+            <span id={headerLabelId} className='text-sm font-medium'>
+              {method.label}
+            </span>
             {method.lastUsedLabel && (
               <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
                 {method.lastUsedLabel}
@@ -120,7 +124,12 @@ export function SavedMethodGroup({
           </span>
         )}
       </div>
-      <div className='space-y-2 p-3'>
+      <div
+        role='group'
+        aria-labelledby={headerLabelId}
+        aria-describedby={hasFeeTooltip ? feeDescriptionId : undefined}
+        className='space-y-2 p-3'
+      >
         <div className='space-y-2 pl-6'>
           {savedInstancesForMethod.map(saved => {
             // Warn right under the card it refers to — but only when
