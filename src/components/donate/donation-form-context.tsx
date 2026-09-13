@@ -11,6 +11,7 @@ import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
@@ -278,9 +279,13 @@ export function DonationFormProvider({
     >
       <FormProvider {...methods}>
         {children}
-        {DevTool !== null && (
-          <DevTool control={methods.control as unknown as Control} />
-        )}
+        {/* Portaled out of the dialog. The panel re-renders its field list on every form change, and the dialog's focus scope treats nodes vanishing inside it as a reason to refocus its surface, which broke Tab between fields in development. */}
+        {DevTool !== null &&
+          typeof document !== 'undefined' &&
+          createPortal(
+            <DevTool control={methods.control as unknown as Control} />,
+            document.body
+          )}
       </FormProvider>
     </DonationFormContext.Provider>
   );
