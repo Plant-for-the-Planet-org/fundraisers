@@ -250,6 +250,11 @@ export function PaymentMethods() {
     const target = event.target as HTMLButtonElement;
     if (target.getAttribute('role') !== 'radio' || target.disabled) return;
     event.preventDefault();
+    // A click on the checked radio is ignored by Radix, so Enter on an already chosen card or SEPA row would do nothing. Go straight to the entry form instead.
+    if (target.value === 'card' || target.value === 'sepa_debit') {
+      handleNewMethodSelect(target.value);
+      return;
+    }
     target.click();
   };
   const handleRadioGroupKeyUp = () => {
