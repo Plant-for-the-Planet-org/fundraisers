@@ -129,7 +129,7 @@
         "title": "Organisator*innen",
         "manage": "Verwalten",
         "dialogTitle": "Organisator*innen verwalten",
-        "dialogDescription": "Füge Personen hinzu, die diese Spendenaktion verwalten oder ansehen können. Organisator*innen können öffentlich angezeigt oder privat gehalten werden.",
+        "dialogDescription": "Füge Personen hinzu, die diesen Spendenaufruf verwalten oder ansehen können. Organisator*innen können öffentlich angezeigt oder privat gehalten werden.",
         "unknownHost": "Unbekannt",
         "you": "(du)",
         "invited": "Eingeladen",
@@ -141,8 +141,8 @@
         "remove": "Entfernen",
         "selfRemove": {
           "title": "Dich selbst als Gastgeber entfernen?",
-          "description": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
-          "descriptionHidden": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen.",
+          "description": "Du verlierst den Zugriff auf diesen Spendenaufruf, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
+          "descriptionHidden": "Du verlierst den Zugriff auf diesen Spendenaufruf, und nur ein anderer Admin kann dich wieder hinzufügen.",
           "hide": "Namen ausblenden",
           "confirm": "Mich entfernen",
           "cancel": "Abbrechen"
