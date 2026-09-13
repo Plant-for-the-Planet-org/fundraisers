@@ -8,7 +8,8 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFormState } from 'react-hook-form';
 import { useLocale, useTranslations } from 'next-intl';
 import { Elements } from '@stripe/react-stripe-js';
 import { trackEvent } from '@/lib/analytics/track';
@@ -20,6 +21,16 @@ import {
   scrollToFirstError,
 } from '@/lib/utils/scroll-into-view';
 import { useAuthStore } from '@/stores/auth-store';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContentFullScreen,
@@ -69,6 +80,9 @@ export function DonateOverlay({
   const signedIn = useAuthStore(s => s.isAuthenticated);
   // Set by the inner form once a result screen (thank-you, pending) is showing.
   const hasResultRef = useRef(false);
+  // Set by the inner form while the donor has typed something worth keeping.
+  const hasInputRef = useRef(false);
+  const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
   // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route goes through here so none is left untracked.
   const handleClose = () => {
@@ -96,11 +110,29 @@ export function DonateOverlay({
         ref={dialogContentRef}
         tabIndex={-1}
         className='light bg-gray-50 text-foreground'
-        onEscapeKeyDown={e => e.preventDefault()}
-        onOpenAutoFocus={event => {
-          // Radix focuses the first focusable (the corner close button) by default, which makes Space/Enter dismiss the overlay. Focus the dialog surface instead so no control is one keystroke from firing.
+        onEscapeKeyDown={event => {
+          // An open combobox owns Esc.
+          const target = event.target as HTMLElement | null;
+          if (target?.getAttribute('aria-expanded') === 'true') {
+            event.preventDefault();
+            return;
+          }
+          // Nothing typed yet, or a result screen: Esc closes like the close button.
+          if (hasResultRef.current || !hasInputRef.current) return;
           event.preventDefault();
-          dialogContentRef.current?.focus();
+          setIsLeaveConfirmOpen(true);
+        }}
+        onOpenAutoFocus={event => {
+          // Radix focuses the first focusable (the corner close button) by default, which makes Space/Enter dismiss the overlay.
+          // A signed-out donor starts in the email field, except on touch devices where an autofocused input would open the keyboard over the whole overlay. Everyone else lands on the dialog surface so no control is one keystroke from firing.
+          event.preventDefault();
+          const isTouch = window.matchMedia('(pointer: coarse)').matches;
+          const emailField = isTouch
+            ? null
+            : dialogContentRef.current?.querySelector<HTMLInputElement>(
+                'input[name="email"]'
+              );
+          (emailField ?? dialogContentRef.current)?.focus();
         }}
       >
         <DialogTitle className='sr-only'>
@@ -114,11 +146,39 @@ export function DonateOverlay({
             paymentOptionsReady={paymentOptionsReady}
             onClose={handleClose}
             hasResultRef={hasResultRef}
+            hasInputRef={hasInputRef}
             isOpen={isOpen}
           />
         ) : (
           <DonateOverlaySkeleton onClose={handleClose} />
         )}
+        <AlertDialog
+          open={isLeaveConfirmOpen}
+          onOpenChange={setIsLeaveConfirmOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {tDonate('overlay.leaveConfirm.title')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {tDonate('overlay.leaveConfirm.description')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              {/* Staying is the safe choice, so it carries the fundraiser accent. Leaving is the quiet one. */}
+              <AlertDialogAction
+                onClick={handleClose}
+                className='border border-border bg-background text-foreground shadow-xs hover:bg-accent'
+              >
+                {tDonate('overlay.leaveConfirm.confirm')}
+              </AlertDialogAction>
+              <AlertDialogCancel className='border-transparent bg-accent-color text-[var(--cta-foreground,#fff)] hover:bg-accent-color hover:text-[var(--cta-foreground,#fff)] hover:opacity-90'>
+                {tDonate('overlay.leaveConfirm.cancel')}
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContentFullScreen>
     </Dialog>
   );
@@ -131,7 +191,31 @@ interface DonateOverlayInnerProps {
   paymentOptionsReady: boolean;
   onClose: () => void;
   hasResultRef: RefObject<boolean>;
+  hasInputRef: RefObject<boolean>;
   isOpen: boolean;
+}
+
+// Fields the donor picks rather than types. Losing them costs one click, so they do not count as input worth a confirmation.
+const CHOICE_FIELDS = new Set([
+  'selectedPaymentMethod',
+  'selectedSavedMethodId',
+  'selectedAddressId',
+  'willAbsorbFee',
+  'makeMonthly',
+]);
+
+/** Mirrors "the donor has typed something" into a ref the outer dialog reads on Esc. Lives inside the form provider. Card and IBAN entry are Stripe fields outside the form and are not counted yet. */
+function FormInputSync({ hasInputRef }: { hasInputRef: RefObject<boolean> }) {
+  const { dirtyFields } = useFormState();
+  const hasTypedInput = Object.keys(dirtyFields).some(
+    field => !CHOICE_FIELDS.has(field)
+  );
+
+  useEffect(() => {
+    hasInputRef.current = hasTypedInput;
+  }, [hasTypedInput, hasInputRef]);
+
+  return null;
 }
 
 /** Inner component rendered only when donationData is available, so hooks can depend on it safely */
@@ -142,6 +226,7 @@ function DonateOverlayInner({
   paymentOptionsReady,
   onClose,
   hasResultRef,
+  hasInputRef,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
@@ -282,6 +367,7 @@ function DonateOverlayInner({
         isOpen={isOpen}
         serverFieldErrors={error?.fieldErrors}
       >
+        <FormInputSync hasInputRef={hasInputRef} />
         <DonateOverlayLayout
           onClose={onClose}
           leftColumn={leftColumn}

@@ -4,6 +4,12 @@
       "aria": {
         "label": "Spendendetails",
         "close": "Spendenfenster schließen"
+      },
+      "leaveConfirm": {
+        "title": "Spende verlassen?",
+        "description": "Deine eingegebenen Angaben gehen verloren.",
+        "cancel": "Weiter ausfüllen",
+        "confirm": "Verlassen"
       }
     },
     "preferences": {
