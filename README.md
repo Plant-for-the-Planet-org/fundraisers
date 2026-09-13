@@ -48,18 +48,44 @@ When adding or upgrading a package, review the `package-lock.json` diff carefull
 
 ## Available Scripts
 
+**Develop**
+
+| Script          | Description                                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `dev`           | Start the development server. Picks webpack or Turbopack by installed RAM — see [`scripts/dev.mjs`](scripts/dev.mjs) |
+| `dev:webpack`   | Force webpack, ignoring the RAM heuristic                                                                            |
+| `dev:turbopack` | Force Turbopack, ignoring the RAM heuristic                                                                          |
+| `dev-https`     | Same as `dev`, over HTTPS with an experimental local certificate                                                     |
+| `setup:env`     | Copy `.env.local` into a fresh git worktree                                                                          |
+
+**Build**
+
+| Script          | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `build`         | Production build. Runs `check:locales` first          |
+| `start`         | Start the production server                           |
+| `clean`         | Delete the `.next` build cache                        |
+| `check:locales` | Check the translation files for missing or extra keys |
+
+**Check**
+
 | Script         | Description                                 |
 | -------------- | ------------------------------------------- |
-| `dev`          | Start the development server (Turbopack)    |
-| `build`        | Production build                            |
-| `start`        | Start the production server                 |
+| `type-check`   | TypeScript type check (no emit)             |
 | `lint`         | Run ESLint                                  |
 | `lint:fix`     | Run ESLint and auto-fix                     |
-| `imports:sort` | Sort imports project-wide (or pass a path)  |
 | `format`       | Format all source files with Prettier       |
 | `format:check` | Check formatting without writing            |
-| `type-check`   | TypeScript type check (no emit)             |
+| `imports:sort` | Sort imports project-wide (or pass a path)  |
 | `find-typos`   | Output unique unrecognised words via cspell |
+| `test`         | Run the unit tests once (Vitest)            |
+| `test:watch`   | Run the unit tests in watch mode            |
+
+**Assets**
+
+| Script            | Description                                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `optimize:images` | Re-encode an image added under `public/` before committing it. Takes a file or folder: `npm run optimize:images -- public/theme-backgrounds/photo.jpg` |
 
 ---
 
