@@ -28,6 +28,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
+import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
 
 export interface StripeCardFormHandle {
@@ -74,6 +75,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.card');
+    const { markPaymentInput } = useDonationForm();
 
     const { control } = useFormContext<DonationFormValues>();
     const [firstname, lastname] = useWatch({
@@ -247,6 +249,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const handleCardNumberChange = (
       event: StripeCardNumberElementChangeEvent
     ) => {
+      if (!event.empty) markPaymentInput();
       setCardNumberComplete(event.complete);
       setCardNumberError(event.error?.message ?? null);
     };
@@ -254,11 +257,13 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const handleCardExpiryChange = (
       event: StripeCardExpiryElementChangeEvent
     ) => {
+      if (!event.empty) markPaymentInput();
       setCardExpiryComplete(event.complete);
       setCardExpiryError(event.error?.message ?? null);
     };
 
     const handleCardCvcChange = (event: StripeCardCvcElementChangeEvent) => {
+      if (!event.empty) markPaymentInput();
       setCardCvcComplete(event.complete);
       setCardCvcError(event.error?.message ?? null);
     };

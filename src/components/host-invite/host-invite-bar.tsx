@@ -26,13 +26,13 @@ import {
   listMyHostInvites,
   respondToHostInvite,
 } from '@/lib/api/host-invite-service';
-import { getSignInPath } from '@/lib/auth/sign-in-redirect';
 import { cn } from '@/lib/utils';
 import {
   isHostInviteLapsed,
   maskedEmailMayMatch,
 } from '@/lib/utils/host-invite';
 import { useAuthStore } from '@/stores/auth-store';
+import { openSignInModal } from '@/stores/sign-in-modal-store';
 import { HostInvitePending } from '@/components/host-invite/host-invite-pending';
 import { Button } from '@/components/ui/button';
 
@@ -131,7 +131,7 @@ export function HostInviteBar({ token, lookup, intent }: HostInviteBarProps) {
   const signInToAccept = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('intent', 'accept');
-    router.push(getSignInPath(`${pathname}?${params.toString()}`));
+    openSignInModal(`${pathname}?${params.toString()}`);
   };
 
   const answer = async (choice: 'accept' | 'decline') => {

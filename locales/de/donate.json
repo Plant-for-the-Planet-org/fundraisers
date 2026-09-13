@@ -11,6 +11,8 @@
       "anonymousDonationDescription": "Dein Name erscheint nicht öffentlich auf der Seite des Spendenaufrufs."
     },
     "yourInfo": "Deine Informationen",
+    "signInNudge": "Schon ein Konto? <signInLink>Anmelden</signInLink>",
+    "notYou": "Nicht {name}? <switchLink>Konto wechseln</switchLink>",
     "organization": "(Firma/Organisation)",
     "donorIdentity": {
       "companyDonation": {

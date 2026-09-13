@@ -7,6 +7,7 @@ import type {
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
+import { clearAuthTime, readAuthTime } from '@/lib/auth/auth-time';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { ensureProfile, isRetryable } from '@/lib/auth/implicit-signup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
@@ -28,6 +29,8 @@ interface User {
 interface AuthStore {
   user: User | null;
   accessToken: string | null;
+  /** Seconds since the epoch of the last interactive sign-in, see `auth-time.ts`. Null when unknown. */
+  authTime: number | null;
   isAuthenticated: boolean;
   isAuthInitializing: boolean;
   error: string | null;
@@ -70,6 +73,7 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       accessToken: null,
+      authTime: null,
       isAuthenticated: false,
       isAuthInitializing: true,
       error: null,
@@ -102,7 +106,11 @@ export const useAuthStore = create<AuthStore>()(
             localStorage.setItem('access_token', token);
           }
 
-          set({ isAuthenticated: true }, undefined, 'auth/set_authenticated');
+          set(
+            { isAuthenticated: true, authTime: readAuthTime() },
+            undefined,
+            'auth/set_authenticated'
+          );
         } catch (err) {
           console.error('Auth failed:', err);
           get().clearAuth();
@@ -198,6 +206,7 @@ export const useAuthStore = create<AuthStore>()(
         if (isBrowser) {
           localStorage.removeItem('access_token');
           localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
+          clearAuthTime();
           // The `ui-locale` cookie is intentionally left in place. A profile sync taught this browser the user's language; logging out should not discard that (the profile is not lost, it re-syncs on the next login).
           // A later different user's profile sync overwrites the `.profile` cookie anyway, and an explicit pick always wins.
         }
@@ -205,6 +214,7 @@ export const useAuthStore = create<AuthStore>()(
           {
             user: null,
             accessToken: null,
+            authTime: null,
             isAuthenticated: false,
             isAuthInitializing: false,
             error: null,

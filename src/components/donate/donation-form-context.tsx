@@ -10,7 +10,14 @@ import type { DonationData } from './donate-overlay';
 import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
@@ -167,6 +174,9 @@ interface DonationFormContextValue {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  /** True once the donor has typed into a card or IBAN field. The sign-in nudge hides then, since signing in swaps the donor details. */
+  hasPaymentInput: boolean;
+  markPaymentInput: () => void;
 }
 
 const DonationFormContext = createContext<DonationFormContextValue | null>(
@@ -246,6 +256,15 @@ export function DonationFormProvider({
     methods.register('makeMonthly');
   }, [methods]);
 
+  const [hasPaymentInput, setHasPaymentInput] = useState(false);
+  const markPaymentInput = useCallback(() => setHasPaymentInput(true), []);
+  // Cleared when the overlay closes, alongside the form reset below. Done during render, as React suggests for state derived from a prop change.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (!isOpen) setHasPaymentInput(false);
+  }
+
   useEffect(() => {
     if (!isOpen) methods.reset();
   }, [isOpen, methods]);
@@ -274,6 +293,8 @@ export function DonationFormProvider({
         onSubmit,
         sepaFormRef,
         cardFormRef,
+        hasPaymentInput,
+        markPaymentInput,
       }}
     >
       <FormProvider {...methods}>
