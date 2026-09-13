@@ -5,6 +5,7 @@ import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import { Plus, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CardBrandIcon } from '@/components/icons/donation';
+import { RadioDot } from './payment-method-option';
 
 type SavedPaymentMethodOptionProps = {
   typeId: PaymentMethodId;
@@ -47,13 +48,13 @@ export function SavedPaymentMethodOption({
           : 'border-border/60 bg-transparent hover:border-gray-400'
       )}
     >
-      <div className='flex flex-1 items-center gap-3'>
+      <div className='flex items-center gap-3'>
         {showBrand && (
           <div className='flex h-5 w-8 shrink-0 items-center justify-center'>
             <CardBrandIcon brand={brand} />
           </div>
         )}
-        <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
+        <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
           <span className='text-sm font-medium tabular-nums'>•••• {last4}</span>
           {expiryDate && (
             <span
@@ -72,6 +73,7 @@ export function SavedPaymentMethodOption({
             </span>
           )}
         </div>
+        <RadioDot isSelected={isSelected} />
       </div>
     </button>
   );
@@ -117,7 +119,8 @@ export function NewMethodOption({
               )}
             />
           </div>
-          <span className='text-sm font-medium'>{label}</span>
+          <span className='flex-1 text-sm font-medium'>{label}</span>
+          <RadioDot isSelected={isSelected} />
         </div>
       </button>
     </div>
