@@ -111,9 +111,12 @@ export function DonateOverlay({
         tabIndex={-1}
         className='light bg-gray-50 text-foreground'
         onEscapeKeyDown={event => {
-          // An open combobox owns Esc.
+          // Only an open combobox owns Esc, because it closes its list on the same key. Other expanded controls in the overlay, such as the gift email preview, have no Esc handler of their own, so claiming the key for them would leave Esc doing nothing at all.
           const target = event.target as HTMLElement | null;
-          if (target?.getAttribute('aria-expanded') === 'true') {
+          const isOpenCombobox =
+            target?.getAttribute('role') === 'combobox' &&
+            target.getAttribute('aria-expanded') === 'true';
+          if (isOpenCombobox) {
             event.preventDefault();
             return;
           }
