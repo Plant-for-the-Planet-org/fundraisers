@@ -469,7 +469,7 @@
         "errorMessage": "Fehler",
         "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut.",
         "publishFailedMessage": "Als Entwurf gespeichert",
-        "publishFailedDescription": "Dein Spendenaufruf wurde angelegt, aber noch nicht veröffentlicht. Aktiviere hier den Status-Schalter, um ihn zu live zu schalten."
+        "publishFailedDescription": "Dein Spendenaufruf wurde erstellt, konnte aber nicht veröffentlicht werden. Schalte den Status hier ein, um ihn live zu stellen."
       }
     },
     "edit": {
@@ -493,9 +493,9 @@
         "errorMessage": "Aktualisierung fehlgeschlagen",
         "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut.",
         "statusChangeFailedMessage": "Status nicht geändert",
-        "statusChangeFailedDescription": "Der Status des Spendenaufrufs konnte nicht geändert werden. Bitte versuche es erneut.",
-        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber des Status des Spendenaufrufs konnte nicht geändert werden. Bitte versuche es erneut.",
-        "statusChangeUnavailableDescription": "Der Status dieses Spendenaufrufs kann von hier aus nicht geändert werden."
+        "statusChangeFailedDescription": "Der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeUnavailableDescription": "Der Status dieses Spendenaufrufs kann hier nicht geändert werden."
       }
     },
     "copyLinkButton": {
