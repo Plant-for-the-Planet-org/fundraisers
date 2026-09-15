@@ -86,7 +86,8 @@ export function DonateOverlay({
   const hasPaymentInputRef = useRef(false);
   const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
-  // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route goes through here so none is left untracked.
+  // Commits the close without asking. Only `requestClose` and the leave-confirm dialog call this.
+  // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route ends here so none is left untracked.
   const handleClose = () => {
     if (donationData && !hasResultRef.current) {
       trackEvent('donation_exited', {
@@ -103,9 +104,9 @@ export function DonateOverlay({
     onClose();
   };
 
-  // The Esc decision, shared by the dialog and the Stripe fields. Stripe's iframes are cross-origin, so a key pressed inside one never reaches this document and the dialog never hears it; those fields call this through Stripe's own `escape` event instead.
-  const handleEscape = () => {
-    // Nothing entered yet, or a result screen: Esc closes like the close button.
+  // The one place that decides whether a close needs confirming. Every donor-initiated close asks here first: the corner X, Esc on the dialog, and Esc inside a Stripe field. Stripe's iframes are cross-origin, so a key pressed inside one never reaches this document and the dialog never hears it; those fields call this through Stripe's own `escape` event instead.
+  const requestClose = () => {
+    // Nothing entered yet, or a result screen: close straight away, there is nothing to lose.
     if (
       hasResultRef.current ||
       (!hasInputRef.current && !hasPaymentInputRef.current)
@@ -120,7 +121,8 @@ export function DonateOverlay({
     <Dialog
       open={isOpen}
       onOpenChange={open => {
-        if (!open) handleClose();
+        // Radix dismissing on its own, rather than the parent closing us. Esc is taken over below, so today this is only a safety net; it runs the same check so any future dismissal route cannot skip it.
+        if (!open) requestClose();
       }}
     >
       <DialogContentFullScreen
@@ -139,7 +141,7 @@ export function DonateOverlay({
           }
           // Radix would close the dialog by itself here. Take the key over so this route and the Stripe one run the same decision.
           event.preventDefault();
-          handleEscape();
+          requestClose();
         }}
         onOpenAutoFocus={event => {
           // Radix focuses the first focusable (the corner close button) by default, which makes Space/Enter dismiss the overlay.
@@ -163,15 +165,14 @@ export function DonateOverlay({
             fundraiser={fundraiser}
             paymentOptions={paymentOptions}
             paymentOptionsReady={paymentOptionsReady}
-            onClose={handleClose}
+            onRequestClose={requestClose}
             hasResultRef={hasResultRef}
             hasInputRef={hasInputRef}
             hasPaymentInputRef={hasPaymentInputRef}
-            onPaymentFieldEscape={handleEscape}
             isOpen={isOpen}
           />
         ) : (
-          <DonateOverlaySkeleton onClose={handleClose} />
+          <DonateOverlaySkeleton onClose={requestClose} />
         )}
         <AlertDialog
           open={isLeaveConfirmOpen}
@@ -210,11 +211,11 @@ interface DonateOverlayInnerProps {
   fundraiser: Fundraiser;
   paymentOptions: PaymentOptions;
   paymentOptionsReady: boolean;
-  onClose: () => void;
+  /** Asks the outer dialog to close. It confirms first if the donor has entered anything. */
+  onRequestClose: () => void;
   hasResultRef: RefObject<boolean>;
   hasInputRef: RefObject<boolean>;
   hasPaymentInputRef: RefObject<boolean>;
-  onPaymentFieldEscape: () => void;
   isOpen: boolean;
 }
 
@@ -247,11 +248,10 @@ function DonateOverlayInner({
   fundraiser,
   paymentOptions,
   paymentOptionsReady,
-  onClose,
+  onRequestClose,
   hasResultRef,
   hasInputRef,
   hasPaymentInputRef,
-  onPaymentFieldEscape,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
@@ -394,13 +394,13 @@ function DonateOverlayInner({
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
         markPaymentInput={markPaymentInput}
-        onPaymentFieldEscape={onPaymentFieldEscape}
+        onPaymentFieldEscape={onRequestClose}
         isOpen={isOpen}
         serverFieldErrors={error?.fieldErrors}
       >
         <FormInputSync hasInputRef={hasInputRef} />
         <DonateOverlayLayout
-          onClose={onClose}
+          onClose={onRequestClose}
           leftColumn={leftColumn}
           rightColumn={rightColumn}
         />
