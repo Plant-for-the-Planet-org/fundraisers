@@ -226,6 +226,9 @@ const CHOICE_FIELDS = new Set([
   'selectedAddressId',
   'willAbsorbFee',
   'makeMonthly',
+  'isAnonymous',
+  'isCompany',
+  'addressType',
 ]);
 
 /** Mirrors "the donor has typed something" into a ref the outer dialog reads on Esc. Lives inside the form provider. Payment fields are not registered with RHF, so they report themselves through `markPaymentInput` instead. */
