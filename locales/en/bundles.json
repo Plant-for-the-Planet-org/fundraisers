@@ -68,7 +68,7 @@
       "allocationLabel": "{percentage, number}% of fundraiser",
       "globalLabel": "Global",
       "viewTransparency": "View Transparency →",
-      "defaultCauseTooltip": "Your fundraiser supports our work to empower young people as ambassadors for climate justice, restoring forests and advocating for a sustainable future.",
+      "defaultCauseTooltip": "Your fundraiser supports our work to empower young people as Climate Justice Ambassadors, restoring forests and advocating for a sustainable future.",
       "aria": {
         "search": "Search projects",
         "addProject": "Add {name}",
