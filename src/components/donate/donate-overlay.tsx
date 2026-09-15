@@ -82,6 +82,8 @@ export function DonateOverlay({
   const hasResultRef = useRef(false);
   // Set by the inner form while the donor has typed something worth keeping.
   const hasInputRef = useRef(false);
+  // Set by the payment forms once the donor has entered card, IBAN, cardholder name or billing address details. Kept apart from hasInputRef because none of those fields are registered with react-hook-form, and because it lives above the card and SEPA forms, which unmount whenever the donor switches payment method.
+  const hasPaymentInputRef = useRef(false);
   const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
   // Closing from the donation form is an abandoned donation; closing a result screen is not. Every close route goes through here so none is left untracked.
@@ -96,7 +98,22 @@ export function DonateOverlay({
       });
     }
     hasResultRef.current = false;
+    // Nothing re-syncs this one on reopen the way FormInputSync does for hasInputRef, so clear it here.
+    hasPaymentInputRef.current = false;
     onClose();
+  };
+
+  // The Esc decision, shared by the dialog and the Stripe fields. Stripe's iframes are cross-origin, so a key pressed inside one never reaches this document and the dialog never hears it; those fields call this through Stripe's own `escape` event instead.
+  const handleEscape = () => {
+    // Nothing entered yet, or a result screen: Esc closes like the close button.
+    if (
+      hasResultRef.current ||
+      (!hasInputRef.current && !hasPaymentInputRef.current)
+    ) {
+      handleClose();
+      return;
+    }
+    setIsLeaveConfirmOpen(true);
   };
 
   return (
@@ -120,10 +137,9 @@ export function DonateOverlay({
             event.preventDefault();
             return;
           }
-          // Nothing typed yet, or a result screen: Esc closes like the close button.
-          if (hasResultRef.current || !hasInputRef.current) return;
+          // Radix would close the dialog by itself here. Take the key over so this route and the Stripe one run the same decision.
           event.preventDefault();
-          setIsLeaveConfirmOpen(true);
+          handleEscape();
         }}
         onOpenAutoFocus={event => {
           // Radix focuses the first focusable (the corner close button) by default, which makes Space/Enter dismiss the overlay.
@@ -150,6 +166,8 @@ export function DonateOverlay({
             onClose={handleClose}
             hasResultRef={hasResultRef}
             hasInputRef={hasInputRef}
+            hasPaymentInputRef={hasPaymentInputRef}
+            onPaymentFieldEscape={handleEscape}
             isOpen={isOpen}
           />
         ) : (
@@ -195,6 +213,8 @@ interface DonateOverlayInnerProps {
   onClose: () => void;
   hasResultRef: RefObject<boolean>;
   hasInputRef: RefObject<boolean>;
+  hasPaymentInputRef: RefObject<boolean>;
+  onPaymentFieldEscape: () => void;
   isOpen: boolean;
 }
 
@@ -207,7 +227,7 @@ const CHOICE_FIELDS = new Set([
   'makeMonthly',
 ]);
 
-/** Mirrors "the donor has typed something" into a ref the outer dialog reads on Esc. Lives inside the form provider. Card and IBAN entry are Stripe fields outside the form and are not counted yet. */
+/** Mirrors "the donor has typed something" into a ref the outer dialog reads on Esc. Lives inside the form provider. Payment fields are not registered with RHF, so they report themselves through `markPaymentInput` instead. */
 function FormInputSync({ hasInputRef }: { hasInputRef: RefObject<boolean> }) {
   const { dirtyFields } = useFormState();
   const hasTypedInput = Object.keys(dirtyFields).some(
@@ -230,11 +250,17 @@ function DonateOverlayInner({
   onClose,
   hasResultRef,
   hasInputRef,
+  hasPaymentInputRef,
+  onPaymentFieldEscape,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
   const cardFormRef = useRef<StripeCardFormHandle>(null);
+
+  const markPaymentInput = useCallback(() => {
+    hasPaymentInputRef.current = true;
+  }, [hasPaymentInputRef]);
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = stripeConfig
@@ -367,6 +393,8 @@ function DonateOverlayInner({
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
+        markPaymentInput={markPaymentInput}
+        onPaymentFieldEscape={onPaymentFieldEscape}
         isOpen={isOpen}
         serverFieldErrors={error?.fieldErrors}
       >

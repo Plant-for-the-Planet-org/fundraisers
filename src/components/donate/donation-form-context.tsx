@@ -168,6 +168,21 @@ interface DonationFormContextValue {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  /**
+   * Call this when the donor enters something in a payment field
+   * that React Hook Form does not track, such as Stripe fields,
+   * cardholder/account holder name, or billing address.
+   *
+   * This helps the overlay know when to show a warning before closing.
+   * The flag stays on until the overlay is closed.
+   */
+  markPaymentInput: () => void;
+  /**
+   * Call when Esc is pressed inside a Stripe element. Their iframes are
+   * cross-origin, so the key never reaches this document and the overlay's
+   * own Esc handler never runs; Stripe's `escape` event is the only way in.
+   */
+  onPaymentFieldEscape: () => void;
 }
 
 const DonationFormContext = createContext<DonationFormContextValue | null>(
@@ -182,6 +197,8 @@ interface DonationFormProviderProps {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  markPaymentInput: () => void;
+  onPaymentFieldEscape: () => void;
   isOpen: boolean;
   /** Field errors the platform rejected the donation with, applied on top of the client-side schema. */
   serverFieldErrors?: DonationFieldErrors;
@@ -201,6 +218,8 @@ export function DonationFormProvider({
   onSubmit,
   sepaFormRef,
   cardFormRef,
+  markPaymentInput,
+  onPaymentFieldEscape,
   isOpen,
   serverFieldErrors,
   children,
@@ -275,6 +294,8 @@ export function DonationFormProvider({
         onSubmit,
         sepaFormRef,
         cardFormRef,
+        markPaymentInput,
+        onPaymentFieldEscape,
       }}
     >
       <FormProvider {...methods}>
