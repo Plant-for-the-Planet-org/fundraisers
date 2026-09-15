@@ -19,6 +19,8 @@ type SavedPaymentMethodOptionProps = {
   expiringSoonLabel?: string;
   ariaLabel: string;
   isSelected: boolean;
+  /** Id of the sr-only fee text this row should be described by, when fees are shown. */
+  describedById?: string;
 };
 
 export function SavedPaymentMethodOption({
@@ -31,6 +33,7 @@ export function SavedPaymentMethodOption({
   expiringSoonLabel,
   ariaLabel,
   isSelected,
+  describedById,
 }: SavedPaymentMethodOptionProps) {
   const showBrand = typeId === 'card';
   return (
@@ -41,6 +44,7 @@ export function SavedPaymentMethodOption({
           ? `${ariaLabel}, ${expiringSoonLabel}`
           : ariaLabel
       }
+      aria-describedby={describedById}
       className={cn(
         'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isSelected
@@ -83,6 +87,8 @@ type NewMethodOptionProps = {
   methodId: PaymentMethodId;
   label: string;
   isSelected: boolean;
+  /** Id of the sr-only fee text this row should be described by, when fees are shown. */
+  describedById?: string;
 };
 
 // "Use a new ..." option shown below saved payment methods.
@@ -96,11 +102,13 @@ export function NewMethodOption({
   methodId,
   label,
   isSelected,
+  describedById,
 }: NewMethodOptionProps) {
   return (
     <div className='border-t border-border pt-2'>
       <RadioGroup.Item
         value={methodId}
+        aria-describedby={describedById}
         className={cn(
           'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           isSelected

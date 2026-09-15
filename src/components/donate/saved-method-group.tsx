@@ -50,7 +50,6 @@ export function SavedMethodGroup({
 }: SavedMethodGroupProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
   const feeDescriptionId = useId();
-  const headerLabelId = useId();
   const hasFeeTooltip =
     showFeeDetails && !!method.feeText && !!method.feeTooltip;
 
@@ -86,7 +85,7 @@ export function SavedMethodGroup({
           The saved instances and the "use a new …" row below select a
           specific option; the radio dot mirrors whichever is active. */}
       <div className='flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'>
-        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this is not a Tab stop and stays out of the accessibility tree. The saved rows below are a group named by this label. */}
+        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this is not a Tab stop and stays out of the accessibility tree. Each saved row below names its own type, so nothing is lost by hiding this. */}
         <button
           type='button'
           tabIndex={-1}
@@ -101,9 +100,7 @@ export function SavedMethodGroup({
             </div>
           )}
           <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
-            <span id={headerLabelId} className='text-sm font-medium'>
-              {method.label}
-            </span>
+            <span className='text-sm font-medium'>{method.label}</span>
             {method.lastUsedLabel && (
               <span className='px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded-full'>
                 {method.lastUsedLabel}
@@ -124,12 +121,8 @@ export function SavedMethodGroup({
           </span>
         )}
       </div>
-      <div
-        role='group'
-        aria-labelledby={headerLabelId}
-        aria-describedby={hasFeeTooltip ? feeDescriptionId : undefined}
-        className='space-y-2 p-3'
-      >
+      {/* Nesting is visual only. `radiogroup` owns nothing but `radio`, and a `group` in between makes some screen readers count set position within it ("1 of 2" instead of the real place in the list). Each row names its own type, and the fee text is attached to each row below. */}
+      <div className='space-y-2 p-3'>
         <div className='space-y-2 pl-6'>
           {savedInstancesForMethod.map(saved => {
             // Warn right under the card it refers to — but only when
@@ -151,6 +144,7 @@ export function SavedMethodGroup({
                   expiringSoonLabel={saved.expiringSoonLabel}
                   ariaLabel={saved.ariaLabel}
                   isSelected={selectedSavedMethodId === saved.id}
+                  describedById={hasFeeTooltip ? feeDescriptionId : undefined}
                 />
                 {showRecurringHint && (
                   <p className='flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-5 text-amber-700'>
@@ -171,6 +165,7 @@ export function SavedMethodGroup({
           methodId={method.id}
           label={newMethodLabel}
           isSelected={isGenericSelected}
+          describedById={hasFeeTooltip ? feeDescriptionId : undefined}
         />
       </div>
     </div>
