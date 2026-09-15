@@ -85,13 +85,11 @@ export function SavedMethodGroup({
           The saved instances and the "use a new …" row below select a
           specific option; the radio dot mirrors whichever is active. */}
       <div className='flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'>
-        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this is not a Tab stop and stays out of the accessibility tree. Each saved row below names its own type, so nothing is lost by hiding this. */}
-        <button
-          type='button'
-          tabIndex={-1}
+        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this row is not focusable at all and stays out of the accessibility tree. A button would still take focus when clicked, and aria-hidden on a focusable element is a violation. Each saved row below names its own type, so nothing is lost by hiding this. */}
+        <div
           aria-hidden='true'
           onClick={handleHeaderSelect}
-          className='flex flex-1 items-center gap-3 text-left'
+          className='flex flex-1 cursor-pointer items-center gap-3'
         >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
           {HeaderLogo && (
@@ -107,7 +105,7 @@ export function SavedMethodGroup({
               </span>
             )}
           </div>
-        </button>
+        </div>
         {showFeeDetails && method.feeText && (
           <MethodFeeDetails
             feeText={method.feeText}
