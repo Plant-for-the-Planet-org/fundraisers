@@ -40,6 +40,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
           <UpdateFundraiserButton
             fundraiserId={fundraiser.id}
             existingSettings={fundraiser.settings}
+            currentStatus={fundraiser.status}
           />
         }
         totalRaised={fundraiser.totalRaised[fundraiser.currency ?? ''] ?? 0}

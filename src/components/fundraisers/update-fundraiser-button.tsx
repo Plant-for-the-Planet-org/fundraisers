@@ -1,6 +1,9 @@
 'use client';
 
-import type { FundraiserSettings } from '@/lib/types/fundraiser';
+import type {
+  FundraiserSettings,
+  FundraiserStatus,
+} from '@/lib/types/fundraiser';
 import type { SelectedImage } from '@/lib/types/image-selection';
 import type { UpdateDirtyFields } from '@/lib/utils/fundraiser-data-builder';
 import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-form-schema';
@@ -11,22 +14,38 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { updateFundraiser } from '@/lib/api/fundraiser-service';
+import {
+  applyFundraiserTransition,
+  updateFundraiser,
+} from '@/lib/api/fundraiser-service';
 import { unsplashClient } from '@/lib/api/unsplash-client';
+import { transitionForStatusToggle } from '@/lib/utils/fundraiser';
 import { buildUpdateFundraiserRequest } from '@/lib/utils/fundraiser-data-builder';
 import { imageToBase64 } from '@/lib/utils/image-processor';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 
+/** Where the status switch sits for a given saved status. Mirrors how the form derives it on load: only a live fundraiser has the switch on. */
+function toggleFor(status: FundraiserStatus): 'draft' | 'active' {
+  return status === 'active' ? 'active' : 'draft';
+}
+
 interface UpdateFundraiserButtonProps {
   fundraiserId: string;
   existingSettings: FundraiserSettings | null;
+  /** The saved status, needed to work out which transition the status switch is asking for. */
+  currentStatus: FundraiserStatus;
 }
 
 export function UpdateFundraiserButton({
   fundraiserId,
   existingSettings,
+  currentStatus,
 }: UpdateFundraiserButtonProps) {
+  // The prop is a snapshot from page load and the page does not refetch after a save, so the saved status is tracked here and refreshed from every response.
+  // Reading the prop instead would misread the second toggle in a session: after switching a live fundraiser off (now `paused`), switching it back on would still map from `active` and ask for no transition.
+  const [savedStatus, setSavedStatus] =
+    useState<FundraiserStatus>(currentStatus);
   const t = useTranslations('Fundraisers.edit.formSubmission');
   const { control, handleSubmit, reset } =
     useFormContext<FundraiserFormValues>();
@@ -72,15 +91,59 @@ export function UpdateFundraiserButton({
         existingSettings
       );
 
-      if (Object.keys(request).length === 0) return;
+      // The status is not part of the update payload: it moves through the lifecycle state machine.
+      const transition = dirtyFields.status
+        ? transitionForStatusToggle(savedStatus, values.status)
+        : null;
+      const hasFieldChanges = Object.keys(request).length > 0;
 
-      const updated = await updateFundraiser(
-        fundraiserId,
-        request,
-        accessToken
-      );
+      // The switch was touched but asks for nothing the fundraiser can do from here (a completed one, say).
+      // Snap it back and say so, rather than leaving a dirty form that silently does nothing.
+      if (dirtyFields.status && !transition && !hasFieldChanges) {
+        reset({ ...values, status: toggleFor(savedStatus) });
+        toast.error(t('statusChangeFailedMessage'), {
+          description: t('statusChangeUnavailableDescription'),
+        });
+        return;
+      }
 
-      reset(values);
+      if (!hasFieldChanges && !transition) return;
+
+      let updated = hasFieldChanges
+        ? await updateFundraiser(fundraiserId, request, accessToken)
+        : null;
+
+      if (updated) setSavedStatus(updated.status);
+
+      if (transition) {
+        // The transition is a second request, so it can fail on its own after the field edits landed.
+        // Reporting that as a failed update would be wrong twice over: the host would not know their edits were saved, and a retry would re-send them.
+        try {
+          updated = await applyFundraiserTransition(
+            fundraiserId,
+            transition,
+            accessToken
+          );
+          setSavedStatus(updated.status);
+        } catch (transitionError) {
+          console.error('Failed to change fundraiser status:', transitionError);
+          // Keep whatever the update saved, and put the switch back where the server has it.
+          reset({
+            ...values,
+            status: toggleFor(updated ? updated.status : savedStatus),
+          });
+          toast.error(t('statusChangeFailedMessage'), {
+            description: updated
+              ? t('statusChangeFailedWithSavedChanges')
+              : t('statusChangeFailedDescription'),
+          });
+          return;
+        }
+      }
+
+      if (!updated) return;
+
+      reset({ ...values, status: toggleFor(updated.status) });
 
       // The backend appends a suffix when the chosen link collides with an existing one, so the saved slug can differ from what was submitted.
       const slugWasAdjusted =

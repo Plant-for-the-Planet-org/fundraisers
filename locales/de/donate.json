@@ -84,7 +84,7 @@
       "dedicatedTo": "{recipientName} gewidmet",
       "sentTo": "An: <recipient>{recipientName} <{recipientEmail}></recipient>",
       "sentFrom": "Von: <sender>Plant-for-the-Planet Trillion Tree Campaign</sender>",
-      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein.",
+      "emailNoticeNoEmail": "Der Link zur Geschenkurkunde wird in deiner Bestätigungsnachricht enthalten sein",
       "emailPreview": {
         "greeting": "Hallo {recipientName},",
         "intro": "{donor} hat dir eine Spende in Höhe von {amount} gewidmet.",

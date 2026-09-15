@@ -96,7 +96,7 @@
       "confirm": "Duplizieren",
       "success": "Entwurfskopie erstellt",
       "imageWarning": "Das Titelbild konnte nicht kopiert werden. Füge auf dem nächsten Bildschirm eins hinzu.",
-      "error": "Der Fundraiser konnte nicht dupliziert werden. Versuche es noch einmal."
+      "error": "Der Spendenaufruf konnte nicht dupliziert werden. Bitte versuche es erneut."
     },
     "list": {
       "loading": "Spendenaufruf wird geladen",
