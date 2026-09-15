@@ -11,6 +11,8 @@ interface InfoTooltipProps {
   triggerLabel?: string;
   className?: string;
   iconClassName?: string;
+  /** False makes the icon a pointer-only affordance, hidden from assistive tech. Pair it with `aria-describedby` on the control the tooltip explains, so keyboard and screen reader users still get the text. */
+  focusable?: boolean;
 }
 // Uses Radix Popover to automatically handle viewport collisions and positioning.
 // Tooltip content is rendered in a portal and repositions when space is limited,
@@ -20,6 +22,7 @@ export function InfoTooltip({
   triggerLabel,
   className,
   iconClassName,
+  focusable = true,
 }: InfoTooltipProps) {
   const t = useTranslations('Common.aria');
   const tooltipId = useId();
@@ -29,11 +32,15 @@ export function InfoTooltip({
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <PopoverPrimitive.Trigger asChild>
+        {/* When it is not focusable it is not a control either: announcing a button no keyboard user can reach or operate fails WCAG 2.1.1, so hide it and let the sr-only description on the explained control carry the text. */}
         <span
-          role='button'
-          tabIndex={0}
-          aria-label={triggerLabel ?? t('moreInformation')}
-          aria-describedby={open ? tooltipId : undefined}
+          role={focusable ? 'button' : undefined}
+          tabIndex={focusable ? 0 : undefined}
+          aria-hidden={focusable ? undefined : true}
+          aria-label={
+            focusable ? (triggerLabel ?? t('moreInformation')) : undefined
+          }
+          aria-describedby={focusable && open ? tooltipId : undefined}
           className={cn(
             'inline-flex cursor-help items-center rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
             className
