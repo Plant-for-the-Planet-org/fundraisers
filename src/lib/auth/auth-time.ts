@@ -40,6 +40,18 @@ export function clearAuthTime() {
   localStorage.removeItem(AUTH_TIME_KEY);
 }
 
+/**
+ * Restores the previous sign-in time if an account switch fails.
+ */
+export function restoreAuthTime(value: number | null) {
+  if (!isBrowser()) return;
+  if (value === null) {
+    clearAuthTime();
+    return;
+  }
+  localStorage.setItem(AUTH_TIME_KEY, String(value));
+}
+
 /** True when the sign-in is older than `maxAgeMs`. An unknown time counts as old, so sessions from before it was recorded qualify too. */
 export function isSignInOlderThan(
   authTime: number | null,

@@ -100,6 +100,13 @@ export async function signInWithPopup(
   clearOAuthState(result.state);
 
   const auth = useAuthStore.getState();
+
+  // If a user is already signed in, only replace the current session if the new account loads successfully.
+  if (auth.isAuthenticated) {
+    const switched = await auth.switchAccount(tokens.access_token);
+    return switched ? 'signed-in' : 'failed';
+  }
+
   await auth.setAccessToken(tokens.access_token);
   return useAuthStore.getState().isAuthenticated ? 'signed-in' : 'failed';
 }

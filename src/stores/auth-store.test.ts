@@ -37,6 +37,32 @@ function failed(reason: string) {
   return { status: 'failed', reason, identity };
 }
 
+const OTHER_TOKEN = 'other-access-token';
+
+const otherProfile = {
+  id: 'prf_2',
+  email: 'bruno@example.org',
+  displayName: 'Bruno Costa',
+  image: null,
+} as UserProfile;
+
+function signedInAsAna() {
+  return {
+    user: {
+      sub: 'prf_1',
+      email: 'ana@example.org',
+      name: 'Ana Silva',
+      profile,
+    },
+    accessToken: TOKEN,
+    authTime: 1_700_000_000,
+    isAuthenticated: true,
+    error: null,
+    profileStatus: 'ready' as const,
+    profileFailureReason: null,
+  };
+}
+
 describe('useAuthStore.setAccessToken', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -128,6 +154,73 @@ describe('useAuthStore.setAccessToken', () => {
     await useAuthStore.getState().setAccessToken(TOKEN);
 
     expect(mockedEnsureProfile).toHaveBeenCalledTimes(1);
+  });
+});
+
+// Someone switching accounts is signed in the whole time. A switch that fails must cost them nothing, so every failure here goes back to the session they had.
+describe('useAuthStore.switchAccount', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    useAuthStore.setState(signedInAsAna());
+  });
+
+  it('signs the user in as the new account', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce({
+      status: 'ready',
+      profile: otherProfile,
+    });
+
+    const switched = await useAuthStore.getState().switchAccount(OTHER_TOKEN);
+
+    expect(switched).toBe(true);
+    const state = useAuthStore.getState();
+    expect(state.accessToken).toBe(OTHER_TOKEN);
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.user).toMatchObject({
+      sub: 'prf_2',
+      email: 'bruno@example.org',
+      profile: otherProfile,
+    });
+  });
+
+  it('keeps the current session when the profile load throws', async () => {
+    mockedEnsureProfile.mockRejectedValueOnce(new Error('boom'));
+
+    const switched = await useAuthStore.getState().switchAccount(OTHER_TOKEN);
+
+    expect(switched).toBe(false);
+    expect(useAuthStore.getState()).toMatchObject(signedInAsAna());
+  });
+
+  it('keeps the current session when the new token is not valid', async () => {
+    mockedEnsureProfile.mockResolvedValueOnce({ status: 'unauthorized' });
+
+    const switched = await useAuthStore.getState().switchAccount(OTHER_TOKEN);
+
+    expect(switched).toBe(false);
+    expect(useAuthStore.getState()).toMatchObject(signedInAsAna());
+  });
+
+  it.each(['identity-revoked', 'unverified-email', 'no-email'])(
+    'keeps the current session on a %s failure',
+    async reason => {
+      mockedEnsureProfile.mockResolvedValueOnce(failed(reason));
+
+      const switched = await useAuthStore.getState().switchAccount(OTHER_TOKEN);
+
+      expect(switched).toBe(false);
+      expect(useAuthStore.getState()).toMatchObject(signedInAsAna());
+    }
+  );
+
+  // Auth0 sent back the account that is already signed in, so there is nothing to swap.
+  it('does no work when the token is already the live one', async () => {
+    const switched = await useAuthStore.getState().switchAccount(TOKEN);
+
+    expect(switched).toBe(true);
+    expect(mockedEnsureProfile).not.toHaveBeenCalled();
+    expect(useAuthStore.getState()).toMatchObject(signedInAsAna());
   });
 });
 
