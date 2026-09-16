@@ -19,37 +19,64 @@ export const RECENT_SIGN_IN_MAX_AGE_MS =
 const isBrowser = () => typeof window !== 'undefined';
 
 /**
+ * The sign-in time is a convenience, so a browser that refuses localStorage must never break signing in or out.
+ * Safari private mode, blocked site data and a full quota all throw here.
+ */
+function writeStored(value: string) {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(AUTH_TIME_KEY, value);
+  } catch {
+    // An unknown sign-in time counts as old, which is the safe side.
+  }
+}
+
+function readStored(): string | null {
+  if (!isBrowser()) return null;
+  try {
+    return localStorage.getItem(AUTH_TIME_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function removeStored() {
+  if (!isBrowser()) return;
+  try {
+    localStorage.removeItem(AUTH_TIME_KEY);
+  } catch {
+    // Nothing to do: the caller is signing out either way.
+  }
+}
+
+/**
  * Records that a person just signed in through Auth0's login screen, as seconds since the epoch.
  * Silent refreshes must not call this: nobody typed anything, so the recorded time stays.
  */
 export function markInteractiveSignIn(now = Date.now()) {
-  if (!isBrowser()) return;
-  localStorage.setItem(AUTH_TIME_KEY, String(Math.floor(now / 1000)));
+  writeStored(String(Math.floor(now / 1000)));
 }
 
 export function readAuthTime(): number | null {
-  if (!isBrowser()) return null;
-  const raw = localStorage.getItem(AUTH_TIME_KEY);
+  const raw = readStored();
   if (raw === null) return null;
   const value = Number(raw);
   return Number.isFinite(value) ? value : null;
 }
 
 export function clearAuthTime() {
-  if (!isBrowser()) return;
-  localStorage.removeItem(AUTH_TIME_KEY);
+  removeStored();
 }
 
 /**
  * Restores the previous sign-in time if an account switch fails.
  */
 export function restoreAuthTime(value: number | null) {
-  if (!isBrowser()) return;
   if (value === null) {
-    clearAuthTime();
+    removeStored();
     return;
   }
-  localStorage.setItem(AUTH_TIME_KEY, String(value));
+  writeStored(String(value));
 }
 
 /** True when the sign-in is older than `maxAgeMs`. An unknown time counts as old, so sessions from before it was recorded qualify too. */
