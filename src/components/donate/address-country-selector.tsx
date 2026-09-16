@@ -30,6 +30,14 @@ export const AddressCountrySelector = ({
   const tDonate = useTranslations('Donate.userAddress');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
   const uid = useId();
 
   // Intentionally uses the full donate country source; do not couple with workspace selector data.
@@ -139,8 +147,11 @@ export const AddressCountrySelector = ({
           }}
           onKeyDown={handleKeyDown}
           onBlur={() => {
-            setIsOpen(false);
-            setQuery(selectedCountry?.name ?? '');
+            // Closing removes the whole option list. Inside a dialog, the focus scope treats nodes vanishing while focus is between fields as a reason to refocus the dialog, so Tab never reached the next field. Close once focus has settled.
+            closeTimerRef.current = window.setTimeout(() => {
+              setIsOpen(false);
+              setQuery(selectedCountry?.name ?? '');
+            }, 0);
             onCountryBlur();
           }}
           role='combobox'
@@ -157,6 +168,8 @@ export const AddressCountrySelector = ({
             id={listboxId}
             ref={listboxRef}
             role='listbox'
+            // Chrome makes scrollable containers Tab stops. The list is driven from the input, so Tab must skip it.
+            tabIndex={-1}
             className='absolute z-50 mt-1 max-h-72 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg'
           >
             {filteredCountries.length > 0 ? (
@@ -166,6 +179,8 @@ export const AddressCountrySelector = ({
                   id={`country-selector-option-${countryOption.code}-${uid}`}
                   type='button'
                   role='option'
+                  // Options are reached with the arrow keys while the input keeps focus. Tab moves on to the next field.
+                  tabIndex={-1}
                   aria-selected={countryOption.code === country}
                   className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-gray-50 ${index === activeIndex ? 'bg-gray-50' : ''}`}
                   onMouseEnter={() => setActiveIndex(index)}

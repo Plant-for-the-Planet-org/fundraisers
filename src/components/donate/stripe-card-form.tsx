@@ -28,6 +28,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { AddressCountrySelector } from './address-country-selector';
+import { useDonationForm } from './donation-form-context';
 import { FormField } from './form-field';
 
 export interface StripeCardFormHandle {
@@ -74,6 +75,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.card');
+    const { markPaymentInput, onPaymentFieldEscape } = useDonationForm();
 
     const { control } = useFormContext<DonationFormValues>();
     const [firstname, lastname] = useWatch({
@@ -244,9 +246,11 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
       }
     };
 
+    // `empty` is all Stripe tells us about content; the card number itself never leaves the iframe.
     const handleCardNumberChange = (
       event: StripeCardNumberElementChangeEvent
     ) => {
+      if (!event.empty) markPaymentInput();
       setCardNumberComplete(event.complete);
       setCardNumberError(event.error?.message ?? null);
     };
@@ -254,19 +258,23 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
     const handleCardExpiryChange = (
       event: StripeCardExpiryElementChangeEvent
     ) => {
+      if (!event.empty) markPaymentInput();
       setCardExpiryComplete(event.complete);
       setCardExpiryError(event.error?.message ?? null);
     };
 
     const handleCardCvcChange = (event: StripeCardCvcElementChangeEvent) => {
+      if (!event.empty) markPaymentInput();
       setCardCvcComplete(event.complete);
       setCardCvcError(event.error?.message ?? null);
     };
 
+    // Only manual edits reach this handler, so the name the donor never touched does not count as input.
     const handleCardholderNameChange = (
       event: ChangeEvent<HTMLInputElement>
     ) => {
       cardholderNameEditedRef.current = true;
+      if (event.target.value) markPaymentInput();
       setCardholderName(event.target.value);
       if (cardholderNameError) setCardholderNameError(null);
     };
@@ -281,6 +289,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             <CardNumberElement
               options={CARD_ELEMENT_OPTIONS}
               onChange={handleCardNumberChange}
+              onEscape={onPaymentFieldEscape}
               onReady={handleCardNumberReady}
             />
           </div>
@@ -295,6 +304,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <CardExpiryElement
                 options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardExpiryChange}
+                onEscape={onPaymentFieldEscape}
               />
             </div>
           </FormField>
@@ -303,6 +313,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <CardCvcElement
                 options={CARD_ELEMENT_OPTIONS}
                 onChange={handleCardCvcChange}
+                onEscape={onPaymentFieldEscape}
               />
             </div>
           </FormField>
@@ -343,6 +354,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <Input
                 value={billingAddress}
                 onChange={e => {
+                  if (e.target.value) markPaymentInput();
                   setBillingAddress(e.target.value);
                   if (billingAddressError) setBillingAddressError(null);
                 }}
@@ -354,7 +366,10 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
             <FormField label={t('address2.label')}>
               <Input
                 value={billingAddress2}
-                onChange={e => setBillingAddress2(e.target.value)}
+                onChange={e => {
+                  if (e.target.value) markPaymentInput();
+                  setBillingAddress2(e.target.value);
+                }}
                 placeholder={t('address2.placeholder')}
                 className='mt-2'
               />
@@ -368,6 +383,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                 <Input
                   value={billingCity}
                   onChange={e => {
+                    if (e.target.value) markPaymentInput();
                     setBillingCity(e.target.value);
                     if (billingCityError) setBillingCityError(null);
                   }}
@@ -378,7 +394,10 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <FormField label={t('stateLabel')}>
                 <Input
                   value={billingState}
-                  onChange={e => setBillingState(e.target.value)}
+                  onChange={e => {
+                    if (e.target.value) markPaymentInput();
+                    setBillingState(e.target.value);
+                  }}
                   placeholder={t('statePlaceholder')}
                   className='mt-2'
                 />
@@ -389,6 +408,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
               <AddressCountrySelector
                 country={billingCountry || undefined}
                 onCountryChange={code => {
+                  if (code) markPaymentInput();
                   setBillingCountry(code);
                   if (billingCountryError) setBillingCountryError(null);
                 }}
@@ -408,6 +428,7 @@ export const StripeCardForm = forwardRef<StripeCardFormHandle>(
                 <Input
                   value={billingZipCode}
                   onChange={e => {
+                    if (e.target.value) markPaymentInput();
                     setBillingZipCode(e.target.value);
                     if (billingZipCodeError) setBillingZipCodeError(null);
                   }}

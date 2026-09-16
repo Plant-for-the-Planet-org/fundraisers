@@ -11,6 +11,7 @@ import type { StripeCardFormHandle } from './stripe-card-form';
 import type { StripeSepaFormHandle } from './stripe-sepa-form';
 
 import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import dynamic from 'next/dynamic';
 import { z } from 'zod';
@@ -167,6 +168,21 @@ interface DonationFormContextValue {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  /**
+   * Call this when the donor enters something in a payment field
+   * that React Hook Form does not track, such as Stripe fields,
+   * cardholder/account holder name, or billing address.
+   *
+   * This helps the overlay know when to show a warning before closing.
+   * The flag stays on until the overlay is closed.
+   */
+  markPaymentInput: () => void;
+  /**
+   * Call when Esc is pressed inside a Stripe element. Their iframes are
+   * cross-origin, so the key never reaches this document and the overlay's
+   * own Esc handler never runs; Stripe's `escape` event is the only way in.
+   */
+  onPaymentFieldEscape: () => void;
 }
 
 const DonationFormContext = createContext<DonationFormContextValue | null>(
@@ -181,6 +197,8 @@ interface DonationFormProviderProps {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  markPaymentInput: () => void;
+  onPaymentFieldEscape: () => void;
   isOpen: boolean;
   /** Field errors the platform rejected the donation with, applied on top of the client-side schema. */
   serverFieldErrors?: DonationFieldErrors;
@@ -200,6 +218,8 @@ export function DonationFormProvider({
   onSubmit,
   sepaFormRef,
   cardFormRef,
+  markPaymentInput,
+  onPaymentFieldEscape,
   isOpen,
   serverFieldErrors,
   children,
@@ -274,13 +294,19 @@ export function DonationFormProvider({
         onSubmit,
         sepaFormRef,
         cardFormRef,
+        markPaymentInput,
+        onPaymentFieldEscape,
       }}
     >
       <FormProvider {...methods}>
         {children}
-        {DevTool !== null && (
-          <DevTool control={methods.control as unknown as Control} />
-        )}
+        {/* Portaled out of the dialog. The panel re-renders its field list on every form change, and the dialog's focus scope treats nodes vanishing inside it as a reason to refocus its surface, which broke Tab between fields in development. */}
+        {DevTool !== null &&
+          typeof document !== 'undefined' &&
+          createPortal(
+            <DevTool control={methods.control as unknown as Control} />,
+            document.body
+          )}
       </FormProvider>
     </DonationFormContext.Provider>
   );

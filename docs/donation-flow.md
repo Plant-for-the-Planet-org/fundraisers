@@ -47,6 +47,15 @@ The overlay currently shows a donation summary, per-project line items, a raw JS
 
 ---
 
+### Keyboard behaviour in the overlay
+
+- Tab moves between controls. The payment list is one Tab stop that lands on the checked row. Fee info icons are not Tab stops; their text is the description of the row or checkbox they explain.
+- Arrows move between payment rows and select as they pass, like native radios. An arrow selection never scrolls to or focuses the entry form. Click, Enter or Space on a card or SEPA row selects it and moves focus into its first field. Enter is handled by us since Radix blocks it on radios.
+- In the country field the arrows move through the options while the input keeps focus. Enter picks the highlighted one, Tab moves on to the zip field. The list and its options are not Tab stops.
+- Esc closes the country list first, then an open tooltip, then the overlay. Once the donor has typed into a field, Esc asks before leaving.
+- A signed-out donor starts in the email field on pointer devices. Touch devices keep focus on the dialog surface so the keyboard does not open over the overlay.
+- Anything that unmounts DOM nodes on blur inside the dialog breaks Tab: the dialog's focus scope refocuses its surface when nodes vanish while focus is in transit. The country list closes after focus has settled, and the react-hook-form DevTool is portaled out of the dialog for this reason.
+
 ## What's not done yet
 
 ### `ClosedForContribution` + `SecurityNotice`
