@@ -169,13 +169,16 @@ interface DonationFormContextValue {
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
   /**
-   * Call this when the donor enters something in a payment field
-   * that React Hook Form does not track, such as Stripe fields,
-   * cardholder/account holder name, or billing address.
+   * True once the donor has entered something in a payment field that React
+   * Hook Form does not track, such as Stripe fields, cardholder/account holder
+   * name, or billing address. Stays on until the overlay closes.
    *
-   * This helps the overlay know when to show a warning before closing.
-   * The flag stays on until the overlay is closed.
+   * The sign-in nudge hides once this is true, since signing in swaps the
+   * donor details. The overlay reads the same value to decide whether to warn
+   * before closing.
    */
+  hasPaymentInput: boolean;
+  /** Call this when the donor enters something in one of those payment fields. */
   markPaymentInput: () => void;
   /**
    * Call when Esc is pressed inside a Stripe element. Their iframes are
@@ -197,6 +200,7 @@ interface DonationFormProviderProps {
   onSubmit: (values: DonationFormValues) => void;
   sepaFormRef: RefObject<StripeSepaFormHandle | null>;
   cardFormRef: RefObject<StripeCardFormHandle | null>;
+  hasPaymentInput: boolean;
   markPaymentInput: () => void;
   onPaymentFieldEscape: () => void;
   isOpen: boolean;
@@ -218,6 +222,7 @@ export function DonationFormProvider({
   onSubmit,
   sepaFormRef,
   cardFormRef,
+  hasPaymentInput,
   markPaymentInput,
   onPaymentFieldEscape,
   isOpen,
@@ -294,6 +299,7 @@ export function DonationFormProvider({
         onSubmit,
         sepaFormRef,
         cardFormRef,
+        hasPaymentInput,
         markPaymentInput,
         onPaymentFieldEscape,
       }}
