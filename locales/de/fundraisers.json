@@ -129,7 +129,7 @@
         "title": "Organisator*innen",
         "manage": "Verwalten",
         "dialogTitle": "Organisator*innen verwalten",
-        "dialogDescription": "Füge Personen hinzu, die diese Spendenaktion verwalten oder ansehen können. Organisator*innen können öffentlich angezeigt oder privat gehalten werden.",
+        "dialogDescription": "Füge Personen hinzu, die diesen Spendenaufruf verwalten oder ansehen können. Organisator*innen können öffentlich angezeigt oder privat gehalten werden.",
         "unknownHost": "Unbekannt",
         "you": "(du)",
         "invited": "Eingeladen",
@@ -141,8 +141,8 @@
         "remove": "Entfernen",
         "selfRemove": {
           "title": "Dich selbst als Gastgeber entfernen?",
-          "description": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
-          "descriptionHidden": "Du verlierst den Zugriff auf diese Spendenaktion, und nur ein anderer Admin kann dich wieder hinzufügen.",
+          "description": "Du verlierst den Zugriff auf diesen Spendenaufruf, und nur ein anderer Admin kann dich wieder hinzufügen. Wenn du nur deinen Namen von der öffentlichen Seite nehmen, den Zugriff aber behalten willst, blende ihn stattdessen aus.",
+          "descriptionHidden": "Du verlierst den Zugriff auf diesen Spendenaufruf, und nur ein anderer Admin kann dich wieder hinzufügen.",
           "hide": "Namen ausblenden",
           "confirm": "Mich entfernen",
           "cancel": "Abbrechen"
@@ -467,7 +467,9 @@
         "buttonSubmit": "Spendenaufruf erstellen",
         "successMessage": "Spendenaufruf erstellt!",
         "errorMessage": "Fehler",
-        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut."
+        "errorDescription": "Dein Spendenaufruf konnte nicht erstellt werden. Überprüfe deine Angaben und versuche es erneut.",
+        "publishFailedMessage": "Als Entwurf gespeichert",
+        "publishFailedDescription": "Dein Spendenaufruf wurde erstellt, konnte aber nicht veröffentlicht werden. Schalte den Status hier ein, um ihn live zu stellen."
       }
     },
     "edit": {
@@ -489,7 +491,11 @@
         "successMessage": "Spendenaufruf aktualisiert!",
         "slugAdjusted": "Der gewählte Link war vergeben, daher lautet er jetzt /raise/{slug}.",
         "errorMessage": "Aktualisierung fehlgeschlagen",
-        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut."
+        "errorDescription": "Deine Änderungen konnten nicht gespeichert werden. Versuche es erneut.",
+        "statusChangeFailedMessage": "Status nicht geändert",
+        "statusChangeFailedDescription": "Der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeFailedWithSavedChanges": "Deine anderen Änderungen wurden gespeichert, aber der Status des Spendenaufrufs konnte nicht geändert werden. Versuche es erneut.",
+        "statusChangeUnavailableDescription": "Der Status dieses Spendenaufrufs kann hier nicht geändert werden."
       }
     },
     "copyLinkButton": {

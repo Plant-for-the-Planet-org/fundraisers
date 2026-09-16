@@ -59,7 +59,8 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
     const stripe = useStripe();
     const elements = useElements();
     const t = useTranslations('Donate.sepa');
-    const { fundraiser, donationData, markPaymentInput } = useDonationForm();
+    const { fundraiser, donationData, markPaymentInput, onPaymentFieldEscape } =
+      useDonationForm();
     const creditor = getSepaCreditor(fundraiser.workspace?.country);
 
     const { control } = useFormContext<DonationFormValues>();
@@ -167,6 +168,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
       }
     };
 
+    // `empty` is all Stripe tells us about content; the IBAN itself never leaves the iframe.
     const handleIbanChange = (event: StripeIbanElementChangeEvent) => {
       if (!event.empty) markPaymentInput();
       setIbanComplete(event.complete);
@@ -180,6 +182,7 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
             <IbanElement
               options={IBAN_ELEMENT_OPTIONS}
               onChange={handleIbanChange}
+              onEscape={onPaymentFieldEscape}
               onReady={handleIbanReady}
             />
           </div>
@@ -192,7 +195,9 @@ export const StripeSepaForm = forwardRef<StripeSepaFormHandle>(
           <Input
             value={accountHolderName}
             onChange={e => {
+              // Only manual edits reach this handler, so the name the donor never touched does not count as input.
               accountHolderNameEditedRef.current = true;
+              if (e.target.value) markPaymentInput();
               setAccountHolderName(e.target.value);
               if (nameError) setNameError(null);
             }}

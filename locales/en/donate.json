@@ -4,6 +4,12 @@
       "aria": {
         "label": "donation details",
         "close": "Close donation overlay"
+      },
+      "leaveConfirm": {
+        "title": "Leave this donation?",
+        "description": "The details you entered will be lost.",
+        "cancel": "Keep editing",
+        "confirm": "Leave"
       }
     },
     "preferences": {
