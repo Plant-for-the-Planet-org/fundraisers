@@ -86,5 +86,8 @@ export function isSignInOlderThan(
   now = Date.now()
 ): boolean {
   if (authTime === null) return true;
-  return now - authTime * 1000 > maxAgeMs;
+  const age = now - authTime * 1000;
+  // If the sign-in time is in the future, treat it as invalid and old.
+  if (age < 0) return true;
+  return age > maxAgeMs;
 }

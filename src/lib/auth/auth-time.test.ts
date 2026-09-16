@@ -62,4 +62,9 @@ describe('isSignInOlderThan', () => {
     const authTime = Math.floor((now - fourHours) / 1000) - 1;
     expect(isSignInOlderThan(authTime, fourHours, now)).toBe(true);
   });
+
+  it('is old when the sign-in is in the future', () => {
+    const authTime = Math.floor(now / 1000) + 60;
+    expect(isSignInOlderThan(authTime, fourHours, now)).toBe(true);
+  });
 });
