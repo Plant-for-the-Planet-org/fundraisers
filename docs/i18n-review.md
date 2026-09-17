@@ -543,6 +543,8 @@ Added [`scripts/check-translations.mjs`](../scripts/check-translations.mjs), run
 
 Off-the-shelf tools were rejected because none model next-intl's namespace binding, where `useTranslations('Fundraisers.edit')` plus `t('title')` resolves to `Fundraisers.edit.title`. They would read nearly every key as dead.
 
+`useTranslations()` with no argument binds the root, so `t('Fundraisers.edit.title')` already carries the whole key and the namespace file it binds is read off the key itself. A namespace the AST cannot read, as in `useTranslations(someVariable)` or `getTranslations({ namespace })`, is fatal rather than silently unresolved.
+
 It reports:
 
 1. Keys in `locales/en` that no source file uses. Advisory — printed, never fatal.
@@ -551,7 +553,7 @@ It reports:
 
 Keys built from a value the AST cannot read (`t(status)`, `t(link.labelKey)`) need an `// i18n-used: <keys>` comment above the call or above the translator it uses. `*` covers every key under the bound namespace, `foo.*` every key under `foo`. A missing, stale or malformed comment is fatal, so the audit cannot go quietly stale.
 
-A comment binds to the one node it is actually attached to, read from the AST rather than by counting lines. Blank lines and prose comments in between are fine, and stacked `i18n-used:` comments all count, but a comment never reaches past the statement it sits above, so it cannot silently cover the next call or the next translator. A comment that ends up covering no call at all is fatal, as is `*` on a translator received as an argument, which has no namespace to scope the wildcard to.
+A comment binds to the one node it is actually attached to, read from the AST rather than by counting lines. Blank lines and prose comments in between are fine, and stacked `i18n-used:` comments all count, but a comment never reaches past the statement it sits above, so it cannot silently cover the next call or the next translator. A comment that ends up covering no call at all is fatal, as is a wildcard with no namespace to anchor it: `*` on a translator received as an argument, or a bare `*` on a root translator, where it would cover every locale file. On a root translator write the namespace into the entry, as in `Fundraisers.*`.
 
 `cookie.json` is allowlisted in the script: it has no namespace wrapper and is read by a direct static import in [`src/lib/constants/cookie-consent-config.ts`](../src/lib/constants/cookie-consent-config.ts), so its keys never appear in a `t()` call. See [§13.1](#131-cookiejson-is-not-loaded-by-next-intl).
 

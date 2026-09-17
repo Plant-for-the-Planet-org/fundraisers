@@ -11,6 +11,8 @@
 // Namespace binding is the one project-specific rule it has to know: `useTranslations('Fundraisers.edit')`
 // plus `t('title')` resolves to the message key `Fundraisers.edit.title`. Off-the-shelf unused-key tools
 // do not model this and would read almost every key as dead.
+// `useTranslations()` with no argument binds the root, so `t('Fundraisers.edit.title')` already carries
+// the whole key. A namespace the AST cannot read, as in `useTranslations(someVariable)`, is an error.
 //
 // Dynamic keys:
 //   - A template literal becomes a pattern, so t(`tabs.${id}.label`) matches Ns.tabs.<anything>.label.
@@ -125,24 +127,41 @@ function isStringLiteral(node) {
   return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node);
 }
 
+// The namespace a translator was bound to. Three outcomes, and they mean different things:
+//   - a string: `useTranslations('Ns')`, so `t('key')` resolves to `Ns.key`.
+//   - ROOT: `useTranslations()` with no namespace, so `t('Ns.key')` already carries the full key.
+//   - null: the namespace is not readable from the AST.
+// ROOT and null used to be the same value, which made a root translator look like a translator with no
+// namespace at all: its keys were matched by suffix and its namespace file was reported as an orphan.
+const ROOT = '';
+
 // `useTranslations('Ns')`, `getTranslations('Ns')` and `getTranslations({ namespace: 'Ns' })`.
 function namespaceOf(call) {
   const arg = call.arguments[0];
-  if (!arg) return null;
+  if (!arg) return ROOT;
   const inner = unwrap(arg);
 
   if (isStringLiteral(inner)) return inner.text;
 
   if (ts.isObjectLiteralExpression(inner)) {
+    // A spread or a computed key could carry a `namespace` the audit cannot see.
+    const opaque = inner.properties.some(
+      property =>
+        ts.isSpreadAssignment(property) ||
+        (property.name && ts.isComputedPropertyName(property.name))
+    );
+    if (opaque) return null;
+
     for (const property of inner.properties) {
-      if (
-        ts.isPropertyAssignment(property) &&
-        property.name.getText() === 'namespace'
-      ) {
-        const value = unwrap(property.initializer);
-        if (isStringLiteral(value)) return value.text;
-      }
+      if (property.name?.getText() !== 'namespace') continue;
+      // A shorthand `{ namespace }` holds a value, not a literal.
+      if (!ts.isPropertyAssignment(property)) return null;
+      const value = unwrap(property.initializer);
+      return isStringLiteral(value) ? value.text : null;
     }
+
+    // `getTranslations({ locale })` names no namespace, so it binds the root.
+    return ROOT;
   }
 
   return null;
@@ -358,6 +377,13 @@ const used = {
   namespaces: new Set(), // every namespace a component binds
 };
 
+// A root translator reads its namespace off the key, so the namespace file it binds is only known once
+// a key resolves. The caller passes a key that starts with a whole segment, never a partial one.
+function noteRootNamespace(key) {
+  const root = key.split('.')[0];
+  if (root) used.namespaces.add(root);
+}
+
 // Annotation entries, kept so a stale one (pointing at a key that no longer exists) can be reported.
 const annotationEntries = [];
 
@@ -476,9 +502,26 @@ function scanFile(file) {
     if (ts.isVariableDeclaration(node) && node.initializer) {
       const bindTranslator = (name, expression) => {
         const factory = translatorFactoryCall(expression);
-        const namespaces = factory
-          ? [namespaceOf(factory)]
-          : aliasedNamespaces(expression, scope);
+        let namespaces;
+
+        if (factory) {
+          const namespace = namespaceOf(factory);
+          if (namespace === null) {
+            // Binding it as unknown anyway keeps the calls below from piling a second round of errors
+            // on top of this one.
+            const { line } = sourceFile.getLineAndCharacterOfPosition(
+              factory.getStart()
+            );
+            errors.push(
+              `${file}:${line + 1}  namespace comes from a value the audit cannot read. ` +
+                `Pass a string literal to ${factory.expression.text}(), or call it with no argument to bind the root.`
+            );
+          }
+          namespaces = [namespace];
+        } else {
+          namespaces = aliasedNamespaces(expression, scope);
+        }
+
         if (!namespaces) return;
         scope.translators.set(name, { namespaces, declaration: node });
         for (const namespace of namespaces) {
@@ -551,8 +594,13 @@ function record(call, translator, sourceFile, file, text, annotations) {
   if (collect(argument)) {
     for (const namespace of namespaces) {
       for (const key of literals) {
-        if (namespace) used.exact.add(qualify(namespace, key));
-        else used.suffixes.add(key);
+        if (namespace === null) {
+          used.suffixes.add(key);
+          continue;
+        }
+        const qualified = qualify(namespace, key);
+        used.exact.add(qualified);
+        if (namespace === ROOT) noteRootNamespace(qualified);
       }
     }
     return;
@@ -561,6 +609,11 @@ function record(call, translator, sourceFile, file, text, annotations) {
   if (argument && ts.isTemplateExpression(argument)) {
     for (const namespace of namespaces) {
       used.patterns.push(patternFromTemplate(argument, namespace));
+      // Only the text before the first `${...}` is literal, so it names a namespace only when a
+      // segment boundary falls inside it.
+      if (namespace === ROOT && argument.head.text.includes('.')) {
+        noteRootNamespace(argument.head.text);
+      }
     }
     return;
   }
@@ -583,25 +636,35 @@ function record(call, translator, sourceFile, file, text, annotations) {
     for (const entry of annotation.entries) {
       // "*" covers every key under the bound namespace, "foo.*" every key under foo.
       if (entry.endsWith('*')) {
-        // A wildcard needs a namespace to scope it to. On a translator passed in as an argument there
-        // is none, and a bare "*" would compile to /^.+$/ - a pattern that marks every key in every
-        // locale file used, which silently turns the whole audit into a no-op.
-        if (namespace === null) {
+        // A wildcard needs a prefix to anchor it. Without one it compiles to /^.+$/ - a pattern that
+        // marks every key in every locale file used, which silently turns the whole audit into a no-op.
+        // A translator passed in as an argument has no namespace at all, and a root translator gives a
+        // bare "*" nothing to stand on either.
+        const prefix =
+          namespace === null
+            ? null
+            : qualify(namespace, entry.replace(/\.?\*$/, ''));
+
+        if (!prefix) {
           const id = `${file}:${annotation.line}:${entry}`;
           if (!reportedUnscopedWildcards.has(id)) {
             reportedUnscopedWildcards.add(id);
             errors.push(
-              `${file}:${annotation.line + 1}  "i18n-used: ${entry}" needs a translator bound to a namespace. ` +
-                `A translator received as an argument has no namespace, so the wildcard cannot be scoped. ` +
-                `List the keys instead.`
+              prefix === null
+                ? `${file}:${annotation.line + 1}  "i18n-used: ${entry}" needs a translator bound to a namespace. ` +
+                    `A translator received as an argument has no namespace, so the wildcard cannot be scoped. ` +
+                    `List the keys instead.`
+                : `${file}:${annotation.line + 1}  "i18n-used: ${entry}" needs a namespace to scope it. ` +
+                    `The translator was bound with no namespace, so a bare "*" would cover every locale file. ` +
+                    `Write the namespace into the entry, as in "Alpha.*", or list the keys instead.`
             );
           }
           continue;
         }
 
-        const prefix = qualify(namespace, entry.replace(/\.?\*$/, ''));
         const pattern = new RegExp(`^${escapeForRegExp(prefix)}\\..+$`);
         used.patterns.push(pattern);
+        if (namespace === ROOT) noteRootNamespace(prefix);
         annotationEntries.push({
           file,
           line: annotation.line,
@@ -610,6 +673,7 @@ function record(call, translator, sourceFile, file, text, annotations) {
         });
       } else {
         const qualified = qualify(namespace, entry);
+        if (namespace === ROOT) noteRootNamespace(qualified);
         used.exact.add(qualified);
         annotationEntries.push({
           file,

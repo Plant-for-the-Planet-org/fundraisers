@@ -155,6 +155,82 @@ export function C() {
   });
 });
 
+describe('a translator bound with no namespace reads the whole key', () => {
+  it('resolves keys through a root useTranslations() and binds the namespace file', () => {
+    // A missing first argument used to read as "namespace unknown", so alpha.json was reported as a file
+    // no component binds and the keys were matched by suffix instead of exactly.
+    const { status, output } = runAudit(`
+export function C() {
+  const tRoot = useTranslations();
+  return <>{tRoot('Alpha.one')}</>;
+}
+`);
+
+    expect(status).toBe(0);
+    expect(output).not.toContain('no component binds this namespace');
+    // Exact resolution both ways: Alpha.one counts as used, the rest still show up as unused.
+    expect(output).not.toContain('Alpha.one');
+    expect(output).toContain('Alpha.other');
+  });
+
+  it('reads a root getTranslations({ locale }) the same way', () => {
+    const { status, output } = runAudit(`
+export async function C() {
+  const t = await getTranslations({ locale: 'en' });
+  return <>{t('Alpha.one')}{t('Alpha.other')}{t('Alpha.status.a')}{t('Alpha.aria.b')}</>;
+}
+`);
+
+    expect(status).toBe(0);
+    expect(output).not.toContain('no component binds this namespace');
+    expect(output).not.toContain('look unused');
+  });
+
+  it('scopes a template literal and an annotation off a root translator', () => {
+    const { status, output } = runAudit(`
+export function C({ id, key1 }: { id: string; key1: string }) {
+  const tTemplate = useTranslations();
+  // i18n-used: Alpha.aria.*
+  const tOpaque = useTranslations();
+  return <>{tTemplate(\`Alpha.status.\${id}\`)}{tOpaque(key1)}{tTemplate('Alpha.one')}{tTemplate('Alpha.other')}</>;
+}
+`);
+
+    expect(status).toBe(0);
+    expect(output).not.toContain('no component binds this namespace');
+    expect(output).not.toContain('look unused');
+  });
+
+  it('rejects a namespace the audit cannot read', () => {
+    const { status, output } = runAudit(`
+export function C({ ns }: { ns: string }) {
+  const t = useTranslations(ns);
+  return <>{t('one')}</>;
+}
+`);
+
+    expect(status).toBe(1);
+    expect(output).toContain('component.tsx:3');
+    expect(output).toContain(
+      'namespace comes from a value the audit cannot read'
+    );
+  });
+
+  it('rejects a namespace passed as a shorthand property', () => {
+    const { status, output } = runAudit(`
+export async function C({ namespace }: { namespace: string }) {
+  const t = await getTranslations({ namespace });
+  return <>{t('one')}</>;
+}
+`);
+
+    expect(status).toBe(1);
+    expect(output).toContain(
+      'namespace comes from a value the audit cannot read'
+    );
+  });
+});
+
 describe('i18n-used wildcards need a namespace', () => {
   it('rejects "*" on a translator received as an argument', () => {
     // A passed-in translator has no namespace, so an unscoped "*" used to compile to /^.+$/ and mark
@@ -178,6 +254,20 @@ export function C() {
     expect(output).toContain('needs a translator bound to a namespace');
     // The audit still does its job for the keys the wildcard was hiding.
     expect(output).toContain('Alpha.other');
+  });
+
+  it('rejects a bare "*" on a root translator', () => {
+    const { status, output } = runAudit(`
+export function C({ key1 }: { key1: string }) {
+  // i18n-used: *
+  const t = useTranslations();
+  return <>{t(key1)}{t('Alpha.one')}{t('Alpha.other')}{t('Alpha.status.a')}{t('Alpha.aria.b')}</>;
+}
+`);
+
+    expect(status).toBe(1);
+    expect(output).toContain('component.tsx:3');
+    expect(output).toContain('needs a namespace to scope it');
   });
 
   it('still scopes a wildcard on a translator bound to a namespace', () => {
