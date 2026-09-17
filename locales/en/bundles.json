@@ -4,37 +4,30 @@
     "moreLabel": "More",
     "tabs": {
       "staff-picks": {
-        "label": "Staff Picks",
-        "description": "Handpicked by the Plant-for-the-Planet-Team."
+        "label": "Staff Picks"
       },
       "wonder": {
-        "label": "Wonder",
-        "description": "The world is vast and beautiful."
+        "label": "Wonder"
       },
       "rage": {
-        "label": "Rage",
-        "description": "This is broken and needs fixing."
+        "label": "Rage"
       },
       "love": {
-        "label": "Love",
-        "description": "For people, places, things I care about."
+        "label": "Love"
       },
       "custom": {
-        "label": "Custom",
-        "description": "Build your own bouquet — pick projects one by one."
+        "label": "Custom"
       }
     },
     "card": {
       "projectCount": "{count, plural, one {# project} other {# projects}}",
       "seeInside": "See inside",
-      "selected": "Selected",
       "containsNonDonatable": "Contains a project that is currently not accepting donations"
     },
     "aria": {
       "openBundle": "See inside the {name} bouquet",
       "selectBundle": "Select the {name} bouquet",
       "selectedBundle": "{name} bouquet is currently selected",
-      "openProject": "Learn more about {name} (opens in a new tab)",
       "closeModal": "Close bouquet preview"
     },
     "modal": {
@@ -49,7 +42,6 @@
       }
     },
     "custom": {
-      "description": "Build your own bouquet — pick projects one by one.",
       "searchPlaceholder": "Search and pick projects to create your bouquet",
       "maxReached": "6 projects selected. Remove one to add another.",
       "showingCount": "Top {shown, number} of {total, number} · Search to find more · ✨ top projects",
@@ -72,8 +64,7 @@
       "aria": {
         "search": "Search projects",
         "addProject": "Add {name}",
-        "removeProject": "Remove {name}",
-        "defaultProjectLocked": "{name} is the default project and cannot be removed"
+        "removeProject": "Remove {name}"
       }
     },
     "projectImageAlt": "Image for {name}",

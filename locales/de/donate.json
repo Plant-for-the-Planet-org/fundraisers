@@ -50,8 +50,6 @@
       },
       "country": {
         "label": "Land *",
-        "placeholder": "Land auswählen",
-        "searchPlaceholder": "Länder werden durchsucht...",
         "noResults": "Keine Land gefunden",
         "selectCountry": "Land auswählen"
       },
@@ -154,7 +152,6 @@
       "accountHolderNamePlaceholder": "Erika Mustermann",
       "accountHolderNameRequired": "Name des Kontoinhabers ist erforderlich",
       "errors": {
-        "validationFailed": "Validierung fehlgeschlagen",
         "stripeNotInitialized": "Stripe nicht initialisiert",
         "ibanElementNotFound": "IBAN-Element nicht gefunden",
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen"
@@ -201,7 +198,6 @@
       "countryPlaceholder": "Land auswählen",
       "countryNoResults": "Kein Land gefunden",
       "errors": {
-        "validationFailed": "Validierung fehlgeschlagen",
         "stripeNotInitialized": "Stripe nicht initialisiert",
         "cardElementNotFound": "Kartenelement nicht gefunden",
         "paymentMethodFailed": "Initialisierung der Zahlungsart fehlgeschlagen",
