@@ -17,6 +17,9 @@
 //   - A key that comes from an opaque value (t(status), t(link.labelKey)) cannot be read from the AST.
 //     Those call sites need an `// i18n-used:` comment listing the keys they can produce. An opaque call
 //     with no comment is an error, so the audit cannot go quietly stale.
+//     An annotation binds to the node it is attached to, read through TypeScript's comment ranges rather
+//     than by counting lines, and never reaches past the statement it sits above. A comment that covers
+//     no call is an error too, so an annotation cannot outlive the call it was written for.
 //
 // Run with `npm run check:translations`. Deliberately left out of prebuild — see docs/i18n-review.md §13.2.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -41,13 +44,10 @@ const DIRECT_IMPORT_FILES = new Map([
   ],
 ]);
 
-// `// i18n-used: a, b.c, d.*` — everything up to the end of the line (or the end of a block comment)
-// is a comma-separated key list. Prose on the annotation line is rejected, so keep it on its own line.
-const ANNOTATION = /i18n-used:\s*([^\n]*?)\s*(?:\*\/|$)/gm;
+// `// i18n-used: a, b.c, d.*` — everything after the marker to the end of the line is a
+// comma-separated key list. Prose on the annotation line is rejected, so keep it on its own line.
+const ANNOTATION = /i18n-used:\s*([^\n]*)/;
 const ANNOTATION_ENTRY = /^(\*|[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)*(\.\*)?)$/;
-
-// How many lines above a call an `i18n-used:` comment may sit and still count as covering it.
-const ANNOTATION_LOOKBEHIND = 3;
 
 const errors = [];
 const notes = [];
@@ -207,15 +207,55 @@ function isTranslatorTypeNode(node, aliases) {
   return false;
 }
 
-// Collects every `i18n-used: a, b, c.*` comment in a file, keyed by line number.
+function commentBody(raw) {
+  return raw.startsWith('//') ? raw.slice(2) : raw.slice(2, -2);
+}
+
+// The comments that belong to a node: the trivia before it, and the trivia after it on the same line.
+// TypeScript classifies those two precisely — a comment on the line above belongs to the node below it,
+// never to the node above — which is what makes an annotation bind to one node and no other.
+function commentRangesOf(node, text) {
+  const ranges = [
+    ...(ts.getLeadingCommentRanges(text, node.getFullStart()) ?? []),
+    ...(ts.getTrailingCommentRanges(text, node.getEnd()) ?? []),
+  ];
+
+  // A JSX comment is not trivia around its container, it sits between the container's braces.
+  // `{/* x */}` on one line makes it a trailing comment of `{`, and a braces-on-their-own-lines
+  // container makes it a leading comment of `}`, so both sides have to be read.
+  if (ts.isJsxExpression(node) && !node.expression) {
+    for (const child of node.getChildren()) {
+      ranges.push(
+        ...(ts.getLeadingCommentRanges(text, child.getFullStart()) ?? []),
+        ...(ts.getTrailingCommentRanges(text, child.getEnd()) ?? [])
+      );
+    }
+  }
+
+  return ranges;
+}
+
+// Collects every `i18n-used: a, b, c.*` comment in a file, keyed by the comment's start offset.
+// Reading real comment ranges rather than the raw text means the marker inside a string literal is
+// not mistaken for an annotation.
 function annotationsIn(text, sourceFile, file) {
-  const byLine = new Map();
-  for (const match of text.matchAll(ANNOTATION)) {
+  const byPos = new Map();
+  const seen = new Set();
+
+  const add = range => {
+    if (seen.has(range.pos)) return;
+    seen.add(range.pos);
+
+    const match = ANNOTATION.exec(
+      commentBody(text.slice(range.pos, range.end))
+    );
+    if (!match) return;
+
+    const { line } = sourceFile.getLineAndCharacterOfPosition(range.pos);
     const entries = match[1]
       .split(',')
       .map(entry => entry.trim())
       .filter(Boolean);
-    const { line } = sourceFile.getLineAndCharacterOfPosition(match.index);
 
     const malformed = entries.filter(entry => !ANNOTATION_ENTRY.test(entry));
     if (entries.length === 0 || malformed.length > 0) {
@@ -223,19 +263,73 @@ function annotationsIn(text, sourceFile, file) {
         `${file}:${line + 1}  malformed "i18n-used:" comment. ` +
           `It takes a comma-separated key list and nothing else; put any explanation on its own line.`
       );
-      continue;
+      return;
     }
 
-    byLine.set(line, [...(byLine.get(line) ?? []), ...entries]);
-  }
-  return byLine;
+    byPos.set(range.pos, { file, line, entries, consumed: false });
+  };
+
+  const visit = node => {
+    for (const range of commentRangesOf(node, text)) add(range);
+    node.getChildren().forEach(visit);
+  };
+  visit(sourceFile);
+
+  return byPos;
 }
 
-function annotationFor(annotations, line) {
-  for (let offset = 0; offset <= ANNOTATION_LOOKBEHIND; offset++) {
-    const entries = annotations.get(line - offset);
-    if (entries) return { entries, line: line - offset };
+// `{/* i18n-used: ... */}` sits as a sibling of the expression it covers rather than in its trivia,
+// so the JSX case has to look back over preceding siblings instead of leading comments.
+function jsxAnnotationsBefore(node, text, annotations) {
+  const parent = node.parent;
+  if (!parent || !(ts.isJsxElement(parent) || ts.isJsxFragment(parent))) {
+    return [];
   }
+
+  const siblings = parent.children;
+  const index = siblings.indexOf(node);
+  if (index < 0) return [];
+
+  const found = [];
+  for (let i = index - 1; i >= 0; i--) {
+    const sibling = siblings[i];
+    if (ts.isJsxText(sibling) && sibling.containsOnlyTriviaWhiteSpaces)
+      continue;
+    if (!ts.isJsxExpression(sibling) || sibling.expression) break;
+
+    for (const range of commentRangesOf(sibling, text)) {
+      const annotation = annotations.get(range.pos);
+      if (annotation) found.push(annotation);
+    }
+  }
+  return found;
+}
+
+// Finds the annotation covering a node by asking which comments are actually attached to it, rather
+// than by counting lines. Climbing stops at the enclosing statement, so an annotation can never reach
+// past the statement it was written above and swallow the next call or the next translator.
+function annotationFor(node, text, annotations) {
+  for (let current = node; current; current = current.parent) {
+    const found = [];
+
+    for (const range of commentRangesOf(current, text)) {
+      const annotation = annotations.get(range.pos);
+      if (annotation) found.push(annotation);
+    }
+    found.push(...jsxAnnotationsBefore(current, text, annotations));
+
+    if (found.length > 0) {
+      for (const annotation of found) annotation.consumed = true;
+      // Stacked annotations all count, so a long one can be split over several lines.
+      return {
+        entries: found.flatMap(annotation => annotation.entries),
+        line: found[0].line,
+      };
+    }
+
+    if (ts.isStatement(current)) break;
+  }
+
   return null;
 }
 
@@ -266,6 +360,9 @@ const used = {
 
 // Annotation entries, kept so a stale one (pointing at a key that no longer exists) can be reported.
 const annotationEntries = [];
+
+// Every annotation seen, so one that ended up covering no call can be reported.
+const allAnnotations = [];
 
 // Wildcards already reported as unscoped, so an alias standing for several translators reports once.
 const reportedUnscopedWildcards = new Set();
@@ -329,9 +426,6 @@ function scanFile(file) {
     file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
   );
 
-  const lineOf = node =>
-    sourceFile.getLineAndCharacterOfPosition(node.getStart()).line;
-
   // Type aliases first, since a `type Translator = ...` can sit below the code that uses it.
   const aliases = new Set();
   const collectAliases = node => {
@@ -346,6 +440,7 @@ function scanFile(file) {
   collectAliases(sourceFile);
 
   const annotations = annotationsIn(text, sourceFile, file);
+  allAnnotations.push(...annotations.values());
 
   const walk = (node, parent) => {
     const scope = createsScope(node) ? newScope(parent) : parent;
@@ -363,7 +458,7 @@ function scanFile(file) {
     ) {
       scope.translators.set(node.name.text, {
         namespaces: [null],
-        line: lineOf(node),
+        declaration: node,
       });
     }
 
@@ -374,7 +469,7 @@ function scanFile(file) {
     ) {
       scope.translators.set(node.name.getText(), {
         namespaces: [null],
-        line: lineOf(node),
+        declaration: node,
       });
     }
 
@@ -385,7 +480,7 @@ function scanFile(file) {
           ? [namespaceOf(factory)]
           : aliasedNamespaces(expression, scope);
         if (!namespaces) return;
-        scope.translators.set(name, { namespaces, line: lineOf(node) });
+        scope.translators.set(name, { namespaces, declaration: node });
         for (const namespace of namespaces) {
           if (namespace) used.namespaces.add(namespace);
         }
@@ -424,7 +519,7 @@ function scanFile(file) {
 
       const translator = name ? lookup(scope, name) : null;
       if (translator) {
-        record(node, translator, sourceFile, file, annotations);
+        record(node, translator, sourceFile, file, text, annotations);
       }
     }
 
@@ -434,8 +529,8 @@ function scanFile(file) {
   walk(sourceFile, newScope(null));
 }
 
-function record(call, translator, sourceFile, file, annotations) {
-  const { namespaces, line: declaredLine } = translator;
+function record(call, translator, sourceFile, file, text, annotations) {
+  const { namespaces, declaration } = translator;
   const { line } = sourceFile.getLineAndCharacterOfPosition(call.getStart());
   const argument = call.arguments[0] && unwrap(call.arguments[0]);
 
@@ -470,13 +565,11 @@ function record(call, translator, sourceFile, file, annotations) {
     return;
   }
 
-  // The annotation can sit just above the call, or next to the translator's declaration when several
+  // The annotation can be attached to the call, or to the translator's declaration when several
   // opaque calls in one file share the same namespace.
   const annotation =
-    annotationFor(annotations, line) ??
-    (declaredLine === undefined
-      ? null
-      : annotationFor(annotations, declaredLine));
+    annotationFor(call, text, annotations) ??
+    (declaration ? annotationFor(declaration, text, annotations) : null);
 
   if (!annotation) {
     errors.push(
@@ -599,7 +692,16 @@ for (const [locale, inventory] of inventories) {
   }
 }
 
-// 3. Annotations that no longer point at a real key.
+// 3. Annotations that cover no call, so nothing would notice if the call they described was deleted.
+for (const annotation of allAnnotations) {
+  if (annotation.consumed) continue;
+  errors.push(
+    `${annotation.file}:${annotation.line + 1}  "i18n-used:" comment covers no translator call. ` +
+      `Put it directly above the call, or above the translator the call uses, or delete it.`
+  );
+}
+
+// 4. Annotations that no longer point at a real key.
 const referenceKeys = [...reference.keys()];
 const reportedAnnotations = new Set();
 
@@ -613,7 +715,7 @@ for (const { file, line, entry, test } of annotationEntries) {
   );
 }
 
-// 4. Unused keys. Advisory, so these are notes rather than errors.
+// 5. Unused keys. Advisory, so these are notes rather than errors.
 const unusedByFile = new Map();
 for (const [key, namespaceFile] of reference) {
   if (DIRECT_IMPORT_FILES.has(namespaceFile)) continue;
