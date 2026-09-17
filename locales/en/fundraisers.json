@@ -66,13 +66,10 @@
       "paymentMethods": {
         "title": "Payment Method",
         "description": "Help your donation go further. Some payment providers charge us fees. Fee-free methods ensure your full donation supports your cause.",
-        "selectMethodPlaceholder": "Select payment method",
         "empty": "No payment methods are currently available.",
         "lastUsed": "Last used",
         "bankTransferRemark": "Please set up a standing order with your bank.",
         "saved": {
-          "cardLabel": "{brand} •••• {last4}",
-          "sepaLabel": "•••• {last4}",
           "cardLabelAria": "{brand} card ending in {last4}",
           "sepaLabelAria": "Bank account ending in {last4}",
           "expiringSoon": "Expires soon",
@@ -419,7 +416,6 @@
         "giftSubtitle": "Celebrate, gift or remember someone by dedicating your contribution.",
         "donateNow": "Donate Now",
         "donateMonthly": "Donate Monthly",
-        "donateQuarterly": "Donate Quarterly",
         "donateYearly": "Donate Yearly",
         "frequency": {
           "oneTime": "One Time",
@@ -431,7 +427,6 @@
         "enterAmount": "Enter Amount",
         "customAmountMin": "Minimum donation amount is {amount}",
         "gift": {
-          "sectionTitle": "Gift Details",
           "recipientName": {
             "label": "Recipient Name *",
             "placeholder": "Enter recipient's name"
