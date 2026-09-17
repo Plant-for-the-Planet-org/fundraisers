@@ -100,11 +100,13 @@ export function usePaymentMethodOptions(): UsePaymentMethodOptionsResult {
   }, [paymentOptions.lastPaymentMethod]);
 
   const getMethodLabel = useCallback(
+    // i18n-used: methods.*
     (methodId: PaymentMethodId) => t(METHOD_TRANSLATION_KEYS[methodId]),
     [t]
   );
 
   const getProviderLabel = useCallback(
+    // i18n-used: providers.*
     (provider: DerivedPaymentMethod['provider']) =>
       t(PROVIDER_TRANSLATION_KEYS[provider]),
     [t]

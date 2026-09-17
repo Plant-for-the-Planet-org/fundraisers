@@ -75,6 +75,7 @@ export function SavedMethodGroup({
   // via the REUSABLE_TYPES filter in useSavedPaymentMethods. The fallback to
   // the generic method label keeps the option labelled even if a new reusable
   // type is added before its copy lands.
+  // i18n-used: saved.newCard, saved.newSepa
   const newMethodLabel = newMethodTranslationKey
     ? t(newMethodTranslationKey)
     : method.label;
