@@ -12,6 +12,7 @@
     "dev:webpack": "next dev --webpack",
     "dev:turbopack": "next dev --turbopack",
     "check:locales": "node scripts/check-locales.mjs",
+    "check:translations": "node scripts/check-translations.mjs",
     "prebuild": "npm run check:locales",
     "build": "next build",
     "clean": "node -e \"require('fs').rmSync('.next', { recursive: true, force: true })\"",
