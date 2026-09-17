@@ -24,14 +24,14 @@ afterAll(() => {
   for (const root of roots) rmSync(root, { recursive: true, force: true });
 });
 
-function runAudit(source: string) {
+function runAudit(source: string, messages: object = MESSAGES) {
   const root = mkdtempSync(join(tmpdir(), 'i18n-audit-'));
   roots.push(root);
 
   for (const locale of ['en', 'de']) {
     const dir = join(root, 'locales', locale);
     mkdirSync(dir, { recursive: true });
-    writeFileSync(join(dir, 'alpha.json'), JSON.stringify(MESSAGES));
+    writeFileSync(join(dir, 'alpha.json'), JSON.stringify(messages));
   }
 
   mkdirSync(join(root, 'src'), { recursive: true });
@@ -287,5 +287,44 @@ export function D() {
 `);
 
     expect(status).toBe(0);
+  });
+});
+
+describe('an orphaned namespace file is judged per root', () => {
+  it('keeps a file live when one of its roots is bound', () => {
+    // Orphan status was decided per key but recorded per file, so one unbound root failed the whole file.
+    // It also hid that file's real unused keys, because the unused scan skips an orphaned file.
+    const { status, output } = runAudit(
+      `
+export function C() {
+  const t = useTranslations('Alpha');
+  return <>{t('one')}{t('status.a')}{t('aria.b')}</>;
+}
+`,
+      { ...MESSAGES, Legacy: { old: 'old' } }
+    );
+
+    expect(status).toBe(0);
+    expect(output).not.toContain('no component binds this namespace');
+    expect(output).toContain('no component binds "Legacy"');
+    // The stray root no longer suppresses the advisory list for the rest of the file.
+    expect(output).toContain('Alpha.other');
+    expect(output).toContain('Legacy.old');
+  });
+
+  it('still fails a file when none of its roots is bound', () => {
+    const { status, output } = runAudit(
+      `
+export function C() {
+  return <>plain</>;
+}
+`,
+      { Beta: { one: 'one' }, Legacy: { old: 'old' } }
+    );
+
+    expect(status).toBe(1);
+    expect(output).toContain(
+      'locales/*/alpha.json  no component binds this namespace'
+    );
   });
 });

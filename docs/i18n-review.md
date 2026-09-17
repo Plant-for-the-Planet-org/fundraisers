@@ -549,7 +549,7 @@ It reports:
 
 1. Keys in `locales/en` that no source file uses. Advisory — printed, never fatal.
 2. Keys present in one locale but not the other. Fatal.
-3. Namespace files that no component binds. Fatal.
+3. Namespace files that no component binds. Fatal, judged per top-level root. A file holding two roots where only one is bound is still in use, so the dead root is reported as a note instead.
 
 Keys built from a value the AST cannot read (`t(status)`, `t(link.labelKey)`) need an `// i18n-used: <keys>` comment above the call or above the translator it uses. `*` covers every key under the bound namespace, `foo.*` every key under `foo`. A missing, stale or malformed comment is fatal, so the audit cannot go quietly stale.
 

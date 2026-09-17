@@ -6,6 +6,7 @@
 //      is cleanup work and the resolver can only ever be an approximation.
 //   2. Keys present in one locale but not the other. Fatal.
 //   3. Namespace files that no component ever binds. Fatal.
+//      Judged per top-level root, so a file holding one live root and one dead root stays live and its dead root is advisory.
 // A call site the resolver cannot read, and a stale or malformed `i18n-used:` comment, are also fatal.
 //
 // Namespace binding is the one project-specific rule it has to know: `useTranslations('Fundraisers.edit')`
@@ -718,20 +719,49 @@ function isUsed(key) {
 }
 
 // 1. Namespace files nothing binds.
+// Judged per top-level root, not per key, because one file can hold several roots.
+// Deciding per key but recording per file let a single dead root condemn a file that is plainly in use.
+// It also hid that file's real unused keys, because section 5 skips an orphaned file.
 const boundRoots = new Set(
   [...used.namespaces].map(namespace => namespace.split('.')[0])
 );
-const orphanFiles = new Set();
 
+const rootsByFile = new Map();
 for (const [key, namespaceFile] of reference) {
+  const root = key.split('.')[0];
+  if (!rootsByFile.has(namespaceFile)) {
+    rootsByFile.set(namespaceFile, new Set());
+  }
+  rootsByFile.get(namespaceFile).add(root);
+}
+
+const orphanFiles = new Set();
+const unboundRootsByFile = new Map();
+
+for (const [namespaceFile, rootsInFile] of rootsByFile) {
   if (DIRECT_IMPORT_FILES.has(namespaceFile)) continue;
-  if (!boundRoots.has(key.split('.')[0])) orphanFiles.add(namespaceFile);
+  const unbound = [...rootsInFile].filter(root => !boundRoots.has(root)).sort();
+  if (unbound.length === 0) continue;
+  // A file with at least one bound root is demonstrably live, so its dead roots are a note, not an error.
+  if (unbound.length === rootsInFile.size) orphanFiles.add(namespaceFile);
+  else unboundRootsByFile.set(namespaceFile, unbound);
 }
 
 for (const namespaceFile of [...orphanFiles].sort()) {
   errors.push(
     `${LOCALES_DIR}/*/${namespaceFile}.json  no component binds this namespace. ` +
       `Delete it, or add it to DIRECT_IMPORT_FILES if it is read by a direct import.`
+  );
+}
+
+for (const namespaceFile of [...unboundRootsByFile.keys()].sort()) {
+  const unbound = unboundRootsByFile
+    .get(namespaceFile)
+    .map(root => `"${root}"`)
+    .join(', ');
+  notes.push(
+    `${LOCALES_DIR}/*/${namespaceFile}.json  no component binds ${unbound}. ` +
+      `The rest of the file is in use, so only those keys look dead.`
   );
 }
 
