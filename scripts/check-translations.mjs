@@ -267,6 +267,9 @@ const used = {
 // Annotation entries, kept so a stale one (pointing at a key that no longer exists) can be reported.
 const annotationEntries = [];
 
+// Wildcards already reported as unscoped, so an alias standing for several translators reports once.
+const reportedUnscopedWildcards = new Set();
+
 // A file can declare `t` several times, once per component, each against a different namespace.
 // Resolution therefore follows lexical scope rather than treating the file as one flat namespace.
 function newScope(parent) {
@@ -487,10 +490,24 @@ function record(call, translator, sourceFile, file, annotations) {
     for (const entry of annotation.entries) {
       // "*" covers every key under the bound namespace, "foo.*" every key under foo.
       if (entry.endsWith('*')) {
+        // A wildcard needs a namespace to scope it to. On a translator passed in as an argument there
+        // is none, and a bare "*" would compile to /^.+$/ - a pattern that marks every key in every
+        // locale file used, which silently turns the whole audit into a no-op.
+        if (namespace === null) {
+          const id = `${file}:${annotation.line}:${entry}`;
+          if (!reportedUnscopedWildcards.has(id)) {
+            reportedUnscopedWildcards.add(id);
+            errors.push(
+              `${file}:${annotation.line + 1}  "i18n-used: ${entry}" needs a translator bound to a namespace. ` +
+                `A translator received as an argument has no namespace, so the wildcard cannot be scoped. ` +
+                `List the keys instead.`
+            );
+          }
+          continue;
+        }
+
         const prefix = qualify(namespace, entry.replace(/\.?\*$/, ''));
-        const pattern = new RegExp(
-          prefix ? `^${escapeForRegExp(prefix)}\\..+$` : '^.+$'
-        );
+        const pattern = new RegExp(`^${escapeForRegExp(prefix)}\\..+$`);
         used.patterns.push(pattern);
         annotationEntries.push({
           file,
