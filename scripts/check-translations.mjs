@@ -23,6 +23,8 @@
 //     An annotation binds to the node it is attached to, read through TypeScript's comment ranges rather
 //     than by counting lines, and never reaches past the statement it sits above. A comment that covers
 //     no call is an error too, so an annotation cannot outlive the call it was written for.
+//     On a translator received as an argument the namespace belongs to the caller, so the entries are
+//     written the way the call site writes them and matched by suffix, exactly like a literal key there.
 //
 // Run with `npm run check:translations`. Deliberately left out of prebuild — see docs/i18n-review.md §13.2.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
@@ -371,6 +373,12 @@ function qualify(namespace, key) {
   return [namespace, key].filter(Boolean).join('.');
 }
 
+// A translator passed in as an argument carries no namespace, so its keys can only be matched by
+// suffix: `t('one')` inside the helper is `Alpha.one` or `Beta.one` depending on who calls it.
+function matchesSuffix(key, suffix) {
+  return key === suffix || key.endsWith(`.${suffix}`);
+}
+
 const used = {
   exact: new Set(), // fully resolved message keys
   patterns: [], // regexes from template literals and `*` annotations
@@ -672,6 +680,17 @@ function record(call, translator, sourceFile, file, text, annotations) {
           entry,
           test: key => pattern.test(key),
         });
+      } else if (namespace === null) {
+        // Qualifying against an unknown namespace yields the bare entry, which no real key ever equals.
+        // That left the keys the annotation named looking unused and reported the annotation as stale,
+        // and no wording of the annotation could have been right.
+        used.suffixes.add(entry);
+        annotationEntries.push({
+          file,
+          line: annotation.line,
+          entry,
+          test: key => matchesSuffix(key, entry),
+        });
       } else {
         const qualified = qualify(namespace, entry);
         if (namespace === ROOT) noteRootNamespace(qualified);
@@ -713,7 +732,7 @@ function isUsed(key) {
   if (used.exact.has(key)) return true;
   if (used.patterns.some(pattern => pattern.test(key))) return true;
   for (const suffix of used.suffixes) {
-    if (key === suffix || key.endsWith(`.${suffix}`)) return true;
+    if (matchesSuffix(key, suffix)) return true;
   }
   return false;
 }

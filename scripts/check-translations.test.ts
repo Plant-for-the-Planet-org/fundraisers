@@ -290,6 +290,59 @@ export function D() {
   });
 });
 
+describe('an annotation on a translator received as an argument', () => {
+  it('matches its entries by suffix, the same way a literal key is matched', () => {
+    // The entries used to be qualified against the unknown namespace, which produced the bare string
+    // "one". No real key equals that, so the keys stayed listed as unused and the annotation was
+    // reported as stale — and no other wording of it would have passed either.
+    const { status, output } = runAudit(
+      `
+type Translator = ReturnType<typeof useTranslations>;
+
+// i18n-used: one, deep.one
+function Helper({ k, t }: { k: string; t: Translator }) {
+  return <>{t(k)}</>;
+}
+
+export function C() {
+  const tAlpha = useTranslations('Alpha');
+  const tBeta = useTranslations('Beta');
+  return <><Helper k='one' t={tAlpha} /><Helper k='deep.one' t={tBeta} /></>;
+}
+`,
+      { Alpha: { one: 'one' }, Beta: { one: 'one', deep: { one: 'one' } } }
+    );
+
+    expect(status).toBe(0);
+    expect(output).not.toContain('matches no key');
+    expect(output).not.toContain('look unused');
+  });
+
+  it('still reports an entry that matches no key under any namespace', () => {
+    const { status, output } = runAudit(
+      `
+type Translator = ReturnType<typeof useTranslations>;
+
+// i18n-used: one, gone
+function Helper({ k, t }: { k: string; t: Translator }) {
+  return <>{t(k)}</>;
+}
+
+export function C() {
+  const tAlpha = useTranslations('Alpha');
+  return <Helper k='one' t={tAlpha} />;
+}
+`,
+      { Alpha: { one: 'one' } }
+    );
+
+    expect(status).toBe(1);
+    expect(output).toContain('component.tsx:4');
+    expect(output).toContain('"i18n-used: gone" matches no key');
+    expect(output).not.toContain('"i18n-used: one" matches no key');
+  });
+});
+
 describe('an orphaned namespace file is judged per root', () => {
   it('keeps a file live when one of its roots is bound', () => {
     // Orphan status was decided per key but recorded per file, so one unbound root failed the whole file.
