@@ -1,7 +1,7 @@
 {
   "About": {
     "meta": {
-      "title": "About Fundraisers",
+      "title": "Fundraisers by Plant-for-the-Planet",
       "description": "Turn a birthday, a wedding or a company milestone into trees in the ground. Fundraisers by Plant-for-the-Planet."
     },
     "hero": {
@@ -253,6 +253,28 @@
           "text": "See every gift arrive in your dashboard. Say thank you."
         }
       }
+    },
+    "projects": {
+      "eyebrow": "Where your forest grows",
+      "title": "Find the cause you care about.",
+      "lead": "Every project is run by people who live there and know the land. And every one meets the minimum standards set by the <standards>Restoration Project Review Board</standards>, a panel of outside experts. <verification>How projects are verified</verification>.",
+      "stats": {
+        "projects": {
+          "value": "300+",
+          "label": "restoration projects"
+        },
+        "countries": {
+          "value": "60+",
+          "label": "countries"
+        },
+        "organizations": {
+          "value": "200+",
+          "label": "local organizations"
+        }
+      },
+      "bouquets": "Or start from a bouquet of causes",
+      "poweredBy": "Powered by <link>ForestCloud</link> from Plant-for-the-Planet.",
+      "globeAlt": "A globe with a dot for every place where a restoration project grows"
     },
     "customize": {
       "eyebrow": "Yours, end to end",

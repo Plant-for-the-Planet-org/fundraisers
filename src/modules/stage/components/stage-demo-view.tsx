@@ -24,7 +24,7 @@ export interface StageDemoViewProps {
   goal: number;
   startRaised: number;
   donors: string[];
-  /** Where the QR code sends people. Defaults to the About page. */
+  /** Where the QR code sends people. Defaults to the home page. */
   qrTargetPath?: string;
   /** Short URL shown under the QR code, display only. */
   qrDisplayUrl: string;
@@ -46,7 +46,7 @@ export function StageDemoView({
   goal,
   startRaised,
   donors,
-  qrTargetPath = '/about',
+  qrTargetPath = '/',
   qrDisplayUrl,
   logoEmoji,
   accentColor,

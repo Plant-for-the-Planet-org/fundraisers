@@ -6,6 +6,7 @@ import { AboutCustomize } from '@/components/about/about-customize';
 import { AboutHero } from '@/components/about/about-hero';
 import { AboutHowItWorks } from '@/components/about/about-how-it-works';
 import { AboutMoreThanForests } from '@/components/about/about-more-than-forests';
+import { AboutProjects } from '@/components/about/about-projects';
 import { AboutStageMode } from '@/components/about/about-stage-mode';
 import { AboutWhoFor } from '@/components/about/about-who-for';
 
@@ -20,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: '/about' },
+    alternates: { canonical: '/' },
     openGraph: {
       title,
       description,
@@ -42,6 +43,7 @@ export default function AboutPage() {
       <AboutHero />
       <AboutWhoFor />
       <AboutHowItWorks />
+      <AboutProjects />
       <AboutCustomize />
       <AboutStageMode />
       <AboutMoreThanForests />

@@ -1,7 +1,7 @@
 {
   "About": {
     "meta": {
-      "title": "Über Fundraisers",
+      "title": "Fundraisers von Plant-for-the-Planet",
       "description": "Mach aus einem Geburtstag, einer Hochzeit oder einem Firmenjubiläum Bäume im Boden. Fundraisers von Plant-for-the-Planet."
     },
     "hero": {
@@ -253,6 +253,28 @@
           "text": "Sieh jede Spende in deinem Dashboard ankommen. Sag Danke."
         }
       }
+    },
+    "projects": {
+      "eyebrow": "Wo dein Wald wächst",
+      "title": "Finde die Sache, die dir am Herzen liegt.",
+      "lead": "Jedes Projekt wird von Menschen vor Ort geführt, die ihr Land kennen. Und jedes erfüllt die Mindeststandards des <standards>Restoration Project Review Board</standards>, eines Gremiums externer Fachleute. <verification>So werden Projekte geprüft</verification>.",
+      "stats": {
+        "projects": {
+          "value": "300+",
+          "label": "Wiederherstellungsprojekte"
+        },
+        "countries": {
+          "value": "60+",
+          "label": "Länder"
+        },
+        "organizations": {
+          "value": "200+",
+          "label": "lokale Organisationen"
+        }
+      },
+      "bouquets": "Oder starte mit einem Bouquet von Anliegen",
+      "poweredBy": "Mit <link>ForestCloud</link> von Plant-for-the-Planet.",
+      "globeAlt": "Ein Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst"
     },
     "customize": {
       "eyebrow": "Deins, von Anfang bis Ende",
