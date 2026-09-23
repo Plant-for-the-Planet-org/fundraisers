@@ -17,6 +17,8 @@
       "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
     },
     "yourInfo": "Your Info",
+    "signInNudge": "Already have an account? <signInLink>Sign in</signInLink>",
+    "notYou": "Not {name}? <switchLink>Switch account</switchLink>",
     "organization": "(Organization)",
     "donorIdentity": {
       "companyDonation": {
