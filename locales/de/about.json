@@ -74,7 +74,7 @@
                 },
                 "m3": {
                   "label": "Jeden Frühling",
-                  "text": "Ihr Wald wächst, und die Familie besucht ihn an ihrem Geburtstag."
+                  "text": "Rosas Wald wächst, und die Familie besucht ihn an ihrem Geburtstag."
                 }
               }
             },
@@ -269,12 +269,13 @@
         },
         "organizations": {
           "value": "200+",
-          "label": "lokale Organisationen"
+          "label": "Organisationen"
         }
       },
       "bouquets": "Oder starte mit einem Bouquet von Anliegen",
-      "poweredBy": "Mit <link>ForestCloud</link> von Plant-for-the-Planet.",
-      "globeAlt": "Ein Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst"
+      "poweredBy": "Mit unserer <link>Restoration Platform</link>.",
+      "globeAlt": "Ein Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst",
+      "viewAll": "Alle Projekte ansehen"
     },
     "customize": {
       "eyebrow": "Deins, von Anfang bis Ende",

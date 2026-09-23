@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { ArrowRight } from 'lucide-react';
+import { PLATFORM_BASE_URL } from '@/lib/constants/app-config';
 import { AboutGlobeLazy } from './about-globe-lazy';
 import {
-  FORESTCLOUD_URL,
   PROJECT_VERIFICATION_URL,
   RESTORATION_STANDARDS_URL,
 } from './about-links';
@@ -40,7 +41,7 @@ export function AboutProjects() {
     };
 
   return (
-    <section className='-mx-4 border-y border-border/60 px-4 py-8 [background-image:linear-gradient(hsl(var(--border)/0.6)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.6)_1px,transparent_1px)] [background-size:28px_28px] sm:rounded-3xl sm:border lg:-mx-8 lg:px-8 md:grid md:grid-cols-[minmax(0,1fr)_260px] md:items-center md:gap-8 lg:grid-cols-[minmax(0,1fr)_300px]'>
+    <section className='-mx-4 border-y border-border/60 px-4 py-8 [background-image:linear-gradient(hsl(var(--border)/0.35)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.35)_1px,transparent_1px)] [background-size:28px_28px] sm:rounded-3xl sm:border md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:items-center md:gap-8 lg:-mx-8 lg:px-8'>
       <div className='space-y-5'>
         <div className='space-y-3'>
           <p className='text-xs font-semibold uppercase tracking-wider text-accent-color'>
@@ -86,14 +87,23 @@ export function AboutProjects() {
           </ul>
         </div>
 
-        <p className='text-xs text-muted-foreground'>
-          {t.rich('poweredBy', { link: externalLink(FORESTCLOUD_URL) })}
-        </p>
+        <a
+          href={PLATFORM_BASE_URL}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='inline-flex items-center gap-1.5 text-sm font-semibold text-accent-color hover:underline'
+        >
+          {t('viewAll')}
+          <ArrowRight className='h-4 w-4' aria-hidden='true' />
+        </a>
       </div>
 
-      <div className='mx-auto mt-8 w-full max-w-[280px] md:mt-0 md:max-w-none'>
+      <figure className='mx-auto mt-8 w-full max-w-[280px] md:mt-0 md:max-w-[380px]'>
         <AboutGlobeLazy label={t('globeAlt')} />
-      </div>
+        <figcaption className='mt-2 text-center text-xs text-muted-foreground'>
+          {t.rich('poweredBy', { link: externalLink(PLATFORM_BASE_URL) })}
+        </figcaption>
+      </figure>
     </section>
   );
 }

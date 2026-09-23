@@ -257,7 +257,7 @@
     "projects": {
       "eyebrow": "Where your forest grows",
       "title": "Find the cause you care about.",
-      "lead": "Every project is run by people who live there and know the land. And every one meets the minimum standards set by the <standards>Restoration Project Review Board</standards>, a panel of outside experts. <verification>How projects are verified</verification>.",
+      "lead": "Every project is run by people who live there and know the land. And every one meets the minimum standards set by the <standards>Restoration Project Review Board</standards>, a panel of external experts. <verification>How projects are verified</verification>.",
       "stats": {
         "projects": {
           "value": "300+",
@@ -269,12 +269,13 @@
         },
         "organizations": {
           "value": "200+",
-          "label": "local organizations"
+          "label": "organizations"
         }
       },
       "bouquets": "Or start from a bouquet of causes",
-      "poweredBy": "Powered by <link>ForestCloud</link> from Plant-for-the-Planet.",
-      "globeAlt": "A globe with a dot for every place where a restoration project grows"
+      "poweredBy": "Powered by our <link>Restoration Platform</link>.",
+      "globeAlt": "A globe with a dot for every place where a restoration project grows",
+      "viewAll": "View all projects"
     },
     "customize": {
       "eyebrow": "Yours, end to end",
