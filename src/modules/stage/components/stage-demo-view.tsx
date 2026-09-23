@@ -71,6 +71,8 @@ export function StageDemoView({
   return (
     <div
       ref={containerRef}
+      // Sample slides and donors, so search engines should not quote them.
+      data-nosnippet
       className={`relative w-full overflow-hidden rounded-3xl ${className ?? ''}`}
       style={{ height: CANVAS_HEIGHT * scale }}
     >
@@ -86,7 +88,7 @@ export function StageDemoView({
         }
         className='absolute left-0 top-0 overflow-hidden bg-[#0b1220] isolate'
       >
-        <StageSlidePanel slides={slides} />
+        <StageSlidePanel slides={slides} titleAs='p' />
         <div
           className='pointer-events-none absolute inset-0 z-10'
           style={{

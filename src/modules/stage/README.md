@@ -139,7 +139,7 @@ The `alltime-stats` type and fetch live in core at [`src/lib/api/alltime-stats.t
 
 ## Demo view
 
-`StageDemoView` (exported from the barrel) renders the same 1920×1080 layout scaled to its container and fed by `useStageDemo`, which seeds a few sample donations and adds one every few seconds. No API calls, no polling. It reuses `StageSlidePanel`, `StageTopBar`, `StageCounterView` (the pure half of `StageCounter`), `StageLeaderboard`, `StageQRPanel` (with `targetPath` and `displayUrl` overrides) and `StageTicker`. The home page uses it to show Stage Mode without a live fundraiser. An optional `logoEmoji` fills the partner logo slot next to the Planet logo.
+`StageDemoView` (exported from the barrel) renders the same 1920×1080 layout scaled to its container and fed by `useStageDemo`, which seeds a few sample donations and adds one every few seconds. No API calls, no polling. It reuses `StageSlidePanel`, `StageTopBar`, `StageCounterView` (the pure half of `StageCounter`), `StageLeaderboard`, `StageQRPanel` (with `targetPath` and `displayUrl` overrides) and `StageTicker`. The home page uses it to show Stage Mode without a live fundraiser. An optional `logoEmoji` fills the partner logo slot next to the Planet logo. It renders the slide title as a paragraph (`StageSlidePanel titleAs`), so the host page keeps its own h1, and it is marked `data-nosnippet`. Stage screens themselves are `noindex`.
 
 ---
 
