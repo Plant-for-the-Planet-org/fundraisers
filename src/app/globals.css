@@ -99,6 +99,14 @@
      Pale by design so they sit behind content in light themes. */
   --color-soft-blue: #eff6ff; /* Soft Blue, Pantone 290 C */
   --color-soft-gold: #fff8e4; /* Soft Yellow, Pantone 7401 C */
+
+  /* About page hero: people circle the cause. The ring turns one way and each chip turns back, so the names stay upright. Keyframes live at the end of this file. */
+  --animate-orbit: orbit 70s linear infinite;
+  --animate-orbit-reverse: orbit-reverse 70s linear infinite;
+  --animate-bob: bob 5s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 4s ease-in-out infinite;
+  --animate-heartbeat: heartbeat 2.4s ease-in-out infinite;
+  --animate-story-progress: story-progress linear forwards;
 }
 
 :root {
@@ -274,5 +282,57 @@ h6 {
 @media (prefers-reduced-motion: reduce) {
   .snake-border::before {
     display: none;
+  }
+}
+
+/* Keyframes for the About hero animation tokens declared in @theme. */
+@keyframes orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes orbit-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -4px;
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes heartbeat {
+  0%,
+  28%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.08);
+  }
+  42% {
+    transform: scale(1.05);
+  }
+}
+@keyframes story-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
   }
 }
