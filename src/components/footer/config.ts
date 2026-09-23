@@ -19,8 +19,8 @@ export const FOOTER_LINKS: readonly FooterLink[] = [
     labelKey: 'about',
     internal: true,
     hrefByLocale: {
-      en: '/about',
-      de: '/about',
+      en: '/',
+      de: '/',
     },
   },
   {

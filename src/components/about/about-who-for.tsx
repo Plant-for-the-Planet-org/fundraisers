@@ -8,9 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AboutExampleCard } from './about-example-card';
 import { AboutForestGraphic } from './about-forest-graphic';
 import { ABOUT_IMAGES } from './about-images';
+import { FORESTCLOUD_URL } from './about-links';
 import { AboutStorySlider } from './about-story-slider';
-
-const FORESTCLOUD_URL = 'https://www.plant-for-the-planet.org/';
 
 type TabKey = 'celebrations' | 'companies' | 'organizations';
 type CardKey = 'c1' | 'c2' | 'c3';
