@@ -8,6 +8,7 @@ import { DEFAULT_THEME, THEMES } from './themes';
 const ROUTE_THEME_MAP: Record<string, string> = {
   '/': 'spring',
   '/explore': 'stratospheric',
+  '/about': 'stratospheric',
   '/login': 'sunset',
   '/fundraisers/create': 'spring',
 };
