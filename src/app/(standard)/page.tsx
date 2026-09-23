@@ -12,6 +12,8 @@ import { AboutWhoFor } from '@/components/about/about-who-for';
 
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
 
+const OG_LOCALES: Record<string, string> = { en: 'en_US', de: 'de_DE' };
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: 'About' });
@@ -26,6 +28,12 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: 'website',
+      url: '/',
+      siteName: 'Plant-for-the-Planet',
+      locale: OG_LOCALES[locale],
+      alternateLocale: Object.entries(OG_LOCALES)
+        .filter(([key]) => key !== locale)
+        .map(([, value]) => value),
       images: [{ url: META_IMAGE_URL, width: 600, height: 314, alt: title }],
     },
     twitter: {
@@ -37,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function AboutPage() {
+export default function HomePage() {
   return (
     <div className='space-y-16 sm:space-y-20'>
       <AboutHero />
