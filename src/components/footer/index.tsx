@@ -1,4 +1,3 @@
-import { LanguageSelector } from './language-selector';
 import { LinksBar } from './links-bar';
 import { Logos } from './logos';
 
@@ -15,7 +14,6 @@ export function Footer({ className }: FooterProps) {
         <div className='flex flex-col md:flex-row justify-between gap-6'>
           <div className='links-wrapper flex flex-col gap-4 items-center md:items-start'>
             <LinksBar />
-            <LanguageSelector />
           </div>
           <div className='logos-wrapper'>
             <Logos />

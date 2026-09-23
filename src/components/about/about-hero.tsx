@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
+import { LocalizedLink } from '@/components/ui/localized-link';
 import { AboutHeroOrbit } from './about-hero-orbit';
 
 export function AboutHero() {
@@ -21,7 +21,7 @@ export function AboutHero() {
           {t('lead')}
         </p>
         <div className='flex flex-col gap-3 pt-2 sm:flex-row'>
-          <Link
+          <LocalizedLink
             href='/fundraisers/create'
             className={cn(
               buttonVariants({ size: 'lg' }),
@@ -29,13 +29,13 @@ export function AboutHero() {
             )}
           >
             {t('start')}
-          </Link>
-          <Link
+          </LocalizedLink>
+          <LocalizedLink
             href='/explore'
             className={cn(buttonVariants({ variant: 'outline', size: 'lg' }))}
           >
             {t('explore')}
-          </Link>
+          </LocalizedLink>
         </div>
       </div>
       <div className='mt-10 md:mt-0 md:w-[46%] md:shrink-0'>

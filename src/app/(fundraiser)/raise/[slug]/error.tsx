@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LocalizedLink } from '@/components/ui/localized-link';
 
 export default function FundraiserError({
   error,
@@ -31,7 +31,7 @@ export default function FundraiserError({
       <div className='flex gap-3'>
         <Button onClick={reset}>{t('retry')}</Button>
         <Button variant='outline' asChild>
-          <Link href='/explore'>{t('browse')}</Link>
+          <LocalizedLink href='/explore'>{t('browse')}</LocalizedLink>
         </Button>
       </div>
     </div>

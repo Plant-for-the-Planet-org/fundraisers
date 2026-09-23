@@ -2,7 +2,14 @@
   "Common": {
     "greeting": "Hallo, Welt!",
     "welcome": "Willkommen bei unserer Anwendung.",
-    "languageSelectionLabel": "Sprache:",
+    "languageMenu": {
+      "label": "Sprache"
+    },
+    "languageNote": {
+      "message": "Auch verfügbar auf",
+      "dismiss": "Schließen"
+    },
+    "languageSaveFailed": "Wir konnten deine Sprache nicht speichern. Bitte versuche es erneut.",
     "metadata": {
       "title": "Spendenaufruf",
       "description": "Plattform für Spendenaufrufe"
