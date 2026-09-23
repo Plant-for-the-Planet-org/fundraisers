@@ -231,7 +231,9 @@
           }
         }
       },
-      "storyDot": "Show story {number} of {total}"
+      "storyDot": "Show story {number} of {total}",
+      "pauseStories": "Pause stories",
+      "playStories": "Play stories"
     },
     "how": {
       "title": "Up and running in a few minutes!",

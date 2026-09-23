@@ -173,7 +173,7 @@ export function StageCounterView({
             }}
           >
             <div
-              className='absolute inset-0'
+              className='absolute inset-0 motion-reduce:animate-none!'
               style={{
                 animation: 'stage-shimmer 2s linear infinite',
                 background:
