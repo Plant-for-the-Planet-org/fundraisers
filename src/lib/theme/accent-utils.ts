@@ -24,7 +24,8 @@ export function getAccentColor(accent: string): string {
     rose: '#e11d48',
     red: '#dc2626',
     orange: '#ea580c',
-    amber: '#d97706',
+    // amber-700, not amber-600: dark enough that --cta-foreground picks white text (5.0:1).
+    amber: '#b45309',
     yellow: '#ca8a04',
     slate: '#475569',
     gray: '#4b5563',
