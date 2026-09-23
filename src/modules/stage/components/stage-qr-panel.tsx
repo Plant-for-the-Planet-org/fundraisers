@@ -11,13 +11,22 @@ import { GlassPanel } from './glass-panel';
 
 interface StageQRPanelProps {
   slug: string;
+  /** Path the QR code opens. Defaults to the fundraiser page; the About demo points it elsewhere. */
+  targetPath?: string;
+  /** Short URL shown under the code. Defaults to the stage short URL for the slug. */
+  displayUrl?: string;
   className?: string;
 }
 
-export function StageQRPanel({ slug, className }: StageQRPanelProps) {
+export function StageQRPanel({
+  slug,
+  targetPath,
+  displayUrl,
+  className,
+}: StageQRPanelProps) {
   const t = useTranslations('Stage');
   const [qrSrc, setQrSrc] = useState<string | null>(null);
-  const donateUrl = `${STAGE_SHORT_URL_DOMAIN}/${slug}`;
+  const donateUrl = displayUrl ?? `${STAGE_SHORT_URL_DOMAIN}/${slug}`;
 
   useEffect(() => {
     // Built from the current origin rather than the short domain, so the QR is
@@ -35,7 +44,8 @@ export function StageQRPanel({ slug, className }: StageQRPanelProps) {
       utm_source: 'stage',
       utm_medium: 'qr',
     });
-    const target = `${window.location.origin}/raise/${encodeURIComponent(slug)}?${params.toString()}`;
+    const path = targetPath ?? `/raise/${encodeURIComponent(slug)}`;
+    const target = `${window.location.origin}${path}?${params.toString()}`;
     // ponytail: window.location.origin is unavailable during SSR, so this
     // value can only be computed client-side after mount — the effect is
     // intentional here, not an oversight the lint rule assumes.
@@ -43,7 +53,7 @@ export function StageQRPanel({ slug, className }: StageQRPanelProps) {
     // https://qr.pp.eco/?https://example.com — no named param, no encoding.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQrSrc(`${QR_CODE_BASE_URL}/?${target}`);
-  }, [slug]);
+  }, [slug, targetPath]);
 
   return (
     <GlassPanel className={`p-[18px] ${className ?? ''}`}>
