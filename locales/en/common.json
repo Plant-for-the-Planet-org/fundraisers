@@ -2,7 +2,14 @@
   "Common": {
     "greeting": "Hello, World!",
     "welcome": "Welcome to our application.",
-    "languageSelectionLabel": "Language:",
+    "languageMenu": {
+      "label": "Language"
+    },
+    "languageNote": {
+      "message": "Also available in",
+      "dismiss": "Dismiss"
+    },
+    "languageSaveFailed": "We could not save your language. Please try again.",
     "metadata": {
       "title": "Fundraisers",
       "description": "Fundraising platform"

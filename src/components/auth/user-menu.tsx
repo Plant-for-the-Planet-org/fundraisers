@@ -1,16 +1,27 @@
 'use client';
 
+import type { LanguageHintStrings } from '@/components/header/language-hint';
+
 import { useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { ChevronDown, Compass, CreditCard, Plus, UserCog } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import {
+  ChevronDown,
+  Compass,
+  CreditCard,
+  GlobeIcon,
+  Plus,
+  UserCog,
+} from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
 import { ImpersonationModal } from '@/components/auth/impersonation-modal';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { SignOutButton } from '@/components/auth/sign-out-button';
+import { GuestLanguageMenu } from '@/components/header/guest-language-menu';
+import { LanguageDialog } from '@/components/header/language-dialog';
+import { LanguageHint, nativeName } from '@/components/header/language-hint';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,12 +33,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/drop-down-menu';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
+import { LocalizedLink } from '@/components/ui/localized-link';
 
 const IMPERSONATION_DOMAIN = '@plant-for-the-planet.org';
 
-export function UserMenu() {
+export function UserMenu({
+  hints,
+}: {
+  /** Language hint strings per offered locale, see LanguageHint. */
+  hints: Record<string, LanguageHintStrings>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [impersonationModalOpen, setImpersonationModalOpen] = useState(false);
+  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
+  const locale = useLocale();
+  const tCommon = useTranslations('Common');
   const isImpersonating = useImpersonationStore(state => state.isActive);
 
   const tDashboard = useTranslations('Dashboard');
@@ -51,11 +71,14 @@ export function UserMenu() {
   const isAuthFlowPage =
     pathname.startsWith('/login') || pathname.startsWith('/verify-email');
 
-  if (!isAuthInitializing && !isAuthenticated && !isAuthFlowPage) {
-    return <SignInButton />;
+  if (!isAuthenticated) {
+    return (
+      <div className='flex items-center gap-2'>
+        <GuestLanguageMenu hints={hints} />
+        {!isAuthFlowPage && <SignInButton />}
+      </div>
+    );
   }
-
-  if (!isAuthenticated) return null;
 
   const profileImage = profile?.image || user?.picture;
   const profileImageUrl = getImageUrl('profile', 'thumb', profileImage);
@@ -66,25 +89,27 @@ export function UserMenu() {
   return (
     <>
       <DropdownMenu onOpenChange={setIsOpen} modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant='ghost'
-            aria-label={tAuth('userMenuLabel')}
-            className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
-          >
-            <Avatar className='h-8 w-8'>
-              {profileImageUrl && (
-                <AvatarImage src={profileImageUrl} alt='' loading='lazy' />
-              )}
-              <FallbackAvatar
-                seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
+        <LanguageHint hints={hints} menuOpen={isOpen || languageDialogOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              aria-label={tAuth('userMenuLabel')}
+              className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
+            >
+              <Avatar className='h-8 w-8'>
+                {profileImageUrl && (
+                  <AvatarImage src={profileImageUrl} alt='' loading='lazy' />
+                )}
+                <FallbackAvatar
+                  seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
+                />
+              </Avatar>
+              <ChevronDown
+                className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
               />
-            </Avatar>
-            <ChevronDown
-              className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-            />
-          </Button>
-        </DropdownMenuTrigger>
+            </Button>
+          </DropdownMenuTrigger>
+        </LanguageHint>
         <DropdownMenuContent
           className='w-66 rounded-xl border border-border bg-background/95 backdrop-blur shadow-xl'
           align='end'
@@ -107,22 +132,25 @@ export function UserMenu() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
-            <Link href='/explore' className='flex items-center'>
+            <LocalizedLink href='/explore' className='flex items-center'>
               <Compass className='mr-2 h-4 w-4' />
               <span>{tHeaderLinks('explore')}</span>
-            </Link>
+            </LocalizedLink>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
-            <Link href='/fundraisers/create' className='flex items-center'>
+            <LocalizedLink
+              href='/fundraisers/create'
+              className='flex items-center'
+            >
               <Plus className='mr-2 h-4 w-4' />
               <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
+            </LocalizedLink>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer'>
-            <Link href='/dashboard' className='flex items-center'>
+            <LocalizedLink href='/dashboard' className='flex items-center'>
               <CreditCard className='mr-2 h-4 w-4' />
               <span>{tDashboard('breadcrumb.dashboard')}</span>
-            </Link>
+            </LocalizedLink>
           </DropdownMenuItem>
           {canImpersonate && (
             <DropdownMenuItem
@@ -140,12 +168,29 @@ export function UserMenu() {
               </span>
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem
+            className='cursor-pointer'
+            onSelect={e => {
+              e.preventDefault();
+              setLanguageDialogOpen(true);
+            }}
+          >
+            <GlobeIcon className='mr-2 h-4 w-4' />
+            <span>{tCommon('languageMenu.label')}</span>
+            <span className='ml-auto pl-3 text-xs text-muted-foreground'>
+              {nativeName(locale)}
+            </span>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <SignOutButton />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <LanguageDialog
+        open={languageDialogOpen}
+        onOpenChange={setLanguageDialogOpen}
+      />
       {canImpersonate && (
         <ImpersonationModal
           open={impersonationModalOpen}

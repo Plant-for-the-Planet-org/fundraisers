@@ -152,6 +152,18 @@ export class UserService {
     return platformFetch<UserProfileResponse>('/profile', { token });
   }
 
+  /** Save the user's language to their profile. Sends only `locale`; the platform keeps the other fields. */
+  async updateProfileLocale(
+    token: string,
+    locale: string
+  ): Promise<UserProfileResponse> {
+    return platformFetch<UserProfileResponse>('/profile', {
+      method: 'PUT',
+      token,
+      body: { locale },
+    });
+  }
+
   /**
    * Get the payment methods available to the authenticated user for a country.
    * GET /profile/paymentMethods/{country}

@@ -1,9 +1,9 @@
 import type { Category } from '@/lib/types/category';
 
-import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { categoriesService } from '@/lib/api/categories-service';
 import { formatCompactNumber } from '@/lib/utils';
+import { LocalizedLink } from '@/components/ui/localized-link';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdaptedCategory extends Category {
@@ -88,7 +88,7 @@ export async function FundraiserCities() {
       <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
         {cities.map(city => (
           <li key={city.id}>
-            <Link
+            <LocalizedLink
               href={`/explore/${city.slug}`}
               className='group block hover:bg-accent/50 rounded-lg transition-colors'
             >
@@ -120,7 +120,7 @@ export async function FundraiserCities() {
                   </p>
                 </div>
               </div>
-            </Link>
+            </LocalizedLink>
           </li>
         ))}
       </ul>

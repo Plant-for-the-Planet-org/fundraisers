@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
+import { LocalizedLink } from '@/components/ui/localized-link';
 
 export function AboutCta() {
   const t = useTranslations('About.cta');
@@ -14,7 +14,7 @@ export function AboutCta() {
         </h2>
         <p className='text-lg leading-relaxed opacity-85'>{t('lead')}</p>
         <div className='flex flex-col justify-center gap-3 pt-3 sm:flex-row'>
-          <Link
+          <LocalizedLink
             href='/fundraisers/create'
             className={cn(
               buttonVariants({ size: 'lg' }),
@@ -22,8 +22,8 @@ export function AboutCta() {
             )}
           >
             {t('start')}
-          </Link>
-          <Link
+          </LocalizedLink>
+          <LocalizedLink
             href='/explore'
             className={cn(
               buttonVariants({ variant: 'outline', size: 'lg' }),
@@ -31,7 +31,7 @@ export function AboutCta() {
             )}
           >
             {t('explore')}
-          </Link>
+          </LocalizedLink>
         </div>
       </div>
     </section>

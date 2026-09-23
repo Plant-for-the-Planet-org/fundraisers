@@ -124,22 +124,25 @@ locales/                      ← Root level (for Lingohub)
 
 src/
   app/
-    layout.tsx                ← Root layout with LocaleInitializer
-    page.tsx                  ← Home page
-    (standard)/               ← Route group (optional)
-      layout.tsx
+    layout.tsx                ← Root layout
+    (standard)/
+      page.tsx                ← Home page (`/`, `/de`)
       explore/
-        page.tsx
+        page.tsx              ← `/explore`, `/de/explore`
   components/
-    locale-initializer.tsx    ← Syncs server/client locale
-    footer/
-      language-selector.tsx   ← Language switcher (Zustand-based)
+    header/
+      language-dialog.tsx     ← Language list, opened from the header
+      language-hint.tsx       ← "Also available in …" hint under the header menu
+      guest-language-menu.tsx ← Globe button for signed-out visitors
   i18n/
     routing.ts                ← Locale configuration
-    request.ts                ← Reads locale from cookie
+    localized-paths.ts        ← Which pages get a URL per language, and how to build it
+    locale-routing.ts         ← Proxy decision: rewrite `/de/...`, redirect by cookie
+    locale-metadata.ts        ← Canonical, hreflang and og:locale for localized pages
+    request.ts                ← Picks the locale: URL, then cookie, then browser
     types.ts                  ← TypeScript type augmentation for next-intl
   stores/
-    localeStore.ts            ← Zustand store for locale state
+    locale-store.ts           ← `setLocale()`: saves to profile and cookie, then switches
 ```
 
 **Usage in Components:**
@@ -182,11 +185,10 @@ export function WelcomeMessage() {
 
 **Key Architectural Decisions:**
 
-1. **Cookie + localStorage for Locale**
-   - localStorage: Persists preference across sessions
-   - Cookie: Allows server to read locale on initial render
-   - No URL-based routing (`/en`, `/de` removed)
-   - Clean URLs: `/explore` instead of `/en/explore`
+1. **A URL per language for our own pages, one URL for fundraisers**
+   - Home and explore: English at `/` and `/explore`, German at `/de` and `/de/explore`, with hreflang tags
+   - Fundraiser pages (`/raise/[slug]`) keep one URL: their content is written once, in one language, so only the UI adapts
+   - Elsewhere the `ui-locale` cookie decides, then the browser language. Signed in, the profile language wins and is kept in the cookie
 
 2. **Zustand for State Management**
    - More performant than Context API (selective re-renders)
@@ -195,9 +197,9 @@ export function WelcomeMessage() {
    - Easy to scale (can add more global state later)
 
 3. **Proxy Instead of Middleware**
-   - Locale handled entirely by cookie + localStorage
    - `src/proxy.ts` used (not `middleware.ts`) — sets `x-pathname` header for theme routing
-   - No locale-based middleware needed
+   - Rewrites `/de/...` to the normal route and passes the locale on; redirects an unprefixed localized URL to `/de/...` when the cookie says German
+   - No next-intl middleware and no `[locale]` folder
 
 4. **Flat App Structure**
    - No `[locale]` folder in app directory
@@ -219,24 +221,26 @@ export function WelcomeMessage() {
    - Trade-off: in namespaces with ICU placeholders (e.g. Fundraisers, Explore), invalid key errors show as `Expected 2-3 arguments, but got 1` rather than a "key not found" message — this is a TypeScript overload resolution limitation, not a bug. Namespaces with only plain strings (e.g. Common) are unaffected and give clear errors.
 
 7. **Single Domain (Current Implementation)**
-   - Currently: One domain with locale in cookie/localStorage
+   - Currently: One domain, a path prefix per language on localized pages
    - Future: Can add multiple domains with different defaults
    - Easy migration path when needed
 
 **URL Structure:**
 
 ```
-✅ http://localhost:3000/           (locale from cookie)
-✅ http://localhost:3000/explore    (clean URLs, no locale prefix)
-❌ http://localhost:3000/en         (not used)
-❌ http://localhost:3000/de/explore (not used)
+✅ http://localhost:3000/           (English home)
+✅ http://localhost:3000/de         (German home)
+✅ http://localhost:3000/de/explore (German explore)
+✅ http://localhost:3000/raise/x    (one URL, UI language from cookie or browser)
+↪ http://localhost:3000/en/explore  (redirects to /explore)
+↪ http://localhost:3000/de/raise/x  (redirects to /raise/x)
 ```
 
 **Locale Persistence Flow:**
 
-1. User visits site → Server reads `ui-locale` cookie → Loads messages
-2. User clicks language → Updates localStorage + cookie → Reloads page
-3. User returns → localStorage synced to cookie → Previous choice remembered
+1. User visits a localized page → The URL decides the language; with no saved choice and a different browser language, a hint offers the other one
+2. User picks a language (header dialog or hint) → Saved to the profile when signed in, and to the `ui-locale` cookie → Opens the same page in that language
+3. User returns → Unprefixed home or explore redirects to their language; other pages read the cookie
 
 ---
 
