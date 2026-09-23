@@ -17,6 +17,7 @@ interface StageCounterProps {
   className?: string;
 }
 
+// Live counter: polls alltime-stats and hands the numbers to the view below.
 export function StageCounter({
   fundraiser,
   showImpact,
@@ -26,19 +27,61 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const raised =
-    data?.stats.raised.total ??
-    fundraiser.totalRaised[fundraiser.currency ?? ''] ??
-    0;
-  const currency = data?.stats.raised.currency ?? fundraiser.currency;
-  const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
-  const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
-  const trees = data?.stats.impact.trees ?? 0;
-  const restoredM2 = data?.stats.impact.restoredM2 ?? 0;
-  const daysLeft = data?.stats.daysLeft;
+  return (
+    <StageCounterView
+      raised={
+        data?.stats.raised.total ??
+        fundraiser.totalRaised[fundraiser.currency ?? ''] ??
+        0
+      }
+      currency={data?.stats.raised.currency ?? fundraiser.currency}
+      goal={data?.stats.goal.amount ?? fundraiser.goalAmount}
+      donationCount={data?.stats.donationCount ?? fundraiser.donationCount}
+      trees={data?.stats.impact.trees ?? 0}
+      restoredM2={data?.stats.impact.restoredM2 ?? 0}
+      daysLeft={data?.stats.daysLeft}
+      showDaysLeft={data?.settings.show_days_left ?? false}
+      showImpactStat={showImpact && (data?.settings.show_impact ?? false)}
+      showProgressBar={showProgressBar}
+      highlight={data?.settings.highlight_impact ?? 'funding'}
+      locale={locale}
+      className={className}
+    />
+  );
+}
 
-  const showDaysLeft = data?.settings.show_days_left ?? false;
-  const showImpactStat = showImpact && (data?.settings.show_impact ?? false);
+export interface StageCounterViewProps {
+  raised: number;
+  currency: string | null;
+  goal: number;
+  donationCount: number;
+  trees: number;
+  restoredM2: number;
+  daysLeft?: number;
+  showDaysLeft: boolean;
+  showImpactStat: boolean;
+  showProgressBar: boolean;
+  highlight: HighlightImpactUnit;
+  locale: string;
+  className?: string;
+}
+
+// Pure counter panel. The live stage and the About page demo both render it; only the data source differs.
+export function StageCounterView({
+  raised,
+  currency,
+  goal,
+  donationCount,
+  trees,
+  restoredM2,
+  daysLeft,
+  showDaysLeft,
+  showImpactStat,
+  showProgressBar,
+  highlight,
+  locale,
+  className,
+}: StageCounterViewProps) {
   const showTrees = showImpactStat && trees > 0;
 
   const pct = goal ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
@@ -74,10 +117,8 @@ export function StageCounter({
     }
   }
 
-  const requestedHighlight: HighlightImpactUnit =
-    data?.settings.highlight_impact ?? 'funding';
   const heroUnit: HighlightImpactUnit =
-    formatImpact(requestedHighlight).value > 0 ? requestedHighlight : 'funding';
+    formatImpact(highlight).value > 0 ? highlight : 'funding';
   const hero = formatImpact(heroUnit);
   const heroIsFunding = heroUnit === 'funding';
 

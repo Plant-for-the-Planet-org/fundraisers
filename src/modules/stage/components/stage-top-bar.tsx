@@ -6,6 +6,8 @@ interface StageTopBarProps {
   title: string;
   description?: string;
   logoUrl?: string;
+  /** Shown in the partner slot when there is no logo, e.g. on the About page demo. */
+  logoEmoji?: string;
   className?: string;
 }
 
@@ -13,6 +15,7 @@ export function StageTopBar({
   title,
   description,
   logoUrl,
+  logoEmoji,
   className,
 }: StageTopBarProps) {
   const t = useTranslations('Stage.topBar');
@@ -43,6 +46,15 @@ export function StageTopBar({
                   className='h-full w-auto object-contain'
                 />
               </div>
+            </>
+          )}
+
+          {!logoUrl && logoEmoji && (
+            <>
+              <div className='h-10 w-px bg-white/45' />
+              <span className='text-[52px] leading-none' aria-hidden='true'>
+                {logoEmoji}
+              </span>
             </>
           )}
         </div>
