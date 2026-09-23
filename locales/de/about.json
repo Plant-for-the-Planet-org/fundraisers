@@ -1,17 +1,17 @@
 {
   "About": {
     "meta": {
-      "title": "Fundraisers von Plant-for-the-Planet",
-      "description": "Mach aus einem Geburtstag, einer Hochzeit oder einem Firmenjubiläum Bäume im Boden. Fundraisers von Plant-for-the-Planet."
+      "title": "Spendenaufrufe von Plant-for-the-Planet",
+      "description": "Mach aus einem Geburtstag, einer Hochzeit oder einem Firmenjubiläum Bäume im Boden. Spendenaufrufe von Plant-for-the-Planet."
     },
     "hero": {
       "title": "Bitte deine Leute, <accent>mit dir zu pflanzen.</accent>",
-      "lead": "Ein Geburtstag. Eine Hochzeit. Der Tag, an dem dein Unternehmen zehn wird. Fundraisers macht aus den Momenten, die dir wichtig sind, Bäume im Boden, und macht es den Menschen, die du liebst, leicht mitzumachen.",
-      "start": "Fundraiser starten",
-      "explore": "Fundraiser entdecken",
+      "lead": "Ein Geburtstag. Eine Hochzeit. Der Tag, an dem dein Unternehmen zehn wird. Mit einem Spendenaufruf werden die Momente, die dir wichtig sind, zu Bäumen im Boden, und die Menschen, die du liebst, können ganz leicht mitmachen.",
+      "start": "Spendenaufruf starten",
+      "explore": "Spendenaufrufe entdecken",
       "orbit": {
-        "alt": "Menschen, die für einen Zweck spenden, als Ring um einen Baum",
-        "justGave": "hat gerade gespendet",
+        "alt": "Menschen, die für einen Zweck spenden, als Ring um ein Herz",
+        "justGave": "hat gespendet",
         "people": {
           "lena": "Lena",
           "fernmoor": "Fernmoor",
@@ -182,7 +182,7 @@
               "moments": {
                 "m1": {
                   "label": "Der Aufruf",
-                  "text": "Du startest einen Fundraiser für die Wiederbepflanzung, mit Fotos von vor Ort."
+                  "text": "Du startest einen Spendenaufruf für die Wiederbepflanzung, mit Fotos von vor Ort."
                 },
                 "m2": {
                   "label": "Die Antwort",
@@ -199,7 +199,7 @@
               "moments": {
                 "m1": {
                   "label": "Der Meilenstein",
-                  "text": "Du startest einen Fundraiser zum Feiern und für die nächste Million."
+                  "text": "Du startest einen Spendenaufruf zum Feiern und für die nächste Million."
                 },
                 "m2": {
                   "label": "Der Abend",
@@ -280,7 +280,7 @@
     "customize": {
       "eyebrow": "Deins, von Anfang bis Ende",
       "title": "Nichts hier sieht nach Vorlage aus. Außer du willst es so.",
-      "lead": "Eine Fundraiser-Seite ist vom ersten Pixel bis zur Dankesnachricht deine. Starte mit einem Theme, oder mische, bis eins passt, und ändere dann alles.",
+      "lead": "Die Seite deines Spendenaufrufs gehört dir, vom ersten Pixel bis zur Dankesnachricht. Starte mit einem Theme, oder mische, bis eins passt, und ändere dann alles.",
       "features": {
         "themes": {
           "title": "Endlose Stile",
@@ -313,7 +313,7 @@
     "stage": {
       "eyebrow": "Stage Mode",
       "title": "Bereit für die große Rede?",
-      "p1": "Sammle mit Stil. Bring deinen Fundraiser auf die große Leinwand, mit Live-Summe, Bestenliste und jeder Spende, die sofort aufpoppt. Die Gäste scannen den Code und spenden vom Platz aus.",
+      "p1": "Sammle mit Stil. Bring deinen Spendenaufruf auf die große Leinwand, mit Live-Summe, Bestenliste und jeder Spende, die sofort aufpoppt. Die Gäste scannen den Code und spenden vom Platz aus.",
       "demo": {
         "title": "Future Forest Gala 2026",
         "description": "Fernmoor GmbH und Freunde, für die Wälder Ghanas",
@@ -337,8 +337,8 @@
     },
     "more": {
       "eyebrow": "Mehr als Bäume",
-      "title": "Jeder Fundraiser trägt auch <accent>Plant-for-the-Planet.</accent>",
-      "p1": "Ein Teil jedes Fundraisers geht an Plant-for-the-Planet selbst. Das hält die ganze Reise in Bewegung: Kinder, die Botschafter für Klimagerechtigkeit werden, Wälder, die in Mexiko, Ghana und Spanien zurückkommen, kostenlose Werkzeuge für die Menschen, die pflanzen, und eine Stimme in den Räumen, in denen Waldpolitik gemacht wird.",
+      "title": "Jeder Spendenaufruf trägt auch <accent>Plant-for-the-Planet.</accent>",
+      "p1": "Ein Teil jedes Spendenaufrufs geht an Plant-for-the-Planet selbst. Das hält die ganze Reise in Bewegung: Kinder, die Botschafter für Klimagerechtigkeit werden, Wälder, die in Mexiko, Ghana und Spanien zurückkommen, kostenlose Werkzeuge für die Menschen, die pflanzen, und eine Stimme in den Räumen, in denen Waldpolitik gemacht wird.",
       "p2": "Wenn deine Freunde also für deinen Geburtstagswald spenden, schenken sie auch irgendwo einer Neunjährigen die Chance, ihren ersten Baum zu pflanzen.",
       "photoAlt": "Botschafter für Klimagerechtigkeit bei einer Plant-for-the-Planet Akademie",
       "pillars": {
@@ -363,8 +363,8 @@
     "cta": {
       "title": "Wähle einen Moment, der dir wichtig ist.",
       "lead": "Gib ihm heute Abend einen Namen und ein Ziel. Alles andere kann bis morgen warten.",
-      "start": "Fundraiser starten",
-      "explore": "Fundraiser entdecken"
+      "start": "Spendenaufruf starten",
+      "explore": "Spendenaufrufe entdecken"
     }
   }
 }
