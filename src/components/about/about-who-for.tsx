@@ -149,6 +149,8 @@ export function AboutWhoFor() {
                     total: String(STORIES.length),
                   })
                 )}
+                pauseLabel={t('pauseStories')}
+                playLabel={t('playStories')}
                 aside={
                   key === 'organizations'
                     ? undefined

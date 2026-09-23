@@ -129,7 +129,7 @@ export function StageTicker({
             }}
           >
             <span
-              className={`block h-[7px] w-[7px] rounded-full bg-white ${offline ? '' : 'animate-pulse'}`}
+              className={`block h-[7px] w-[7px] rounded-full bg-white ${offline ? '' : 'animate-pulse motion-reduce:animate-none'}`}
             />
             {offline ? t('offline') : t('live')}
           </span>
@@ -155,7 +155,7 @@ export function StageTicker({
         {items.length > 0 ? (
           <div
             ref={trackRef}
-            className={`flex h-full items-center gap-12 whitespace-nowrap px-6 ${shouldScroll ? '' : 'justify-center'}`}
+            className={`flex h-full items-center gap-12 whitespace-nowrap px-6 motion-reduce:animate-none! ${shouldScroll ? '' : 'justify-center'}`}
             style={
               shouldScroll
                 ? { animation: 'ticker-scroll 60s linear infinite' }

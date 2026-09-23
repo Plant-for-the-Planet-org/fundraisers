@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { useEffect, useState } from 'react';
+import { Pause, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   LeafyGreenIcon,
@@ -29,6 +30,8 @@ interface AboutStorySliderProps {
   footer?: ReactNode;
   /** One accessible label per dot, e.g. "Show story 2 of 3". */
   dotLabels: string[];
+  pauseLabel: string;
+  playLabel: string;
 }
 
 function usePrefersReducedMotion() {
@@ -43,18 +46,22 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
-// Cycles through a tab's stories every few seconds. Pauses on hover and keyboard focus, and never auto-advances under reduced motion.
+// Cycles through a tab's stories every few seconds. Pauses on hover and keyboard focus, has a pause button for touch screens (WCAG 2.2.2), and never auto-advances under reduced motion.
 export function AboutStorySlider({
   stories,
   aside,
   staticAside,
   footer,
   dotLabels,
+  pauseLabel,
+  playLabel,
 }: AboutStorySliderProps) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [stopped, setStopped] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
-  const autoplay = !paused && !reducedMotion && stories.length > 1;
+  const canAutoplay = !reducedMotion && stories.length > 1;
+  const autoplay = canAutoplay && !paused && !stopped;
 
   useEffect(() => {
     if (!autoplay) return;
@@ -80,7 +87,8 @@ export function AboutStorySlider({
         {/* All stories share one grid cell, so the card always takes the height of the longest story and never jumps between slides. On large screens it also stretches to the height of the example cards beside it. */}
         <div
           className='grid rounded-2xl bg-background/45 p-4 ring-1 ring-accent-color/10 sm:p-6 lg:flex-1'
-          aria-live='polite'
+          // Announce only changes the user makes, not every automatic slide.
+          aria-live={autoplay ? 'off' : 'polite'}
         >
           {stories.map((item, index) => (
             <div
@@ -145,6 +153,20 @@ export function AboutStorySlider({
                 )}
               </button>
             ))}
+            {canAutoplay && (
+              <button
+                type='button'
+                aria-label={stopped ? playLabel : pauseLabel}
+                onClick={() => setStopped(value => !value)}
+                className='ml-1 flex h-7 w-7 items-center justify-center rounded-full text-accent-color transition-colors hover:bg-accent-color/10'
+              >
+                {stopped ? (
+                  <Play className='h-3.5 w-3.5' aria-hidden='true' />
+                ) : (
+                  <Pause className='h-3.5 w-3.5' aria-hidden='true' />
+                )}
+              </button>
+            )}
           </div>
         )}
 

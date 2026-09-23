@@ -56,7 +56,7 @@ export function StageSlidePanel({
             {slide.image && (
               <div
                 key={`${slide.position}-${i === activeIndex}`}
-                className='absolute inset-0 bg-cover bg-center'
+                className='absolute inset-0 bg-cover bg-center motion-reduce:animate-none!'
                 style={{
                   backgroundImage: `url(${slide.image})`,
                   animation:

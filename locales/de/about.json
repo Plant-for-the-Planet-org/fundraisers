@@ -231,7 +231,9 @@
           }
         }
       },
-      "storyDot": "Geschichte {number} von {total} zeigen"
+      "storyDot": "Geschichte {number} von {total} zeigen",
+      "pauseStories": "Geschichten anhalten",
+      "playStories": "Geschichten abspielen"
     },
     "how": {
       "title": "In wenigen Minuten startklar!",
