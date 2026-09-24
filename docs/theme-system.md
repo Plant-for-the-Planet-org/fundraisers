@@ -466,3 +466,9 @@ It is not `featured`, so it never shows in the fundraiser theme picker.
 Dashboard marks (chart bars, icons, links, chips, the active menu item) use `--accent-color` directly through the `accent-color` Tailwind utilities. Only the shadcn `Button` still reads `primary`, so `DashboardShell` mirrors the accent into `--primary` (`hexToHslTriplet`), on its wrapper and on `<html>` while it is mounted, because dialogs and menus portal to `<body>`. Changing the theme's `accent` recolours the whole dashboard.
 
 Green stays reserved for status (live, going up) and red for going down, so the dashboard accent is deliberately not green.
+
+## Explore theme
+
+`/explore` (and its category pages) use `explore` in `themes.ts`: Stratospheric's soft yellow, pink and purple wash with its amber accent, plus a faint tree pattern (`bg-trees`, 8%) in the accent.
+
+It is a copy rather than a change to `stratospheric`, because fundraisers can pick Stratospheric for their own pages. It is not `featured`, so it never shows in the theme picker.
