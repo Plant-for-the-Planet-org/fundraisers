@@ -7,7 +7,8 @@ export interface AlltimeStats {
     donationCount: number;
     goal: { amount: number; currency: string };
     daysLeft: number;
-    raised: { total: number; currency: string };
+    // Currency-keyed, e.g. { EUR: 6429.56, USD: 100309.56 }, same shape as Fundraiser.totalRaised.
+    raised: Record<string, number>;
     impact: {
       trees: number;
       conservedM2: number;

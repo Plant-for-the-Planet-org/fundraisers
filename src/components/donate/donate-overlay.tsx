@@ -83,7 +83,9 @@ export function DonateOverlay({
   // Set by the inner form while the donor has typed something worth keeping.
   const hasInputRef = useRef(false);
   // Set by the payment forms once the donor has entered card, IBAN, cardholder name or billing address details. Kept apart from hasInputRef because none of those fields are registered with react-hook-form, and because it lives above the card and SEPA forms, which unmount whenever the donor switches payment method.
-  const hasPaymentInputRef = useRef(false);
+  // State rather than a ref: the sign-in nudge in DonorInfo hides on it, so a change has to re-render. Repeat calls with the same value are free — React skips the re-render.
+  const [hasPaymentInput, setHasPaymentInput] = useState(false);
+  const markPaymentInput = () => setHasPaymentInput(true);
   const [isLeaveConfirmOpen, setIsLeaveConfirmOpen] = useState(false);
 
   // Commits the close without asking. Only `requestClose` and the leave-confirm dialog call this.
@@ -100,17 +102,14 @@ export function DonateOverlay({
     }
     hasResultRef.current = false;
     // Nothing re-syncs this one on reopen the way FormInputSync does for hasInputRef, so clear it here.
-    hasPaymentInputRef.current = false;
+    setHasPaymentInput(false);
     onClose();
   };
 
   // The one place that decides whether a close needs confirming. Every donor-initiated close asks here first: the corner X, Esc on the dialog, and Esc inside a Stripe field. Stripe's iframes are cross-origin, so a key pressed inside one never reaches this document and the dialog never hears it; those fields call this through Stripe's own `escape` event instead.
   const requestClose = () => {
     // Nothing entered yet, or a result screen: close straight away, there is nothing to lose.
-    if (
-      hasResultRef.current ||
-      (!hasInputRef.current && !hasPaymentInputRef.current)
-    ) {
+    if (hasResultRef.current || (!hasInputRef.current && !hasPaymentInput)) {
       handleClose();
       return;
     }
@@ -168,7 +167,8 @@ export function DonateOverlay({
             onRequestClose={requestClose}
             hasResultRef={hasResultRef}
             hasInputRef={hasInputRef}
-            hasPaymentInputRef={hasPaymentInputRef}
+            hasPaymentInput={hasPaymentInput}
+            markPaymentInput={markPaymentInput}
             isOpen={isOpen}
           />
         ) : (
@@ -215,7 +215,8 @@ interface DonateOverlayInnerProps {
   onRequestClose: () => void;
   hasResultRef: RefObject<boolean>;
   hasInputRef: RefObject<boolean>;
-  hasPaymentInputRef: RefObject<boolean>;
+  hasPaymentInput: boolean;
+  markPaymentInput: () => void;
   isOpen: boolean;
 }
 
@@ -254,16 +255,13 @@ function DonateOverlayInner({
   onRequestClose,
   hasResultRef,
   hasInputRef,
-  hasPaymentInputRef,
+  hasPaymentInput,
+  markPaymentInput,
   isOpen,
 }: DonateOverlayInnerProps) {
   const locale = useLocale();
   const sepaFormRef = useRef<StripeSepaFormHandle>(null);
   const cardFormRef = useRef<StripeCardFormHandle>(null);
-
-  const markPaymentInput = useCallback(() => {
-    hasPaymentInputRef.current = true;
-  }, [hasPaymentInputRef]);
 
   const stripeConfig = paymentOptions.gateways.stripe;
   const stripePromise = stripeConfig
@@ -396,6 +394,7 @@ function DonateOverlayInner({
         onSubmit={onSubmit}
         sepaFormRef={sepaFormRef}
         cardFormRef={cardFormRef}
+        hasPaymentInput={hasPaymentInput}
         markPaymentInput={markPaymentInput}
         onPaymentFieldEscape={onRequestClose}
         isOpen={isOpen}
