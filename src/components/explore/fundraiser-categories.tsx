@@ -22,16 +22,16 @@ export async function CategoriesSkeleton() {
       <div>
         <Skeleton className='h-7 w-48 mb-2' />
       </div>
-      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
         {Array.from({ length: 8 }).map((_, i) => (
           <li
             key={i}
-            className='p-4 rounded-xl border border-border bg-background'
+            className='rounded-xl bg-background/50 p-4 backdrop-blur-sm'
           >
-            <div className='flex flex-col items-start space-y-3'>
-              <Skeleton className='w-14 h-14' />
+            <div className='flex flex-col items-start space-y-2'>
+              <Skeleton className='w-8 h-8' />
               <div className='w-full'>
-                <Skeleton className='h-5 w-24 mb-1' />
+                <Skeleton className='h-5 w-24 mb-0.5' />
                 <Skeleton className='h-4 w-20' />
               </div>
             </div>
@@ -111,19 +111,17 @@ export async function FundraiserCategories() {
         </h2>
       </div>
 
-      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
         {categories.map(category => (
           <li key={category.id}>
             <Link
               href={`/explore/${category.slug}`}
-              className='block rounded-xl border border-border bg-background p-4 transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+              className='block rounded-xl bg-background/50 p-4 backdrop-blur-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-background'
             >
-              <div className='flex flex-col items-start space-y-3'>
-                <div className='w-14 h-14 flex items-center justify-start'>
-                  <CategoryIcon category={category} size='regular' />
-                </div>
+              <div className='flex flex-col items-start space-y-2'>
+                <CategoryIcon category={category} size='compact' />
                 <div>
-                  <h3 className='font-medium text-foreground mb-1'>
+                  <h3 className='font-medium text-foreground mb-0.5'>
                     {category.name}
                   </h3>
                   <p className='text-sm text-muted-foreground'>
