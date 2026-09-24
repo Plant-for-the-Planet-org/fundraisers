@@ -1,6 +1,6 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { getDaysLeft } from './fundraiser';
+import { getDaysLeft, hasFundraiserConcluded } from './fundraiser';
 
 export type DisplayStatus =
   | 'active'
@@ -45,29 +45,48 @@ export const DEFAULT_FUNDRAISER_LIST_FILTERS: FundraiserListFilters = {
   sort: 'newest',
 };
 
-// Used by `FundraiserStatusBadge` (added in PR 3) to pick the badge variant.
-export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
+type StatusBucket = Exclude<FundraiserListStatusFilter, 'all'>;
+
+/**
+ * The status a host should see, which is not always the platform's `status`.
+ * The platform can leave a fundraiser `active` after its end date has passed and donations have closed. The public page already calls that ended, so the dashboard does too.
+ */
+function getStatusBucket(fundraiser: Fundraiser): StatusBucket {
+  if (hasFundraiserConcluded(fundraiser)) return 'ended';
   switch (fundraiser.status) {
     case 'completed':
     case 'cancelled':
-    // Archived fundraisers are not shown in the list, but map them to `ended`
-    // to avoid falling back to `active`.
+    // Archived fundraisers are not shown in the list, but map them to `ended` to avoid falling back to `active`.
     case 'archived':
       return 'ended';
     case 'paused':
       return 'paused';
     case 'draft':
       return 'draft';
-    case 'active': {
-      const daysLeft = getDaysLeft(fundraiser.endDate);
-      if (daysLeft > 0 && daysLeft <= ENDING_SOON_THRESHOLD_DAYS) {
-        return 'ending-soon';
-      }
-      return 'active';
-    }
     default:
       return 'active';
   }
+}
+
+/** Live right now: taking donations and before its end date. */
+export function isLiveStatus(status: DisplayStatus): boolean {
+  return status === 'active' || status === 'ending-soon';
+}
+
+export function isFundraiserLive(fundraiser: Fundraiser): boolean {
+  return isLiveStatus(deriveDisplayStatus(fundraiser));
+}
+
+// Used by `FundraiserStatusBadge` to pick the badge variant.
+export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
+  const bucket = getStatusBucket(fundraiser);
+  if (bucket === 'active') {
+    const daysLeft = getDaysLeft(fundraiser.endDate);
+    if (daysLeft > 0 && daysLeft <= ENDING_SOON_THRESHOLD_DAYS) {
+      return 'ending-soon';
+    }
+  }
+  return bucket;
 }
 
 /**
@@ -95,24 +114,7 @@ function matchesStatus(
   fundraiser: Fundraiser,
   filter: FundraiserListStatusFilter
 ): boolean {
-  switch (filter) {
-    case 'all':
-      return true;
-    case 'active':
-      return fundraiser.status === 'active';
-    case 'draft':
-      return fundraiser.status === 'draft';
-    case 'paused':
-      return fundraiser.status === 'paused';
-    case 'ended':
-      return (
-        fundraiser.status === 'completed' || fundraiser.status === 'cancelled'
-      );
-    default: {
-      filter satisfies never;
-      return true;
-    }
-  }
+  return filter === 'all' || getStatusBucket(fundraiser) === filter;
 }
 
 export function filterFundraisers(
@@ -211,21 +213,7 @@ export function getStatusCounts(
   };
 
   for (const fundraiser of fundraisers) {
-    switch (fundraiser.status) {
-      case 'active':
-        counts.active += 1;
-        break;
-      case 'draft':
-        counts.draft += 1;
-        break;
-      case 'paused':
-        counts.paused += 1;
-        break;
-      case 'completed':
-      case 'cancelled':
-        counts.ended += 1;
-        break;
-    }
+    counts[getStatusBucket(fundraiser)] += 1;
   }
 
   return counts;
