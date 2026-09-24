@@ -6,6 +6,8 @@ import { CookieSettingsButton } from '../cookie/cookie-settings-button';
 import { FOOTER_LINKS, getFooterLinkHref } from './config';
 
 export function LinksBar() {
+  // One label per FOOTER_LINKS entry.
+  // i18n-used: *
   const tLinks = useTranslations('Common.legalLinks');
   const tAria = useTranslations('Common.aria');
   const locale = useLocale();

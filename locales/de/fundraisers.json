@@ -66,13 +66,10 @@
       "paymentMethods": {
         "title": "Zahlungsart",
         "description": "Hilf mit, dass deine Spende ankommt. Einige Zahlungsanbieter berechnen uns Gebühren. Mit einer gebührenfreien Methode kannst du sicherstellen, dass deine Spende komplett bei den Projekten ankommt.",
-        "selectMethodPlaceholder": "Zahlungsart auswählen",
         "empty": "Es sind derzeit keine Zahlungsarten verfügbar.",
         "lastUsed": "Zuletzt benutzt",
         "bankTransferRemark": "Bitte richte einen Dauerauftrag bei deiner Bank ein.",
         "saved": {
-          "cardLabel": "{brand} •••• {last4}",
-          "sepaLabel": "•••• {last4}",
           "cardLabelAria": "{brand} Karte endet mit {last4}",
           "sepaLabelAria": "Bankkonto endet mit {last4}",
           "expiringSoon": "Läuft bald ab",
@@ -419,7 +416,6 @@
         "giftSubtitle": "Feiere, beschenke oder erinnere an jemanden, indem du deinen Beitrag widmest.",
         "donateNow": "Jetzt spenden",
         "donateMonthly": "Monatlich spenden",
-        "donateQuarterly": "Vierteljährlich spenden",
         "donateYearly": "Jährlich spenden",
         "frequency": {
           "oneTime": "Einmalig",
@@ -431,7 +427,6 @@
         "enterAmount": "Betrag eingeben",
         "customAmountMin": "Mindestspendenbetrag ist {amount}",
         "gift": {
-          "sectionTitle": "Geschenk Details",
           "recipientName": {
             "label": "Name des/der Beschenkten *",
             "placeholder": "Name des/der Beschenkten eingeben"

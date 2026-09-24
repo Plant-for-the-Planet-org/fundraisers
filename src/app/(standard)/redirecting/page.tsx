@@ -76,5 +76,6 @@ export default function RedirectingPage() {
     return 'redirecting';
   };
 
+  // i18n-used: signingIn, signingOut, redirecting
   return <Loader text={tAuth(getLoaderKey())} />;
 }
