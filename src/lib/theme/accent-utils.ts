@@ -11,10 +11,10 @@ export function getAccentColor(accent: string): string {
   const map: Record<AccentColor, string> = {
     planet: '#007a49',
     blue: '#2563eb',
-    cyan: '#0891b2',
-    emerald: '#059669',
-    green: '#16a34a',
-    teal: '#0d9488',
+    cyan: '#0e7490',
+    emerald: '#047857',
+    green: '#15803d',
+    teal: '#0f766e',
     lime: '#65a30d',
     indigo: '#4f46e5',
     purple: '#9333ea',
@@ -23,7 +23,7 @@ export function getAccentColor(accent: string): string {
     pink: '#db2777',
     rose: '#e11d48',
     red: '#dc2626',
-    orange: '#ea580c',
+    orange: '#c2410c',
     amber: '#d97706',
     yellow: '#ca8a04',
     slate: '#475569',
@@ -32,5 +32,5 @@ export function getAccentColor(accent: string): string {
     neutral: '#525252',
     stone: '#57534e',
   };
-  return map[accent as AccentColor] ?? '#16a34a';
+  return map[accent as AccentColor] ?? '#15803d';
 }

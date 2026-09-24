@@ -2,10 +2,11 @@
 
 import type { Theme } from '@/lib/theme/types';
 
+import { getAccentColor } from '@/lib/theme/accent-utils';
 import { resolveBgAsset } from '@/lib/theme/backgrounds';
 import { customGradientCss, isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
-import { ACCENT_BG, FEATURED_THEMES } from './constants';
+import { FEATURED_THEMES } from './constants';
 
 // Resolve a theme's background to a small preview visual, mirroring how
 // ThemeShell paints its base wash. Falls back to the decoration thumbnail (then
@@ -83,10 +84,8 @@ export function ThemeBrowseGrid({
               </div>
             </div>
             <span
-              className={cn(
-                'w-2.5 h-2.5 rounded-full border border-border flex-shrink-0',
-                ACCENT_BG[theme.accent]
-              )}
+              className='w-2.5 h-2.5 rounded-full border border-border flex-shrink-0'
+              style={{ backgroundColor: getAccentColor(theme.accent) }}
             />
           </button>
         );

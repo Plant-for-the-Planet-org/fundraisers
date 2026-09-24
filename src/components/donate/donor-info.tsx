@@ -53,7 +53,7 @@ export function DonorInfo() {
                 <button
                   type='button'
                   onClick={openSignIn}
-                  className='font-medium text-accent-color hover:underline'
+                  className='font-medium text-accent-text hover:underline'
                 >
                   {chunks}
                 </button>
@@ -69,7 +69,7 @@ export function DonorInfo() {
                 <button
                   type='button'
                   onClick={openSwitchAccount}
-                  className='font-medium text-accent-color hover:underline'
+                  className='font-medium text-accent-text hover:underline'
                 >
                   {chunks}
                 </button>

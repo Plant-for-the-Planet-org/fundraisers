@@ -8,16 +8,12 @@ import type {
 } from '@/lib/theme/types';
 
 import { useTranslations } from 'next-intl';
+import { getAccentColor } from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { AccentColorControl } from './accent-color-control';
-import {
-  ACCENT_BG,
-  ANIMATION_OPTIONS,
-  DECORATIONS,
-  FONT_OPTIONS,
-} from './constants';
+import { ANIMATION_OPTIONS, DECORATIONS, FONT_OPTIONS } from './constants';
 
 export function ThemeChipRow({
   label,
@@ -139,7 +135,7 @@ export function AccentDotRow({
           active={value === accent}
           title={tTheme('selectAccent', { accent })}
           onClick={() => onChange(accent)}
-          swatchClass={ACCENT_BG[accent]}
+          swatchStyle={{ backgroundColor: getAccentColor(accent) }}
         />
       ))}
       <AccentColorControl

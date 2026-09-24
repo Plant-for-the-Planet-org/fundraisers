@@ -54,6 +54,7 @@
   --color-warning: hsl(var(--warning));
   --color-success: hsl(var(--success));
   --color-accent-color: var(--accent-color);
+  --color-accent-text: var(--accent-text, var(--accent-color));
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
   --color-tab-border: var(--tab-border-color);
@@ -116,7 +117,7 @@
   --primary: 214 100% 59%;
   --primary-foreground: 0 0% 100%;
   --radius: 0.5rem;
-  --accent-color: #16a34a;
+  --accent-color: #15803d;
   --ring: 142 76% 36%;
   --destructive: 0 72% 51%;
   --warning: 21 90% 48%;
