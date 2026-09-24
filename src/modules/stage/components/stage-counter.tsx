@@ -6,6 +6,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
+import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 import { useAlltimeStats } from '../hooks/use-alltime-stats';
 import { GlassPanel } from './glass-panel';
 
@@ -26,11 +27,11 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const raised =
-    data?.stats.raised.total ??
-    fundraiser.totalRaised[fundraiser.currency ?? ''] ??
-    0;
-  const currency = data?.stats.raised.currency ?? fundraiser.currency;
+  const currency = data?.stats.goal.currency ?? fundraiser.currency;
+  const raised = convertTotalRaisedToSingleCurrency(
+    data?.stats.raised ?? fundraiser.totalRaised,
+    currency
+  );
   const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
   const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
   const trees = data?.stats.impact.trees ?? 0;

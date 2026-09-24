@@ -5,6 +5,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { use } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { EditFundraiserFormProvider } from '@/components/fundraisers/edit-fundraiser-form-context';
 import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
@@ -43,7 +44,10 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
             currentStatus={fundraiser.status}
           />
         }
-        totalRaised={fundraiser.totalRaised[fundraiser.currency ?? ''] ?? 0}
+        totalRaised={convertTotalRaisedToSingleCurrency(
+          fundraiser.totalRaised,
+          fundraiser.currency
+        )}
         endDate={fundraiser.endDate}
         fundraiserId={fundraiser.id}
         hosts={fundraiser.hosts}
