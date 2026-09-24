@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { isFundraiserSortOption } from '@/lib/api/categories-service';
 import { CategoryPageLoader } from '@/components/explore/category-page-loader';
 import { CategoryPageSkeleton } from '@/components/explore/category-page-skeleton';
+import { localizedPageMetadata } from '@/i18n/locale-metadata';
 
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
 
@@ -31,14 +32,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const categoryName = humanizeCategorySlug(category);
   const title = tMetadata('title', { categoryName });
   const description = tMetadata('description', { categoryName });
+  const localized = localizedPageMetadata(`/explore/${category}`, locale);
 
   return {
     title,
     description,
-    alternates: {
-      canonical: `/explore/${category}`,
-    },
+    alternates: localized.alternates,
     openGraph: {
+      ...localized.openGraph,
       title,
       description,
       type: 'website',

@@ -1,5 +1,6 @@
 import type { Theme } from './types';
 
+import { splitLocalePrefix } from '@/i18n/localized-paths';
 import { DEFAULT_THEME, THEMES } from './themes';
 
 // Maps route path prefixes → theme ID.
@@ -17,7 +18,9 @@ const EXACT_ROUTE_THEME_MAP: Record<string, string> = {
   '/': 'stratospheric',
 };
 
-export function getThemeForPath(pathname: string): Theme {
+export function getThemeForPath(path: string): Theme {
+  // `/de/explore` gets the same theme as `/explore`.
+  const { pathname } = splitLocalePrefix(path);
   // Exact match
   const exact = EXACT_ROUTE_THEME_MAP[pathname] ?? ROUTE_THEME_MAP[pathname];
   if (exact) {

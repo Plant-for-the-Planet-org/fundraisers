@@ -14,6 +14,7 @@ import {
   FundraiserCitiesSkeleton,
 } from '@/components/explore/fundraiser-cities';
 import { PageHeader } from '@/components/explore/page-header';
+import { localizedPageMetadata } from '@/i18n/locale-metadata';
 
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
 
@@ -22,14 +23,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const tExplore = await getTranslations({ locale, namespace: 'Explore' });
   const title = tExplore('title');
   const description = tExplore('description');
+  const localized = localizedPageMetadata('/explore', locale);
 
   return {
     title,
     description,
-    alternates: {
-      canonical: '/explore',
-    },
+    alternates: localized.alternates,
     openGraph: {
+      ...localized.openGraph,
       title,
       description,
       type: 'website',

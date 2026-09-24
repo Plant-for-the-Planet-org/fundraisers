@@ -6,7 +6,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "source \"$HOME/.nvm/nvm.sh\" && nvm use 24 >/dev/null && npm run dev"
+        "if [ -s \"$HOME/.nvm/nvm.sh\" ]; then source \"$HOME/.nvm/nvm.sh\" && nvm use 24 >/dev/null; else export PATH=\"/opt/homebrew/opt/node@24/bin:$PATH\"; fi && npm run dev"
       ],
       "port": 3000,
       "autoPort": true

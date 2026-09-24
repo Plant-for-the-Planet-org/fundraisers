@@ -9,6 +9,7 @@ import { AboutMoreThanForests } from '@/components/about/about-more-than-forests
 import { AboutProjects } from '@/components/about/about-projects';
 import { AboutStageMode } from '@/components/about/about-stage-mode';
 import { AboutWhoFor } from '@/components/about/about-who-for';
+import { localizedPageMetadata } from '@/i18n/locale-metadata';
 
 const META_IMAGE_URL = '/FUNDRAISER-Meta-Cover.jpg';
 
@@ -19,12 +20,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations({ locale, namespace: 'About' });
   const title = t('meta.title');
   const description = t('meta.description');
+  const localized = localizedPageMetadata('/', locale);
 
   return {
     title,
     description,
-    alternates: { canonical: '/' },
+    alternates: localized.alternates,
     openGraph: {
+      ...localized.openGraph,
       title,
       description,
       type: 'website',

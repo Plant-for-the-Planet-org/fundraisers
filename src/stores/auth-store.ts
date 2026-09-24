@@ -50,6 +50,8 @@ interface AuthStore {
   logout: (customReturnTo?: string | undefined) => void;
   clearAuth: () => void;
   refreshProfile: () => Promise<void>;
+  /** Saves the language to the signed-in user's profile. Throws when the save fails. */
+  updateProfileLocale: (locale: string) => Promise<void>;
   retryProfileSetup: () => Promise<void>;
 }
 
@@ -306,6 +308,19 @@ export const useAuthStore = create<AuthStore>()(
           },
           undefined,
           'auth/retry_profile_setup'
+        );
+      },
+
+      updateProfileLocale: async (locale: string) => {
+        const { accessToken, user } = get();
+        if (!accessToken || !user?.profile) return;
+
+        await userService.updateProfileLocale(accessToken, locale);
+        // Merge rather than trust the response shape, so a partial reply cannot drop other profile fields.
+        set(
+          { user: { ...user, profile: { ...user.profile, locale } } },
+          undefined,
+          'auth/update_profile_locale'
         );
       },
 
