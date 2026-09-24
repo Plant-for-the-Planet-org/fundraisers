@@ -187,12 +187,6 @@ export function FundraiserView({
               countryCode={workspaceCountry}
               isTaxDeductible={isTaxDeductible}
             />
-            {/* Sits at the very bottom on mobile, after the projects. Closed fundraisers get a share action in their card instead. */}
-            {fundraiser.visibility === 'public' && (
-              <div className='md:hidden order-2'>
-                <CopyLinkButton />
-              </div>
-            )}
           </>
         ) : (
           <ClosedForContribution
