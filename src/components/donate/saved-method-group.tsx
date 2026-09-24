@@ -4,6 +4,7 @@ import type { PaymentMethodId } from '@/lib/types/payment-methods';
 import type { SavedMethodOption } from '@/components/donate/saved-method-option';
 import type { VisibleMethodOption } from '@/components/donate/use-payment-method-options';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
 import { TriangleAlert } from 'lucide-react';
 import {
@@ -29,10 +30,6 @@ interface SavedMethodGroupProps {
   isSubscription: boolean;
   /** Whether processing-fee details should be shown for this donation. */
   showFeeDetails: boolean;
-  /** Called when a saved method row is chosen. */
-  onSavedMethodSelect: (savedMethodId: string, typeId: PaymentMethodId) => void;
-  /** Called when the "use a new …" row is chosen. */
-  onNewMethodSelect: (methodId: PaymentMethodId) => void;
   /** Called when the group header/container is chosen, selecting the preferred saved method. */
   onSavedGroupSelect: (methodId: PaymentMethodId) => void;
 }
@@ -49,11 +46,12 @@ export function SavedMethodGroup({
   selectedPaymentMethod,
   isSubscription,
   showFeeDetails,
-  onSavedMethodSelect,
-  onNewMethodSelect,
   onSavedGroupSelect,
 }: SavedMethodGroupProps) {
   const t = useTranslations('Fundraisers.donate.paymentMethods');
+  const feeDescriptionId = useId();
+  const hasFeeTooltip =
+    showFeeDetails && !!method.feeText && !!method.feeTooltip;
 
   // A generic option is only "selected" when no saved method is active — a
   // saved card and the generic card share the same id.
@@ -87,11 +85,11 @@ export function SavedMethodGroup({
           The saved instances and the "use a new …" row below select a
           specific option; the radio dot mirrors whichever is active. */}
       <div className='flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'>
-        <button
-          type='button'
+        {/* A pointer shortcut: clicking the type row picks the preferred saved method. Keyboard users reach every row with the arrow keys, so this row is not focusable at all and stays out of the accessibility tree. A button would still take focus when clicked, and aria-hidden on a focusable element is a violation. Each saved row below names its own type, so nothing is lost by hiding this. */}
+        <div
+          aria-hidden='true'
           onClick={handleHeaderSelect}
-          aria-pressed={selectedPaymentMethod === method.id}
-          className='flex flex-1 items-center gap-3 text-left'
+          className='flex flex-1 cursor-pointer items-center gap-3'
         >
           <RadioDot isSelected={selectedPaymentMethod === method.id} />
           {HeaderLogo && (
@@ -107,14 +105,21 @@ export function SavedMethodGroup({
               </span>
             )}
           </div>
-        </button>
+        </div>
         {showFeeDetails && method.feeText && (
           <MethodFeeDetails
             feeText={method.feeText}
             feeTooltip={method.feeTooltip}
+            tooltipFocusable={false}
           />
         )}
+        {hasFeeTooltip && (
+          <span id={feeDescriptionId} className='sr-only'>
+            {method.feeTooltip}
+          </span>
+        )}
       </div>
+      {/* Nesting is visual only. `radiogroup` owns nothing but `radio`, and a `group` in between makes some screen readers count set position within it ("1 of 2" instead of the real place in the list). Each row names its own type, and the fee text is attached to each row below. */}
       <div className='space-y-2 p-3'>
         <div className='space-y-2 pl-6'>
           {savedInstancesForMethod.map(saved => {
@@ -128,6 +133,7 @@ export function SavedMethodGroup({
             return (
               <div key={saved.id} className='space-y-2'>
                 <SavedPaymentMethodOption
+                  savedMethodId={saved.id}
                   typeId={saved.typeId}
                   brand={saved.brand}
                   last4={saved.last4}
@@ -136,7 +142,7 @@ export function SavedMethodGroup({
                   expiringSoonLabel={saved.expiringSoonLabel}
                   ariaLabel={saved.ariaLabel}
                   isSelected={selectedSavedMethodId === saved.id}
-                  onSelect={() => onSavedMethodSelect(saved.id, saved.typeId)}
+                  describedById={hasFeeTooltip ? feeDescriptionId : undefined}
                 />
                 {showRecurringHint && (
                   <p className='flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-5 text-amber-700'>
@@ -154,9 +160,10 @@ export function SavedMethodGroup({
           })}
         </div>
         <NewMethodOption
+          methodId={method.id}
           label={newMethodLabel}
           isSelected={isGenericSelected}
-          onSelect={() => onNewMethodSelect(method.id)}
+          describedById={hasFeeTooltip ? feeDescriptionId : undefined}
         />
       </div>
     </div>

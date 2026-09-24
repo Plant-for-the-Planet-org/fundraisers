@@ -4,6 +4,12 @@
       "aria": {
         "label": "donation details",
         "close": "Close donation overlay"
+      },
+      "leaveConfirm": {
+        "title": "Leave this donation?",
+        "description": "The details you entered will be lost.",
+        "cancel": "Keep editing",
+        "confirm": "Leave"
       }
     },
     "preferences": {
@@ -11,6 +17,8 @@
       "anonymousDonationDescription": "Your name won't be shown publicly on the fundraiser page"
     },
     "yourInfo": "Your Info",
+    "signInNudge": "Already have an account? <signInLink>Sign in</signInLink>",
+    "notYou": "Not {name}? <switchLink>Switch account</switchLink>",
     "organization": "(Organization)",
     "donorIdentity": {
       "companyDonation": {

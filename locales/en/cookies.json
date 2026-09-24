@@ -28,7 +28,7 @@
       "items": {
         "session": {
           "title": "Staying signed in",
-          "body": "A session cookie set only after you log in, so you do not have to sign in again on every page."
+          "body": "A session cookie set only after you log in, so you do not have to sign in again on every page. We also keep the time of your last sign-in, so the donation form can offer to switch accounts once it is a few hours old."
         },
         "language": {
           "title": "Your language",

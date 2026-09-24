@@ -8,6 +8,7 @@ import {
   exchangeCodeForTokens,
   getAccessTokenSilently,
 } from '@/lib/auth/auth0-config';
+import { isSignInPopupWindow } from '@/lib/auth/sign-in-popup';
 import { cleanUrl, getValidStoredToken } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -43,6 +44,8 @@ export function AuthInitializer() {
     // the code exchange, then wipe access_token from localStorage (which is
     // shared across same-origin frames).
     if (typeof window !== 'undefined' && window.self !== window.top) return;
+    // The sign-in popup has no PKCE verifier either. The opener exchanges the code, see sign-in-popup.ts.
+    if (isSignInPopupWindow()) return;
     if (logoutSuccess === 'true') return;
     if (didStartInit.current) return;
     didStartInit.current = true;

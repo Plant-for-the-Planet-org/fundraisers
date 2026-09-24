@@ -7,6 +7,11 @@ import type {
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
+import {
+  clearAuthTime,
+  readAuthTime,
+  restoreAuthTime,
+} from '@/lib/auth/auth-time';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { ensureProfile, isRetryable } from '@/lib/auth/implicit-signup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
@@ -28,6 +33,8 @@ interface User {
 interface AuthStore {
   user: User | null;
   accessToken: string | null;
+  /** Seconds since the epoch of the last interactive sign-in, see `auth-time.ts`. Null when unknown. */
+  authTime: number | null;
   isAuthenticated: boolean;
   isAuthInitializing: boolean;
   error: string | null;
@@ -36,6 +43,8 @@ interface AuthStore {
   profileFailureReason: SignupFailureReason | null;
 
   setAccessToken: (token: string | null) => Promise<void>;
+  /** Switches accounts and keeps the current session if the new account fails to load. */
+  switchAccount: (token: string) => Promise<boolean>;
   setIsAuthInitializing: (value: boolean) => void;
   loadUserProfile: () => Promise<void>;
   logout: (customReturnTo?: string | undefined) => void;
@@ -65,11 +74,42 @@ function userFromIdentity(identity: PartialIdentity): User {
   };
 }
 
+/**
+ * Applies a new login session:
+ * - saves the new token
+ * - loads the user's profile
+ * - marks the user as signed in
+ *
+ * If anything fails, this throws an error.
+ * The caller decides whether to sign out or restore the previous session.
+ */
+async function applySession(token: string) {
+  useAuthStore.setState({ accessToken: token }, undefined, {
+    type: 'auth/set_access_token',
+  });
+
+  await useAuthStore.getState().loadUserProfile();
+  if (!useAuthStore.getState().user) {
+    throw new Error('User profile not loaded');
+  }
+
+  if (isBrowser) {
+    localStorage.setItem('access_token', token);
+  }
+
+  useAuthStore.setState(
+    { isAuthenticated: true, authTime: readAuthTime() },
+    undefined,
+    'auth/set_authenticated'
+  );
+}
+
 export const useAuthStore = create<AuthStore>()(
   devtools(
     (set, get) => ({
       user: null,
       accessToken: null,
+      authTime: null,
       isAuthenticated: false,
       isAuthInitializing: true,
       error: null,
@@ -89,23 +129,37 @@ export const useAuthStore = create<AuthStore>()(
 
         if (get().accessToken === token) return;
 
-        set({ accessToken: token }, undefined, {
-          type: 'auth/set_access_token',
-        });
-
         try {
-          await get().loadUserProfile();
-          const user = get().user;
-          if (!user) throw new Error('User profile not loaded');
-
-          if (isBrowser) {
-            localStorage.setItem('access_token', token);
-          }
-
-          set({ isAuthenticated: true }, undefined, 'auth/set_authenticated');
+          await applySession(token);
         } catch (err) {
           console.error('Auth failed:', err);
           get().clearAuth();
+        }
+      },
+
+      switchAccount: async (token: string) => {
+        // Everything `applySession` and `loadUserProfile` touch, so a rollback puts the session back exactly as it stood.
+        const previous = {
+          user: get().user,
+          accessToken: get().accessToken,
+          authTime: get().authTime,
+          isAuthenticated: get().isAuthenticated,
+          error: get().error,
+          profileStatus: get().profileStatus,
+          profileFailureReason: get().profileFailureReason,
+        };
+
+        if (previous.accessToken === token) return previous.isAuthenticated;
+
+        try {
+          await applySession(token);
+          return true;
+        } catch (err) {
+          // If the new account fails to load, keep the user signed in to the previous account.
+          console.error('Account switch failed, keeping the session:', err);
+          set(previous, undefined, 'auth/switch_account_reverted');
+          restoreAuthTime(previous.authTime);
+          return false;
         }
       },
 
@@ -198,6 +252,7 @@ export const useAuthStore = create<AuthStore>()(
         if (isBrowser) {
           localStorage.removeItem('access_token');
           localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
+          clearAuthTime();
           // The `ui-locale` cookie is intentionally left in place. A profile sync taught this browser the user's language; logging out should not discard that (the profile is not lost, it re-syncs on the next login).
           // A later different user's profile sync overwrites the `.profile` cookie anyway, and an explicit pick always wins.
         }
@@ -205,6 +260,7 @@ export const useAuthStore = create<AuthStore>()(
           {
             user: null,
             accessToken: null,
+            authTime: null,
             isAuthenticated: false,
             isAuthInitializing: false,
             error: null,

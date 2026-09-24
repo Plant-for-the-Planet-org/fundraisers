@@ -1,5 +1,6 @@
 import type { RedirectPath } from '../types/auth';
 
+import { clearAuthTime } from '../auth/auth-time';
 import { DEFAULT_REDIRECT_PATH, PROTECTED_PATH } from '../constants/auth';
 import { ALLOWED_REDIRECT_ROOTS } from '../types/auth';
 
@@ -75,6 +76,8 @@ export const getValidStoredToken = () => {
 
   if (isTokenExpired(token)) {
     localStorage.removeItem('access_token');
+    // Clear the old sign-in time so the next silent login isn't treated as a recent sign-in.
+    clearAuthTime();
     return null;
   }
 

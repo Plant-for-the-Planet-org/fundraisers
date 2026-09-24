@@ -125,6 +125,18 @@ export function ThemeShell({
   // The accent colour drives the CTA (solid), progress fill, and the nav logo;
   // the CTA text colour is picked for contrast against it.
   const accentColor = getAccentColor(activeTheme.accent);
+  const ctaForeground = ctaTextFor(getReadableMode(accentColor));
+
+  // Dialogs and toasts portal to <body>, outside this wrapper, so they would only see the :root default. Mirror the accent on the root element for them.
+  useEffect(() => {
+    const html = document.documentElement;
+    html.style.setProperty('--accent-color', accentColor);
+    html.style.setProperty('--cta-foreground', ctaForeground);
+    return () => {
+      html.style.removeProperty('--accent-color');
+      html.style.removeProperty('--cta-foreground');
+    };
+  }, [accentColor, ctaForeground]);
 
   // A single colour representing the chosen background, at full strength (not
   // the 14% wash). Used to tint image/pattern decorations. Falls back to the
@@ -144,7 +156,7 @@ export function ThemeShell({
           '--theme-title-font': getFontStack(activeTheme.titleFont),
           '--accent-color': accentColor,
           '--theme-bg-color': bgTintColor,
-          '--cta-foreground': ctaTextFor(getReadableMode(accentColor)),
+          '--cta-foreground': ctaForeground,
         } as React.CSSProperties
       }
     >

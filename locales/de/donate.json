@@ -4,6 +4,12 @@
       "aria": {
         "label": "Spendendetails",
         "close": "Spendenfenster schließen"
+      },
+      "leaveConfirm": {
+        "title": "Spende verlassen?",
+        "description": "Deine eingegebenen Angaben gehen verloren.",
+        "cancel": "Weiter ausfüllen",
+        "confirm": "Verlassen"
       }
     },
     "preferences": {
@@ -11,6 +17,8 @@
       "anonymousDonationDescription": "Dein Name erscheint nicht öffentlich auf der Seite des Spendenaufrufs."
     },
     "yourInfo": "Deine Informationen",
+    "signInNudge": "Schon ein Konto? <signInLink>Anmelden</signInLink>",
+    "notYou": "Nicht {name}? <switchLink>Konto wechseln</switchLink>",
     "organization": "(Firma/Organisation)",
     "donorIdentity": {
       "companyDonation": {
