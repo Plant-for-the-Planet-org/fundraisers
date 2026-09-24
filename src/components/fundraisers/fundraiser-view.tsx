@@ -80,10 +80,12 @@ export function FundraiserView({
     fundraiser.workspace !== null;
 
   return (
-    <FundraiserLayout>
+    // Mobile is one column, capped so wide phones and small tablets don't stretch the image and form.
+    <FundraiserLayout className='max-md:max-w-lg max-md:mx-auto max-md:w-full'>
       <SidebarPanel>
         {/* Image */}
         <ImageDisplay
+          className='h-auto aspect-square'
           image={fundraiser.image}
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
