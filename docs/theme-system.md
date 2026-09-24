@@ -454,3 +454,11 @@ Fundraiser view routes live under the `(fundraiser)` route group with their own 
 **`MainContent`** (`src/components/ui/main-content.tsx`) is used by StandardLayout and will be used by the fundraiser layout in Phase 2. It owns the `flex-1` main element and the `max-w-[960px] rounded-2xl backdrop-blur-[10px]` content wrapper — pure layout, no theme awareness.
 
 **`PageContainer`** (`src/components/ui/page-container.tsx`) is not currently used. It was the original single-div wrapper before the theme system introduced a three-div structure (outer theme wrapper → fixed background layer → z-10 content layer). It could be adapted to accept a `theme` prop for Phase 2 if the pattern is worth extracting once both layouts exist, but that decision is deferred until then.
+
+---
+
+## Explore theme
+
+`/explore` (and its category pages) use `explore` in `themes.ts`: Stratospheric's soft yellow, pink and purple wash with its amber accent, plus a faint tree pattern (`bg-trees`, 8%) in the accent.
+
+It is a copy rather than a change to `stratospheric`, because fundraisers can pick Stratospheric for their own pages. It is not `featured`, so it never shows in the theme picker.
