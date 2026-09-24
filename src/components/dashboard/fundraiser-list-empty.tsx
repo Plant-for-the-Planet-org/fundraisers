@@ -8,7 +8,7 @@ export function FundraiserListEmpty() {
 
   return (
     <div className='fundraiser-list-empty flex flex-col items-center justify-center rounded-lg border border-dashed border-border/60 bg-card/40 px-6 py-12 text-center'>
-      <div className='mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary'>
+      <div className='mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent-color/10 text-accent-color'>
         <HeartHandshake className='h-6 w-6' aria-hidden='true' />
       </div>
       <h3 className='text-base font-semibold text-foreground'>{t('title')}</h3>

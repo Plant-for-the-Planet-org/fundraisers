@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { isTrackedPath, resolveUmamiConfig } from './umami';
+import {
+  isCollectingInsights,
+  isTrackedPath,
+  resolveUmamiConfig,
+} from './umami';
 
 const base = {
   baseUrl: 'https://umami.example',
@@ -61,5 +65,26 @@ describe('resolveUmamiConfig', () => {
 
   it('stays off on untracked paths', () => {
     expect(resolveUmamiConfig({ ...base, pathname: '/login' })).toBeNull();
+  });
+});
+
+describe('COLLECT_INSIGHTS', () => {
+  it('collects by default when the variable is not set', () => {
+    expect(isCollectingInsights(undefined)).toBe(true);
+    expect(resolveUmamiConfig(base)).not.toBeNull();
+  });
+
+  it('turns collection off with false (or 0, off, no), in any case', () => {
+    for (const value of ['false', 'FALSE', '0', 'off', 'no', ' False ']) {
+      expect(isCollectingInsights(value)).toBe(false);
+      expect(
+        resolveUmamiConfig({ ...base, collectInsights: value })
+      ).toBeNull();
+    }
+  });
+
+  it('keeps collecting for true or any other value', () => {
+    expect(isCollectingInsights('on')).toBe(true);
+    expect(isCollectingInsights('true')).toBe(true);
   });
 });

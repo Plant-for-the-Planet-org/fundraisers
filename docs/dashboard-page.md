@@ -1,787 +1,165 @@
-# Manage Fundraisers (Dashboard) Page Plan
+# Host dashboard
 
-## Summary
+Where hosts manage their fundraisers: see how they are doing, who gave, where visitors come from, and what to do next.
 
-Reshape `/(standard)/dashboard/page.tsx` into a single, focused **Manage fundraisers** screen. It has three layers stacked vertically:
+The original build plan for the first dashboard (header, summary tiles, list, toolbar, row actions) is in git history. This page describes how the dashboard works now.
 
-1. **Header** — page title + supporting copy.
-2. **Summary** — three stat tiles (Fundraisers / Total Raised / Donations).
-3. **Manage list** — toolbar (search + status filter + sort) above a list of the user's fundraisers, each with a kebab action menu (Edit, Copy link, Pause/Resume).
-
-The page keeps `AuthGuard` and `useAuthStore`; data fetching still flows through `lib/api/fundraisers-service.ts`. Rendering is broken into small, single‑responsibility components colocated under `src/components/dashboard/`.
+For Umami page views and donation events, see [insights.md](./insights.md).
 
 ---
 
-## Goals
+## Routes
 
-- Match the new visual design (header copy, three summary tiles, search + filter + sort toolbar, list rows with status badges and a kebab menu).
-- Keep the page itself thin — it composes feature components and owns only top‑level data fetching and one shared filter/sort state.
-- Make every list row actionable (Edit / Copy link / Pause / Resume) without leaving the page.
-- Be resilient to partial data (multi‑currency totals, missing host display name, missing image, very long titles).
-- Stay localized end to end (`Dashboard.*` keys in `locales/en/dashboard.json` and `locales/de/dashboard.json`).
-- Replace legacy components cleanly — no parallel "old vs new" cards left behind.
+| Route | What it shows | Menu |
+| --- | --- | --- |
+| `/dashboard` | Overview: stats strip, pending host invitations, latest 2 fundraisers | Overview |
+| `/dashboard/fundraisers` | The full list with search, status filter and sort | Fundraisers |
+| `/dashboard/fundraisers/[slug]` | One fundraiser: stats, "Make it a success" checklist, hosts, features | Fundraisers |
+| `/dashboard/fundraisers/[slug]/donors` | Donors and donations, paged | Fundraisers |
+| `/dashboard/fundraisers/[slug]/insights` | That fundraiser's visitors, donation journey, countries, sources | Fundraisers |
+| `/dashboard/fundraisers/[slug]/share` | Tagged share links per channel | Fundraisers |
+| `/dashboard/insights` | All your fundraisers combined, a ranking, or one picked from a list (`?fundraiser=<slug>`) | Insights |
+| `/dashboard/fundraisers/edit/[slug]` | The editor (no menu, full width) | none |
 
-Out of scope (call out, do not build): pagination/infinite scroll, bulk actions, share‑sheet beyond Copy link, server‑side filtering, analytics events.
+Both Insights routes, and the Insights menu item and tab, only exist when Umami is set up (`UMAMI_API_KEY`). Without it they return a 404 and are hidden.
 
----
-
-## Delivery Plan (PRs)
-
-The work ships in four PRs so each lands a reviewable, user‑visible slice. Each PR's scope is fixed — anything not listed under "In scope" belongs to a later PR, even if mentioned elsewhere in this doc.
-
-### PR 1 — Header + summary tiles ✅ shipped
-
-**Goal:** show the page chrome and the three top‑line metrics. No list yet.
-
-**In scope**
-
-- `BreadcrumbTrail` (Home → Dashboard).
-- `DashboardHeader` (title + subtitle).
-- `DashboardSummary` + `SummaryStatCard` + `SummaryStatCardSkeleton`.
-- `DashboardStatsError` (retained from legacy, generic retry block spanning the grid).
-- Slim `getDashboardSummary` returning only `{ totalCount, activeCount, donationsCount, totalRaisedByCurrency }`. `activeCount` is currently derived from `canDonate`; switch to `status === 'active'` in PR 2 once the field is wired into the `Fundraiser` type.
-- Locale keys: `breadcrumb.*`, `manageFundraisers.*`, `summary.*`, `statsError.*` only.
-- Page composition: `AuthGuard` → breadcrumb → header → summary.
-- Removed legacy components: `card-base`, `my-fundraisers-card`, `total-raised-card`, `donations-card`, `dashboard-stat-card-skeleton`.
-
-**Out of scope (deferred):** list, toolbar, action menu, `Fundraiser.status` field on the type, `pauseFundraiser` / `resumeFundraiser`, PATCH support on `external-client`, all derivation/filter/sort utilities, list‑related locale keys.
-
-**Acceptance**
-
-- `/dashboard` renders header + 3 tiles; numbers match `getFundraisers` payload.
-- DE locale renders all four sections.
-- `npm run type-check` clean; ESLint clean on changed files.
+Fundraiser URLs use the slug. Renaming a fundraiser changes its URL; the editor already redirects to the new slug.
 
 ---
 
-### PR 2 — Fundraiser list (read‑only) ✅ shipped
+## Layout and route groups
 
-**Goal:** render the user's fundraisers below the summary as a static list — no toolbar, no actions yet. Sorted newest‑first by `startDate`.
+```
+src/app/(standard)/dashboard/
+  layout.tsx                      metadata only (noindex)
+  (menu)/layout.tsx               DashboardShell: left menu + content
+    (home)/layout.tsx             DashboardFundraisersProvider (shared list)
+      page.tsx                    /dashboard
+      fundraisers/page.tsx        /dashboard/fundraisers
+    fundraisers/[slug]/layout.tsx FundraiserDetailShell (header + tabs)
+      page.tsx, donors/, insights/, share/
+    insights/page.tsx             /dashboard/insights
+  fundraisers/edit/[slug]/        the editor, outside (menu) on purpose
+```
 
-**In scope**
+- The dashboard sits inside the standard 960px frame, like other pages. The menu takes part of that width.
+- `(menu)` holds the menu. The editor is outside it because the editor and its live preview need the full width.
+- `(home)` shares one fundraiser list between Overview and Fundraisers, so moving between them does not refetch.
 
-- New components in `src/components/dashboard/`:
-  - `fundraiser-list.tsx` — handles the loading / empty / populated states.
-  - `fundraiser-list-item.tsx` — image, title, host, `amount of goal`, donations, days‑left. **No status badge yet — that lands in PR 3.**
-  - `fundraiser-list-item-skeleton.tsx` — shown 3–5× while loading.
-  - `fundraiser-list-empty.tsx` — zero‑fundraisers CTA → `/fundraisers/create`.
-- New utility `src/lib/utils/fundraiser-list.ts` with **only** what the list needs at this stage:
-  - `DisplayStatus` type, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
-  - **Not** the filter/sort/counts functions — those land in PR 3.
-- Add `status: FundraiserStatus` to the `Fundraiser` interface (required — backend now returns it on `GET /fundraisers`). Drive `deriveDisplayStatus` from `status` directly.
-- Update `getDashboardSummary` so `activeCount` is `status === 'active'` (no longer the `canDonate` proxy).
-- Page composition: render the list directly under `DashboardSummary`. Default order: `startDate` desc.
-- Locale keys added: `statusBadge.*`, `listItem.*`, `empty.*`.
+### The menu (`DashboardShell`, `DashboardNav`)
 
-**Out of scope (deferred to PR 3 / 4):** status badge component (`fundraiser-status-badge.tsx`) and `statusBadge.*` locale keys, search box, status‑filter pills, sort menu, result‑count line, `noResults` empty state, all per‑row actions (kebab menu).
+- Items: Overview, Fundraisers, Insights (only with Umami).
+- Collapsed to an icon rail by default. The choice is remembered per browser (`localStorage`, `use-menu-collapsed.ts`); the server renders the default.
+- Rows have a fixed height and padding, so icons stay in place when the menu is toggled. The toggle is instant; a width animation would reflow the content on every frame.
+- On small screens the menu opens as a sheet from a "Menu" button.
+- Starting a fundraiser is in the site header ("Start Fundraiser"), not in the menu.
 
-**Dependencies / risks**
+### Theme
 
-- Backend `status` field has shipped on `GET /fundraisers` — no fallback required.
+The dashboard has its own theme, `dashboard` in `src/lib/theme/themes.ts`: a light indigo-to-sky wash, a faint dot pattern, and an indigo accent. `route-themes.ts` maps `/dashboard` to it.
 
-**Acceptance**
+Chart bars, icons, links, chips and the active menu item use the theme's `--accent-color` directly (`bg-accent-color`, `text-accent-color`). The shadcn `Button` is hard-wired to `primary`, so `DashboardShell` also mirrors the accent into `--primary`, on its wrapper and on `<html>` while the dashboard is open (dialogs and menus portal to `<body>`). To change the dashboard colour, change the theme's `accent`.
 
-- All of the user's fundraisers render in a single list, newest first.
-- Long titles truncate; missing image shows the placeholder; missing host shows the fallback string.
-- Skeleton renders during `isLoading`; empty state renders when the user has zero fundraisers.
-
----
-
-### PR 3 — Search + filter + sort toolbar ✅ shipped
-
-**Goal:** add the toolbar above the list. Users can search by name/host, filter by status, and pick a sort order. The list re‑renders accordingly.
-
-**In scope**
-
-- New components:
-  - `fundraiser-status-badge.tsx` — variants `active` / `paused` / `ended` / `ending-soon`. Wired into `fundraiser-list-item.tsx` next to the title.
-  - `fundraiser-list-section.tsx` — wraps toolbar + result count + list, owns filter state.
-  - `fundraiser-list-toolbar.tsx`.
-  - `fundraiser-search-input.tsx` (250 ms debounce, syncs from parent for "Clear filters").
-  - `fundraiser-status-filter.tsx` (segmented pills with counts from the **unfiltered** list).
-  - `fundraiser-sort-menu.tsx` (dropdown: newest / oldest / most‑raised / ending‑soonest / name‑asc).
-  - `fundraiser-list-no-results.tsx` (filtered‑empty state with "Clear filters" button).
-- Extend `src/lib/utils/fundraiser-list.ts` with: `FundraiserListSort`, `FundraiserListStatusFilter`, `FundraiserListFilters`, `FundraiserStatusCounts`, `DEFAULT_FUNDRAISER_LIST_FILTERS`, `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
-- New `useFundraiserListFilters` hook in `src/components/dashboard/use-fundraiser-list-filters.ts`.
-- Wire `FundraiserListSection` into the page in place of the bare list from PR 2.
-- Locale keys added: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
-
-**Out of scope (deferred to PR 4):** any per‑row actions; URL‑sync for filter state (still a doc open question).
-
-**Dependencies / risks**
-
-- Backend `status` field has shipped on `GET /fundraisers` (added to `Fundraiser` in PR 2), so the Paused/Ended buckets can be driven directly off it.
-
-**Acceptance**
-
-- Typing in search filters the list with no perceptible lag; debounce ≈ 250 ms.
-- Each pill (All / Active / Draft / Paused / Ended) shows its count from the **search‑filtered** list (counts update as the user types) and stays stable as the user toggles between pills.
-- All five sort options behave per the rules in `sortFundraisers`.
-- "No fundraisers match these filters." renders with a working "Clear filters" button.
-- DE locale renders pluralized strings correctly.
+Green stays reserved for status (live, going up) and red for going down, so the accent is deliberately not green.
 
 ---
 
-### PR 4 — Per‑row actions (Edit / Copy link / Pause / Resume) ✅ shipped
+## Overview (`/dashboard`)
 
-**Goal:** add the kebab menu on each row with the four actions. Pause/Resume hits the backend and the list reflects the new status without a full reload.
+- **Stats strip** (`StatStrip`, shared with the fundraiser Overview): Total raised, Donations, Active fundraisers, and, with Umami, Views this week with the change against last week.
+  - The strip knows up front whether the views cell exists, so the loading skeleton has the same shape as the loaded strip (2 by 2 on small screens, 4 across on desktop).
+- **Pending invitations** to co-host, with accept and decline.
+- **Active fundraisers**: up to 2 live fundraisers, newest first, with "View all". When nothing is live, it shows the 2 newest as "Latest fundraisers".
 
-**In scope**
+## Fundraisers (`/dashboard/fundraisers`)
 
-- New component `fundraiser-action-menu.tsx`:
-  - **Owner gating (first):** if the current user's host record on the fundraiser does not have `role === 'owner'` (e.g. they are an `admin` co‑host), the menu collapses to **Copy link only** regardless of status. Owner check uses `auth-store` `user.sub` (mapped to `profile.id`) against `fundraiser.hosts[].user.id`.
-  - Items gated per API `status` for owners:
-    - `active` → Edit, Copy link, Pause.
-    - `paused` → Edit, Copy link, Resume.
-    - `draft` → Edit, Copy link, Activate (Activate publishes the draft via `{ status: 'active' }` — same handler as Resume, only the label differs).
-    - `completed` / `cancelled` → Copy link only (read‑only).
-  - Clipboard via `navigator.clipboard.writeText`; on failure show error toast (no `execCommand` fallback — modern browsers only).
-  - `sonner` toasts for success / error.
-  - `modal={false}` on the `DropdownMenu` to disable Radix's scroll‑lock side effects (prevents horizontal layout shift on open/close), matching `FundraiserSortMenu`.
-- API layer:
-  - Reuse the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts) (which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`). Pause = `updateFundraiser(id, { status: 'paused' }, token)`; Resume = `updateFundraiser(id, { status: 'active' }, token)`. `UpdateFundraiserRequest` already accepts `status?: FundraiserStatus` — no type, client, or service changes required.
-- Page composition: thread `onFundraiserUpdated` from the page through `FundraiserListSection` → `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume, the menu calls `onFundraiserUpdated(updatedFundraiser)` with the API response and the page applies it to local state via `setFundraisers(prev => prev.map(...))` — no refetch, no `isLoading` toggle, no skeleton flash on unrelated rows. The summary tiles are derived from the patched list (`useMemo`), so they update alongside the affected row. The page also exposes `retryAfterError` (loud — toggles `isLoading`) wired to `DashboardSummary onRetry`.
-- Locale keys added: `actions.*`.
-- **Split Draft out of Paused** (carry‑over from PR 3, where drafts collapsed into Paused):
-  - Extend `DisplayStatus`, `FundraiserListStatusFilter`, and `FundraiserStatusCounts` with a `'draft'` member.
-  - `deriveDisplayStatus`: API `status === 'draft'` → `'draft'` (no longer `'paused'`).
-  - `filterFundraisers`: `'draft'` filter → API `status === 'draft'`; `'paused'` filter → API `status === 'paused'` only.
-  - `getStatusCounts`: track `draft` independently from `paused`.
-  - `FundraiserStatusFilter`: add a `Draft` pill between `Active` and `Paused`.
-  - `FundraiserStatusBadge`: add a `draft` variant (blue accent).
-  - Locale keys added: `statusFilter.draft`, `statusBadge.draft`.
+The list with search, status pills and sort. Clicking a fundraiser opens its dashboard page (not the public page). The row menu has View page, Edit, Duplicate, Stage Mode, Share, Pause or Resume, and Delete, depending on status and role.
 
-**Out of scope:** share‑sheet beyond Copy link.
+The toolbar uses container queries rather than screen breakpoints, because the menu takes part of the width.
 
-**Dependencies / risks**
+---
 
-- **Pause/Resume contract** — handled by the existing `updateFundraiser` helper (`PUT /fundraisers/{id}`) with `status` already in `UpdateFundraiserRequest`. No backend or client changes needed.
-- **Toast system** — `sonner` is already used elsewhere in the app, so no new infra needed.
+## One fundraiser (`/dashboard/fundraisers/[slug]`)
 
-**Acceptance**
+### Who can see it
 
-- Pause on an Active row → row badge flips to Paused, status‑filter pill counts update (Active −1, Paused +1). The Fundraisers tile's active count also drops by one (summary is derived from the list).
-- Resume on a Paused row → reverse.
-- Activate on a Draft row → row transitions to Active (badge flips, Draft pill −1, Active pill +1). The Fundraisers tile's active count increases by one.
-- Admin co‑host viewing a fundraiser they do not own → menu shows **Copy link only** for any status.
-- Copy link → clipboard contains `${origin}${getFundraiserUrl(fundraiser)}` (i.e. `${origin}/fundraisers/{slug-or-id}`); toast shows.
-- Network failure on Pause → row stays Active, error toast shows, no local state corruption.
-- Opening / closing the action menu does not shift the page horizontally (verified with `modal={false}`).
+Every active host of the fundraiser, including view-only co-hosts. Only owners and admins can edit.
+
+`useHostedFundraiser` loads the fundraiser with the host's token and checks it is in the platform's list of fundraisers the caller actively hosts. That list also carries every host, including private ones (the single-fundraiser payload only has public hosts), so its hosts are used.
+
+For view-only co-hosts, the edit actions are hidden: the header's Edit button, the checklist's Fix and Invite buttons, the features' Turn on and Manage buttons, and the Hosts card's Invite button. Sharing stays available.
+
+### Overview tab
+
+- **Stats strip**: Raised (with % of goal), Donations, Donors, Avg. donation value.
+- **Make it a success**: cover image, story (200 characters of text, or 100 with a picture or video), goal, published, a co-host who has accepted, first donation. Logic in `src/lib/utils/fundraiser-checklist.ts`. When every step is done and the fundraiser takes donations, it nudges to the Share tab.
+- **Hosts**: active and invited hosts, with Invite co-host (opens the existing Manage hosts dialog). The checklist's co-host step opens the same dialog.
+- **Features**: Leaderboard, Thank-you note, Stage Mode, each On or with a Turn on link to the editor.
+
+### Donors tab
+
+Data comes from the public leaderboard endpoints (`/fundraisers/:id/leaderboard/{recent|top}`), the same as the public "Show all donations" overlay.
+
+- **Donors** (default, listed first) when the leaderboard groups top donors per person (`aggregate_top_by_donor`). Otherwise that tab is "Top donations" and Donations is the default.
+- **Donations**, newest first, with a toggle for oldest first.
+- 20 per page, "1–20 of 1,215" with round previous and next buttons, at the top and bottom.
+- Anonymous donors are masked by the platform, so they show as "Anonymous" here too.
+
+Oldest first reads the newest-first list from the end (`src/lib/utils/reverse-pages.ts`), at most 2 API pages per page, so pages stay full and the range label stays true.
+
+The API cannot sort by name or amount, filter out anonymous donors, or search. Those need a platform change (see Platform requests).
+
+### Share tab
+
+Pick a channel (Plain link, WhatsApp, Instagram, LinkedIn, Facebook, Email, Newsletter) and copy one link. Tagged links add `utm_source` and `utm_medium`, the same shape as the Stage Mode QR code, so Insights can tell channels apart.
+
+Every host-facing "Share" button leads here: the checklist, the donors empty state, and the row menu. The public page's "Copy Link" stays a plain copy, because visitors use it too.
+
+This tab is built as cards so story images or post templates to download can be added later.
+
+---
+
+## Status: what "active" means
+
+The platform can leave a fundraiser `active` after its end date, with donations closed. The public page already calls that ended (`hasFundraiserConcluded`), and the dashboard does too.
+
+One rule, `getStatusBucket` in `src/lib/utils/fundraiser-list.ts`, drives the badge, the status filter, the filter counts and the Active fundraisers stat. `isLiveStatus` and `isFundraiserLive` are the shared "live right now" checks.
 
 ---
 
 ## Delete action
 
-The kebab menu's **Delete** action removes a fundraiser. The user always sees a single, delete-focused flow — there is no separate "archive" option or copy.
+`DELETE /fundraisers/{id}` succeeds in one of two shapes, and the UI treats them the same:
 
-**Two API responses, one outcome.** `DELETE /fundraisers/{id}` succeeds in one of two shapes, and the UI treats them identically:
+| Response | Backend meaning | UI |
+| --- | --- | --- |
+| `204 No Content` | No donations, hard-deleted | Row removed |
+| `200 OK` with `{ "status": "archived" }` | Had donations, archived | Row removed |
 
-| Response                                | Backend meaning                                | UI behavior              |
-| --------------------------------------- | ---------------------------------------------- | ------------------------ |
-| `204 No Content`                        | No donations → hard-deleted                    | Row removed from list    |
-| `200 OK` with `{ "status": "archived" }`| Had donations → soft-deleted (archived)        | Row removed from list    |
-
-Both mean "the delete succeeded," so `deleteFundraiser` ([src/lib/api/fundraiser-service.ts](../src/lib/api/fundraiser-service.ts)) resolves without inspecting the body, and `FundraiserActionMenu.handleDelete` calls `onFundraiserRemoved(id)` in either case. The page drops the row via `handleFundraiserRemoved`; the summary tiles, derived from the list, update to reflect the removed fundraiser (total, donations, and total-raised all drop).
-
-**Archived fundraisers are never shown.** The list API (`GET /fundraisers`) does not return archived fundraisers, and a delete removes the row from local state by id (see `handleFundraiserRemoved`), so an archived fundraiser never enters the list in the first place. There is deliberately no extra client-side filter for `status: 'archived'` — the API contract owns this exclusion. This is expected behavior, **not a bug**.
-
-**States.** The confirm button shows a spinner and disables the dialog while the request is in flight; on error the dialog stays open with an error toast so the user can retry; on success the row is removed from the list, which unmounts the dialog along with it (so it disappears with the row rather than playing a close animation), and a "Fundraiser deleted" toast confirms.
+The list API does not return archived fundraisers, so there is no client-side filter for them. While the request runs, the dialog cannot be dismissed. On error the dialog stays open with a toast. On success the row and its dialog go, and the stats (derived from the list) update.
 
 ---
 
-## Page Layout (top → bottom)
+## Edge cases
 
-```
-┌────────────────────────────────────────────────────────────┐
-│ Manage fundraisers                                         │  ← DashboardHeader
-│ View, edit, and track every fundraiser you've created…     │
-├────────────────────────────────────────────────────────────┤
-│ ┌─Fundraisers─┐ ┌─Total Raised─┐ ┌─Donations─┐             │  ← DashboardSummary
-│ │  8          │ │  €16,837.61  │ │  626      │   (3 tiles) │
-│ │  6 active   │ │  across all… │ │  from supp│             │
-│ └─────────────┘ └──────────────┘ └───────────┘             │
-├────────────────────────────────────────────────────────────┤
-│ [🔍 Search…]   [All 8 | Active 6 | Draft 1 | Paused 0 | Ended 1] │  ← FundraiserListToolbar
-│                                       Sort: Newest first ▼ │
-│ Showing 8 of 8                                              │  ← result count
-├────────────────────────────────────────────────────────────┤
-│ [img] Plant 500 trees…  • Active                       ⋮   │  ← FundraiserListItem
-│       by {host name}                                        │
-│       €2,000 of €5,000 · 200 donations · 30 days left       │
-│ ──────────────────────────────────────────────────────────  │
-│ [img] Test fundraiser  • Ended                         ⋮    │
-│       by {host name}                                        │
-│       €2.37 of €50.00 · 5 donations · Ended                 │
-│ … (more rows)                                               │
-└────────────────────────────────────────────────────────────┘
-```
+| Scenario | Behavior |
+| --- | --- |
+| No fundraisers | Toolbar hidden, empty state with a create button. Stats show zeros. |
+| Search or filter matches nothing | "No results" with Clear filters. |
+| Several currencies | Total raised is one amount in the dominant currency, converted with `convertTotalRaisedToSingleCurrency`. |
+| Active, but past its end date and closed to donations | Counted and shown as **Ended** (see Status). |
+| End date 7 days away or less | "Ending soon" badge; still counted as Active. |
+| Fundraiser has no donations | Donors tab shows an empty state; the Share button only shows while it takes donations. |
+| View-only co-host | Sees every dashboard page; edit actions hidden. |
+| Clipboard not available | Error toast. |
+| Pause, resume or delete fails | Toast; local state unchanged. |
 
 ---
 
-## Component Architecture
+## Platform requests
 
-All new files live under [src/components/dashboard/](src/components/dashboard/) (kebab‑case files, PascalCase named exports — see [docs/naming.md](docs/naming.md)).
+Things the dashboard would do better with platform support:
 
-```
-src/components/dashboard/
-├── dashboard-header.tsx                # Title + subtitle (i18n)
-│
-├── dashboard-summary.tsx               # Wrapper: 3 stat tiles, handles loading/error
-├── summary-stat-card.tsx               # Generic tile (label, value, helper)
-├── summary-stat-card-skeleton.tsx
-│
-├── fundraiser-list-section.tsx         # Owns filter/sort/search state + result count
-├── fundraiser-list-toolbar.tsx         # Composes search + status filter + sort
-├── fundraiser-search-input.tsx         # Debounced search box
-├── fundraiser-status-filter.tsx        # Segmented control: All / Active / Paused / Ended
-├── fundraiser-sort-menu.tsx            # Dropdown: Newest / Oldest / Most raised / …
-│
-├── fundraiser-list.tsx                 # Renders rows or empty/no-results state
-├── fundraiser-list-item.tsx            # One row (image + meta + status + ⋮)
-├── fundraiser-list-item-skeleton.tsx
-├── fundraiser-status-badge.tsx         # Active / Draft / Paused / Ended / Ending soon
-├── fundraiser-action-menu.tsx          # ⋮ menu (Edit / Copy link / Pause | Resume)
-├── fundraiser-list-empty.tsx           # User has zero fundraisers
-├── fundraiser-list-no-results.tsx      # Filters/search produced zero rows
-│
-├── dashboard-stats-error.tsx           # (kept) generic retryable error block
-└── index.ts                            # Re-exports
-```
-
-Removed (replaced by the above): `card-base.tsx`, `my-fundraisers-card.tsx`, `total-raised-card.tsx`, `donations-card.tsx`, `dashboard-stat-card-skeleton.tsx`. Delete cleanly — do not leave shims or deprecated wrappers.
-
-### Where each piece lives
-
-| Concern                                                  | Owner                                                                                                    |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Auth gating, top‑level fetch, error boundary             | [src/app/(standard)/dashboard/page.tsx](<src/app/(standard)/dashboard/page.tsx>)                         |
-| Page title + subtitle                                    | `DashboardHeader`                                                                                        |
-| Stat tile values + skeleton/error                        | `DashboardSummary` → `SummaryStatCard`                                                                   |
-| Filter/sort/search **state**                             | `FundraiserListSection` (single source of truth)                                                         |
-| Toolbar UI                                               | `FundraiserListToolbar` (controlled by section)                                                          |
-| Pure filter/sort logic                                   | `lib/utils/fundraiser-list.ts`                                                                           |
-| Derived display status (active/paused/ended/ending‑soon) | `lib/utils/fundraiser-list.ts`                                                                           |
-| Pause/Resume mutation                                    | `updateFundraiser` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts)             |
-| Row UI                                                   | `FundraiserListItem`                                                                                     |
-| Per‑row actions                                          | `FundraiserActionMenu` (uses [src/components/ui/dropdown-menu.tsx](src/components/ui/dropdown-menu.tsx)) |
-
----
-
-## Component Specs
-
-### `DashboardHeader`
-
-- Props: none.
-- Renders `<h1>` with `t('manageFundraisers.title')` and a `<p>` with `t('manageFundraisers.subtitle')`.
-- The breadcrumb is rendered by the page (above the header), not by this component.
-
-### `DashboardSummary`
-
-- Props: `{ summary: DashboardSummaryStats; isLoading: boolean; hasError: boolean; onRetry: () => void; }`
-- Layout: `grid gap-4 md:grid-cols-3` (drop the `lg:grid-cols-3` step — only 3 tiles).
-- States:
-  - `hasError` → renders `DashboardStatsError` spanning all columns.
-  - `isLoading` → 3× `SummaryStatCardSkeleton`.
-  - `success` → 3× `SummaryStatCard`.
-- Tiles (label / value / helper):
-  1. `t('summary.fundraisers.label')` / `summary.totalCount` / `t('summary.fundraisers.activeHelper', { count: summary.activeCount })`
-  2. `t('summary.totalRaised.label')` / consolidated total in dominant currency / `t('summary.totalRaised.helper')`.
-  3. `t('summary.donations.label')` / `summary.donationsCount` / `t('summary.donations.helper')`.
-
-### `SummaryStatCard`
-
-- Props: `{ label: string; value: ReactNode; helper?: ReactNode; }`
-- Layout: small uppercase label, large numeric value, muted helper line. Built on existing `Card` primitives in [src/components/ui/card.tsx](src/components/ui/card.tsx). No hover lift, no link — these are read‑only metrics.
-
-### `FundraiserListSection`
-
-- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; onFundraiserUpdated: (updated: Fundraiser) => void; }`
-- Owns local state via `useFundraiserListFilters` (see Hooks).
-- Computes `visibleFundraisers = sortFundraisers(filterFundraisers(fundraisers, { search, status }), sort)`.
-- Renders: `FundraiserListToolbar` → result count line (`Showing <bold>{visible}</bold> of {total}`, rendered via `t.rich` so the visible count is bolded) → `FundraiserList`.
-- Threads `onFundraiserUpdated` and `onFundraiserRemoved` down to `FundraiserList` → `FundraiserListItem` → `FundraiserActionMenu`. After a successful Pause/Resume the page merges the API response into local state, and after a successful Delete it filters the row out by id — no refetch, no `isLoading` toggle. The affected row re‑renders (or drops), and because the summary is derived from the list, the stat tiles recompute in the same pass.
-
-### `FundraiserListToolbar`
-
-- Props: `{ filters: FundraiserListFilters; counts: FundraiserStatusCounts; onChange: (next: FundraiserListFilters) => void; }`
-- Pure presentational; composes `FundraiserSearchInput`, `FundraiserStatusFilter`, `FundraiserSortMenu`.
-- Mobile: stacks vertically (`flex-col md:flex-row`). The five status‑filter pills (`All`/`Active`/`Draft`/`Paused`/`Ended`) spread via `justify-between` when they fit; if not, the row scrolls horizontally (`overflow-x-auto`, pills are `shrink-0`). On `md+` the filter becomes `inline-flex` and overflow is disabled.
-
-### `FundraiserSearchInput`
-
-- Props: `{ value: string; onChange: (next: string) => void; placeholder?: string; }`
-- Internally debounces input (250 ms) before calling `onChange`. Search input is **controlled by its own local string** so typing feels instant, then it fires upstream.
-- Searches against fundraiser **title** and **host display name** (case‑insensitive via `.trim().toLowerCase().includes(query)`).
-
-### `FundraiserStatusFilter`
-
-- Props: `{ value: FundraiserListStatusFilter; counts: FundraiserStatusCounts; onChange: (next: FundraiserListStatusFilter) => void; }`
-- Segmented pills: `All` | `Active` | `Draft` | `Paused` | `Ended`. Each shows its count badge.
-- Counts are computed from the **search‑filtered** list (so typing in search updates the pill numbers to reflect what currently matches), but **not** from the status‑filtered list — toggling between pills never changes the badge numbers, only typing in search does.
-
-### `FundraiserSortMenu`
-
-- Props: `{ value: FundraiserListSort; onChange: (next: FundraiserListSort) => void; className?: string; }`
-- Dropdown built on [src/components/ui/dropdown-menu.tsx](src/components/ui/dropdown-menu.tsx). Mounted with `modal={false}` to disable Radix's scroll-lock side effects (which would otherwise shift the page when opening/closing the menu).
-- Options: `newest` (default), `oldest`, `most-raised`, `ending-soonest`, `name-asc`. Trigger renders `t('sort.triggerLabel')` (literal "Sort: ") followed by the selected option label inline so the option can be styled distinctly. The selected option in the menu shows a green `Check` on the left.
-- Trigger has a fixed `md:w-52` so its width does not change with the selected option (prevents toolbar layout shifts).
-
-### `FundraiserList`
-
-- Props: `{ fundraisers: Fundraiser[]; isLoading: boolean; isFiltered: boolean; onClearFilters: () => void; onActionComplete: () => void; }`.
-- If `isLoading`: renders 4 `FundraiserListItemSkeleton` rows.
-- If `fundraisers.length === 0`: render `FundraiserListNoResults` (with `onClearFilters`) when `isFiltered`, otherwise `FundraiserListEmpty`.
-- Otherwise maps to `FundraiserListItem`.
-
-### `FundraiserListItem`
-
-- Props: `{ fundraiser: Fundraiser; onFundraiserUpdated: (updated: Fundraiser) => void; }`
-- Layout (left → right):
-  - 80×80 image (or placeholder if `fundraiser.image` is null) — uses `next/image` with `fill` and `sizes`.
-  - Block: title (PR 3 also renders `FundraiserStatusBadge` next to the title); "by {hostName}" line — formatted from `fundraiser.hosts` as `X` (1), `X and Y` (2), or `X, Y and N other(s)` (3+) via `listItem.hostsTwo` / `listItem.hostsMany`; metric row (`amountRaised of goal · N donations · timeLeft`).
-  - Right: `FundraiserActionMenu`.
-- Title is a `<Link>` to the public fundraiser page (or to edit if you prefer; **call out** as an open question).
-
-### `FundraiserStatusBadge`
-
-- Props: `{ status: DisplayStatus; }`
-- Variants: `active` (green), `draft` (muted — same treatment as paused), `paused` (muted), `ended` (gray), `ending-soon` (amber). Pure presentational; no logic. The display status is derived upstream (see `deriveDisplayStatus`).
-- Drafts get their own **Draft** badge and filter bucket — they do not collapse into Paused.
-
-### `FundraiserActionMenu`
-
-- Props: `{ fundraiser: Fundraiser; onFundraiserUpdated: (updated: Fundraiser) => void; }`
-- Items are gated in two layers — first by the **viewer's host role**, then by **API `status`**.
-
-**1. Owner gating.** The dashboard list contains every fundraiser the current user co‑hosts. The menu first checks whether the current user's host record on this fundraiser has `role === 'owner'`. The current user ID comes from `useAuthStore(state => state.user?.sub)` (the auth store maps `sub` to `profile.id`, which matches `host.user.id`).
-
-| Viewer is…           | Menu                                                          |
-| -------------------- | ------------------------------------------------------------- |
-| **Owner**            | Status‑gated menu (table below).                              |
-| Admin (or any other) | **Copy link only** — Edit, Pause, Resume all hidden.          |
-| Not a host at all    | Defensive: Copy link only (should not occur in normal flows). |
-
-**2. Status gating (owners only).**
-
-| API `status`             | Edit | Copy link | Pause | Resume |
-| ------------------------ | :--: | :-------: | :---: | :----: |
-| `active`                 |  ✓   |     ✓     |   ✓   |        |
-| `paused`                 |  ✓   |     ✓     |       |   ✓    |
-| `draft`                  |  ✓   |     ✓     |       |   ✓    |
-| `completed`, `cancelled` |      |     ✓     |       |        |
-
-- **Edit** → navigates to `/dashboard/fundraisers/edit/[slug]` (existing route). Hidden for ended (`completed` / `cancelled`) fundraisers and for non‑owner viewers.
-- **Copy link** → writes `${window.location.origin}${getFundraiserUrl(fundraiser)}` (resolves to `/fundraisers/{slug-or-id}` — see [src/lib/utils/fundraiser.ts](src/lib/utils/fundraiser.ts)) to clipboard via `navigator.clipboard.writeText`. Surfaces success/error via `sonner` toast. No `execCommand` fallback — modern browsers only.
-- **Pause** (when API `status === 'active'`) / **Resume** (when API `status === 'paused'` or `'draft'`). Both call `updateFundraiser(fundraiser.id, { status: 'paused' | 'active' }, token)` (via the `pauseFundraiser` / `resumeFundraiser` helpers), then `onFundraiserUpdated(updated)` with the API response so the page can merge the new fundraiser into local state — no refetch. The same `Resume` action publishes a draft (transitions `draft → active`); the badge for drafts collapses into "Paused" so the user sees a single, consistent verb across both states. Disabled while in‑flight; show spinner inside the menu item; menu stays open until the request resolves (`onSelect` calls `event.preventDefault()` on Pause/Resume only).
-- **Visual styling:** Pause uses the destructive variant (red); Resume uses an emerald accent (`text-emerald-600` icon, `text-emerald-700` label, `bg-emerald-50` focus) to mirror Pause as a positive counterpart. A `DropdownMenuSeparator` divides the safe actions (Edit / Copy link) from the status‑change action (Pause / Resume).
-- **Layout stability:** the `DropdownMenu` is mounted with `modal={false}` to disable Radix's scroll‑lock side effects, which would otherwise add body padding on open and shift the page horizontally. Matches `FundraiserSortMenu`.
-- **Empty menu:** if the row resolves to zero items (defensive — every status currently has at least Copy link), the component returns `null` so no kebab trigger renders.
-
-### `FundraiserListEmpty`
-
-- Zero fundraisers ever. Friendly copy + CTA `Create your first fundraiser` linking to `/fundraisers/create`.
-
-### `FundraiserListNoResults`
-
-- Filters/search produced no rows. Copy: "No fundraisers match these filters." + secondary button `Clear filters` (calls `onChange(DEFAULT_FILTERS)` upstream).
-
-### Skeletons
-
-- `SummaryStatCardSkeleton` — three rendered while summary loads.
-- `FundraiserListItemSkeleton` — render 3–5 while the list loads. Use existing [src/components/ui/skeleton.tsx](src/components/ui/skeleton.tsx).
-
----
-
-## Data Layer
-
-### Extend `lib/api/fundraisers-service.ts`
-
-Replace `DashboardFundraiserStats` with a richer summary. **Status buckets are driven entirely by the API `status` field returned from `GET /fundraisers`** (no `endDate` derivation):
-
-| API `status`             | Filter bucket | Counted in    |
-| ------------------------ | ------------- | ------------- |
-| `active`                 | **Active**    | `activeCount` |
-| `draft`                  | **Draft**     | `draftCount`  |
-| `paused`                 | **Paused**    | `pausedCount` |
-| `completed`, `cancelled` | **Ended**     | `endedCount`  |
-
-```ts
-export interface DashboardSummaryStats {
-  totalCount: number;          // every fundraiser owned by user (all statuses)
-  activeCount: number;         // status === 'active'
-  donationsCount: number;      // sum of donationCount across user's fundraisers
-  consolidatedTotalRaised: { amount: number; currency: string } | null;
-}
-
-export function getDashboardSummary(fundraisers: Fundraiser[]): DashboardSummaryStats { … }
-```
-
-> Note: `donationsCount` is summed client‑side from `Fundraiser.donationCount`. If the API later exposes a single endpoint returning the full summary, swap implementation; the page just consumes the shape.
-
-> The status‑filter pill counts (Draft/Paused/Ended) are computed by `getStatusCounts(fundraisers)` in the list utility — they do not live on `DashboardSummaryStats`, since the tiles only surface `totalCount` / `activeCount` / `donationsCount`.
-
-Pause/Resume reuses the existing `updateFundraiser(id, data, token)` in [src/lib/api/fundraiser-service.ts](src/lib/api/fundraiser-service.ts), which `PUT`s to `/fundraisers/{id}` via `putAuthenticated`. `UpdateFundraiserRequest.status` is already typed as `FundraiserStatus`, so:
-
-```ts
-// Pause
-await updateFundraiser(fundraiser.id, { status: 'paused' }, token);
-// Resume
-await updateFundraiser(fundraiser.id, { status: 'active' }, token);
-```
-
-No new API methods, no `patch` helper on `external-client`, no type changes.
-
-Drop `getDashboardFundraiserStats` (and its callers in tests, if any).
-
-### New: `lib/utils/fundraiser-list.ts` (pure functions, fully unit‑testable)
-
-```ts
-export type DisplayStatus =
-  | 'active'
-  | 'draft'
-  | 'paused'
-  | 'ended'
-  | 'ending-soon';
-export type FundraiserListSort =
-  | 'newest'
-  | 'oldest'
-  | 'most-raised'
-  | 'ending-soonest'
-  | 'name-asc';
-export type FundraiserListStatusFilter =
-  | 'all'
-  | 'active'
-  | 'draft'
-  | 'paused'
-  | 'ended';
-
-export interface FundraiserListFilters {
-  search: string;
-  status: FundraiserListStatusFilter;
-  sort: FundraiserListSort;
-}
-
-export interface FundraiserStatusCounts {
-  all: number;
-  active: number;
-  draft: number;
-  paused: number;
-  ended: number;
-}
-
-export const ENDING_SOON_THRESHOLD_DAYS = 7;
-
-export function deriveDisplayStatus(f: Fundraiser, now?: Date): DisplayStatus;
-export function getDaysLeft(endDate: string, now?: Date): number; // negative if past
-export function filterFundraisers(
-  fundraisers: Fundraiser[],
-  f: FundraiserListFilters
-): Fundraiser[];
-export function sortFundraisers(
-  fundraisers: Fundraiser[],
-  sort: FundraiserListSort
-): Fundraiser[];
-export function getStatusCounts(
-  fundraisers: Fundraiser[]
-): FundraiserStatusCounts;
-```
-
-**Filter buckets — driven by API `status` only:**
-
-| API `status`             | Filter bucket | `DisplayStatus` (badge)                             |
-| ------------------------ | ------------- | --------------------------------------------------- |
-| `active`                 | **Active**    | `active`, or `ending-soon` if `0 < getDaysLeft ≤ 7` |
-| `draft`                  | **Draft**     | `draft`                                             |
-| `paused`                 | **Paused**    | `paused`                                            |
-| `completed`, `cancelled` | **Ended**     | `ended`                                             |
-
-Rules:
-
-- `deriveDisplayStatus`: switch on API `status`. `'completed' | 'cancelled'` → `ended`. `'paused'` → `paused`. `'draft'` → `draft`. `'active'` → `ending-soon` if `0 < getDaysLeft ≤ ENDING_SOON_THRESHOLD_DAYS`, else `active`. `endDate` is **not** consulted for non‑active statuses — the API status wins.
-- `filterFundraisers`:
-  - `all` → everything (no exclusions; drafts included).
-  - `active` → API `status === 'active'` (covers both `active` and `ending-soon` badges).
-  - `draft` → API `status === 'draft'`.
-  - `paused` → API `status === 'paused'`.
-  - `ended` → API `status` in `{'completed','cancelled'}`.
-  - Search matches title and host display name (lowercased, trimmed).
-- `sortFundraisers`: stable sort. `newest`/`oldest` use `startDate`; `ending-soonest` puts ended/paused/draft last and orders active rows by smallest positive `daysLeft`; `most-raised` uses `totalRaised` desc with currency tiebreak via `currency.localeCompare`; `name-asc` uses `title.localeCompare(other, locale, { sensitivity: 'base' })` — locale must be passed in.
-- `getStatusCounts`: returns `{ all, active, draft, paused, ended }` using the same buckets above. `draft` and `paused` are tracked independently.
-
-### Hook: `useFundraiserListFilters`
-
-Located in [src/components/dashboard/use-fundraiser-list-filters.ts](src/components/dashboard/use-fundraiser-list-filters.ts) (or `src/lib/hooks/`).
-
-```ts
-const DEFAULT_FILTERS: FundraiserListFilters = {
-  search: '',
-  status: 'all',
-  sort: 'newest',
-};
-export function useFundraiserListFilters(): {
-  filters: FundraiserListFilters;
-  updateFilters: (next: Partial<FundraiserListFilters>) => void;
-  resetFilters: () => void;
-};
-```
-
-**URL sync (still open as of PR 3):** the hook currently keeps filters in local component state only — refreshing the page resets to defaults. Persisting filters in the query string via Next.js `useSearchParams` is a future‑polish item; revisit alongside any analytics work.
-
----
-
-## Page Composition
-
-The page stays thin: `AuthGuard` → single `getFundraisers(accessToken)` fetch → memoized `getDashboardSummary` → composes feature components. Per‑PR composition (what's wired up at each step) lives in the **Delivery Plan** section above.
-
-Mutation refresh strategy: a successful Pause/Resume calls `onFundraiserUpdated(updatedFundraiser)` with the API response, and a successful Delete calls `onFundraiserRemoved(id)`. The page applies these to local state (`setFundraisers(prev => prev.map(...))` or `.filter(...)`) — no refetch, no `isLoading` toggle. The summary stat tiles are **derived from the `fundraisers` list via `useMemo(getDashboardSummary, [fundraisers])`**, so they stay in sync with every mutation: activating a draft bumps the active count, deleting a fundraiser drops it from the total / donations / total-raised, and so on. The list is the single source of truth for both the rows and the tiles. The error retry path on `DashboardSummary` uses a separate `retryAfterError` callback that does toggle `isLoading=true`.
-
----
-
-## i18n
-
-Extend `locales/en/dashboard.json` and `locales/de/dashboard.json` under the existing `Dashboard` namespace. Update [src/i18n/types.ts](src/i18n/types.ts) so `useTranslations('Dashboard')` stays type‑safe.
-
-Proposed key shape (English; German mirrors structure):
-
-```json
-{
-  "Dashboard": {
-    "breadcrumb": { "home": "Home", "dashboard": "Dashboard" },
-    "manageFundraisers": {
-      "title": "Manage fundraisers",
-      "subtitle": "View, edit, and track every fundraiser you've created. Pause collection, or share the ones that need a push."
-    },
-    "summary": {
-      "fundraisers": {
-        "label": "Fundraisers",
-        "activeHelper": "{count, plural, =0 {No active} one {# active} other {# active}}"
-      },
-      "totalRaised": {
-        "label": "Total Raised",
-        "helper": "across all time",
-        "empty": "No funds raised yet"
-      },
-      "donations": {
-        "label": "Donations",
-        "helper": "from supporters"
-      }
-    },
-    "toolbar": {
-      "searchPlaceholder": "Search by name or host...",
-      "resultCount": "Showing <bold>{visible}</bold> of {total}"
-    },
-    "statusFilter": {
-      "all": "All",
-      "active": "Active",
-      "draft": "Draft",
-      "paused": "Paused",
-      "ended": "Ended"
-    },
-    "sort": {
-      "triggerLabel": "Sort: ",
-      "options": {
-        "newest": "Newest first",
-        "oldest": "Oldest first",
-        "most-raised": "Most raised",
-        "ending-soonest": "Ending soonest",
-        "name-asc": "Name A-Z"
-      }
-    },
-    "statusBadge": {
-      "active": "Active",
-      "draft": "Draft",
-      "paused": "Paused",
-      "ended": "Ended",
-      "ending-soon": "Ending soon"
-    },
-    "listItem": {
-      "byHost": "by {host}",
-      "hostsTwo": "{first} and {second}",
-      "hostsMany": "{first}, {second} and {count, plural, one {# other} other {# others}}",
-      "amountOfGoal": "{raised} of {goal}",
-      "donations": "{count, plural, one {# donation} other {# donations}}",
-      "daysLeft": "{count, plural, one {# day left} other {# days left}}",
-      "ended": "Ended"
-    },
-    "actions": {
-      "menuLabel": "Open actions",
-      "edit": "Edit",
-      "copyLink": "Copy link",
-      "pause": "Pause",
-      "resume": "Resume",
-      "activate": "Activate",
-      "copyLinkSuccess": "Link copied",
-      "copyLinkError": "Could not copy link",
-      "pauseSuccess": "Fundraiser paused",
-      "resumeSuccess": "Fundraiser resumed",
-      "mutationError": "Something went wrong. Try again."
-    },
-    "empty": {
-      "title": "You haven't created a fundraiser yet",
-      "description": "Start a campaign to begin collecting donations.",
-      "cta": "Create your first fundraiser"
-    },
-    "noResults": {
-      "title": "No fundraisers match these filters.",
-      "cta": "Clear filters"
-    },
-    "statsError": {
-      "title": "Couldn't load dashboard stats",
-      "description": "Something went wrong while loading your fundraiser data.",
-      "retry": "Try again"
-    }
-  }
-}
-```
-
----
-
-## Edge Cases & Behavior
-
-| Scenario                                                       | Behavior                                                                                                                                                                                                                                                         |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| User has zero fundraisers                                      | Hide toolbar, show `FundraiserListEmpty` with CTA. Summary tiles still render with zeros.                                                                                                                                                                        |
-| User has fundraisers, but filter/search returns none           | Show `FundraiserListNoResults` with "Clear filters" button. Toolbar stays visible.                                                                                                                                                                               |
-| Multiple currencies in total raised                            | Stat tile shows a single consolidated amount in the dominant currency (most fundraisers by primary currency; tiebreak EUR > USD > CHF > BRL > CZK). Amounts in other currencies are converted using floor exchange rates via `convertTotalRaisedToSingleCurrency`. |
-| Fundraiser with `endDate` passed but API `status === 'active'` | Stays in **Active** filter — API `status` is the source of truth. Badge shows `ending-soon` only while `daysLeft > 0`; once past, badge falls back to `active` (no special "expired but active" state). Backend is responsible for transitioning to `completed`. |
-| `endDate` ≤ 7 days away and API `status === 'active'`          | `ending-soon` badge (amber). Counted under **Active** filter (`ending-soon` is a visual subset of active, not a separate bucket).                                                                                                                                |
-| `status === 'completed'` or `'cancelled'`                      | **Ended** filter. Read‑only — action menu shows **Copy link only** (no Edit, no Pause/Resume).                                                                                                                                                                   |
-| `status === 'paused'`                                          | **Paused** filter. Action menu shows Resume.                                                                                                                                                                                                                     |
-| Current user is an **admin** co‑host (not owner)               | Action menu shows **Copy link only**. Edit, Pause, Resume are hidden regardless of fundraiser status. Determined by checking `fundraiser.hosts[].user.id === auth.user.sub && role === 'owner'`.                                                                 |
-| `status === 'draft'`                                           | **Draft** filter, **Draft** badge. Action menu shows Edit + Copy link, **no** Pause/Resume (drafts are published, not resumed). Counted under `draftCount`.                                                                                                      |
-| Long titles / host names                                       | Truncate with ellipsis (`line-clamp-1` for title, `truncate` for host). Full text in `title=""` attr for tooltip.                                                                                                                                                |
-| Missing `fundraiser.image`                                     | Render solid placeholder with first letter of title; same dimensions.                                                                                                                                                                                            |
-| Missing host display name                                      | Per host, fall back to `host.user?.name`; if no host has any name, render `tFundraisers('unknownHost')`. Multiple hosts compose as `X` / `X and Y` / `X, Y and N other(s)` (`listItem.hostsTwo` / `hostsMany`).                                                  |
-| `navigator.clipboard` unavailable (HTTP, old browser)          | Show error toast. No `execCommand` fallback for v1 — the app is HTTPS‑only in supported browsers.                                                                                                                                                                |
-| Pause/Resume API in flight                                     | Disable that menu item, show inline spinner; ignore repeated clicks.                                                                                                                                                                                             |
-| Pause/Resume API fails                                         | Show error toast, do NOT mutate local state, keep previous status.                                                                                                                                                                                               |
-| Pause/Resume API succeeds                                      | The API response is merged into local state for that one fundraiser — no refetch, no `isLoading` toggle. Status‑filter pill counts update, and the summary stat tiles (derived from the list) update too. The toast confirms success. |
-| Delete confirmed, API in flight                                | Confirm button shows a spinner; the dialog cannot be dismissed (`onOpenChange` ignores close while `isDeleting`); Cancel is disabled.                                                                                                                            |
-| Delete API succeeds (`204` or `200 archived`)                  | Both responses mean success. The row is filtered out of the list by id; the dialog unmounts with the row (no close animation); a "Fundraiser deleted" toast confirms. The summary tiles (total / donations / total‑raised) drop accordingly, since they derive from the list. |
-| Delete API fails                                               | The dialog stays open with an error toast so the user can retry; local state is untouched, the row remains.                                                                                                                                                      |
-| Search typed quickly                                           | Debounce 250 ms before filtering; filtering itself is sync and cheap.                                                                                                                                                                                            |
-| List > ~50 items                                               | Acceptable for v1 (no virtualization). Flag as a future concern if perf testing shows scroll stutter.                                                                                                                                                            |
-| User on small screen                                           | Toolbar stacks; status filter scrolls horizontally; action menu remains a `Dropdown` (not a sheet) for v1.                                                                                                                                                       |
-
----
-
-## Accessibility
-
-- `DashboardHeader`'s `<h1>` is the page's only h1.
-- Search input has visible placeholder + `aria-label` from `t('toolbar.searchPlaceholder')`.
-- Status filter uses `role="radiogroup"` with each pill as `role="radio" aria-checked`. Sort menu uses the existing `DropdownMenu` primitive (already accessible).
-- Each `FundraiserListItem` is a `<li>` inside `<ul>`; the row title is the only link in the row's main flow. Action menu trigger has `aria-label={t('actions.menuLabel')}`.
-- Status badges are decorative — the same status text is in the row's accessible name (e.g., `aria-label="Plant 500 trees, Active, €2,000 of €5,000"`). Don't rely on color alone.
-- Toast messages also write to a polite `aria-live` region.
-
----
-
-## Test Plan
-
-Manual:
-
-- `npm run type-check`
-- Sign in → `/dashboard` renders header, three tiles, list. Numbers match `getFundraisers` payload.
-- Search "plan" → list filters; clear → restores. Verify debounce feels snappy, not sluggish.
-- Toggle status filter; toggle again to "All". Verify counts in pills don't change as you toggle.
-- Cycle every sort option; verify ordering matches spec (especially `ending-soonest` placing past‑end at the bottom).
-- Open action menu on Active row → Pause → row badge flips to Paused, "Active" filter loses one, "Paused" gains one. Resume reverses it.
-- Open action menu on a Draft row → Activate publishes it (row moves out of "Draft" filter, into "Active").
-- Sign in as an admin co‑host of a fundraiser → action menu on that row shows Copy link only.
-- Open and close the action menu repeatedly → page should not shift horizontally.
-- Copy link on a row → paste elsewhere matches the public URL.
-- Force network failure on Pause → row stays Active, error toast shows.
-- Empty state: log in as a user with zero fundraisers (or temporarily stub) → verify `FundraiserListEmpty` and CTA.
-- DE locale: verify all copy translates and plurals (`{count, plural, …}`) render correctly.
-- Mobile width (≤ 640 px): toolbar stacks, list rows remain readable, action menu opens within viewport.
-
-Unit (recommended for `lib/utils/fundraiser-list.ts`):
-
-- `deriveDisplayStatus` truth table covering all status × dateLeft combinations.
-- `filterFundraisers` for each status filter + search match cases.
-- `sortFundraisers` for each sort option, including ties.
-- `getStatusCounts` against a fixture with mixed statuses.
-
----
-
-## Open Questions / Decisions Needed
-
-1. **URL‑sync filters?** Persist `?status=active&sort=most-raised&q=plan` in the query string? _Still open after PR 3 — implementation keeps filters in local component state only._
-2. **Pagination** — list is unpaginated for v1. Confirm this is acceptable for users with > 50 fundraisers.
-3. **Multi‑currency tile** — resolved: single consolidated total in the dominant currency (by fundraiser count, tiebreak EUR > USD > CHF > BRL > CZK), converted via floor exchange rates. Keeps the tile height stable and matches fundraiser‑level display behavior.
-
-**Resolved:**
-
-- Pause/Resume uses the existing `updateFundraiser` (`PUT /fundraisers/{id}` with `{ status }`) — no new endpoint needed.
-- Copy link uses `getFundraiserUrl(fundraiser)` (resolves to `/fundraisers/{slug-or-id}`) prefixed with `window.location.origin`. Shown for all statuses including drafts (the URL is generated client‑side; whether it publicly resolves is the backend's concern).
-- Drafts get an **Activate** action (label only — same handler as Resume, publishes via `{ status: 'active' }`). The split between Draft and Paused buckets means users no longer see two "Paused"‑badged rows, so a single shared verb is no longer necessary; "Activate" reads more naturally for a draft that has never been live than "Resume" does. Chosen over (a) leaving drafts action‑less or (b) "Publish".
-- **Owner gating** on Edit / Pause / Resume: only host records with `role === 'owner'` see them; admin co‑hosts see Copy link only. Resolves the UX inconsistency where two "Paused"‑badged rows showed different menus to non‑owners.
-- Ended fundraisers (`completed` / `cancelled`) are read‑only — no Edit, only Copy link.
-- Filter buckets are driven by API `status` only (not `endDate`).
-- Drafts have their own **Draft** filter bucket and **Draft** badge — they do **not** collapse into Paused (the API ships `status: 'draft'` on `GET /fundraisers`, so the UI surfaces it directly).
-- Five badges exist: Active, Draft, Paused, Ended, Ending soon.
-- Toast feedback uses `sonner` (already a dependency, used elsewhere in the app).
-- No `execCommand('copy')` fallback for the clipboard — modern browsers + HTTPS only.
-
----
-
-## Migration Checklist (per PR)
-
-### PR 1 — Header + summary tiles ✅
-
-- [x] Delete legacy components: `card-base.tsx`, `my-fundraisers-card.tsx`, `total-raised-card.tsx`, `donations-card.tsx`, `dashboard-stat-card-skeleton.tsx`.
-- [x] Add `dashboard-header.tsx`, `dashboard-summary.tsx`, `summary-stat-card.tsx`, `summary-stat-card-skeleton.tsx`; update `src/components/dashboard/index.ts`.
-- [x] Replace `getDashboardFundraiserStats` with slim `getDashboardSummary` (`{ totalCount, activeCount, donationsCount, consolidatedTotalRaised }`).
-- [x] Rewrite `src/app/(standard)/dashboard/page.tsx`: `AuthGuard` → breadcrumb → header → summary.
-- [x] Update locale files (`breadcrumb.*`, `manageFundraisers.*`, `summary.*`, `statsError.*` only).
-- [x] Update `src/components/auth/user-menu.tsx` to use `breadcrumb.dashboard` (legacy `dashboard` key dropped).
-
-### PR 2 — Fundraiser list (read‑only) ✅
-
-- [x] Add `status: FundraiserStatus` to the `Fundraiser` interface (required — backend ships it on `GET /fundraisers`).
-- [x] Switch `getDashboardSummary`'s `activeCount` to `status === 'active'` (drop the `canDonate` proxy).
-- [x] Add `src/lib/utils/fundraiser-list.ts` with **only** `DisplayStatus`, `ENDING_SOON_THRESHOLD_DAYS`, `getDaysLeft`, `deriveDisplayStatus`.
-- [x] Add components: `fundraiser-list-item.tsx`, `fundraiser-list-item-skeleton.tsx`, `fundraiser-list.tsx`, `fundraiser-list-empty.tsx`; export from `index.ts`. **Status badge component is deferred to PR 3.**
-- [x] Page: render the list directly under `DashboardSummary`, sorted newest‑first by `startDate`.
-- [x] Locale keys: `listItem.*`, `empty.*`. (`statusBadge.*` is added in PR 3.)
-- [ ] Unit tests for `deriveDisplayStatus`.
-
-### PR 3 — Toolbar (search + filter + sort) ✅
-
-- [x] Extend `src/lib/utils/fundraiser-list.ts` with filter/sort/counts types + functions.
-- [x] Add `useFundraiserListFilters` hook in `src/components/dashboard/`.
-- [x] Add components: `fundraiser-status-badge.tsx` (variants `active` / `paused` / `ended` / `ending-soon`; wired into `fundraiser-list-item.tsx`), `fundraiser-search-input.tsx`, `fundraiser-status-filter.tsx`, `fundraiser-sort-menu.tsx`, `fundraiser-list-toolbar.tsx`, `fundraiser-list-no-results.tsx`, `fundraiser-list-section.tsx`; export from `index.ts`.
-- [x] Replace the bare list in the page with `FundraiserListSection`.
-- [x] Locale keys: `statusBadge.*`, `toolbar.*`, `statusFilter.*`, `sort.*`, `noResults.*`.
-- [x] Layout stability: `scrollbar-gutter: stable` on `html` (in `src/app/globals.css`) so list height changes between filters don't shift the page; `modal={false}` on the sort `DropdownMenu` to disable Radix's scroll-lock side effects.
-- [ ] Unit tests for `filterFundraisers`, `sortFundraisers`, `getStatusCounts`.
-
-### PR 4 — Per‑row actions ✅
-
-- [x] Add `fundraiser-action-menu.tsx` — calls existing `updateFundraiser` for Pause/Resume; uses `getFundraiserUrl` for Copy link; mounted with `modal={false}` for layout stability. Export from `index.ts`.
-- [x] Owner gating: read current user from `useAuthStore` and compare against `fundraiser.hosts[].user.id` + `role === 'owner'`. Non‑owners see Copy link only.
-- [x] Drafts include the same Resume case as `paused` in `getAvailableActions` (publishes via `{ status: 'active' }`), but the menu item label is **Activate** when `fundraiser.status === 'draft'`.
-- [x] Thread `onFundraiserUpdated = (updatedFundraiser) => setFundraisers(prev => prev.map(...))` from the page → section → list → item → menu. The menu calls it with the API response from `pauseFundraiser` / `resumeFundraiser`. Page exposes a separate `retryAfterError` (loud — toggles `isLoading`) for the summary's error retry button. The summary is **derived from the `fundraisers` list** via `useMemo(getDashboardSummary, [fundraisers])` (updated in the delete/archive work), so action‑driven row mutations recompute the tiles automatically — no separate summary state, no refetch.
-- [x] Locale keys: `actions.*`.
-- [x] Verify Pause/Resume endpoint contract with backend before merging.
-- [x] Split Draft out of Paused:
-  - [x] Extend `DisplayStatus`, `FundraiserListStatusFilter`, `FundraiserStatusCounts` with `'draft'`.
-  - [x] Update `deriveDisplayStatus`, `filterFundraisers`, `getStatusCounts` so `draft` is its own bucket (no longer aliased to `paused`).
-  - [x] Add `Draft` pill to `fundraiser-status-filter.tsx` (between `Active` and `Paused`).
-  - [x] Add `draft` variant (reuses the muted Paused treatment) to `fundraiser-status-badge.tsx`.
-  - [x] Locale keys: `statusFilter.draft`, `statusBadge.draft` (en + de).
-  - [ ] Update `deriveDisplayStatus` / `filterFundraisers` / `getStatusCounts` unit tests.
-
-### PR 5 — Delete / archive action ✅
-
-- [x] Add the **Delete** item to `fundraiser-action-menu.tsx` (`delete` in `ActionVisibility`, gated by `OWNER_ACTIONS_BY_STATUS`; hidden for non‑owners and for already‑`archived` fundraisers). A single delete‑focused flow — no separate "archive" option or copy.
-- [x] Add `deleteFundraiser(id, token)` to `fundraiser-service.ts`. It treats both `204 No Content` (hard delete) and `200 { status: 'archived' }` (soft delete) as success and resolves without inspecting the body; `platformFetch` throws on non‑2xx.
-- [x] Confirmation dialog (shadcn `Dialog`): spinner + non‑dismissible while the request is in flight; error toast keeps it open for retry; on success the row is removed and the dialog unmounts with it.
-- [x] `handleDelete` settles local UI state (`setDeleteDialogOpen(false)`) before calling `onFundraiserRemoved(id)`, so the ordering stays correct if the row is ever kept and only flipped to `archived`.
-- [x] Thread `onFundraiserRemoved = (id) => setFundraisers(prev => prev.filter(...))` from the page → section → list → item → menu.
-- [x] Keep the summary in sync by deriving it from the list (`useMemo(getDashboardSummary, [fundraisers])`) instead of a separate summary `useState`, so a delete drops the total / donations / total‑raised without a refetch.
-- [x] Locale keys: `actions.delete`, `actions.deleteSuccess`, `deleteDialog.*` (en + de).
-
-### Cross‑PR housekeeping
-
-- [ ] Update [docs/structure.md](docs/structure.md) entries for the new dashboard files once PR 4 lands (or piecemeal per PR if the inventory grows quickly).
+1. **Sorting and filtering on the leaderboard endpoints**: `sort` (name, date, amount), `order`, `anonymous=exclude|only`, and name search.
+2. **Daily donation stats**: `GET /fundraisers/:id/stats/daily` (count and amount per day), for a donations-over-time chart.
+3. **Status transition**: move fundraisers to `completed` after their end date, so `status` is correct on its own.

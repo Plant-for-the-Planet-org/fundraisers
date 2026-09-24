@@ -13,7 +13,17 @@ export type ResolveUmamiConfigInput = {
   baseUrl: string | undefined;
   websiteId: string | undefined;
   pathname: string;
+  /** The `COLLECT_INSIGHTS` env value. On unless it is set to false (or 0, off, no). */
+  collectInsights?: string | undefined;
 };
+
+/**
+ * Whether this box sends visits and events to Umami. On by default wherever Umami is configured; `COLLECT_INSIGHTS=false` turns it off (for example locally) while the dashboard Insights, which only read stats, keep working.
+ */
+export function isCollectingInsights(value: string | undefined): boolean {
+  if (value === undefined) return true;
+  return !['off', 'false', '0', 'no'].includes(value.trim().toLowerCase());
+}
 
 // Auth hand-off paths carry an OAuth `state` nonce and a `redirectTo` in the query
 // string, and Umami stores the full URL. Nothing here is worth measuring anyway.
@@ -37,13 +47,15 @@ export function isTrackedPath(pathname: string): boolean {
  * Decides whether to load the Umami tracker and its recorder.
  *
  * Reports from any host the env vars are set on, so a preview or staging box can point at its own Umami website for testing.
- * Returns null when analytics should stay off: no instance configured (the default locally) or an untracked path.
+ * Returns null when analytics should stay off: collection switched off, no instance configured (the default locally), or an untracked path.
  */
 export function resolveUmamiConfig({
   baseUrl,
   websiteId,
   pathname,
+  collectInsights,
 }: ResolveUmamiConfigInput): UmamiConfig | null {
+  if (!isCollectingInsights(collectInsights)) return null;
   const base = baseUrl?.trim().replace(/\/+$/, '');
   if (!base || !websiteId) return null;
   if (!isTrackedPath(pathname)) return null;

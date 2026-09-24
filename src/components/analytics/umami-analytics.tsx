@@ -22,6 +22,7 @@ export async function UmamiAnalytics() {
     baseUrl: process.env.NEXT_PUBLIC_UMAMI_URL,
     websiteId: process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID,
     pathname: headersList.get('x-pathname') ?? '/',
+    collectInsights: process.env.COLLECT_INSIGHTS,
   });
 
   if (!config) return null;

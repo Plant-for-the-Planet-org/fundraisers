@@ -4,6 +4,196 @@
       "home": "Startseite",
       "dashboard": "Dashboard"
     },
+    "nav": {
+      "label": "Dashboard-Menü",
+      "openMenu": "Menü",
+      "overview": "Übersicht",
+      "fundraisers": "Spendenaufrufe",
+      "collapse": "Menü einklappen",
+      "expand": "Menü ausklappen",
+      "insights": "Einblicke"
+    },
+    "overview": {
+      "title": "Übersicht",
+      "subtitle": "So laufen deine Spendenaufrufe, und Einladungen, die auf dich warten.",
+      "latest": {
+        "activeTitle": "Aktive Spendenaufrufe",
+        "title": "Neueste Spendenaufrufe",
+        "viewAll": "Alle anzeigen ({count, number})"
+      }
+    },
+    "insights": {
+      "title": "Einblicke",
+      "subtitle": "Wie Leute deine Spendenaufrufe finden und welche sie am meisten besuchen.",
+      "pickerLabel": "Spendenaufruf",
+      "allFundraisers": "Alle Spendenaufrufe",
+      "combinedTitle": "Besucher*innen über deine Spendenaufrufe",
+      "rankingTitle": "Spendenaufrufe nach Aufrufen",
+      "rankingEmpty": "Noch keiner deiner Spendenaufrufe hat eine öffentliche Seite.",
+      "columns": {
+        "fundraiser": "Spendenaufruf",
+        "views": "Aufrufe",
+        "clicks": "Klicks auf Spenden",
+        "submissions": "Abgeschickt",
+        "rate": "Klickrate",
+        "conversion": "Konversion"
+      },
+      "loadError": "Besucherzahlen konnten nicht geladen werden.",
+      "retry": "Erneut versuchen",
+      "liveLegend": "Aktiv"
+    },
+    "fundraiser": {
+      "back": "Alle Spendenaufrufe",
+      "viewPage": "Seite ansehen",
+      "edit": "Bearbeiten",
+      "unauthorizedTitle": "Du hast keinen Zugriff auf diesen Spendenaufruf",
+      "unauthorizedDescription": "Nur Gastgeber*innen dieses Spendenaufrufs können sein Dashboard sehen.",
+      "tabs": {
+        "overview": "Übersicht",
+        "donors": "Spender*innen",
+        "insights": "Einblicke",
+        "share": "Teilen"
+      },
+      "stats": {
+        "raised": "Gesammelt",
+        "raisedHelper": "{percent, number} % von {goal}",
+        "noGoal": "Kein Ziel gesetzt",
+        "donations": "Spenden",
+        "donors": "Spender*innen",
+        "average": "Ø Spendenwert"
+      },
+      "insights": {
+        "title": "Besucher*innen",
+        "ranges": {
+          "24h": "24 Std.",
+          "7d": "7 Tage",
+          "30d": "30 Tage",
+          "campaign": "Gesamte Laufzeit"
+        },
+        "periodUntilToday": "{start} – heute",
+        "visitors": "Besucher*innen",
+        "views": "Seitenaufrufe",
+        "time": "Zeit",
+        "chartLabel": "Besucher*innen deiner Spendenseite im Zeitverlauf",
+        "tooltip": "{visitors, plural, one {# Besucher*in} other {# Besucher*innen}} · {views, plural, one {# Aufruf} other {# Aufrufe}}",
+        "empty": "In diesem Zeitraum gab es noch keine Besuche.",
+        "loadError": "Besucherzahlen konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "journey": {
+          "title": "Weg zur Spende",
+          "clickRate": "{percent, number} % der Besucher*innen haben auf Spenden geklickt",
+          "donate_clicked": "Auf Spenden geklickt",
+          "donation_submitted": "Abgeschickt",
+          "donation_completed": "Abgeschlossen"
+        },
+        "audience": {
+          "countries": "Top-Länder",
+          "sourcesTitle": "Top-Quellen",
+          "taggedTitle": "Über deine markierten Links",
+          "direct": "Direkt oder Apps",
+          "noData": "Keine Daten für diesen Zeitraum.",
+          "builderTitle": "Teile deinen Spendenaufruf",
+          "builderHint": "Nutze für jeden Ort, an dem du teilst, einen eigenen Link. Unter Einblicke siehst du dann, welcher Besucher*innen bringt.",
+          "linkCopied": "Link für {source} kopiert",
+          "linkCopyError": "Link konnte nicht kopiert werden",
+          "sources": {
+            "linkedin": "LinkedIn",
+            "instagram": "Instagram",
+            "facebook": "Facebook",
+            "whatsapp": "WhatsApp",
+            "x": "X",
+            "google": "Google",
+            "bing": "Bing",
+            "email": "E-Mail",
+            "newsletter": "Newsletter",
+            "stage": "Stage-Mode-QR-Code"
+          },
+          "plainLink": "Einfacher Link",
+          "copy": "Kopieren",
+          "linkLabel": "Link",
+          "channelLabel": "Wo teilst du?",
+          "tagHint": "Die meisten Besuche erscheinen als Direkt? Teile <link>markierte Links</link>, um zu sehen, welcher Kanal wirkt."
+        },
+        "updatedLabel": "Stand",
+        "changeContext": "zum Zeitraum davor",
+        "accuracyNote": "Besucher*innen und Spendenschritte stammen aus datenschutzfreundlicher Analyse ohne Cookies. Wer Tracker blockiert, wird nicht gezählt, daher sind diese Zahlen ein Richtwert. Gesammelte Beträge und Spendenzahlen stammen aus unseren Daten; Spenden per Lastschrift oder Überweisung zählen, sobald die Zahlung eingeht, und können daher einige Tage später erscheinen."
+      },
+      "checklist": {
+        "title": "So wird es ein Erfolg",
+        "progress": "{done, number} von {total, number} erledigt",
+        "allDone": "Alles erledigt. Dein Spendenaufruf hat alles, was er braucht.",
+        "allDoneShare": "Alles erledigt. Bleib dran: Teile ihn dort, wo deine Leute sind.",
+        "fix": "Beheben",
+        "items": {
+          "coverImage": {
+            "title": "Titelbild hinzufügen",
+            "hint": "Ein starkes Foto ist das Erste, was Leute sehen, wenn du deinen Link teilst."
+          },
+          "story": {
+            "title": "Erzähl deine Geschichte",
+            "hint": "Sag in ein paar ehrlichen Sätzen, warum dir das wichtig ist. Ein Foto oder Video hilft, es zu fühlen."
+          },
+          "goal": {
+            "title": "Ziel festlegen",
+            "hint": "Ein klares Ziel gibt Leuten einen Grund, dir zu helfen, es zu erreichen."
+          },
+          "published": {
+            "title": "Spendenaufruf veröffentlichen",
+            "hint": "Entwürfe sehen nur du und deine Mit-Gastgeber*innen."
+          },
+          "coHost": {
+            "title": "Mit-Gastgeber*in einladen",
+            "hint": "Je mehr Leute den Link teilen, desto mehr Freund*innen sehen ihn."
+          },
+          "firstDonation": {
+            "title": "Die erste Spende begrüßen",
+            "hint": "Frag zuerst enge Freund*innen oder Familie. Frühe Spenden schaffen Vertrauen."
+          }
+        },
+        "invite": "Einladen",
+        "share": "Teilen"
+      },
+      "hosts": {
+        "invite": "Mit-Gastgeber*in einladen"
+      },
+      "modules": {
+        "title": "Funktionen",
+        "on": "An",
+        "turnOn": "Einschalten",
+        "manage": "Verwalten",
+        "items": {
+          "leaderboard": {
+            "title": "Bestenliste",
+            "hint": "Zeig neueste und größte Unterstützer*innen auf deiner Seite."
+          },
+          "thankYouNote": {
+            "title": "Dankesnachricht",
+            "hint": "Eine persönliche Nachricht, die Spender*innen nach ihrer Spende sehen."
+          },
+          "stage": {
+            "title": "Stage Mode",
+            "hint": "Eine Vollbildansicht für Events und Bildschirme vor Ort."
+          }
+        }
+      },
+      "donors": {
+        "emptyTitle": "Noch keine Spenden",
+        "emptyHint": "Teile deinen Link, damit die erste Spende eingeht. Frühe Spenden von Freund*innen und Familie schaffen Vertrauen.",
+        "emptyHintClosed": "Spenden erscheinen hier, sobald Leute für deinen Spendenaufruf spenden können.",
+        "donations": "Spenden ({count, number})",
+        "donors": "Spender*innen ({count, number})",
+        "topDonations": "Größte Spenden ({count, number})",
+        "anonymousNote": "Wer anonym spenden wollte, wird als Anonym angezeigt.",
+        "previous": "Vorherige Seite",
+        "next": "Nächste Seite",
+        "loadError": "Spenden konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "share": "Teilen",
+        "range": "{from, number}–{to, number} von {total, number}",
+        "newestFirst": "Neueste zuerst",
+        "oldestFirst": "Älteste zuerst"
+      }
+    },
     "manageFundraisers": {
       "title": "Spendenaufrufe verwalten",
       "subtitle": "Verwalte, editiere und beobachte deine Spendenaufrufe. Pausiere sie oder teile die, die mehr Sichtbarkeit brauchen."
@@ -11,16 +201,17 @@
     "summary": {
       "loading": "Übersicht wird geladen...",
       "fundraisers": {
-        "label": "Spendenaufrufe",
-        "activeStatus": "{count, plural, =0 {Keine aktiven Spendenaufrufe} other {<bold>{count, number}</bold> aktiv}}"
+        "label": "Aktive Spendenaufrufe"
       },
       "totalRaised": {
-        "label": "Insgesamt gesammelt",
-        "helper": "über die ganze Zeit"
+        "label": "Insgesamt gesammelt"
       },
       "donations": {
-        "label": "Spenden",
-        "helper": "von Unterstützer*innen"
+        "label": "Spenden"
+      },
+      "views": {
+        "label": "Aufrufe diese Woche",
+        "changeContext": "zur Vorwoche"
       }
     },
     "statsError": {
@@ -66,16 +257,15 @@
     },
     "actions": {
       "menuLabel": "Aktionen öffnen",
+      "viewPage": "Seite ansehen",
       "edit": "Bearbeiten",
       "clone": "Duplizieren",
       "stageMode": "Bühnenmodus",
       "stageModeBlocked": "Dein Browser hat das Pop-up für den Bühnenmodus blockiert. Erlaube Pop-ups für diese Seite und versuche es erneut.",
-      "copyLink": "Link kopieren",
+      "share": "Teilen",
       "pause": "Pausieren",
       "resume": "Fortsetzen",
       "delete": "Löschen",
-      "copyLinkSuccess": "Link kopiert",
-      "copyLinkError": "Link konnte nicht kopiert werden",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
       "deleteSuccess": "Spendenaufruf gelöscht",
@@ -108,8 +298,8 @@
         "ended": "Beendet"
       },
       "empty": {
-        "title": "Du hast noch keine Spendenaufruf erstellt",
-        "description": "Starte einen Aufruf, um mit dem Sammeln von Spenden zu beginnen.",
+        "title": "Du hast noch keinen Spendenaufruf erstellt",
+        "description": "Starte einen Spendenaufruf und bewirke etwas.",
         "cta": "Erstelle deinen ersten Spendenaufruf"
       }
     }

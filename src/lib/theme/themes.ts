@@ -305,6 +305,28 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-grid', 'bg-paper', 'bg-waves'],
     bg: defineBg('bg-gray-50'),
+  }, // The host dashboard: calm and plain like Minimal, with an indigo accent that stands apart from the green used for status (live, going up).
+  // Not featured, so it never shows in the fundraiser theme picker.
+  dashboard: {
+    id: 'dashboard',
+    name: 'Dashboard',
+    category: 'minimal',
+    accent: 'indigo',
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    isPlain: true,
+    colorOptions: ['indigo'],
+    curatedBgs: [],
+    // A light indigo-to-sky wash with a faint dot grid in the accent: some depth without competing with the cards.
+    bg: defineBg(
+      'bg-gradient-to-br from-indigo-100/70 via-white to-sky-100/60',
+      {
+        decoration: 'pattern',
+        pattern_id: 'bg-dots',
+        opacity: 0.06,
+      }
+    ),
   },
 };
 

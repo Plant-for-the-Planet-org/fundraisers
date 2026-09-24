@@ -1,9 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { LogOut } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import { ArrowRightFromBracketIcon } from '@/components/ui/ui-icons';
 
 export function SignOutButton() {
   const tAuth = useTranslations('Auth');
@@ -16,7 +16,7 @@ export function SignOutButton() {
       size='sm'
       className='w-full justify-start hover:bg-gray-100 cursor-pointer'
     >
-      <LogOut className='mr-2 h-4 w-4' />
+      <ArrowRightFromBracketIcon className='mr-2 h-4 w-4' />
       {tAuth('signOut')}
     </Button>
   );

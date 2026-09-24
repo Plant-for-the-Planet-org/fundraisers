@@ -454,3 +454,15 @@ Fundraiser view routes live under the `(fundraiser)` route group with their own 
 **`MainContent`** (`src/components/ui/main-content.tsx`) is used by StandardLayout and will be used by the fundraiser layout in Phase 2. It owns the `flex-1` main element and the `max-w-[960px] rounded-2xl backdrop-blur-[10px]` content wrapper — pure layout, no theme awareness.
 
 **`PageContainer`** (`src/components/ui/page-container.tsx`) is not currently used. It was the original single-div wrapper before the theme system introduced a three-div structure (outer theme wrapper → fixed background layer → z-10 content layer). It could be adapted to accept a `theme` prop for Phase 2 if the pattern is worth extracting once both layouts exist, but that decision is deferred until then.
+
+---
+
+## Dashboard theme
+
+The host dashboard has its own theme, `dashboard` in `themes.ts`: a light indigo-to-sky wash, a faint dot pattern (6%), and an indigo accent. `route-themes.ts` maps `/dashboard` to it; the editor (`/dashboard/fundraisers/edit`) keeps `spring` as its fallback, since it previews the fundraiser's own theme.
+
+It is not `featured`, so it never shows in the fundraiser theme picker.
+
+Dashboard marks (chart bars, icons, links, chips, the active menu item) use `--accent-color` directly through the `accent-color` Tailwind utilities. Only the shadcn `Button` still reads `primary`, so `DashboardShell` mirrors the accent into `--primary` (`hexToHslTriplet`), on its wrapper and on `<html>` while it is mounted, because dialogs and menus portal to `<body>`. Changing the theme's `accent` recolours the whole dashboard.
+
+Green stays reserved for status (live, going up) and red for going down, so the dashboard accent is deliberately not green.

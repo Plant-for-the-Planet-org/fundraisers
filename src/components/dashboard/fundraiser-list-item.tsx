@@ -9,7 +9,6 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import {
   convertTotalRaisedToSingleCurrency,
   getDaysLeft,
-  getFundraiserUrl,
 } from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus } from '@/lib/utils/fundraiser-list';
 import { getImageUrl } from '@/lib/utils/images';
@@ -37,6 +36,7 @@ export function FundraiserListItem({
   const imageUrl = getImageUrl('fundraiser', 'small', fundraiser.image);
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const displayStatus = deriveDisplayStatus(fundraiser);
+  const detailHref = `/dashboard/fundraisers/${encodeURIComponent(fundraiser.slug)}`;
 
   const hostDisplay =
     useHostDisplay(fundraiser) ??
@@ -67,7 +67,7 @@ export function FundraiserListItem({
   return (
     <li className='fundraiser-list-item group flex items-start gap-4 py-4'>
       <Link
-        href={getFundraiserUrl(fundraiser)}
+        href={detailHref}
         className='shrink-0 h-20 w-20 overflow-hidden rounded-lg bg-muted transition-transform duration-300 group-hover:scale-110'
         aria-hidden
         tabIndex={-1}
@@ -79,8 +79,8 @@ export function FundraiserListItem({
         <div className='flex items-center justify-between gap-x-2 gap-y-1'>
           <h3 className='text-base font-semibold text-foreground line-clamp-2'>
             <Link
-              href={getFundraiserUrl(fundraiser)}
-              className='hover:text-primary transition-colors'
+              href={detailHref}
+              className='hover:text-accent-color transition-colors'
             >
               {fundraiser.title}
             </Link>

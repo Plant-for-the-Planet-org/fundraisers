@@ -28,26 +28,29 @@ export function FundraiserListToolbar({
   const handleSortChange = (sort: FundraiserListSort) =>
     onFiltersChange({ sort });
 
+  // Container queries rather than screen breakpoints, because the dashboard menu takes part of the width.
   return (
-    <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 md:flex-row md:items-center'>
-      <FundraiserSearchInput
-        value={filters.search}
-        onChange={handleSearchChange}
-        className='min-w-0 flex-1'
-      />
-      <div className='flex items-center gap-3'>
-        <FundraiserStatusFilter
-          value={filters.status}
-          statusCounts={statusCounts}
-          onChange={handleStatusChange}
-          inlineFilterClassName='hidden lg:inline-flex'
-          dropdownFilterClassName='lg:hidden grow shrink basis-0 md:basis-auto md:w-40 md:grow-0'
+    <div className='@container'>
+      <div className='fundraiser-list-toolbar flex flex-col items-stretch gap-3 @4xl:flex-row @4xl:items-center'>
+        <FundraiserSearchInput
+          value={filters.search}
+          onChange={handleSearchChange}
+          className='min-w-0 flex-1'
         />
-        <FundraiserSortMenu
-          value={filters.sort}
-          onChange={handleSortChange}
-          className='grow shrink basis-0 md:basis-auto md:w-50 md:grow-0'
-        />
+        <div className='flex items-center gap-3'>
+          <FundraiserStatusFilter
+            value={filters.status}
+            statusCounts={statusCounts}
+            onChange={handleStatusChange}
+            inlineFilterClassName='hidden @2xl:inline-flex'
+            dropdownFilterClassName='@2xl:hidden grow shrink basis-0 @xl:basis-auto @xl:w-40 @xl:grow-0'
+          />
+          <FundraiserSortMenu
+            value={filters.sort}
+            onChange={handleSortChange}
+            className='grow shrink basis-0 @xl:basis-auto @xl:w-50 @xl:grow-0 @2xl:ml-auto'
+          />
+        </div>
       </div>
     </div>
   );
