@@ -4,6 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { normalizeFundraiser } from '@/lib/api/normalize-fundraiser';
 import { platformFetch } from '@/lib/api/platform-fetch';
 import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
+import { isFundraiserLive } from '@/lib/utils/fundraiser-list';
 
 interface FundraisersApiEnvelope {
   fundraisers?: unknown;
@@ -65,7 +66,8 @@ export function getDashboardSummary(
   >();
 
   for (const fundraiser of fundraisers) {
-    if (fundraiser.status === 'active') {
+    // Matches the list's Active filter, which leaves out fundraisers the platform still calls active after their end date.
+    if (isFundraiserLive(fundraiser)) {
       activeFundraiserCount += 1;
     }
 
