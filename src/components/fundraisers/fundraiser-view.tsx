@@ -91,11 +91,16 @@ export function FundraiserView({
         />
 
         {/* Title */}
-        <TitleDisplay className='md:hidden' value={fundraiser.title} />
+        <TitleDisplay
+          className='md:hidden text-center'
+          value={fundraiser.title}
+        />
 
-        {/* Mobile shows the hosts right under the title, pulled up so they read as its byline. Desktop moves them below the donors. `empty:hidden` drops the gap when neither renders. */}
+        {/* Mobile shows the hosts right under the title, pulled up and centred with it so they read as its byline. Desktop moves them below the donors. `empty:hidden` drops the gap when neither renders. */}
         <div className='flex flex-col gap-6 max-md:-mt-4 md:order-1 empty:hidden'>
-          <Hosts mode='display' fundraiser={fundraiser} />
+          <div className='max-md:flex max-md:justify-center'>
+            <Hosts mode='display' fundraiser={fundraiser} />
+          </div>
           {/* Host edit shortcut (only visible to logged-in hosts) */}
           <HostControls fundraiser={fundraiser} />
         </div>
@@ -182,9 +187,9 @@ export function FundraiserView({
               countryCode={workspaceCountry}
               isTaxDeductible={isTaxDeductible}
             />
-            {/* Closed fundraisers get a share action in their card instead. */}
+            {/* Sits at the very bottom on mobile, after the projects. Closed fundraisers get a share action in their card instead. */}
             {fundraiser.visibility === 'public' && (
-              <div className='md:hidden'>
+              <div className='md:hidden order-2'>
                 <CopyLinkButton />
               </div>
             )}
