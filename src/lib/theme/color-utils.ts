@@ -51,6 +51,27 @@ export function getRelativeLuminance(hex: string): number {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
 
+/** WCAG contrast ratio between two colours, from 1 (same) to 21 (black on white). */
+export function getContrastRatio(a: string, b: string): number {
+  const [light, dark] = [getRelativeLuminance(a), getRelativeLuminance(b)].sort(
+    (x, y) => y - x
+  );
+  return (light + 0.05) / (dark + 0.05);
+}
+
+/** WCAG AA minimum for normal-size text. */
+export const MIN_TEXT_CONTRAST = 4.5;
+
+/**
+ * Text colour for a solid button filled with `hex`.
+ * Prefers white, since black on a mid-dark colour looks muddy. Falls back to near-black only when white would fail AA, which is the case for bright colours like yellow.
+ */
+export function getOnColorText(hex: string): string {
+  return getContrastRatio(hex, '#ffffff') >= MIN_TEXT_CONTRAST
+    ? '#ffffff'
+    : '#111111';
+}
+
 // Above this luminance a colour reads better with dark text (light mode);
 // below it, with light text (dark mode). 0.179 is the WCAG cross-over point
 // between black-on-colour and white-on-colour contrast.
