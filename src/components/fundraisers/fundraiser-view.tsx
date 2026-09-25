@@ -11,6 +11,7 @@ import {
   getFundraiserUrl,
   hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
+import { selectPublicHosts } from '@/lib/utils/fundraiser-hosts';
 import {
   ClosedForContribution,
   type FundraiserImpact,
@@ -78,18 +79,35 @@ export function FundraiserView({
     fundraiser.canDonate &&
     paymentOptions !== undefined &&
     fundraiser.workspace !== null;
+  const hasHosts = selectPublicHosts(fundraiser.hosts).length > 0;
 
   return (
-    <FundraiserLayout>
+    // Mobile is one column, capped so wide phones and small tablets don't stretch the image and form.
+    <FundraiserLayout className='max-md:max-w-lg max-md:mx-auto max-md:w-full'>
       <SidebarPanel>
         {/* Image */}
         <ImageDisplay
+          className='h-auto aspect-square'
           image={fundraiser.image}
           alt={t('coverImageAlt', { title: fundraiser.title })}
         />
 
         {/* Title */}
-        <TitleDisplay className='md:hidden' value={fundraiser.title} />
+        <TitleDisplay
+          className='md:hidden text-center'
+          value={fundraiser.title}
+        />
+
+        {/* Mobile shows the hosts right under the title, pulled up and centred with it so they read as its byline. Desktop moves them below the donors. The hosts row only renders when there are hosts, so `empty:hidden` can drop the whole block when neither renders. */}
+        <div className='flex flex-col gap-6 max-md:-mt-4 md:order-1 empty:hidden'>
+          {hasHosts && (
+            <div className='max-md:flex max-md:justify-center'>
+              <Hosts mode='display' fundraiser={fundraiser} />
+            </div>
+          )}
+          {/* Host edit shortcut (only visible to logged-in hosts) */}
+          <HostControls fundraiser={fundraiser} />
+        </div>
 
         {/* Goal progress */}
         <GoalProgressDisplay
@@ -129,20 +147,9 @@ export function FundraiserView({
             </Suspense>
           ))}
 
-        <div className='md:hidden flex flex-col'>
-          {/** Copy link */}
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
-        </div>
-
-        {/* Hosts */}
-        <Hosts mode='display' fundraiser={fundraiser} />
-
-        {/* Host edit shortcut (only visible to logged-in hosts) */}
-        <HostControls fundraiser={fundraiser} />
-
         {/** Copy link */}
         {fundraiser.visibility === 'public' && (
-          <div className='hidden md:block mt-3'>
+          <div className='hidden md:block md:order-1 mt-3'>
             <CopyLinkButton />
           </div>
         )}
@@ -152,21 +159,24 @@ export function FundraiserView({
         {/* Title */}
         <TitleDisplay className='hidden md:block' value={fundraiser.title} />
 
+        {/* On mobile the donation form comes first, so the leaderboard, description and projects move below it. */}
         {/* Leaderboard */}
-        {canShowLeaderboard &&
-          (leaderboardFetchStrategy === 'client' ? (
-            <LeaderboardClientLoader
-              idOrSlug={fundraiser.slug}
-              settings={leaderboardSettings}
-            />
-          ) : (
-            <Suspense fallback={<LeaderboardSkeleton />}>
-              <LeaderboardServerLoader
+        <div className='max-md:order-1 min-w-0 empty:hidden'>
+          {canShowLeaderboard &&
+            (leaderboardFetchStrategy === 'client' ? (
+              <LeaderboardClientLoader
                 idOrSlug={fundraiser.slug}
                 settings={leaderboardSettings}
               />
-            </Suspense>
-          ))}
+            ) : (
+              <Suspense fallback={<LeaderboardSkeleton />}>
+                <LeaderboardServerLoader
+                  idOrSlug={fundraiser.slug}
+                  settings={leaderboardSettings}
+                />
+              </Suspense>
+            ))}
+        </div>
 
         {/* Donation form + overlay */}
         {canReceiveDonations ? (
@@ -206,12 +216,16 @@ export function FundraiserView({
         )}
 
         {/* Description */}
-        <DescriptionDisplay value={fundraiser.description} />
+        <div className='max-md:order-1 min-w-0 empty:hidden'>
+          <DescriptionDisplay value={fundraiser.description} />
+        </div>
 
         {/* Project allocations */}
-        <ProjectsSupportedDisplay
-          projectAllocations={fundraiser.projectAllocations}
-        />
+        <div className='max-md:order-1 min-w-0 empty:hidden'>
+          <ProjectsSupportedDisplay
+            projectAllocations={fundraiser.projectAllocations}
+          />
+        </div>
       </MainPanel>
     </FundraiserLayout>
   );

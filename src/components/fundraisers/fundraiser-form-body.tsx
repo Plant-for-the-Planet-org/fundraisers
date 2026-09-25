@@ -52,44 +52,76 @@ export function FundraiserFormBody({
   const isEditMode = mode === 'edit';
 
   return (
+    // On mobile both panels merge into one column, ordered like the public page: title and hosts first, then goal and donors, then the contribution form. Desktop keeps the two-column source order.
     <FundraiserLayout>
-      <SidebarPanel>
-        <ImageSelector autoLoadDefault={!isEditMode} />
-        <GoalSettings
-          isEditMode={isEditMode}
-          totalRaised={totalRaised}
-          endDate={endDate}
-        />
-        <DonorsPreview />
-        {isEditMode && fundraiserId ? (
-          <HostsManager
-            fundraiserId={fundraiserId}
-            initialHosts={hosts ?? []}
+      <SidebarPanel flattenOnMobile>
+        <div className='max-md:order-1 empty:hidden'>
+          <ImageSelector autoLoadDefault={!isEditMode} />
+        </div>
+        <div className='max-md:order-5 empty:hidden'>
+          <GoalSettings
+            isEditMode={isEditMode}
+            totalRaised={totalRaised}
+            endDate={endDate}
           />
-        ) : (
-          <Hosts mode='preview' />
-        )}
-        <ThemeSettings />
+        </div>
+        <div className='max-md:order-6 empty:hidden'>
+          <DonorsPreview />
+        </div>
+        <div className='max-md:order-4 empty:hidden'>
+          {isEditMode && fundraiserId ? (
+            <HostsManager
+              fundraiserId={fundraiserId}
+              initialHosts={hosts ?? []}
+            />
+          ) : (
+            <Hosts mode='preview' />
+          )}
+        </div>
+        <div className='max-md:order-13 empty:hidden'>
+          <ThemeSettings />
+        </div>
       </SidebarPanel>
-      <MainPanel>
-        <Title />
-        {isEditMode && <SlugField />}
-        <LeaderboardSettings />
-        <ContributionSettings />
-        <DescriptionInput />
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      <MainPanel flattenOnMobile>
+        <div className='max-md:order-2'>
+          <Title />
+        </div>
+        {isEditMode && (
+          <div className='max-md:order-3'>
+            <SlugField />
+          </div>
+        )}
+        <div className='max-md:order-8 empty:hidden'>
+          <LeaderboardSettings />
+        </div>
+        <div className='max-md:order-7 empty:hidden'>
+          <ContributionSettings />
+        </div>
+        <div className='max-md:order-9'>
+          <DescriptionInput />
+        </div>
+        <div className='max-md:order-10 grid grid-cols-1 md:grid-cols-2 gap-4'>
           <WorkspaceSelector disabled={isEditMode} />
           <GoalInput />
         </div>
-        <WorkspaceInfo />
-        <BundleSelection mode={mode} />
-        <Options />
-        <StickyFormBar>
-          <div className='flex gap-2'>
-            {isEditMode && slug && <ViewButton slug={slug} />}
-            {submitButton}
-          </div>
-        </StickyFormBar>
+        <div className='max-md:order-11 empty:hidden'>
+          <WorkspaceInfo />
+        </div>
+        <div className='max-md:order-12 empty:hidden'>
+          <BundleSelection mode={mode} />
+        </div>
+        <div className='max-md:order-14 empty:hidden'>
+          <Options />
+        </div>
+        {/* Without an order the bar defaults to 0 on mobile and jumps above the image, which also breaks its docking at the end of the form. */}
+        <div className='max-md:order-last'>
+          <StickyFormBar>
+            <div className='flex gap-2'>
+              {isEditMode && slug && <ViewButton slug={slug} />}
+              {submitButton}
+            </div>
+          </StickyFormBar>
+        </div>
       </MainPanel>
     </FundraiserLayout>
   );
