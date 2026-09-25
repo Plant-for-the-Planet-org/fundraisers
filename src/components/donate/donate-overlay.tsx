@@ -345,7 +345,7 @@ function DonateOverlayInner({
   const leftColumn = thankYouState ? (
     <DonationThankYou
       thankYouState={thankYouState}
-      fundraiserSlug={fundraiser.slug}
+      fundraiser={fundraiser}
       hostMessageConfig={hostMessageConfig}
     />
   ) : (

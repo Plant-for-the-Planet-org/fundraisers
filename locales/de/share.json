@@ -1,0 +1,170 @@
+{
+  "Share": {
+    "image": {
+      "byLine": "von {name}",
+      "raisedOf": "{raised} von {goal} gesammelt",
+      "raised": "{raised} gesammelt",
+      "joined": "{first}, {second} und {others, plural, one {# weitere Person} other {# weitere}} sind dabei"
+    },
+    "cta": {
+      "joinMe": "Mach mit",
+      "supportMyFundraiser": "Unterstütze meinen Spendenaufruf",
+      "helpUsFinish": "Hilf uns ans Ziel",
+      "yourTurn": "Du bist dran",
+      "giftTree": "Verschenke einen Baum",
+      "protectForest": "Schütze einen Wald",
+      "youngVoices": "Gib jungen Menschen eine Stimme",
+      "giftForPlanet": "Ein Geschenk für den Planeten",
+      "treatPlanet": "Süßes für den Planeten",
+      "celebrateWithMe": "Feier mit mir",
+      "custom": "Eigener Text…",
+      "customLabel": "Dein Text",
+      "customPlaceholder": "Pflanz mit mir"
+    },
+    "captions": {
+      "none": "Ich sammle Spenden für {name}. Jede Spende hilft. Machst du mit?",
+      "christmas": "Dieses Weihnachten sammle ich Spenden für {name}. Lust auf ein Geschenk, das zählt? Mach mit.",
+      "halloween": "Keine Tricks, nur Süßes für den Planeten: Ich sammle Spenden für {name}. Mach mit!",
+      "birthday": "Zu meinem Geburtstag sammle ich statt Geschenken Spenden für {name}. Feier mit mir!",
+      "donor": "Ich habe gerade {name} unterstützt. Machst du mit?"
+    },
+    "seasons": {
+      "none": "Dein Design",
+      "christmas": "Weihnachten",
+      "halloween": "Halloween",
+      "birthday": "Geburtstag"
+    },
+    "platforms": {
+      "instagram": "Instagram",
+      "whatsapp": "WhatsApp",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "x": "X",
+      "other": "Andere"
+    },
+    "channels": {
+      "instagramStory": {
+        "label": "Story",
+        "hint": "Video oder Bild, 9:16",
+        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu. Wir haben ihn für dich kopiert."
+      },
+      "instagramPost": {
+        "label": "Beitrag",
+        "hint": "Bild, 4:5",
+        "tip": "Links in Instagram-Beschreibungen sind nicht klickbar. Setz den Link auch in deine Bio oder eine Story."
+      },
+      "whatsappStatus": {
+        "label": "Status",
+        "hint": "Video oder Bild, 9:16",
+        "tip": "Dein Link ist kopiert. Füge ihn als Status-Text ein, damit Freund*innen ihn antippen können."
+      },
+      "whatsappMessage": {
+        "label": "Nachricht",
+        "hint": "Link mit Vorschau",
+        "tip": "Chats zeigen deinen Link mit diesem Vorschaubild, eine Nachricht mit dem Link reicht also."
+      },
+      "tiktokVideo": {
+        "label": "Video",
+        "hint": "Video oder Bild, 9:16",
+        "tip": "Links in TikTok-Beschreibungen sind nicht klickbar. Setz deinen Link in deine Bio."
+      },
+      "youtubeShort": {
+        "label": "Short",
+        "hint": "Video, 9:16",
+        "tip": "Setz deinen Link in die Beschreibung des Shorts oder pinne ihn als Kommentar."
+      },
+      "linkedinPost": {
+        "label": "Beitrag",
+        "hint": "Bild, 4:5",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      },
+      "linkedinWide": {
+        "label": "Breiter Beitrag",
+        "hint": "Bild, 1,91:1",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      },
+      "facebookPost": {
+        "label": "Beitrag",
+        "hint": "Bild, 4:5",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      },
+      "facebookStory": {
+        "label": "Story",
+        "hint": "Video oder Bild, 9:16",
+        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu. Wir haben ihn für dich kopiert."
+      },
+      "xPost": {
+        "label": "Beitrag",
+        "hint": "Bild, 16:9",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      },
+      "xTallPost": {
+        "label": "Hoher Beitrag",
+        "hint": "Bild, 4:5",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      },
+      "email": {
+        "label": "E-Mail oder Newsletter",
+        "hint": "Banner, 1,91:1",
+        "tip": "Setz das Banner oben in deine E-Mail und verlinke es mit deinem Spendenaufruf."
+      },
+      "anyStory": {
+        "label": "Story, jede App",
+        "hint": "Video oder Bild, 9:16",
+        "tip": "Dein Link ist kopiert. Füge ihn dort ein, wo die App es erlaubt."
+      },
+      "anyPost": {
+        "label": "Beitrag, jede App",
+        "hint": "Bild, 4:5",
+        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+      }
+    },
+    "studio": {
+      "whereTitle": "Wo teilst du?",
+      "whereHint": "Wir machen die passende Größe, mit einem Link, der zeigt, welcher Kanal Spenden gebracht hat.",
+      "platformLabel": "Plattform",
+      "formatLabel": "Format",
+      "customizeTitle": "Mach es zu deinem",
+      "customizeHint": "Farben und Schriften kommen aus dem Design deines Spendenaufrufs.",
+      "style": "Stil",
+      "buttonText": "Button-Text",
+      "showDonors": "Spender*innen zeigen, die dabei sind",
+      "captionTitle": "Text",
+      "captionHint": "Wird beim Teilen für dich kopiert. Du kannst ihn anpassen.",
+      "linkLabel": "Dein Link",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Link kopiert",
+      "copyFailed": "Kopieren hat nicht geklappt",
+      "kindLabel": "Bild oder Video",
+      "video": "Video",
+      "image": "Bild",
+      "videoMeta": "Video, {seconds} s · {width}×{height}",
+      "imageMeta": "Bild · {width}×{height}",
+      "previewLabel": "Vorschau",
+      "preparing": "Wird vorbereitet…",
+      "preparingVideo": "Video wird vorbereitet… {percent} %",
+      "shareTo": "Auf {platform} teilen",
+      "share": "Teilen",
+      "shareLink": "Link teilen",
+      "downloadImage": "Bild herunterladen",
+      "downloadVideo": "Video herunterladen",
+      "downloadPreview": "Vorschaubild herunterladen",
+      "kit": "Alles herunterladen (.zip)",
+      "kitPreparing": "Alle Dateien werden vorbereitet…",
+      "kitDone": "Paket heruntergeladen",
+      "kitFailed": "Die Dateien konnten nicht vorbereitet werden",
+      "handoffTitle": "Weiter auf deinem Handy",
+      "handoffBody": "Scanne den Code, um diese Seite auf deinem Handy zu öffnen und direkt auf Instagram oder WhatsApp zu teilen.",
+      "handoffAlt": "QR-Code für diese Seite",
+      "shareFailed": "Teilen hat nicht geklappt. Lade die Datei stattdessen herunter.",
+      "savedTip": "{file} gespeichert. Dein Text ist kopiert. {tip}",
+      "noVideo": "Dieser Browser kann keine Videos erstellen. Teile stattdessen das Bild.",
+      "messageCopied": "Nachricht kopiert"
+    },
+    "donor": {
+      "moreFormats": "Weitere Formate"
+    }
+  }
+}

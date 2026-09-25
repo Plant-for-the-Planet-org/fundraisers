@@ -4,8 +4,10 @@ import type { FundraiserInsights } from '@/lib/types/fundraiser-insights';
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { getReferralCode } from '@/lib/share/referral';
 import { formatCompactNumber } from '@/lib/utils';
 import { countryCodeToFlag, getCountry } from '@/lib/utils/country';
+import { useAuthStore } from '@/stores/auth-store';
 import { CountryFlag } from '@/components/ui/country-flag';
 
 /** Sources with a friendly name. Anything else shows as the domain or the raw utm_source value. */
@@ -82,6 +84,7 @@ export function InsightsAudience({
 }) {
   const t = useTranslations('Dashboard.fundraiser.insights.audience');
   const locale = useLocale();
+  const ownRef = getReferralCode(useAuthStore(state => state.user?.profile));
 
   const sourceLabel = (source: string) =>
     isKnownSource(source) ? t(`sources.${source}`) : source;
@@ -123,6 +126,25 @@ export function InsightsAudience({
     };
   });
 
+  // Names for other people's codes need a lookup the platform does not offer yet, so they show as their code.
+  const referralRows = (data.referrals ?? []).map(referral => ({
+    key: referral.ref,
+    label: (
+      <span className='truncate'>
+        {referral.ref === ownRef
+          ? t('referralYou')
+          : t('referralSupporter', { code: referral.ref })}
+        {referral.donations > 0 && (
+          <span className='text-muted-foreground'>
+            {' · '}
+            {t('referralDonations', { count: referral.donations })}
+          </span>
+        )}
+      </span>
+    ),
+    value: referral.visits,
+  }));
+
   return (
     <div className='space-y-5'>
       <div className='grid gap-6 sm:grid-cols-2'>
@@ -157,6 +179,17 @@ export function InsightsAudience({
           rows={taggedRows}
           emptyLabel={t('noData')}
         />
+      )}
+
+      {referralRows.length > 0 && (
+        <div className='space-y-2'>
+          <RankedList
+            title={t('referralsTitle')}
+            rows={referralRows}
+            emptyLabel={t('noData')}
+          />
+          <p className='text-xs text-muted-foreground'>{t('referralHint')}</p>
+        </div>
       )}
     </div>
   );

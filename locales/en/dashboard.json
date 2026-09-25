@@ -112,7 +112,12 @@
           "copy": "Copy",
           "linkLabel": "Link",
           "channelLabel": "Where are you sharing?",
-          "tagHint": "Most visits show as Direct? Share <link>tagged links</link> to see which channel works."
+          "tagHint": "Most visits show as Direct? Share <link>tagged links</link> to see which channel works.",
+          "referralsTitle": "From people sharing",
+          "referralYou": "Your links",
+          "referralSupporter": "Supporter {code}",
+          "referralDonations": "{count, plural, one {# donation} other {# donations}}",
+          "referralHint": "Links from the Share tab carry a personal code, so you see whose shares bring visitors and donations."
         },
         "updatedLabel": "Updated",
         "changeContext": "vs before",

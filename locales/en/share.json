@@ -1,0 +1,170 @@
+{
+  "Share": {
+    "image": {
+      "byLine": "by {name}",
+      "raisedOf": "{raised} raised of {goal}",
+      "raised": "{raised} raised",
+      "joined": "{first}, {second} and {others, plural, one {# other} other {# others}} have joined"
+    },
+    "cta": {
+      "joinMe": "Join me",
+      "supportMyFundraiser": "Support my fundraiser",
+      "helpUsFinish": "Help us finish",
+      "yourTurn": "Your turn",
+      "giftTree": "Gift a tree",
+      "protectForest": "Protect a forest",
+      "youngVoices": "Give young people a voice",
+      "giftForPlanet": "A gift for the planet",
+      "treatPlanet": "Treat the planet",
+      "celebrateWithMe": "Celebrate with me",
+      "custom": "Write your own…",
+      "customLabel": "Your text",
+      "customPlaceholder": "Plant with me"
+    },
+    "captions": {
+      "none": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "christmas": "This Christmas I'm fundraising for {name}. Want to give a gift that matters? Join me.",
+      "halloween": "No tricks, just a treat for the planet: I'm fundraising for {name}. Join me!",
+      "birthday": "For my birthday I'm fundraising for {name} instead of gifts. Celebrate with me!",
+      "donor": "I just supported {name}. Will you join me?"
+    },
+    "seasons": {
+      "none": "Your theme",
+      "christmas": "Christmas",
+      "halloween": "Halloween",
+      "birthday": "Birthday"
+    },
+    "platforms": {
+      "instagram": "Instagram",
+      "whatsapp": "WhatsApp",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "x": "X",
+      "other": "Other"
+    },
+    "channels": {
+      "instagramStory": {
+        "label": "Story",
+        "hint": "Video or image, 9:16",
+        "tip": "After posting, add your link with the link sticker. We copied it for you."
+      },
+      "instagramPost": {
+        "label": "Post",
+        "hint": "Image, 4:5",
+        "tip": "Links in Instagram captions are not clickable. Put the link in your bio or a story too."
+      },
+      "whatsappStatus": {
+        "label": "Status",
+        "hint": "Video or image, 9:16",
+        "tip": "Your link is copied. Paste it as the Status caption so friends can tap it."
+      },
+      "whatsappMessage": {
+        "label": "Message",
+        "hint": "Link with a preview",
+        "tip": "Chats show your link with this preview image, so a message with the link is enough."
+      },
+      "tiktokVideo": {
+        "label": "Video",
+        "hint": "Video or image, 9:16",
+        "tip": "Links in TikTok captions are not clickable. Add your link to your bio."
+      },
+      "youtubeShort": {
+        "label": "Short",
+        "hint": "Video, 9:16",
+        "tip": "Add your link to the Short description, or pin it as a comment."
+      },
+      "linkedinPost": {
+        "label": "Post",
+        "hint": "Image, 4:5",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      },
+      "linkedinWide": {
+        "label": "Wide post",
+        "hint": "Image, 1.91:1",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      },
+      "facebookPost": {
+        "label": "Post",
+        "hint": "Image, 4:5",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      },
+      "facebookStory": {
+        "label": "Story",
+        "hint": "Video or image, 9:16",
+        "tip": "After posting, add your link with the link sticker. We copied it for you."
+      },
+      "xPost": {
+        "label": "Post",
+        "hint": "Image, 16:9",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      },
+      "xTallPost": {
+        "label": "Tall post",
+        "hint": "Image, 4:5",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      },
+      "email": {
+        "label": "Email or newsletter",
+        "hint": "Banner, 1.91:1",
+        "tip": "Add the banner at the top of your email and link it to your fundraiser."
+      },
+      "anyStory": {
+        "label": "Story, any app",
+        "hint": "Video or image, 9:16",
+        "tip": "Your link is copied. Add it wherever the app allows."
+      },
+      "anyPost": {
+        "label": "Post, any app",
+        "hint": "Image, 4:5",
+        "tip": "The caption with your link is copied. Paste it into your post."
+      }
+    },
+    "studio": {
+      "whereTitle": "Where are you sharing?",
+      "whereHint": "We make the right size, with a link that shows which channel brought donations.",
+      "platformLabel": "Platform",
+      "formatLabel": "Format",
+      "customizeTitle": "Make it yours",
+      "customizeHint": "Colors and fonts come from your fundraiser theme.",
+      "style": "Style",
+      "buttonText": "Button text",
+      "showDonors": "Show donors who joined",
+      "captionTitle": "Caption",
+      "captionHint": "Copied for you when you share. Edit it if you like.",
+      "linkLabel": "Your link",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "copyFailed": "Could not copy",
+      "kindLabel": "Image or video",
+      "video": "Video",
+      "image": "Image",
+      "videoMeta": "Video, {seconds} s · {width}×{height}",
+      "imageMeta": "Image · {width}×{height}",
+      "previewLabel": "Preview",
+      "preparing": "Preparing…",
+      "preparingVideo": "Preparing video… {percent}%",
+      "shareTo": "Share to {platform}",
+      "share": "Share",
+      "shareLink": "Share link",
+      "downloadImage": "Download image",
+      "downloadVideo": "Download video",
+      "downloadPreview": "Download preview image",
+      "kit": "Download everything (.zip)",
+      "kitPreparing": "Preparing all files…",
+      "kitDone": "Share kit downloaded",
+      "kitFailed": "Could not prepare the files",
+      "handoffTitle": "Continue on your phone",
+      "handoffBody": "Scan to open this page on your phone and share straight to Instagram or WhatsApp.",
+      "handoffAlt": "QR code for this page",
+      "shareFailed": "Could not open sharing. Try Download instead.",
+      "savedTip": "Saved {file}. Your caption is copied. {tip}",
+      "noVideo": "This browser can't make videos. Share the image instead.",
+      "messageCopied": "Message copied"
+    },
+    "donor": {
+      "moreFormats": "More formats"
+    }
+  }
+}

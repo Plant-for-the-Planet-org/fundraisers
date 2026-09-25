@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import type { ThankYouState } from '@/lib/types/donation-submit';
-import type { FundraiserHost } from '@/lib/types/fundraiser';
+import type { Fundraiser, FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
 import { useLocale } from 'next-intl';
@@ -19,13 +19,13 @@ interface HostMessageConfig {
 
 interface DonationThankYouProps {
   thankYouState: ThankYouState;
-  fundraiserSlug: string;
+  fundraiser: Fundraiser;
   hostMessageConfig: HostMessageConfig | null;
 }
 
 export function DonationThankYou({
   thankYouState,
-  fundraiserSlug,
+  fundraiser,
   hostMessageConfig,
 }: DonationThankYouProps) {
   const locale = useLocale();
@@ -82,7 +82,7 @@ export function DonationThankYou({
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
       {card}
       {hostMessageCard}
-      <ShareSection fundraiserSlug={fundraiserSlug} />
+      <ShareSection fundraiser={fundraiser} />
     </div>
   );
 }

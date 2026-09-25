@@ -112,7 +112,12 @@
           "copy": "Kopieren",
           "linkLabel": "Link",
           "channelLabel": "Wo teilst du?",
-          "tagHint": "Die meisten Besuche erscheinen als Direkt? Teile <link>markierte Links</link>, um zu sehen, welcher Kanal wirkt."
+          "tagHint": "Die meisten Besuche erscheinen als Direkt? Teile <link>markierte Links</link>, um zu sehen, welcher Kanal wirkt.",
+          "referralsTitle": "Von Menschen, die teilen",
+          "referralYou": "Deine Links",
+          "referralSupporter": "Unterstützer*in {code}",
+          "referralDonations": "{count, plural, one {# Spende} other {# Spenden}}",
+          "referralHint": "Links aus dem Tab Teilen tragen einen persönlichen Code, so siehst du, wessen Teilen Besuche und Spenden bringt."
         },
         "updatedLabel": "Stand",
         "changeContext": "zum Zeitraum davor",

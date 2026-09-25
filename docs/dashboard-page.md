@@ -115,7 +115,7 @@ Pick a channel (Plain link, WhatsApp, Instagram, LinkedIn, Facebook, Email, News
 
 Every host-facing "Share" button leads here: the checklist, the donors empty state, and the row menu. The public page's "Copy Link" stays a plain copy, because visitors use it too.
 
-This tab is built as cards so story images or post templates to download can be added later.
+Above the links, the share studio makes images and videos for each platform (story, post, TikTok, Shorts, link preview), in the fundraiser's theme with live progress, and shares or downloads them. See `docs/share.md`. Links from both carry the host's `?ref=` code once the profile has one.
 
 ---
 

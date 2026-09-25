@@ -25,6 +25,7 @@ import {
   buildDonationPayload,
 } from '@/lib/donation/payload-builder';
 import { resolveThankYouStateFromDonation } from '@/lib/donation/resolve-donation-status';
+import { readRefParam } from '@/lib/share/referral';
 import { INITIAL_DONATION_STATE } from '@/lib/types/donation-submit';
 import { getDonationProcessingFeeInfo } from '@/lib/utils/donation-payment-fees';
 import { generateIdempotencyKeyWithPrefix } from '@/lib/utils/idempotency';
@@ -121,6 +122,8 @@ export function useSubmissionCore(
           upgradedToMonthly:
             donationData.frequency === 'once' &&
             payload.frequency === 'monthly',
+          // Whose share link brought the donor, for the host's Insights. Read from the URL, like the UTM tags; the overlay never leaves the page.
+          ref: readRefParam(window.location.search) ?? undefined,
           ...extra,
         });
 

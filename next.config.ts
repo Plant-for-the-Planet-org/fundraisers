@@ -9,6 +9,8 @@ const isDev = process.env.NODE_ENV === 'development';
 const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
+  // Native canvas for the link preview image (src/lib/share/server). Loaded by Node at runtime, not bundled.
+  serverExternalPackages: ['@napi-rs/canvas'],
   // Dev-only memory tweak; gated so it can never affect a production build.
   // Lowers webpack's memory ceiling on the low-RAM (8 GB) dev path; inert under Turbopack.
   ...(isDev && {

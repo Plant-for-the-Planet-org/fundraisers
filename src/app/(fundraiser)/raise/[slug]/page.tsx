@@ -7,11 +7,13 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { getAlltimeStats } from '@/lib/api/alltime-stats';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
+import { shareImagePath } from '@/lib/share/preview';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
+import { ShareVisitTracker } from '@/components/fundraisers/share-visit-tracker';
 import { HostInviteNotice } from '@/components/host-invite/host-invite-notice';
 import { loadFundraiserForRoute } from './load-fundraiser';
 
@@ -80,7 +82,10 @@ export async function generateMetadata({
       id: fundraiser.id,
       slug: fundraiser.slug || fundraiser.hid,
     });
-    const imageUrl = getFundraiserMetadataImage(fundraiser.image);
+    // The live banner (progress, theme, CTA), with the cover photo as the fallback for a fundraiser without a slug yet.
+    const imageUrl = fundraiser.slug
+      ? shareImagePath(fundraiser.slug, locale)
+      : getFundraiserMetadataImage(fundraiser.image);
 
     return {
       title: fundraiser.title,
@@ -192,6 +197,7 @@ export default async function FundraiserPage({
       <Suspense fallback={null}>
         <HostInviteNotice />
       </Suspense>
+      <ShareVisitTracker slug={fundraiser.slug} />
       <FundraiserView
         fundraiser={fundraiser}
         paymentOptions={paymentOptions}
