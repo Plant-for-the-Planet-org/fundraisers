@@ -75,6 +75,7 @@
         "time": "Zeit",
         "chartLabel": "Besucher*innen deiner Spendenseite im Zeitverlauf",
         "tooltip": "{visitors, plural, one {# Besucher*in} other {# Besucher*innen}} · {views, plural, one {# Aufruf} other {# Aufrufe}}",
+        "busiestHour": "Stärkste Stunde: {time}",
         "empty": "In diesem Zeitraum gab es noch keine Besuche.",
         "loadError": "Besucherzahlen konnten nicht geladen werden.",
         "retry": "Erneut versuchen",

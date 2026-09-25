@@ -75,6 +75,7 @@
         "time": "Time",
         "chartLabel": "Visitors to your fundraiser page over time",
         "tooltip": "{visitors, plural, one {# visitor} other {# visitors}} · {views, plural, one {# view} other {# views}}",
+        "busiestHour": "Busiest hour: {time}",
         "empty": "No visits in this period yet.",
         "loadError": "Couldn't load visitor numbers.",
         "retry": "Try again",

@@ -25,6 +25,8 @@ export interface InsightsBucket {
   key: string;
   views: number;
   visitors: number;
+  /** Visitors per local hour of this day, 7-day range only, drawn inside the day bar to show when in the day people came. */
+  hourlyVisitors?: number[];
 }
 
 export interface InsightsCountry {

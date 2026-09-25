@@ -73,7 +73,9 @@ Notes:
 
 ### Time windows
 
-- Ranges: 24 hours (hourly bars), 7 days and 30 days (daily bars), and on a single fundraiser, Campaign: start date to end date, or to today while it runs. Campaigns longer than 90 days use monthly bars.
+- Ranges: 24 hours (hourly bars, rolling), 7 days and 30 days (daily bars), and on a single fundraiser, Campaign: start date to end date, or to today while it runs. Campaigns longer than 90 days use monthly bars.
+- 7 days and 30 days start at midnight in the host's timezone: today so far plus the full days before it, so they show exactly 7 or 30 bars. "vs before" compares with a window of the same length just before.
+- 7 days asks Umami for hours instead of days and adds them up into day bars, so each light day bar can show its 24 hours inside it, with the busiest hour in the tooltip. Same number of requests as the daily series. Views add up exactly. Day visitors are summed per hour, so someone who comes back later that day counts twice. The headline numbers come from Umami's own count and stay exact.
 - Umami labels each bucket with the local time in the requested timezone but writes it with a `Z`. The label is matched as text, never parsed as UTC (`src/lib/analytics/insights-buckets.ts`). Days with no views are filled with zeros.
 - Umami only has data from when tracking started (September 2026), so a Campaign view for an older fundraiser shows empty months before that.
 - A renamed fundraiser starts fresh, because views are stored by path.

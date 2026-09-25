@@ -2,11 +2,17 @@ import type {
   AccountInsights,
   DonationEventName,
   FundraiserInsights,
+  InsightsBucket,
   InsightsRange,
 } from '@/lib/types/fundraiser-insights';
+import type { RangeWindow } from './insights-buckets';
 
 import { DONATION_EVENTS } from '@/lib/types/fundraiser-insights';
-import { buildBuckets, getRangeWindow } from './insights-buckets';
+import {
+  buildBuckets,
+  buildDayBucketsFromHours,
+  getRangeWindow,
+} from './insights-buckets';
 import { groupReferrers } from './referrer-sources';
 import { getUmamiBaseUrl } from './umami';
 
@@ -52,6 +58,27 @@ interface UmamiSeriesResponse {
 interface UmamiStatsResponse {
   pageviews: number;
   visitors: number;
+}
+
+/** 7d asks Umami for hours and builds its day bars from them, so the bars can show when in the day people came. 30d would need 720 hours, too thin to read. */
+function wantsHourlyDetail(range: InsightsRange) {
+  return range === '7d';
+}
+
+function toBuckets(
+  range: InsightsRange,
+  window: RangeWindow,
+  timeZone: string,
+  series: UmamiSeriesResponse
+): InsightsBucket[] {
+  return wantsHourlyDetail(range)
+    ? buildDayBucketsFromHours(
+        window,
+        timeZone,
+        series.pageviews,
+        series.sessions
+      )
+    : buildBuckets(window, timeZone, series.pageviews, series.sessions);
 }
 
 interface UmamiMetric {
@@ -126,7 +153,7 @@ export async function getFundraiserInsights({
   campaign: { startDate: string; endDate: string };
 }): Promise<FundraiserInsights | null> {
   const { now, revalidate } = snapshot(SNAPSHOT_MINUTES[range]);
-  const window = getRangeWindow(range, now, campaign);
+  const window = getRangeWindow(range, now, timeZone, campaign);
   // Only the campaign range can be empty: it has not started yet.
   if (!window) return null;
   if (!isSafeSlug(slug)) throw new Error('Refusing an unexpected slug format');
@@ -147,7 +174,7 @@ export async function getFundraiserInsights({
       'pageviews',
       {
         ...base,
-        unit: window.unit,
+        unit: wantsHourlyDetail(range) ? 'hour' : window.unit,
         timezone: timeZone,
       },
       revalidate
@@ -217,7 +244,7 @@ export async function getFundraiserInsights({
     visitors: stats.visitors,
     previousViews: previous.pageviews,
     previousVisitors: previous.visitors,
-    buckets: buildBuckets(window, timeZone, series.pageviews, series.sessions),
+    buckets: toBuckets(range, window, timeZone, series),
     events: eventCounts,
     countries: countries
       .filter(metric => /^[A-Z]{2}$/.test(metric.x))
@@ -335,7 +362,7 @@ export async function getAccountInsights({
   }
 > {
   const { now, revalidate } = snapshot(SNAPSHOT_MINUTES[range]);
-  const window = getRangeWindow(range, now)!;
+  const window = getRangeWindow(range, now, timeZone)!;
   const previous = {
     startAt: window.startAt - (window.endAt - window.startAt),
     endAt: window.startAt,
@@ -354,7 +381,10 @@ export async function getAccountInsights({
       visitors: 0,
       previousViews: 0,
       previousVisitors: 0,
-      buckets: buildBuckets(window, timeZone, [], []),
+      buckets: toBuckets(range, window, timeZone, {
+        pageviews: [],
+        sessions: [],
+      }),
       viewsBySlug: {},
       clicksBySlug: {},
       submissionsBySlug: {},
@@ -377,7 +407,7 @@ export async function getAccountInsights({
               'pageviews',
               {
                 ...base,
-                unit: window.unit,
+                unit: wantsHourlyDetail(range) ? 'hour' : window.unit,
                 timezone: timeZone,
               },
               revalidate
@@ -439,12 +469,10 @@ export async function getAccountInsights({
     visitors: totalVisitors,
     previousViews,
     previousVisitors,
-    buckets: buildBuckets(
-      window,
-      timeZone,
-      [...views].map(([x, y]) => ({ x, y })),
-      [...visitors].map(([x, y]) => ({ x, y }))
-    ),
+    buckets: toBuckets(range, window, timeZone, {
+      pageviews: [...views].map(([x, y]) => ({ x, y })),
+      sessions: [...visitors].map(([x, y]) => ({ x, y })),
+    }),
     viewsBySlug,
     clicksBySlug: pick(clicksBySlug, wanted),
     submissionsBySlug: pick(submissionsBySlug, wanted),

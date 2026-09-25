@@ -48,6 +48,19 @@ function formatBucket(
     : date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
 }
 
+/** The clock hour with the most visitors in a day bucket, or null when the day had none. */
+function busiestHour(bucket: InsightsBucket, locale: string) {
+  const hours = bucket.hourlyVisitors;
+  if (!hours) return null;
+  const peak = Math.max(...hours);
+  if (peak === 0) return null;
+  const hour = String(hours.indexOf(peak)).padStart(2, '0');
+  return new Date(`${bucket.key}T${hour}:00`).toLocaleTimeString(locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export function PeriodLabel({ data }: { data: InsightsSeries }) {
   const t = useTranslations('Dashboard.fundraiser.insights');
   const locale = useLocale();
@@ -104,9 +117,16 @@ export function VisitorsChart({ data }: { data: InsightsSeries }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   const max = Math.max(1, ...data.buckets.map(bucket => bucket.visitors));
+  // 7d days carry their hours: the day bar turns light and its hours are drawn inside it, sized against the busiest hour of the week and fitted to the day bar. They show the shape of each day; the tooltip gives the numbers.
+  const hasHours = data.buckets.some(bucket => bucket.hourlyVisitors);
+  const maxHour = Math.max(
+    1,
+    ...data.buckets.flatMap(bucket => bucket.hourlyVisitors ?? [])
+  );
   const first = data.buckets[0];
   const last = data.buckets[data.buckets.length - 1];
   const active = hovered === null ? null : data.buckets[hovered];
+  const activeBusiestHour = active && busiestHour(active, locale);
 
   return (
     <div className='space-y-2'>
@@ -127,6 +147,11 @@ export function VisitorsChart({ data }: { data: InsightsSeries }) {
                 views: active.views,
               })}
             </p>
+            {activeBusiestHour && (
+              <p className='text-muted-foreground'>
+                {t('busiestHour', { time: activeBusiestHour })}
+              </p>
+            )}
           </div>
         )}
 
@@ -144,7 +169,10 @@ export function VisitorsChart({ data }: { data: InsightsSeries }) {
             >
               <div
                 className={cn(
-                  'w-full max-w-6 rounded-t bg-accent-color transition-opacity',
+                  'relative w-full rounded-t transition-opacity',
+                  hasHours
+                    ? 'max-w-16 bg-accent-color/20'
+                    : 'max-w-6 bg-accent-color',
                   hovered !== null && hovered !== index && 'opacity-50'
                 )}
                 style={{
@@ -153,7 +181,22 @@ export function VisitorsChart({ data }: { data: InsightsSeries }) {
                       ? 0
                       : Math.max(2, (bucket.visitors / max) * CHART_HEIGHT),
                 }}
-              />
+              >
+                {bucket.hourlyVisitors && (
+                  <div
+                    className='absolute inset-0 flex items-end sm:gap-px'
+                    aria-hidden='true'
+                  >
+                    {bucket.hourlyVisitors.map((hourVisitors, hour) => (
+                      <div
+                        key={hour}
+                        className='min-w-0 flex-1 bg-accent-color'
+                        style={{ height: `${(hourVisitors / maxHour) * 90}%` }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
