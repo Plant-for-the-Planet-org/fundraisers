@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { ManageHostsDialog } from './manage-hosts-dialog';
 import { SectionHeader } from './typography';
@@ -77,15 +78,17 @@ export function HostsManager({
       <SectionHeader
         className='flex-row items-center justify-between'
         actionSlot={
-          <button
+          <Button
             type='button'
+            variant='ghost'
+            size='sm'
             onClick={() => setOpen(true)}
             aria-label={t('manage')}
             title={t('manage')}
-            className='text-muted-foreground transition-colors hover:text-foreground'
+            className='p-1 h-auto hover:bg-muted-foreground/15 dark:hover:bg-muted-foreground/30'
           >
-            <Settings2 size={16} />
-          </button>
+            <Settings2 className='w-4 h-4' />
+          </Button>
         }
       >
         {t('title')}
