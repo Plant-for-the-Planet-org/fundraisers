@@ -113,12 +113,15 @@ export function FundraiserFormBody({
         <div className='max-md:order-14 empty:hidden'>
           <Options />
         </div>
-        <StickyFormBar>
-          <div className='flex gap-2'>
-            {isEditMode && slug && <ViewButton slug={slug} />}
-            {submitButton}
-          </div>
-        </StickyFormBar>
+        {/* Without an order the bar defaults to 0 on mobile and jumps above the image, which also breaks its docking at the end of the form. */}
+        <div className='max-md:order-last'>
+          <StickyFormBar>
+            <div className='flex gap-2'>
+              {isEditMode && slug && <ViewButton slug={slug} />}
+              {submitButton}
+            </div>
+          </StickyFormBar>
+        </div>
       </MainPanel>
     </FundraiserLayout>
   );
