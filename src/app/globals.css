@@ -54,7 +54,7 @@
   --color-warning: hsl(var(--warning));
   --color-success: hsl(var(--success));
   --color-accent-color: var(--accent-color);
-  --color-accent-text: var(--accent-text, var(--accent-color));
+  --color-accent-text: var(--accent-text);
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
   --color-tab-border: var(--tab-border-color);
@@ -130,6 +130,7 @@
   --section-divider: 220 13% 91%;
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
+  --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
 }
 
 .dark {
@@ -156,6 +157,7 @@
   --section-divider: 217 19% 27%;
   --base-rgb: 0 0 0;
   --reverse-rgb: 255 255 255;
+  --accent-text: var(--accent-text-on-dark, hsl(var(--foreground)));
 }
 
 .light {
@@ -182,6 +184,7 @@
   --section-divider: 220 13% 91%;
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
+  --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
 }
 
 body {

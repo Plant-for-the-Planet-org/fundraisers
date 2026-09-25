@@ -120,25 +120,32 @@ export function ThemeShell({
   // the CTA text colour is picked for contrast against it.
   const accentColor = getAccentColor(activeTheme.accent);
   const ctaForeground = getOnColorText(accentColor);
-  // Links drawn in the accent fall back to the normal text colour when the accent is too light (or, in dark mode, too dark) to read against the page.
-  const pageBase = activeTheme.mode === 'dark' ? '#000000' : '#ffffff';
-  const accentText =
-    getContrastRatio(accentColor, pageBase) >= MIN_TEXT_CONTRAST
+  // Accent links need a colour for both modes, because a surface can differ from the page: the donate overlay is always light, even on a dark page. Left unset where the accent fails AA, so globals.css falls back to that surface's own text colour.
+  const accentTextOn = (base: string) =>
+    getContrastRatio(accentColor, base) >= MIN_TEXT_CONTRAST
       ? accentColor
-      : 'hsl(var(--foreground))';
+      : undefined;
+  const accentTextOnLight = accentTextOn('#ffffff');
+  const accentTextOnDark = accentTextOn('#000000');
 
   // Dialogs and toasts portal to <body>, outside this wrapper, so they would only see the :root default. Mirror the accent on the root element for them.
   useEffect(() => {
     const html = document.documentElement;
+    const setOrRemove = (name: string, value: string | undefined) =>
+      value
+        ? html.style.setProperty(name, value)
+        : html.style.removeProperty(name);
     html.style.setProperty('--accent-color', accentColor);
     html.style.setProperty('--cta-foreground', ctaForeground);
-    html.style.setProperty('--accent-text', accentText);
+    setOrRemove('--accent-text-on-light', accentTextOnLight);
+    setOrRemove('--accent-text-on-dark', accentTextOnDark);
     return () => {
       html.style.removeProperty('--accent-color');
       html.style.removeProperty('--cta-foreground');
-      html.style.removeProperty('--accent-text');
+      html.style.removeProperty('--accent-text-on-light');
+      html.style.removeProperty('--accent-text-on-dark');
     };
-  }, [accentColor, ctaForeground, accentText]);
+  }, [accentColor, ctaForeground, accentTextOnLight, accentTextOnDark]);
 
   // A single colour representing the chosen background, at full strength (not
   // the 14% wash). Used to tint image/pattern decorations. Falls back to the
@@ -159,7 +166,8 @@ export function ThemeShell({
           '--accent-color': accentColor,
           '--theme-bg-color': bgTintColor,
           '--cta-foreground': ctaForeground,
-          '--accent-text': accentText,
+          '--accent-text-on-light': accentTextOnLight,
+          '--accent-text-on-dark': accentTextOnDark,
         } as React.CSSProperties
       }
     >
