@@ -4,7 +4,7 @@ How the dashboard shows page views, visitors, donation events, countries and sou
 
 Where it shows up:
 
-- **Overview**: "Views this week" across your fundraisers.
+- **Overview**: "Visitors this week" across your fundraisers.
 - **A fundraiser's Insights tab**: visitors over time, donation journey, countries, sources.
 - **Insights page** (`/dashboard/insights`): all your fundraisers combined, a ranking, or one fundraiser picked from a list.
 
@@ -37,7 +37,7 @@ The browser never talks to Umami. It calls our own routes, which call Umami with
 | --- | --- |
 | `GET /api/fundraisers/[slug]/insights?range&tz` | A fundraiser's Insights |
 | `GET /api/insights/account?range&tz` | The Insights page |
-| `GET /api/insights/summary` | Overview, Views this week |
+| `GET /api/insights/summary` | Overview, Visitors this week |
 
 Each route first runs `getHostedFundraisersForInsights` (`src/app/api/_lib/hosted-fundraisers.ts`):
 
@@ -57,16 +57,18 @@ All numbers filter on the fundraiser page path, `/raise/<slug>`. The fundraiser 
 | --- | --- |
 | Visitors and page views, with the period before | `stats` with `path` |
 | Visitors per hour, day or month | `pageviews` with `unit` and `timezone` |
-| Donation journey (clicked, submitted, completed) | `metrics?type=event` with `path` |
+| Donation journey (clicked, submitted, completed) | `metrics/expanded?type=event` with `path`, using `visitors` |
 | Countries, sources, channels, tagged links | `metrics?type=country`, `referrer`, `channel`, `utmSource` |
-| Ranking: views per fundraiser | one `metrics?type=path` call for the whole site, filtered on our server |
-| Ranking: donate clicks and submissions per fundraiser | `event-data/values` on the event's `fundraiser` property, one call per event |
+| Ranking: visitors per fundraiser | one `metrics?type=path` call for the whole site, filtered on our server. This metric counts visitors, not page views. |
+| Ranking: visitors who clicked Donate and who submitted, per fundraiser | `event-data/values` on the event's `fundraiser` property finds the fundraisers with any donation step (one call per event), then one `metrics/expanded?type=event` call per such fundraiser |
+| Overview, visitors this week | `stats` with the comma-joined paths, this week and the week before |
 
 Notes:
 
 - **Combined numbers**: comma-separated paths mean "any of these", and Umami counts each visitor once across them, so one request covers up to 40 fundraisers. Larger lists are split into groups of 40 and added up, which counts a visitor twice if they saw fundraisers in two groups.
 - **Sources**: referrer hosts are grouped into platforms (`com.linkedin.android` counts as LinkedIn, `l.instagram.com` as Instagram), and sign-in redirects are dropped (`src/lib/analytics/referrer-sources.ts`). Visits with no referrer, including WhatsApp and most apps, show as "Direct or apps".
-- **Conversion** in the ranking is submitted donations per page view. The completed event undercounts, because some payment flows leave the page before it is sent.
+- **People, not events**: the donation journey, click rate and conversion count visitors who sent an event at least once, not how often it fired. One person can press Donate several times, so event counts divided by visitors went over 100%. `metrics/expanded` returns both: `pageviews` is how often the event fired, `visitors` is how many people sent it. Rates are capped at 100% for the rare event whose page view fell just before the window.
+- **Conversion** in the ranking is visitors who submitted a donation, as a share of visitors. The completed event undercounts, because some payment flows leave the page before it is sent.
 - **Change** ("+54%") is (this period − the period before) ÷ the period before. It is hidden when the period before had nothing.
 
 - **Accuracy**: a note under both Insights pages says visitor numbers and donation steps are a guide, not exact. Umami runs without cookies and does not count people who block trackers. Amounts raised and donation totals come from the platform; donations by direct debit or bank transfer count once the payment arrives, so they can show up a few days later.
@@ -90,7 +92,7 @@ Numbers are a snapshot, not realtime. How often a snapshot is taken depends on t
 | --- | --- |
 | 24 hours | 5 minutes, since this is what hosts watch live, for example during an event |
 | 7 days, 30 days, Campaign | 30 minutes |
-| Overview, Views this week | 30 minutes |
+| Overview, Visitors this week | 30 minutes |
 
 1. **Umami answers** are kept in the Next.js data cache for one snapshot (`cache: 'force-cache'` with `revalidate`). The window end snaps to the last full snapshot, so the request URL (the cache key) stays the same for everyone during that snapshot and all hosts share one answer. Umami is only queried when someone looks, at most once per snapshot per fundraiser and range.
    - `force-cache` is required. Next.js does not cache requests that send an `authorization` header unless asked to, and the Umami calls send the key that way.

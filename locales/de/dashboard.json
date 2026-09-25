@@ -27,12 +27,12 @@
       "pickerLabel": "Spendenaufruf",
       "allFundraisers": "Alle Spendenaufrufe",
       "combinedTitle": "Besucher*innen über deine Spendenaufrufe",
-      "rankingTitle": "Spendenaufrufe nach Aufrufen",
+      "rankingTitle": "Spendenaufrufe nach Besucher*innen",
       "rankingEmpty": "Noch keiner deiner Spendenaufrufe hat eine öffentliche Seite.",
       "columns": {
         "fundraiser": "Spendenaufruf",
-        "views": "Aufrufe",
-        "clicks": "Klicks auf Spenden",
+        "visitors": "Besucher*innen",
+        "clicks": "Auf Spenden geklickt",
         "submissions": "Abgeschickt",
         "rate": "Klickrate",
         "conversion": "Konversion"
@@ -209,8 +209,8 @@
       "donations": {
         "label": "Spenden"
       },
-      "views": {
-        "label": "Aufrufe diese Woche",
+      "visitors": {
+        "label": "Besucher*innen diese Woche",
         "changeContext": "zur Vorwoche"
       }
     },

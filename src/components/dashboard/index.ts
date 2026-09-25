@@ -21,4 +21,4 @@ export { FundraiserStatusFilter } from './fundraiser-status-filter';
 export { LatestFundraisers } from './latest-fundraisers';
 export { PendingInvitations } from './pending-invitations';
 export { useFundraiserListFilters } from './use-fundraiser-list-filters';
-export { useWeeklyViews } from './use-weekly-views';
+export { useWeeklyVisitors } from './use-weekly-visitors';

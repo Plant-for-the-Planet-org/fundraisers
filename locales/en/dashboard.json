@@ -27,12 +27,12 @@
       "pickerLabel": "Fundraiser",
       "allFundraisers": "All fundraisers",
       "combinedTitle": "Visitors across your fundraisers",
-      "rankingTitle": "Fundraisers by views",
+      "rankingTitle": "Fundraisers by visitors",
       "rankingEmpty": "None of your fundraisers has a public page yet.",
       "columns": {
         "fundraiser": "Fundraiser",
-        "views": "Views",
-        "clicks": "Donate clicks",
+        "visitors": "Visitors",
+        "clicks": "Clicked Donate",
         "submissions": "Submitted",
         "rate": "Click rate",
         "conversion": "Conversion"
@@ -209,8 +209,8 @@
       "donations": {
         "label": "Donations"
       },
-      "views": {
-        "label": "Views this week",
+      "visitors": {
+        "label": "Visitors this week",
         "changeContext": "vs last week"
       }
     },

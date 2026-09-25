@@ -283,15 +283,22 @@ export function SeriesTotals({ data }: { data: InsightsSeries }) {
 function DonationJourney({ data }: { data: FundraiserInsights }) {
   const t = useTranslations('Dashboard.fundraiser.insights.journey');
   const locale = useLocale();
-  const { events, visitors } = data;
+  const { eventVisitors, visitors } = data;
 
+  // People who reached each step, not how often it happened, so the rate below stays a share of visitors.
   const steps = [
-    { key: 'donate_clicked', value: events.donate_clicked },
-    { key: 'donation_submitted', value: events.donation_submitted },
-    { key: 'donation_completed', value: events.donation_completed },
+    { key: 'donate_clicked', value: eventVisitors.donate_clicked },
+    { key: 'donation_submitted', value: eventVisitors.donation_submitted },
+    { key: 'donation_completed', value: eventVisitors.donation_completed },
   ] as const;
+  // Capped: an event near the window's start can belong to a visit whose page view fell just before it.
   const clickRate =
-    visitors > 0 ? Math.round((events.donate_clicked / visitors) * 100) : null;
+    visitors > 0
+      ? Math.min(
+          Math.round((eventVisitors.donate_clicked / visitors) * 100),
+          100
+        )
+      : null;
 
   return (
     <div className='space-y-3'>

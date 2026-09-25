@@ -66,7 +66,7 @@ Green stays reserved for status (live, going up) and red for going down, so the 
 
 ## Overview (`/dashboard`)
 
-- **Stats strip** (`StatStrip`, shared with the fundraiser Overview): Total raised, Donations, Active fundraisers, and, with Umami, Views this week with the change against last week.
+- **Stats strip** (`StatStrip`, shared with the fundraiser Overview): Total raised, Donations, Active fundraisers, and, with Umami, Visitors this week with the change against last week.
   - The strip knows up front whether the views cell exists, so the loading skeleton has the same shape as the loaded strip (2 by 2 on small screens, 4 across on desktop).
 - **Pending invitations** to co-host, with accept and decline.
 - **Active fundraisers**: up to 2 live fundraisers, newest first, with "View all". When nothing is live, it shows the 2 newest as "Latest fundraisers".

@@ -60,7 +60,8 @@ export interface InsightsSeries {
 }
 
 export interface FundraiserInsights extends InsightsSeries {
-  events: Record<DonationEventName, number>;
+  /** Visitors who sent each donation event at least once. People, not events: one person can press Donate several times. */
+  eventVisitors: Record<DonationEventName, number>;
   countries: InsightsCountry[];
   sources: InsightsSource[];
   /** Visitors who arrived through a link with `utm_source`, by that value. */
@@ -75,9 +76,11 @@ export interface AccountInsightsFundraiser {
   status: 'active' | 'draft' | 'paused' | 'ended' | 'ending-soon';
   /** For the single-fundraiser view, which offers the campaign range once a fundraiser has started. */
   startDate: string;
-  views: number;
-  donateClicks: number;
-  donateSubmissions: number;
+  visitors: number;
+  /** Visitors who clicked Donate at least once. */
+  clickedVisitors: number;
+  /** Visitors who submitted a donation at least once. */
+  submittedVisitors: number;
 }
 
 /** Every fundraiser the caller actively hosts, combined, plus a per-fundraiser ranking. */
