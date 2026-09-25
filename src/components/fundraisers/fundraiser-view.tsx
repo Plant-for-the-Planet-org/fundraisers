@@ -11,6 +11,7 @@ import {
   getFundraiserUrl,
   hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
+import { selectPublicHosts } from '@/lib/utils/fundraiser-hosts';
 import {
   ClosedForContribution,
   type FundraiserImpact,
@@ -78,6 +79,7 @@ export function FundraiserView({
     fundraiser.canDonate &&
     paymentOptions !== undefined &&
     fundraiser.workspace !== null;
+  const hasHosts = selectPublicHosts(fundraiser.hosts).length > 0;
 
   return (
     // Mobile is one column, capped so wide phones and small tablets don't stretch the image and form.
@@ -96,11 +98,13 @@ export function FundraiserView({
           value={fundraiser.title}
         />
 
-        {/* Mobile shows the hosts right under the title, pulled up and centred with it so they read as its byline. Desktop moves them below the donors. `empty:hidden` drops the gap when neither renders. */}
+        {/* Mobile shows the hosts right under the title, pulled up and centred with it so they read as its byline. Desktop moves them below the donors. The hosts row only renders when there are hosts, so `empty:hidden` can drop the whole block when neither renders. */}
         <div className='flex flex-col gap-6 max-md:-mt-4 md:order-1 empty:hidden'>
-          <div className='max-md:flex max-md:justify-center'>
-            <Hosts mode='display' fundraiser={fundraiser} />
-          </div>
+          {hasHosts && (
+            <div className='max-md:flex max-md:justify-center'>
+              <Hosts mode='display' fundraiser={fundraiser} />
+            </div>
+          )}
           {/* Host edit shortcut (only visible to logged-in hosts) */}
           <HostControls fundraiser={fundraiser} />
         </div>
