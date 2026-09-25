@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {
+  getActiveImpersonation,
+  impersonationHeaders,
+} from '@/lib/api/platform-fetch';
 import { useAuthStore } from '@/stores/auth-store';
 
 export interface WeeklyViews {
@@ -22,7 +26,11 @@ export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
     let ignore = false;
 
     fetch('/api/insights/summary', {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      // Our route checks hosting on the server, which cannot see the impersonation in localStorage, so it is sent along.
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...impersonationHeaders(getActiveImpersonation()),
+      },
     })
       .then(async response => {
         if (!response.ok) return;

@@ -4,11 +4,12 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { NextResponse } from 'next/server';
 import { isUmamiStatsConfigured } from '@/lib/analytics/umami-stats';
 import { getFundraisers } from '@/lib/api/fundraisers-service';
-import { PlatformAPIError } from '@/lib/api/platform-fetch';
+import { PlatformAPIError, readImpersonation } from '@/lib/api/platform-fetch';
 
 /**
  * The first steps every insights route takes: Umami is set up, the caller sent a platform token, and the platform lists the fundraisers they actively host.
  * Routes only ever query Umami for slugs from this list, never for a slug from the request alone.
+ * While staff impersonate a host, the browser forwards the impersonation headers and the list is the host's. The platform checks the pin, so the headers alone grant nothing.
  *
  * Returns the list, or the response to send back when a step fails.
  */
@@ -33,7 +34,12 @@ export async function getHostedFundraisersForInsights(
   }
 
   try {
-    return { fundraisers: await getFundraisers(token) };
+    return {
+      fundraisers: await getFundraisers(
+        token,
+        readImpersonation(request.headers)
+      ),
+    };
   } catch (error) {
     if (
       error instanceof PlatformAPIError &&

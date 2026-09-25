@@ -55,6 +55,40 @@ export interface PlatformFetchOptions {
   skipImpersonationFromStore?: boolean;
 }
 
+export interface Impersonation {
+  email: string;
+  pin: string;
+}
+
+/** The headers that make a platform call run as the impersonated user. */
+export function impersonationHeaders(
+  impersonation: Impersonation | null | undefined
+): Record<string, string> {
+  if (!impersonation) return {};
+  return {
+    'x-switch-user': impersonation.email,
+    'x-user-support-pin': impersonation.pin,
+  };
+}
+
+/**
+ * The impersonation in progress in this browser, or null.
+ * It lives in localStorage, so on the server this is always null: our own API routes read it from the request with `readImpersonation` instead.
+ */
+export function getActiveImpersonation(): Impersonation | null {
+  const imp = useImpersonationStore.getState();
+  return imp.isActive && imp.email && imp.pin
+    ? { email: imp.email, pin: imp.pin }
+    : null;
+}
+
+/** The impersonation a browser forwarded to one of our API routes, so the route's platform calls run as that user too. */
+export function readImpersonation(headers: Headers): Impersonation | null {
+  const email = headers.get('x-switch-user')?.trim();
+  const pin = headers.get('x-user-support-pin')?.trim();
+  return email && pin ? { email, pin } : null;
+}
+
 export async function platformFetch<T>(
   path: string,
   opts: PlatformFetchOptions = {}
@@ -79,11 +113,7 @@ export async function platformFetch<T>(
     headers['Authorization'] = `Bearer ${opts.token}`;
 
     if (!opts.skipImpersonationFromStore) {
-      const imp = useImpersonationStore.getState();
-      if (imp.isActive && imp.email && imp.pin) {
-        headers['x-switch-user'] = imp.email;
-        headers['x-user-support-pin'] = imp.pin;
-      }
+      Object.assign(headers, impersonationHeaders(getActiveImpersonation()));
     }
   }
 

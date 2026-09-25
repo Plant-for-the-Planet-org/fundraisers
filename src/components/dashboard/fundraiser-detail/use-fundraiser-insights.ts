@@ -6,6 +6,10 @@ import type {
 } from '@/lib/types/fundraiser-insights';
 
 import { useEffect, useState } from 'react';
+import {
+  getActiveImpersonation,
+  impersonationHeaders,
+} from '@/lib/api/platform-fetch';
 import { useAuthStore } from '@/stores/auth-store';
 
 export type InsightsState =
@@ -36,7 +40,11 @@ export function useFundraiserInsights(
     setState({ status: 'loading' });
 
     fetch(`/api/fundraisers/${encodeURIComponent(slug)}/insights?${params}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      // Our route checks hosting on the server, which cannot see the impersonation in localStorage, so it is sent along.
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...impersonationHeaders(getActiveImpersonation()),
+      },
     })
       .then(async response => {
         if (ignore) return;
