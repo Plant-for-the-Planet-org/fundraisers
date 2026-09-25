@@ -51,14 +51,41 @@ function formatAmount(value: number, locale: string, compact: boolean): string {
 
 const NO_BREAK_SPACE = '\u00a0';
 
-interface CurrencyLayout {
+interface CurrencyPattern {
   currencyFirst: boolean;
   gap: string;
+  minusBetweenCurrencyAndNumber: boolean;
+}
+
+interface CurrencyLayout {
+  positive: CurrencyPattern;
+  negative: CurrencyPattern;
   minusSign: string;
   minusBeforeCurrency: boolean;
 }
 
 const layoutCache = new Map<string, CurrencyLayout>();
+
+function getCurrencyPattern(parts: Intl.NumberFormatPart[]): CurrencyPattern {
+  const currencyAt = parts.findIndex(p => p.type === 'currency');
+  const integerAt = parts.findIndex(p => p.type === 'integer');
+  const minusAt = parts.findIndex(p => p.type === 'minusSign');
+  const currencyFirst = currencyAt < integerAt;
+  const between = currencyFirst
+    ? parts.slice(currencyAt + 1, integerAt)
+    : parts.slice(integerAt + 1, currencyAt);
+
+  return {
+    currencyFirst,
+    gap: between
+      .filter(p => p.type === 'literal')
+      .map(p => p.value)
+      .join(''),
+    minusBetweenCurrencyAndNumber:
+      minusAt > Math.min(currencyAt, integerAt) &&
+      minusAt < Math.max(currencyAt, integerAt),
+  };
+}
 
 /**
  * Learn from Intl where the locale puts the currency, what sits between it and the number, and where the minus sign goes.
@@ -75,20 +102,11 @@ function getCurrencyLayout(locale: string): CurrencyLayout {
   });
   const positive = probe.formatToParts(1);
   const negative = probe.formatToParts(-1);
-  const currencyAt = positive.findIndex(p => p.type === 'currency');
-  const integerAt = positive.findIndex(p => p.type === 'integer');
-  const currencyFirst = currencyAt < integerAt;
-  const between = currencyFirst
-    ? positive.slice(currencyAt + 1, integerAt)
-    : positive.slice(integerAt + 1, currencyAt);
   const minusAt = negative.findIndex(p => p.type === 'minusSign');
 
   const layout: CurrencyLayout = {
-    currencyFirst,
-    gap: between
-      .filter(p => p.type === 'literal')
-      .map(p => p.value)
-      .join(''),
+    positive: getCurrencyPattern(positive),
+    negative: getCurrencyPattern(negative),
     minusSign: negative[minusAt]?.value ?? '-',
     minusBeforeCurrency:
       minusAt < negative.findIndex(p => p.type === 'currency'),
@@ -101,19 +119,30 @@ function getCurrencyLayout(locale: string): CurrencyLayout {
 function attachCurrency(
   formattedAmount: string,
   label: string,
-  locale: string
+  locale: string,
+  isNegative: boolean
 ): string {
-  const { currencyFirst, gap, minusSign, minusBeforeCurrency } =
-    getCurrencyLayout(locale || 'en');
+  const layout = getCurrencyLayout(locale || 'en');
+  const { currencyFirst, gap, minusBetweenCurrencyAndNumber } = isNegative
+    ? layout.negative
+    : layout.positive;
 
-  // Same rule Intl follows: a label that touches the number with a letter ("CHF", "kr") gets a space, a sign like "€" or "$" does not.
+  // Add a space for letter labels touching the number, unless the minus sign sits between them.
   const edge = currencyFirst ? label[label.length - 1] : label[0];
-  const space = gap || (/\p{L}/u.test(edge ?? '') ? NO_BREAK_SPACE : '');
+  const space =
+    gap ||
+    (!minusBetweenCurrencyAndNumber && /\p{L}/u.test(edge ?? '')
+      ? NO_BREAK_SPACE
+      : '');
 
   if (!currencyFirst) return `${formattedAmount}${space}${label}`;
-  if (minusBeforeCurrency && formattedAmount.startsWith(minusSign)) {
-    const unsigned = formattedAmount.slice(minusSign.length);
-    return `${minusSign}${label}${space}${unsigned}`;
+  if (
+    isNegative &&
+    layout.minusBeforeCurrency &&
+    formattedAmount.startsWith(layout.minusSign)
+  ) {
+    const unsigned = formattedAmount.slice(layout.minusSign.length);
+    return `${layout.minusSign}${label}${space}${unsigned}`;
   }
   return `${label}${space}${formattedAmount}`;
 }
@@ -144,7 +173,8 @@ export function formatCurrency(
   return attachCurrency(
     formattedAmount,
     CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper,
-    locale
+    locale,
+    amount < 0 || Object.is(amount, -0)
   );
 }
 
@@ -178,7 +208,12 @@ export function formatCurrencyFromDecimal(
     currencyDisplay === 'code'
       ? currencyUpper
       : (CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper);
-  return attachCurrency(formattedAmount, label, locale);
+  return attachCurrency(
+    formattedAmount,
+    label,
+    locale,
+    amount < 0 || Object.is(amount, -0)
+  );
 }
 
 /**

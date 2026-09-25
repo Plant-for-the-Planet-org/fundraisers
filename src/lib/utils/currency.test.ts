@@ -88,6 +88,17 @@ describe('formatCurrencyFromDecimal', () => {
       expect(formatCurrencyFromDecimal(-50, 'CHF', 'en')).toBe(`-CHF${NBSP}50`);
       expect(formatCurrencyFromDecimal(-50, 'EUR', 'de')).toBe(`-50${NBSP}€`);
     });
+
+    it('uses the negative currency pattern in Swiss German', () => {
+      expect(formatCurrencyFromDecimal(50, 'EUR', 'de-CH')).toBe(`€${NBSP}50`);
+      expect(formatCurrencyFromDecimal(-50, 'EUR', 'de-CH')).toBe('€-50');
+      expect(
+        formatCurrencyFromDecimal(-50, 'EUR', 'de-CH', {
+          currencyDisplay: 'code',
+        })
+      ).toBe('EUR-50');
+      expect(formatCurrency(-5000, 'EUR', 'de-CH')).toBe('€-50');
+    });
   });
 
   describe('no currency', () => {
