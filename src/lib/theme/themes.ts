@@ -106,6 +106,27 @@ export const THEMES: Record<string, Theme> = {
       'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30'
     ),
   },
+  // The Explore page: Stratospheric's soft wash and amber accent, plus a faint tree pattern in the accent.
+  // A copy rather than an edit, because fundraisers can pick Stratospheric for their own pages. Not featured, so it never shows in the theme picker.
+  explore: {
+    id: 'explore',
+    name: 'Explore',
+    category: 'atmospheric',
+    accent: 'amber',
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    colorOptions: ['amber'],
+    curatedBgs: [],
+    bg: defineBg(
+      'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30',
+      {
+        decoration: 'pattern',
+        pattern_id: 'bg-trees',
+        opacity: 0.08,
+      }
+    ),
+  },
   sunset: {
     id: 'sunset',
     name: 'Sunset',
