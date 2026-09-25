@@ -1,3 +1,5 @@
+// Link preview URLs are immutable snapshots. If a change here can alter the link preview banner (the `banner` format) for the same fundraiser, bump SHARE_IMAGE_DESIGN_VERSION in ./design-version.ts.
+// Without the bump, a fundraiser keeps its old cached preview until something on it changes, and an ended one keeps it for good. share-banner.test.ts fails until you do.
 import type { ShareFormat, ShareSizes, ShareZone } from '../formats';
 import type {
   Ctx,
@@ -13,12 +15,15 @@ import { drawThemeAnimation } from './animations';
 import {
   accentGraphicOnLight,
   accentTextOnWhite,
+  giftPillOnDark,
+  giftPillOnLight,
   textOnAccent,
 } from './contrast';
 import {
   backOut,
   drawArrow,
   drawSparkle,
+  fitFont,
   mix,
   mixHex,
   phase,
@@ -36,6 +41,43 @@ const RING_START = 1.0;
 const RING_END = 2.8;
 const CTA_START = 2.4;
 
+// The donor's gift sits in a pill, its text a fifth larger than the amount. Padding and height are in gift font sizes.
+const GIFT_SCALE = 1.2;
+const PILL_PAD = 0.8;
+const PILL_HEIGHT = 1.6;
+
+/** A font in the given weight and family, by size, for fitFont. */
+const fontOf = (weight: number, family: string) => (size: number) =>
+  `${weight} ${size}px ${family}`;
+
+/**
+ * The name's font size. A word wider than the column, such as a German compound, makes the name up to a fifth smaller so the word stays whole.
+ * A word that needs more (a title with no spaces, in Japanese say) keeps the full size and breaks between characters instead.
+ */
+function titleSize(
+  g: Ctx,
+  name: string,
+  maxWidth: number,
+  size: number,
+  font: (size: number) => string
+): number {
+  g.font = font(size);
+  const widest = name
+    .split(' ')
+    .reduce((a, b) =>
+      g.measureText(b).width > g.measureText(a).width ? b : a
+    );
+  const fitted = fitFont(
+    g,
+    widest,
+    maxWidth,
+    size,
+    font,
+    Math.ceil(size * 0.8)
+  );
+  return g.measureText(widest).width <= maxWidth ? fitted : size;
+}
+
 function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
   const graphic = accentGraphicOnLight(a);
   const avatars = [
@@ -46,13 +88,17 @@ function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
     mix(a, '#000000', 0.05),
   ];
   // Dark: a deep version of the accent with light text. Light: a pale wash of the accent with dark text.
+  const darkBg = mixHex(a, '#050505', 0.72);
+  const pill = mode === 'dark' ? giftPillOnDark(a, darkBg) : giftPillOnLight(a);
   return mode === 'dark'
     ? {
-        bg: mix(a, '#050505', 0.72),
+        bg: darkBg,
         glow: rgba(a, 0.55),
         dot: mix(a, '#ffffff', 0.6),
         text: '#ffffff',
         muted: 'rgba(255,255,255,0.75)',
+        accentText: pill.text,
+        giftPill: pill.fill,
         track: 'rgba(255,255,255,0.2)',
         bar: mix(a, '#ffffff', 0.45),
         ctaBg: '#ffffff',
@@ -75,6 +121,8 @@ function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
         dot: a,
         text: '#111111',
         muted: 'rgba(17,17,17,0.65)',
+        accentText: pill.text,
+        giftPill: pill.fill,
         track: rgba(a, 0.18),
         bar: graphic,
         ctaBg: a,
@@ -266,8 +314,9 @@ function drawGauge(
   season.behindPhoto?.(g, cx, cy, photoR, t, k);
   g.globalAlpha = pIn;
   g.shadowColor = 'rgba(0,0,0,0.3)';
-  g.shadowBlur = 50 * k;
-  g.shadowOffsetY = 16 * k;
+  // Shadows ignore the canvas scale, so a denser canvas scales them by hand.
+  g.shadowBlur = 50 * k * f.scale;
+  g.shadowOffsetY = 16 * k * f.scale;
   g.fillStyle = P.frame;
   g.beginPath();
   g.arc(cx, cy, photoR + 10 * k, 0, Math.PI * 2);
@@ -312,7 +361,7 @@ function drawGauge(
   g.restore();
 }
 
-/** Name, host and amount. Returns the height used; with `measureOnly` it draws nothing. */
+/** Name, host, amount and the donor's gift line, if there is one. Returns the height used; with `measureOnly` it draws nothing. */
 function drawTitle(
   g: Ctx,
   f: FrameContext,
@@ -324,14 +373,35 @@ function drawTitle(
   measureOnly = false
 ): number {
   const { t, P, data, fonts } = f;
-  g.font = `700 ${s.title}px ${fonts.title}`;
+  const giftLine = data.giftLine;
+  const giftWidth = (size: number) => {
+    g.font = `800 ${size}px ${fonts.body}`;
+    return g.measureText(giftLine ?? '').width + 2 * PILL_PAD * size;
+  };
+  let giftFont = 0;
+  if (giftLine) {
+    giftFont = Math.round(s.raised * GIFT_SCALE);
+    // A large amount in a narrow column: shrink the pill rather than let it run past the zone.
+    const full = giftWidth(giftFont);
+    if (full > maxWidth) {
+      giftFont = Math.floor((giftFont * maxWidth) / full);
+      while (giftFont > 1 && giftWidth(giftFont) > maxWidth) giftFont--;
+    }
+  }
+  const pillH = giftFont * PILL_HEIGHT;
+  const giftGap = s.raised * 0.25;
+
+  const titleFont = fontOf(700, fonts.title);
+  const nameSize = titleSize(g, data.name, maxWidth, s.title, titleFont);
+  g.font = titleFont(nameSize);
   const lines = wrapBalanced(g, data.name, maxWidth, 3);
-  const lineH = s.title * 1.17;
+  const lineH = nameSize * 1.17;
   const byH = s.by * 1.4;
   const raisedH = s.raised * 1.6;
   // The name and host belong together; the amount is its own line, so it gets a little room.
   const raisedGap = s.raised * 0.55;
-  const height = lines.length * lineH + byH + raisedGap + raisedH;
+  const giftH = giftLine ? giftGap + pillH : 0;
+  const height = lines.length * lineH + byH + raisedGap + raisedH + giftH;
   if (measureOnly) return height;
 
   const aTitle = phase(t, 0.5, 1.1);
@@ -345,21 +415,53 @@ function drawTitle(
     g.fillText(line, x, cy + lineH / 2 + lift);
     cy += lineH;
   }
-  g.font = `500 ${s.by}px ${fonts.body}`;
+  // A long host name or amount shrinks to fit the column, and past that is narrowed by fillText.
+  fitFont(g, data.byLine, maxWidth, s.by, fontOf(500, fonts.body));
   g.fillStyle = P.muted;
-  g.fillText(data.byLine, x, cy + byH / 2 + lift);
+  g.fillText(data.byLine, x, cy + byH / 2 + lift, maxWidth);
   cy += byH + raisedGap;
+  const goalText = data.goal ? data.formatMoney(data.goal) : null;
+  // Fitted to the final amount, so the size holds while the amount counts up.
+  fitFont(
+    g,
+    data.raisedLine(data.formatMoney(data.raised), goalText),
+    maxWidth,
+    s.raised,
+    fontOf(600, fonts.body)
+  );
   const counted = data.raised * phase(t, RING_START, RING_END);
-  g.font = `600 ${s.raised}px ${fonts.body}`;
   g.fillStyle = P.text;
   g.fillText(
-    data.raisedLine(
-      data.formatMoney(counted),
-      data.goal ? data.formatMoney(data.goal) : null
-    ),
+    data.raisedLine(data.formatMoney(counted), goalText),
     x,
-    cy + raisedH / 2 + lift
+    cy + raisedH / 2 + lift,
+    maxWidth
   );
+  if (giftLine) {
+    cy += raisedH + giftGap;
+    const aGift = phase(t, 1.4, 2.0);
+    const drop = (1 - aGift) * 20;
+    const pad = PILL_PAD * giftFont;
+    const pillW = giftWidth(giftFont);
+    g.globalAlpha = aGift;
+    g.fillStyle = P.giftPill;
+    roundRect(
+      g,
+      align === 'center' ? x - pillW / 2 : x,
+      cy + drop,
+      pillW,
+      pillH,
+      pillH / 2
+    );
+    g.fill();
+    g.fillStyle = P.accentText;
+    // A hair below the middle, which looks centred in the pill.
+    g.fillText(
+      giftLine,
+      align === 'center' ? x : x + pad,
+      cy + pillH / 2 + giftFont * 0.04 + drop
+    );
+  }
   g.globalAlpha = 1;
   return height;
 }
@@ -371,6 +473,7 @@ function drawFirstGift(
   x: number,
   y: number,
   align: Align,
+  maxWidth: number,
   s: ShareSizes
 ) {
   const { t, P, data, fonts } = f;
@@ -401,12 +504,13 @@ function drawFirstGift(
     g.restore();
   }
   const textGap = s.avatarText * 0.6;
+  const text = data.firstLine ?? '';
   g.globalAlpha = phase(t, 2.1, 2.5);
   g.fillStyle = P.muted;
-  g.font = `500 ${s.avatarText}px ${fonts.body}`;
+  fitFont(g, text, maxWidth, s.avatarText, fontOf(500, fonts.body));
   g.textAlign = align;
   g.textBaseline = 'middle';
-  g.fillText(data.firstLine ?? '', x, y + size + textGap + s.avatarText * 0.65);
+  g.fillText(text, x, y + size + textGap + s.avatarText * 0.65, maxWidth);
   g.globalAlpha = 1;
 }
 
@@ -417,6 +521,7 @@ function drawAvatars(
   x: number,
   y: number,
   align: Align,
+  maxWidth: number,
   s: ShareSizes,
   measureOnly = false
 ): number {
@@ -429,7 +534,7 @@ function drawAvatars(
   if (measureOnly) return height;
 
   if (shown.length === 0 && data.firstLine) {
-    drawFirstGift(g, f, x, y, align, s);
+    drawFirstGift(g, f, x, y, align, maxWidth, s);
     return height;
   }
 
@@ -474,15 +579,12 @@ function drawAvatars(
     }
     ax += size - overlap;
   });
+  const text = data.donorsLine ?? '';
   g.globalAlpha = phase(t, 2.1, 2.5);
   g.fillStyle = P.muted;
-  g.font = `500 ${s.avatarText}px ${fonts.body}`;
+  fitFont(g, text, maxWidth, s.avatarText, fontOf(500, fonts.body));
   g.textAlign = align;
-  g.fillText(
-    data.donorsLine ?? '',
-    x,
-    y + size + textGap + s.avatarText * 0.65
-  );
+  g.fillText(text, x, y + size + textGap + s.avatarText * 0.65, maxWidth);
   g.globalAlpha = 1;
   return height;
 }
@@ -494,6 +596,7 @@ function drawCta(
   x: number,
   y: number,
   align: Align,
+  maxWidth: number,
   s: ShareSizes,
   measureOnly = false
 ): number {
@@ -551,7 +654,13 @@ function drawCta(
   g.fillStyle = P.ctaText;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
-  g.fillText(data.cta, season.ctaDecor ? s.cta * 0.45 : 0, 3 * k);
+  // Past the smallest font the button stops growing, so the text narrows to keep its padding.
+  g.fillText(
+    data.cta,
+    season.ctaDecor ? s.cta * 0.45 : 0,
+    3 * k,
+    Math.max(1, ctaW - pad)
+  );
   g.restore();
   season.ctaAround?.(g, cx, cy, ctaW, s.cta, t, k, P);
 
@@ -602,10 +711,15 @@ function drawCta(
   }
   g.globalAlpha = aCta;
   g.fillStyle = P.muted;
-  g.font = `500 ${s.url}px ${fonts.body}`;
+  fitFont(g, data.url, maxWidth, s.url, fontOf(500, fonts.body));
   g.textAlign = align;
   g.textBaseline = 'middle';
-  g.fillText(data.url, x, y + s.cta + urlH / 2 + 16 * k + urlGap / 2 + rise);
+  g.fillText(
+    data.url,
+    x,
+    y + s.cta + urlH / 2 + 16 * k + urlGap / 2 + rise,
+    maxWidth
+  );
   g.globalAlpha = 1;
   return height;
 }
@@ -628,6 +742,22 @@ function drawGuides(g: Ctx, z: ShareZone, w: number, h: number) {
   g.fillRect(z.x + z.w, 0, 3, h);
 }
 
+/** The format's sizes with the text scaled by `factor`, keeping the ring at `gauge`. */
+function scaleText(
+  base: ShareSizes,
+  factor: number,
+  gauge: number
+): ShareSizes {
+  const s = Object.fromEntries(
+    Object.entries(base).map(([key, value]) => [
+      key,
+      Math.round(value * factor),
+    ])
+  ) as unknown as ShareSizes;
+  s.gauge = gauge;
+  return s;
+}
+
 /** One centred column. Tight zones shrink the ring, then drop the avatars, then scale the text. */
 function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   const z = F.zone;
@@ -638,8 +768,8 @@ function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
     return (
       s.gauge +
       drawTitle(g, f, 0, 0, 'center', textW, s, true) +
-      (avatars ? drawAvatars(g, f, 0, 0, 'center', s, true) : 0) +
-      drawCta(g, f, 0, 0, 'center', s, true) +
+      (avatars ? drawAvatars(g, f, 0, 0, 'center', textW, s, true) : 0) +
+      drawCta(g, f, 0, 0, 'center', textW, s, true) +
       (48 + 80 + (avatars ? 48 : 0)) * gs
     );
   };
@@ -661,14 +791,7 @@ function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
     measure(s, avatars) > z.h && factor > 0.7;
     factor -= 0.03
   ) {
-    const gauge = s.gauge;
-    s = Object.fromEntries(
-      Object.entries(F.size).map(([key, value]) => [
-        key,
-        Math.round(value * factor),
-      ])
-    ) as unknown as ShareSizes;
-    s.gauge = gauge;
+    s = scaleText(F.size, factor, s.gauge);
   }
 
   // Spare height goes to the gaps, most of it between the fundraiser and the invite.
@@ -698,27 +821,39 @@ function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   drawGauge(g, f, cx, y + s.gauge / 2, s.gauge);
   y += s.gauge + gaps.photo;
   y += drawTitle(g, f, cx, y, 'center', textW, s) + gaps.group;
-  if (avatars) y += drawAvatars(g, f, cx, y, 'center', s) + gaps.social;
+  if (avatars) y += drawAvatars(g, f, cx, y, 'center', textW, s) + gaps.social;
   f.maxCtaWidth = z.w - 2 * 170 * (s.cta / 104);
-  drawCta(g, f, cx, y, 'center', s);
+  drawCta(g, f, cx, y, 'center', textW, s);
   if (guides) drawGuides(g, z, F.w, F.h);
 }
 
-/** The ring on the left, the text on the right, for wide formats. */
+/** The ring on the left, the text on the right, for wide formats. Text that does not fit drops the avatars, then scales down. */
 function layoutSplit(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   const z = F.zone;
-  const s = F.size;
-  const gaugeSize = Math.min(s.gauge, z.h);
+  const gaugeSize = Math.min(F.size.gauge, z.h);
   const textX = z.x + gaugeSize + z.w * 0.05;
   const textW = z.x + z.w - textX;
-  const avatars = hasAvatarRow(f.data);
+  const measure = (s: ShareSizes, avatars: boolean) =>
+    drawTitle(g, f, 0, 0, 'left', textW, s, true) +
+    s.title * 0.7 +
+    (avatars
+      ? drawAvatars(g, f, 0, 0, 'left', textW, s, true) + s.title * 0.55
+      : 0) +
+    drawCta(g, f, 0, 0, 'left', textW, s, true);
+
+  let avatars = hasAvatarRow(f.data);
+  if (measure(F.size, avatars) > z.h) avatars = false;
+  let s: ShareSizes = { ...F.size };
+  for (
+    let factor = 0.97;
+    measure(s, avatars) > z.h && factor > 0.7;
+    factor -= 0.03
+  ) {
+    s = scaleText(F.size, factor, s.gauge);
+  }
   const gapGroup = s.title * 0.7;
   const gapSocial = s.title * 0.55;
-  const total =
-    drawTitle(g, f, 0, 0, 'left', textW, s, true) +
-    gapGroup +
-    (avatars ? drawAvatars(g, f, 0, 0, 'left', s, true) + gapSocial : 0) +
-    drawCta(g, f, 0, 0, 'left', s, true);
+  const total = measure(s, avatars);
   const gcx = z.x + gaugeSize / 2;
   const gcy = z.y + z.h / 2;
 
@@ -726,9 +861,9 @@ function layoutSplit(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   drawGauge(g, f, gcx, gcy, gaugeSize);
   let y = z.y + Math.max(0, (z.h - total) / 2);
   y += drawTitle(g, f, textX, y, 'left', textW, s) + gapGroup;
-  if (avatars) y += drawAvatars(g, f, textX, y, 'left', s) + gapSocial;
+  if (avatars) y += drawAvatars(g, f, textX, y, 'left', textW, s) + gapSocial;
   f.maxCtaWidth = textW - 30;
-  drawCta(g, f, textX, y, 'left', s);
+  drawCta(g, f, textX, y, 'left', textW, s);
   if (guides) drawGuides(g, z, F.w, F.h);
 }
 
@@ -754,11 +889,11 @@ export function drawShareFrame(g: Ctx, t: number, options: ShareRenderOptions) {
       body: `"${options.theme.bodyFont}", sans-serif`,
     },
     maxCtaWidth: Number.POSITIVE_INFINITY,
+    scale: options.scale ?? 1,
   };
   g.save();
   // Everything is laid out in format units; a denser canvas only scales them.
-  const scale = options.scale ?? 1;
-  g.scale(scale, scale);
+  g.scale(frame.scale, frame.scale);
   if (F.layout === 'stack') layoutStack(g, frame, F, options.guides ?? false);
   else layoutSplit(g, frame, F, options.guides ?? false);
   g.restore();

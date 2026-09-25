@@ -1,7 +1,7 @@
 /** The query parameter a personal share link carries. */
 export const REF_PARAM = 'ref';
 
-/** Codes are issued by the platform; anything else in the URL is ignored, so a hand-typed `?ref=` cannot pose as someone. */
+/** The shape of a platform code. The check only drops malformed values. It does not prove who owns a code, so a hand-typed `?ref=` in this shape still counts. */
 const REF_CODE = /^[A-Za-z0-9_-]{4,32}$/;
 
 export function isValidRefCode(

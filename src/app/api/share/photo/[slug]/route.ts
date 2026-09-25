@@ -2,67 +2,52 @@ import type { NextRequest } from 'next/server';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { NextResponse } from 'next/server';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { getFundraisers } from '@/lib/api/fundraisers-service';
 import { getLeaderboard } from '@/lib/api/leaderboard-service';
 import { readImpersonation } from '@/lib/api/platform-fetch';
 import { resolveShareBackground } from '@/lib/share/render/theme-background';
 import { fetchAllowedImage } from '@/lib/share/server/fetch-image';
+import {
+  pickShareDonors,
+  SHARE_LEADERBOARD_LIMIT,
+} from '@/lib/share/share-data';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { getImageUrl, resolveFundraiserImageSource } from '@/lib/utils/images';
 import { routing } from '@/i18n/routing';
 
 export const runtime = 'nodejs';
 
-// Big enough for a full-bleed background at 2x.
-const MAX_RASTER_SIDE = 2400;
-
-async function rasterize(
-  svg: Buffer
-): Promise<{ bytes: Buffer; type: string } | null> {
-  const image = await loadImage(svg).catch(() => null);
-  if (!image || !image.width || !image.height) return null;
-  const scale = Math.min(
-    1,
-    MAX_RASTER_SIDE / Math.max(image.width, image.height)
-  );
-  const canvas = createCanvas(
-    Math.round(image.width * scale),
-    Math.round(image.height * scale)
-  );
-  canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-  return { bytes: await canvas.encode('png'), type: 'image/png' };
-}
-
 /**
- * A draft is not public yet, so it is looked up among the caller's own fundraisers, as the host they are or are impersonating.
  * A public or unlisted fundraiser needs no token.
+ * A draft is not public yet, so it is looked up among the caller's own fundraisers, as the host they are or are impersonating.
  */
 async function findFundraiser(
   request: NextRequest,
   slug: string
 ): Promise<Fundraiser | null> {
+  const found = await getCachedFundraiser(slug, routing.defaultLocale).catch(
+    () => null
+  );
+  if (found) return found;
   const token = request.headers
     .get('authorization')
     ?.replace(/^Bearer\s+/i, '')
     .trim();
-  if (token) {
-    const hosted = await getFundraisers(
-      token,
-      readImpersonation(request.headers)
-    );
-    const own = hosted.find(fundraiser => fundraiser.slug === slug);
-    if (own) return own;
-  }
-  return getCachedFundraiser(slug, routing.defaultLocale).catch(() => null);
+  if (!token) return null;
+  // An expired or rejected token only means "not one of mine", never a failed request.
+  const hosted = await getFundraisers(
+    token,
+    readImpersonation(request.headers)
+  ).catch(() => []);
+  return hosted.find(fundraiser => fundraiser.slug === slug) ?? null;
 }
 
 /**
  * Which image of this fundraiser to serve:
  * - by default, its cover photo;
  * - `?asset=background`: its theme's own background image or pattern, when that is on another host;
- * - `?donor=<donation id>`: the profile photo of a donor the public leaderboard names.
+ * - `?donor=<donation id>`: the profile photo of a donor the share image names, by the rules of pickShareDonors.
  * Only URLs that belong to the fundraiser are ever fetched, never one from the request.
  */
 async function resolveSource(
@@ -71,18 +56,21 @@ async function resolveSource(
 ): Promise<string | null> {
   const { searchParams } = request.nextUrl;
   const donor = searchParams.get('donor');
+  const [fundraiser, board] = await Promise.all([
+    findFundraiser(request, slug),
+    donor
+      ? getLeaderboard(slug, SHARE_LEADERBOARD_LIMIT).catch(() => null)
+      : null,
+  ]);
+  if (!fundraiser) return null;
   if (donor) {
-    const board = await getLeaderboard(slug, 20).catch(() => null);
-    if (!board || board.settings?.anonymize) return null;
-    const donation = [...(board?.top ?? []), ...(board?.recent ?? [])].find(
-      entry => entry.id === donor && !entry.isAnonymous
+    const person = pickShareDonors(fundraiser, board)?.people.find(
+      entry => entry.seed === donor
     );
-    return donation?.avatarUrl
-      ? getImageUrl('profile', 'thumb', donation.avatarUrl)
+    return person?.avatarFile
+      ? getImageUrl('profile', 'thumb', person.avatarFile)
       : null;
   }
-  const fundraiser = await findFundraiser(request, slug);
-  if (!fundraiser) return null;
   if (searchParams.get('asset') === 'background') {
     const src = resolveShareBackground(buildTheme(fundraiser.settings?.theme))
       .decoration?.src;
@@ -105,19 +93,14 @@ export async function GET(
     const src = await resolveSource(request, slug);
     if (!src) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-    const image = await fetchAllowedImage(src, { allowSvg: true });
+    // Raster types only: an SVG passed on would run as a page on our origin.
+    const image = await fetchAllowedImage(src);
     if (!image)
       return NextResponse.json({ error: 'upstream' }, { status: 502 });
-    // An SVG is drawn to a PNG here: passed on as it is, it would run as a page on our origin.
-    const body =
-      image.type === 'image/svg+xml'
-        ? await rasterize(image.bytes)
-        : { bytes: image.bytes, type: image.type };
-    if (!body) return NextResponse.json({ error: 'upstream' }, { status: 502 });
 
-    return new NextResponse(new Uint8Array(body.bytes), {
+    return new NextResponse(new Uint8Array(image.bytes), {
       headers: {
-        'Content-Type': body.type,
+        'Content-Type': image.type,
         // Only ever an image: never sniffed as something else, never run as a document.
         'X-Content-Type-Options': 'nosniff',
         'Content-Security-Policy': "default-src 'none'; sandbox",

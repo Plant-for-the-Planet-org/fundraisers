@@ -8,7 +8,12 @@
       "goal": "Goal: {goal}",
       "started": "Just getting started",
       "first": "Be the first to give",
-      "newBadge": "New"
+      "newBadge": "New",
+      "gift": {
+        "once": "I just gave {amount}!",
+        "monthly": "I give {amount} every month!",
+        "yearly": "I give {amount} every year!"
+      }
     },
     "cta": {
       "joinMe": "Join me",
@@ -32,6 +37,12 @@
       "halloween": "No tricks, just a treat for the planet: I'm fundraising for {name}. Join me!",
       "birthday": "For my birthday I'm fundraising for {name} instead of gifts. Celebrate with me!",
       "donor": "I just supported {name}. Will you join me?",
+      "supporter": "Please support {name}. Every donation helps!",
+      "gift": {
+        "once": "I just gave {amount} to \"{name}\". Join me:",
+        "monthly": "I give {amount} every month to \"{name}\". Join me:",
+        "yearly": "I give {amount} every year to \"{name}\". Join me:"
+      },
       "concluded": "We did it! Thank you to everyone who gave to {name}."
     },
     "seasons": {
@@ -54,17 +65,17 @@
       "instagramStory": {
         "label": "Story",
         "hint": "Video or image, 9:16",
-        "tip": "After posting, add your link with the link sticker. We copied it for you."
+        "tip": "After posting, add your link with the link sticker."
       },
       "instagramPost": {
         "label": "Post",
-        "hint": "Image, 4:5",
+        "hint": "Image or video, 4:5",
         "tip": "Links in Instagram captions are not clickable. Put the link in your bio or a story too."
       },
       "whatsappStatus": {
         "label": "Status",
         "hint": "Video or image, 9:16",
-        "tip": "Your link is copied. Paste it as the Status caption so friends can tap it."
+        "tip": "Add your link as the Status caption so friends can tap it."
       },
       "whatsappMessage": {
         "label": "Message",
@@ -84,47 +95,47 @@
       "linkedinPost": {
         "label": "Post",
         "hint": "Image, 4:5",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "tip": "Put the link in your post text so people can tap it."
       },
       "linkedinWide": {
         "label": "Wide post",
-        "hint": "Video or image, 1.91:1",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "hint": "Image or video, 1.91:1",
+        "tip": "Put the link in your post text so people can tap it."
       },
       "facebookPost": {
         "label": "Post",
-        "hint": "Image, 4:5",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "hint": "Image or video, 4:5",
+        "tip": "Put the link in your post text so people can tap it."
       },
       "facebookStory": {
         "label": "Story",
         "hint": "Video or image, 9:16",
-        "tip": "After posting, add your link with the link sticker. We copied it for you."
+        "tip": "After posting, add your link with the link sticker."
       },
       "xPost": {
         "label": "Post",
-        "hint": "Image, 16:9",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "hint": "Image or video, 16:9",
+        "tip": "Put the link in your post text so people can tap it."
       },
       "xTallPost": {
         "label": "Tall post",
         "hint": "Image, 4:5",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "tip": "Put the link in your post text so people can tap it."
       },
-      "email": {
-        "label": "Email or newsletter",
+      "newsletter": {
+        "label": "Newsletter",
         "hint": "Banner, 1.91:1",
         "tip": "Add the banner at the top of your email and link it to your fundraiser."
       },
       "anyStory": {
         "label": "Story",
         "hint": "Video or image, 9:16",
-        "tip": "Your link is copied. Add it wherever the app allows."
+        "tip": "Add your link wherever the app allows."
       },
       "anyPost": {
         "label": "Post",
         "hint": "Image, 4:5",
-        "tip": "The caption with your link is copied. Paste it into your post."
+        "tip": "Put the link in your post text so people can tap it."
       }
     },
     "studio": {
@@ -139,7 +150,8 @@
       "showDonors": "Show donors who gave",
       "donorsUnavailable": "Shown when at least 3 donors are public and the leaderboard is on.",
       "captionTitle": "Caption",
-      "captionHint": "Copied for you when you share. Edit it if you like.",
+      "captionHint": "Copied with your link when you share. Edit it if you like.",
+      "captionHintLinkAlone": "For this format we copy only your link when you share. Use Copy to get the text too.",
       "linkLabel": "Your link",
       "copy": "Copy",
       "captionCopied": "Text and link copied",
@@ -152,6 +164,8 @@
       "previewLabel": "Preview",
       "preparing": "Preparing…",
       "preparingVideo": "Preparing video… {percent}%",
+      "renderFailed": "Try again",
+      "renderFailedTip": "Could not make the image.",
       "shareTo": "Share to {platform}",
       "share": "Share",
       "shareLink": "Share link",
@@ -163,12 +177,14 @@
       "kitDone": "Share kit downloaded",
       "kitFailed": "Could not prepare the files",
       "shareFailed": "Could not open sharing. Try Download instead.",
-      "savedTip": "Saved {file}. Your caption is copied. {tip}",
+      "savedTip": "Saved {file}. {tip}",
+      "linkCopiedTip": "Your link is copied.",
+      "captionCopiedTip": "Your caption and link are copied, ready to paste.",
       "noVideo": "This browser can't make videos. Share the image instead.",
       "messageCopied": "Message copied"
     },
     "donor": {
-      "moreFormats": "More formats"
+      "includeGift": "Include my contribution"
     }
   }
 }

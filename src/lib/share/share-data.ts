@@ -1,16 +1,24 @@
+import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
 import type { ShareRenderData } from './render/types';
 
+import { LEADERBOARD_PAGE_LIMIT } from '@/lib/constants/leaderboard';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import {
   convertTotalRaisedToSingleCurrency,
   hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
-import { selectPublicHosts } from '@/lib/utils/fundraiser-hosts';
 
 /** Fewer public donors than this and the avatar row is left out: two initials look emptier than none. */
 export const MIN_DONORS_FOR_AVATARS = 3;
+
+/**
+ * The leaderboard `limit` for everything that calls pickShareDonors: the studio, the link preview and the photo route.
+ * Who gets picked depends on how many top entries it sees, so a different limit could make the photo route refuse a donor the image shows.
+ * It is the page's own limit, so the page's metadata and its donor list share one request on the server. Ten top and ten recent entries are plenty for five names.
+ */
+export const SHARE_LEADERBOARD_LIMIT = LEADERBOARD_PAGE_LIMIT;
 
 export interface ShareDonors {
   /** First names of public donors, top donors first, at most five. */
@@ -21,9 +29,19 @@ export interface ShareDonors {
   count: number;
 }
 
+/** Whether a share image may name donors, with the public page's rules: the leaderboard is on, a list is shown, and it is not anonymised. */
+export function showsShareDonors(fundraiser: Fundraiser): boolean {
+  const settings = fundraiser.settings?.modules?.leaderboard;
+  return Boolean(
+    settings?.enabled &&
+    (settings.show_recent_list || settings.show_top_list) &&
+    !settings.anonymize
+  );
+}
+
 /**
- * The donors a share image may name, following the same rules as the public page: the leaderboard must be on and shown, and not anonymised.
- * Top donors come first, then recent ones, like the public page's donor strip. The top list is grouped per person, so a few people giving often do not fill the row alone.
+ * The donors a share image may name (see showsShareDonors).
+ * Top donors come first, then recent ones, like the public page's donor strip. When the host groups the top list per donor (the default), a few people giving often do not fill the row alone.
  * Anonymous donors are left out. Only first names are used.
  */
 export function pickShareDonors(
@@ -33,10 +51,7 @@ export function pickShareDonors(
     'recent' | 'top' | 'donorCount'
   > | null
 ): ShareDonors | null {
-  const settings = fundraiser.settings?.modules?.leaderboard;
-  const shown =
-    settings?.enabled && (settings.show_recent_list || settings.show_top_list);
-  if (!leaderboard || !shown || settings.anonymize) return null;
+  if (!leaderboard || !showsShareDonors(fundraiser)) return null;
 
   const names: string[] = [];
   const people: ShareDonors['people'] = [];
@@ -70,11 +85,30 @@ export interface ShareLabels {
   first: () => string;
   /** The ring's badge before anyone has given, such as "New". */
   newBadge: () => string;
+  /** The donor's own gift: "I just gave €50!", or "I give €20 every month!". The link preview leaves it out, so it never shows a gift. */
+  gift?: (amount: string, frequency: DonationFrequency) => string;
 }
 
-/** The first public host's name, as the public page shows it. */
+/** A donor's completed gift, for the image and caption right after giving. `amount` is a decimal, as the API returns it. */
+export interface ShareGift {
+  amount: number;
+  currency: string;
+  frequency: DonationFrequency;
+}
+
+/** The gift's amount in the donor's own currency, which can differ from the fundraiser's. The image and the caption both use it, so they always match. */
+export function formatShareGiftAmount(gift: ShareGift, locale: string): string {
+  return formatCurrencyFromDecimal(gift.amount, gift.currency, locale);
+}
+
+/**
+ * The name of the first active host who chose to be named.
+ * Unlike the page's host list (`selectPublicHosts`), it never falls back to other hosts: the dashboard's copy of a fundraiser has private hosts too, and an image must not name one.
+ */
 export function getShareHostName(fundraiser: Fundraiser): string | null {
-  const host = selectPublicHosts(fundraiser.hosts)[0];
+  const host = fundraiser.hosts.find(
+    entry => entry.status === 'active' && entry.isPublic
+  );
   return host?.displayName ?? host?.user?.name ?? null;
 }
 
@@ -93,6 +127,8 @@ export function buildShareRenderData({
   cta,
   url,
   labels,
+  gift = null,
+  showGift = true,
 }: {
   fundraiser: Fundraiser;
   locale: string;
@@ -100,14 +136,25 @@ export function buildShareRenderData({
   cta: string;
   url: string;
   labels: ShareLabels;
+  /** The donor's completed gift. It always counts in the total, even with its line turned off. */
+  gift?: ShareGift | null;
+  /** Puts the gift on its own line under the amount. */
+  showGift?: boolean;
 }): ShareRenderData {
   const host = getShareHostName(fundraiser);
+  // The page-load totals do not have the donor's own gift yet, so add it; otherwise the first donor's image still says "Be the first to give".
+  const totals = { ...fundraiser.totalRaised };
+  if (gift) {
+    const key = gift.currency.toUpperCase();
+    totals[key] = (totals[key] ?? 0) + gift.amount;
+  }
   const raised = convertTotalRaisedToSingleCurrency(
-    fundraiser.totalRaised,
+    totals,
     fundraiser.currency
   );
   // Nothing raised yet: lead with the goal and invite the first gift, rather than show zeros.
-  const fresh = raised <= 0 && !hasFundraiserConcluded(fundraiser);
+  // A gift in a currency with no rate adds nothing to `raised`, but must still never sit next to the first-gift invite.
+  const fresh = raised <= 0 && !gift && !hasFundraiserConcluded(fundraiser);
   return {
     name: fundraiser.title,
     byLine: host ? labels.byLine(host) : '',
@@ -127,6 +174,10 @@ export function buildShareRenderData({
         : goal
           ? labels.raisedOf(raisedText, goal)
           : labels.raised(raisedText),
+    giftLine:
+      gift && showGift && labels.gift
+        ? labels.gift(formatShareGiftAmount(gift, locale), gift.frequency)
+        : null,
     donors: donors?.names ?? [],
     concluded: hasFundraiserConcluded(fundraiser),
     firstLine: fresh && !donors ? labels.first() : null,

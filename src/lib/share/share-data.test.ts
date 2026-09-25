@@ -1,7 +1,12 @@
+import type { DonationFrequency } from '@/lib/types/donation';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
+import type { ShareGift } from './share-data';
 
+import { createTranslator } from 'next-intl';
 import { describe, expect, it } from 'vitest';
+import de from '../../../locales/de/share.json';
+import en from '../../../locales/en/share.json';
 import { buildShareRenderData, pickShareDonors } from './share-data';
 
 const donation = (
@@ -172,5 +177,165 @@ describe('buildShareRenderData', () => {
     expect(data.goal).toBeNull();
     expect(data.donorsLine).toBeNull();
     expect(data.raisedLine('€3,400', null)).toBe('€3,400 raised');
+  });
+
+  it('never names a private host, even when no host is public', () => {
+    const host = fundraiser(shownBoard).hosts[0];
+    const build = (hosts: Fundraiser['hosts']) =>
+      buildShareRenderData({
+        fundraiser: fundraiser(shownBoard, { hosts }),
+        locale: 'en',
+        donors: null,
+        cta: 'Join me',
+        url: 'x',
+        labels,
+      }).byLine;
+
+    // The dashboard's copy of a fundraiser lists private hosts too.
+    expect(build([{ ...host, isPublic: false }])).toBe('');
+    expect(
+      build([
+        { ...host, isPublic: false },
+        { ...host, displayName: 'Tom', status: 'invited' },
+        { ...host, displayName: 'Lea' },
+      ])
+    ).toBe('by Lea');
+  });
+
+  describe('the gift line', () => {
+    const messages = { en, de };
+    const build = (gift: ShareGift | null, locale: 'en' | 'de' = 'en') => {
+      const t = createTranslator({
+        locale,
+        messages: messages[locale],
+        namespace: 'Share',
+      });
+      return buildShareRenderData({
+        fundraiser: fundraiser(shownBoard),
+        locale,
+        donors: null,
+        cta: 'Join me',
+        url: 'x',
+        labels: {
+          ...labels,
+          // As the studio wires it.
+          gift: (amount, frequency) => t(`image.gift.${frequency}`, { amount }),
+        },
+        gift,
+      });
+    };
+
+    it.each<[DonationFrequency, number, string, string]>([
+      ['once', 50, 'I just gave €50!', 'Ich habe gerade €50 gespendet!'],
+      ['monthly', 20, 'I give €20 every month!', 'Ich spende jeden Monat €20!'],
+      ['yearly', 50, 'I give €50 every year!', 'Ich spende jedes Jahr €50!'],
+    ])('says what a %s gift is', (frequency, amount, english, german) => {
+      const gift = { amount, currency: 'EUR', frequency };
+      expect(build(gift).giftLine).toBe(english);
+      expect(build(gift, 'de').giftLine).toBe(german);
+    });
+
+    it("uses the donor's own currency and reads the amount as a decimal", () => {
+      // The fundraiser raises in euros.
+      expect(
+        build({ amount: 12.5, currency: 'USD', frequency: 'once' }).giftLine
+      ).toBe('I just gave $12.50!');
+      expect(
+        build({ amount: 1250, currency: 'EUR', frequency: 'monthly' }, 'de')
+          .giftLine
+      ).toBe('Ich spende jeden Monat €1.250!');
+    });
+
+    it('leaves the line out without a gift', () => {
+      expect(build(null).giftLine).toBeNull();
+    });
+
+    it('leaves the line out without a gift label, as in the link preview', () => {
+      const data = buildShareRenderData({
+        fundraiser: fundraiser(shownBoard),
+        locale: 'en',
+        donors: null,
+        cta: 'Join me',
+        url: 'x',
+        labels,
+        gift: { amount: 50, currency: 'EUR', frequency: 'once' },
+      });
+      expect(data.giftLine).toBeNull();
+    });
+
+    it("counts the donor's gift, so the first donor is not invited to give first", () => {
+      // Active and open, or hasFundraiserConcluded would hide the invite for the wrong reason.
+      const fresh = fundraiser(shownBoard, {
+        status: 'active',
+        canDonate: true,
+        totalRaised: {},
+      } as Partial<Fundraiser>);
+      const build = (gift: ShareGift | null) =>
+        buildShareRenderData({
+          fundraiser: fresh,
+          locale: 'en',
+          donors: null,
+          cta: 'Join me',
+          url: 'x',
+          labels: { ...labels, gift: amount => `I just gave ${amount}!` },
+          gift,
+        });
+
+      const before = build(null);
+      expect(before.badge).toBe('New');
+      expect(before.firstLine).toBe('Be the first to give');
+
+      const after = build({ amount: 50, currency: 'EUR', frequency: 'once' });
+      expect(after.badge).toBeNull();
+      expect(after.firstLine).toBeNull();
+      expect(after.raised).toBe(50);
+      expect(
+        after.raisedLine(
+          after.formatMoney(after.raised),
+          after.formatMoney(5000)
+        )
+      ).toBe('€50 raised of €5,000');
+      // Another currency is converted, like the rest of the total.
+      expect(
+        build({ amount: 50, currency: 'USD', frequency: 'once' }).raised
+      ).toBe(40);
+    });
+
+    it('still counts the gift when the donor leaves its line off', () => {
+      const fresh = fundraiser(shownBoard, {
+        status: 'active',
+        canDonate: true,
+        totalRaised: { EUR: 100 },
+      } as Partial<Fundraiser>);
+      const data = buildShareRenderData({
+        fundraiser: fresh,
+        locale: 'en',
+        donors: null,
+        cta: 'Join me',
+        url: 'x',
+        labels: { ...labels, gift: amount => `I just gave ${amount}!` },
+        gift: { amount: 50, currency: 'EUR', frequency: 'once' },
+        showGift: false,
+      });
+      expect(data.giftLine).toBeNull();
+      expect(data.raised).toBe(150);
+
+      const first = buildShareRenderData({
+        fundraiser: fundraiser(shownBoard, {
+          status: 'active',
+          canDonate: true,
+          totalRaised: {},
+        } as Partial<Fundraiser>),
+        locale: 'en',
+        donors: null,
+        cta: 'Join me',
+        url: 'x',
+        labels,
+        gift: { amount: 50, currency: 'EUR', frequency: 'once' },
+        showGift: false,
+      });
+      expect(first.firstLine).toBeNull();
+      expect(first.badge).toBeNull();
+    });
   });
 });

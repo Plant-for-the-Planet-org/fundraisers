@@ -44,23 +44,12 @@ export function FundraiserChecklistCard({
         </span>
       </div>
 
+      {/* Sharing stays open until the fundraiser ends, so every step is done only once donations have closed for good. */}
       {doneCount === items.length ? (
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <p className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <CircleCheckIcon className='size-4 shrink-0 text-success' />
-            {fundraiser.canDonate ? t('allDoneShare') : t('allDone')}
-          </p>
-          {/* Everything is in place, so the next thing that moves the needle is sharing. */}
-          {fundraiser.canDonate && (
-            <Button asChild size='sm'>
-              <Link
-                href={`/dashboard/fundraisers/${encodeURIComponent(fundraiser.slug)}/share`}
-              >
-                {t('share')}
-              </Link>
-            </Button>
-          )}
-        </div>
+        <p className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <CircleCheckIcon className='size-4 shrink-0 text-success' />
+          {t('allDone')}
+        </p>
       ) : (
         <div className='flex flex-col gap-1'>
           <ul

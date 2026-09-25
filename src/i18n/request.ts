@@ -37,8 +37,7 @@ export default getRequestConfig(async ({ locale: requested }) => {
   const [cookieStore, headerStore] = await Promise.all([cookies(), headers()]);
 
   // A locale passed in code (getTranslations({ locale })) wins, for output that is not for the current visitor, such as a link preview.
-  // Otherwise: explicit selection > profile language (both tags of the same
-  // `ui-locale` cookie, see resolve-locale.ts) > browser language > default.
+  // Otherwise: explicit selection > profile language (both tags of the same `ui-locale` cookie, see resolve-locale.ts) > browser language > default.
   const locale =
     requested && hasLocale(routing.locales, requested)
       ? requested

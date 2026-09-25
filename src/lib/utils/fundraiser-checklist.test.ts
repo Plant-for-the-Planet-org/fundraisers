@@ -71,7 +71,7 @@ describe('getFundraiserChecklist', () => {
     expect(doneIds(makeFundraiser())).toEqual([]);
   });
 
-  it('marks everything done on a complete, live fundraiser', () => {
+  it('marks every step but sharing done on a complete, live fundraiser', () => {
     const fundraiser = makeFundraiser({
       image: 'cover.jpg',
       description: `<p>${'a'.repeat(STORY_MIN_LENGTH)}</p>`,
@@ -81,6 +81,7 @@ describe('getFundraiserChecklist', () => {
       donationCount: 3,
     });
     expect(doneIds(fundraiser)).toHaveLength(6);
+    expect(doneIds(fundraiser)).not.toContain('share');
   });
 
   it('counts the story by its text, not its markup', () => {

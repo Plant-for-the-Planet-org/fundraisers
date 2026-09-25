@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { crc32, createZip } from './zip';
+import { crc32, createZipParts } from './zip';
 
 describe('crc32', () => {
   it('matches the standard check value', () => {
@@ -7,13 +7,14 @@ describe('crc32', () => {
   });
 });
 
-describe('createZip', () => {
-  it('writes one stored entry per file, with a directory at the end', () => {
+describe('createZipParts', () => {
+  it('writes one stored entry per file, with a directory at the end', async () => {
     const files = [
       { name: 'story.png', data: new Uint8Array([1, 2, 3]) },
       { name: 'captions.txt', data: new TextEncoder().encode('Join me') },
     ];
-    const zip = createZip(files);
+    const blob = new Blob(createZipParts(files) as BlobPart[]);
+    const zip = new Uint8Array(await blob.arrayBuffer());
     const view = new DataView(zip.buffer);
 
     expect(view.getUint32(0, true)).toBe(0x04034b50);

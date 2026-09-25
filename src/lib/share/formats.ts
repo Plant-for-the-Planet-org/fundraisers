@@ -101,12 +101,12 @@ export const SHARE_FORMATS = {
       url: 21,
     },
   },
-  // 16:9 image in the X feed.
+  // About 16:9, for the X feed. It is 676px tall, not 675, because H.264 video needs an even width and height.
   wide: {
     w: 1200,
-    h: 675,
+    h: 676,
     layout: 'split',
-    zone: { x: 60, y: 50, w: 1080, h: 575 },
+    zone: { x: 60, y: 50, w: 1080, h: 576 },
     size: {
       gauge: 500,
       title: 44,

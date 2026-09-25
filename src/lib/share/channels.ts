@@ -26,6 +26,8 @@ export interface ShareChannel {
   utm: { source: string; medium: string };
   /** A chat builds its own preview from the link, so only text is shared. */
   linkOnly?: boolean;
+  /** The tip only says to put the link in the post text, which the copied caption already holds, so it shows only when the copy failed. */
+  tipOnlyIfCopyFails?: boolean;
 }
 
 const social = (source: string) => ({ source, medium: 'social' });
@@ -80,6 +82,7 @@ export const SHARE_CHANNELS = [
     format: 'post',
     kinds: ['image'],
     utm: social('linkedin'),
+    tipOnlyIfCopyFails: true,
   },
   {
     id: 'linkedinWide',
@@ -87,6 +90,7 @@ export const SHARE_CHANNELS = [
     format: 'banner',
     kinds: ['image', 'video'],
     utm: social('linkedin'),
+    tipOnlyIfCopyFails: true,
   },
   {
     id: 'facebookPost',
@@ -94,6 +98,7 @@ export const SHARE_CHANNELS = [
     format: 'post',
     kinds: ['image', 'video'],
     utm: social('facebook'),
+    tipOnlyIfCopyFails: true,
   },
   {
     id: 'facebookStory',
@@ -108,6 +113,7 @@ export const SHARE_CHANNELS = [
     format: 'wide',
     kinds: ['image', 'video'],
     utm: social('x'),
+    tipOnlyIfCopyFails: true,
   },
   {
     id: 'xTallPost',
@@ -115,27 +121,30 @@ export const SHARE_CHANNELS = [
     format: 'post',
     kinds: ['image'],
     utm: social('x'),
+    tipOnlyIfCopyFails: true,
   },
   {
     id: 'anyStory',
     platform: 'other',
     format: 'story',
     kinds: ['video', 'image'],
-    utm: social('share'),
+    utm: social('share_sheet'),
   },
   {
     id: 'anyPost',
     platform: 'other',
     format: 'post',
     kinds: ['image'],
-    utm: social('share'),
+    utm: social('share_sheet'),
+    tipOnlyIfCopyFails: true,
   },
   {
-    id: 'email',
+    id: 'newsletter',
     platform: 'other',
     format: 'banner',
     kinds: ['image'],
-    utm: { source: 'email', medium: 'email' },
+    // The same tags as the link picker's Newsletter chip, so both land in one Insights row.
+    utm: { source: 'newsletter', medium: 'email' },
   },
 ] as const satisfies readonly ShareChannel[];
 

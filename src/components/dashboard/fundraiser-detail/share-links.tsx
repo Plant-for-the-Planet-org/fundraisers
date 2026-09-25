@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { buildShareUrl } from '@/lib/share/links';
 import { getReferralCode } from '@/lib/share/referral';
 import { useAuthStore } from '@/stores/auth-store';
+import { useOrigin } from '@/components/share/use-origin';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,16 +24,6 @@ const CHANNELS = [
 ] as const;
 
 type ChannelId = (typeof CHANNELS)[number]['id'];
-
-function useOrigin() {
-  // The origin is only known in the browser. Until then the link renders without it.
-  const [origin, setOrigin] = useState('');
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOrigin(window.location.origin);
-  }, []);
-  return origin;
-}
 
 /** Pick where you are sharing, then copy one link. */
 function ShareLinkPicker({ slug }: { slug: string }) {

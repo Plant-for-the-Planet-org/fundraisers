@@ -25,7 +25,7 @@ export function resolveThankYouState(
           transferAccount: response.response.account,
         };
       }
-      return { status: 'completed', donationId };
+      return { status: 'completed', donationId, amount, currency, frequency };
 
     // thank you state is only associated with "success" status
     case 'action_required':

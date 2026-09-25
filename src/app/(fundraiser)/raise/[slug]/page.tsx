@@ -2,14 +2,18 @@ import type { Metadata } from 'next';
 import type { AlltimeStats } from '@/lib/api/alltime-stats';
 
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getAlltimeStats } from '@/lib/api/alltime-stats';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { shareImagePath } from '@/lib/share/preview';
+import { shareImageVersion } from '@/lib/share/server/preview-version';
+import { loadShareLeaderboard } from '@/lib/share/server/share-leaderboard';
 import { getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
+import { getShareOrigin } from '@/lib/utils/public-base-url';
 import { getRichTextTextContent } from '@/lib/utils/rich-text';
 import { FundraiserAuthRetry } from '@/components/fundraisers/fundraiser-auth-retry';
 import { FundraiserView } from '@/components/fundraisers/fundraiser-view';
@@ -83,8 +87,18 @@ export async function generateMetadata({
       slug: fundraiser.slug || fundraiser.hid,
     });
     // The live banner (progress, theme, CTA), with the cover photo as the fallback for a fundraiser without a slug yet.
+    // Its URL carries a hash of what it draws, computed as the image route does, so crawlers refetch it only when it changed.
+    // Without the donor row the hash may be out of date; the image route then redirects to the current one.
     const imageUrl = fundraiser.slug
-      ? shareImagePath(fundraiser.slug, locale)
+      ? shareImagePath(
+          fundraiser.slug,
+          locale,
+          shareImageVersion(
+            fundraiser,
+            getShareOrigin(await headers()),
+            await loadShareLeaderboard(fundraiser).catch(() => null)
+          )
+        )
       : getFundraiserMetadataImage(fundraiser.image);
 
     return {

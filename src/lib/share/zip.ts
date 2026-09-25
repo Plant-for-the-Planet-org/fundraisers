@@ -23,8 +23,8 @@ export interface ZipEntry {
 /**
  * A zip without compression, enough for a handful of share files.
  * PNG and MP4 are compressed already, so storing them as they are costs almost nothing and needs no library.
+ * It comes as a list of parts, so a Blob can be built from them without copying everything into one more buffer.
  */
-/** The zip as a list of parts, so a Blob can be built from them without copying everything into one more buffer. */
 export function createZipParts(entries: readonly ZipEntry[]): Uint8Array[] {
   const encoder = new TextEncoder();
   const parts: Uint8Array[] = [];
@@ -70,15 +70,4 @@ export function createZipParts(entries: readonly ZipEntry[]): Uint8Array[] {
   end.setUint32(16, offset, true);
 
   return [...parts, ...central, new Uint8Array(end.buffer)];
-}
-
-export function createZip(entries: readonly ZipEntry[]): Uint8Array {
-  const all = createZipParts(entries);
-  const out = new Uint8Array(all.reduce((sum, part) => sum + part.length, 0));
-  let at = 0;
-  for (const part of all) {
-    out.set(part, at);
-    at += part.length;
-  }
-  return out;
 }

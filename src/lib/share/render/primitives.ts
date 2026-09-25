@@ -62,36 +62,119 @@ export function roundRect(
   g.closePath();
 }
 
-function greedyWrap(g: Ctx, text: string, maxWidth: number): string[] {
+const segmenter =
+  typeof Intl.Segmenter === 'function'
+    ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+    : null;
+
+/** The characters as a reader sees them, so an emoji or an accent is never cut in half. */
+function graphemes(text: string): string[] {
+  return segmenter
+    ? Array.from(segmenter.segment(text), part => part.segment)
+    : Array.from(text);
+}
+
+/** Pieces of a word too wide for one line, broken between characters: a title with no spaces (in Japanese, say) or a long compound. */
+function breakWord(g: Ctx, word: string, maxWidth: number): string[] {
+  const pieces: string[] = [];
+  let piece = '';
+  for (const char of graphemes(word)) {
+    if (piece && g.measureText(piece + char).width > maxWidth) {
+      pieces.push(piece);
+      piece = char;
+    } else piece += char;
+  }
+  if (piece) pieces.push(piece);
+  return pieces;
+}
+
+/** The lines, and how many words had to be broken to fit them. */
+function greedyWrap(
+  g: Ctx,
+  text: string,
+  maxWidth: number
+): { lines: string[]; broken: number } {
   const lines: string[] = [];
+  let broken = 0;
   let line = '';
   for (const word of text.split(' ')) {
     const test = line ? `${line} ${word}` : word;
-    if (g.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = word;
-    } else line = test;
+    if (g.measureText(test).width <= maxWidth) {
+      line = test;
+      continue;
+    }
+    if (line) lines.push(line);
+    let pieces = [word];
+    if (g.measureText(word).width > maxWidth) {
+      pieces = breakWord(g, word, maxWidth);
+      broken++;
+    }
+    lines.push(...pieces.slice(0, -1));
+    line = pieces[pieces.length - 1] ?? '';
   }
   if (line) lines.push(line);
-  return lines;
+  return { lines, broken };
 }
 
-/** Wraps into as few lines as fit, then narrows the width while the line count holds, so the lines come out even. */
+/** Cuts the line until it fits with an ellipsis after it. */
+function withEllipsis(g: Ctx, line: string, maxWidth: number): string {
+  const chars = graphemes(line);
+  const cut = () => `${chars.join('').trimEnd()}…`;
+  while (chars.length > 0 && g.measureText(cut()).width > maxWidth) chars.pop();
+  return cut();
+}
+
+/** Wraps into as few lines as fit, then narrows the width while the line count holds, so the lines come out even. Text past `maxLines` is cut, with an ellipsis. */
 export function wrapBalanced(
   g: Ctx,
   text: string,
   maxWidth: number,
   maxLines: number
 ): string[] {
-  let lines = greedyWrap(g, text, maxWidth).slice(0, maxLines);
+  const full = greedyWrap(g, text, maxWidth);
+  let lines = full.lines;
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    lines[maxLines - 1] = withEllipsis(g, lines[maxLines - 1], maxWidth);
+    return lines;
+  }
   if (lines.length > 1) {
     for (let w = maxWidth - 10; w > maxWidth * 0.5; w -= 10) {
       const tighter = greedyWrap(g, text, w);
-      if (tighter.length !== lines.length) break;
-      lines = tighter;
+      // Evener lines are not worth breaking a word that fits whole.
+      if (
+        tighter.lines.length !== lines.length ||
+        tighter.broken !== full.broken
+      )
+        break;
+      lines = tighter.lines;
     }
   }
   return lines;
+}
+
+/**
+ * Sets the largest font, from `size` down to `minSize`, at which one line of `text` fits `maxWidth`, and returns its size.
+ * Text still too wide at `minSize` needs `maxWidth` passed to fillText as well, which narrows it.
+ */
+export function fitFont(
+  g: Ctx,
+  text: string,
+  maxWidth: number,
+  size: number,
+  font: (size: number) => string,
+  minSize = Math.ceil(size * 0.7)
+): number {
+  g.font = font(size);
+  const width = g.measureText(text).width;
+  if (width <= maxWidth) return size;
+  let fitted = Math.max(minSize, Math.floor((size * maxWidth) / width));
+  g.font = font(fitted);
+  while (fitted > minSize && g.measureText(text).width > maxWidth) {
+    fitted--;
+    g.font = font(fitted);
+  }
+  return fitted;
 }
 
 export function glowDot(

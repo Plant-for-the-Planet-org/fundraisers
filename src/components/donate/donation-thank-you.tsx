@@ -1,16 +1,26 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { ShareGift } from '@/lib/share/share-data';
+import type { DonationFrequency } from '@/lib/types/donation';
 import type { ThankYouState } from '@/lib/types/donation-submit';
 import type { Fundraiser, FundraiserHost } from '@/lib/types/fundraiser';
 import type { SafeHtml } from '@/lib/types/safe-html';
 
+import { useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { BankTransferDetails } from './bank-transfer-details';
 import { HostMessageCard } from './host-message-card';
 import { ShareSection } from './share-section';
 import { ThankYouCard } from './thank-you-card';
+
+// The API sends `frequency` as a plain string; any other value would put a raw message key on a public share image.
+const SHARE_GIFT_FREQUENCIES: readonly DonationFrequency[] = [
+  'once',
+  'monthly',
+  'yearly',
+];
 
 interface HostMessageConfig {
   message: SafeHtml;
@@ -29,6 +39,21 @@ export function DonationThankYou({
   hostMessageConfig,
 }: DonationThankYouProps) {
   const locale = useLocale();
+  // Only money that has moved: a pending bank transfer or a payment still processing gets no gift on the share image.
+  const gift = useMemo<ShareGift | null>(
+    () =>
+      thankYouState.status === 'completed' &&
+      thankYouState.amount > 0 &&
+      thankYouState.currency &&
+      SHARE_GIFT_FREQUENCIES.includes(thankYouState.frequency)
+        ? {
+            amount: thankYouState.amount,
+            currency: thankYouState.currency,
+            frequency: thankYouState.frequency,
+          }
+        : null,
+    [thankYouState]
+  );
   let card: ReactNode;
   let hostMessageCard: ReactNode = null;
   switch (thankYouState.status) {
@@ -82,7 +107,7 @@ export function DonationThankYou({
     <div className='mx-auto flex w-full max-w-lg flex-col gap-6'>
       {card}
       {hostMessageCard}
-      <ShareSection fundraiser={fundraiser} />
+      <ShareSection fundraiser={fundraiser} gift={gift} />
     </div>
   );
 }

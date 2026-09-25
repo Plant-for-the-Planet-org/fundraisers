@@ -92,7 +92,7 @@ For view-only co-hosts, the edit actions are hidden: the header's Edit button, t
 ### Overview tab
 
 - **Stats strip**: Raised (with % of goal), Donations, Donors, Avg. donation value.
-- **Make it a success**: cover image, story (200 characters of text, or 100 with a picture or video), goal, published, a co-host who has accepted, first donation. Logic in `src/lib/utils/fundraiser-checklist.ts`. When every step is done and the fundraiser takes donations, it nudges to the Share tab.
+- **Make it a success**: cover image, story (200 characters of text, or 100 with a picture or video), goal, published, a co-host who has accepted, first donation, and keep sharing. Logic in `src/lib/utils/fundraiser-checklist.ts`. Sharing is never finished while people can still give, so it stays open, and counted, until the fundraiser ends. While donations are open, it and the first donation step link to the Share tab. So a live fundraiser shows at most 6 of 7, and "All done", which thanks the host, appears only once it has ended.
 - **Hosts**: active and invited hosts, with Invite co-host (opens the existing Manage hosts dialog). The checklist's co-host step opens the same dialog.
 - **Features**: Leaderboard, Thank-you note, Stage Mode, each On or with a Turn on link to the editor.
 
@@ -113,9 +113,11 @@ The API cannot sort by name or amount, filter out anonymous donors, or search. T
 
 Pick a channel (Plain link, WhatsApp, Instagram, LinkedIn, Facebook, Email, Newsletter) and copy one link. Tagged links add `utm_source` and `utm_medium`, the same shape as the Stage Mode QR code, so Insights can tell channels apart.
 
-Every host-facing "Share" button leads here: the checklist, the donors empty state, and the row menu. The public page's "Copy Link" stays a plain copy, because visitors use it too.
+Every host-facing "Share" button leads here: the checklist, the donors empty state, and the row menu. On the public page, the sidebar "Copy Link" and the one in the Share images dialog copy the same link (`useFundraiserShareUrl`): `/raise/<slug>` with `utm_source=fundraiser`, `utm_medium=copy_link` and the viewer's own `ref` code when they have one. The query the visitor landed with, which may carry someone else's code, never travels with it.
 
 Above the links, the share studio makes images and videos for each platform (story, post, TikTok, Shorts, link preview), in the fundraiser's theme with live progress, and shares or downloads them. See `docs/share.md`. Links from both carry the host's `?ref=` code once the profile has one.
+
+On phones the studio shows the platforms first, then the preview with its Share button, then Make it yours and the caption, so a host sees the result of a pick without scrolling. From `md` up the preview sits in its own column beside the other cards, and the tab order follows the same order.
 
 ---
 

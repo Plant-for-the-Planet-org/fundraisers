@@ -17,11 +17,16 @@ const KNOWN_SOURCES = [
   'facebook',
   'whatsapp',
   'x',
+  'tiktok',
+  'youtube',
   'google',
   'bing',
   'email',
   'newsletter',
   'stage',
+  'fundraiser',
+  'thank_you',
+  'share_sheet',
 ] as const;
 
 type KnownSourceKey = (typeof KNOWN_SOURCES)[number];

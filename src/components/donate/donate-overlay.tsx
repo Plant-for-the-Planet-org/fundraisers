@@ -355,31 +355,33 @@ function DonateOverlayInner({
     </>
   );
 
-  const rightColumn = (
+  const rightColumn = thankYouState ? (
+    // Under the thank-you cards on small screens, so it takes their width.
+    <div className='mx-auto w-full max-w-lg space-y-6'>
+      <GiftSummary />
+      <DonationSummary />
+    </div>
+  ) : (
     <>
       <GiftSummary />
       <DonationSummary />
-      {thankYouState === null && (
-        <>
-          <DonateOptions />
-          <DonateCTA
-            isLoading={isLoading}
-            isSuccess={false}
-            stripePromise={stripePromise}
-            resetError={reset}
-            onPayPalCreateOrder={onPayPalCreateOrder}
-            onPayPalApproved={onPayPalApproved}
-            onPayPalError={onPayPalError}
-            onWalletConfirm={onWalletConfirm}
-            onWalletError={onWalletError}
-            onWalletCancel={onWalletCancel}
-          />
-          {error?.code && (
-            <div ref={errorBannerRef}>
-              <DonationFailureBanner errorCode={error.code} reset={reset} />
-            </div>
-          )}
-        </>
+      <DonateOptions />
+      <DonateCTA
+        isLoading={isLoading}
+        isSuccess={false}
+        stripePromise={stripePromise}
+        resetError={reset}
+        onPayPalCreateOrder={onPayPalCreateOrder}
+        onPayPalApproved={onPayPalApproved}
+        onPayPalError={onPayPalError}
+        onWalletConfirm={onWalletConfirm}
+        onWalletError={onWalletError}
+        onWalletCancel={onWalletCancel}
+      />
+      {error?.code && (
+        <div ref={errorBannerRef}>
+          <DonationFailureBanner errorCode={error.code} reset={reset} />
+        </div>
       )}
     </>
   );

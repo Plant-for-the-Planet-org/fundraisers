@@ -5,12 +5,12 @@ import { SHARE_FONT_WEIGHTS, SHARE_FONTS } from '../fonts';
 
 import 'server-only';
 
-const registered = new Map<FontId, Promise<void>>();
+const registered = new Map<FontId, Promise<boolean>>();
 
 /**
  * Downloads a theme font from Google Fonts once per server process and registers it with the canvas.
  * Google serves TTF files to a request without a browser user agent, which is what `@napi-rs/canvas` reads.
- * A failed download is dropped from the cache so the next render tries again; that render falls back to a system font.
+ * A failed download is dropped from the cache so the next render tries again; this render falls back to a system font.
  */
 async function load(font: FontId): Promise<void> {
   const { family } = SHARE_FONTS[font];
@@ -36,18 +36,24 @@ async function load(font: FontId): Promise<void> {
   );
 }
 
-export async function registerShareFonts(fonts: FontId[]): Promise<void> {
-  await Promise.all(
+/** Resolves false when a font could not be loaded, so the caller knows this render used a system font in its place. */
+export async function registerShareFonts(fonts: FontId[]): Promise<boolean> {
+  const loaded = await Promise.all(
     [...new Set(fonts)].map(font => {
       let pending = registered.get(font);
       if (!pending) {
-        pending = load(font).catch(error => {
-          registered.delete(font);
-          console.warn(`[share-image] Could not load font ${font}:`, error);
-        });
+        pending = load(font).then(
+          () => true,
+          error => {
+            registered.delete(font);
+            console.warn(`[share-image] Could not load font ${font}:`, error);
+            return false;
+          }
+        );
         registered.set(font, pending);
       }
       return pending;
     })
   );
+  return loaded.every(Boolean);
 }

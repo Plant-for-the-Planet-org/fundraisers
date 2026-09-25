@@ -26,6 +26,9 @@ export async function fetchImage(
   return image;
 }
 
+const createCanvas: ShareAssetLoader['createCanvas'] = (width, height) =>
+  Object.assign(document.createElement('canvas'), { width, height });
+
 /**
  * Loads share assets in the browser.
  * Library assets and data URIs are same-origin, so a canvas can draw them and still export. A theme image on another host goes through our photo route instead.
@@ -42,8 +45,21 @@ export function browserAssetLoader(
             headers
           )
         : loadImageElement(src),
-    createCanvas: (width, height) =>
-      Object.assign(document.createElement('canvas'), { width, height }),
+    createCanvas,
+  };
+}
+
+/**
+ * Loads images from our own routes, such as donor photos, with the host's token so a draft's images load too.
+ * Anything that is not a path on our origin loads nothing, so the token never goes to another host.
+ */
+export function browserRouteLoader(
+  headers: Record<string, string>
+): ShareAssetLoader {
+  return {
+    loadImage: async (src: string): Promise<ShareImage | null> =>
+      /^\/(?![/\\])/.test(src) ? fetchImage(src, headers) : null,
+    createCanvas,
   };
 }
 

@@ -7,7 +7,7 @@ import type {
   ShareRenderData,
   ShareRenderTheme,
 } from '@/lib/share/render/types';
-import type { ShareDonors } from '@/lib/share/share-data';
+import type { ShareDonors, ShareGift } from '@/lib/share/share-data';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { ProjectPurpose } from '@/lib/types/project-selection';
 
@@ -26,7 +26,11 @@ import {
   loadShareBackgroundAssets,
   resolveShareBackground,
 } from '@/lib/share/render/theme-background';
-import { buildShareRenderData, pickShareDonors } from '@/lib/share/share-data';
+import {
+  buildShareRenderData,
+  pickShareDonors,
+  SHARE_LEADERBOARD_LIMIT,
+} from '@/lib/share/share-data';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useAuthStore } from '@/stores/auth-store';
@@ -34,36 +38,39 @@ import { useImpersonationStore } from '@/stores/impersonation-store';
 import {
   browserAssetLoader,
   browserMakePath,
+  browserRouteLoader,
   fetchImage,
 } from './browser-assets';
+import { useOrigin } from './use-origin';
 
 /**
  * The fundraiser's cover photo, loaded through our own route so the canvas stays exportable.
  * Drafts are only visible to their hosts, so the token and any impersonation go along.
+ * Undefined while loading, null when there is none.
  */
 function useSharePhoto(
   slug: string,
   headers: Record<string, string>
-): ShareImage | null {
+): ShareImage | null | undefined {
   const [photo, setPhoto] = useState<{
     slug: string;
-    image: ShareImage;
+    image: ShareImage | null;
   } | null>(null);
 
   useEffect(() => {
     let ignore = false;
     // No photo leaves the ring's circle plain.
-    fetchImage(`/api/share/photo/${encodeURIComponent(slug)}`, headers).then(
-      image => {
-        if (image && !ignore) setPhoto({ slug, image });
-      }
-    );
+    fetchImage(`/api/share/photo/${encodeURIComponent(slug)}`, headers)
+      .catch(() => null)
+      .then(image => {
+        if (!ignore) setPhoto({ slug, image });
+      });
     return () => {
       ignore = true;
     };
   }, [slug, headers]);
 
-  return photo?.slug === slug ? photo.image : null;
+  return photo?.slug === slug ? photo.image : undefined;
 }
 
 /** Public donors for the avatar row, by the public page's rules. */
@@ -76,7 +83,7 @@ function useShareDonors(
   } | null>(null);
   useEffect(() => {
     let ignore = false;
-    getLeaderboard(fundraiser.slug, 20)
+    getLeaderboard(fundraiser.slug, SHARE_LEADERBOARD_LIMIT)
       .then(board => {
         if (!ignore)
           setDonors({
@@ -142,17 +149,20 @@ function useShareBackground(
   return loaded?.spec === spec ? loaded : null;
 }
 
-/** Each named donor's photo, or the app's generated avatar, in the order of `donors.names`. */
+/**
+ * Each named donor's photo, or the app's generated avatar, in the order of `donors.names`.
+ * Undefined while they load. Null while the donors themselves load, when no donor may be shown, or when the avatars cannot be made.
+ */
 function useShareAvatars(
   slug: string,
   donors: ShareDonors | null | undefined,
   dark: boolean,
   headers: Record<string, string>
-): ShareImage[] | null {
+): ShareImage[] | null | undefined {
   const [avatars, setAvatars] = useState<{
     donors: ShareDonors;
     dark: boolean;
-    images: ShareImage[];
+    images: ShareImage[] | null;
   } | null>(null);
   useEffect(() => {
     if (!donors) return;
@@ -165,23 +175,37 @@ function useShareAvatars(
           : null,
       })),
       {
-        loader: browserAssetLoader(slug, headers),
+        loader: browserRouteLoader(headers),
         makePath: browserMakePath,
         dark,
       }
     )
+      // The row keeps its initials when the avatars cannot be made.
+      .catch(() => null)
       .then(images => {
         if (!ignore) setAvatars({ donors, dark, images });
-      })
-      // The row keeps its initials when the avatars cannot be made.
-      .catch(() => undefined);
+      });
     return () => {
       ignore = true;
     };
   }, [slug, donors, dark, headers]);
+  if (!donors) return null;
   return avatars && avatars.donors === donors && avatars.dark === dark
     ? avatars.images
-    : null;
+    : undefined;
+}
+
+/** How long a file waits for the photo and donors before it is made without the ones still loading. */
+const SETTLE_TIMEOUT_MS = 2500;
+
+/** True once `SETTLE_TIMEOUT_MS` has passed since the studio opened this fundraiser. */
+function useSettleTimeout(slug: string): boolean {
+  const [timedOut, setTimedOut] = useState<string | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => setTimedOut(slug), SETTLE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [slug]);
+  return timedOut === slug;
 }
 
 /**
@@ -254,34 +278,33 @@ function useFontsReady(families: string[]): boolean {
   return ready === key;
 }
 
-/** The site origin, known only in the browser. Until then links are relative. */
-export function useOrigin(): string {
-  const [origin, setOrigin] = useState('');
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOrigin(window.location.origin);
-  }, []);
-  return origin;
-}
-
 /** Everything the share renderer needs for this fundraiser, updated as the choices change. */
 export function useShareRender({
   fundraiser,
   season,
   cta,
   showDonors,
+  gift = null,
+  showGift = true,
 }: {
   fundraiser: Fundraiser;
   season: SeasonId;
   cta: string;
   showDonors: boolean;
+  /** The donor's completed gift. It always counts in the total on the image. */
+  gift?: ShareGift | null;
+  /** Puts the gift on its own line under the amount. */
+  showGift?: boolean;
 }): {
   data: ShareRenderData;
   theme: ShareRenderTheme;
   photo: ShareImage | null;
   background: ShareBackground | null;
   avatars: ShareImage[] | null;
+  /** The fonts and the background are loaded, so the preview can draw. */
   ready: boolean;
+  /** The photo, the donors and their avatars have loaded or failed, or waited long enough. Files wait for this, so a quick tap never shares a picture with a plain circle where the photo goes. */
+  settled: boolean;
   /** False once it is known that no donor may be named; see pickShareDonors. */
   donorsAvailable: boolean;
 } {
@@ -343,19 +366,31 @@ export function useShareRender({
           started: () => t('image.started'),
           first: () => t('image.first'),
           newBadge: () => t('image.newBadge'),
+          gift: (amount, frequency) => t(`image.gift.${frequency}`, { amount }),
         },
+        gift,
+        showGift,
       }),
-    [fundraiser, locale, donors, showDonors, cta, t, origin]
+    [fundraiser, locale, donors, showDonors, cta, t, origin, gift, showGift]
   );
+
+  const timedOut = useSettleTimeout(fundraiser.slug);
+  const settled =
+    timedOut ||
+    (photo !== undefined &&
+      donors !== undefined &&
+      (!showDonors || donors === null || avatars !== undefined));
 
   return {
     data,
     theme,
-    photo,
+    photo: photo ?? null,
     background,
-    avatars,
-    // The background is part of the look; wait for it like the fonts. Avatars fill in when they load.
+    // Off, the avatars stay out of the options, so their late arrival does not make the file again.
+    avatars: showDonors ? (avatars ?? null) : null,
+    // The background is part of the look; wait for it like the fonts. The photo and avatars fill in the preview when they load.
     ready: fontsReady && background !== null,
+    settled,
     donorsAvailable: donors !== null,
   };
 }

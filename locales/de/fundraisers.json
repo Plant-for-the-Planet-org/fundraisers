@@ -46,10 +46,7 @@
       "closedNote": "Dieser Spendenaufruf nimmt keine neuen Spenden mehr an.",
       "notAvailableNote": "Wende dich an die Organisator*innen.",
       "exploreCta": "Weitere Spendenaufrufe entdecken",
-      "shareCta": "Teilen",
-      "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",
-      "shareCopied": "Link kopiert!",
-      "shareFailed": "Der Link konnte nicht geteilt werden. Bitte erneut versuchen."
+      "shareCta": "Teilen"
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 Diese Spende wird sicher über <b>{organization}, {country}</b> abgewickelt und ist in {country} steuerlich absetzbar.",
@@ -502,7 +499,13 @@
       "label": "Link kopieren",
       "copiedLabel": "Kopiert!",
       "successToast": "Link kopiert!",
-      "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
+      "errorToast": "Link konnte nicht kopiert werden. Dein Link:"
+    },
+    "shareImages": {
+      "label": "Bilder zum Teilen",
+      "loading": "Wird geladen…",
+      "loadError": "Die Bilder konnten nicht geladen werden. Bitte lade die Seite neu.",
+      "moreOptions": "Mehr Optionen im Tab Teilen"
     },
     "hostControls": {
       "hostLabel": "Du bist Organisator*in",

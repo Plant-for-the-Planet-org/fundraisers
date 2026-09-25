@@ -4,11 +4,16 @@
       "byLine": "von {name}",
       "raisedOf": "{raised} von {goal} gesammelt",
       "raised": "{raised} gesammelt",
-      "given": "{first}, {second} und {others, plural, one {# weitere Person hat} other {# weitere haben}} gespendet",
+      "given": "{first}, {second} und {others, plural, one {eine weitere Person haben} other {# weitere haben}} gespendet",
       "goal": "Ziel: {goal}",
       "started": "Gerade gestartet",
       "first": "Mach den Anfang mit der ersten Spende",
-      "newBadge": "Neu"
+      "newBadge": "Neu",
+      "gift": {
+        "once": "Ich habe gerade {amount} gespendet!",
+        "monthly": "Ich spende jeden Monat {amount}!",
+        "yearly": "Ich spende jedes Jahr {amount}!"
+      }
     },
     "cta": {
       "joinMe": "Mach mit",
@@ -32,6 +37,12 @@
       "halloween": "Keine Tricks, nur Süßes für den Planeten: Ich sammle Spenden für {name}. Mach mit!",
       "birthday": "Zu meinem Geburtstag sammle ich statt Geschenken Spenden für {name}. Feier mit mir!",
       "donor": "Ich habe gerade {name} unterstützt. Machst du mit?",
+      "supporter": "Bitte unterstütze {name}. Jede Spende hilft!",
+      "gift": {
+        "once": "Ich habe gerade {amount} für „{name}“ gespendet. Mach mit:",
+        "monthly": "Ich spende jeden Monat {amount} für „{name}“. Mach mit:",
+        "yearly": "Ich spende jedes Jahr {amount} für „{name}“. Mach mit:"
+      },
       "concluded": "Geschafft! Danke an alle, die für {name} gespendet haben."
     },
     "seasons": {
@@ -54,17 +65,17 @@
       "instagramStory": {
         "label": "Story",
         "hint": "Video oder Bild, 9:16",
-        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu. Wir haben ihn für dich kopiert."
+        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu."
       },
       "instagramPost": {
         "label": "Beitrag",
-        "hint": "Bild, 4:5",
+        "hint": "Bild oder Video, 4:5",
         "tip": "Links in Instagram-Beschreibungen sind nicht klickbar. Setz den Link auch in deine Bio oder eine Story."
       },
       "whatsappStatus": {
         "label": "Status",
         "hint": "Video oder Bild, 9:16",
-        "tip": "Dein Link ist kopiert. Füge ihn als Status-Text ein, damit Freund*innen ihn antippen können."
+        "tip": "Füge deinen Link als Status-Text ein, damit Freund*innen ihn antippen können."
       },
       "whatsappMessage": {
         "label": "Nachricht",
@@ -84,47 +95,47 @@
       "linkedinPost": {
         "label": "Beitrag",
         "hint": "Bild, 4:5",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       },
       "linkedinWide": {
         "label": "Breiter Beitrag",
-        "hint": "Video oder Bild, 1,91:1",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "hint": "Bild oder Video, 1,91:1",
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       },
       "facebookPost": {
         "label": "Beitrag",
-        "hint": "Bild, 4:5",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "hint": "Bild oder Video, 4:5",
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       },
       "facebookStory": {
         "label": "Story",
         "hint": "Video oder Bild, 9:16",
-        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu. Wir haben ihn für dich kopiert."
+        "tip": "Füge nach dem Posten deinen Link mit dem Link-Sticker hinzu."
       },
       "xPost": {
         "label": "Beitrag",
-        "hint": "Bild, 16:9",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "hint": "Bild oder Video, 16:9",
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       },
       "xTallPost": {
         "label": "Hoher Beitrag",
         "hint": "Bild, 4:5",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       },
-      "email": {
-        "label": "E-Mail oder Newsletter",
+      "newsletter": {
+        "label": "Newsletter",
         "hint": "Banner, 1,91:1",
         "tip": "Setz das Banner oben in deine E-Mail und verlinke es mit deinem Spendenaufruf."
       },
       "anyStory": {
         "label": "Story",
         "hint": "Video oder Bild, 9:16",
-        "tip": "Dein Link ist kopiert. Füge ihn dort ein, wo die App es erlaubt."
+        "tip": "Füge deinen Link dort ein, wo die App es erlaubt."
       },
       "anyPost": {
         "label": "Beitrag",
         "hint": "Bild, 4:5",
-        "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
+        "tip": "Setz den Link in den Text deines Beitrags, damit man ihn antippen kann."
       }
     },
     "studio": {
@@ -139,7 +150,8 @@
       "showDonors": "Spender*innen zeigen",
       "donorsUnavailable": "Wird gezeigt, wenn mindestens 3 Spender*innen öffentlich sind und die Bestenliste an ist.",
       "captionTitle": "Text",
-      "captionHint": "Wird beim Teilen für dich kopiert. Du kannst ihn anpassen.",
+      "captionHint": "Wird beim Teilen mit deinem Link für dich kopiert. Du kannst ihn anpassen.",
+      "captionHintLinkAlone": "Bei diesem Format kopieren wir beim Teilen nur deinen Link. Mit Kopieren bekommst du auch den Text.",
       "linkLabel": "Dein Link",
       "copy": "Kopieren",
       "captionCopied": "Text und Link kopiert",
@@ -152,6 +164,8 @@
       "previewLabel": "Vorschau",
       "preparing": "Wird vorbereitet…",
       "preparingVideo": "Video wird vorbereitet… {percent} %",
+      "renderFailed": "Erneut versuchen",
+      "renderFailedTip": "Bild konnte nicht erstellt werden.",
       "shareTo": "Auf {platform} teilen",
       "share": "Teilen",
       "shareLink": "Link teilen",
@@ -163,12 +177,14 @@
       "kitDone": "Paket heruntergeladen",
       "kitFailed": "Die Dateien konnten nicht vorbereitet werden",
       "shareFailed": "Teilen hat nicht geklappt. Lade die Datei stattdessen herunter.",
-      "savedTip": "{file} gespeichert. Dein Text ist kopiert. {tip}",
+      "savedTip": "{file} gespeichert. {tip}",
+      "linkCopiedTip": "Dein Link ist kopiert.",
+      "captionCopiedTip": "Dein Text und dein Link sind kopiert und bereit zum Einfügen.",
       "noVideo": "Dieser Browser kann keine Videos erstellen. Teile stattdessen das Bild.",
       "messageCopied": "Nachricht kopiert"
     },
     "donor": {
-      "moreFormats": "Weitere Formate"
+      "includeGift": "Meine Spende zeigen"
     }
   }
 }

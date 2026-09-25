@@ -3,12 +3,12 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { Suspense } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { Share2 } from 'lucide-react';
 import { formatCompactNumber } from '@/lib/utils';
 import { getTaxDeductibilityInfo } from '@/lib/utils/country-currency';
 import {
   convertTotalRaisedToSingleCurrency,
   getDaysLeft,
-  getFundraiserUrl,
   hasFundraiserConcluded,
 } from '@/lib/utils/fundraiser';
 import {
@@ -26,12 +26,14 @@ import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
+import { ShareImagesButton } from '@/components/fundraisers/share-images-button';
 import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
+import { Button } from '@/components/ui/button';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
-import { CopyLinkButton } from './copy-link-button';
+import { FundraiserCopyLinkButton } from './fundraiser-copy-link-button';
 import { LeaderboardClientLoader } from './leaderboard/leaderboard-client-loader';
 import { LeaderboardServerLoader } from './leaderboard/leaderboard-server-loader';
 import { LeaderboardSkeleton } from './leaderboard/leaderboard-skeleton';
@@ -78,6 +80,17 @@ export function FundraiserView({
     fundraiser.canDonate &&
     paymentOptions !== undefined &&
     fundraiser.workspace !== null;
+  const isPublic = fundraiser.visibility === 'public';
+  const concluded = hasFundraiserConcluded(fundraiser);
+  // The studio builds every link and image path from the slug. Its images ask people to give, so they wait while the page cannot take donations on a fundraiser that has not ended; once it has, they say thank you.
+  const canShareImages =
+    isPublic && Boolean(fundraiser.slug) && (canReceiveDonations || concluded);
+  const shareButtons = isPublic && (
+    <>
+      <FundraiserCopyLinkButton slug={fundraiser.slug} />
+      {canShareImages ? <ShareImagesButton fundraiser={fundraiser} /> : null}
+    </>
+  );
 
   return (
     <FundraiserLayout>
@@ -129,9 +142,9 @@ export function FundraiserView({
             </Suspense>
           ))}
 
-        <div className='md:hidden flex flex-col'>
-          {/** Copy link */}
-          {fundraiser.visibility === 'public' && <CopyLinkButton />}
+        <div className='md:hidden flex flex-wrap gap-2'>
+          {/** Copy link, share images */}
+          {shareButtons}
         </div>
 
         {/* Hosts */}
@@ -140,10 +153,10 @@ export function FundraiserView({
         {/* Host edit shortcut (only visible to logged-in hosts) */}
         <HostControls fundraiser={fundraiser} />
 
-        {/** Copy link */}
-        {fundraiser.visibility === 'public' && (
-          <div className='hidden md:block mt-3'>
-            <CopyLinkButton />
+        {/** Copy link, share images */}
+        {isPublic && (
+          <div className='hidden md:flex mt-3 flex-wrap gap-2'>
+            {shareButtons}
           </div>
         )}
       </SidebarPanel>
@@ -184,8 +197,7 @@ export function FundraiserView({
           </>
         ) : (
           <ClosedForContribution
-            title={fundraiser.title}
-            concluded={hasFundraiserConcluded(fundraiser)}
+            concluded={concluded}
             raisedAmount={totalRaisedAmount}
             goalAmount={fundraiser.goalAmount}
             currency={fundraiser.currency}
@@ -194,13 +206,18 @@ export function FundraiserView({
             projectNames={fundraiser.projectAllocations.map(
               allocation => allocation.project.name
             )}
-            sharePath={
-              fundraiser.visibility === 'public'
-                ? getFundraiserUrl({
-                    id: fundraiser.id,
-                    slug: fundraiser.slug || fundraiser.hid,
-                  })
-                : undefined
+            shareButton={
+              canShareImages ? (
+                <ShareImagesButton
+                  fundraiser={fundraiser}
+                  trigger={
+                    <Button variant='ghost' size='sm'>
+                      <Share2 aria-hidden='true' />
+                      {t('closedForContribution.shareCta')}
+                    </Button>
+                  }
+                />
+              ) : undefined
             }
           />
         )}

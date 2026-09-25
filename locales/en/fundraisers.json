@@ -46,10 +46,7 @@
       "closedNote": "This fundraiser no longer accepts new donations.",
       "notAvailableNote": "Check with the host.",
       "exploreCta": "Explore other fundraisers",
-      "shareCta": "Share",
-      "shareText": "{title} raised {amount}. Thank you to everyone who gave!",
-      "shareCopied": "Link copied!",
-      "shareFailed": "Could not share the link. Try again."
+      "shareCta": "Share"
     },
     "securityNotice": {
       "withTaxDeduction": "🔒 This donation will be processed securely by <b>{organization}, {country}</b> and is eligible for tax-deduction in {country}.",
@@ -502,7 +499,13 @@
       "label": "Copy Link",
       "copiedLabel": "Copied!",
       "successToast": "Link copied!",
-      "errorToast": "Could not copy link. Please copy the URL manually."
+      "errorToast": "Could not copy the link. Your link:"
+    },
+    "shareImages": {
+      "label": "Share images",
+      "loading": "Loading…",
+      "loadError": "Could not load the images. Please reload the page.",
+      "moreOptions": "More options in your Share tab"
     },
     "hostControls": {
       "hostLabel": "You're a host",

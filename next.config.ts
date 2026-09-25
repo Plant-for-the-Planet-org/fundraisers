@@ -3,12 +3,15 @@ import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
 import { localeDeclarations } from './next.config.utils';
+import { LINK_PREVIEW_BOTS } from './src/lib/share/preview-bots';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 const nextConfig: NextConfig = {
   /* config options here */
   poweredByHeader: false,
+  // Crawlers that get the page's metadata in <head>. Next's own list plus link preview fetchers it misses, such as Pinterest, Mastodon and Viber.
+  htmlLimitedBots: LINK_PREVIEW_BOTS,
   // Native canvas for the link preview image (src/lib/share/server). Loaded by Node at runtime, not bundled.
   serverExternalPackages: ['@napi-rs/canvas'],
   // Dev-only memory tweak; gated so it can never affect a production build.

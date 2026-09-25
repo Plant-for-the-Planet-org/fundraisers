@@ -1,5 +1,6 @@
 import type { Ctx, Palette, Season, TickOptions } from './types';
 
+import { pillOnDark } from './contrast';
 import {
   drawSparkle,
   drawStar,
@@ -576,6 +577,8 @@ export const SEASONS: Record<SeasonId, Season> = {
       dot: '#ffffff',
       text: '#ffffff',
       muted: 'rgba(255,255,255,0.78)',
+      accentText: XMAS.gold,
+      giftPill: pillOnDark(XMAS.green),
       track: 'rgba(255,255,255,0.14)',
       bar: '#e53935',
       ctaBg: XMAS.red,
@@ -605,6 +608,8 @@ export const SEASONS: Record<SeasonId, Season> = {
       dot: '#ffffff',
       text: '#ffffff',
       muted: 'rgba(255,255,255,0.75)',
+      accentText: HW.orange,
+      giftPill: pillOnDark(HW.night),
       track: 'rgba(255,255,255,0.12)',
       bar: HW.orange,
       ctaBg: HW.orange,

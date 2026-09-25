@@ -22,6 +22,8 @@ export interface ShareRenderData {
   formatMoney: (amount: number) => string;
   /** "€3,400 raised of €5,000", or "€3,400 raised" when `goal` is null. Called every frame with the counted-up amount. */
   raisedLine: (raised: string, goal: string | null) => string;
+  /** The donor's own gift, such as "I just gave €50!", in a pill under the amount. Null leaves it out. */
+  giftLine: string | null;
   /** First names of public donors, top donors first. Their avatars, or initials until those load, fill the avatar row. */
   donors: string[];
   /** "Anna, Ben and 46 others have given". Null hides the avatar row. */
@@ -67,6 +69,10 @@ export interface Palette {
   dot: string;
   text: string;
   muted: string;
+  /** The donor's gift line, in the accent. It reads on `giftPill` at 4.5:1. */
+  accentText: string;
+  /** The soft pill behind the donor's gift line. */
+  giftPill: string;
   track: string;
   bar: string;
   ctaBg: string;
@@ -102,6 +108,8 @@ export interface FrameContext {
   fonts: Fonts;
   /** The widest the button may grow, set by the layout before it draws the button. */
   maxCtaWidth: number;
+  /** The canvas pixels per format unit (`ShareRenderOptions.scale`). */
+  scale: number;
 }
 
 export interface TickOptions {

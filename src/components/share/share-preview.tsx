@@ -3,22 +3,11 @@
 import type { ShareFormatId } from '@/lib/share/formats';
 import type { ShareDrawOptions } from './use-share-files';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
 import { drawShareFrame } from '@/lib/share/render/draw-share-frame';
 import { cn } from '@/lib/utils';
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReduced(query.matches);
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  }, []);
-  return reduced;
-}
 
 /**
  * The share image or video, live, in a phone-like frame.
@@ -37,12 +26,12 @@ export function SharePreview({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const optionsRef = useRef(options);
-  // The latest options, for the animation loop and the file job, without restarting them.
+  // The latest options, for the animation loop, without restarting it.
   useLayoutEffect(() => {
     optionsRef.current = options;
   });
   const { w, h } = SHARE_FORMATS[format];
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const still = !animate || reducedMotion;
 
   useEffect(() => {

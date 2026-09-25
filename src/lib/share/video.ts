@@ -34,32 +34,38 @@ export async function encodeShareVideo(
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
-  const g = canvas.getContext('2d');
-  if (!g) return null;
+  try {
+    const g = canvas.getContext('2d');
+    if (!g) return null;
 
-  const output = new Output({
-    format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
-    target: new BufferTarget(),
-  });
-  const source = new CanvasSource(canvas, {
-    codec: 'avc',
-    bitrate: bitrateFor(w, h),
-  });
-  output.addVideoTrack(source, { frameRate: SHARE_VIDEO_FPS });
-  await output.start();
+    const output = new Output({
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      target: new BufferTarget(),
+    });
+    const source = new CanvasSource(canvas, {
+      codec: 'avc',
+      bitrate: bitrateFor(w, h),
+    });
+    output.addVideoTrack(source, { frameRate: SHARE_VIDEO_FPS });
+    await output.start();
 
-  const frames = SHARE_VIDEO_FPS * SHARE_VIDEO_SECONDS;
-  for (let i = 0; i < frames; i++) {
-    if (signal?.aborted) {
-      await output.cancel();
-      return null;
+    const frames = SHARE_VIDEO_FPS * SHARE_VIDEO_SECONDS;
+    for (let i = 0; i < frames; i++) {
+      if (signal?.aborted) {
+        await output.cancel();
+        return null;
+      }
+      draw(g, i / SHARE_VIDEO_FPS);
+      await source.add(i / SHARE_VIDEO_FPS, 1 / SHARE_VIDEO_FPS);
+      if (i % 10 === 0) onProgress?.(i / frames);
     }
-    draw(g, i / SHARE_VIDEO_FPS);
-    await source.add(i / SHARE_VIDEO_FPS, 1 / SHARE_VIDEO_FPS);
-    if (i % 10 === 0) onProgress?.(i / frames);
+    await output.finalize();
+    onProgress?.(1);
+    const buffer = output.target.buffer;
+    return buffer ? new Blob([buffer], { type: 'video/mp4' }) : null;
+  } finally {
+    // Frees the canvas memory now rather than at the next garbage collection, which a phone may not reach before the next file.
+    canvas.width = 0;
+    canvas.height = 0;
   }
-  await output.finalize();
-  onProgress?.(1);
-  const buffer = output.target.buffer;
-  return buffer ? new Blob([buffer], { type: 'video/mp4' }) : null;
 }

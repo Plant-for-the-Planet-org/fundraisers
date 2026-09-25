@@ -102,11 +102,16 @@
             "facebook": "Facebook",
             "whatsapp": "WhatsApp",
             "x": "X",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
             "google": "Google",
             "bing": "Bing",
             "email": "E-Mail",
             "newsletter": "Newsletter",
-            "stage": "Stage-Mode-QR-Code"
+            "stage": "Stage-Mode-QR-Code",
+            "fundraiser": "Spendenseite",
+            "thank_you": "Dankesseite",
+            "share_sheet": "Teilen-Menü"
           },
           "plainLink": "Einfacher Link",
           "copy": "Kopieren",
@@ -117,7 +122,7 @@
           "referralYou": "Deine Links",
           "referralSupporter": "Unterstützer*in {code}",
           "referralDonations": "{count, plural, one {# Spende} other {# Spenden}}",
-          "referralHint": "Links aus dem Tab Teilen tragen einen persönlichen Code, so siehst du, wessen Teilen Besuche und Spenden bringt."
+          "referralHint": "Geteilte Links tragen den persönlichen Code der Person, die sie teilt. So siehst du, wessen Teilen Besuche und Spenden bringt."
         },
         "updatedLabel": "Stand",
         "changeContext": "zum Zeitraum davor",
@@ -126,8 +131,7 @@
       "checklist": {
         "title": "So wird es ein Erfolg",
         "progress": "{done, number} von {total, number} erledigt",
-        "allDone": "Alles erledigt. Dein Spendenaufruf hat alles, was er braucht.",
-        "allDoneShare": "Alles erledigt. Bleib dran: Teile ihn dort, wo deine Leute sind.",
+        "allDone": "Alles erledigt. Danke für deinen Einsatz bei diesem Spendenaufruf.",
         "fix": "Beheben",
         "items": {
           "coverImage": {
