@@ -49,28 +49,81 @@ function formatAmount(value: number, locale: string, compact: boolean): string {
     : formatLocalizedNumber(value, locale);
 }
 
-/** Attach the currency symbol (or code) to a formatted number string. */
-function attachSymbol(formattedAmount: string, currencyUpper: string): string {
-  const symbol = CURRENCY_SYMBOLS[currencyUpper];
+const NO_BREAK_SPACE = '\u00a0';
 
-  if (symbol) {
-    const symbolAfter = ['SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF'].includes(
-      currencyUpper
-    );
-    return symbolAfter
-      ? `${formattedAmount} ${symbol}`
-      : `${symbol}${formattedAmount}`;
+interface CurrencyLayout {
+  currencyFirst: boolean;
+  gap: string;
+  minusSign: string;
+  minusBeforeCurrency: boolean;
+}
+
+const layoutCache = new Map<string, CurrencyLayout>();
+
+/**
+ * Learn from Intl where the locale puts the currency, what sits between it and the number, and where the minus sign goes.
+ * The probe is EUR because its narrow symbol "€" is not a letter, so Intl adds no spacing of its own and any gap comes from the locale pattern ("50 €" in German).
+ */
+function getCurrencyLayout(locale: string): CurrencyLayout {
+  const cached = layoutCache.get(locale);
+  if (cached) return cached;
+
+  const probe = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR',
+    currencyDisplay: 'narrowSymbol',
+  });
+  const positive = probe.formatToParts(1);
+  const negative = probe.formatToParts(-1);
+  const currencyAt = positive.findIndex(p => p.type === 'currency');
+  const integerAt = positive.findIndex(p => p.type === 'integer');
+  const currencyFirst = currencyAt < integerAt;
+  const between = currencyFirst
+    ? positive.slice(currencyAt + 1, integerAt)
+    : positive.slice(integerAt + 1, currencyAt);
+  const minusAt = negative.findIndex(p => p.type === 'minusSign');
+
+  const layout: CurrencyLayout = {
+    currencyFirst,
+    gap: between
+      .filter(p => p.type === 'literal')
+      .map(p => p.value)
+      .join(''),
+    minusSign: negative[minusAt]?.value ?? '-',
+    minusBeforeCurrency:
+      minusAt < negative.findIndex(p => p.type === 'currency'),
+  };
+  layoutCache.set(locale, layout);
+  return layout;
+}
+
+/** Place the currency label (the app's symbol or the ISO code) where the locale puts the currency. */
+function attachCurrency(
+  formattedAmount: string,
+  label: string,
+  locale: string
+): string {
+  const { currencyFirst, gap, minusSign, minusBeforeCurrency } =
+    getCurrencyLayout(locale || 'en');
+
+  // Same rule Intl follows: a label that touches the number with a letter ("CHF", "kr") gets a space, a sign like "€" or "$" does not.
+  const edge = currencyFirst ? label[label.length - 1] : label[0];
+  const space = gap || (/\p{L}/u.test(edge ?? '') ? NO_BREAK_SPACE : '');
+
+  if (!currencyFirst) return `${formattedAmount}${space}${label}`;
+  if (minusBeforeCurrency && formattedAmount.startsWith(minusSign)) {
+    const unsigned = formattedAmount.slice(minusSign.length);
+    return `${minusSign}${label}${space}${unsigned}`;
   }
-
-  return `${formattedAmount} ${currencyUpper}`;
+  return `${label}${space}${formattedAmount}`;
 }
 
 /**
  * Format currency amount from cents with appropriate symbol or code.
  *
- * Locale must be supplied by the caller (next-intl `useLocale()` /
- * `getLocale()`). Exact notation by default; pass { compact: true } for
- * abbreviated display (e.g. $12.30 K, or 12,30 Tsd. in German).
+ * Locale must be supplied by the caller (next-intl `useLocale()` / `getLocale()`).
+ * The locale decides where the symbol goes: "€1,234.50" in English, "1.234,50 €" in German.
+ * Exact notation by default; pass { compact: true } for abbreviated display from a million up (e.g. €1.20 M, or 1,20 Mio. € in German).
  *
  * @param amountInCents - The amount in cents from API (e.g., 1234 = $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
@@ -88,15 +141,19 @@ export function formatCurrency(
   const formattedAmount = formatAmount(amount, locale, compact);
   const currencyUpper = currency?.toUpperCase();
   if (!currencyUpper) return formattedAmount;
-  return attachSymbol(formattedAmount, currencyUpper);
+  return attachCurrency(
+    formattedAmount,
+    CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper,
+    locale
+  );
 }
 
 /**
  * Format currency amount from decimal value.
  *
- * Locale must be supplied by the caller (next-intl `useLocale()` /
- * `getLocale()`). Exact notation by default; pass { compact: true } for
- * abbreviated display (e.g. €18.70 K, or 18,70 Tsd. in German).
+ * Locale must be supplied by the caller (next-intl `useLocale()` / `getLocale()`).
+ * The locale decides where the symbol or code goes: "€50" and "EUR 50" in English, "50 €" and "50 EUR" in German.
+ * Exact notation by default; pass { compact: true } for abbreviated display from a million up (e.g. €1.20 M, or 1,20 Mio. € in German).
  *
  * @param amount - The amount in major currency units (e.g., 12.34 for $12.34)
  * @param currency - The currency code (e.g., 'USD', 'EUR')
@@ -117,11 +174,11 @@ export function formatCurrencyFromDecimal(
   const currencyUpper = currency?.toUpperCase();
   if (!currencyUpper) return formattedAmount;
 
-  if (currencyDisplay === 'code') {
-    return `${currencyUpper} ${formattedAmount}`;
-  }
-
-  return attachSymbol(formattedAmount, currencyUpper);
+  const label =
+    currencyDisplay === 'code'
+      ? currencyUpper
+      : (CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper);
+  return attachCurrency(formattedAmount, label, locale);
 }
 
 /**
