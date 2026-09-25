@@ -1,8 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { buildShareUrl } from '@/lib/share/links';
+import { getReferralCode } from '@/lib/share/referral';
+import { useAuthStore } from '@/stores/auth-store';
+import { useOrigin } from '@/components/share/use-origin';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,32 +25,26 @@ const CHANNELS = [
 
 type ChannelId = (typeof CHANNELS)[number]['id'];
 
-function useOrigin() {
-  // The origin is only known in the browser. Until then the link renders without it.
-  const [origin, setOrigin] = useState('');
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOrigin(window.location.origin);
-  }, []);
-  return origin;
-}
-
 /** Pick where you are sharing, then copy one link. */
 function ShareLinkPicker({ slug }: { slug: string }) {
   const t = useTranslations('Dashboard.fundraiser.insights.audience');
   const origin = useOrigin();
+  const refCode = getReferralCode(useAuthStore(state => state.user?.profile));
   const [channelId, setChannelId] = useState<ChannelId>('plain');
 
   const channel = CHANNELS.find(option => option.id === channelId)!;
   const label = (id: ChannelId) =>
     id === 'plain' ? t('plainLink') : t(`sources.${id}`);
-  const base = `${origin}/raise/${encodeURIComponent(slug)}`;
-  const url = channel.medium
-    ? `${base}?${new URLSearchParams({
-        utm_source: channel.id,
-        utm_medium: channel.medium,
-      })}`
-    : base;
+  // Every link carries the host's own code, so Insights can tell their shares from their co-hosts' and supporters'.
+  const url = origin
+    ? buildShareUrl({
+        origin,
+        slug,
+        source: channel.medium ? channel.id : undefined,
+        medium: channel.medium ?? undefined,
+        ref: refCode,
+      })
+    : `/raise/${encodeURIComponent(slug)}`;
 
   const copy = async () => {
     try {

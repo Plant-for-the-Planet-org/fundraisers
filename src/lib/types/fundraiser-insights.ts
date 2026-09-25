@@ -67,6 +67,15 @@ export interface FundraiserInsights extends InsightsSeries {
   taggedSources: Array<{ source: string; visitors: number }>;
   /** Visitors with no referrer: typed or pasted links, and apps like WhatsApp that do not send one. */
   directVisitors: number;
+  /** Visits and donations that came through personal share links, by the sharer's code. */
+  referrals: InsightsReferral[];
+}
+
+export interface InsightsReferral {
+  /** The sharer's code from `?ref=`. */
+  ref: string;
+  visits: number;
+  donations: number;
 }
 
 export interface AccountInsightsFundraiser {

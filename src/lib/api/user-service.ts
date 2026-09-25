@@ -88,6 +88,8 @@ export interface UserProfileResponse {
     received: number;
     target: number;
   };
+  /** Short code that tags the links this person shares (`?ref=`). Not yet returned by the platform; the field name is a placeholder until the API confirms it. */
+  referralCode?: string | null;
 }
 
 export type ProfilePaymentMethodType =

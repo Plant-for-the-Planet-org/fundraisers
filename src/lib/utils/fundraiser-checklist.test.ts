@@ -56,11 +56,22 @@ function doneIds(fundraiser: Fundraiser): string[] {
 }
 
 describe('getFundraiserChecklist', () => {
+  it('keeps sharing open while people can give, and ticks it once the fundraiser ends', () => {
+    const live = makeFundraiser({ status: 'active', canDonate: true });
+    expect(doneIds(live)).not.toContain('share');
+    const ended = makeFundraiser({ status: 'completed', canDonate: false });
+    expect(doneIds(ended)).toContain('share');
+  });
+
+  it('puts sharing last', () => {
+    expect(getFundraiserChecklist(makeFundraiser()).at(-1)?.id).toBe('share');
+  });
+
   it('marks nothing done on a blank draft', () => {
     expect(doneIds(makeFundraiser())).toEqual([]);
   });
 
-  it('marks everything done on a complete, live fundraiser', () => {
+  it('marks every step but sharing done on a complete, live fundraiser', () => {
     const fundraiser = makeFundraiser({
       image: 'cover.jpg',
       description: `<p>${'a'.repeat(STORY_MIN_LENGTH)}</p>`,
@@ -70,6 +81,7 @@ describe('getFundraiserChecklist', () => {
       donationCount: 3,
     });
     expect(doneIds(fundraiser)).toHaveLength(6);
+    expect(doneIds(fundraiser)).not.toContain('share');
   });
 
   it('counts the story by its text, not its markup', () => {

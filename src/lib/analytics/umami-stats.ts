@@ -7,12 +7,14 @@ import type {
 } from '@/lib/types/fundraiser-insights';
 import type { RangeWindow } from './insights-buckets';
 
+import { isValidRefCode } from '@/lib/share/links';
 import { DONATION_EVENTS } from '@/lib/types/fundraiser-insights';
 import {
   buildBuckets,
   buildDayBucketsFromHours,
   getRangeWindow,
 } from './insights-buckets';
+import { mergeReferrals } from './referrals';
 import { groupReferrers } from './referrer-sources';
 import { getUmamiBaseUrl } from './umami';
 
@@ -169,6 +171,8 @@ export async function getFundraiserInsights({
     referrers,
     channels,
     utmSources,
+    refVisits,
+    refDonations,
   ] = await Promise.all([
     umamiGet<UmamiSeriesResponse>(
       'pageviews',
@@ -225,6 +229,8 @@ export async function getFundraiserInsights({
       },
       revalidate
     ),
+    refCounts('share_visit', base, revalidate),
+    refCounts('donation_completed', base, revalidate),
   ]);
 
   const eventCounts = Object.fromEntries(
@@ -255,7 +261,35 @@ export async function getFundraiserInsights({
       visitors: metric.y,
     })),
     directVisitors: channels.find(metric => metric.x === 'direct')?.y ?? 0,
+    referrals: mergeReferrals(refVisits, refDonations),
   };
+}
+
+/**
+ * How often an event fired per `ref` code on one fundraiser page.
+ * Optional on purpose: a Umami that cannot answer this leaves the rest of Insights intact, with no referrals.
+ */
+async function refCounts(
+  event: 'share_visit' | 'donation_completed',
+  base: { startAt: number; endAt: number; path: string },
+  revalidate: number
+): Promise<Record<string, number>> {
+  try {
+    const values = await umamiGet<Array<{ value: string; total: number }>>(
+      'event-data/values',
+      { ...base, event, propertyName: 'ref' },
+      revalidate
+    );
+    // Anyone can type any ?ref= into a URL; only well-formed codes reach the host's Insights.
+    return Object.fromEntries(
+      values
+        .filter(({ value }) => isValidRefCode(value))
+        .map(({ value, total }) => [value, total])
+    );
+  } catch (error) {
+    console.warn(`[insights] No ref counts for ${event}:`, error);
+    return {};
+  }
 }
 
 /**

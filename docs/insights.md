@@ -105,3 +105,11 @@ The period line on each card shows the window and when the snapshot was taken: "
 ## Tagged links
 
 The Share tab builds links like `/raise/<slug>?utm_source=whatsapp&utm_medium=messaging`. They show up under "From your tagged links" on Insights. Same shape as the Stage Mode QR code: a source and a medium, no campaign.
+
+The share studio, the fundraiser page's Copy Link and the thank-you Copy Link tag their links too, so rows like "Fundraiser page", "Thank-you screen" and "Share menu" can show up there. `docs/naming.md` lists every token.
+
+## People sharing
+
+Links shared from the Share tab, from the fundraiser page (Copy Link and the Share images dialog) or after donating carry the sharer's `?ref=` code (see `docs/share.md`). The landing page sends `share_visit` with the code, and every donation event carries it. "From people sharing" counts both per code with `event-data/values` (`propertyName=ref`), filtered to the fundraiser's path.
+
+Both calls are optional: if Umami cannot answer them, the rest of Insights still loads and the list stays empty.

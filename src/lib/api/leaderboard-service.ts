@@ -4,12 +4,13 @@ import type {
 } from '@/lib/types/leaderboard';
 
 import { cache } from 'react';
+import { LEADERBOARD_PAGE_LIMIT } from '@/lib/constants/leaderboard';
 import { platformFetch } from './platform-fetch';
 import { withRetry } from './utils';
 
 export async function getLeaderboard(
   idOrSlug: string,
-  limit: number = 10
+  limit: number = LEADERBOARD_PAGE_LIMIT
 ): Promise<LeaderboardApiResponse> {
   const params = new URLSearchParams({ limit: limit.toString() });
   return platformFetch<LeaderboardApiResponse>(

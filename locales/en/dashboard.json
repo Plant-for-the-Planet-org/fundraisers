@@ -102,17 +102,27 @@
             "facebook": "Facebook",
             "whatsapp": "WhatsApp",
             "x": "X",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
             "google": "Google",
             "bing": "Bing",
             "email": "Email",
             "newsletter": "Newsletter",
-            "stage": "Stage Mode QR code"
+            "stage": "Stage Mode QR code",
+            "fundraiser": "Fundraiser page",
+            "thank_you": "Thank-you screen",
+            "share_sheet": "Share menu"
           },
           "plainLink": "Plain link",
           "copy": "Copy",
           "linkLabel": "Link",
           "channelLabel": "Where are you sharing?",
-          "tagHint": "Most visits show as Direct? Share <link>tagged links</link> to see which channel works."
+          "tagHint": "Most visits show as Direct? Share <link>tagged links</link> to see which channel works.",
+          "referralsTitle": "From people sharing",
+          "referralYou": "Your links",
+          "referralSupporter": "Supporter {code}",
+          "referralDonations": "{count, plural, one {# donation} other {# donations}}",
+          "referralHint": "Shared links carry the sharer's personal code, so you see whose shares bring visitors and donations."
         },
         "updatedLabel": "Updated",
         "changeContext": "vs before",
@@ -121,8 +131,7 @@
       "checklist": {
         "title": "Make it a success",
         "progress": "{done, number} of {total, number} done",
-        "allDone": "All set. Your fundraiser has everything it needs to do well.",
-        "allDoneShare": "All set. Keep it going: share it where your people are.",
+        "allDone": "All done. Thank you for running this fundraiser.",
         "fix": "Fix",
         "items": {
           "coverImage": {
@@ -148,10 +157,16 @@
           "firstDonation": {
             "title": "Welcome the first donation",
             "hint": "Ask a close friend or family member first. Early gifts build trust."
+          },
+          "share": {
+            "title": "Keep sharing",
+            "hint": "Each share brings new people. Stories, posts and a link for every place you share are ready in the Share tab."
           }
         },
         "invite": "Invite",
-        "share": "Share"
+        "share": "Share",
+        "showDone": "Show {count, number} done",
+        "hideDone": "Hide done"
       },
       "hosts": {
         "invite": "Invite co-host"

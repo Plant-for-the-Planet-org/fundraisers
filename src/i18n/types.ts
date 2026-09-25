@@ -9,6 +9,7 @@ import type MessagesExplore from '../../locales/en/explore.json';
 import type MessagesFundraisers from '../../locales/en/fundraisers.json';
 import type MessagesHostInvite from '../../locales/en/host-invite.json';
 import type MessagesLeaderboard from '../../locales/en/leaderboard.json';
+import type MessagesShare from '../../locales/en/share.json';
 import type MessagesStage from '../../locales/en/stage.json';
 
 type Messages = typeof MessagesCommon &
@@ -21,7 +22,8 @@ type Messages = typeof MessagesCommon &
   typeof MessagesStage &
   typeof MessagesLeaderboard &
   typeof MessagesCookies &
-  typeof MessagesHostInvite;
+  typeof MessagesHostInvite &
+  typeof MessagesShare;
 
 declare module 'next-intl' {
   interface AppConfig {

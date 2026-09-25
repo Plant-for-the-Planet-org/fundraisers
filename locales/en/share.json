@@ -1,0 +1,190 @@
+{
+  "Share": {
+    "image": {
+      "byLine": "by {name}",
+      "raisedOf": "{raised} raised of {goal}",
+      "raised": "{raised} raised",
+      "given": "{first}, {second} and {others, plural, one {# other} other {# others}} have given",
+      "goal": "Goal: {goal}",
+      "started": "Just getting started",
+      "first": "Be the first to give",
+      "newBadge": "New",
+      "gift": {
+        "once": "I just gave {amount}!",
+        "monthly": "I give {amount} every month!",
+        "yearly": "I give {amount} every year!"
+      }
+    },
+    "cta": {
+      "joinMe": "Join me",
+      "supportMyFundraiser": "Support my fundraiser",
+      "helpUsFinish": "Help us finish",
+      "yourTurn": "Your turn",
+      "giftTree": "Gift a tree",
+      "protectForest": "Protect a forest",
+      "youngVoices": "Give young people a voice",
+      "giftForPlanet": "A gift for the planet",
+      "treatPlanet": "Treat the planet",
+      "celebrateWithMe": "Celebrate with me",
+      "thankYou": "Thank you!",
+      "custom": "Write your own…",
+      "customLabel": "Your text",
+      "customPlaceholder": "Plant with me"
+    },
+    "captions": {
+      "none": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "christmas": "This Christmas I'm fundraising for {name}. Want to give a gift that matters? Join me.",
+      "halloween": "No tricks, just a treat for the planet: I'm fundraising for {name}. Join me!",
+      "birthday": "For my birthday I'm fundraising for {name} instead of gifts. Celebrate with me!",
+      "donor": "I just supported {name}. Will you join me?",
+      "supporter": "Please support {name}. Every donation helps!",
+      "gift": {
+        "once": "I just gave {amount} to \"{name}\". Join me:",
+        "monthly": "I give {amount} every month to \"{name}\". Join me:",
+        "yearly": "I give {amount} every year to \"{name}\". Join me:"
+      },
+      "concluded": "We did it! Thank you to everyone who gave to {name}."
+    },
+    "seasons": {
+      "none": "Your theme",
+      "christmas": "Christmas",
+      "halloween": "Halloween",
+      "birthday": "Birthday"
+    },
+    "platforms": {
+      "other": "Any app",
+      "instagram": "Instagram",
+      "whatsapp": "WhatsApp",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "x": "X"
+    },
+    "channels": {
+      "instagramStory": {
+        "label": "Story",
+        "hint": "Video or image, 9:16",
+        "tip": "After posting, add your link with the link sticker."
+      },
+      "instagramPost": {
+        "label": "Post",
+        "hint": "Image or video, 4:5",
+        "tip": "Links in Instagram captions are not clickable. Put the link in your bio or a story too."
+      },
+      "whatsappStatus": {
+        "label": "Status",
+        "hint": "Video or image, 9:16",
+        "tip": "Add your link as the Status caption so friends can tap it."
+      },
+      "whatsappMessage": {
+        "label": "Message",
+        "hint": "Link with a preview",
+        "tip": "Chats show your link with this preview image, so a message with the link is enough."
+      },
+      "tiktokVideo": {
+        "label": "Video",
+        "hint": "Video or image, 9:16",
+        "tip": "Links in TikTok captions are not clickable. Add your link to your bio."
+      },
+      "youtubeShort": {
+        "label": "Short",
+        "hint": "Video, 9:16",
+        "tip": "Add your link to the Short description, or pin it as a comment."
+      },
+      "linkedinPost": {
+        "label": "Post",
+        "hint": "Image, 4:5",
+        "tip": "Put the link in your post text so people can tap it."
+      },
+      "linkedinWide": {
+        "label": "Wide post",
+        "hint": "Image or video, 1.91:1",
+        "tip": "Put the link in your post text so people can tap it."
+      },
+      "facebookPost": {
+        "label": "Post",
+        "hint": "Image or video, 4:5",
+        "tip": "Put the link in your post text so people can tap it."
+      },
+      "facebookStory": {
+        "label": "Story",
+        "hint": "Video or image, 9:16",
+        "tip": "After posting, add your link with the link sticker."
+      },
+      "xPost": {
+        "label": "Post",
+        "hint": "Image or video, 16:9",
+        "tip": "Put the link in your post text so people can tap it."
+      },
+      "xTallPost": {
+        "label": "Tall post",
+        "hint": "Image, 4:5",
+        "tip": "Put the link in your post text so people can tap it."
+      },
+      "newsletter": {
+        "label": "Newsletter",
+        "hint": "Banner, 1.91:1",
+        "tip": "Add the banner at the top of your email and link it to your fundraiser."
+      },
+      "anyStory": {
+        "label": "Story",
+        "hint": "Video or image, 9:16",
+        "tip": "Add your link wherever the app allows."
+      },
+      "anyPost": {
+        "label": "Post",
+        "hint": "Image, 4:5",
+        "tip": "Put the link in your post text so people can tap it."
+      }
+    },
+    "studio": {
+      "whereTitle": "Where are you sharing?",
+      "whereHint": "We make the right size, with a link that shows which channel brought donations.",
+      "platformLabel": "Platform",
+      "formatLabel": "Format",
+      "customizeTitle": "Make it yours",
+      "customizeHint": "Colors and fonts come from your fundraiser theme.",
+      "style": "Style",
+      "buttonText": "Button text",
+      "showDonors": "Show donors who gave",
+      "donorsUnavailable": "Shown when at least 3 donors are public and the leaderboard is on.",
+      "captionTitle": "Caption",
+      "captionHint": "Copied with your link when you share. Edit it if you like.",
+      "captionHintLinkAlone": "For this format we copy only your link when you share. Use Copy to get the text too.",
+      "linkLabel": "Your link",
+      "copy": "Copy",
+      "captionCopied": "Text and link copied",
+      "copyFailed": "Could not copy",
+      "kindLabel": "Image or video",
+      "video": "Video",
+      "image": "Image",
+      "videoMeta": "Video, {seconds} s · {width}×{height}",
+      "imageMeta": "Image · {width}×{height}",
+      "previewLabel": "Preview",
+      "preparing": "Preparing…",
+      "preparingVideo": "Preparing video… {percent}%",
+      "renderFailed": "Try again",
+      "renderFailedTip": "Could not make the image.",
+      "shareTo": "Share to {platform}",
+      "share": "Share",
+      "shareLink": "Share link",
+      "downloadImage": "Download image",
+      "downloadVideo": "Download video",
+      "downloadPreview": "Download preview image",
+      "kit": "Download everything (.zip)",
+      "kitPreparing": "Preparing all files…",
+      "kitDone": "Share kit downloaded",
+      "kitFailed": "Could not prepare the files",
+      "shareFailed": "Could not open sharing. Try Download instead.",
+      "savedTip": "Saved {file}. {tip}",
+      "linkCopiedTip": "Your link is copied.",
+      "captionCopiedTip": "Your caption and link are copied, ready to paste.",
+      "noVideo": "This browser can't make videos. Share the image instead.",
+      "messageCopied": "Message copied"
+    },
+    "donor": {
+      "includeGift": "Include my contribution"
+    }
+  }
+}
