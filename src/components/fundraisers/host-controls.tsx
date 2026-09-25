@@ -54,6 +54,7 @@ export function HostControls({ fundraiser }: { fundraiser: Fundraiser }) {
       </span>
       <Link
         href={editPath}
+        aria-label={t('editLabel')}
         className='shrink-0 font-medium text-foreground underline-offset-2 hover:underline'
       >
         {t('editButton')}

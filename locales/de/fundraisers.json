@@ -506,7 +506,8 @@
     },
     "hostControls": {
       "hostLabel": "Du bist Organisator*in",
-      "editButton": "Bearbeiten"
+      "editButton": "Bearbeiten",
+      "editLabel": "Spendenaufruf bearbeiten"
     }
   }
 }

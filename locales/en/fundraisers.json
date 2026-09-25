@@ -506,7 +506,8 @@
     },
     "hostControls": {
       "hostLabel": "You're a host",
-      "editButton": "Edit"
+      "editButton": "Edit",
+      "editLabel": "Edit fundraiser"
     }
   }
 }
