@@ -58,13 +58,16 @@ interface UmamiMetric {
   y: number;
 }
 
+const UMAMI_TIMEOUT_MS = 8000;
+
 function getUmamiConfig() {
   const baseUrl = process.env.NEXT_PUBLIC_UMAMI_URL?.trim().replace(/\/+$/, '');
   const apiKey = process.env.UMAMI_API_KEY;
   // A separate id lets a local or preview box read production stats without also sending its own visits there.
+  // `||`, not `??`: `.env.example` ships the override as an empty line, which loads as ''.
   const websiteId =
-    process.env.UMAMI_STATS_WEBSITE_ID ??
-    process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+    process.env.UMAMI_STATS_WEBSITE_ID?.trim() ||
+    process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID?.trim();
 
   if (!baseUrl || !apiKey || !websiteId) return null;
   return { baseUrl, apiKey, websiteId };
@@ -89,6 +92,8 @@ async function umamiGet<T>(
     `${config.baseUrl}/api/websites/${config.websiteId}/${path}?${query}`,
     {
       headers: { Authorization: `Bearer ${config.apiKey}` },
+      // A slow Umami should fail into the route's 502 and retry button, not hang the request.
+      signal: AbortSignal.timeout(UMAMI_TIMEOUT_MS),
       // Opt-in is required: without force-cache, Next.js skips its cache for requests that send an authorization header.
       // The key is the URL plus headers. The key header is the same for everyone, and the snapped window keeps the URL stable, so hosts share one answer.
       cache: 'force-cache',

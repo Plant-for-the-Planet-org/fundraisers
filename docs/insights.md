@@ -94,7 +94,7 @@ Numbers are a snapshot, not realtime. How often a snapshot is taken depends on t
    - `force-cache` is required. Next.js does not cache requests that send an `authorization` header unless asked to, and the Umami calls send the key that way.
    - Only responses are stored; the key is not written to the cache.
 2. **The platform check** is never cached. It runs on every request with the caller's token, so access is always current.
-3. **The browser** keeps our responses for 60 seconds (`Cache-Control: private, max-age=60`). Kept short so an old response shape does not linger after a deploy.
+3. **The browser** does not keep our responses (`Cache-Control: private, no-store`). The answer depends on who is signed in, but the browser cache keys on the URL only, not the `Authorization` header. So after a sign-out and sign-in, or an account switch, a kept response would show the previous account's numbers. The server cache in step 1 already makes repeat calls cheap.
 
 The period line on each card shows the window and when the snapshot was taken: "Sep 17 – 24, 2026 · 10:30 PM".
 

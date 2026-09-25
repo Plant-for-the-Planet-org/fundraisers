@@ -44,10 +44,10 @@ export function useFundraiserInsights(
           setState({ status: 'error' });
           return;
         }
-        setState({
-          status: 'ready',
-          data: (await response.json()) as FundraiserInsights,
-        });
+        const data = (await response.json()) as FundraiserInsights;
+        // Checked again: the range can change while the body is still being read.
+        if (ignore) return;
+        setState({ status: 'ready', data });
       })
       .catch(() => {
         if (!ignore) setState({ status: 'error' });

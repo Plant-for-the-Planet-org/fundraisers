@@ -47,8 +47,8 @@ export async function GET(
       return NextResponse.json({ error: 'not_started' }, { status: 422 });
     }
     return NextResponse.json(insights, {
-      // Short on purpose: the server already caches Umami, and a long browser cache would keep serving an old response shape after a deploy.
-      headers: { 'Cache-Control': 'private, max-age=60' },
+      // The answer depends on who is signed in, and the browser cache does not key on the Authorization header.
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (error) {
     console.error('[insights] Failed to load Umami stats:', error);

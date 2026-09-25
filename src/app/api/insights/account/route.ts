@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(body, {
-      headers: { 'Cache-Control': 'private, max-age=60' },
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (error) {
     console.error('[insights/account] Failed to load Umami stats:', error);

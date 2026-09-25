@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         .map(fundraiser => fundraiser.slug)
     );
     return NextResponse.json(views, {
-      headers: { 'Cache-Control': 'private, max-age=60' },
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (error) {
     console.error('[insights/summary] Failed to load Umami stats:', error);

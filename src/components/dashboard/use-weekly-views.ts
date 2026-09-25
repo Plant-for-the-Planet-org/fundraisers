@@ -11,7 +11,11 @@ export interface WeeklyViews {
 /** Views this week across the host's fundraisers. Null while loading, when Umami is not set up, or when the call fails. */
 export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
   const accessToken = useAuthStore(state => state.accessToken);
-  const [views, setViews] = useState<WeeklyViews | null>(null);
+  // Tagged with the token it was fetched for, so an account switch never shows the last account's number.
+  const [views, setViews] = useState<{
+    accessToken: string;
+    data: WeeklyViews;
+  } | null>(null);
 
   useEffect(() => {
     if (!enabled || !accessToken) return;
@@ -21,9 +25,9 @@ export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
       .then(async response => {
-        if (!ignore && response.ok) {
-          setViews((await response.json()) as WeeklyViews);
-        }
+        if (!response.ok) return;
+        const data = (await response.json()) as WeeklyViews;
+        if (!ignore) setViews({ accessToken, data });
       })
       .catch(() => {
         // An optional number; nothing to tell the host if it is missing.
@@ -34,5 +38,6 @@ export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
     };
   }, [enabled, accessToken]);
 
-  return views;
+  if (!enabled || views?.accessToken !== accessToken) return null;
+  return views.data;
 }
