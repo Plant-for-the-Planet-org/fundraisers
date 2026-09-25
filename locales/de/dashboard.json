@@ -6,7 +6,6 @@
     },
     "nav": {
       "label": "Dashboard-Menü",
-      "openMenu": "Menü",
       "overview": "Übersicht",
       "fundraisers": "Spendenaufrufe",
       "collapse": "Menü einklappen",

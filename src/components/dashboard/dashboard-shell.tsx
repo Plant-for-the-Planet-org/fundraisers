@@ -3,21 +3,14 @@
 import type { ReactNode } from 'react';
 import type { CSSProperties } from 'react';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { hexToHslTriplet } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { cn } from '@/lib/utils/cn';
-import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { BarsIcon, SidebarIcon } from '@/components/ui/ui-icons';
+import { SidebarIcon } from '@/components/ui/ui-icons';
 import { DashboardNav } from './dashboard-nav';
 import { useMenuCollapsed } from './use-menu-collapsed';
 
@@ -36,7 +29,6 @@ export function DashboardShell({
   insightsEnabled: boolean;
 }) {
   const t = useTranslations('Dashboard.nav');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [collapsed, toggleCollapsed] = useMenuCollapsed();
   const pathname = usePathname();
 
@@ -60,14 +52,15 @@ export function DashboardShell({
         className='flex flex-col gap-4 md:flex-row md:gap-6'
         style={{ '--primary': primary } as CSSProperties}
       >
+        {/* One menu for all sizes. Small screens: a row of icons when collapsed, the full list when expanded, since three labels do not fit in a row on a phone. Desktop: the side rail. */}
         {/* No width animation: the content would reflow on every frame of it. */}
-        <aside
-          className={cn(
-            'hidden shrink-0 md:block',
-            collapsed ? 'w-10' : 'w-48'
-          )}
-        >
-          <div className='sticky top-8 flex flex-col gap-2'>
+        <aside className={cn('shrink-0', collapsed ? 'md:w-10' : 'md:w-48')}>
+          <div
+            className={cn(
+              'flex gap-1 md:sticky md:top-8 md:flex-col md:gap-2',
+              collapsed ? 'flex-row items-center' : 'flex-col'
+            )}
+          >
             <DashboardNav
               collapsed={collapsed}
               insightsEnabled={insightsEnabled}
@@ -85,24 +78,6 @@ export function DashboardShell({
             </button>
           </div>
         </aside>
-
-        <div className='md:hidden'>
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant='outline' size='sm'>
-                <BarsIcon />
-                {t('openMenu')}
-              </Button>
-            </SheetTrigger>
-            <SheetContent aria-describedby={undefined}>
-              <SheetTitle>{t('label')}</SheetTitle>
-              <DashboardNav
-                insightsEnabled={insightsEnabled}
-                onNavigate={() => setIsMenuOpen(false)}
-              />
-            </SheetContent>
-          </Sheet>
-        </div>
 
         <div className='min-w-0 flex-1'>{children}</div>
       </div>

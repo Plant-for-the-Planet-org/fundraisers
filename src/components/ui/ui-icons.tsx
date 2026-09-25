@@ -44,22 +44,6 @@ export function HandHoldingHeartIcon(props: IconProps) {
   );
 }
 
-export function BarsIcon(props: IconProps) {
-  return (
-    <svg {...baseProps} viewBox='0 0 448 512' {...props}>
-      <path
-        opacity='.4'
-        fill='currentColor'
-        d='M0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32z'
-      />
-      <path
-        fill='currentColor'
-        d='M448 96c0-17.7-14.3-32-32-32L32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32zm0 320c0-17.7-14.3-32-32-32L32 384c-17.7 0-32 14.3-32 32s14.3 32 32 32l384 0c17.7 0 32-14.3 32-32z'
-      />
-    </svg>
-  );
-}
-
 export function XmarkIcon(props: IconProps) {
   return (
     <svg {...baseProps} viewBox='0 0 384 512' {...props}>

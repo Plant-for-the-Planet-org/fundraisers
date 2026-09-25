@@ -34,8 +34,6 @@ const NAV_ITEMS = [
 ] as const;
 
 interface DashboardNavProps {
-  /** Lets the mobile sheet close itself after a link is picked. */
-  onNavigate?: () => void;
   /** Icons only; the label stays for screen readers and shows as a tooltip. */
   collapsed?: boolean;
   /** Insights needs the Umami key, so the item only shows where one is set. */
@@ -43,7 +41,6 @@ interface DashboardNavProps {
 }
 
 export function DashboardNav({
-  onNavigate,
   collapsed = false,
   insightsEnabled = false,
 }: DashboardNavProps) {
@@ -52,7 +49,13 @@ export function DashboardNav({
 
   return (
     <nav aria-label={t('label')}>
-      <ul className='m-0 flex list-none flex-col gap-1 p-0'>
+      <ul
+        className={cn(
+          'm-0 flex list-none gap-1 p-0',
+          // Collapsed on a small screen, the icons sit in a row above the content.
+          collapsed ? 'flex-row md:flex-col' : 'flex-col'
+        )}
+      >
         {NAV_ITEMS.filter(
           item => item.labelKey !== 'insights' || insightsEnabled
         ).map(({ href, labelKey, icon: Icon, isActive }) => {
@@ -61,7 +64,6 @@ export function DashboardNav({
             <li key={href}>
               <Link
                 href={href}
-                onClick={onNavigate}
                 aria-current={active ? 'page' : undefined}
                 title={collapsed ? t(labelKey) : undefined}
                 className={cn(

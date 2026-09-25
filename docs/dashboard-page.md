@@ -51,7 +51,7 @@ src/app/(standard)/dashboard/
 - Items: Overview, Fundraisers, Insights (only with Umami).
 - Collapsed to an icon rail by default. The choice is remembered per browser (`localStorage`, `use-menu-collapsed.ts`); the server renders the default.
 - Rows have a fixed height and padding, so icons stay in place when the menu is toggled. The toggle is instant; a width animation would reflow the content on every frame.
-- On small screens the menu opens as a sheet from a "Menu" button.
+- On small screens the same menu sits above the content: a row of icons plus the toggle when collapsed, the full list with labels when expanded. It shares the collapse setting with desktop.
 - Starting a fundraiser is in the site header ("Start Fundraiser"), not in the menu.
 
 ### Theme

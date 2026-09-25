@@ -6,7 +6,6 @@
     },
     "nav": {
       "label": "Dashboard menu",
-      "openMenu": "Menu",
       "overview": "Overview",
       "fundraisers": "Fundraisers",
       "collapse": "Collapse menu",
