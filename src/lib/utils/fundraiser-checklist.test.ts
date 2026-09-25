@@ -56,6 +56,17 @@ function doneIds(fundraiser: Fundraiser): string[] {
 }
 
 describe('getFundraiserChecklist', () => {
+  it('keeps sharing open while people can give, and ticks it once the fundraiser ends', () => {
+    const live = makeFundraiser({ status: 'active', canDonate: true });
+    expect(doneIds(live)).not.toContain('share');
+    const ended = makeFundraiser({ status: 'completed', canDonate: false });
+    expect(doneIds(ended)).toContain('share');
+  });
+
+  it('puts sharing last', () => {
+    expect(getFundraiserChecklist(makeFundraiser()).at(-1)?.id).toBe('share');
+  });
+
   it('marks nothing done on a blank draft', () => {
     expect(doneIds(makeFundraiser())).toEqual([]);
   });

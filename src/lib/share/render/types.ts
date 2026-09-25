@@ -1,5 +1,6 @@
 import type { ShareFormatId } from '../formats';
 import type { SeasonId } from './seasons';
+import type { ShareBackground } from './theme-background';
 
 /** A 2D context from the browser or from `@napi-rs/canvas` on the server. Both implement the same drawing calls. */
 export type Ctx = CanvasRenderingContext2D;
@@ -21,11 +22,17 @@ export interface ShareRenderData {
   formatMoney: (amount: number) => string;
   /** "€3,400 raised of €5,000", or "€3,400 raised" when `goal` is null. Called every frame with the counted-up amount. */
   raisedLine: (raised: string, goal: string | null) => string;
-  /** First names of public donors, newest first. Their initials fill the avatar row. */
+  /** First names of public donors, top donors first. Their avatars, or initials until those load, fill the avatar row. */
   donors: string[];
-  /** "Anna, Ben and 46 others have joined". Null hides the avatar row. */
-  joinedLine: string | null;
+  /** "Anna, Ben and 46 others have given". Null hides the avatar row. */
+  donorsLine: string | null;
+  /** "Be the first to give", shown in place of the avatar row before anyone has given. */
+  firstLine: string | null;
+  /** Replaces the percentage in the ring's badge, such as "New" before anyone has given. */
+  badge: string | null;
   cta: string;
+  /** The fundraiser has ended: confetti falls, whatever the style, and the button thanks people. */
+  concluded: boolean;
   /** Shown under the button, without the protocol. */
   url: string;
 }
@@ -44,6 +51,12 @@ export interface ShareRenderOptions {
   data: ShareRenderData;
   theme: ShareRenderTheme;
   photo: ShareImage | null;
+  /** The fundraiser page's own background. Without it, the image uses a wash of the accent. */
+  background?: ShareBackground | null;
+  /** One image per donor in `data.donors`: their photo, or the app's generated avatar. */
+  avatars?: Array<ShareImage | null> | null;
+  /** Pixel density: the canvas is `scale` times the format's size. Images export at 2 for sharp text; video stays at 1. */
+  scale?: number;
   /** Draws the safe zone, for checking a layout. Never on for files people share. */
   guides?: boolean;
 }
@@ -83,6 +96,9 @@ export interface FrameContext {
   season: Season;
   data: ShareRenderData;
   photo: ShareImage | null;
+  background: ShareBackground | null;
+  avatars: Array<ShareImage | null>;
+  dark: boolean;
   fonts: Fonts;
   /** The widest the button may grow, set by the layout before it draws the button. */
   maxCtaWidth: number;

@@ -14,7 +14,9 @@ Images and videos people share for a fundraiser, the link preview other apps sho
 | `src/lib/share/video.ts` | Encodes the animation to MP4 in the browser (WebCodecs, through `mediabunny`). |
 | `src/components/share/share-studio.tsx` | The UI: host variant in the dashboard Share tab, donor variant on the thank-you screen. |
 | `src/app/api/share-image/[slug]` | The link preview image, drawn on the server with `@napi-rs/canvas`. |
-| `src/app/api/share/photo/[slug]` | The cover photo from our origin, so a canvas that draws it can still be exported. |
+| `src/lib/share/render/theme-background.ts` | The fundraiser page's background (base, wash, decoration, animation) rebuilt for a canvas. |
+| `src/lib/share/render/avatars.ts` | Donor avatars: the profile photo, or the app's generated avatar (same icon and colour as `FallbackAvatar`). |
+| `src/app/api/share/photo/[slug]` | The fundraiser's images from our origin (cover photo, theme background, public donor photos), so a canvas that draws them can still be exported. |
 
 ## Formats and safe zones
 
@@ -31,15 +33,27 @@ All vertical formats are 1080×1920 and differ only in what the app covers. The 
 
 The zones come from creator guides, not official specs. Check a new format with `guides: true`, which draws the zone.
 
+## Background, text and avatars
+
+- The plain style and Birthday draw on the fundraiser page's own background, as ThemeShell paints it: white or black base, then the preset gradient (Tailwind classes, read with `tailwind-colors.ts`), custom gradient or solid colour, then the pattern, image or logo, then the page's animation. Christmas and Halloween bring their own colours.
+- Button and badge text follow the page's rule: dark on light accents, white on dark ones (`contrast.ts`).
+- Fonts are the theme's title and body fonts: read from the page in the browser, downloaded from Google Fonts on the server.
+- Donors come from the top list first (grouped per person), then recent donations, like the public donor strip.
+- Nothing raised yet: the badge says "New", the amount line shows the goal, and a dashed empty avatar invites the first gift. An ended fundraiser thanks people, with confetti. Over the goal, the badge shows the real percentage.
+
 ## Seasons
 
 A season is a set of optional drawing hooks (`render/types.ts`, `Season`): palette, background, ring ticks, ring tip, behind the photo, on the photo, on the button, around the button. The plain theme is the season with no hooks. Christmas and Halloween bring their own palette; Birthday keeps the fundraiser's.
 
 Christmas wording follows the fundraiser's project purposes (`cta.ts`), since not every project plants trees. Mixed or unknown purposes get the neutral "A gift for the planet".
 
+## Sizes
+
+Images export at twice the format's size (a story is 2160×3840) so text stays sharp after the app scales it; videos stay at the format's size, and the link preview at 1200×630.
+
 ## Sharing a file
 
-Files are made as soon as a choice changes, not on the tap: Safari only opens the share sheet right after a tap. Where the share sheet takes files (most phones), the button opens it; the link or caption is copied first, because a story cannot carry a link. Elsewhere the button downloads the file, and on desktop a QR code opens the same page on the phone.
+Files are made as soon as a choice changes, not on the tap: Safari only opens the share sheet right after a tap. Where the share sheet takes files (most phones), the button opens it; the link or caption is copied first, because a story cannot carry a link. Elsewhere, such as most desktop browsers, the button downloads the file and copies the caption.
 
 ## Link preview
 
@@ -48,6 +62,10 @@ Files are made as soon as a choice changes, not on the tap: Safari only opens th
 - The route draws the banner in the fundraiser's theme with live progress, and keeps one render per fundraiser and locale for 2 hours.
 - `v` changes every 2 hours, so a crawler that caches images by URL (LinkedIn, Facebook, X) fetches new numbers the next time it reads the page. A preview already posted never changes.
 - Fonts come from Google Fonts on the server, once per process; a failed download falls back to a system font. Any failure redirects to the cover photo, so a link never previews blank.
+
+## Fetching images on the server
+
+`fetchAllowedImage` (server) only contacts hosts on the image allowlist, checks each redirect hop again, caps the size, and requires an image type. The photo route passes on raster images only: an SVG is drawn to a PNG first, and every response carries `nosniff` and a `sandbox` CSP, so nothing it serves can run as a page on our origin.
 
 ## Ref codes
 

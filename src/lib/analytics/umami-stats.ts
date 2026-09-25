@@ -7,6 +7,7 @@ import type {
 } from '@/lib/types/fundraiser-insights';
 import type { RangeWindow } from './insights-buckets';
 
+import { isValidRefCode } from '@/lib/share/links';
 import { DONATION_EVENTS } from '@/lib/types/fundraiser-insights';
 import {
   buildBuckets,
@@ -279,7 +280,12 @@ async function refCounts(
       { ...base, event, propertyName: 'ref' },
       revalidate
     );
-    return Object.fromEntries(values.map(({ value, total }) => [value, total]));
+    // Anyone can type any ?ref= into a URL; only well-formed codes reach the host's Insights.
+    return Object.fromEntries(
+      values
+        .filter(({ value }) => isValidRefCode(value))
+        .map(({ value, total }) => [value, total])
+    );
   } catch (error) {
     console.warn(`[insights] No ref counts for ${event}:`, error);
     return {};

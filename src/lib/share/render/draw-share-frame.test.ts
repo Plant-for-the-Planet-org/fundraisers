@@ -15,8 +15,11 @@ const data: ShareRenderData = {
   raisedLine: (raised, goal) =>
     goal ? `${raised} raised of ${goal}` : `${raised} raised`,
   donors: ['Anna', 'Ben', 'Chloé', 'David', 'Emre'],
-  joinedLine: 'Anna, Ben and 46 others have joined',
+  donorsLine: 'Anna, Ben and 46 others have given',
   cta: 'Join me',
+  concluded: false,
+  firstLine: null,
+  badge: null,
   url: 'startplanting.org/raise/forests',
 };
 
@@ -60,9 +63,13 @@ describe('drawShareFrame', () => {
             photo: null,
           });
         }
-        // The end frame has content: something other than background across the middle.
-        const middle = g.getImageData(0, Math.round(h * 0.4), w, 4).data;
-        expect(busyPixels(middle)).toBeGreaterThan(0);
+        // The end frame has content: something other than background across the middle rows.
+        const busy = [0.3, 0.4, 0.5, 0.6].reduce(
+          (sum, at) =>
+            sum + busyPixels(g.getImageData(0, Math.round(h * at), w, 4).data),
+          0
+        );
+        expect(busy).toBeGreaterThan(0);
       });
     }
   }
@@ -73,7 +80,7 @@ describe('drawShareFrame', () => {
     expect(() =>
       drawShareFrame(g, SHARE_VIDEO_SECONDS, {
         format: 'story',
-        data: { ...data, goal: null, donors: [], joinedLine: null },
+        data: { ...data, goal: null, donors: [], donorsLine: null },
         theme: {
           accent: '#e11d48',
           mode: 'light',

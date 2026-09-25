@@ -22,7 +22,7 @@ export type SeasonId = (typeof SEASON_IDS)[number];
 const XMAS = { green: '#0e3b2c', red: '#c62828', gold: '#f4c542' };
 const LIGHT_COLORS = ['#ff5252', '#ffd54f', '#69f0ae', '#40c4ff'];
 
-function drawSnow(g: Ctx, w: number, h: number, t: number) {
+export function drawSnow(g: Ctx, w: number, h: number, t: number) {
   const count = Math.round((w * h) / 22000);
   g.fillStyle = '#ffffff';
   for (let i = 0; i < count; i++) {
@@ -408,7 +408,7 @@ const CONFETTI = [
   '#ff9100',
 ];
 
-function drawConfetti(g: Ctx, w: number, h: number, t: number) {
+export function drawConfetti(g: Ctx, w: number, h: number, t: number) {
   const count = Math.round((w * h) / 30000);
   const scale = w / 1080;
   for (let i = 0; i < count; i++) {
@@ -464,7 +464,8 @@ function drawBalloons(
     [1, 0, '#40c4ff'],
     [1, 1, '#e040fb'],
   ];
-  const canvasWidth = g.canvas.width;
+  // In format units, even on a denser canvas.
+  const canvasWidth = g.canvas.width / (g.getTransform().a || 1);
   for (const [side, n, color] of sets) {
     const bx = cx + side * (r + 150 * k + n * 70 * k);
     const by = cy - 40 * k - n * 90 * k + Math.sin(t * 1.6 + n + side) * 14 * k;

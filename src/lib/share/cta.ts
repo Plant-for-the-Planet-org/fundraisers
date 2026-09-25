@@ -16,7 +16,8 @@ export type CtaKey =
   | 'youngVoices'
   | 'giftForPlanet'
   | 'treatPlanet'
-  | 'celebrateWithMe';
+  | 'celebrateWithMe'
+  | 'thankYou';
 
 /** A custom button text stays short, so it reads as a button and fits every format. */
 export const CUSTOM_CTA_MAX_LENGTH = 24;
@@ -44,8 +45,11 @@ const CHRISTMAS_BY_GROUP: Record<PurposeGroup, CtaKey> = {
  */
 export function seasonalCta(
   season: SeasonId,
-  purposes: readonly ProjectPurpose[]
+  purposes: readonly ProjectPurpose[],
+  concluded = false
 ): CtaKey {
+  // An ended fundraiser no longer asks; it thanks.
+  if (concluded) return 'thankYou';
   switch (season) {
     case 'christmas': {
       const groups = new Set(

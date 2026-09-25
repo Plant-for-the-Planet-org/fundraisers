@@ -12,6 +12,19 @@ export function mix(a: string, b: string, t: number): string {
   return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * t)).join(',')})`;
 }
 
+/** `a` moved toward `b` by `t`, as a #rrggbb hex, for maths that needs hex input. */
+export function mixHex(a: string, b: string, t: number): string {
+  const x = hexToRgb(a);
+  const y = hexToRgb(b);
+  return `#${x
+    .map((v, i) =>
+      Math.round(v + (y[i] - v) * t)
+        .toString(16)
+        .padStart(2, '0')
+    )
+    .join('')}`;
+}
+
 export function rgba(hex: string, alpha: number): string {
   return `rgba(${hexToRgb(hex).join(',')},${alpha})`;
 }

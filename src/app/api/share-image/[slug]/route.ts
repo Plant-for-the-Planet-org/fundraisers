@@ -8,6 +8,7 @@ import { getLeaderboard } from '@/lib/api/leaderboard-service';
 import { SHARE_PREVIEW_WINDOW_MS } from '@/lib/share/preview';
 import { renderFundraiserShareImage } from '@/lib/share/server/render-share-image';
 import { resolveFundraiserImageSource } from '@/lib/utils/images';
+import { getShareOrigin } from '@/lib/utils/public-base-url';
 import { routing } from '@/i18n/routing';
 
 export const runtime = 'nodejs';
@@ -51,7 +52,9 @@ export async function GET(
     requested && hasLocale(routing.locales, requested)
       ? requested
       : routing.defaultLocale;
-  const key = `${slug}:${locale}`;
+  // The printed link and the fallback use the public origin, not the proxy's internal one.
+  const origin = getShareOrigin(request.headers, request.url);
+  const key = `${origin}:${slug}:${locale}`;
 
   const cached = cache.get(key);
   if (cached && cached.expires > Date.now()) return pngResponse(cached.png);
@@ -67,16 +70,13 @@ export async function GET(
     ).catch(() => null);
     const png = await renderFundraiserShareImage(fundraiser, {
       locale,
-      origin: request.nextUrl.origin,
+      origin,
       leaderboard,
     });
     remember(key, png);
     return pngResponse(png);
   } catch (error) {
     console.error('[share-image] Falling back for', slug, error);
-    return NextResponse.redirect(
-      new URL(fallback, request.nextUrl.origin),
-      302
-    );
+    return NextResponse.redirect(new URL(fallback, origin), 302);
   }
 }

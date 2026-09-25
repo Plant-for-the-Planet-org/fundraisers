@@ -49,6 +49,7 @@ const shownBoard = {
 
 describe('pickShareDonors', () => {
   const board = {
+    top: [] as LeaderboardDonation[],
     recent: [
       donation('Anna Weber'),
       donation('Hidden', true),
@@ -60,9 +61,36 @@ describe('pickShareDonors', () => {
   };
 
   it('names public donors by first name, once each', () => {
-    expect(pickShareDonors(fundraiser(shownBoard), board)).toEqual({
+    expect(pickShareDonors(fundraiser(shownBoard), board)).toMatchObject({
       names: ['Anna', 'Ben', 'Chloé'],
       count: 48,
+      // The donation id seeds the generated avatar, as in the donor list.
+      people: [
+        { seed: 'Anna Weber', avatarFile: null },
+        { seed: 'Ben', avatarFile: null },
+        { seed: 'Chloé Martin', avatarFile: null },
+      ],
+    });
+  });
+
+  it('takes top donors first, so a few frequent givers do not fill the row alone', () => {
+    const frequent = {
+      top: [
+        donation('Heidi Klum'),
+        donation('Anonymous', true),
+        donation('Leni Klum'),
+        donation('Maja Neske'),
+      ],
+      recent: [
+        donation('Sagar Aryal'),
+        donation('Sagar Aryal'),
+        donation('Maria Hosfeld'),
+      ],
+      donorCount: 246,
+    };
+    expect(pickShareDonors(fundraiser(shownBoard), frequent)).toMatchObject({
+      names: ['Heidi', 'Leni', 'Maja', 'Sagar', 'Maria'],
+      count: 246,
     });
   });
 
@@ -79,6 +107,7 @@ describe('pickShareDonors', () => {
   it('leaves the row out with too few public donors', () => {
     expect(
       pickShareDonors(fundraiser(shownBoard), {
+        top: [],
         recent: [donation('Anna'), donation('Ben')],
         donorCount: 2,
       })
@@ -91,15 +120,23 @@ describe('buildShareRenderData', () => {
     byLine: (host: string) => `by ${host}`,
     raisedOf: (raised: string, goal: string) => `${raised} raised of ${goal}`,
     raised: (raised: string) => `${raised} raised`,
-    joined: (first: string, second: string, others: number) =>
-      `${first}, ${second} and ${others} others have joined`,
+    goal: (goal: string) => `Goal: ${goal}`,
+    started: () => 'Just getting started',
+    first: () => 'Be the first to give',
+    newBadge: () => 'New',
+    given: (first: string, second: string, others: number) =>
+      `${first}, ${second} and ${others} others have given`,
   };
 
   it('fills the text from the fundraiser', () => {
     const data = buildShareRenderData({
       fundraiser: fundraiser(shownBoard),
       locale: 'en',
-      donors: { names: ['Anna', 'Ben', 'Chloé'], count: 48 },
+      donors: {
+        names: ['Anna', 'Ben', 'Chloé'],
+        people: [],
+        count: 48,
+      },
       cta: 'Join me',
       url: 'startplanting.org/raise/forests',
       labels,
@@ -107,7 +144,7 @@ describe('buildShareRenderData', () => {
     expect(data.byLine).toBe('by Maya Schneider');
     expect(data.raised).toBe(3400);
     expect(data.goal).toBe(5000);
-    expect(data.joinedLine).toBe('Anna, Ben and 46 others have joined');
+    expect(data.donorsLine).toBe('Anna, Ben and 46 others have given');
     expect(
       data.raisedLine(data.formatMoney(3400), data.formatMoney(5000))
     ).toContain('raised of');
@@ -133,7 +170,7 @@ describe('buildShareRenderData', () => {
       labels,
     });
     expect(data.goal).toBeNull();
-    expect(data.joinedLine).toBeNull();
+    expect(data.donorsLine).toBeNull();
     expect(data.raisedLine('€3,400', null)).toBe('€3,400 raised');
   });
 });

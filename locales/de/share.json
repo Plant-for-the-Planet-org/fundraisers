@@ -4,7 +4,11 @@
       "byLine": "von {name}",
       "raisedOf": "{raised} von {goal} gesammelt",
       "raised": "{raised} gesammelt",
-      "joined": "{first}, {second} und {others, plural, one {# weitere Person} other {# weitere}} sind dabei"
+      "given": "{first}, {second} und {others, plural, one {# weitere Person hat} other {# weitere haben}} gespendet",
+      "goal": "Ziel: {goal}",
+      "started": "Gerade gestartet",
+      "first": "Mach den Anfang mit der ersten Spende",
+      "newBadge": "Neu"
     },
     "cta": {
       "joinMe": "Mach mit",
@@ -17,6 +21,7 @@
       "giftForPlanet": "Ein Geschenk für den Planeten",
       "treatPlanet": "Süßes für den Planeten",
       "celebrateWithMe": "Feier mit mir",
+      "thankYou": "Danke!",
       "custom": "Eigener Text…",
       "customLabel": "Dein Text",
       "customPlaceholder": "Pflanz mit mir"
@@ -26,7 +31,8 @@
       "christmas": "Dieses Weihnachten sammle ich Spenden für {name}. Lust auf ein Geschenk, das zählt? Mach mit.",
       "halloween": "Keine Tricks, nur Süßes für den Planeten: Ich sammle Spenden für {name}. Mach mit!",
       "birthday": "Zu meinem Geburtstag sammle ich statt Geschenken Spenden für {name}. Feier mit mir!",
-      "donor": "Ich habe gerade {name} unterstützt. Machst du mit?"
+      "donor": "Ich habe gerade {name} unterstützt. Machst du mit?",
+      "concluded": "Geschafft! Danke an alle, die für {name} gespendet haben."
     },
     "seasons": {
       "none": "Dein Design",
@@ -35,14 +41,14 @@
       "birthday": "Geburtstag"
     },
     "platforms": {
+      "other": "Jede App",
       "instagram": "Instagram",
       "whatsapp": "WhatsApp",
       "tiktok": "TikTok",
       "youtube": "YouTube",
       "linkedin": "LinkedIn",
       "facebook": "Facebook",
-      "x": "X",
-      "other": "Andere"
+      "x": "X"
     },
     "channels": {
       "instagramStory": {
@@ -82,7 +88,7 @@
       },
       "linkedinWide": {
         "label": "Breiter Beitrag",
-        "hint": "Bild, 1,91:1",
+        "hint": "Video oder Bild, 1,91:1",
         "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
       },
       "facebookPost": {
@@ -111,12 +117,12 @@
         "tip": "Setz das Banner oben in deine E-Mail und verlinke es mit deinem Spendenaufruf."
       },
       "anyStory": {
-        "label": "Story, jede App",
+        "label": "Story",
         "hint": "Video oder Bild, 9:16",
         "tip": "Dein Link ist kopiert. Füge ihn dort ein, wo die App es erlaubt."
       },
       "anyPost": {
-        "label": "Beitrag, jede App",
+        "label": "Beitrag",
         "hint": "Bild, 4:5",
         "tip": "Der Text mit deinem Link ist kopiert. Füge ihn in deinen Beitrag ein."
       }
@@ -130,12 +136,13 @@
       "customizeHint": "Farben und Schriften kommen aus dem Design deines Spendenaufrufs.",
       "style": "Stil",
       "buttonText": "Button-Text",
-      "showDonors": "Spender*innen zeigen, die dabei sind",
+      "showDonors": "Spender*innen zeigen",
+      "donorsUnavailable": "Wird gezeigt, wenn mindestens 3 Spender*innen öffentlich sind und die Bestenliste an ist.",
       "captionTitle": "Text",
       "captionHint": "Wird beim Teilen für dich kopiert. Du kannst ihn anpassen.",
       "linkLabel": "Dein Link",
-      "copyLink": "Link kopieren",
-      "linkCopied": "Link kopiert",
+      "copy": "Kopieren",
+      "captionCopied": "Text und Link kopiert",
       "copyFailed": "Kopieren hat nicht geklappt",
       "kindLabel": "Bild oder Video",
       "video": "Video",
@@ -155,9 +162,6 @@
       "kitPreparing": "Alle Dateien werden vorbereitet…",
       "kitDone": "Paket heruntergeladen",
       "kitFailed": "Die Dateien konnten nicht vorbereitet werden",
-      "handoffTitle": "Weiter auf deinem Handy",
-      "handoffBody": "Scanne den Code, um diese Seite auf deinem Handy zu öffnen und direkt auf Instagram oder WhatsApp zu teilen.",
-      "handoffAlt": "QR-Code für diese Seite",
       "shareFailed": "Teilen hat nicht geklappt. Lade die Datei stattdessen herunter.",
       "savedTip": "{file} gespeichert. Dein Text ist kopiert. {tip}",
       "noVideo": "Dieser Browser kann keine Videos erstellen. Teile stattdessen das Bild.",

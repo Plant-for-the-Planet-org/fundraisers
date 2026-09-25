@@ -3,22 +3,31 @@ import type {
   Ctx,
   FrameContext,
   Palette,
+  ShareRenderData,
   ShareRenderOptions,
   ShareRenderTheme,
 } from './types';
 
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '../formats';
+import { drawThemeAnimation } from './animations';
+import {
+  accentGraphicOnLight,
+  accentTextOnWhite,
+  textOnAccent,
+} from './contrast';
 import {
   backOut,
   drawArrow,
   drawSparkle,
   mix,
+  mixHex,
   phase,
   rgba,
   roundRect,
   wrapBalanced,
 } from './primitives';
 import { SEASONS } from './seasons';
+import { paintShareBackground } from './theme-background';
 
 type Align = 'center' | 'left';
 
@@ -28,6 +37,7 @@ const RING_END = 2.8;
 const CTA_START = 2.4;
 
 function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
+  const graphic = accentGraphicOnLight(a);
   const avatars = [
     mix(a, '#000000', 0.15),
     mix(a, '#ffffff', 0.25),
@@ -46,7 +56,7 @@ function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
         track: 'rgba(255,255,255,0.2)',
         bar: mix(a, '#ffffff', 0.45),
         ctaBg: '#ffffff',
-        ctaText: mix(a, '#000000', 0.35),
+        ctaText: accentTextOnWhite(a),
         ctaShadow: mix(a, '#000000', 0.55),
         ctaOutline: mix(a, '#000000', 0.55),
         sparkle: mix(a, '#ffffff', 0.7),
@@ -55,7 +65,7 @@ function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
         tip: '#ffffff',
         tipGlow: 'rgba(255,255,255,0.6)',
         badgeBg: '#ffffff',
-        badgeText: mix(a, '#000000', 0.35),
+        badgeText: accentTextOnWhite(a),
         frame: '#ffffff',
         avatars,
       }
@@ -66,18 +76,18 @@ function themePalette({ accent: a, mode }: ShareRenderTheme): Palette {
         text: '#111111',
         muted: 'rgba(17,17,17,0.65)',
         track: rgba(a, 0.18),
-        bar: a,
+        bar: graphic,
         ctaBg: a,
-        ctaText: '#ffffff',
+        ctaText: textOnAccent(a),
         ctaShadow: mix(a, '#000000', 0.45),
         ctaOutline: mix(a, '#000000', 0.45),
-        sparkle: a,
+        sparkle: graphic,
         tick: rgba(a, 0.35),
         avatarRing: '#ffffff',
-        tip: mix(a, '#000000', 0.2),
+        tip: mixHex(graphic, '#000000', 0.2),
         tipGlow: rgba(a, 0.45),
         badgeBg: a,
-        badgeText: '#ffffff',
+        badgeText: textOnAccent(a),
         frame: '#ffffff',
         avatars,
       };
@@ -93,9 +103,14 @@ function drawBackground(
   glowX: number,
   glowY: number
 ) {
-  const { P, season, t } = f;
-  g.fillStyle = P.bg;
-  g.fillRect(0, 0, w, h);
+  const { P, season, t, background } = f;
+  // The plain style and Birthday sit on the fundraiser page's own background; Christmas and Halloween bring their own colours.
+  const themed = background && !season.palette;
+  if (themed) paintShareBackground(g, w, h, background);
+  else {
+    g.fillStyle = P.bg;
+    g.fillRect(0, 0, w, h);
+  }
   const glow = g.createRadialGradient(
     glowX,
     glowY,
@@ -112,6 +127,17 @@ function drawBackground(
     season.background(g, w, h, t);
     return;
   }
+  // An ended fundraiser celebrates, unless a style brings its own background.
+  if (f.data.concluded) {
+    drawThemeAnimation(g, 'confetti', w, h, t, f.dark);
+    return;
+  }
+  if (themed && background.spec.animation !== 'none') {
+    drawThemeAnimation(g, background.spec.animation, w, h, t, f.dark);
+    return;
+  }
+  // The page's own pattern or image is the texture; the dots only fill a plain background.
+  if (themed && background.spec.decoration) return;
   // A dot grid that pulses out from the ring in a slow wave.
   const gap = 54;
   g.fillStyle = P.dot;
@@ -144,7 +170,9 @@ function drawGauge(
   const sweep = Math.PI * 1.5;
   const pIn = phase(t, 0, 0.7);
   const pBar = phase(t, RING_START, RING_END);
-  const share = data.goal ? Math.min(1, data.raised / data.goal) : 0;
+  // The ring stops when full; the badge keeps counting past 100%.
+  const ratio = data.goal ? data.raised / data.goal : 0;
+  const share = Math.min(1, ratio);
 
   g.save();
   g.globalAlpha = pIn;
@@ -199,7 +227,22 @@ function drawGauge(
     }
     g.globalAlpha = pIn;
 
-    if (pBar > 0) {
+    if (share === 0) {
+      // Nothing raised yet: a soft glow pulses where the ring will start filling.
+      const sx = cx + ringR * Math.cos(start);
+      const sy = cy + ringR * Math.sin(start);
+      // Brightest on the last frame, which is also the still image.
+      const pulse = 0.55 + 0.45 * Math.cos((t - SHARE_VIDEO_SECONDS) * 3);
+      const glow = g.createRadialGradient(sx, sy, 0, sx, sy, 60 * k);
+      glow.addColorStop(0, P.tipGlow);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      g.globalAlpha = pIn * pulse;
+      g.fillStyle = glow;
+      g.beginPath();
+      g.arc(sx, sy, 60 * k, 0, Math.PI * 2);
+      g.fill();
+      g.globalAlpha = pIn;
+    } else if (pBar > 0) {
       const tx = cx + ringR * Math.cos(end);
       const ty = cy + ringR * Math.sin(end);
       const tipGlow = g.createRadialGradient(tx, ty, 0, tx, ty, 50 * k);
@@ -253,7 +296,7 @@ function drawGauge(
   season.photoDecor?.(g, cx, cy, photoR, t, k);
 
   if (data.goal) {
-    const pct = `${Math.round(share * 100 * pBar)}%`;
+    const pct = data.badge ?? `${Math.round(ratio * 100 * pBar)}%`;
     g.globalAlpha = pIn;
     g.font = `800 ${44 * k}px ${fonts.body}`;
     g.textAlign = 'center';
@@ -286,7 +329,9 @@ function drawTitle(
   const lineH = s.title * 1.17;
   const byH = s.by * 1.4;
   const raisedH = s.raised * 1.6;
-  const height = lines.length * lineH + byH + raisedH;
+  // The name and host belong together; the amount is its own line, so it gets a little room.
+  const raisedGap = s.raised * 0.55;
+  const height = lines.length * lineH + byH + raisedGap + raisedH;
   if (measureOnly) return height;
 
   const aTitle = phase(t, 0.5, 1.1);
@@ -303,7 +348,7 @@ function drawTitle(
   g.font = `500 ${s.by}px ${fonts.body}`;
   g.fillStyle = P.muted;
   g.fillText(data.byLine, x, cy + byH / 2 + lift);
-  cy += byH;
+  cy += byH + raisedGap;
   const counted = data.raised * phase(t, RING_START, RING_END);
   g.font = `600 ${s.raised}px ${fonts.body}`;
   g.fillStyle = P.text;
@@ -317,6 +362,52 @@ function drawTitle(
   );
   g.globalAlpha = 1;
   return height;
+}
+
+/** Before anyone has given: an empty, dashed avatar with a plus, and an invitation to be first. */
+function drawFirstGift(
+  g: Ctx,
+  f: FrameContext,
+  x: number,
+  y: number,
+  align: Align,
+  s: ShareSizes
+) {
+  const { t, P, data, fonts } = f;
+  const size = s.avatar;
+  const p = backOut(phase(t, 1.5, 1.9));
+  const acx = align === 'center' ? x : x + size / 2;
+  const acy = y + size / 2;
+  if (p > 0) {
+    const r = (size / 2) * p;
+    g.save();
+    g.strokeStyle = P.muted;
+    g.lineWidth = Math.max(2, size * 0.05);
+    g.setLineDash([size * 0.12, size * 0.09]);
+    // The dashes turn slowly, so the empty seat looks like it is waiting.
+    g.lineDashOffset = -t * size * 0.2;
+    g.beginPath();
+    g.arc(acx, acy, r, 0, Math.PI * 2);
+    g.stroke();
+    g.setLineDash([]);
+    g.lineCap = 'round';
+    const arm = r * 0.38;
+    g.beginPath();
+    g.moveTo(acx - arm, acy);
+    g.lineTo(acx + arm, acy);
+    g.moveTo(acx, acy - arm);
+    g.lineTo(acx, acy + arm);
+    g.stroke();
+    g.restore();
+  }
+  const textGap = s.avatarText * 0.6;
+  g.globalAlpha = phase(t, 2.1, 2.5);
+  g.fillStyle = P.muted;
+  g.font = `500 ${s.avatarText}px ${fonts.body}`;
+  g.textAlign = align;
+  g.textBaseline = 'middle';
+  g.fillText(data.firstLine ?? '', x, y + size + textGap + s.avatarText * 0.65);
+  g.globalAlpha = 1;
 }
 
 /** Overlapping avatars that pop in one by one, the names line below. */
@@ -337,6 +428,11 @@ function drawAvatars(
   const height = size + textGap + s.avatarText * 1.3;
   if (measureOnly) return height;
 
+  if (shown.length === 0 && data.firstLine) {
+    drawFirstGift(g, f, x, y, align, s);
+    return height;
+  }
+
   const rowW = shown.length * size - (shown.length - 1) * overlap;
   let ax = align === 'center' ? x - rowW / 2 : x;
   const acy = y + size / 2;
@@ -351,6 +447,23 @@ function drawAvatars(
       g.beginPath();
       g.arc(acx, acy, r + size * 0.06, 0, Math.PI * 2);
       g.fill();
+      const avatar = f.avatars[i];
+      if (avatar) {
+        g.save();
+        g.beginPath();
+        g.arc(acx, acy, r, 0, Math.PI * 2);
+        g.clip();
+        g.drawImage(
+          avatar as CanvasImageSource,
+          acx - r,
+          acy - r,
+          r * 2,
+          r * 2
+        );
+        g.restore();
+        ax += size - overlap;
+        return;
+      }
       g.fillStyle = P.avatars[i % P.avatars.length];
       g.beginPath();
       g.arc(acx, acy, r, 0, Math.PI * 2);
@@ -366,7 +479,7 @@ function drawAvatars(
   g.font = `500 ${s.avatarText}px ${fonts.body}`;
   g.textAlign = align;
   g.fillText(
-    data.joinedLine ?? '',
+    data.donorsLine ?? '',
     x,
     y + size + textGap + s.avatarText * 0.65
   );
@@ -387,7 +500,8 @@ function drawCta(
   const { t, P, data, season, fonts } = f;
   const k = s.cta / 104;
   const urlGap = (season.urlGap ?? 0) * k;
-  const urlH = s.url * 2.2 + urlGap;
+  // Room under the button for its shadow and pop, then the link.
+  const urlH = s.url * 3 + urlGap;
   const height = s.cta + urlH;
   if (measureOnly) return height;
 
@@ -491,12 +605,20 @@ function drawCta(
   g.font = `500 ${s.url}px ${fonts.body}`;
   g.textAlign = align;
   g.textBaseline = 'middle';
-  g.fillText(data.url, x, y + s.cta + urlH / 2 + 8 * k + urlGap / 2 + rise);
+  g.fillText(data.url, x, y + s.cta + urlH / 2 + 16 * k + urlGap / 2 + rise);
   g.globalAlpha = 1;
   return height;
 }
 
 // ---------- Layouts ----------
+
+/** Donors who gave, or the invitation to be first. */
+function hasAvatarRow(data: ShareRenderData) {
+  return (
+    (data.donorsLine !== null && data.donors.length > 0) ||
+    data.firstLine !== null
+  );
+}
 
 function drawGuides(g: Ctx, z: ShareZone, w: number, h: number) {
   g.fillStyle = 'rgba(255,0,0,0.7)';
@@ -526,7 +648,7 @@ function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
       s.gauge -= 10;
   };
 
-  let avatars = f.data.joinedLine !== null && f.data.donors.length > 0;
+  let avatars = hasAvatarRow(f.data);
   let s: ShareSizes = { ...F.size };
   shrinkRing(s, avatars);
   if (measure(s, avatars) > z.h && avatars) {
@@ -589,7 +711,7 @@ function layoutSplit(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   const gaugeSize = Math.min(s.gauge, z.h);
   const textX = z.x + gaugeSize + z.w * 0.05;
   const textW = z.x + z.w - textX;
-  const avatars = f.data.joinedLine !== null && f.data.donors.length > 0;
+  const avatars = hasAvatarRow(f.data);
   const gapGroup = s.title * 0.7;
   const gapSocial = s.title * 0.55;
   const total =
@@ -624,6 +746,9 @@ export function drawShareFrame(g: Ctx, t: number, options: ShareRenderOptions) {
     season,
     data: options.data,
     photo: options.photo,
+    background: options.background ?? null,
+    avatars: options.avatars ?? [],
+    dark: options.theme.mode === 'dark',
     fonts: {
       title: `"${options.theme.titleFont}", sans-serif`,
       body: `"${options.theme.bodyFont}", sans-serif`,
@@ -631,6 +756,9 @@ export function drawShareFrame(g: Ctx, t: number, options: ShareRenderOptions) {
     maxCtaWidth: Number.POSITIVE_INFINITY,
   };
   g.save();
+  // Everything is laid out in format units; a denser canvas only scales them.
+  const scale = options.scale ?? 1;
+  g.scale(scale, scale);
   if (F.layout === 'stack') layoutStack(g, frame, F, options.guides ?? false);
   else layoutSplit(g, frame, F, options.guides ?? false);
   g.restore();

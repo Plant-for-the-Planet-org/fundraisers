@@ -26,8 +26,6 @@ export interface ShareFormat {
   layout: 'stack' | 'split';
   zone: ShareZone;
   size: ShareSizes;
-  /** Only vertical formats are offered as video. */
-  video: boolean;
 }
 
 const TALL_SIZES: ShareSizes = {
@@ -50,7 +48,6 @@ export const SHARE_FORMATS = {
     layout: 'stack',
     zone: { x: 65, y: 250, w: 950, h: 1420 },
     size: TALL_SIZES,
-    video: true,
   },
   // TikTok covers the bottom with the caption and the right with its buttons. The zone narrows on both sides so the column stays centred.
   tiktok: {
@@ -59,7 +56,6 @@ export const SHARE_FORMATS = {
     layout: 'stack',
     zone: { x: 150, y: 140, w: 780, h: 1380 },
     size: TALL_SIZES,
-    video: true,
   },
   // YouTube Shorts has the tightest overlay: search at the top, channel and description at the bottom, buttons on the right.
   shorts: {
@@ -68,7 +64,6 @@ export const SHARE_FORMATS = {
     layout: 'stack',
     zone: { x: 120, y: 380, w: 840, h: 1160 },
     size: TALL_SIZES,
-    video: true,
   },
   // 4:5 feed post. The Instagram grid crops it to 3:4, trimming about 34px on each side.
   post: {
@@ -87,7 +82,6 @@ export const SHARE_FORMATS = {
       ctaFont: 36,
       url: 25,
     },
-    video: true,
   },
   // 1.91:1, the link preview size for WhatsApp, LinkedIn, Facebook and email.
   banner: {
@@ -106,7 +100,6 @@ export const SHARE_FORMATS = {
       ctaFont: 28,
       url: 21,
     },
-    video: false,
   },
   // 16:9 image in the X feed.
   wide: {
@@ -125,7 +118,6 @@ export const SHARE_FORMATS = {
       ctaFont: 29,
       url: 22,
     },
-    video: true,
   },
 } as const satisfies Record<string, ShareFormat>;
 

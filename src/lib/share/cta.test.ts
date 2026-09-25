@@ -24,4 +24,9 @@ describe('seasonalCta', () => {
     expect(seasonalCta('birthday', [])).toBe('celebrateWithMe');
     expect(seasonalCta('none', ['trees'])).toBe('joinMe');
   });
+
+  it('thanks people once the fundraiser has ended', () => {
+    expect(seasonalCta('none', ['trees'], true)).toBe('thankYou');
+    expect(seasonalCta('christmas', ['trees'], true)).toBe('thankYou');
+  });
 });

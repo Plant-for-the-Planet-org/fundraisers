@@ -4,7 +4,11 @@
       "byLine": "by {name}",
       "raisedOf": "{raised} raised of {goal}",
       "raised": "{raised} raised",
-      "joined": "{first}, {second} and {others, plural, one {# other} other {# others}} have joined"
+      "given": "{first}, {second} and {others, plural, one {# other} other {# others}} have given",
+      "goal": "Goal: {goal}",
+      "started": "Just getting started",
+      "first": "Be the first to give",
+      "newBadge": "New"
     },
     "cta": {
       "joinMe": "Join me",
@@ -17,6 +21,7 @@
       "giftForPlanet": "A gift for the planet",
       "treatPlanet": "Treat the planet",
       "celebrateWithMe": "Celebrate with me",
+      "thankYou": "Thank you!",
       "custom": "Write your own…",
       "customLabel": "Your text",
       "customPlaceholder": "Plant with me"
@@ -26,7 +31,8 @@
       "christmas": "This Christmas I'm fundraising for {name}. Want to give a gift that matters? Join me.",
       "halloween": "No tricks, just a treat for the planet: I'm fundraising for {name}. Join me!",
       "birthday": "For my birthday I'm fundraising for {name} instead of gifts. Celebrate with me!",
-      "donor": "I just supported {name}. Will you join me?"
+      "donor": "I just supported {name}. Will you join me?",
+      "concluded": "We did it! Thank you to everyone who gave to {name}."
     },
     "seasons": {
       "none": "Your theme",
@@ -35,14 +41,14 @@
       "birthday": "Birthday"
     },
     "platforms": {
+      "other": "Any app",
       "instagram": "Instagram",
       "whatsapp": "WhatsApp",
       "tiktok": "TikTok",
       "youtube": "YouTube",
       "linkedin": "LinkedIn",
       "facebook": "Facebook",
-      "x": "X",
-      "other": "Other"
+      "x": "X"
     },
     "channels": {
       "instagramStory": {
@@ -82,7 +88,7 @@
       },
       "linkedinWide": {
         "label": "Wide post",
-        "hint": "Image, 1.91:1",
+        "hint": "Video or image, 1.91:1",
         "tip": "The caption with your link is copied. Paste it into your post."
       },
       "facebookPost": {
@@ -111,12 +117,12 @@
         "tip": "Add the banner at the top of your email and link it to your fundraiser."
       },
       "anyStory": {
-        "label": "Story, any app",
+        "label": "Story",
         "hint": "Video or image, 9:16",
         "tip": "Your link is copied. Add it wherever the app allows."
       },
       "anyPost": {
-        "label": "Post, any app",
+        "label": "Post",
         "hint": "Image, 4:5",
         "tip": "The caption with your link is copied. Paste it into your post."
       }
@@ -130,12 +136,13 @@
       "customizeHint": "Colors and fonts come from your fundraiser theme.",
       "style": "Style",
       "buttonText": "Button text",
-      "showDonors": "Show donors who joined",
+      "showDonors": "Show donors who gave",
+      "donorsUnavailable": "Shown when at least 3 donors are public and the leaderboard is on.",
       "captionTitle": "Caption",
       "captionHint": "Copied for you when you share. Edit it if you like.",
       "linkLabel": "Your link",
-      "copyLink": "Copy link",
-      "linkCopied": "Link copied",
+      "copy": "Copy",
+      "captionCopied": "Text and link copied",
       "copyFailed": "Could not copy",
       "kindLabel": "Image or video",
       "video": "Video",
@@ -155,9 +162,6 @@
       "kitPreparing": "Preparing all files…",
       "kitDone": "Share kit downloaded",
       "kitFailed": "Could not prepare the files",
-      "handoffTitle": "Continue on your phone",
-      "handoffBody": "Scan to open this page on your phone and share straight to Instagram or WhatsApp.",
-      "handoffAlt": "QR code for this page",
       "shareFailed": "Could not open sharing. Try Download instead.",
       "savedTip": "Saved {file}. Your caption is copied. {tip}",
       "noVideo": "This browser can't make videos. Share the image instead.",

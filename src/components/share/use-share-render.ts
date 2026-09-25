@@ -1,6 +1,7 @@
 'use client';
 
 import type { SeasonId } from '@/lib/share/render/seasons';
+import type { ShareBackground } from '@/lib/share/render/theme-background';
 import type {
   ShareImage,
   ShareRenderData,
@@ -13,71 +14,69 @@ import type { ProjectPurpose } from '@/lib/types/project-selection';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { getLeaderboard } from '@/lib/api/leaderboard-service';
-import {
-  getActiveImpersonation,
-  impersonationHeaders,
-} from '@/lib/api/platform-fetch';
+import { impersonationHeaders } from '@/lib/api/platform-fetch';
 import { projectsService } from '@/lib/api/projects-service';
 import {
   resolveBrowserFontFamily,
   SHARE_FONT_WEIGHTS,
 } from '@/lib/share/fonts';
 import { displayUrl } from '@/lib/share/links';
+import { loadShareAvatars } from '@/lib/share/render/avatars';
+import {
+  loadShareBackgroundAssets,
+  resolveShareBackground,
+} from '@/lib/share/render/theme-background';
 import { buildShareRenderData, pickShareDonors } from '@/lib/share/share-data';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { useAuthStore } from '@/stores/auth-store';
+import { useImpersonationStore } from '@/stores/impersonation-store';
+import {
+  browserAssetLoader,
+  browserMakePath,
+  fetchImage,
+} from './browser-assets';
 
 /**
  * The fundraiser's cover photo, loaded through our own route so the canvas stays exportable.
  * Drafts are only visible to their hosts, so the token and any impersonation go along.
  */
-function useSharePhoto(slug: string): ShareImage | null {
-  const token = useAuthStore(state => state.accessToken);
+function useSharePhoto(
+  slug: string,
+  headers: Record<string, string>
+): ShareImage | null {
   const [photo, setPhoto] = useState<{
     slug: string;
     image: ShareImage;
   } | null>(null);
 
   useEffect(() => {
-    let url: string | null = null;
     let ignore = false;
-    const headers: Record<string, string> = {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...impersonationHeaders(getActiveImpersonation()),
-    };
-    fetch(`/api/share/photo/${encodeURIComponent(slug)}`, { headers })
-      .then(response => (response.ok ? response.blob() : null))
-      .then(blob => {
-        if (!blob || ignore) return;
-        url = URL.createObjectURL(blob);
-        const image = new Image();
-        image.onload = () => {
-          if (!ignore) setPhoto({ slug, image });
-        };
-        image.src = url;
-      })
-      .catch(() => {
-        // No photo: the ring shows a plain circle.
-      });
+    // No photo leaves the ring's circle plain.
+    fetchImage(`/api/share/photo/${encodeURIComponent(slug)}`, headers).then(
+      image => {
+        if (image && !ignore) setPhoto({ slug, image });
+      }
+    );
     return () => {
       ignore = true;
-      if (url) URL.revokeObjectURL(url);
     };
-  }, [slug, token]);
+  }, [slug, headers]);
 
   return photo?.slug === slug ? photo.image : null;
 }
 
 /** Public donors for the avatar row, by the public page's rules. */
-function useShareDonors(fundraiser: Fundraiser): ShareDonors | null {
+function useShareDonors(
+  fundraiser: Fundraiser
+): ShareDonors | null | undefined {
   const [donors, setDonors] = useState<{
     slug: string;
     value: ShareDonors | null;
   } | null>(null);
   useEffect(() => {
     let ignore = false;
-    getLeaderboard(fundraiser.slug, 10)
+    getLeaderboard(fundraiser.slug, 20)
       .then(board => {
         if (!ignore)
           setDonors({
@@ -92,7 +91,97 @@ function useShareDonors(fundraiser: Fundraiser): ShareDonors | null {
       ignore = true;
     };
   }, [fundraiser]);
-  return donors?.slug === fundraiser.slug ? donors.value : null;
+  // Undefined while loading, null when no donor may be named.
+  return donors?.slug === fundraiser.slug ? donors.value : undefined;
+}
+
+/** The host's token and any impersonation, for our routes that serve a draft's images. */
+function useShareHeaders(): Record<string, string> {
+  const token = useAuthStore(state => state.accessToken);
+  // Subscribed, so starting or stopping impersonation refreshes the headers too.
+  const email = useImpersonationStore(state =>
+    state.isActive ? state.email : null
+  );
+  const pin = useImpersonationStore(state =>
+    state.isActive ? state.pin : null
+  );
+  return useMemo(
+    () => ({
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...impersonationHeaders(email && pin ? { email, pin } : null),
+    }),
+    [token, email, pin]
+  );
+}
+
+/** The fundraiser page's background, with its decoration loaded. Null until it is ready. */
+function useShareBackground(
+  fundraiser: Fundraiser,
+  headers: Record<string, string>
+): ShareBackground | null {
+  const spec = useMemo(
+    () => resolveShareBackground(buildTheme(fundraiser.settings?.theme)),
+    [fundraiser.settings?.theme]
+  );
+  const [loaded, setLoaded] = useState<ShareBackground | null>(null);
+  useEffect(() => {
+    let ignore = false;
+    loadShareBackgroundAssets(
+      spec,
+      browserAssetLoader(fundraiser.slug, headers)
+    )
+      // A decoration that cannot load leaves the plain wash, rather than a studio stuck on "Preparing".
+      .catch(() => ({}))
+      .then(assets => {
+        if (!ignore) setLoaded({ spec, assets });
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [spec, fundraiser.slug, headers]);
+  return loaded?.spec === spec ? loaded : null;
+}
+
+/** Each named donor's photo, or the app's generated avatar, in the order of `donors.names`. */
+function useShareAvatars(
+  slug: string,
+  donors: ShareDonors | null | undefined,
+  dark: boolean,
+  headers: Record<string, string>
+): ShareImage[] | null {
+  const [avatars, setAvatars] = useState<{
+    donors: ShareDonors;
+    dark: boolean;
+    images: ShareImage[];
+  } | null>(null);
+  useEffect(() => {
+    if (!donors) return;
+    let ignore = false;
+    loadShareAvatars(
+      donors.people.map(person => ({
+        seed: person.seed,
+        photo: person.avatarFile
+          ? `/api/share/photo/${encodeURIComponent(slug)}?donor=${encodeURIComponent(person.seed)}`
+          : null,
+      })),
+      {
+        loader: browserAssetLoader(slug, headers),
+        makePath: browserMakePath,
+        dark,
+      }
+    )
+      .then(images => {
+        if (!ignore) setAvatars({ donors, dark, images });
+      })
+      // The row keeps its initials when the avatars cannot be made.
+      .catch(() => undefined);
+    return () => {
+      ignore = true;
+    };
+  }, [slug, donors, dark, headers]);
+  return avatars && avatars.donors === donors && avatars.dark === dark
+    ? avatars.images
+    : null;
 }
 
 /**
@@ -190,15 +279,27 @@ export function useShareRender({
   data: ShareRenderData;
   theme: ShareRenderTheme;
   photo: ShareImage | null;
+  background: ShareBackground | null;
+  avatars: ShareImage[] | null;
   ready: boolean;
+  /** False once it is known that no donor may be named; see pickShareDonors. */
+  donorsAvailable: boolean;
 } {
   const locale = useLocale();
   const t = useTranslations('Share');
   const origin = useOrigin();
-  const photo = useSharePhoto(fundraiser.slug);
+  const headers = useShareHeaders();
+  const photo = useSharePhoto(fundraiser.slug, headers);
   const donors = useShareDonors(fundraiser);
+  const background = useShareBackground(fundraiser, headers);
 
   const built = buildTheme(fundraiser.settings?.theme);
+  const avatars = useShareAvatars(
+    fundraiser.slug,
+    donors,
+    built.mode === 'dark',
+    headers
+  );
   const [titleFont, bodyFont] = useMemo(
     () =>
       typeof document === 'undefined'
@@ -227,7 +328,7 @@ export function useShareRender({
       buildShareRenderData({
         fundraiser,
         locale,
-        donors: showDonors ? donors : null,
+        donors: showDonors ? (donors ?? null) : null,
         cta,
         url: origin
           ? displayUrl(origin, fundraiser.slug)
@@ -236,12 +337,25 @@ export function useShareRender({
           byLine: name => t('image.byLine', { name }),
           raisedOf: (raised, goal) => t('image.raisedOf', { raised, goal }),
           raised: raised => t('image.raised', { raised }),
-          joined: (first, second, others) =>
-            t('image.joined', { first, second, others }),
+          given: (first, second, others) =>
+            t('image.given', { first, second, others }),
+          goal: goal => t('image.goal', { goal }),
+          started: () => t('image.started'),
+          first: () => t('image.first'),
+          newBadge: () => t('image.newBadge'),
         },
       }),
     [fundraiser, locale, donors, showDonors, cta, t, origin]
   );
 
-  return { data, theme, photo, ready: fontsReady };
+  return {
+    data,
+    theme,
+    photo,
+    background,
+    avatars,
+    // The background is part of the look; wait for it like the fonts. Avatars fill in when they load.
+    ready: fontsReady && background !== null,
+    donorsAvailable: donors !== null,
+  };
 }

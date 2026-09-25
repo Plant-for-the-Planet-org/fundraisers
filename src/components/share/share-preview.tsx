@@ -3,10 +3,22 @@
 import type { ShareFormatId } from '@/lib/share/formats';
 import type { ShareDrawOptions } from './use-share-files';
 
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
 import { drawShareFrame } from '@/lib/share/render/draw-share-frame';
 import { cn } from '@/lib/utils';
+
+function useReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return reduced;
+}
 
 /**
  * The share image or video, live, in a phone-like frame.
@@ -30,32 +42,30 @@ export function SharePreview({
     optionsRef.current = options;
   });
   const { w, h } = SHARE_FORMATS[format];
+  const reducedMotion = useReducedMotion();
+  const still = !animate || reducedMotion;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const g = canvas?.getContext('2d');
-    if (!canvas || !g) return;
-    const still =
-      !animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!canvas || !g || still) return;
     let frame = 0;
     const start = performance.now();
     const draw = (now: number) => {
-      const t = still
-        ? SHARE_VIDEO_SECONDS
-        : ((now - start) / 1000) % SHARE_VIDEO_SECONDS;
+      const t = ((now - start) / 1000) % SHARE_VIDEO_SECONDS;
       drawShareFrame(g, t, { ...optionsRef.current, format });
-      if (!still) frame = requestAnimationFrame(draw);
+      frame = requestAnimationFrame(draw);
     };
     frame = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(frame);
-  }, [format, animate]);
+  }, [format, still]);
 
-  // A still preview redraws when the options change; the animated one picks them up on its next frame.
+  // A still preview (an image, or reduced motion) redraws its last frame when the options change; the animated one picks them up on its next frame.
   useEffect(() => {
     const g = canvasRef.current?.getContext('2d');
-    if (g && !animate)
+    if (g && still)
       drawShareFrame(g, SHARE_VIDEO_SECONDS, { ...options, format });
-  }, [options, animate, format]);
+  }, [options, still, format]);
 
   const wide = w > h;
   return (

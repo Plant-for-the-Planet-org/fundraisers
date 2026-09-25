@@ -1,6 +1,8 @@
 import type { ShareFormatId } from './formats';
 
+// The generic share sheet comes first: it is the default and works with any app.
 export const SHARE_PLATFORMS = [
+  'other',
   'instagram',
   'whatsapp',
   'tiktok',
@@ -8,7 +10,6 @@ export const SHARE_PLATFORMS = [
   'linkedin',
   'facebook',
   'x',
-  'other',
 ] as const;
 
 export type SharePlatformId = (typeof SHARE_PLATFORMS)[number];
@@ -84,7 +85,7 @@ export const SHARE_CHANNELS = [
     id: 'linkedinWide',
     platform: 'linkedin',
     format: 'banner',
-    kinds: ['image'],
+    kinds: ['image', 'video'],
     utm: social('linkedin'),
   },
   {
@@ -116,13 +117,6 @@ export const SHARE_CHANNELS = [
     utm: social('x'),
   },
   {
-    id: 'email',
-    platform: 'other',
-    format: 'banner',
-    kinds: ['image'],
-    utm: { source: 'email', medium: 'email' },
-  },
-  {
     id: 'anyStory',
     platform: 'other',
     format: 'story',
@@ -135,6 +129,13 @@ export const SHARE_CHANNELS = [
     format: 'post',
     kinds: ['image'],
     utm: social('share'),
+  },
+  {
+    id: 'email',
+    platform: 'other',
+    format: 'banner',
+    kinds: ['image'],
+    utm: { source: 'email', medium: 'email' },
   },
 ] as const satisfies readonly ShareChannel[];
 

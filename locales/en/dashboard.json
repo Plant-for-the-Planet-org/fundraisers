@@ -153,10 +153,16 @@
           "firstDonation": {
             "title": "Welcome the first donation",
             "hint": "Ask a close friend or family member first. Early gifts build trust."
+          },
+          "share": {
+            "title": "Keep sharing",
+            "hint": "Each share brings new people. Stories, posts and a link for every place you share are ready in the Share tab."
           }
         },
         "invite": "Invite",
-        "share": "Share"
+        "share": "Share",
+        "showDone": "Show {count, number} done",
+        "hideDone": "Hide done"
       },
       "hosts": {
         "invite": "Invite co-host"

@@ -12,7 +12,6 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import QRCode from 'qrcode';
 import { toast } from 'sonner';
 import {
   channelsFor,
@@ -35,8 +34,9 @@ import {
   shareFile,
   shareText,
 } from '@/lib/share/web-share';
-import { createZip } from '@/lib/share/zip';
+import { createZipParts } from '@/lib/share/zip';
 import { cn } from '@/lib/utils';
+import { hasFundraiserConcluded } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -57,6 +57,7 @@ import { SharePreview } from './share-preview';
 import {
   makeShareImage,
   makeShareVideo,
+  SHARE_IMAGE_SCALE,
   useShareFiles,
 } from './use-share-files';
 import {
@@ -66,6 +67,7 @@ import {
 } from './use-share-render';
 
 const CUSTOM = '__custom';
+const SUGGESTED = '__suggested';
 
 /** Aspect shapes for the format cards, in px. */
 const SHAPES = {
@@ -79,7 +81,8 @@ const SHAPES = {
 
 function cardClass(active: boolean) {
   return cn(
-    'flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors',
+    // A tile: the shape on top, the name and size below, so long names still fit a narrow column.
+    'flex flex-col items-start justify-start gap-2 rounded-lg border px-3 py-3 text-left text-sm transition-colors',
     active
       ? 'border-accent-color bg-accent-color/10 ring-1 ring-accent-color'
       : 'border-border hover:bg-accent/60'
@@ -111,11 +114,16 @@ export function ShareStudio({
   const origin = useOrigin();
   const refCode = getReferralCode(useAuthStore(state => state.user?.profile));
 
-  const [channelId, setChannelId] = useState<ShareChannelId>('instagramStory');
+  const [channelId, setChannelId] = useState<ShareChannelId>('anyStory');
   const channel: ShareChannel = getChannel(channelId);
   const [kind, setKind] = useState<ShareKind>('video');
   const [season, setSeason] = useState<SeasonId>('none');
-  const [ctaChoice, setCtaChoice] = useState<CtaKey | typeof CUSTOM>('joinMe');
+  // An ended fundraiser thanks people instead of asking.
+  const concluded = hasFundraiserConcluded(fundraiser);
+  // Until the host picks one, the button text follows the style's suggestion, which changes as the projects' purposes load.
+  const [ctaChoice, setCtaChoice] = useState<
+    CtaKey | typeof CUSTOM | typeof SUGGESTED
+  >(SUGGESTED);
   const [customCta, setCustomCta] = useState('');
   const [showDonors, setShowDonors] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -130,20 +138,42 @@ export function ShareStudio({
   }, []);
 
   const purposes = useProjectPurposes(fundraiser, season === 'christmas');
-  const suggested = seasonalCta(season, purposes);
+  const suggested = seasonalCta(season, purposes, concluded);
   const ctaOptions = useMemo(
     () => [...new Set<CtaKey>([suggested, ...CTA_PRESETS])],
     [suggested]
   );
+  const ctaKey: CtaKey | typeof CUSTOM =
+    ctaChoice === SUGGESTED ? suggested : ctaChoice;
   const cta =
-    ctaChoice === CUSTOM
+    ctaKey === CUSTOM
       ? customCta.trim() || t('cta.joinMe')
-      : t(`cta.${ctaChoice}`);
+      : t(`cta.${ctaKey}`);
 
-  const render = useShareRender({ fundraiser, season, cta, showDonors });
+  const link = origin
+    ? buildShareUrl({
+        origin,
+        slug: fundraiser.slug,
+        source: channel.utm.source,
+        medium: channel.utm.medium,
+        ref: refCode,
+      })
+    : '';
+  const render = useShareRender({
+    fundraiser,
+    season,
+    cta,
+    showDonors,
+  });
   const options = useMemo(
-    () => ({ data: render.data, theme: render.theme, photo: render.photo }),
-    [render.data, render.theme, render.photo]
+    () => ({
+      data: render.data,
+      theme: render.theme,
+      photo: render.photo,
+      background: render.background,
+      avatars: render.avatars,
+    }),
+    [render.data, render.theme, render.photo, render.background, render.avatars]
   );
   const format = channel.format;
   const effectiveKind: ShareKind = channel.kinds.includes(kind)
@@ -160,18 +190,14 @@ export function ShareStudio({
   const file =
     effectiveKind === 'video' && files.video ? files.video : files.image;
 
-  const link = origin
-    ? buildShareUrl({
-        origin,
-        slug: fundraiser.slug,
-        source: channel.utm.source,
-        medium: channel.utm.medium,
-        ref: refCode,
-      })
-    : '';
-  const defaultMessage = t(isHost ? `captions.${season}` : 'captions.donor', {
-    name: fundraiser.title,
-  });
+  const defaultMessage = t(
+    concluded
+      ? 'captions.concluded'
+      : isHost
+        ? `captions.${season}`
+        : 'captions.donor',
+    { name: fundraiser.title }
+  );
   const caption = `${message ?? defaultMessage}\n${link}`;
   const platformLabel = t(`platforms.${channel.platform}`);
   const channelTip = t(`channels.${channelId}.tip`);
@@ -190,7 +216,7 @@ export function ShareStudio({
   const selectSeason = (value: SeasonId) => {
     setSeason(value);
     // A style suggests its own button text; a custom one stays.
-    if (ctaChoice !== CUSTOM) setCtaChoice(seasonalCta(value, purposes));
+    if (ctaChoice !== CUSTOM) setCtaChoice(SUGGESTED);
   };
 
   const busy = !file || files.progress !== null;
@@ -251,15 +277,25 @@ export function ShareStudio({
   const onKit = async () => {
     setKitBusy(true);
     try {
-      const images = await Promise.all(
-        (['story', 'post', 'banner'] as const).map(f =>
-          makeShareImage(f, options, `${fundraiser.slug}-${f}`)
-        )
-      );
-      const video = await makeShareVideo(
-        'story',
-        options,
-        `${fundraiser.slug}-story`
+      // One file at a time, each turned into bytes before the next, so a phone never holds every large canvas at once.
+      const entries: Array<{ name: string; data: Uint8Array }> = [];
+      const add = async (file: File | null) => {
+        if (file)
+          entries.push({
+            name: file.name,
+            data: new Uint8Array(await file.arrayBuffer()),
+          });
+      };
+      for (const f of ['story', 'post', 'banner'] as const) {
+        await add(await makeShareImage(f, options, `${fundraiser.slug}-${f}`));
+      }
+      // The images still ship if the video cannot be made.
+      await add(
+        await makeShareVideo(
+          'story',
+          options,
+          `${fundraiser.slug}-story`
+        ).catch(() => null)
       );
       const captions = SHARE_CHANNELS.filter(c => !('linkOnly' in c))
         .map(c => {
@@ -273,19 +309,14 @@ export function ShareStudio({
           return `${t(`platforms.${c.platform}`)}: ${t(`channels.${c.id}.label`)}\n${message ?? defaultMessage}\n${url}\n`;
         })
         .join('\n');
-      const entries = await Promise.all(
-        [...images, ...(video ? [video] : [])].map(async f => ({
-          name: f.name,
-          data: new Uint8Array(await f.arrayBuffer()),
-        }))
-      );
       entries.push({
         name: 'captions.txt',
         data: new TextEncoder().encode(captions),
       });
-      const zip = createZip(entries);
       downloadBlob(
-        new Blob([zip.buffer as ArrayBuffer], { type: 'application/zip' }),
+        new Blob(createZipParts(entries) as BlobPart[], {
+          type: 'application/zip',
+        }),
         `${fundraiser.slug}-share-kit.zip`
       );
       toast.success(t('studio.kitDone'));
@@ -328,7 +359,10 @@ export function ShareStudio({
               width: String(w),
               height: String(h),
             })
-          : t('studio.imageMeta', { width: String(w), height: String(h) })}
+          : t('studio.imageMeta', {
+              width: String(w * SHARE_IMAGE_SCALE),
+              height: String(h * SHARE_IMAGE_SCALE),
+            })}
       </p>
       <div className='grid w-full gap-2'>
         {files.progress !== null && (
@@ -365,7 +399,6 @@ export function ShareStudio({
             {tip}
           </p>
         )}
-        {isHost && !shareFiles && <Handoff />}
         {isHost && (
           <Button
             variant='link'
@@ -420,7 +453,7 @@ export function ShareStudio({
         })}
       </div>
       <div
-        className='grid gap-2 sm:grid-cols-2 lg:grid-cols-3'
+        className='grid grid-cols-2 gap-2 sm:grid-cols-3'
         role='group'
         aria-label={t('studio.formatLabel')}
       >
@@ -435,11 +468,12 @@ export function ShareStudio({
               onClick={() => selectChannel(id)}
               className={cardClass(id === channelId)}
             >
-              <span
-                className='shrink-0 rounded-[3px] border-2 border-current opacity-50'
-                style={{ width: sw, height: sh }}
-                aria-hidden='true'
-              />
+              <span className='flex h-5 items-center' aria-hidden='true'>
+                <span
+                  className='rounded-[3px] border-2 border-current opacity-50'
+                  style={{ width: sw, height: sh }}
+                />
+              </span>
               <span className='min-w-0'>
                 <span className='block text-foreground'>
                   {t(`channels.${id}.label`)}
@@ -465,7 +499,7 @@ export function ShareStudio({
   }
 
   return (
-    <div className='grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]'>
+    <div className='grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_17rem] lg:grid-cols-[minmax(0,1fr)_22rem]'>
       <div className='grid min-w-0 gap-6'>
         {picker}
         <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
@@ -499,7 +533,7 @@ export function ShareStudio({
             <div className='grid gap-1.5'>
               <Label htmlFor='share-cta'>{t('studio.buttonText')}</Label>
               <Select
-                value={ctaChoice}
+                value={ctaKey}
                 onValueChange={value =>
                   setCtaChoice(value as CtaKey | typeof CUSTOM)
                 }
@@ -517,7 +551,7 @@ export function ShareStudio({
                 </SelectContent>
               </Select>
             </div>
-            {ctaChoice === CUSTOM && (
+            {ctaKey === CUSTOM && (
               <div className='grid gap-1.5'>
                 <Label htmlFor='share-cta-custom'>{t('cta.customLabel')}</Label>
                 <Input
@@ -531,15 +565,29 @@ export function ShareStudio({
                 />
               </div>
             )}
-            <label className='flex h-9 items-center gap-2 text-sm'>
-              <Switch checked={showDonors} onCheckedChange={setShowDonors} />
-              {t('studio.showDonors')}
-            </label>
+            <div className='grid gap-1'>
+              <label className='flex h-9 items-center gap-2 text-sm'>
+                <Switch
+                  checked={showDonors && render.donorsAvailable}
+                  disabled={!render.donorsAvailable}
+                  onCheckedChange={setShowDonors}
+                />
+                {t('studio.showDonors')}
+              </label>
+              {!render.donorsAvailable && (
+                <p className='max-w-64 text-xs text-muted-foreground'>
+                  {t('studio.donorsUnavailable')}
+                </p>
+              )}
+            </div>
           </div>
         </Card>
         <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
           <div>
-            <h2 className='text-lg font-semibold text-foreground'>
+            <h2
+              id='share-caption-title'
+              className='text-lg font-semibold text-foreground'
+            >
               {t('studio.captionTitle')}
             </h2>
             <p className='mt-1 text-sm text-muted-foreground'>
@@ -547,6 +595,7 @@ export function ShareStudio({
             </p>
           </div>
           <Textarea
+            aria-labelledby='share-caption-title'
             value={message ?? defaultMessage}
             onChange={event => setMessage(event.target.value)}
             rows={3}
@@ -562,49 +611,17 @@ export function ShareStudio({
             <Button
               variant='outline'
               onClick={async () => {
-                if (await copyText(link)) toast.success(t('studio.linkCopied'));
+                if (await copyText(caption))
+                  toast.success(t('studio.captionCopied'));
                 else toast.error(t('studio.copyFailed'));
               }}
             >
-              {t('studio.copyLink')}
+              {t('studio.copy')}
             </Button>
           </div>
         </Card>
       </div>
-      <div className='lg:sticky lg:top-8'>{preview}</div>
-    </div>
-  );
-}
-
-/** On a computer the share sheet cannot take files, so a QR code opens this page on the phone, where Instagram lives. */
-function Handoff() {
-  const t = useTranslations('Share.studio');
-  const [qr, setQr] = useState<string | null>(null);
-  useEffect(() => {
-    let ignore = false;
-    QRCode.toDataURL(window.location.href, { width: 240, margin: 1 })
-      .then(url => {
-        if (!ignore) setQr(url);
-      })
-      .catch(() => undefined);
-    return () => {
-      ignore = true;
-    };
-  }, []);
-  if (!qr) return null;
-  return (
-    <div className='grid grid-cols-[5.5rem_1fr] items-center gap-3 pt-1'>
-      <img
-        src={qr}
-        alt={t('handoffAlt')}
-        className='size-22 rounded-md bg-white p-1'
-      />
-      <p className='text-sm text-muted-foreground'>
-        <span className='block font-medium text-foreground'>
-          {t('handoffTitle')}
-        </span>
-        {t('handoffBody')}
-      </p>
+      <div className='md:sticky md:top-8'>{preview}</div>
     </div>
   );
 }

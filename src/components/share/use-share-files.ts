@@ -11,6 +11,22 @@ import { encodeShareVideo } from '@/lib/share/video';
 
 export type ShareDrawOptions = Omit<ShareRenderOptions, 'format'>;
 
+const ids = new WeakMap<object, number>();
+let nextId = 1;
+/** A stable number per object, so a cache key can tell two loaded images apart. */
+function idOf(value: object | null | undefined): number {
+  if (!value) return 0;
+  let id = ids.get(value);
+  if (!id) {
+    id = nextId++;
+    ids.set(value, id);
+  }
+  return id;
+}
+
+/** Still images export at twice the format's size, so text and icons stay sharp after the app scales them. */
+export const SHARE_IMAGE_SCALE = 2;
+
 export async function makeShareImage(
   format: ShareFormatId,
   options: ShareDrawOptions,
@@ -18,11 +34,12 @@ export async function makeShareImage(
 ): Promise<File> {
   const { w, h } = SHARE_FORMATS[format];
   const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = w * SHARE_IMAGE_SCALE;
+  canvas.height = h * SHARE_IMAGE_SCALE;
   drawShareFrame(canvas.getContext('2d')!, SHARE_VIDEO_SECONDS, {
     ...options,
     format,
+    scale: SHARE_IMAGE_SCALE,
   });
   const blob = await new Promise<Blob | null>(resolve =>
     canvas.toBlob(resolve, 'image/png')
@@ -96,15 +113,16 @@ export function useShareFiles({
   });
 
   // Anything that changes the picture changes the key.
+  // Everything that changes the picture changes the key. Loaded images count by identity, so a new photo, background or avatar set makes a new file.
   const key = JSON.stringify([
     format,
     kind,
     name,
     options.theme,
-    options.data.cta,
-    options.data.joinedLine,
-    options.data.url,
-    !!options.photo,
+    { ...options.data, formatMoney: undefined, raisedLine: undefined },
+    idOf(options.photo),
+    idOf(options.background),
+    idOf(options.avatars),
   ]);
 
   useEffect(() => {
@@ -115,7 +133,7 @@ export function useShareFiles({
       try {
         const image = await makeShareImage(format, optionsRef.current, name);
         if (controller.signal.aborted) return;
-        const wantsVideo = kind === 'video' && SHARE_FORMATS[format].video;
+        const wantsVideo = kind === 'video';
         setFiles({
           key,
           image,
@@ -124,6 +142,7 @@ export function useShareFiles({
           videoUnsupported: false,
         });
         if (!wantsVideo) return;
+        // A failed encode keeps the image and falls back to it, like a browser that cannot encode.
         const video = await makeShareVideo(
           format,
           optionsRef.current,
@@ -133,7 +152,10 @@ export function useShareFiles({
               setFiles(current => ({ ...current, progress }));
           },
           controller.signal
-        );
+        ).catch(error => {
+          console.error('[share] Could not make the video:', error);
+          return null;
+        });
         if (controller.signal.aborted) return;
         setFiles({
           key,

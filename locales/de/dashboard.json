@@ -153,10 +153,16 @@
           "firstDonation": {
             "title": "Die erste Spende begrüßen",
             "hint": "Frag zuerst enge Freund*innen oder Familie. Frühe Spenden schaffen Vertrauen."
+          },
+          "share": {
+            "title": "Teile weiter",
+            "hint": "Jedes Teilen bringt neue Menschen. Storys, Beiträge und einen Link für jeden Ort findest du im Tab Teilen."
           }
         },
         "invite": "Einladen",
-        "share": "Teilen"
+        "share": "Teilen",
+        "showDone": "{count, number} erledigte anzeigen",
+        "hideDone": "Erledigte ausblenden"
       },
       "hosts": {
         "invite": "Mit-Gastgeber*in einladen"
