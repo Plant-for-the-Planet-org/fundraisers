@@ -8,6 +8,7 @@ import type {
 import { DONATION_EVENTS } from '@/lib/types/fundraiser-insights';
 import { buildBuckets, getRangeWindow } from './insights-buckets';
 import { groupReferrers } from './referrer-sources';
+import { getUmamiBaseUrl } from './umami';
 
 import 'server-only';
 
@@ -61,7 +62,7 @@ interface UmamiMetric {
 const UMAMI_TIMEOUT_MS = 8000;
 
 function getUmamiConfig() {
-  const baseUrl = process.env.NEXT_PUBLIC_UMAMI_URL?.trim().replace(/\/+$/, '');
+  const baseUrl = getUmamiBaseUrl();
   const apiKey = process.env.UMAMI_API_KEY;
   // A separate id lets a local or preview box read production stats without also sending its own visits there.
   // `||`, not `??`: `.env.example` ships the override as an empty line, which loads as ''.

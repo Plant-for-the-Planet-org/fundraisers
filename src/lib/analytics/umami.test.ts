@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  DEFAULT_UMAMI_URL,
+  getUmamiBaseUrl,
   isCollectingInsights,
   isTrackedPath,
   resolveUmamiConfig,
@@ -61,6 +63,7 @@ describe('resolveUmamiConfig', () => {
 
   it('stays off without a website id', () => {
     expect(resolveUmamiConfig({ ...base, websiteId: undefined })).toBeNull();
+    expect(resolveUmamiConfig({ ...base, websiteId: '   ' })).toBeNull();
   });
 
   it('stays off on untracked paths', () => {
@@ -86,5 +89,23 @@ describe('COLLECT_INSIGHTS', () => {
   it('keeps collecting for true or any other value', () => {
     expect(isCollectingInsights('on')).toBe(true);
     expect(isCollectingInsights('true')).toBe(true);
+  });
+});
+
+describe('getUmamiBaseUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('falls back to our instance when the variable is empty or blank', () => {
+    vi.stubEnv('NEXT_PUBLIC_UMAMI_URL', '');
+    expect(getUmamiBaseUrl()).toBe(DEFAULT_UMAMI_URL);
+    vi.stubEnv('NEXT_PUBLIC_UMAMI_URL', '   ');
+    expect(getUmamiBaseUrl()).toBe(DEFAULT_UMAMI_URL);
+  });
+
+  it('uses the variable when set, without a trailing slash', () => {
+    vi.stubEnv('NEXT_PUBLIC_UMAMI_URL', 'https://umami.example/');
+    expect(getUmamiBaseUrl()).toBe('https://umami.example');
   });
 });

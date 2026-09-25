@@ -1,3 +1,12 @@
+export const DEFAULT_UMAMI_URL = 'https://insights.startplanting.org';
+
+/** The Umami instance origin, for both the tracker and the stats. Uses ours when `NEXT_PUBLIC_UMAMI_URL` is unset or empty. */
+export function getUmamiBaseUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_UMAMI_URL?.trim() || DEFAULT_UMAMI_URL
+  ).replace(/\/+$/, '');
+}
+
 export type UmamiConfig = {
   src: string;
   /**
@@ -57,12 +66,13 @@ export function resolveUmamiConfig({
 }: ResolveUmamiConfigInput): UmamiConfig | null {
   if (!isCollectingInsights(collectInsights)) return null;
   const base = baseUrl?.trim().replace(/\/+$/, '');
-  if (!base || !websiteId) return null;
+  const id = websiteId?.trim();
+  if (!base || !id) return null;
   if (!isTrackedPath(pathname)) return null;
 
   return {
     src: `${base}/script.js`,
     recorderSrc: `${base}/recorder.js`,
-    websiteId,
+    websiteId: id,
   };
 }

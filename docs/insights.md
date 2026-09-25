@@ -16,7 +16,7 @@ The dashboard layout is described in [dashboard-page.md](./dashboard-page.md).
 
 | Variable | Where | What |
 | --- | --- | --- |
-| `NEXT_PUBLIC_UMAMI_URL` | public | The Umami instance (also used by the tracker) |
+| `NEXT_PUBLIC_UMAMI_URL` | public, optional | The Umami instance, also used by the tracker. Defaults to `https://insights.startplanting.org` when unset or empty. |
 | `NEXT_PUBLIC_UMAMI_WEBSITE_ID` | public | The website the tracker reports to |
 | `UMAMI_API_KEY` | **server only** | API key for reading stats |
 | `UMAMI_STATS_WEBSITE_ID` | server only, optional | The website to read stats from, when it differs from the one this box reports to (for example, reading production stats locally) |
