@@ -9,7 +9,12 @@ vi.mock('@/stores/impersonation-store', () => ({
 import type { PlatformAPIError } from './platform-fetch';
 
 import { useImpersonationStore } from '@/stores/impersonation-store';
-import { platformFetch } from './platform-fetch';
+import {
+  getActiveImpersonation,
+  impersonationHeaders,
+  platformFetch,
+  readImpersonation,
+} from './platform-fetch';
 
 const getState = useImpersonationStore.getState as ReturnType<typeof vi.fn>;
 
@@ -207,5 +212,33 @@ describe('platformFetch', () => {
 
       await expect(platformFetch('/foo')).resolves.toBe('plain text body');
     });
+  });
+});
+
+describe('impersonation hand-off to our API routes', () => {
+  it('sends the active impersonation and reads it back on the server', () => {
+    getState.mockReturnValue({
+      isActive: true,
+      email: 'host@example.com',
+      pin: '1234',
+    });
+    const sent = new Headers(impersonationHeaders(getActiveImpersonation()));
+
+    expect(readImpersonation(sent)).toEqual({
+      email: 'host@example.com',
+      pin: '1234',
+    });
+  });
+
+  it('sends nothing when no impersonation is active', () => {
+    getState.mockReturnValue({ isActive: false, email: null, pin: null });
+
+    expect(impersonationHeaders(getActiveImpersonation())).toEqual({});
+  });
+
+  it('ignores a request with only one of the two headers', () => {
+    expect(
+      readImpersonation(new Headers({ 'x-switch-user': 'host@example.com' }))
+    ).toBeNull();
   });
 });
