@@ -25,7 +25,7 @@ The dashboard layout is described in [dashboard-page.md](./dashboard-page.md).
 - Create the key as a dedicated **view-only** Umami user added to the website's team. Umami keys act with the user's full permissions and never expire, so a view-only user keeps a leaked key harmless beyond reading stats.
 - Never prefix the key with `NEXT_PUBLIC_`. Next.js would bundle it into the browser code.
 - Locally, `COLLECT_INSIGHTS=false` with the production website id lets you see real numbers without counting your own visits.
-- Without `UMAMI_API_KEY`, every Insights route returns a 404 and the Insights menu item, tab and Overview cell are hidden. The check runs on the server (`isUmamiStatsConfigured`).
+- Without `UMAMI_API_KEY`, every Insights route returns a 503, the Insights pages return a 404, and the Insights menu item, tab and Overview cell are hidden. The check runs on the server (`isUmamiStatsConfigured`).
 
 ---
 

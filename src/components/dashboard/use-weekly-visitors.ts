@@ -33,12 +33,16 @@ export function useWeeklyVisitors(enabled: boolean): WeeklyVisitors | null {
       },
     })
       .then(async response => {
-        if (!response.ok) return;
+        if (!response.ok) {
+          if (!ignore) setVisitors(null);
+          return;
+        }
         const data = (await response.json()) as WeeklyVisitors;
         if (!ignore) setVisitors({ accessToken, data });
       })
       .catch(() => {
         // An optional number; nothing to tell the host if it is missing.
+        if (!ignore) setVisitors(null);
       });
 
     return () => {
