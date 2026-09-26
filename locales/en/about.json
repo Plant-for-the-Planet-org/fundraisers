@@ -367,6 +367,7 @@
       "lead": "Give it a name and a goal tonight. Everything else can wait until tomorrow.",
       "start": "Start a fundraiser",
       "explore": "Explore fundraisers"
-    }
+    },
+    "disclaimer": "The people, companies and fundraisers shown on this page are examples. To find real fundraisers, visit <exploreLink>Explore</exploreLink>."
   }
 }

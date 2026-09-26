@@ -367,6 +367,7 @@
       "lead": "Gib ihm heute Abend einen Namen und ein Ziel. Alles andere kann bis morgen warten.",
       "start": "Spendenaufruf starten",
       "explore": "Spendenaufrufe entdecken"
-    }
+    },
+    "disclaimer": "Die Personen, Unternehmen und Spendenaufrufe auf dieser Seite sind Beispiele. Echte Spendenaufrufe findest du unter <exploreLink>Entdecken</exploreLink>."
   }
 }

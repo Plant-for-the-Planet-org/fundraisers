@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { AboutCta } from '@/components/about/about-cta';
 import { AboutCustomize } from '@/components/about/about-customize';
+import { AboutDisclaimer } from '@/components/about/about-disclaimer';
 import { AboutHero } from '@/components/about/about-hero';
 import { AboutHowItWorks } from '@/components/about/about-how-it-works';
 import { AboutMoreThanForests } from '@/components/about/about-more-than-forests';
@@ -56,6 +57,7 @@ export default function HomePage() {
       <AboutStageMode />
       <AboutMoreThanForests />
       <AboutCta />
+      <AboutDisclaimer />
     </div>
   );
 }
