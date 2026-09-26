@@ -1,0 +1,373 @@
+{
+  "About": {
+    "meta": {
+      "title": "Fundraisers by Plant-for-the-Planet",
+      "description": "Turn a birthday, a wedding or a company milestone into trees in the ground. Fundraisers by Plant-for-the-Planet."
+    },
+    "hero": {
+      "title": "Ask your people to <accent>plant with you.</accent>",
+      "lead": "A birthday. A wedding. The day your company turns ten. Fundraisers turns the moments that matter to you into trees in the ground, and makes it easy for the people you love to join in.",
+      "start": "Start a fundraiser",
+      "explore": "Explore fundraisers",
+      "orbit": {
+        "alt": "People giving to one cause, shown as a ring around a heart",
+        "justGave": "just gave",
+        "people": {
+          "lena": "Lena",
+          "fernmoor": "Fernmoor",
+          "class": "Class 7b",
+          "ana": "Ana",
+          "tomas": "Tomás",
+          "jonas": "Jonas"
+        }
+      }
+    },
+    "who": {
+      "title": "Built for you",
+      "lead": "Whether you are in a suit, a party hat or muddy boots. The same tool for very different evenings.",
+      "tabs": {
+        "celebrations": {
+          "label": "Celebrations",
+          "heading": "Instead of another present.",
+          "cards": {
+            "c1": {
+              "title": "Six friends, six summits, 600 trees",
+              "host": "The Sunday Hikers"
+            },
+            "c2": {
+              "title": "Trees instead of flowers, in memory of Rosa",
+              "host": "The Berger family"
+            },
+            "c3": {
+              "title": "Grandpa Henk turns 70. So does the oak he planted.",
+              "host": "The van Dijk family"
+            }
+          },
+          "stories": {
+            "s1": {
+              "scene": "Six friends are hiking the Alps this summer. Every summit they reach plants another hundred trees.",
+              "moments": {
+                "m1": {
+                  "label": "The plan",
+                  "text": "One link in the group chat, with a photo of the route and a goal of 600 trees."
+                },
+                "m2": {
+                  "label": "The hike",
+                  "text": "Friends back home give at every summit, and each gift gets a thank-you on the spot."
+                },
+                "m3": {
+                  "label": "Years later",
+                  "text": "Somewhere in Ghana, their forest is taller than any of them."
+                }
+              }
+            },
+            "s2": {
+              "scene": "When Rosa died, her family asked for trees instead of flowers.",
+              "moments": {
+                "m1": {
+                  "label": "The notice",
+                  "text": "One line in the funeral notice, and a page with her favourite photo."
+                },
+                "m2": {
+                  "label": "The weeks after",
+                  "text": "Friends and neighbours give in her name, and each gift gets a personal thank-you."
+                },
+                "m3": {
+                  "label": "Every spring",
+                  "text": "Her forest grows, and the family visits it on her birthday."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Henk's father planted an oak the day Henk was born. This year they both turn 70.",
+              "moments": {
+                "m1": {
+                  "label": "The family",
+                  "text": "The grandchildren build the page, with a photo of Henk under his oak."
+                },
+                "m2": {
+                  "label": "The party",
+                  "text": "Cousins from four countries give, and Henk reads every thank-you out loud."
+                },
+                "m3": {
+                  "label": "The next 70 years",
+                  "text": "A new forest, all younger than the oak, all growing."
+                }
+              }
+            }
+          }
+        },
+        "companies": {
+          "label": "Companies",
+          "heading": "Something your team will remember.",
+          "cards": {
+            "c1": {
+              "title": "Every kilometre plants a tree: the Fernmoor team run",
+              "host": "Fernmoor running club"
+            },
+            "c2": {
+              "title": "Volunteer day: plant in the morning, raise by the evening",
+              "host": "Halden & Co. and 3 co-hosts"
+            },
+            "c3": {
+              "title": "No gift boxes this Christmas: a forest for our clients",
+              "host": "Moosberg Studio"
+            }
+          },
+          "stories": {
+            "s1": {
+              "scene": "Fernmoor's running club has a race every spring. This year every kilometre plants a tree.",
+              "moments": {
+                "m1": {
+                  "label": "Before the run",
+                  "text": "One page in Fernmoor's colours, shared with colleagues, friends and family."
+                },
+                "m2": {
+                  "label": "On the day",
+                  "text": "Supporters give while the runners are out, and the total climbs."
+                },
+                "m3": {
+                  "label": "Afterwards",
+                  "text": "Tired legs, and a forest with the whole team's name on it."
+                }
+              }
+            },
+            "s2": {
+              "scene": "Once a year, everyone at Halden & Co. takes a day off to volunteer. This year they also raise.",
+              "moments": {
+                "m1": {
+                  "label": "The morning",
+                  "text": "Teams plant trees together in the local park."
+                },
+                "m2": {
+                  "label": "The afternoon",
+                  "text": "Everyone shares the page, and friends and family give from home."
+                },
+                "m3": {
+                  "label": "The evening",
+                  "text": "The total goes up on the big screen, and everyone sees what one day can do."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Every December, Moosberg Studio sends clients a gift box. This year they send a link instead.",
+              "moments": {
+                "m1": {
+                  "label": "The card",
+                  "text": "A Christmas card with one link: no chocolates this year, a forest instead."
+                },
+                "m2": {
+                  "label": "The weeks before Christmas",
+                  "text": "Clients and partners give, and every gift gets a thank-you."
+                },
+                "m3": {
+                  "label": "January",
+                  "text": "The studio shares the total, a forest grown in its clients’ name."
+                }
+              }
+            }
+          }
+        },
+        "organizations": {
+          "label": "Restoration organizations",
+          "shortLabel": "Organizations",
+          "heading": "Raise for the forest you are growing.",
+          "learnMore": "Learn about ForestCloud",
+          "forest": {
+            "alt": "Photos from Plant-for-the-Planet restoration projects in Ghana, Mexico and Spain"
+          },
+          "stories": {
+            "s1": {
+              "scene": "A wildfire burned part of your restoration site last summer.",
+              "moments": {
+                "m1": {
+                  "label": "The appeal",
+                  "text": "You start a fundraiser for the replanting, with photos from the ground."
+                },
+                "m2": {
+                  "label": "The response",
+                  "text": "Partners and past donors share it, and gifts arrive from people you have never met."
+                },
+                "m3": {
+                  "label": "The new season",
+                  "text": "Paid out on schedule through ForestCloud, the seedlings go in before the rains."
+                }
+              }
+            },
+            "s2": {
+              "scene": "Your project has just planted its millionth tree.",
+              "moments": {
+                "m1": {
+                  "label": "The milestone",
+                  "text": "You open a fundraiser to celebrate, and to fund the next million."
+                },
+                "m2": {
+                  "label": "The evening",
+                  "text": "A live event in Stage Mode, with the total climbing on the big screen."
+                },
+                "m3": {
+                  "label": "Afterwards",
+                  "text": "Every gift paid out through ForestCloud, on the platform’s regular schedule."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Earth Day is coming, and you want the world to see your forest.",
+              "moments": {
+                "m1": {
+                  "label": "The weeks before",
+                  "text": "A page in your colours, with your photo and your story."
+                },
+                "m2": {
+                  "label": "Earth Day",
+                  "text": "Schools and companies pick your project and share it for the day."
+                },
+                "m3": {
+                  "label": "The day after",
+                  "text": "Your share arrives on schedule, and many new supporters stay."
+                }
+              }
+            }
+          }
+        }
+      },
+      "storyDot": "Show story {number} of {total}",
+      "pauseStories": "Pause stories",
+      "playStories": "Play stories"
+    },
+    "how": {
+      "title": "Up and running in a few minutes!",
+      "steps": {
+        "start": {
+          "title": "Start",
+          "text": "Give it a name, a goal and an end date. Pick a cause."
+        },
+        "make": {
+          "title": "Make it yours",
+          "text": "Add your photo, tell your story, choose your colours. Preview it before anyone else sees it."
+        },
+        "share": {
+          "title": "Share",
+          "text": "Send your link. Add co-hosts. Let Explore do some of the work for you."
+        },
+        "grow": {
+          "title": "Watch it grow",
+          "text": "See every gift arrive in your dashboard. Say thank you."
+        }
+      }
+    },
+    "projects": {
+      "eyebrow": "Where your forest grows",
+      "title": "Find the cause you care about.",
+      "lead": "Every project is run by people who live there and know the land. And every one meets the minimum standards set by the <standards>Restoration Project Review Board</standards>, a panel of external experts. <verification>How projects are verified</verification>.",
+      "stats": {
+        "projects": {
+          "value": "300+",
+          "label": "restoration projects"
+        },
+        "countries": {
+          "value": "60+",
+          "label": "countries"
+        },
+        "organizations": {
+          "value": "200+",
+          "label": "organizations"
+        }
+      },
+      "bouquets": "Or start from a bouquet of causes",
+      "poweredBy": "Powered by our <link>Restoration Platform</link>.",
+      "globeAlt": "A globe with a dot for every place where a restoration project grows",
+      "viewAll": "View all projects"
+    },
+    "customize": {
+      "eyebrow": "Yours, end to end",
+      "title": "Nothing here looks like a template. Unless you want it to.",
+      "lead": "A fundraiser page is yours from the first pixel to the thank-you note. Start from a theme, or shuffle until one feels right, then change anything.",
+      "features": {
+        "themes": {
+          "title": "Endless styles",
+          "text": "Multiple themes to start from, Spring to Midnight, light or dark. One tap to switch, one to shuffle, then change anything."
+        },
+        "colours": {
+          "title": "Your colours",
+          "text": "Pick an accent, or a custom one with the eyedropper. Solid or gradient backgrounds with your own stops."
+        },
+        "type": {
+          "title": "Your type",
+          "text": "Choose a font you like for titles and body. Playfair for a wedding, Poppins for a launch."
+        },
+        "backgrounds": {
+          "title": "Patterns, images, logos",
+          "text": "A tiled pattern, a full photo, or your partner logo behind the page, tinted and dialled in with opacity."
+        },
+        "motion": {
+          "title": "A little magic",
+          "text": "Confetti for the birthday. Snow for December. Hearts for the wedding. Fireworks for the launch."
+        },
+        "story": {
+          "title": "Your story",
+          "text": "A cover photo, a description with links and video, and a thank-you note in your words when a gift lands."
+        }
+      },
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "stage": {
+      "eyebrow": "Stage Mode",
+      "title": "Ready for the big speech?",
+      "p1": "Raise in style. Put your fundraiser on the big screen with a live total, a leaderboard and every gift popping up as it lands. Guests scan the code and give from their seat.",
+      "demo": {
+        "title": "Future Forest Gala 2026",
+        "description": "Fernmoor GmbH and friends, for the forests of Ghana",
+        "shortUrl": "stage.pp.eco/your-fundraiser",
+        "slides": {
+          "s1": {
+            "title": "Tonight becomes a forest.",
+            "description": "Every gift in this room takes root in Ghana and keeps growing long after the last song."
+          },
+          "s2": {
+            "title": "It started with a child.",
+            "description": "Plant-for-the-Planet began with a nine-year-old and one tree. Tonight we add ours."
+          },
+          "s3": {
+            "title": "Every tree is cared for.",
+            "description": "Planted by people who live there, looked after for years, until it is a forest again."
+          }
+        }
+      },
+      "devices": "Any smart TV, Chromecast, Apple TV or projector. Nothing to install."
+    },
+    "more": {
+      "eyebrow": "More than trees",
+      "title": "Every fundraiser also carries <accent>Plant-for-the-Planet.</accent>",
+      "p1": "A share of every fundraiser goes to Plant-for-the-Planet itself. That is what keeps the whole journey moving: children who become Climate Justice Ambassadors, forests that come back in Mexico, Ghana and Spain, free tools for the people doing the planting, and a voice in the rooms where forest policy is made.",
+      "p2": "So when your friends give to your birthday forest, they are also giving a nine-year-old somewhere the chance to plant her first tree.",
+      "photoAlt": "Climate Justice Ambassadors at a Plant-for-the-Planet Academy",
+      "pillars": {
+        "youth": {
+          "title": "Young people",
+          "text": "100,000+ Climate Justice Ambassadors in 76 countries."
+        },
+        "forests": {
+          "title": "Forests",
+          "text": "Mexico, Ghana and Spain. 36 million trees and counting."
+        },
+        "tools": {
+          "title": "ForestCloud",
+          "text": "Open source, commission-free tools to scale forest restoration. 300+ projects in over 60 countries."
+        },
+        "voice": {
+          "title": "A louder voice",
+          "text": "Advocacy for forests and climate justice."
+        }
+      }
+    },
+    "cta": {
+      "title": "Pick a moment that matters to you.",
+      "lead": "Give it a name and a goal tonight. Everything else can wait until tomorrow.",
+      "start": "Start a fundraiser",
+      "explore": "Explore fundraisers"
+    },
+    "disclaimer": "The people, companies and fundraisers shown on this page are examples. To find real fundraisers, visit <exploreLink>Explore</exploreLink>."
+  }
+}

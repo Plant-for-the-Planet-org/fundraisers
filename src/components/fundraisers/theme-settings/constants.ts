@@ -45,7 +45,7 @@ export const ACCENT_BG: Record<AccentColor, string> = {
   rose: 'bg-rose-500',
   red: 'bg-red-500',
   orange: 'bg-orange-500',
-  amber: 'bg-amber-500',
+  amber: 'bg-amber-700', // matches the #b45309 accent in accent-utils
   yellow: 'bg-yellow-500',
   slate: 'bg-slate-500',
   gray: 'bg-gray-500',

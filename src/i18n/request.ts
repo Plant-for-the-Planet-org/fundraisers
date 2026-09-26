@@ -15,6 +15,7 @@ const CORE_NAMESPACES = [
   'leaderboard',
   'cookies',
   'host-invite',
+  'about',
 ] as const;
 
 // If a namespace file is missing, log a warning and skip it (return {}) instead of throwing.
