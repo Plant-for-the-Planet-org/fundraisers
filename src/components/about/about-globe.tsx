@@ -54,9 +54,8 @@ export function AboutGlobe({ label }: { label: string }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let reducedMotion = motionQuery.matches;
     const size = canvas.offsetWidth;
     const dpr = Math.min(window.devicePixelRatio, 2);
     let phi = START_PHI;
@@ -88,6 +87,12 @@ export function AboutGlobe({ label }: { label: string }) {
 
     let drawnPhi = NaN;
 
+    const onMotionChange = () => {
+      reducedMotion = motionQuery.matches;
+      drawnPhi = NaN;
+    };
+    motionQuery.addEventListener('change', onMotionChange);
+
     const render = (time: number) => {
       if (visible) {
         if (!reducedMotion && dragStart.current === null) {
@@ -98,7 +103,7 @@ export function AboutGlobe({ label }: { label: string }) {
         if (!reducedMotion || viewPhi !== drawnPhi) {
           globe.update({
             phi: viewPhi,
-            ...(reducedMotion ? {} : { markers: pulsingMarkers(time) }),
+            markers: reducedMotion ? BASE_MARKERS : pulsingMarkers(time),
           });
           drawnPhi = viewPhi;
         }
@@ -111,6 +116,7 @@ export function AboutGlobe({ label }: { label: string }) {
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      motionQuery.removeEventListener('change', onMotionChange);
       globe.destroy();
     };
   }, []);

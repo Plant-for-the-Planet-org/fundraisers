@@ -129,29 +129,36 @@ export function AboutStorySlider({
         </div>
 
         {stories.length > 1 && (
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center'>
             {stories.map((_, index) => (
+              // The dot stays small, but the button around it is at least 24px so it is easy to tap (WCAG 2.5.8).
               <button
                 key={index}
                 type='button'
                 aria-label={dotLabels[index]}
                 aria-current={index === active}
                 onClick={() => setActive(index)}
-                className={cn(
-                  'relative h-2 overflow-hidden rounded-full bg-accent-color/25 transition-all duration-300',
-                  index === active ? 'w-8' : 'w-2 hover:bg-accent-color/50'
-                )}
+                className='group flex h-6 min-w-6 items-center justify-center px-1'
               >
-                {index === active && (
-                  <span
-                    key={active}
-                    className='absolute inset-y-0 left-0 rounded-full bg-accent-color animate-story-progress motion-reduce:w-full motion-reduce:animate-none'
-                    style={{
-                      animationDuration: `${STORY_MS}ms`,
-                      animationPlayState: autoplay ? 'running' : 'paused',
-                    }}
-                  />
-                )}
+                <span
+                  className={cn(
+                    'relative block h-2 overflow-hidden rounded-full bg-accent-color/25 transition-all duration-300',
+                    index === active
+                      ? 'w-8'
+                      : 'w-2 group-hover:bg-accent-color/50'
+                  )}
+                >
+                  {index === active && (
+                    <span
+                      key={active}
+                      className='absolute inset-y-0 left-0 rounded-full bg-accent-color animate-story-progress motion-reduce:w-full motion-reduce:animate-none'
+                      style={{
+                        animationDuration: `${STORY_MS}ms`,
+                        animationPlayState: autoplay ? 'running' : 'paused',
+                      }}
+                    />
+                  )}
+                </span>
               </button>
             ))}
             {canAutoplay && (
