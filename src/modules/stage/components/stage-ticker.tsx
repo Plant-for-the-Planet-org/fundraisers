@@ -4,6 +4,7 @@ import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { formatTimeAgo } from '@/lib/utils/time';
 import { STAGE_POLL_INTERVAL_SECONDS } from '../stage-hash';
@@ -80,19 +81,22 @@ export function StageTicker({
   const remaining = useCountdown();
   const trackRef = useRef<HTMLDivElement>(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  // Under reduced motion the track does not move, so it scrolls by hand instead and shows each donation once.
+  const animate = shouldScroll && !reducedMotion;
 
   useLayoutEffect(() => {
     const tickerElement = trackRef.current;
     if (!tickerElement) return;
-    const contentWidth = shouldScroll
+    const contentWidth = animate
       ? tickerElement.scrollWidth / 2
       : tickerElement.scrollWidth;
     const willOverflow = contentWidth > tickerElement.clientWidth;
     if (willOverflow !== shouldScroll) setShouldScroll(willOverflow);
-  }, [recent, shouldScroll]);
+  }, [recent, shouldScroll, animate]);
 
   const items =
-    recent.length > 0 ? (shouldScroll ? [...recent, ...recent] : recent) : [];
+    recent.length > 0 ? (animate ? [...recent, ...recent] : recent) : [];
 
   return (
     <div
@@ -144,7 +148,10 @@ export function StageTicker({
 
       {/* Scrolling track */}
       <div
-        className='relative overflow-hidden'
+        className={`relative ${shouldScroll && !animate ? 'overflow-x-auto' : 'overflow-hidden'}`}
+        {...(shouldScroll && !animate
+          ? { tabIndex: 0, role: 'region', 'aria-label': t('recentGifts') }
+          : {})}
         style={{
           maskImage:
             'linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%)',
@@ -155,9 +162,9 @@ export function StageTicker({
         {items.length > 0 ? (
           <div
             ref={trackRef}
-            className={`flex h-full items-center gap-12 whitespace-nowrap px-6 motion-reduce:animate-none! ${shouldScroll ? '' : 'justify-center'}`}
+            className={`flex h-full items-center gap-12 whitespace-nowrap px-6 ${shouldScroll ? '' : 'justify-center'}`}
             style={
-              shouldScroll
+              animate
                 ? { animation: 'ticker-scroll 60s linear infinite' }
                 : undefined
             }

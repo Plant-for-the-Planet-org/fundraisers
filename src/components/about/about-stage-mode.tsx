@@ -57,6 +57,8 @@ export function AboutStageMode() {
           goal={5000}
           startRaised={2640}
           donors={DEMO_DONORS}
+          // The demo has no fundraiser of its own, so a scan opens Explore, where people can find a real one to give to.
+          qrTargetPath='/explore'
           qrDisplayUrl={t('demo.shortUrl')}
           logoEmoji='🥂'
           className='shadow-lg'

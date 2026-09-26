@@ -57,11 +57,12 @@ export function AboutStorySlider({
   playLabel,
 }: AboutStorySliderProps) {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [stopped, setStopped] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
   const canAutoplay = !reducedMotion && stories.length > 1;
-  const autoplay = canAutoplay && !paused && !stopped;
+  const autoplay = canAutoplay && !hovered && !focused && !stopped;
 
   useEffect(() => {
     if (!autoplay) return;
@@ -75,12 +76,12 @@ export function AboutStorySlider({
   return (
     <div
       className='lg:flex lg:items-stretch lg:gap-10'
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
       onBlur={event => {
         if (!event.currentTarget.contains(event.relatedTarget))
-          setPaused(false);
+          setFocused(false);
       }}
     >
       <div className='flex flex-col gap-4 lg:flex-1'>

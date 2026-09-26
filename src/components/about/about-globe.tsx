@@ -86,15 +86,22 @@ export function AboutGlobe({ label }: { label: string }) {
     });
     observer.observe(canvas);
 
+    let drawnPhi = NaN;
+
     const render = (time: number) => {
       if (visible) {
         if (!reducedMotion && dragStart.current === null) {
           phi += spinSpeed(phi + dragOffset.current);
         }
-        globe.update({
-          phi: phi + dragOffset.current,
-          ...(reducedMotion ? {} : { markers: pulsingMarkers(time) }),
-        });
+        const viewPhi = phi + dragOffset.current;
+        // Each update redraws the globe, so under reduced motion only redraw when a drag moves it.
+        if (!reducedMotion || viewPhi !== drawnPhi) {
+          globe.update({
+            phi: viewPhi,
+            ...(reducedMotion ? {} : { markers: pulsingMarkers(time) }),
+          });
+          drawnPhi = viewPhi;
+        }
       }
       frame = requestAnimationFrame(render);
     };

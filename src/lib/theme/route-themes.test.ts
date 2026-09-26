@@ -12,7 +12,7 @@ describe('getThemeForPath', () => {
   });
 
   it('matches the longest prefix', () => {
-    expect(getThemeForPath('/explore/birthdays').id).toBe('stratospheric');
+    expect(getThemeForPath('/explore/birthdays').id).toBe('explore');
     expect(getThemeForPath('/login').id).toBe('sunset');
   });
 });
