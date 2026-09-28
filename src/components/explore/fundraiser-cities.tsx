@@ -21,7 +21,7 @@ export async function FundraiserCitiesSkeleton() {
       <div>
         <Skeleton className='h-7 w-48 mb-2' />
       </div>
-      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
         {Array.from({ length: 8 }).map((_, i) => (
           <li key={i} className='flex items-center space-x-3'>
             <Skeleton className='w-10 h-10 rounded-full shrink-0' />
@@ -85,7 +85,7 @@ export async function FundraiserCities() {
         </h2>
       </div>
 
-      <ul className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+      <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
         {cities.map(city => (
           <li key={city.id}>
             <Link

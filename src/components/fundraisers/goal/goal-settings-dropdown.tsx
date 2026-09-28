@@ -5,8 +5,7 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { memo, useState } from 'react';
 import { useController } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Settings2, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SectionSettingsButton } from '@/components/fundraisers/section-settings-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,19 +46,7 @@ export const GoalSettingsDropdown = memo(function GoalSettingsDropdown() {
   return (
     <DropdownMenu modal={false} open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button
-          type='button'
-          variant='ghost'
-          size='sm'
-          className='p-1 h-auto hover:bg-muted-foreground/15 dark:hover:bg-muted-foreground/30'
-          aria-label={t('openSettings')}
-        >
-          {isOpen ? (
-            <X className='w-4 h-4' />
-          ) : (
-            <Settings2 className='w-4 h-4' />
-          )}
-        </Button>
+        <SectionSettingsButton isOpen={isOpen} aria-label={t('openSettings')} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-56 p-4 border-border'>
         <div className='space-y-3'>
