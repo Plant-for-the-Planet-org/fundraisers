@@ -10,6 +10,7 @@ import { useImpersonationStore } from '@/stores/impersonation-store';
 import { ImpersonationModal } from '@/components/auth/impersonation-modal';
 import { SignInButton } from '@/components/auth/sign-in-button';
 import { SignOutButton } from '@/components/auth/sign-out-button';
+import { shouldShowStartFundraiser } from '@/components/header/config';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -118,12 +119,14 @@ export function UserMenu() {
               <span>{tHeaderLinks('explore')}</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
-            <Link href='/fundraisers/create' className='flex items-center'>
-              <PlusIcon className='mr-2 h-4 w-4' />
-              <span>{tFundraiser('startFundraiser')}</span>
-            </Link>
-          </DropdownMenuItem>
+          {shouldShowStartFundraiser(pathname) && (
+            <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
+              <Link href='/fundraisers/create' className='flex items-center'>
+                <PlusIcon className='mr-2 h-4 w-4' />
+                <span>{tFundraiser('startFundraiser')}</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
               <HouseIcon className='mr-2 h-4 w-4' />
