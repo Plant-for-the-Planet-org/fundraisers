@@ -47,6 +47,8 @@ export function FundraiserStatusBadge({
         )}
         aria-hidden='true'
       />
+      {/* One label per DisplayStatus. */}
+      {/* i18n-used: * */}
       {t(status)}
     </span>
   );

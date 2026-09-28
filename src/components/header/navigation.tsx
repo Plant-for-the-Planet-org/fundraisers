@@ -15,6 +15,8 @@ const HIDE_START_FUNDRAISER_PATHS = [
 
 export function Navigation() {
   const pathname = usePathname();
+  // One label per HEADER_LINKS entry.
+  // i18n-used: *
   const tHeaderLinks = useTranslations('Common.headerLinks');
   const tAria = useTranslations('Common.aria');
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);

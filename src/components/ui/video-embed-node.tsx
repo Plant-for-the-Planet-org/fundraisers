@@ -61,6 +61,8 @@ function VideoEmbedNodeView({
   deleteNode,
   updateAttributes,
 }: NodeViewProps) {
+  // ASPECT_OPTIONS labels, read through labelKey.
+  // i18n-used: aspectLandscape, aspectPortrait, aspectSquare
   const t = useTranslations('Common.videoEmbed.editor');
   const provider = node.attrs.provider as string;
   const videoId = node.attrs.videoId as string;

@@ -19,7 +19,6 @@
     "fundraiserCities": {
       "title": "Aufrufe in deiner Nähe",
       "loading": "Spendenaufrufe in deiner Nähe werden geladen",
-      "noCategoriesFound": "Derzeit sind keine Spendenaufrufe in deiner Nähe verfügbar.",
       "fundraiserCount": "{count, plural, =0 {0 Spendenaufrufe} one {1 Spendenaufruf} other {{formattedCount} Spendenaufrufe}}"
     },
     "locationMap": {

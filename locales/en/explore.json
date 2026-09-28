@@ -19,7 +19,6 @@
     "fundraiserCities": {
       "title": "Local Fundraisers",
       "loading": "Loading local fundraisers",
-      "noCategoriesFound": "No local fundraisers available at the moment.",
       "fundraiserCount": "{count, plural, =0 {0 Fundraisers} one {1 Fundraiser} other {{formattedCount} Fundraisers}}"
     },
     "locationMap": {
