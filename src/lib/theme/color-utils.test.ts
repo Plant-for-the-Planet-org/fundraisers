@@ -26,10 +26,24 @@ describe('getOnColorText', () => {
     expect(getOnColorText('#15803d')).toBe('#ffffff');
   });
 
-  it('uses near-black only when white fails, as on bright yellow', () => {
-    expect(getOnColorText('#ca8a04')).toBe('#111111');
+  it('uses black only when white fails, as on bright yellow', () => {
+    expect(getOnColorText('#ca8a04')).toBe('#000000');
     // The old green-600: white is 3.3:1 here, so black is the readable choice.
-    expect(getOnColorText('#16a34a')).toBe('#111111');
+    expect(getOnColorText('#16a34a')).toBe('#000000');
+  });
+
+  it('keeps custom hex accents at AA contrast for button text', () => {
+    // #ee0033 sits in the band where white and #111111 both fail AA.
+    const hexes = ['#ee0033'];
+    const toHex = (n: number) => n.toString(16).padStart(2, '0');
+    for (let r = 0; r < 256; r += 8)
+      for (let g = 0; g < 256; g += 8)
+        for (let b = 0; b < 256; b += 8)
+          hexes.push(`#${toHex(r)}${toHex(g)}${toHex(b)}`);
+    const failing = hexes.filter(
+      hex => getContrastRatio(hex, getOnColorText(hex)) < MIN_TEXT_CONTRAST
+    );
+    expect(failing).toEqual([]);
   });
 
   it('keeps every palette accent at AA contrast for button text', () => {
