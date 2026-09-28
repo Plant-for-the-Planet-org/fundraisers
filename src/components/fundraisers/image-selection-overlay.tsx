@@ -35,9 +35,14 @@ export function ImageSelectionOverlay({
   const categories = useMemo(() => getVisibleImageCategories(), []);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(
+  const [pickedCategory, setSelectedCategory] = useState(
     categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID
   );
+  const selectedCategory = categories.some(
+    category => category.id === pickedCategory
+  )
+    ? pickedCategory
+    : (categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID);
   const [isDragOver, setIsDragOver] = useState(false);
   const [images, setImages] = useState<UnsplashPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -154,20 +159,6 @@ export function ImageSelectionOverlay({
     },
     [onClose, onImageSelect]
   );
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      return;
-    }
-
-    const categoryExists = categories.some(
-      category => category.id === selectedCategory
-    );
-
-    if (!categoryExists) {
-      setSelectedCategory(categories[0]?.id ?? DEFAULT_IMAGE_CATEGORY_ID);
-    }
-  }, [categories, selectedCategory]);
 
   // TODO: a whitespace-only query trims to empty, so every space keystroke re-runs this with delay 0 and reloads the category, flashing the spinner. Fix by skipping the reload when the trimmed query is unchanged from the last load.
   useEffect(() => {

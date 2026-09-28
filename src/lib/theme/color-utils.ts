@@ -51,6 +51,28 @@ export function getRelativeLuminance(hex: string): number {
   return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
 }
 
+/** WCAG contrast ratio between two colours, from 1 (same) to 21 (black on white). */
+export function getContrastRatio(a: string, b: string): number {
+  const [light, dark] = [getRelativeLuminance(a), getRelativeLuminance(b)].sort(
+    (x, y) => y - x
+  );
+  return (light + 0.05) / (dark + 0.05);
+}
+
+/** WCAG AA minimum for normal-size text. */
+export const MIN_TEXT_CONTRAST = 4.5;
+
+/**
+ * Text colour for a solid button filled with `hex`.
+ * Prefers white, since black on a mid-dark colour looks muddy. Falls back to black only when white would fail AA, which is the case for bright colours like yellow.
+ * The fallback must be pure black: any colour where white fails reaches at least 4.58 against it, but a near-black like #111111 can fall short too (e.g. #ee0033).
+ */
+export function getOnColorText(hex: string): string {
+  return getContrastRatio(hex, '#ffffff') >= MIN_TEXT_CONTRAST
+    ? '#ffffff'
+    : '#000000';
+}
+
 // Above this luminance a colour reads better with dark text (light mode);
 // below it, with light text (dark mode). 0.179 is the WCAG cross-over point
 // between black-on-colour and white-on-colour contrast.
@@ -105,4 +127,30 @@ export function getSwatchContrast(
           ? 'text-zinc-900'
           : 'text-muted-foreground',
   };
+}
+
+/**
+ * A hex colour as the bare "H S% L%" triplet the shadcn tokens hold, e.g. `--primary: 243 75% 59%`.
+ * Lets a theme accent (hex) stand in for a token that is used as hsl(var(--token)).
+ */
+export function hexToHslTriplet(hex: string): string {
+  const { r, g, b } = hexToRgb(hex);
+  const [rn, gn, bn] = [r / 255, g / 255, b / 255];
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+
+  let hue = 0;
+  let saturation = 0;
+  if (delta !== 0) {
+    saturation = delta / (1 - Math.abs(2 * lightness - 1));
+    if (max === rn) hue = ((gn - bn) / delta) % 6;
+    else if (max === gn) hue = (bn - rn) / delta + 2;
+    else hue = (rn - gn) / delta + 4;
+    hue = Math.round(hue * 60);
+    if (hue < 0) hue += 360;
+  }
+
+  return `${hue} ${Math.round(saturation * 100)}% ${Math.round(lightness * 100)}%`;
 }

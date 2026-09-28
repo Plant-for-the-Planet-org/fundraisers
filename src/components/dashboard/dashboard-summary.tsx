@@ -1,19 +1,28 @@
 'use client';
 
 import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
+import type { WeeklyVisitors } from './use-weekly-visitors';
 
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { DashboardStatsError } from './dashboard-stats-error';
-import { SummaryStatCard } from './summary-stat-card';
-import { SummaryStatCardSkeleton } from './summary-stat-card-skeleton';
+import {
+  StatCell,
+  StatDelta,
+  StatStrip,
+  StatStripSkeleton,
+} from './stat-strip';
 
 interface DashboardSummaryProps {
   summary: DashboardSummaryStats;
   isLoading: boolean;
   hasError: boolean;
   onRetry: () => void;
+  /** Whether this deployment can count visitors. Decides the layout up front, so the strip does not change shape when the number arrives. */
+  showVisitors: boolean;
+  /** Null while loading or if the count failed; the cell shows a dash. */
+  weeklyVisitors: WeeklyVisitors | null;
 }
 
 export function DashboardSummary({
@@ -21,6 +30,8 @@ export function DashboardSummary({
   isLoading,
   hasError,
   onRetry,
+  showVisitors,
+  weeklyVisitors,
 }: DashboardSummaryProps) {
   const t = useTranslations('Dashboard.summary');
   const locale = useLocale();
@@ -35,11 +46,7 @@ export function DashboardSummary({
 
   if (isLoading) {
     return (
-      <div className='grid gap-4 md:grid-cols-3'>
-        <SummaryStatCardSkeleton />
-        <SummaryStatCardSkeleton />
-        <SummaryStatCardSkeleton />
-      </div>
+      <StatStripSkeleton columns={showVisitors ? 4 : 3} label={t('loading')} />
     );
   }
 
@@ -55,32 +62,36 @@ export function DashboardSummary({
       )
     : formatCompactNumber(0, locale);
 
-  const fundraisersHelper = t.rich('fundraisers.activeStatus', {
-    count: summary.activeFundraiserCount,
-    bold: chunks => (
-      <span className='font-semibold text-emerald-600 dark:text-emerald-400'>
-        {chunks}
-      </span>
-    ),
-  });
-
   return (
-    <div className='grid gap-4 md:grid-cols-3'>
-      <SummaryStatCard
-        label={t('fundraisers.label')}
-        value={formatCompactNumber(summary.totalFundraiserCount, locale)}
-        helper={fundraisersHelper}
-      />
-      <SummaryStatCard
-        label={t('totalRaised.label')}
-        value={totalRaisedValue}
-        helper={t('totalRaised.helper')}
-      />
-      <SummaryStatCard
+    <StatStrip columns={showVisitors ? 4 : 3}>
+      <StatCell label={t('totalRaised.label')} value={totalRaisedValue} />
+      <StatCell
         label={t('donations.label')}
         value={formatCompactNumber(summary.donationsCount, locale)}
-        helper={t('donations.helper')}
       />
-    </div>
+      <StatCell
+        label={t('fundraisers.label')}
+        value={formatCompactNumber(summary.activeFundraiserCount, locale)}
+      />
+      {showVisitors && (
+        <StatCell
+          label={t('visitors.label')}
+          value={
+            weeklyVisitors
+              ? formatCompactNumber(weeklyVisitors.visitors, locale)
+              : '–'
+          }
+          delta={
+            weeklyVisitors && (
+              <StatDelta
+                current={weeklyVisitors.visitors}
+                previous={weeklyVisitors.previousVisitors}
+                context={t('visitors.changeContext')}
+              />
+            )
+          }
+        />
+      )}
+    </StatStrip>
   );
 }
