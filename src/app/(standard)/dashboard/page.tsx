@@ -76,6 +76,8 @@ export default function DashboardPage() {
     // Mocks AbortSignal (AbortController) so stale responses are ignored if the effect re-runs before a fetch completes. This can happen if the user quickly navigates away and back to the dashboard, or if the access token changes.
     const signal = { aborted: false };
 
+    // A client-side fetch has to set loading state from the effect. The rule has no way to allow that without a data library, which this app does not use.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void fetchFundraisers(signal);
     return () => {
       signal.aborted = true;
