@@ -1,8 +1,9 @@
 import type { RawFundraiser } from '@/lib/api/normalize-fundraiser';
+import type { Impersonation } from '@/lib/api/platform-fetch';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { normalizeFundraiser } from '@/lib/api/normalize-fundraiser';
-import { platformFetch } from '@/lib/api/platform-fetch';
+import { impersonationHeaders, platformFetch } from '@/lib/api/platform-fetch';
 import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 import { isFundraiserLive } from '@/lib/utils/fundraiser-list';
 
@@ -40,8 +41,21 @@ function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
   return [];
 }
 
-export async function getFundraisers(token: string): Promise<Fundraiser[]> {
-  const payload = await platformFetch<unknown>('/fundraisers', { token });
+/** `impersonation` is for server routes, which have no impersonation store; in the browser, platformFetch adds it on its own. */
+export async function getFundraisers(
+  token: string,
+  impersonation?: Impersonation | null
+): Promise<Fundraiser[]> {
+  const payload = await platformFetch<unknown>(
+    '/fundraisers',
+    impersonation
+      ? {
+          token,
+          skipImpersonationFromStore: true,
+          extraHeaders: impersonationHeaders(impersonation),
+        }
+      : { token }
+  );
 
   return normalizeFundraisersResponse(payload);
 }
