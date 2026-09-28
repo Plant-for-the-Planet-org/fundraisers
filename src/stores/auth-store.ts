@@ -59,7 +59,13 @@ interface AuthStore {
 const isBrowser = typeof window !== 'undefined';
 
 // Guarded like `clearStoredSession`, since `logout` runs this first and a throw would keep the tab from leaving for Auth0.
-function clearStoredImpersonation() {
+// `stop()` needs the guard too: zustand's persist saves after every change and does not catch a failed write, such as a full quota.
+function endImpersonation() {
+  try {
+    useImpersonationStore.getState().stop();
+  } catch {
+    // The in-memory state is already reset before the save runs, so only the save failed.
+  }
   if (!isBrowser) return;
   try {
     localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
@@ -230,8 +236,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: (customReturnTo?: string) => {
-        useImpersonationStore.getState().stop();
-        clearStoredImpersonation();
+        endImpersonation();
 
         const currentPage = window.location.pathname + window.location.search;
         const redirectAfterLogout = customReturnTo || currentPage;
@@ -262,9 +267,8 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       clearAuth: () => {
-        useImpersonationStore.getState().stop();
         clearStoredSession();
-        clearStoredImpersonation();
+        endImpersonation();
         // The `ui-locale` cookie is intentionally left in place. A profile sync taught this browser the user's language; logging out should not discard that (the profile is not lost, it re-syncs on the next login).
         // A later different user's profile sync overwrites the `.profile` cookie anyway, and an explicit pick always wins.
         set(
