@@ -11,7 +11,7 @@ export function readRefParam(search: string): string | null {
   return isValidRefCode(value) ? value : null;
 }
 
-/** The person's own code, for tagging the links they share. Null until the platform returns one. */
+/** The person's own code, for tagging the links they share. Null for organisation profiles, which get no code. */
 export function getReferralCode(
   profile: Pick<UserProfileResponse, 'referralCode'> | null | undefined
 ): string | null {

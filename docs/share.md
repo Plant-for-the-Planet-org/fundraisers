@@ -124,7 +124,7 @@ Before the server canvas decodes a downloaded image, `fitsDecodeBudget` reads it
 
 `?ref=<code>` on a link says whose share it is.
 
-- The code is the sharer's own, from the profile (`referralCode`, a placeholder name until the platform returns it; see `referral.ts`). Until then links carry no `ref`.
+- The code is the sharer's own, from the profile (`referralCode`, see `referral.ts`). The platform gives every donor profile a 7-character code; organisation profiles get none, so their links carry no `ref`.
 - Only codes that look like one (`isValidRefCode`) are used or counted.
 - Nothing is stored on the device: the landing page sends a `share_visit` event, and the donation events read the code from the URL at submit time, like the UTM tags. The overlay never leaves the page, so the URL still has it.
 - Insights counts `share_visit` and `donation_completed` per code (see `docs/insights.md`). The host's own code shows as "Your links"; others show their code until the platform offers a name lookup.
