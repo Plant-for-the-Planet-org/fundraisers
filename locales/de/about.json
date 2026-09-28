@@ -1,0 +1,373 @@
+{
+  "About": {
+    "meta": {
+      "title": "Spendenaufrufe von Plant-for-the-Planet",
+      "description": "Mach aus einem Geburtstag, einer Hochzeit oder einem Firmenjubiläum Bäume im Boden. Spendenaufrufe von Plant-for-the-Planet."
+    },
+    "hero": {
+      "title": "Bitte deine Leute, <accent>mit dir zu pflanzen.</accent>",
+      "lead": "Ein Geburtstag. Eine Hochzeit. Der Tag, an dem dein Unternehmen zehn wird. Mit einem Spendenaufruf werden die Momente, die dir wichtig sind, zu Bäumen im Boden, und die Menschen, die du liebst, können ganz leicht mitmachen.",
+      "start": "Spendenaufruf starten",
+      "explore": "Spendenaufrufe entdecken",
+      "orbit": {
+        "alt": "Menschen, die für einen Zweck spenden, als Ring um ein Herz",
+        "justGave": "hat gespendet",
+        "people": {
+          "lena": "Lena",
+          "fernmoor": "Fernmoor",
+          "class": "Klasse 7b",
+          "ana": "Ana",
+          "tomas": "Tomás",
+          "jonas": "Jonas"
+        }
+      }
+    },
+    "who": {
+      "title": "Für dich gemacht",
+      "lead": "Ob im Anzug, mit Partyhut oder in Gummistiefeln. Dasselbe Werkzeug für ganz verschiedene Abende.",
+      "tabs": {
+        "celebrations": {
+          "label": "Feiern",
+          "heading": "Statt noch einem Geschenk.",
+          "cards": {
+            "c1": {
+              "title": "Sechs Freunde, sechs Gipfel, 600 Bäume",
+              "host": "Die Sonntagswanderer"
+            },
+            "c2": {
+              "title": "Bäume statt Blumen, in Erinnerung an Rosa",
+              "host": "Familie Berger"
+            },
+            "c3": {
+              "title": "Opa Henk wird 70. Die Eiche, die er gepflanzt hat, auch.",
+              "host": "Familie van Dijk"
+            }
+          },
+          "stories": {
+            "s1": {
+              "scene": "Sechs Freunde wandern diesen Sommer durch die Alpen. Jeder Gipfel pflanzt hundert weitere Bäume.",
+              "moments": {
+                "m1": {
+                  "label": "Der Plan",
+                  "text": "Ein Link im Gruppenchat, mit einem Foto der Route und dem Ziel von 600 Bäumen."
+                },
+                "m2": {
+                  "label": "Die Wanderung",
+                  "text": "Freunde zu Hause spenden an jedem Gipfel, und jede Spende bekommt sofort ein Dankeschön."
+                },
+                "m3": {
+                  "label": "Jahre später",
+                  "text": "Irgendwo in Ghana ist ihr Wald größer als jeder von ihnen."
+                }
+              }
+            },
+            "s2": {
+              "scene": "Als Rosa gestorben ist, hat ihre Familie um Bäume statt Blumen gebeten.",
+              "moments": {
+                "m1": {
+                  "label": "Die Traueranzeige",
+                  "text": "Eine Zeile in der Anzeige und eine Seite mit ihrem Lieblingsfoto."
+                },
+                "m2": {
+                  "label": "Die Wochen danach",
+                  "text": "Freunde und Nachbarn spenden in ihrem Namen, und jede Spende bekommt ein persönliches Dankeschön."
+                },
+                "m3": {
+                  "label": "Jeden Frühling",
+                  "text": "Rosas Wald wächst, und die Familie besucht ihn an ihrem Geburtstag."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Henks Vater hat an Henks Geburtstag eine Eiche gepflanzt. Dieses Jahr werden beide 70.",
+              "moments": {
+                "m1": {
+                  "label": "Die Familie",
+                  "text": "Die Enkel bauen die Seite, mit einem Foto von Henk unter seiner Eiche."
+                },
+                "m2": {
+                  "label": "Die Feier",
+                  "text": "Cousins aus vier Ländern spenden, und Henk liest jedes Dankeschön laut vor."
+                },
+                "m3": {
+                  "label": "Die nächsten 70 Jahre",
+                  "text": "Ein neuer Wald, jünger als die Eiche, und er wächst."
+                }
+              }
+            }
+          }
+        },
+        "companies": {
+          "label": "Unternehmen",
+          "heading": "Etwas, an das sich dein Team erinnert.",
+          "cards": {
+            "c1": {
+              "title": "Jeder Kilometer pflanzt einen Baum: der Fernmoor-Teamlauf",
+              "host": "Fernmoor Laufgruppe"
+            },
+            "c2": {
+              "title": "Freiwilligentag: morgens pflanzen, abends sammeln",
+              "host": "Halden & Co. und 3 Co-Hosts"
+            },
+            "c3": {
+              "title": "Keine Geschenkboxen zu Weihnachten: ein Wald für unsere Kunden",
+              "host": "Moosberg Studio"
+            }
+          },
+          "stories": {
+            "s1": {
+              "scene": "Die Laufgruppe von Fernmoor hat jeden Frühling ein Rennen. Dieses Jahr pflanzt jeder Kilometer einen Baum.",
+              "moments": {
+                "m1": {
+                  "label": "Vor dem Lauf",
+                  "text": "Eine Seite in Fernmoors Farben, geteilt mit Kolleginnen, Freunden und Familie."
+                },
+                "m2": {
+                  "label": "Am Tag",
+                  "text": "Unterstützer spenden, während die Läufer unterwegs sind, und die Summe steigt."
+                },
+                "m3": {
+                  "label": "Danach",
+                  "text": "Müde Beine, und ein Wald mit dem Namen des ganzen Teams."
+                }
+              }
+            },
+            "s2": {
+              "scene": "Einmal im Jahr nimmt sich ganz Halden & Co. einen Tag für Freiwilligenarbeit. Dieses Jahr sammeln sie auch.",
+              "moments": {
+                "m1": {
+                  "label": "Der Morgen",
+                  "text": "Die Teams pflanzen gemeinsam Bäume im Park."
+                },
+                "m2": {
+                  "label": "Der Nachmittag",
+                  "text": "Alle teilen die Seite, und Freunde und Familie spenden von zu Hause."
+                },
+                "m3": {
+                  "label": "Der Abend",
+                  "text": "Die Summe steigt auf der großen Leinwand, und alle sehen, was ein Tag schafft."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Jeden Dezember schickt Moosberg Studio den Kunden eine Geschenkbox. Dieses Jahr schicken sie einen Link.",
+              "moments": {
+                "m1": {
+                  "label": "Die Karte",
+                  "text": "Eine Weihnachtskarte mit einem Link: dieses Jahr keine Pralinen, sondern ein Wald."
+                },
+                "m2": {
+                  "label": "Die Wochen vor Weihnachten",
+                  "text": "Kunden und Partner spenden, und jede Spende bekommt ein Dankeschön."
+                },
+                "m3": {
+                  "label": "Im Januar",
+                  "text": "Das Studio teilt die Summe, einen Wald im Namen seiner Kunden."
+                }
+              }
+            }
+          }
+        },
+        "organizations": {
+          "label": "Restaurierungsorganisationen",
+          "shortLabel": "Organisationen",
+          "heading": "Sammle für den Wald, den du wachsen lässt.",
+          "learnMore": "Mehr über ForestCloud",
+          "forest": {
+            "alt": "Fotos aus Restaurierungsprojekten von Plant-for-the-Planet in Ghana, Mexiko und Spanien"
+          },
+          "stories": {
+            "s1": {
+              "scene": "Ein Waldbrand hat letzten Sommer einen Teil deiner Fläche zerstört.",
+              "moments": {
+                "m1": {
+                  "label": "Der Aufruf",
+                  "text": "Du startest einen Spendenaufruf für die Wiederbepflanzung, mit Fotos von vor Ort."
+                },
+                "m2": {
+                  "label": "Die Antwort",
+                  "text": "Partner und frühere Spender teilen ihn, und Spenden kommen von Menschen, die du nie getroffen hast."
+                },
+                "m3": {
+                  "label": "Die neue Saison",
+                  "text": "Pünktlich über ForestCloud ausgezahlt, kommen die Setzlinge vor dem Regen in den Boden."
+                }
+              }
+            },
+            "s2": {
+              "scene": "Dein Projekt hat gerade seinen millionsten Baum gepflanzt.",
+              "moments": {
+                "m1": {
+                  "label": "Der Meilenstein",
+                  "text": "Du startest einen Spendenaufruf zum Feiern und für die nächste Million."
+                },
+                "m2": {
+                  "label": "Der Abend",
+                  "text": "Ein Live-Event im Stage Mode, die Summe steigt auf der großen Leinwand."
+                },
+                "m3": {
+                  "label": "Danach",
+                  "text": "Jede Spende über ForestCloud ausgezahlt, im regulären Rhythmus der Plattform."
+                }
+              }
+            },
+            "s3": {
+              "scene": "Der Earth Day steht vor der Tür, und du willst der Welt deinen Wald zeigen.",
+              "moments": {
+                "m1": {
+                  "label": "Die Wochen davor",
+                  "text": "Eine Seite in deinen Farben, mit deinem Foto und deiner Geschichte."
+                },
+                "m2": {
+                  "label": "Earth Day",
+                  "text": "Schulen und Unternehmen wählen dein Projekt und teilen es an diesem Tag."
+                },
+                "m3": {
+                  "label": "Am Tag danach",
+                  "text": "Dein Anteil kommt pünktlich an, und viele neue Unterstützer bleiben."
+                }
+              }
+            }
+          }
+        }
+      },
+      "storyDot": "Geschichte {number} von {total} zeigen",
+      "pauseStories": "Geschichten anhalten",
+      "playStories": "Geschichten abspielen"
+    },
+    "how": {
+      "title": "In wenigen Minuten startklar!",
+      "steps": {
+        "start": {
+          "title": "Starten",
+          "text": "Gib ihm einen Namen, ein Ziel und ein Enddatum. Wähle einen Zweck."
+        },
+        "make": {
+          "title": "Mach es zu deinem",
+          "text": "Füge dein Foto hinzu, erzähl deine Geschichte, wähle deine Farben. Sieh es dir an, bevor es jemand anders sieht."
+        },
+        "share": {
+          "title": "Teilen",
+          "text": "Verschicke deinen Link. Lade Co-Hosts ein. Lass Entdecken einen Teil der Arbeit für dich machen."
+        },
+        "grow": {
+          "title": "Zusehen, wie es wächst",
+          "text": "Sieh jede Spende in deinem Dashboard ankommen. Sag Danke."
+        }
+      }
+    },
+    "projects": {
+      "eyebrow": "Wo dein Wald wächst",
+      "title": "Finde die Sache, die dir am Herzen liegt.",
+      "lead": "Jedes Projekt wird von Menschen vor Ort geführt, die ihr Land kennen. Und jedes erfüllt die Mindeststandards des <standards>Restoration Project Review Board</standards>, eines Gremiums externer Fachleute. <verification>So werden Projekte geprüft</verification>.",
+      "stats": {
+        "projects": {
+          "value": "300+",
+          "label": "Wiederherstellungsprojekte"
+        },
+        "countries": {
+          "value": "60+",
+          "label": "Länder"
+        },
+        "organizations": {
+          "value": "200+",
+          "label": "Organisationen"
+        }
+      },
+      "bouquets": "Oder starte mit einem Bouquet von Anliegen",
+      "poweredBy": "Mit unserer <link>Restoration Platform</link>.",
+      "globeAlt": "Ein Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst",
+      "viewAll": "Alle Projekte ansehen"
+    },
+    "customize": {
+      "eyebrow": "Deins, von Anfang bis Ende",
+      "title": "Nichts hier sieht nach Vorlage aus. Außer du willst es so.",
+      "lead": "Die Seite deines Spendenaufrufs gehört dir, vom ersten Pixel bis zur Dankesnachricht. Starte mit einem Theme, oder mische, bis eins passt, und ändere dann alles.",
+      "features": {
+        "themes": {
+          "title": "Endlose Stile",
+          "text": "Viele Themes zum Starten, von Spring bis Midnight, hell oder dunkel. Ein Tipp zum Wechseln, einer zum Mischen, dann ändere alles."
+        },
+        "colours": {
+          "title": "Deine Farben",
+          "text": "Wähle eine Akzentfarbe oder eine eigene mit der Pipette. Einfarbige oder Verlaufs-Hintergründe mit eigenen Stopps."
+        },
+        "type": {
+          "title": "Deine Schrift",
+          "text": "Wähle eine Schrift, die dir gefällt, für Titel und Text. Playfair für die Hochzeit, Poppins für den Launch."
+        },
+        "backgrounds": {
+          "title": "Muster, Bilder, Logos",
+          "text": "Ein gekacheltes Muster, ein großes Foto oder dein Partnerlogo hinter der Seite, getönt und mit Deckkraft eingestellt."
+        },
+        "motion": {
+          "title": "Ein bisschen Magie",
+          "text": "Konfetti zum Geburtstag. Schnee im Dezember. Herzen zur Hochzeit. Feuerwerk zum Launch."
+        },
+        "story": {
+          "title": "Deine Geschichte",
+          "text": "Ein Titelfoto, eine Beschreibung mit Links und Video und eine Dankesnachricht in deinen Worten, wenn eine Spende ankommt."
+        }
+      },
+      "prev": "Zurück",
+      "next": "Weiter"
+    },
+    "stage": {
+      "eyebrow": "Stage Mode",
+      "title": "Bereit für die große Rede?",
+      "p1": "Sammle mit Stil. Bring deinen Spendenaufruf auf die große Leinwand, mit Live-Summe, Bestenliste und jeder Spende, die sofort aufpoppt. Die Gäste scannen den Code und spenden vom Platz aus.",
+      "demo": {
+        "title": "Future Forest Gala 2026",
+        "description": "Fernmoor GmbH und Freunde, für die Wälder Ghanas",
+        "shortUrl": "stage.pp.eco/dein-fundraiser",
+        "slides": {
+          "s1": {
+            "title": "Heute Abend wächst ein Wald.",
+            "description": "Jede Spende in diesem Raum schlägt Wurzeln in Ghana und wächst weiter, lange nach dem letzten Lied."
+          },
+          "s2": {
+            "title": "Alles begann mit einem Kind.",
+            "description": "Plant-for-the-Planet begann mit einem Neunjährigen und einem Baum. Heute Abend kommen unsere dazu."
+          },
+          "s3": {
+            "title": "Jeder Baum wird umsorgt.",
+            "description": "Gepflanzt von Menschen vor Ort, über Jahre gepflegt, bis wieder ein Wald steht."
+          }
+        }
+      },
+      "devices": "Jeder Smart-TV, Chromecast, Apple TV oder Beamer. Nichts zu installieren."
+    },
+    "more": {
+      "eyebrow": "Mehr als Bäume",
+      "title": "Jeder Spendenaufruf trägt auch <accent>Plant-for-the-Planet.</accent>",
+      "p1": "Ein Teil jedes Spendenaufrufs geht an Plant-for-the-Planet selbst. Das hält die ganze Reise in Bewegung: Kinder, die Botschafter für Klimagerechtigkeit werden, Wälder, die in Mexiko, Ghana und Spanien zurückkommen, kostenlose Werkzeuge für die Menschen, die pflanzen, und eine Stimme in den Räumen, in denen Waldpolitik gemacht wird.",
+      "p2": "Wenn deine Freunde also für deinen Geburtstagswald spenden, schenken sie auch irgendwo einer Neunjährigen die Chance, ihren ersten Baum zu pflanzen.",
+      "photoAlt": "Botschafter für Klimagerechtigkeit bei einer Plant-for-the-Planet Akademie",
+      "pillars": {
+        "youth": {
+          "title": "Junge Menschen",
+          "text": "100.000+ Botschafter für Klimagerechtigkeit in 76 Ländern."
+        },
+        "forests": {
+          "title": "Wälder",
+          "text": "Mexiko, Ghana und Spanien. 36 Millionen Bäume und mehr."
+        },
+        "tools": {
+          "title": "ForestCloud",
+          "text": "Open Source und provisionsfreie Werkzeuge, um Waldwiederherstellung zu skalieren. Über 300 Projekte in mehr als 60 Ländern."
+        },
+        "voice": {
+          "title": "Eine lautere Stimme",
+          "text": "Einsatz für Wälder und Klimagerechtigkeit."
+        }
+      }
+    },
+    "cta": {
+      "title": "Wähle einen Moment, der dir wichtig ist.",
+      "lead": "Gib ihm heute Abend einen Namen und ein Ziel. Alles andere kann bis morgen warten.",
+      "start": "Spendenaufruf starten",
+      "explore": "Spendenaufrufe entdecken"
+    },
+    "disclaimer": "Die Personen, Unternehmen und Spendenaufrufe auf dieser Seite sind Beispiele. Echte Spendenaufrufe findest du unter <exploreLink>Entdecken</exploreLink>."
+  }
+}

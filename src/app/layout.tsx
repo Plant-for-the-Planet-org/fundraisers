@@ -83,7 +83,8 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
   const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? '/';
+  // Empty, not '/', when the header is missing: '/' now has its own home page theme, and unknown paths should get the default.
+  const pathname = headersList.get('x-pathname') ?? '';
   const theme = getThemeForPath(pathname);
 
   return (

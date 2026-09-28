@@ -15,10 +15,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: {
       userAgent: '*',
       allow: '/',
-      // '/$' anchors to the exact root path (Googlebot-supported), since
-      // '/' is a dead redirect (see next.config.ts) rather than real content.
-      // Crawlers that ignore '$' simply won't match this rule.
-      disallow: ['/$', '/sentry-test'],
+      disallow: ['/sentry-test'],
     },
   };
 }
