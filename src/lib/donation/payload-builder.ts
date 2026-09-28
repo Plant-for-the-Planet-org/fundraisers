@@ -28,21 +28,39 @@ export function calculateFrequency(
   return frequency;
 }
 
+export interface DonationMetadataOptions {
+  userProfile?: UserProfileResponse;
+  sourceUrl?: string;
+  referrer?: string;
+  willAbsorbFee?: boolean;
+  processingFeeCents?: number;
+  /**
+   * Omit to read UTM parameters from the current URL.
+   * Pass `null` to skip URL-derived UTM parameters.
+   * `utm_campaign` is always set to the fundraiser ID.
+   */
+  utm?: DonationUtm | null;
+}
+
 /**
  * Builds donation metadata including fundraiser context and custom fields
  */
 export function buildDonationMetadata(
   formData: DonationFormData,
   fundraiserData: Fundraiser,
-  userProfile?: UserProfileResponse,
-  sourceUrl?: string,
-  referrer?: string,
-  willAbsorbFee?: boolean,
-  processingFeeCents?: number,
-  utm?: DonationUtm
+  options: DonationMetadataOptions = {}
 ): DonationPayload['metadata'] {
+  const {
+    userProfile,
+    sourceUrl,
+    referrer,
+    willAbsorbFee,
+    processingFeeCents,
+    utm,
+  } = options;
+
   const source = sourceUrl || getSourceUrl(fundraiserData.id);
-  const campaign = utm ?? getUtmParams(fundraiserData);
+  const campaign = utm === undefined ? getUtmParams(fundraiserData) : utm;
   const isAbsorbingFee =
     willAbsorbFee && processingFeeCents && processingFeeCents > 0;
 
@@ -212,23 +230,19 @@ export function buildDonationPayload(
 ): DonationPayload {
   const sourceUrl = getSourceUrl(fundraiser.id);
   const referrer = getReferrer();
-  const utm = getUtmParams(fundraiser);
 
   const lineItems = calculateLineItems(
     formData.amountCents,
     fundraiser.projectAllocations,
     getDefaultCauseId(fundraiser.workspace?.country ?? '')
   );
-  const metadata = buildDonationMetadata(
-    formData,
-    fundraiser,
-    donorProfile,
+  const metadata = buildDonationMetadata(formData, fundraiser, {
+    userProfile: donorProfile,
     sourceUrl,
     referrer,
     willAbsorbFee,
     processingFeeCents,
-    utm
-  );
+  });
   const donorAlias = buildDonorAlias(formData, donorProfile);
   const baseDonationPayload: DonationPayloadBase = {
     amount: formData.amountCents / 100,

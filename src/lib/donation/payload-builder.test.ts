@@ -1,7 +1,7 @@
 import type { DonationFormData, DonationMetadata } from '../types/donation';
 import type { Fundraiser } from '../types/fundraiser';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { buildDonationMetadata } from './payload-builder';
 
 const fundraiser = {
@@ -18,18 +18,23 @@ const formData = {
   isAnonymous: false,
 } as DonationFormData;
 
+/** Tests run in the node environment, so there is no URL to read until one is stubbed. */
+function stubLandingUrl(search: string) {
+  vi.stubGlobal('window', {
+    location: { search, origin: 'https://fundraisers.test' },
+  });
+}
+
 describe('buildDonationMetadata', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('carries the campaign alongside the fundraiser id', () => {
-    const metadata = buildDonationMetadata(
-      formData,
-      fundraiser,
-      undefined,
-      undefined,
-      'example.org',
-      undefined,
-      undefined,
-      { utm_source: 'stage', utm_medium: 'qr' }
-    );
+    const metadata = buildDonationMetadata(formData, fundraiser, {
+      referrer: 'example.org',
+      utm: { utm_source: 'stage', utm_medium: 'qr' },
+    });
 
     expect(metadata).toMatchObject({
       utm_campaign: fundraiser.id,
@@ -47,18 +52,31 @@ describe('buildDonationMetadata', () => {
       fundraiser: { id: 'fr_someOtherOne', privacy: { is_anonymous: false } },
     };
 
-    const metadata = buildDonationMetadata(
-      formData,
-      fundraiser,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      hostile
-    );
+    const metadata = buildDonationMetadata(formData, fundraiser, {
+      utm: hostile,
+    });
 
     expect(metadata.utm_campaign).toBe(fundraiser.id);
     expect(metadata.fundraiser.id).toBe(fundraiser.id);
+  });
+
+  it('reads the campaign off the URL when utm is omitted', () => {
+    stubLandingUrl('?utm_source=newsletter');
+
+    const metadata = buildDonationMetadata(formData, fundraiser);
+
+    expect(metadata).toMatchObject({
+      utm_campaign: fundraiser.id,
+      utm_source: 'newsletter',
+    });
+  });
+
+  it('attaches no campaign when utm is null', () => {
+    stubLandingUrl('?utm_source=newsletter');
+
+    const metadata = buildDonationMetadata(formData, fundraiser, { utm: null });
+
+    expect(metadata.utm_campaign).toBe(fundraiser.id);
+    expect(metadata).not.toHaveProperty('utm_source');
   });
 });
