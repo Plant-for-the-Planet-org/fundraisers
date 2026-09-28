@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
+import { LocalizedLink } from '@/components/ui/localized-link';
 
 export default async function FundraiserNotFound() {
   const t = await getTranslations('Fundraisers.notFound');
@@ -13,10 +13,10 @@ export default async function FundraiserNotFound() {
         <p className='text-foreground/60 mb-8'>{t('description')}</p>
         <div className='flex flex-col gap-3'>
           <Button asChild>
-            <Link href='/explore'>{t('browseCta')}</Link>
+            <LocalizedLink href='/explore'>{t('browseCta')}</LocalizedLink>
           </Button>
           <Button variant='outline' asChild>
-            <Link href='/'>{t('homeCta')}</Link>
+            <LocalizedLink href='/'>{t('homeCta')}</LocalizedLink>
           </Button>
         </div>
       </div>

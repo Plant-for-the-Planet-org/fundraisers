@@ -5,9 +5,10 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useOptimistic, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { isFundraiserSortOption } from '@/lib/api/categories-service';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { localizeHref } from '@/i18n/localized-paths';
 import { FundraiserCard } from './fundraiser-card';
 import { FundraiserCardSkeletonGrid } from './fundraiser-card-skeleton';
 
@@ -24,6 +25,7 @@ export function CategoryFundraisers({
 }: CategoryFundraisersProps) {
   const tCategoryPage = useTranslations('Explore.categoryPage');
   const router = useRouter();
+  const locale = useLocale();
   const [isPending, startTransition] = useTransition();
   const [optimisticSort, setOptimisticSort] = useOptimistic(currentSort);
 
@@ -31,7 +33,7 @@ export function CategoryFundraisers({
     if (!isFundraiserSortOption(newSort) || newSort === currentSort) return;
     startTransition(() => {
       setOptimisticSort(newSort);
-      router.push(`/explore/${slug}?sort=${newSort}`);
+      router.push(localizeHref(`/explore/${slug}?sort=${newSort}`, locale));
     });
   };
 

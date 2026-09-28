@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { Compass, Share2, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
+import { LocalizedLink } from '@/components/ui/localized-link';
 
 // On. The alltime-stats unit aggregation once returned values ~100x too high for older fundraisers; flip to false if those numbers show up again.
 const SHOW_IMPACT_LINE = true;
@@ -154,10 +154,10 @@ export function ClosedForContribution({
 
       <div className='flex flex-wrap gap-2'>
         <Button asChild variant='outline' size='sm'>
-          <Link href='/explore'>
+          <LocalizedLink href='/explore'>
             <Compass aria-hidden='true' />
             {t('exploreCta')}
-          </Link>
+          </LocalizedLink>
         </Button>
         {concluded && sharePath && (
           <Button variant='ghost' size='sm' onClick={handleShare}>
