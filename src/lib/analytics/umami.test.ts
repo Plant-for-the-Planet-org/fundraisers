@@ -32,6 +32,13 @@ describe('isTrackedPath', () => {
   it('skips Stage Mode, which sits on a projector for hours', () => {
     expect(isTrackedPath('/raise/tree-drive/stage')).toBe(false);
   });
+
+  it('skips host invite pages, which carry the invite token in the path', () => {
+    expect(isTrackedPath('/raise/tree-drive/invite/abc123')).toBe(false);
+    expect(isTrackedPath('/raise/tree-drive/invite')).toBe(false);
+    expect(isTrackedPath('/raise/invite')).toBe(true);
+    expect(isTrackedPath('/raise/tree-drive/invites')).toBe(true);
+  });
 });
 
 describe('resolveUmamiConfig', () => {

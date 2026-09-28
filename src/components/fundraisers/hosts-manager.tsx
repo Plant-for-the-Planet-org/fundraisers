@@ -4,7 +4,7 @@ import type { FundraiserHost } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { EyeOff, Settings2 } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { listFundraiserHosts } from '@/lib/api/fundraiser-hosts-service';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
 import { ManageHostsDialog } from './manage-hosts-dialog';
+import { SectionSettingsButton } from './section-settings-button';
 import { SectionHeader } from './typography';
 
 interface HostsManagerProps {
@@ -77,15 +78,11 @@ export function HostsManager({
       <SectionHeader
         className='flex-row items-center justify-between'
         actionSlot={
-          <button
-            type='button'
+          <SectionSettingsButton
             onClick={() => setOpen(true)}
             aria-label={t('manage')}
             title={t('manage')}
-            className='text-muted-foreground transition-colors hover:text-foreground'
-          >
-            <Settings2 size={16} />
-          </button>
+          />
         }
       >
         {t('title')}
