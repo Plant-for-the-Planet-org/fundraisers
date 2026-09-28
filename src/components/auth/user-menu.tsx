@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, Compass, CreditCard, Plus, UserCog } from 'lucide-react';
 import { getImageUrl } from '@/lib/utils/images';
 import { useAuthStore } from '@/stores/auth-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
@@ -22,6 +21,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/drop-down-menu';
 import { FallbackAvatar } from '@/components/ui/fallback-avatar';
+import {
+  ChevronDownIcon,
+  CompassIcon,
+  HouseIcon,
+  PlusIcon,
+  UserGearIcon,
+} from '@/components/ui/ui-icons';
 
 const IMPERSONATION_DOMAIN = '@plant-for-the-planet.org';
 
@@ -80,7 +86,7 @@ export function UserMenu() {
                 seed={profile?.id ?? userEmail ?? displayName ?? 'user'}
               />
             </Avatar>
-            <ChevronDown
+            <ChevronDownIcon
               className={`h-3 w-3 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
             />
           </Button>
@@ -108,19 +114,19 @@ export function UserMenu() {
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
             <Link href='/explore' className='flex items-center'>
-              <Compass className='mr-2 h-4 w-4' />
+              <CompassIcon className='mr-2 h-4 w-4' />
               <span>{tHeaderLinks('explore')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer xs:hidden'>
             <Link href='/fundraisers/create' className='flex items-center'>
-              <Plus className='mr-2 h-4 w-4' />
+              <PlusIcon className='mr-2 h-4 w-4' />
               <span>{tFundraiser('startFundraiser')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className='cursor-pointer'>
             <Link href='/dashboard' className='flex items-center'>
-              <CreditCard className='mr-2 h-4 w-4' />
+              <HouseIcon className='mr-2 h-4 w-4' />
               <span>{tDashboard('breadcrumb.dashboard')}</span>
             </Link>
           </DropdownMenuItem>
@@ -132,7 +138,7 @@ export function UserMenu() {
                 setImpersonationModalOpen(true);
               }}
             >
-              <UserCog className='mr-2 h-4 w-4' />
+              <UserGearIcon className='mr-2 h-4 w-4' />
               <span>
                 {isImpersonating
                   ? tAuth('impersonation.switch')

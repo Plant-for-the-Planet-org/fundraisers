@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
   Copy,
-  Link as LinkIcon,
   Loader2,
   Monitor,
   MoreVertical,
@@ -45,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ArrowUpRightFromSquareIcon, LinkIcon } from '@/components/ui/ui-icons';
 import { openStageWindow } from '@/modules/stage';
 import { CloneFundraiserDialog } from './clone-fundraiser-dialog';
 
@@ -186,17 +186,6 @@ export function FundraiserActionMenu({
 
   const editHref = `/dashboard/fundraisers/edit/${fundraiser.slug}`;
 
-  const handleCopyLink = async () => {
-    const path = getFundraiserUrl(fundraiser);
-    const url = `${window.location.origin}${path}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success(t('copyLinkSuccess'));
-    } catch {
-      toast.error(t('copyLinkError'));
-    }
-  };
-
   const handleStatusChange = async (action: StatusActionKind) => {
     if (pending || !accessToken) return;
 
@@ -262,6 +251,17 @@ export function FundraiserActionMenu({
         align='end'
         className='w-52 rounded-xl border-border/60 shadow-lg'
       >
+        <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
+          <a
+            href={getFundraiserUrl(fundraiser)}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            <ArrowUpRightFromSquareIcon />
+            {t('viewPage')}
+          </a>
+        </DropdownMenuItem>
+
         {actions.edit && (
           <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
             <Link href={editHref}>
@@ -300,12 +300,13 @@ export function FundraiserActionMenu({
         )}
 
         {actions.copyLink && (
-          <DropdownMenuItem
-            className='cursor-pointer rounded-lg py-2'
-            onSelect={handleCopyLink}
-          >
-            <LinkIcon aria-hidden='true' />
-            {t('copyLink')}
+          <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
+            <Link
+              href={`/dashboard/fundraisers/${encodeURIComponent(fundraiser.slug)}/share`}
+            >
+              <LinkIcon />
+              {t('share')}
+            </Link>
           </DropdownMenuItem>
         )}
 
