@@ -59,6 +59,8 @@ export function useBundleProjects(
   }, [locale, country]);
 
   useEffect(() => {
+    // A client-side fetch has to set loading state from the effect. The rule has no way to allow that without a data library, which this app does not use.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProjects();
   }, [fetchProjects]);
 
