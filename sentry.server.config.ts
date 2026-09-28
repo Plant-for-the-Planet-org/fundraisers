@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { stripImpersonationHeaders } from '@/lib/sentry/strip-impersonation-headers';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -18,4 +19,7 @@ Sentry.init({
 
   // Enable logs to be sent to Sentry
   enableLogs: true,
+
+  beforeSend: stripImpersonationHeaders,
+  beforeSendTransaction: stripImpersonationHeaders,
 });

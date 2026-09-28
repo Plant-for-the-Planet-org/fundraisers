@@ -106,3 +106,29 @@ export function getSwatchContrast(
           : 'text-muted-foreground',
   };
 }
+
+/**
+ * A hex colour as the bare "H S% L%" triplet the shadcn tokens hold, e.g. `--primary: 243 75% 59%`.
+ * Lets a theme accent (hex) stand in for a token that is used as hsl(var(--token)).
+ */
+export function hexToHslTriplet(hex: string): string {
+  const { r, g, b } = hexToRgb(hex);
+  const [rn, gn, bn] = [r / 255, g / 255, b / 255];
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+
+  let hue = 0;
+  let saturation = 0;
+  if (delta !== 0) {
+    saturation = delta / (1 - Math.abs(2 * lightness - 1));
+    if (max === rn) hue = ((gn - bn) / delta) % 6;
+    else if (max === gn) hue = (bn - rn) / delta + 2;
+    else hue = (rn - gn) / delta + 4;
+    hue = Math.round(hue * 60);
+    if (hue < 0) hue += 360;
+  }
+
+  return `${hue} ${Math.round(saturation * 100)}% ${Math.round(lightness * 100)}%`;
+}

@@ -106,6 +106,27 @@ export const THEMES: Record<string, Theme> = {
       'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30'
     ),
   },
+  // The Explore page: Stratospheric's soft wash and amber accent, plus a faint tree pattern in the accent.
+  // A copy rather than an edit, because fundraisers can pick Stratospheric for their own pages. Not featured, so it never shows in the theme picker.
+  explore: {
+    id: 'explore',
+    name: 'Explore',
+    category: 'atmospheric',
+    accent: 'amber',
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    colorOptions: ['amber'],
+    curatedBgs: [],
+    bg: defineBg(
+      'bg-gradient-to-br from-yellow-100/40 via-pink-100/35 to-purple-100/30',
+      {
+        decoration: 'pattern',
+        pattern_id: 'bg-trees',
+        opacity: 0.08,
+      }
+    ),
+  },
   sunset: {
     id: 'sunset',
     name: 'Sunset',
@@ -305,6 +326,28 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-grid', 'bg-paper', 'bg-waves'],
     bg: defineBg('bg-gray-50'),
+  }, // The host dashboard: calm and plain like Minimal, with an indigo accent that stands apart from the green used for status (live, going up).
+  // Not featured, so it never shows in the fundraiser theme picker.
+  dashboard: {
+    id: 'dashboard',
+    name: 'Dashboard',
+    category: 'minimal',
+    accent: 'indigo',
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    isPlain: true,
+    colorOptions: ['indigo'],
+    curatedBgs: [],
+    // A light indigo-to-sky wash with a faint dot grid in the accent: some depth without competing with the cards.
+    bg: defineBg(
+      'bg-gradient-to-br from-indigo-100/70 via-white to-sky-100/60',
+      {
+        decoration: 'pattern',
+        pattern_id: 'bg-dots',
+        opacity: 0.06,
+      }
+    ),
   },
 };
 
