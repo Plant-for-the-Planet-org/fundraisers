@@ -19,18 +19,40 @@ export interface RangeWindow {
   unit: InsightsUnit;
 }
 
+/** Creating a formatter is slow and the bucket loops run once per hour step, so each one is made once per timezone and reused. */
+function cachedFormatter(
+  cache: Map<string, Intl.DateTimeFormat>,
+  locale: string,
+  options: Intl.DateTimeFormatOptions,
+  timeZone: string
+) {
+  let formatter = cache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { ...options, timeZone });
+    cache.set(timeZone, formatter);
+  }
+  return formatter;
+}
+
+const offsetFormatters = new Map<string, Intl.DateTimeFormat>();
+const keyFormatters = new Map<string, Intl.DateTimeFormat>();
+
 /** Milliseconds the timezone is ahead of UTC at a given moment. */
 function timeZoneOffset(time: number, timeZone: string): number {
   const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hourCycle: 'h23',
-    })
+    cachedFormatter(
+      offsetFormatters,
+      'en-US',
+      {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hourCycle: 'h23',
+      },
+      timeZone
+    )
       .formatToParts(time)
       .map(part => [part.type, Number(part.value)])
   );
@@ -98,14 +120,18 @@ export function isValidTimeZone(timeZone: string): boolean {
 
 function localKey(time: number, unit: InsightsUnit, timeZone: string) {
   const parts = Object.fromEntries(
-    new Intl.DateTimeFormat('en-CA', {
-      timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      hourCycle: 'h23',
-    })
+    cachedFormatter(
+      keyFormatters,
+      'en-US',
+      {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hourCycle: 'h23',
+      },
+      timeZone
+    )
       .formatToParts(time)
       .map(part => [part.type, part.value])
   );
