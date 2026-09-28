@@ -244,6 +244,12 @@ export const useAuthStore = create<AuthStore>()(
         logoutUrl.searchParams.set('client_id', clientId!);
         logoutUrl.searchParams.set('returnTo', logoutSuccessUrl);
 
+        // Drop the saved token now, so an abandoned or failed trip to Auth0 does not leave the next visit signed in. The in-memory state stays until /redirecting clears it: clearing it here would let AuthGuard jump to /login before the tab leaves.
+        if (isBrowser) {
+          localStorage.removeItem('access_token');
+          clearAuthTime();
+        }
+
         window.location.href = logoutUrl.toString();
       },
 

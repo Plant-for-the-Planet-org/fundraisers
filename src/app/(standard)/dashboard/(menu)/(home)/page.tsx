@@ -9,7 +9,7 @@ import {
   PendingInvitations,
   useDashboardFundraisers,
   useInsightsEnabled,
-  useWeeklyViews,
+  useWeeklyVisitors,
 } from '@/components/dashboard';
 
 export default function DashboardOverviewPage() {
@@ -28,13 +28,13 @@ export default function DashboardOverviewPage() {
   const hasPublicFundraiser = fundraisers.some(
     fundraiser => fundraiser.status !== 'draft'
   );
-  const fetchedViews = useWeeklyViews(
+  const fetchedVisitors = useWeeklyVisitors(
     insightsEnabled && !isLoading && hasPublicFundraiser
   );
-  const weeklyViews =
+  const weeklyVisitors =
     !isLoading && !hasPublicFundraiser
-      ? { views: 0, previousViews: 0 }
-      : fetchedViews;
+      ? { visitors: 0, previousVisitors: 0 }
+      : fetchedVisitors;
 
   return (
     <AuthGuard>
@@ -46,8 +46,8 @@ export default function DashboardOverviewPage() {
           isLoading={isLoading}
           hasError={hasError}
           onRetry={refetch}
-          showViews={insightsEnabled}
-          weeklyViews={weeklyViews}
+          showVisitors={insightsEnabled}
+          weeklyVisitors={weeklyVisitors}
         />
 
         {/* Accepting adds a fundraiser to the list and changes the summary tiles, so this refetches rather than patching local state: the platform only lists fundraisers where you are already an active host. */}

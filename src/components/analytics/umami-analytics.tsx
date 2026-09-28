@@ -33,6 +33,7 @@ export async function UmamiAnalytics() {
         src={config.src}
         strategy='afterInteractive'
         data-website-id={config.websiteId}
+        data-performance='true'
       />
       <Script
         src={config.recorderSrc}

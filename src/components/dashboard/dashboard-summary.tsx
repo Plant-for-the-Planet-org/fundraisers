@@ -1,7 +1,7 @@
 'use client';
 
 import type { DashboardSummaryStats } from '@/lib/api/fundraisers-service';
-import type { WeeklyViews } from './use-weekly-views';
+import type { WeeklyVisitors } from './use-weekly-visitors';
 
 import { useLocale, useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
@@ -19,10 +19,10 @@ interface DashboardSummaryProps {
   isLoading: boolean;
   hasError: boolean;
   onRetry: () => void;
-  /** Whether this deployment can count views. Decides the layout up front, so the strip does not change shape when the number arrives. */
-  showViews: boolean;
+  /** Whether this deployment can count visitors. Decides the layout up front, so the strip does not change shape when the number arrives. */
+  showVisitors: boolean;
   /** Null while loading or if the count failed; the cell shows a dash. */
-  weeklyViews: WeeklyViews | null;
+  weeklyVisitors: WeeklyVisitors | null;
 }
 
 export function DashboardSummary({
@@ -30,8 +30,8 @@ export function DashboardSummary({
   isLoading,
   hasError,
   onRetry,
-  showViews,
-  weeklyViews,
+  showVisitors,
+  weeklyVisitors,
 }: DashboardSummaryProps) {
   const t = useTranslations('Dashboard.summary');
   const locale = useLocale();
@@ -46,7 +46,7 @@ export function DashboardSummary({
 
   if (isLoading) {
     return (
-      <StatStripSkeleton columns={showViews ? 4 : 3} label={t('loading')} />
+      <StatStripSkeleton columns={showVisitors ? 4 : 3} label={t('loading')} />
     );
   }
 
@@ -63,7 +63,7 @@ export function DashboardSummary({
     : formatCompactNumber(0, locale);
 
   return (
-    <StatStrip columns={showViews ? 4 : 3}>
+    <StatStrip columns={showVisitors ? 4 : 3}>
       <StatCell label={t('totalRaised.label')} value={totalRaisedValue} />
       <StatCell
         label={t('donations.label')}
@@ -73,18 +73,20 @@ export function DashboardSummary({
         label={t('fundraisers.label')}
         value={formatCompactNumber(summary.activeFundraiserCount, locale)}
       />
-      {showViews && (
+      {showVisitors && (
         <StatCell
-          label={t('views.label')}
+          label={t('visitors.label')}
           value={
-            weeklyViews ? formatCompactNumber(weeklyViews.views, locale) : '–'
+            weeklyVisitors
+              ? formatCompactNumber(weeklyVisitors.visitors, locale)
+              : '–'
           }
           delta={
-            weeklyViews && (
+            weeklyVisitors && (
               <StatDelta
-                current={weeklyViews.views}
-                previous={weeklyViews.previousViews}
-                context={t('views.changeContext')}
+                current={weeklyVisitors.visitors}
+                previous={weeklyVisitors.previousVisitors}
+                context={t('visitors.changeContext')}
               />
             )
           }

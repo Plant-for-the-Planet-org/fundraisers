@@ -61,6 +61,11 @@ function LiveDot({ className }: { className?: string }) {
   );
 }
 
+/** Part of the visitors, capped at all of them: an event near the window's start can belong to a visit whose page view fell just before it. */
+function share(part: number, visitors: number) {
+  return Math.min(part / visitors, 1);
+}
+
 function Ranking({
   fundraisers,
   onSelect,
@@ -98,7 +103,7 @@ function Ranking({
                 {t('columns.fundraiser')}
               </th>
               <th className='w-0 px-3 py-2 text-right font-medium whitespace-nowrap'>
-                {t('columns.views')}
+                {t('columns.visitors')}
               </th>
               <th className='hidden w-0 px-3 py-2 text-right font-medium whitespace-nowrap sm:table-cell'>
                 {t('columns.clicks')}
@@ -134,24 +139,26 @@ function Ranking({
                   </button>
                 </td>
                 <td className='px-3 py-3 text-right text-foreground tabular-nums'>
-                  {formatCompactNumber(fundraiser.views, locale)}
+                  {formatCompactNumber(fundraiser.visitors, locale)}
                 </td>
                 <td className='hidden px-3 py-3 text-right text-muted-foreground tabular-nums sm:table-cell'>
-                  {formatCompactNumber(fundraiser.donateClicks, locale)}
+                  {formatCompactNumber(fundraiser.clickedVisitors, locale)}
                 </td>
                 <td className='hidden px-3 py-3 text-right text-muted-foreground tabular-nums sm:table-cell'>
-                  {formatCompactNumber(fundraiser.donateSubmissions, locale)}
+                  {formatCompactNumber(fundraiser.submittedVisitors, locale)}
                 </td>
                 <td className='px-3 py-3 text-right text-muted-foreground tabular-nums'>
-                  {fundraiser.views > 0
-                    ? percent.format(fundraiser.donateClicks / fundraiser.views)
+                  {fundraiser.visitors > 0
+                    ? percent.format(
+                        share(fundraiser.clickedVisitors, fundraiser.visitors)
+                      )
                     : '–'}
                 </td>
                 {/* Submitted rather than completed: some payment flows leave the page before the completed event is sent, so it undercounts. */}
                 <td className='px-6 py-3 text-right font-medium text-foreground tabular-nums'>
-                  {fundraiser.views > 0
+                  {fundraiser.visitors > 0
                     ? percent.format(
-                        fundraiser.donateSubmissions / fundraiser.views
+                        share(fundraiser.submittedVisitors, fundraiser.visitors)
                       )
                     : '–'}
                 </td>

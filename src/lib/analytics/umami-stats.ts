@@ -40,8 +40,8 @@ const SNAPSHOT_MINUTES: Record<InsightsRange, number> = {
   campaign: 30,
 };
 
-/** The Overview's "Views this week". */
-const WEEKLY_VIEWS_SNAPSHOT_MINUTES = 30;
+/** The Overview's "Visitors this week". */
+const WEEKLY_VISITORS_SNAPSHOT_MINUTES = 30;
 
 /**
  * The window end, snapped to the last full snapshot, and how long Umami answers may be cached.
@@ -86,6 +86,24 @@ function toBuckets(
 interface UmamiMetric {
   x: string;
   y: number;
+}
+
+/** A `metrics/expanded` row. For events, `pageviews` is how often the event fired and `visitors` how many people sent it. Umami returns some counts as strings. */
+interface UmamiExpandedMetric {
+  name: string;
+  visitors: number | string;
+}
+
+/** Visitors who sent each donation event, from a `metrics/expanded?type=event` answer. */
+function toEventVisitors(
+  metrics: UmamiExpandedMetric[]
+): Record<DonationEventName, number> {
+  return Object.fromEntries(
+    DONATION_EVENTS.map(name => [
+      name,
+      Number(metrics.find(metric => metric.name === name)?.visitors ?? 0),
+    ])
+  ) as Record<DonationEventName, number>;
 }
 
 const UMAMI_TIMEOUT_MS = 8000;
@@ -195,7 +213,12 @@ export async function getFundraiserInsights({
           },
           revalidate
         ),
-    umamiGet<UmamiMetric[]>('metrics', { ...base, type: 'event' }, revalidate),
+    // Expanded, for people per event rather than how often it fired.
+    umamiGet<UmamiExpandedMetric[]>(
+      'metrics/expanded',
+      { ...base, type: 'event' },
+      revalidate
+    ),
     umamiGet<UmamiMetric[]>(
       'metrics',
       {
@@ -233,13 +256,6 @@ export async function getFundraiserInsights({
     refCounts('donation_completed', base, revalidate),
   ]);
 
-  const eventCounts = Object.fromEntries(
-    DONATION_EVENTS.map(name => [
-      name,
-      events.find(metric => metric.x === name)?.y ?? 0,
-    ])
-  ) as Record<DonationEventName, number>;
-
   return {
     range,
     unit: window.unit,
@@ -251,7 +267,7 @@ export async function getFundraiserInsights({
     previousViews: previous.pageviews,
     previousVisitors: previous.visitors,
     buckets: toBuckets(range, window, timeZone, series),
-    events: eventCounts,
+    eventVisitors: toEventVisitors(events),
     countries: countries
       .filter(metric => /^[A-Z]{2}$/.test(metric.x))
       .map(metric => ({ code: metric.x, visitors: metric.y })),
@@ -292,45 +308,6 @@ async function refCounts(
   }
 }
 
-/**
- * Page views over the last 7 days, summed across several fundraiser pages, with the week before for comparison.
- *
- * One `path` metrics call per week covers every page at once, so the cost does not grow with the number of fundraisers.
- */
-export async function getWeeklyViewsForSlugs(
-  slugs: string[]
-): Promise<{ views: number; previousViews: number }> {
-  slugs = slugs.filter(isSafeSlug);
-  if (slugs.length === 0) return { views: 0, previousViews: 0 };
-
-  const { now, revalidate } = snapshot(WEEKLY_VIEWS_SNAPSHOT_MINUTES);
-  const week = 7 * 24 * 60 * 60 * 1000;
-  const wanted = new Set(slugs.map(slug => `/raise/${slug}`));
-
-  const sumFor = async (startAt: number, endAt: number) => {
-    // Well above the number of pages the site gets views on in a week, so no fundraiser page is cut off.
-    const metrics = await umamiGet<UmamiMetric[]>(
-      'metrics',
-      {
-        startAt,
-        endAt,
-        type: 'path',
-        limit: 1000,
-      },
-      revalidate
-    );
-    return metrics
-      .filter(metric => wanted.has(metric.x))
-      .reduce((total, metric) => total + metric.y, 0);
-  };
-
-  const [views, previousViews] = await Promise.all([
-    sumFor(now - week, now),
-    sumFor(now - 2 * week, now - week),
-  ]);
-  return { views, previousViews };
-}
-
 /** Paths per Umami request, so a host with many fundraisers never produces an overlong URL. */
 const PATHS_PER_REQUEST = 40;
 
@@ -342,12 +319,50 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-/** How many times an event fired per fundraiser slug, from the `fundraiser` property every donation event carries. */
-async function eventCountsBySlug(
+/**
+ * Visitors over the last 7 days across several fundraiser pages, with the week before for comparison.
+ *
+ * Umami counts each visitor once across comma-separated paths, so someone who saw two of the pages counts once. Only above PATHS_PER_REQUEST fundraisers are groups added together.
+ */
+export async function getWeeklyVisitorsForSlugs(
+  slugs: string[]
+): Promise<{ visitors: number; previousVisitors: number }> {
+  slugs = slugs.filter(isSafeSlug);
+  if (slugs.length === 0) return { visitors: 0, previousVisitors: 0 };
+
+  const { now, revalidate } = snapshot(WEEKLY_VISITORS_SNAPSHOT_MINUTES);
+  const week = 7 * 24 * 60 * 60 * 1000;
+  const groups = chunk(
+    slugs.map(slug => `/raise/${slug}`),
+    PATHS_PER_REQUEST
+  );
+
+  const sumFor = async (startAt: number, endAt: number) => {
+    const results = await Promise.all(
+      groups.map(paths =>
+        umamiGet<UmamiStatsResponse>(
+          'stats',
+          { startAt, endAt, path: paths.join(',') },
+          revalidate
+        )
+      )
+    );
+    return results.reduce((total, stats) => total + stats.visitors, 0);
+  };
+
+  const [visitors, previousVisitors] = await Promise.all([
+    sumFor(now - week, now),
+    sumFor(now - 2 * week, now - week),
+  ]);
+  return { visitors, previousVisitors };
+}
+
+/** Slugs that got this event in the window, from the `fundraiser` property every donation event carries. */
+async function slugsWithEvent(
   event: 'donate_clicked' | 'donation_submitted',
   window: { startAt: number; endAt: number },
   revalidate: number
-): Promise<Record<string, number>> {
+): Promise<string[]> {
   const values = await umamiGet<Array<{ value: string; total: number }>>(
     'event-data/values',
     {
@@ -358,13 +373,51 @@ async function eventCountsBySlug(
     },
     revalidate
   );
-  return Object.fromEntries(values.map(({ value, total }) => [value, total]));
+  return values.map(({ value }) => value);
 }
 
-function pick(counts: Record<string, number>, slugs: Set<string>) {
-  return Object.fromEntries(
-    Object.entries(counts).filter(([slug]) => slugs.has(slug))
+/**
+ * Visitors who clicked Donate and who submitted, per fundraiser.
+ *
+ * Umami can only count people per event for one path filter at a time, so this asks once per fundraiser. Two site-wide calls first find the fundraisers that had any donation step, so fundraisers without one cost nothing.
+ */
+async function donorStepsBySlug(
+  slugs: Set<string>,
+  window: { startAt: number; endAt: number },
+  revalidate: number
+): Promise<Record<string, { clicked: number; submitted: number }>> {
+  const [clicked, submitted] = await Promise.all([
+    slugsWithEvent('donate_clicked', window, revalidate),
+    slugsWithEvent('donation_submitted', window, revalidate),
+  ]);
+  const active = [...new Set([...clicked, ...submitted])].filter(
+    slug => slugs.has(slug) && isSafeSlug(slug)
   );
+
+  const entries = await Promise.all(
+    active.map(async slug => {
+      const events = toEventVisitors(
+        await umamiGet<UmamiExpandedMetric[]>(
+          'metrics/expanded',
+          {
+            startAt: window.startAt,
+            endAt: window.endAt,
+            path: `/raise/${slug}`,
+            type: 'event',
+          },
+          revalidate
+        )
+      );
+      return [
+        slug,
+        {
+          clicked: events.donate_clicked,
+          submitted: events.donation_submitted,
+        },
+      ] as const;
+    })
+  );
+  return Object.fromEntries(entries);
 }
 
 function addSeries(
@@ -375,7 +428,7 @@ function addSeries(
 }
 
 /**
- * Visitors across several fundraiser pages combined, plus views and donate clicks per fundraiser.
+ * Visitors across several fundraiser pages combined, plus visitors, donate clicks and submissions per fundraiser.
  *
  * Umami treats comma-separated paths as "any of these" and counts each visitor once across them, so one request covers a whole group of fundraisers.
  * Only when a host has more than PATHS_PER_REQUEST fundraisers are groups added together, and then a visitor who saw pages in two groups counts twice.
@@ -390,9 +443,8 @@ export async function getAccountInsights({
   timeZone: string;
 }): Promise<
   Omit<AccountInsights, 'fundraisers'> & {
-    viewsBySlug: Record<string, number>;
-    clicksBySlug: Record<string, number>;
-    submissionsBySlug: Record<string, number>;
+    visitorsBySlug: Record<string, number>;
+    donorStepsBySlug: Record<string, { clicked: number; submitted: number }>;
   }
 > {
   const { now, revalidate } = snapshot(SNAPSHOT_MINUTES[range]);
@@ -419,9 +471,8 @@ export async function getAccountInsights({
         pageviews: [],
         sessions: [],
       }),
-      viewsBySlug: {},
-      clicksBySlug: {},
-      submissionsBySlug: {},
+      visitorsBySlug: {},
+      donorStepsBySlug: {},
     };
   }
 
@@ -430,46 +481,44 @@ export async function getAccountInsights({
     PATHS_PER_REQUEST
   );
 
-  const [groupResults, pathMetrics, clicksBySlug, submissionsBySlug] =
-    await Promise.all([
-      Promise.all(
-        groups.map(paths => {
-          const path = paths.join(',');
-          const base = { startAt: window.startAt, endAt: window.endAt, path };
-          return Promise.all([
-            umamiGet<UmamiSeriesResponse>(
-              'pageviews',
-              {
-                ...base,
-                unit: wantsHourlyDetail(range) ? 'hour' : window.unit,
-                timezone: timeZone,
-              },
-              revalidate
-            ),
-            umamiGet<UmamiStatsResponse>('stats', base, revalidate),
-            umamiGet<UmamiStatsResponse>(
-              'stats',
-              { ...previous, path },
-              revalidate
-            ),
-          ]);
-        })
-      ),
-      // Views per page for the ranking: one request for the whole site, filtered here.
-      umamiGet<UmamiMetric[]>(
-        'metrics',
-        {
-          startAt: window.startAt,
-          endAt: window.endAt,
-          type: 'path',
-          limit: 1000,
-        },
-        revalidate
-      ),
-      // Donation events carry the fundraiser slug, so one request per event counts it for every fundraiser.
-      eventCountsBySlug('donate_clicked', window, revalidate),
-      eventCountsBySlug('donation_submitted', window, revalidate),
-    ]);
+  const wanted = new Set(slugs);
+  const [groupResults, pathMetrics, donorSteps] = await Promise.all([
+    Promise.all(
+      groups.map(paths => {
+        const path = paths.join(',');
+        const base = { startAt: window.startAt, endAt: window.endAt, path };
+        return Promise.all([
+          umamiGet<UmamiSeriesResponse>(
+            'pageviews',
+            {
+              ...base,
+              unit: wantsHourlyDetail(range) ? 'hour' : window.unit,
+              timezone: timeZone,
+            },
+            revalidate
+          ),
+          umamiGet<UmamiStatsResponse>('stats', base, revalidate),
+          umamiGet<UmamiStatsResponse>(
+            'stats',
+            { ...previous, path },
+            revalidate
+          ),
+        ]);
+      })
+    ),
+    // Visitors per page for the ranking (the path metric counts visitors, not views): one request for the whole site, filtered here.
+    umamiGet<UmamiMetric[]>(
+      'metrics',
+      {
+        startAt: window.startAt,
+        endAt: window.endAt,
+        type: 'path',
+        limit: 1000,
+      },
+      revalidate
+    ),
+    donorStepsBySlug(wanted, window, revalidate),
+  ]);
 
   const views = new Map<string, number>();
   const visitors = new Map<string, number>();
@@ -486,11 +535,10 @@ export async function getAccountInsights({
     previousVisitors += before.visitors;
   }
 
-  const wanted = new Set(slugs);
-  const viewsBySlug: Record<string, number> = {};
+  const visitorsBySlug: Record<string, number> = {};
   for (const metric of pathMetrics) {
     const slug = metric.x.startsWith('/raise/') ? metric.x.slice(7) : null;
-    if (slug && wanted.has(slug)) viewsBySlug[slug] = metric.y;
+    if (slug && wanted.has(slug)) visitorsBySlug[slug] = metric.y;
   }
 
   return {
@@ -507,8 +555,7 @@ export async function getAccountInsights({
       pageviews: [...views].map(([x, y]) => ({ x, y })),
       sessions: [...visitors].map(([x, y]) => ({ x, y })),
     }),
-    viewsBySlug,
-    clicksBySlug: pick(clicksBySlug, wanted),
-    submissionsBySlug: pick(submissionsBySlug, wanted),
+    visitorsBySlug,
+    donorStepsBySlug: donorSteps,
   };
 }

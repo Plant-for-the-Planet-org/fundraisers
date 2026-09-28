@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   );
 
   try {
-    const { viewsBySlug, clicksBySlug, submissionsBySlug, ...series } =
+    const { visitorsBySlug, donorStepsBySlug, ...series } =
       await getAccountInsights({
         slugs: measured.map(fundraiser => fundraiser.slug),
         range,
@@ -56,15 +56,15 @@ export async function GET(request: NextRequest) {
           title: fundraiser.title,
           status: deriveDisplayStatus(fundraiser),
           startDate: fundraiser.startDate,
-          views: viewsBySlug[fundraiser.slug] ?? 0,
-          donateClicks: clicksBySlug[fundraiser.slug] ?? 0,
-          donateSubmissions: submissionsBySlug[fundraiser.slug] ?? 0,
+          visitors: visitorsBySlug[fundraiser.slug] ?? 0,
+          clickedVisitors: donorStepsBySlug[fundraiser.slug]?.clicked ?? 0,
+          submittedVisitors: donorStepsBySlug[fundraiser.slug]?.submitted ?? 0,
         }))
-        // Live fundraisers first, since those are the ones a host can still act on; then by views.
+        // Live fundraisers first, since those are the ones a host can still act on; then by visitors.
         .sort(
           (a, b) =>
             Number(isLiveStatus(b.status)) - Number(isLiveStatus(a.status)) ||
-            b.views - a.views
+            b.visitors - a.visitors
         ),
     };
 

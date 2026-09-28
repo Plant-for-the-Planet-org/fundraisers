@@ -7,18 +7,18 @@ import {
 } from '@/lib/api/platform-fetch';
 import { useAuthStore } from '@/stores/auth-store';
 
-export interface WeeklyViews {
-  views: number;
-  previousViews: number;
+export interface WeeklyVisitors {
+  visitors: number;
+  previousVisitors: number;
 }
 
-/** Views this week across the host's fundraisers. Null while loading, when Umami is not set up, or when the call fails. */
-export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
+/** Visitors this week across the host's fundraisers. Null while loading, when Umami is not set up, or when the call fails. */
+export function useWeeklyVisitors(enabled: boolean): WeeklyVisitors | null {
   const accessToken = useAuthStore(state => state.accessToken);
   // Tagged with the token it was fetched for, so an account switch never shows the last account's number.
-  const [views, setViews] = useState<{
+  const [visitors, setVisitors] = useState<{
     accessToken: string;
-    data: WeeklyViews;
+    data: WeeklyVisitors;
   } | null>(null);
 
   useEffect(() => {
@@ -33,12 +33,16 @@ export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
       },
     })
       .then(async response => {
-        if (!response.ok) return;
-        const data = (await response.json()) as WeeklyViews;
-        if (!ignore) setViews({ accessToken, data });
+        if (!response.ok) {
+          if (!ignore) setVisitors(null);
+          return;
+        }
+        const data = (await response.json()) as WeeklyVisitors;
+        if (!ignore) setVisitors({ accessToken, data });
       })
       .catch(() => {
         // An optional number; nothing to tell the host if it is missing.
+        if (!ignore) setVisitors(null);
       });
 
     return () => {
@@ -46,6 +50,6 @@ export function useWeeklyViews(enabled: boolean): WeeklyViews | null {
     };
   }, [enabled, accessToken]);
 
-  if (!enabled || views?.accessToken !== accessToken) return null;
-  return views.data;
+  if (!enabled || visitors?.accessToken !== accessToken) return null;
+  return visitors.data;
 }
