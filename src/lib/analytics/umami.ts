@@ -25,8 +25,12 @@ const UNTRACKED_PATH_PREFIXES = ['/login', '/redirecting'];
  */
 const UNTRACKED_PATH_SUFFIX = '/stage';
 
+/** Host invite links carry the invite token in the path, and Umami stores the full path. */
+const INVITE_PATH = /^\/raise\/[^/]+\/invite(\/|$)/;
+
 export function isTrackedPath(pathname: string): boolean {
   if (pathname.endsWith(UNTRACKED_PATH_SUFFIX)) return false;
+  if (INVITE_PATH.test(pathname)) return false;
 
   return !UNTRACKED_PATH_PREFIXES.some(
     prefix => pathname === prefix || pathname.startsWith(`${prefix}/`)
