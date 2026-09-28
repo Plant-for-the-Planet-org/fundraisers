@@ -54,6 +54,7 @@
   --color-warning: hsl(var(--warning));
   --color-success: hsl(var(--success));
   --color-accent-color: var(--accent-color);
+  --color-accent-text: var(--accent-text);
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
   --color-tab-border: var(--tab-border-color);
@@ -116,7 +117,7 @@
   --primary: 214 100% 59%;
   --primary-foreground: 0 0% 100%;
   --radius: 0.5rem;
-  --accent-color: #16a34a;
+  --accent-color: #15803d;
   --ring: 142 76% 36%;
   --destructive: 0 72% 51%;
   --warning: 21 90% 48%;
@@ -129,6 +130,7 @@
   --section-divider: 220 13% 91%;
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
+  --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
 }
 
 .dark {
@@ -155,6 +157,7 @@
   --section-divider: 217 19% 27%;
   --base-rgb: 0 0 0;
   --reverse-rgb: 255 255 255;
+  --accent-text: var(--accent-text-on-dark, hsl(var(--foreground)));
 }
 
 .light {
@@ -181,6 +184,7 @@
   --section-divider: 220 13% 91%;
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
+  --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
 }
 
 body {
