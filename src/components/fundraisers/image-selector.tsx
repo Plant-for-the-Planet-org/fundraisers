@@ -120,6 +120,8 @@ export function ImageSelector({
       return;
     }
 
+    // Loading the first default photo is a client-side fetch, so it has to set loading state from the effect. hasAttemptedDefaultLoad keeps it to one run.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void applyNextDefaultPhoto(false);
   }, [
     autoLoadDefault,

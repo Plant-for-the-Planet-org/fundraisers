@@ -16,12 +16,12 @@ export function Logo() {
         <style>{`
           .logo {
             --start:      #000000;
-            --planting:   var(--accent-color, #16a34a);
+            --planting:   var(--accent-color, #15803d);
             --ico-heart:  #d62828;
           }
           .dark .logo {
             --start:      #ffffff;
-            --planting:   var(--accent-color, #16a34a);
+            --planting:   var(--accent-color, #15803d);
             --ico-planet: #ffffff;
             --ico-heart:  #ef4444;
           }

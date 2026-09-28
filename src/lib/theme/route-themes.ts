@@ -11,6 +11,9 @@ const ROUTE_THEME_MAP: Record<string, string> = {
   '/explore': 'explore',
   '/login': 'sunset',
   '/fundraisers/create': 'spring',
+  '/dashboard': 'dashboard',
+  // The editor previews the fundraiser's own theme; this is only what shows before that loads.
+  '/dashboard/fundraisers/edit': 'spring',
 };
 
 const EXACT_ROUTE_THEME_MAP: Record<string, string> = {
