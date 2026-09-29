@@ -120,8 +120,9 @@ function attachCurrency(
   formattedAmount: string,
   label: string,
   locale: string,
-  isNegative: boolean
+  amount: number
 ): string {
+  const isNegative = amount < 0 || Object.is(amount, -0);
   const layout = getCurrencyLayout(locale || 'en');
   const { currencyFirst, gap, minusBetweenCurrencyAndNumber } = isNegative
     ? layout.negative
@@ -174,7 +175,7 @@ export function formatCurrency(
     formattedAmount,
     CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper,
     locale,
-    amount < 0 || Object.is(amount, -0)
+    amount
   );
 }
 
@@ -208,12 +209,7 @@ export function formatCurrencyFromDecimal(
     currencyDisplay === 'code'
       ? currencyUpper
       : (CURRENCY_SYMBOLS[currencyUpper] ?? currencyUpper);
-  return attachCurrency(
-    formattedAmount,
-    label,
-    locale,
-    amount < 0 || Object.is(amount, -0)
-  );
+  return attachCurrency(formattedAmount, label, locale, amount);
 }
 
 /**
