@@ -51,6 +51,7 @@ export function usePayPalFlow(core: SubmissionCore) {
     createAttempt,
     failSubmission,
     token,
+    locale,
     paymentOptions,
   } = core;
 
@@ -80,7 +81,8 @@ export function usePayPalFlow(core: SubmissionCore) {
         const donationResponse = await donationService.createDonation(
           attempt.payload,
           token || undefined,
-          donationKeyRef.current
+          donationKeyRef.current,
+          locale
         );
         paypalOrderRef.current = {
           attempt,
@@ -114,6 +116,7 @@ export function usePayPalFlow(core: SubmissionCore) {
     [
       paymentOptions,
       token,
+      locale,
       createAttempt,
       submittingRef,
       setDonationState,
