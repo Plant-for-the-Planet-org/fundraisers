@@ -7,20 +7,24 @@ const served = (userAgent: string) =>
   new RegExp(LINK_PREVIEW_BOTS.source, 'i').test(userAgent);
 
 describe('LINK_PREVIEW_BOTS', () => {
-  it("keeps all of Next's own list", () => {
+  it("starts from Next's own list", () => {
     expect(
       LINK_PREVIEW_BOTS.source.startsWith(HTML_LIMITED_BOT_UA_RE.source)
     ).toBe(true);
-    for (const agent of [
+  });
+
+  // None of these are in EXTRA_PREVIEW_BOTS, so they depend on Next keeping them. If a Next upgrade drops one, add it there.
+  describe("still covers the most important apps to share fundraiser links on, which rely on Next's list", () => {
+    it.each([
       'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
       'LinkedInBot/1.0 (compatible; Mozilla/5.0; Apache-HttpClient +http://www.linkedin.com)',
       'WhatsApp/2.23.20.0',
       'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
       'Twitterbot/1.0',
       'Mozilla/5.0 (compatible; Discordbot/2.0; +https://discordapp.com)',
-    ]) {
-      expect(served(agent), agent).toBe(true);
-    }
+    ])('%s', agent => {
+      expect(served(agent)).toBe(true);
+    });
   });
 
   it.each([
