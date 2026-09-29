@@ -20,11 +20,12 @@ const KNOWN_SOURCES = [
   'email',
   'newsletter',
   'stage',
+  'report',
 ] as const;
 
 type KnownSourceKey = (typeof KNOWN_SOURCES)[number];
 
-function isKnownSource(source: string): source is KnownSourceKey {
+export function isKnownSource(source: string): source is KnownSourceKey {
   return (KNOWN_SOURCES as readonly string[]).includes(source);
 }
 
