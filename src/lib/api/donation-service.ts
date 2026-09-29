@@ -134,7 +134,8 @@ export class DonationService {
   async createDonation(
     payload: DonationPayload,
     authToken?: string,
-    idempotencyKey?: string
+    idempotencyKey?: string,
+    locale?: string
   ): Promise<DonationResponse> {
     try {
       const data = await platformFetch<unknown>('/donations', {
@@ -142,6 +143,7 @@ export class DonationService {
         body: payload,
         token: authToken,
         idempotencyKey,
+        locale,
         timeoutMs: DONATION_TIMEOUT_MS,
       });
       return transformResponse(data);

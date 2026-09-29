@@ -46,6 +46,8 @@ export interface PlatformFetchOptions {
   token?: string;
   timeoutMs?: number;
   idempotencyKey?: string;
+  /** Sent as `?locale=`, the only place the platform reads it when creating a donation. */
+  locale?: string;
   extraHeaders?: ExtraHeaders;
   /**
    * Skip injecting impersonation headers from the impersonation store.
@@ -141,9 +143,14 @@ export async function platformFetch<T>(
     }
   }
 
+  // Added here, not by callers, because `needsTrackingId` above matches the bare path.
+  const url = opts.locale
+    ? `${path}${path.includes('?') ? '&' : '?'}${new URLSearchParams({ locale: opts.locale })}`
+    : path;
+
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await fetch(`${API_BASE_URL}${url}`, {
       method,
       headers,
       body: requestBody,
