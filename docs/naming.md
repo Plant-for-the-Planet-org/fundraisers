@@ -132,8 +132,9 @@ Readable tokens win. UTM values show up as labels in Umami and in the donation `
 
 - Lowercase `snake_case`, ASCII only, no spaces. Whole words, no dropped vowels.
 - Avoid values that read as something else in an analytics column. `fr` looks like the French locale before it looks like a fundraiser.
-- `utm_source` names the surface the link was made on: `fundraiser` (fundraiser page), `stage` (Stage Mode).
-- `utm_medium` names the placement or mechanism on that surface: `qr`, `closed_banner` (closed fundraiser banner share).
+- `utm_source` on a link that is copied or scanned, where we cannot know where it goes, names the surface it came from: `fundraiser` (fundraiser page), `thank_you` (thank-you screen), `stage` (Stage Mode).
+- `utm_source` on a link made to be posted somewhere else names that place: `instagram`, `whatsapp`, `newsletter`, or `share_sheet` when the phone's share menu picks the app.
+- `utm_medium` names the mechanism on our surface (`qr`, `copy_link`) or the kind of place the link was posted (`social`, `messaging`, `email`).
 - `utm_campaign` is reserved by the platform for the fundraiser GUID. Never set it from this app (see `src/lib/donation/utm.ts`).
 - `utm_id` carries a fundraiser GUID only on links that leave the fundraiser, so the destination knows who sent the donor. Never on internal links.
 - Internal navigation gets no UTM at all. Umami records page flow on its own, and rewriting a visitor's UTM would steal attribution from the channel that brought them.
@@ -141,9 +142,24 @@ Readable tokens win. UTM values show up as labels in Umami and in the donation `
 
 Every token in use lives in this table. Add a row before using a new one, so a reader can see the whole vocabulary in one place.
 
-| Parameter    | Token           | Meaning                                 | Set in                                               |
-| ------------ | --------------- | --------------------------------------- | ---------------------------------------------------- |
-| `utm_source` | `fundraiser`    | Public fundraiser page                  | `components/fundraisers/closed-for-contribution.tsx` |
-| `utm_source` | `stage`         | Stage Mode screen                       | `modules/stage/components/stage-qr-panel.tsx`        |
-| `utm_medium` | `qr`            | QR code scan                            | `modules/stage/components/stage-qr-panel.tsx`        |
-| `utm_medium` | `closed_banner` | Share from the closed fundraiser banner | `components/fundraisers/closed-for-contribution.tsx` |
+| Parameter    | Token           | Meaning                                                             | Set in                                                                                      |
+| ------------ | --------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `utm_source` | `fundraiser`    | Copy Link on the fundraiser page and in its Share images dialog     | `components/fundraisers/use-fundraiser-share-url.ts`                                        |
+| `utm_source` | `thank_you`     | Copy Link on the thank-you screen after a donation                  | `components/donate/share-section.tsx`, through `useFundraiserShareUrl`                      |
+| `utm_source` | `stage`         | Stage Mode screen                                                   | `modules/stage/components/stage-qr-panel.tsx`                                               |
+| `utm_source` | `instagram`     | Instagram, from the share studio or a Share tab link                | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_source` | `whatsapp`      | WhatsApp, from the share studio or a Share tab link                 | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_source` | `tiktok`        | TikTok, from the share studio                                       | `lib/share/channels.ts`                                                                     |
+| `utm_source` | `youtube`       | YouTube Shorts, from the share studio                               | `lib/share/channels.ts`                                                                     |
+| `utm_source` | `linkedin`      | LinkedIn, from the share studio or a Share tab link                 | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_source` | `facebook`      | Facebook, from the share studio or a Share tab link                 | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_source` | `x`             | X, from the share studio                                            | `lib/share/channels.ts`                                                                     |
+| `utm_source` | `share_sheet`   | "Any app" in the share studio: the phone's share menu picks the app | `lib/share/channels.ts`                                                                     |
+| `utm_source` | `email`         | Email link on the Share tab                                         | `components/dashboard/fundraiser-detail/share-links.tsx`                                    |
+| `utm_source` | `newsletter`    | Newsletter, from the share studio banner or a Share tab link        | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_medium` | `qr`            | QR code scan                                                        | `modules/stage/components/stage-qr-panel.tsx`                                               |
+| `utm_medium` | `copy_link`     | A Copy Link button                                                  | `components/fundraisers/use-fundraiser-share-url.ts`                                        |
+| `utm_medium` | `social`        | Posted on a social platform                                         | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_medium` | `messaging`     | Sent in a chat app                                                  | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_medium` | `email`         | Sent by email or in a newsletter                                    | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
+| `utm_medium` | `closed_banner` | Share from the closed fundraiser banner                             | No longer set. Older links still carry it.                                                  |

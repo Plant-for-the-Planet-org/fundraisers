@@ -102,17 +102,27 @@
             "facebook": "Facebook",
             "whatsapp": "WhatsApp",
             "x": "X",
+            "tiktok": "TikTok",
+            "youtube": "YouTube",
             "google": "Google",
             "bing": "Bing",
             "email": "E-Mail",
             "newsletter": "Newsletter",
-            "stage": "Stage-Mode-QR-Code"
+            "stage": "Stage-Mode-QR-Code",
+            "fundraiser": "Spendenseite",
+            "thank_you": "Dankesseite",
+            "share_sheet": "Teilen-Menü"
           },
           "plainLink": "Einfacher Link",
           "copy": "Kopieren",
           "linkLabel": "Link",
           "channelLabel": "Wo teilst du?",
-          "tagHint": "Die meisten Besuche erscheinen als Direkt? Teile <link>markierte Links</link>, um zu sehen, welcher Kanal wirkt."
+          "tagHint": "Die meisten Besuche erscheinen als Direkt? Teile <link>markierte Links</link>, um zu sehen, welcher Kanal wirkt.",
+          "referralsTitle": "Von Menschen, die teilen",
+          "referralYou": "Deine Links",
+          "referralSupporter": "Unterstützer*in {code}",
+          "referralDonations": "{count, plural, one {# Spende} other {# Spenden}}",
+          "referralHint": "Geteilte Links tragen den persönlichen Code der Person, die sie teilt. So siehst du, wessen Teilen Besuche und Spenden bringt."
         },
         "updatedLabel": "Stand",
         "changeContext": "zum Zeitraum davor",
@@ -121,8 +131,7 @@
       "checklist": {
         "title": "So wird es ein Erfolg",
         "progress": "{done, number} von {total, number} erledigt",
-        "allDone": "Alles erledigt. Dein Spendenaufruf hat alles, was er braucht.",
-        "allDoneShare": "Alles erledigt. Bleib dran: Teile ihn dort, wo deine Leute sind.",
+        "allDone": "Alles erledigt. Danke für deinen Einsatz bei diesem Spendenaufruf.",
         "fix": "Beheben",
         "items": {
           "coverImage": {
@@ -148,10 +157,16 @@
           "firstDonation": {
             "title": "Die erste Spende begrüßen",
             "hint": "Frag zuerst enge Freund*innen oder Familie. Frühe Spenden schaffen Vertrauen."
+          },
+          "share": {
+            "title": "Teile weiter",
+            "hint": "Jedes Teilen bringt neue Menschen. Storys, Beiträge und einen Link für jeden Ort findest du im Tab Teilen."
           }
         },
         "invite": "Einladen",
-        "share": "Teilen"
+        "share": "Teilen",
+        "showDone": "{count, number} erledigte anzeigen",
+        "hideDone": "Erledigte ausblenden"
       },
       "hosts": {
         "invite": "Mit-Gastgeber*in einladen"

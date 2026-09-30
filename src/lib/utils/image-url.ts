@@ -1,6 +1,7 @@
 // Image hosts we trust, for user-entered image URLs (stage images, theme backgrounds).
 // When a fundraiser is saved, the form checks each image URL against this list, so images can only load from known https hosts.
-// This is about trusting the source, not security: these URLs are only shown as <img> or CSS background images, where javascript:/data: URLs can't run code and our server never downloads them.
+// These URLs are shown as <img> or CSS background images, where javascript:/data: URLs can't run code.
+// The server downloads images only from a narrower subset of these hosts, see src/lib/share/server/fetch-image.ts.
 export const ALLOWED_IMAGE_HOSTNAME_SUFFIXES = [
   'plant-for-the-planet.org',
   'unsplash.com',

@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { EMAIL_VERIFICATION_PENDING_COOKIE } from '@/lib/constants/auth';
+import { getPublicBaseUrl } from '@/lib/utils/public-base-url';
 
 // Maps an auth error_description to a dedicated page. All other errors fall through to the generic auth_failed path.
 // We read error_description as sent by the auth provider; the only actionable denial it sends is 'email_not_verified'. (A legacy '401' code seen in other clients does not reach this app and is intentionally not handled.)
@@ -10,24 +11,13 @@ const USER_ACTIONABLE_ERRORS: Record<string, string> = {
   email_not_verified: '/verify-email',
 };
 
-function getPublicBaseUrl(request: NextRequest): URL {
-  const forwardedHost = request.headers.get('x-forwarded-host');
-  const host = forwardedHost ?? request.headers.get('host');
-  if (!host) return new URL(request.url);
-
-  const forwardedProto = request.headers.get('x-forwarded-proto');
-  const protocol =
-    forwardedProto ?? (host.includes('localhost') ? 'http' : 'https');
-  return new URL(`${protocol}://${host}`);
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const error = searchParams.get('error');
 
-  const base = getPublicBaseUrl(request);
+  const base = getPublicBaseUrl(request.headers, request.url);
 
   if (error) {
     const errorDesc = searchParams.get('error_description') ?? error;

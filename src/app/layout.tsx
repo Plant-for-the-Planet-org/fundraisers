@@ -12,6 +12,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { getThemeForPath } from '@/lib/theme/route-themes';
+import { getPublicBaseUrl } from '@/lib/utils/public-base-url';
 import { UmamiAnalytics } from '@/components/analytics/umami-analytics';
 import { AuthInitializer } from '@/components/auth/auth-initializer';
 import { ImpersonationBanner } from '@/components/auth/impersonation-banner';
@@ -53,17 +54,7 @@ const roboto = Roboto({
 });
 
 async function getMetadataBase(): Promise<URL> {
-  const headersList = await headers();
-  const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
-  const protocol =
-    headersList.get('x-forwarded-proto') ??
-    (host?.includes('localhost') ? 'http' : 'https');
-
-  if (host) {
-    return new URL(`${protocol}://${host}`);
-  }
-
-  return new URL('http://localhost:3000');
+  return getPublicBaseUrl(await headers());
 }
 
 export async function generateMetadata(): Promise<Metadata> {

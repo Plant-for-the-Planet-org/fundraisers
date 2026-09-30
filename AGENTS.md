@@ -150,6 +150,14 @@ Clearing `tsconfig.tsbuildinfo` does nothing. This is a shadowing file, not a ca
 
 Run `npm run build` (or let the dev server recompile) before trusting `npm run type-check` after a locale edit.
 
+### Share image design changes need a version bump
+
+Link preview images (`/api/share-image/[slug]`) are cached as immutable, and their URL carries a hash of what the banner shows plus `SHARE_IMAGE_DESIGN_VERSION` (`src/lib/share/render/design-version.ts`).
+
+If you change how the banner looks or what it says (the drawing code in `src/lib/share/render/`, the server data in `src/lib/share/server/share-banner.ts`, or its strings in `locales/*/share.json`), bump that version and add its entry to `design-fingerprints.json`.
+
+Without the bump, a fundraiser keeps its old preview until something on it changes, and an ended one keeps it for good. `share-banner.test.ts` fails until you do; its failure message prints the new entry. See `docs/share.md`, "Link preview".
+
 ## Deployment
 
 <!-- Where it deploys, how releases work, env vars, feature flags. -->
