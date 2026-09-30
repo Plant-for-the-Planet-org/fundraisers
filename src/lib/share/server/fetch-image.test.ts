@@ -285,6 +285,59 @@ describe('fetchAllowedImage', () => {
     expect(onTransientFailure).toHaveBeenCalledTimes(1);
   });
 
+  it.each<[string, number, Record<string, string>]>([
+    ['a redirect', 302, { location: 'https://images.unsplash.com/b.png' }],
+    ['an error status', 404, { 'content-type': 'text/html' }],
+    ['a refused type', 200, { 'content-type': 'image/svg+xml' }],
+  ])(
+    'cancels the unread body of %s, so its connection is freed',
+    async (_, status, headers) => {
+      const url = 'https://images.unsplash.com/a.png';
+      const cancel = vi.fn();
+      mockFetch({
+        [url]: () =>
+          new Response(
+            new ReadableStream({
+              pull(controller) {
+                controller.enqueue(new Uint8Array([1]));
+              },
+              cancel,
+            }),
+            { status, headers }
+          ),
+        'https://images.unsplash.com/b.png': () => png(),
+      });
+
+      await fetchAllowedImage(url);
+      expect(cancel).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  // The one path that throws. Reporting it keeps a preview drawn without this image off the year-long cache.
+  it('reports a body that breaks while reading as a failure that may pass later, and throws', async () => {
+    const url = 'https://images.unsplash.com/a.png';
+    mockFetch({
+      [url]: () =>
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new Uint8Array([1, 2, 3]));
+              controller.error(
+                new DOMException('The operation timed out.', 'TimeoutError')
+              );
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'image/png' } }
+        ),
+    });
+    const onTransientFailure = vi.fn();
+
+    await expect(
+      fetchAllowedImage(url, { onTransientFailure })
+    ).rejects.toThrow('timed out');
+    expect(onTransientFailure).toHaveBeenCalledTimes(1);
+  });
+
   it.each<[string, string, () => Response]>([
     [
       'a missing image',

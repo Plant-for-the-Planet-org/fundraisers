@@ -72,6 +72,11 @@ function isTransientStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
 }
 
+/** Frees a response whose body is not read, so its connection is released now rather than at garbage collection. */
+function discard(response: Response): void {
+  response.body?.cancel().catch(() => {});
+}
+
 async function readCapped(
   response: Response,
   maxBytes: number
@@ -120,12 +125,14 @@ export async function fetchAllowedImage(
       return null;
     }
     if (response.status >= 300 && response.status < 400) {
+      discard(response);
       const location = response.headers.get('location');
       if (!location) return null;
       current = new URL(location, current).toString();
       continue;
     }
     if (!response.ok) {
+      discard(response);
       if (isTransientStatus(response.status)) onTransientFailure?.();
       return null;
     }
@@ -133,7 +140,10 @@ export async function fetchAllowedImage(
       .split(';')[0]
       .trim()
       .toLowerCase();
-    if (!RASTER_IMAGE_TYPES.includes(type)) return null;
+    if (!RASTER_IMAGE_TYPES.includes(type)) {
+      discard(response);
+      return null;
+    }
     const bytes = await readCapped(response, maxBytes).catch(error => {
       onTransientFailure?.();
       throw error;
