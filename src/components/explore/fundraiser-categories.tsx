@@ -1,9 +1,9 @@
 import type { Category } from '@/lib/types/category';
 
-import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { categoriesService } from '@/lib/api/categories-service';
 import { formatCompactNumber } from '@/lib/utils';
+import { LocalizedLink } from '@/components/ui/localized-link';
 import { Skeleton } from '../ui/skeleton';
 import { CategoryIcon } from './category-icon';
 
@@ -114,7 +114,7 @@ export async function FundraiserCategories() {
       <ul className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
         {categories.map(category => (
           <li key={category.id}>
-            <Link
+            <LocalizedLink
               href={`/explore/${category.slug}`}
               className='block rounded-xl bg-background/50 p-4 backdrop-blur-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-background'
             >
@@ -129,7 +129,7 @@ export async function FundraiserCategories() {
                   </p>
                 </div>
               </div>
-            </Link>
+            </LocalizedLink>
           </li>
         ))}
       </ul>

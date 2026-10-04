@@ -52,16 +52,10 @@ const LOCALE_SOURCE_SEPARATOR = '.';
 
 /**
  * The `ui-locale` cookie holds both a locale and who set it, as
- * `<locale>.<source>` (e.g. `de.profile`, `en.explicit`) — one cookie, not
- * two, but still able to tell "the user picked this" from "this is what
- * their profile says" so a profile update can keep taking priority over
- * browser language without ever clobbering an explicit pick.
+ * `<locale>.<source>` (e.g. `de.profile`, `en.explicit`).
+ * The server only reads the locale. Signed in, the profile language wins and LocaleProfileSync keeps the cookie in line with it, whatever the tag says.
  *
- * Legacy cookies written before this tag existed have no separator — those
- * are treated as `explicit`, since that's the only thing they could have
- * meant (the cookie was only ever written by an explicit pick or an
- * old one-time profile seed, both of which should keep outranking a
- * fresh profile sync).
+ * Legacy cookies written before this tag existed have no separator; those are treated as `explicit`.
  */
 export function parseLocaleCookieValue(raw?: string | null): {
   locale?: string;
@@ -83,16 +77,10 @@ export function serializeLocaleCookieValue(
 }
 
 /**
- * Resolve the UI locale by priority, low to high:
+ * Resolve the UI locale for pages whose URL does not fix it, by priority, low to high:
  *   1. default locale
  *   2. browser language (Accept-Language) if it maps to a supported locale
- *   3. user's profile language (`ui-locale` cookie, `.profile` tag)
- *   4. user's explicit selection (`ui-locale` cookie, `.explicit` tag)
- *
- * Tiers 3 and 4 share one cookie — whichever tag is stored is already the
- * winner between them, so the server only needs the locale value, never the
- * tag itself (the tag only matters client-side, to decide whether a profile
- * sync is allowed to overwrite the cookie).
+ *   3. the `ui-locale` cookie: the visitor's pick, or their profile language when signed in (see LocaleProfileSync)
  *
  * Kept free of `next/headers` so it stays pure and unit-testable — the caller
  * (i18n/request.ts) reads the cookie + header and passes the values in.
