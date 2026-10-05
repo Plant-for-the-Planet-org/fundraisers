@@ -80,6 +80,14 @@ When adding a feature, ask: does it show or change data for "the current user"? 
 
 See [`docs/cookie-consent-stance.md`](docs/cookie-consent-stance.md) for the full stance, default position, and review rule.
 
+## SEO: confirm with team first
+
+Check with Sagar before you change `src/app/robots.ts`, any sitemap, or SEO metadata (robots or noindex rules, canonical URLs, titles, descriptions, Open Graph).
+
+These changes are easy to miss in review, and a mistake can quietly drop pages from search for weeks.
+
+The current robots stance: the prod host allows all, and every other host disallows all. Do not add path `Disallow` rules on prod. A `/$` rule once blocked `/`, which redirects to `/explore`, so Google could not follow the redirect and some SEO tools read the whole site as blocked.
+
 ## Conventions
 
 <!-- Code style notes, naming, file layout patterns, comment policy. -->
