@@ -155,16 +155,76 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     src: '/theme-backgrounds/forest-bw.jpg',
   },
   {
-    id: 'bg-academy',
-    label: 'Academy',
+    id: 'bg-forest-bw-2',
+    label: 'Forest BW 2',
     type: 'image',
-    src: '/theme-backgrounds/academy.jpg',
+    src: '/theme-backgrounds/forest-bw-2.jpg',
   },
   {
-    id: 'bg-academy-bw',
-    label: 'Academy BW',
+    id: 'bg-planting-bw',
+    label: 'Planting BW',
     type: 'image',
-    src: '/theme-backgrounds/academy-bw.jpg',
+    src: '/theme-backgrounds/planting-bw.jpg',
+  },
+  {
+    id: 'bg-rangers-bw',
+    label: 'Rangers BW',
+    type: 'image',
+    src: '/theme-backgrounds/rangers-bw.jpg',
+  },
+  {
+    id: 'bg-child-planting',
+    label: 'Child planting',
+    type: 'image',
+    src: '/theme-backgrounds/child_planting.jpg',
+  },
+  {
+    id: 'bg-hands',
+    label: 'Hands',
+    type: 'image',
+    src: '/theme-backgrounds/hands.jpg',
+  },
+  {
+    id: 'bg-youth-summit',
+    label: 'Youth summit',
+    type: 'image',
+    src: '/theme-backgrounds/youth_summit.jpg',
+  },
+  {
+    id: 'bg-ambassador-council',
+    label: 'Ambassador council',
+    type: 'image',
+    src: '/theme-backgrounds/global_ambassador_council.jpg',
+  },
+  {
+    id: 'bg-planting-yucatan',
+    label: 'Planting - Yucatán',
+    type: 'image',
+    src: '/theme-backgrounds/planting_in_action_yucatan.jpg',
+  },
+  {
+    id: 'bg-saplings-yucatan',
+    label: 'Saplings - Yucatán',
+    type: 'image',
+    src: '/theme-backgrounds/saplings_planting_site_yucatan_ceiba_pentandra.jpg',
+  },
+  {
+    id: 'bg-sapling-yucatan-2',
+    label: 'Sapling - Yucatán 2',
+    type: 'image',
+    src: '/theme-backgrounds/sapling_planting_site_bacalar.jpg',
+  },
+  {
+    id: 'bg-reforestation-ghana-1',
+    label: 'Reforestation Ghana 1',
+    type: 'image',
+    src: '/theme-backgrounds/reforestation_ghana_1.jpg',
+  },
+  {
+    id: 'bg-reforestation-ghana-2',
+    label: 'Reforestation Ghana 2',
+    type: 'image',
+    src: '/theme-backgrounds/reforestation_ghana_2.jpg',
   },
   // Patterns (legacy placeholders — kept as resources, hidden from the picker)
   {
@@ -254,13 +314,6 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     type: 'image',
     thumb: '/theme-backgrounds/planet-light.svg',
     src: '/theme-backgrounds/planet-light.svg',
-  },
-  {
-    id: 'bg-planet-dark',
-    label: 'Planet dark',
-    type: 'image',
-    thumb: '/theme-backgrounds/planet-dark.svg',
-    src: '/theme-backgrounds/planet-dark.svg',
   },
   // Videos (looping placeholder = static SVG until real assets land)
   {
