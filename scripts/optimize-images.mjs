@@ -50,13 +50,29 @@ function collect(target) {
   return [target];
 }
 
-const files = targets.flatMap(collect).sort();
+const failed = [];
+
+// collect() stats the path, so a missing or unreadable target throws here — before the loop below, and
+// outside its handler. Catch per target so one bad path cannot cost us the others.
+const files = targets
+  .flatMap(target => {
+    try {
+      return collect(target);
+    } catch (error) {
+      failed.push(target);
+      console.error(
+        `FAIL  ${target} — ${String(error.message).split('\n')[0]}`
+      );
+      return [];
+    }
+  })
+  .sort();
+
 const kb = bytes => `${Math.round(bytes / 1024)} KB`;
 
 let totalBefore = 0;
 let totalAfter = 0;
 let written = 0;
-const failed = [];
 
 for (const file of files) {
   const before = statSync(file).size;
@@ -112,7 +128,7 @@ console.log(
 
 if (failed.length > 0) {
   console.error(
-    `\n${failed.length} image(s) could not be read and were left untouched:\n${failed.map(f => `  ${f}`).join('\n')}\n\nIf one is a phone photo, it is probably HEIC under a .jpg name. Convert it first: sips -s format jpeg <file> --out <file>.jpg`
+    `\n${failed.length} target(s) could not be read and were left untouched:\n${failed.map(f => `  ${f}`).join('\n')}\n\nCheck the path exists. If it does and came off a phone, it is probably HEIC under a .jpg name — convert it first: sips -s format jpeg <file> --out <file>.jpg`
   );
   process.exit(1);
 }
