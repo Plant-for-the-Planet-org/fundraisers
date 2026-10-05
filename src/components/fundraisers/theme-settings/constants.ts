@@ -103,11 +103,20 @@ const PICKABLE_BG_IDS = new Set([
   'bg-woodgrain',
   'bg-forest',
   'bg-forest-bw',
-  'bg-academy',
-  'bg-academy-bw',
+  'bg-forest-bw-2',
+  'bg-planting-bw',
+  'bg-rangers-bw',
+  'bg-child-planting',
+  'bg-hands',
+  'bg-youth-summit',
+  'bg-ambassador-council',
+  'bg-planting-yucatan',
+  'bg-saplings-yucatan',
+  'bg-sapling-yucatan-2',
+  'bg-reforestation-ghana-1',
+  'bg-reforestation-ghana-2',
   'bg-planet-botanical',
   'bg-planet-light',
-  'bg-planet-dark',
 ]);
 
 export const PATTERNS = BG_LIBRARY.filter(
