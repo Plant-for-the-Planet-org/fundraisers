@@ -10,6 +10,7 @@ import { buildAddressPayload } from '@/lib/utils/profile';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { AddressAutocompleteInput } from './address-autocomplete-input';
 import { AddressCountrySelector } from './address-country-selector';
 import { AddressTypeRadioGroup } from './address-type-radio-group';
 import { FormField } from './form-field';
@@ -38,6 +39,15 @@ export const AddressForm = () => {
   } = useController<DonationFormValues, 'country'>({
     name: 'country',
   });
+
+  const {
+    field: {
+      value: address,
+      onChange: setAddress,
+      onBlur: onAddressBlur,
+      ref: addressRef,
+    },
+  } = useController<DonationFormValues, 'address'>({ name: 'address' });
 
   const watchedFields = useWatch({
     name: ['address', 'city', 'zipCode', 'country'],
@@ -110,8 +120,20 @@ export const AddressForm = () => {
             label={tDonate('address.label')}
             error={translateError(errors.address?.message)}
           >
-            <Input
-              {...register('address')}
+            <AddressAutocompleteInput
+              name='address'
+              value={address ?? ''}
+              onChange={setAddress}
+              onBlur={onAddressBlur}
+              inputRef={addressRef}
+              country={country}
+              onAddressResolved={resolved => {
+                const options = { shouldValidate: true, shouldDirty: true };
+                setValue('address', resolved.address, options);
+                setValue('city', resolved.city, options);
+                setValue('zipCode', resolved.zipCode, options);
+                if (resolved.state) setValue('state', resolved.state, options);
+              }}
               placeholder={tDonate('address.placeholder')}
               className='border-gray-300 focus:border-gray-500 focus:ring-gray-500 mt-2'
             />
