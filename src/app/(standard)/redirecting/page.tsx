@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { clearOAuthState, getStoredOAuthState } from '@/lib/auth/oauth-state';
+import {
+  isSignInPopupWindow,
+  postSignInCodeToOpener,
+} from '@/lib/auth/sign-in-popup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
 import { cleanUrl, getSafeRedirectPath } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/auth-store';
@@ -30,9 +34,16 @@ export default function RedirectingPage() {
   const logoutSuccess = searchParams.get('logoutSuccess');
   const safeRedirectPath = getSafeRedirectPath(redirectPath);
   const nonce = searchParams.get('state');
+  const code = searchParams.get('code');
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
   useEffect(() => {
+    // Popup sign-in: the opener owns the PKCE verifier and finishes the exchange. AuthInitializer stays idle in this window, so isAuthInitializing never settles here.
+    if (code && isSignInPopupWindow()) {
+      if (postSignInCodeToOpener(code, nonce)) window.close();
+      return;
+    }
+
     if (nonce) {
       // Wait until auth finishes, so the destination loads ready instead of
       // briefly showing AuthGuard's "Redirecting you..." loader.
@@ -50,7 +61,14 @@ export default function RedirectingPage() {
     if (logoutSuccess === 'true') {
       router.replace(safeRedirectPath);
     }
-  }, [logoutSuccess, router, safeRedirectPath, nonce, isAuthInitializing]);
+  }, [
+    logoutSuccess,
+    router,
+    safeRedirectPath,
+    nonce,
+    code,
+    isAuthInitializing,
+  ]);
 
   const getLoaderKey = () => {
     if (nonce) return 'signingIn';

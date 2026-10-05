@@ -28,7 +28,7 @@
       "items": {
         "session": {
           "title": "Angemeldet bleiben",
-          "body": "Ein Sitzungs-Cookie, das erst nach deiner Anmeldung gesetzt wird, damit du dich nicht auf jeder Seite neu anmelden musst."
+          "body": "Ein Sitzungs-Cookie, das erst nach deiner Anmeldung gesetzt wird, damit du dich nicht auf jeder Seite neu anmelden musst. Außerdem merken wir uns den Zeitpunkt deiner letzten Anmeldung, damit das Spendenformular nach ein paar Stunden einen Kontowechsel anbieten kann."
         },
         "language": {
           "title": "Deine Sprache",

@@ -3,10 +3,14 @@
 import type { PaymentMethodId } from '@/lib/types/payment-methods';
 
 import { Plus, TriangleAlert } from 'lucide-react';
+import { RadioGroup } from 'radix-ui';
 import { cn } from '@/lib/utils';
+import { savedMethodRadioValue } from '@/components/donate/payment-methods-helpers';
 import { CardBrandIcon } from '@/components/icons/donation';
+import { RadioDot } from './payment-method-option';
 
 type SavedPaymentMethodOptionProps = {
+  savedMethodId: string;
   typeId: PaymentMethodId;
   brand?: string | null;
   last4: string;
@@ -15,10 +19,12 @@ type SavedPaymentMethodOptionProps = {
   expiringSoonLabel?: string;
   ariaLabel: string;
   isSelected: boolean;
-  onSelect: () => void;
+  /** Id of the sr-only fee text this row should be described by, when fees are shown. */
+  describedById?: string;
 };
 
 export function SavedPaymentMethodOption({
+  savedMethodId,
   typeId,
   brand,
   last4,
@@ -27,33 +33,32 @@ export function SavedPaymentMethodOption({
   expiringSoonLabel,
   ariaLabel,
   isSelected,
-  onSelect,
+  describedById,
 }: SavedPaymentMethodOptionProps) {
   const showBrand = typeId === 'card';
   return (
-    <button
-      type='button'
-      onClick={onSelect}
-      aria-pressed={isSelected}
+    <RadioGroup.Item
+      value={savedMethodRadioValue(savedMethodId)}
       aria-label={
         isExpiringSoon && expiringSoonLabel
           ? `${ariaLabel}, ${expiringSoonLabel}`
           : ariaLabel
       }
+      aria-describedby={describedById}
       className={cn(
-        'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
+        'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
         isSelected
-          ? 'border-foreground bg-muted hover:border-gray-400'
+          ? 'border-foreground bg-muted'
           : 'border-border/60 bg-transparent hover:border-gray-400'
       )}
     >
-      <div className='flex flex-1 items-center gap-3'>
+      <div className='flex items-center gap-3'>
         {showBrand && (
           <div className='flex h-5 w-8 shrink-0 items-center justify-center'>
             <CardBrandIcon brand={brand} />
           </div>
         )}
-        <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
+        <div className='flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5'>
           <span className='text-sm font-medium tabular-nums'>•••• {last4}</span>
           {expiryDate && (
             <span
@@ -72,15 +77,18 @@ export function SavedPaymentMethodOption({
             </span>
           )}
         </div>
+        <RadioDot isSelected={isSelected} />
       </div>
-    </button>
+    </RadioGroup.Item>
   );
 }
 
 type NewMethodOptionProps = {
+  methodId: PaymentMethodId;
   label: string;
   isSelected: boolean;
-  onSelect: () => void;
+  /** Id of the sr-only fee text this row should be described by, when fees are shown. */
+  describedById?: string;
 };
 
 // "Use a new ..." option shown below saved payment methods.
@@ -91,18 +99,18 @@ type NewMethodOptionProps = {
 // The layout intentionally matches saved payment rows so it feels like part
 // of the same selection group.
 export function NewMethodOption({
+  methodId,
   label,
   isSelected,
-  onSelect,
+  describedById,
 }: NewMethodOptionProps) {
   return (
     <div className='border-t border-border pt-2'>
-      <button
-        type='button'
-        onClick={onSelect}
-        aria-pressed={isSelected}
+      <RadioGroup.Item
+        value={methodId}
+        aria-describedby={describedById}
         className={cn(
-          'w-full rounded-lg border px-3 py-2.5 text-left transition-all',
+          'w-full rounded-lg border px-3 py-2.5 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           isSelected
             ? 'border-foreground bg-muted'
             : 'border-border/60 bg-transparent hover:border-gray-400'
@@ -117,9 +125,10 @@ export function NewMethodOption({
               )}
             />
           </div>
-          <span className='text-sm font-medium'>{label}</span>
+          <span className='flex-1 text-sm font-medium'>{label}</span>
+          <RadioDot isSelected={isSelected} />
         </div>
-      </button>
+      </RadioGroup.Item>
     </div>
   );
 }

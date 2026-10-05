@@ -38,6 +38,10 @@ export function DonateOptions() {
 
   if (!showCoverFees && !showMakeMonthly) return null;
 
+  const coverFeesTooltip = t('donate.options.coverFeesTooltip', {
+    providerName: paymentProviderName,
+  });
+
   return (
     <div className='donate-options space-y-4'>
       {showCoverFees && (
@@ -50,6 +54,7 @@ export function DonateOptions() {
                 id='willAbsorbFee'
                 checked={field.value}
                 onCheckedChange={field.onChange}
+                aria-describedby='willAbsorbFee-description'
                 className='mt-0.5'
               />
             )}
@@ -68,13 +73,16 @@ export function DonateOptions() {
                 providerName: paymentProviderName,
               })}
             </label>
+            {/* Out of the Tab order. The checkbox is described by the same text, so keyboard users hear it on focus. */}
             <InfoTooltip
-              content={t('donate.options.coverFeesTooltip', {
-                providerName: paymentProviderName,
-              })}
+              content={coverFeesTooltip}
               triggerLabel={t('donate.options.coverFeesTooltipTriggerLabel')}
               className='mt-0.5'
+              focusable={false}
             />
+            <span id='willAbsorbFee-description' className='sr-only'>
+              {coverFeesTooltip}
+            </span>
           </div>
         </div>
       )}

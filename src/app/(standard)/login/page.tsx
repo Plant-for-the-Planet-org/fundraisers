@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getSafeRedirectPath } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/auth-store';
-import { SignInFormPanel } from '@/components/auth/sign-in-form-panel';
+import { SignInCard } from '@/components/auth/sign-in-card';
 import { SignInHeroImage } from '@/components/auth/sign-in-hero-image';
 import { Loader } from '@/components/ui/loader';
 
@@ -14,7 +14,6 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const safeRedirectPath = getSafeRedirectPath(searchParams.get('redirectTo'));
-  // store: state
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
@@ -30,12 +29,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='flex flex-col lg:flex-row'>
-      {/* Left side - Hero Image with Tagline (hidden on mobile, shown on desktop) */}
+    <div className='flex flex-col lg:flex-row lg:items-stretch'>
       <SignInHeroImage />
 
-      {/* Right side - Login (order-1 on mobile, order-2 on desktop) */}
-      <SignInFormPanel redirectTo={safeRedirectPath} />
+      <section className='flex flex-1 items-center justify-center px-6 py-12 lg:px-12'>
+        <div className='w-full max-w-sm'>
+          <SignInCard
+            variant='plain'
+            returnTo={safeRedirectPath}
+            onSignedIn={() => router.replace(safeRedirectPath)}
+            header={
+              <div className='space-y-1.5'>
+                <h1 className='text-xl font-semibold leading-none'>
+                  {tAuth('form.title')}
+                </h1>
+                <p className='text-sm text-muted-foreground'>
+                  {tAuth('form.subtitle')}
+                </p>
+              </div>
+            }
+          />
+        </div>
+      </section>
     </div>
   );
 }

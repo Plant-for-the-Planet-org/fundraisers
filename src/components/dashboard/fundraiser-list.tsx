@@ -14,9 +14,8 @@ interface FundraiserListProps {
   onClearFilters: () => void;
   onFundraiserUpdated: (updatedFundraiser: Fundraiser) => void;
   onFundraiserRemoved: (id: string) => void;
+  skeletonRows?: number;
 }
-
-const SKELETON_ROWS = 4;
 
 export function FundraiserList({
   fundraisers,
@@ -25,11 +24,12 @@ export function FundraiserList({
   onClearFilters,
   onFundraiserUpdated,
   onFundraiserRemoved,
+  skeletonRows = 4,
 }: FundraiserListProps) {
   if (isLoading) {
     return (
       <ul className='fundraiser-list grid grid-cols-1 gap-x-8 md:grid-cols-2'>
-        {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
+        {Array.from({ length: skeletonRows }).map((_, index) => (
           <FundraiserListItemSkeleton key={index} />
         ))}
       </ul>

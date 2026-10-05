@@ -1,6 +1,7 @@
 import type { RedirectPath } from '../types/auth';
 
 import { DEFAULT_REDIRECT_PATH } from '../constants/auth';
+import { markInteractiveSignIn } from './auth-time';
 import { storeOAuthState } from './oauth-state';
 import {
   clearStoredCodeVerifier,
@@ -303,6 +304,9 @@ export async function exchangeCodeForTokens(
     }
 
     const tokens: Auth0TokenResponse = await response.json();
+
+    // Silent auth passes its verifier in memory, so that is the marker for a refresh nobody typed a password for.
+    if (!inMemoryVerifier) markInteractiveSignIn();
 
     return tokens;
   } catch (error) {

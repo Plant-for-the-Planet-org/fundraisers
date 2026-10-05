@@ -19,7 +19,7 @@
     },
     "accepted": {
       "title": "Du bist bereits Organisator*in",
-      "description": "Du hast die Einladung angenommen, diese Spendenaktion mitzugestalten.",
+      "description": "Du hast die Einladung angenommen, diesen Spendenaufruf mitzugestalten.",
       "cta": "Zu deinem Dashboard",
       "ctaSignedOut": "Anmelden und zum Dashboard"
     },
@@ -44,23 +44,23 @@
     "error": {
       "title": "Wir konnten deine Einladung nicht öffnen",
       "description": "Bei uns ist etwas schiefgelaufen. Deine Einladung gibt es weiterhin.",
-      "cta": "Erneut versuchen"
+      "cta": "Nochmal versuchen"
     },
     "notice": {
       "acceptedTitle": "Du bist jetzt Organisator*in",
-      "acceptedBody": "Du kannst diese Spendenaktion über dein Dashboard verfolgen.",
-      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diese Spendenaktion zu verwalten.",
+      "acceptedBody": "Du kannst diesen Spendenaufruf über dein Dashboard verfolgen.",
+      "acceptedBodySignedOut": "Erstelle ein Konto mit der Adresse, an die die Einladung ging, um diesen Spendenaufruf zu verwalten.",
       "acceptedCta": "Zu deinem Dashboard",
       "acceptedCtaSignedOut": "Konto erstellen",
       "acceptedDismiss": "Später",
       "declined": "Einladung abgelehnt. Du wurdest nicht als Organisator*in hinzugefügt.",
-      "expired": "Diese Einladung ist abgelaufen. Bitte die*den Organisator*in der Spendenaktion um eine neue.",
+      "expired": "Diese Einladung ist abgelaufen. Bitte die*den Organisator*in des Spendenaufrufs um eine neue.",
       "invalid": "Dieser Einladungslink ist nicht gültig.",
-      "alreadyHost": "Du bist bereits Organisator*in dieser Spendenaktion."
+      "alreadyHost": "Du bist bereits Organisator*in dieses Spendenaufrufs."
     },
     "dashboard": {
       "title": "{count, plural, =1 {Du hast eine Einladung} other {Du hast # Einladungen}}",
-      "subtitle": "Jemand hat dich eingeladen, seine Spendenaktion mitzugestalten. Du bist erst Organisator*in, wenn du zustimmst.",
+      "subtitle": "Jemand hat dich eingeladen, seinen Spendenaufruf mitzugestalten. Du bist erst Organisator*in, wenn du zustimmst.",
       "acceptedToast": "Du bist jetzt Organisator*in von {fundraiser}",
       "declinedToast": "Einladung abgelehnt.",
       "answerFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.",

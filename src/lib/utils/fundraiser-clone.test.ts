@@ -116,13 +116,14 @@ describe('buildCloneFundraiserRequest', () => {
     expect(request.metadata).toEqual({ closedMessage: 'kept too' });
   });
 
-  it('always starts as a draft, whatever the source status is', () => {
+  it('never carries the source status, so the clone starts as a draft', () => {
     const request = buildCloneFundraiserRequest(
       makeFundraiser({ status: 'active' }),
       'Copy'
     );
 
-    expect(request.status).toBe('draft');
+    // The status is server-owned: leaving it out of the payload is what makes the clone a draft.
+    expect(request).not.toHaveProperty('status');
   });
 
   it('flattens project allocations into the create shape', () => {

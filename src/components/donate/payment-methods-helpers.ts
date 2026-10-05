@@ -118,3 +118,16 @@ export function getExpiryInfo(expires: string | null | undefined): {
     isExpiringSoon: !isExpired && expiryEndMs - now <= EXPIRING_SOON_WINDOW_MS,
   };
 }
+
+// The payment list is one radio group with a single string value. Generic and "use a new" rows use the method id, saved cards and IBANs are prefixed so they cannot collide with a method id.
+const SAVED_RADIO_VALUE_PREFIX = 'saved:';
+
+export function savedMethodRadioValue(savedMethodId: string) {
+  return `${SAVED_RADIO_VALUE_PREFIX}${savedMethodId}`;
+}
+
+export function parseSavedMethodRadioValue(value: string): string | null {
+  return value.startsWith(SAVED_RADIO_VALUE_PREFIX)
+    ? value.slice(SAVED_RADIO_VALUE_PREFIX.length)
+    : null;
+}
