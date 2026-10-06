@@ -10,6 +10,7 @@ import {
   funnelSteps,
   goalProgress,
   otherCountryVisitors,
+  rankedSources,
   splitTop,
   sumVisitors,
 } from '@/lib/analytics/insights-report';
@@ -216,22 +217,11 @@ export function ReportSheet({
     label: getCountry(country.code, locale),
     visitors: country.visitors,
   }));
-  const sourceRows: RankedRow[] = [
-    ...data.sources.map(source => ({
-      key: source.source,
-      label: sourceLabel(source.source),
-      visitors: source.visitors,
-    })),
-    ...(data.directVisitors > 0
-      ? [
-          {
-            key: '__direct',
-            label: tAudience('direct'),
-            visitors: data.directVisitors,
-          },
-        ]
-      : []),
-  ].sort((a, b) => b.visitors - a.visitors);
+  const sourceRows: RankedRow[] = rankedSources(data).map(row => ({
+    key: row.key,
+    label: row.source === null ? tAudience('direct') : sourceLabel(row.source),
+    visitors: row.visitors,
+  }));
 
   const countries = splitTop(countryRows);
   const sources = splitTop(sourceRows);

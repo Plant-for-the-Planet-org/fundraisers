@@ -4,6 +4,7 @@ import type { FundraiserInsights } from '@/lib/types/fundraiser-insights';
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { rankedSources } from '@/lib/analytics/insights-report';
 import { formatCompactNumber } from '@/lib/utils';
 import { countryCodeToFlag, getCountry } from '@/lib/utils/country';
 import { CountryFlag } from '@/components/ui/country-flag';
@@ -98,22 +99,15 @@ export function InsightsAudience({
     value: country.visitors,
   }));
 
-  const sourceRows = [
-    ...data.sources.map(source => ({
-      key: source.source,
-      label: <span className='truncate'>{sourceLabel(source.source)}</span>,
-      value: source.visitors,
-    })),
-    ...(data.directVisitors > 0
-      ? [
-          {
-            key: '__direct',
-            label: <span className='truncate'>{t('direct')}</span>,
-            value: data.directVisitors,
-          },
-        ]
-      : []),
-  ].sort((a, b) => b.value - a.value);
+  const sourceRows = rankedSources(data).map(row => ({
+    key: row.key,
+    label: (
+      <span className='truncate'>
+        {row.source === null ? t('direct') : sourceLabel(row.source)}
+      </span>
+    ),
+    value: row.visitors,
+  }));
 
   const taggedRows = data.taggedSources.map(tagged => {
     const source = UTM_ALIASES[tagged.source] ?? tagged.source;

@@ -9,6 +9,7 @@ import {
   otherCountryVisitors,
   parseReportRange,
   publicHostsLine,
+  rankedSources,
   readableInk,
   reportLink,
   splitTop,
@@ -185,6 +186,51 @@ describe('publicHostsLine', () => {
       names: [],
       others: 0,
     });
+  });
+});
+
+describe('rankedSources', () => {
+  const source = (name: string, visitors: number) => ({
+    source: name,
+    known: true,
+    visitors,
+  });
+
+  it('adds a Direct row and sorts busiest first', () => {
+    expect(
+      rankedSources({
+        sources: [source('google', 5), source('whatsapp', 20)],
+        directVisitors: 12,
+      })
+    ).toEqual([
+      { key: 'whatsapp', source: 'whatsapp', visitors: 20 },
+      { key: '__direct', source: null, visitors: 12 },
+      { key: 'google', source: 'google', visitors: 5 },
+    ]);
+  });
+
+  it('leaves out Direct when nobody came directly', () => {
+    const rows = rankedSources({
+      sources: [source('google', 5)],
+      directVisitors: 0,
+    });
+    expect(rows.map(row => row.key)).toEqual(['google']);
+  });
+
+  it('keeps the incoming order on a tie, with Direct after the sources', () => {
+    const rows = rankedSources({
+      sources: [source('linkedin', 4), source('facebook', 4)],
+      directVisitors: 4,
+    });
+    expect(rows.map(row => row.key)).toEqual([
+      'linkedin',
+      'facebook',
+      '__direct',
+    ]);
+  });
+
+  it('is empty without any visitors', () => {
+    expect(rankedSources({ sources: [], directVisitors: 0 })).toEqual([]);
   });
 });
 

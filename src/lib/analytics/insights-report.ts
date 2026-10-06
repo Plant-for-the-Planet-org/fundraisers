@@ -1,6 +1,7 @@
 import type { FundraiserHost } from '@/lib/types/fundraiser';
 import type {
   DonationEventName,
+  FundraiserInsights,
   InsightsBucket,
   InsightsRange,
 } from '@/lib/types/fundraiser-insights';
@@ -39,6 +40,32 @@ export function otherCountryVisitors(
 ) {
   const shownTotal = shown.reduce((sum, row) => sum + row.visitors, 0);
   return Math.max(0, visitors - shownTotal);
+}
+
+export interface SourceRow {
+  key: string;
+  /** The referring source, or null for the Direct row. */
+  source: string | null;
+  visitors: number;
+}
+
+/**
+ * Where visitors came from, busiest first: the referring sources plus one Direct row when there were direct visitors.
+ * Shared by the Insights tab and the PDF report, so the two always list the same sources. Each adds its own labels.
+ */
+export function rankedSources(
+  data: Pick<FundraiserInsights, 'sources' | 'directVisitors'>
+): SourceRow[] {
+  return [
+    ...data.sources.map(({ source, visitors }) => ({
+      key: source,
+      source,
+      visitors,
+    })),
+    ...(data.directVisitors > 0
+      ? [{ key: '__direct', source: null, visitors: data.directVisitors }]
+      : []),
+  ].sort((a, b) => b.visitors - a.visitors);
 }
 
 export function sumVisitors(rows: Array<{ visitors: number }>) {
