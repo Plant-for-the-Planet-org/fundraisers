@@ -47,7 +47,7 @@ Left out on purpose: the status pill (it is stale the day after printing), the "
 - **Other rows**:
   - Countries: "Other countries" is total visitors minus the top 4 (clamped at 0). The API only returns the top 6, so summing hidden rows would undercount. This also includes visitors with an unknown country.
   - Sources: "Other" is the sum of the hidden known rows.
-- **QR link**: `<origin>/raise/<slug>?utm_source=report&utm_medium=print`. Same shape as the Share tab links. Add `report` to the known source names in `insights-audience.tsx` (and its translations) so it reads as "Printed report" under "From your tagged links".
+- **QR link**: `<origin>/raise/<slug>?utm_source=report&utm_medium=print`. Same shape as the Share tab links. Both tokens are listed in `docs/naming.md`. Add `report` to the known source names in `insights-audience.tsx` (and its translations) so it reads as "Printed report" under "From your tagged links".
 - **Paid step**: the `donation_completed` event fires for a paid card or wallet payment and a confirmed SEPA mandate. A pending bank transfer does not fire it. A fundraiser can show donations on the platform and 0 in this step (Nepal shows 8 submitted, 0 paid, 4 donations). Open question below.
 
 ## Steps
