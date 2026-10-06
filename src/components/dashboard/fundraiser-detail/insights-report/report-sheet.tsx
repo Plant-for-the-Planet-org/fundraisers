@@ -411,7 +411,7 @@ export function ReportSheet({
             <span className='truncate'>{shownLink}</span>
           </p>
         </div>
-        <div className='shrink-0 rounded-md border border-neutral-300 bg-white p-[5px]'>
+        <div className='shrink-0 overflow-hidden rounded-md border border-neutral-300 bg-white'>
           <ReportQr value={link} label={tReport('qrLabel')} />
         </div>
       </footer>

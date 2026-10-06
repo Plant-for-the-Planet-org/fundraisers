@@ -3,6 +3,11 @@
 import { useMemo } from 'react';
 import QRCode from 'qrcode';
 
+// The blank border the QR standard (ISO/IEC 18004) asks for, in cells. Drawn here so it stays 4 cells whatever the link length.
+// Denso Wave, the QR code's inventor: "QR Code requires a four-module wide margin at all sides of a symbol."
+// https://www.qrcode.com/en/howto/code.html
+const QUIET_ZONE = 4;
+
 /** A QR code drawn as one SVG path, so it stays sharp at any print size. */
 export function ReportQr({ value, label }: { value: string; label: string }) {
   const { size, path } = useMemo(() => {
@@ -15,16 +20,24 @@ export function ReportQr({ value, label }: { value: string; label: string }) {
     }
     return { size: modules.size, path: cells.join('') };
   }, [value]);
+  const box = size + 2 * QUIET_ZONE;
 
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
-      viewBox={`0 0 ${size} ${size}`}
+      viewBox={`${-QUIET_ZONE} ${-QUIET_ZONE} ${box} ${box}`}
       shapeRendering='crispEdges'
       role='img'
       aria-label={label}
-      className='size-16'
+      className='size-[74px]'
     >
+      <rect
+        x={-QUIET_ZONE}
+        y={-QUIET_ZONE}
+        width={box}
+        height={box}
+        fill='#ffffff'
+      />
       <path d={path} fill='#000000' />
     </svg>
   );
