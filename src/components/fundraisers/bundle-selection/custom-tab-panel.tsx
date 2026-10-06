@@ -22,6 +22,17 @@ import { useBundleProjects } from './use-bundle-projects';
 const INITIAL_VISIBLE_COUNT = 6;
 const MAX_PROJECTS = 6;
 
+// Mulberry32: a small seeded random generator, so the shuffle stays pure during render.
+function createSeededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 interface CustomTabPanelProps {
   country: AllowedCountry;
 }
@@ -102,14 +113,17 @@ export function CustomTabPanel({ country }: CustomTabPanelProps) {
 
   // Shuffle once when projects load. Depends only on `projects` so add/remove
   // does not reshuffle — selections just disappear from the stable list.
+  // The seed is picked once per mount, so re-renders give the same order.
+  const [shuffleSeed] = useState(() => Math.floor(Math.random() * 4294967296));
   const shuffledTopProjects = useMemo(() => {
+    const random = createSeededRandom(shuffleSeed);
     const top = projects.filter(p => p.isTopProject).slice();
     for (let i = top.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(random() * (i + 1));
       [top[i], top[j]] = [top[j]!, top[i]!];
     }
     return top;
-  }, [projects]);
+  }, [projects, shuffleSeed]);
 
   const filteredProjects = useMemo(() => {
     if (trimmedQuery) {

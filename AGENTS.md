@@ -22,16 +22,17 @@ Requires a `.env.local` file in the project root before running locally.
 
 Node 24 is required (Next.js needs ≥20.9). The dev server may already be running on port 3000 — check first. If not, `nvm use 24` then `npm run dev`. The `.claude/launch.json` `fundraisers-dev` preset handles this automatically via `bash -lc`.
 
-| Command                | When to use                                                      |
-| ---------------------- | ---------------------------------------------------------------- |
-| `npm run dev`          | Start the local dev server                                       |
-| `npm run build`        | Production build — run before pushing to catch type/build errors |
-| `npm run lint`         | ESLint checks                                                    |
-| `npm run type-check`   | TypeScript checks without emitting files                         |
-| `npm run format`       | Auto-format code style issues                                    |
-| `npm run imports:sort` | Sort import order                                                |
-| `npm run test`         | Run unit tests once (Vitest)                                     |
-| `npm run test:watch`   | Run unit tests in watch mode                                     |
+| Command                                       | When to use                                                      |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| `npm run dev`                                 | Start the local dev server                                       |
+| `npm run build`                               | Production build — run before pushing to catch type/build errors |
+| `npm run lint`                                | ESLint checks                                                    |
+| `npm run type-check`                          | TypeScript checks without emitting files                         |
+| `npm run format`                              | Auto-format code style issues                                    |
+| `npm run imports:sort`                        | Sort import order                                                |
+| `npm run optimize:images -- <file-or-folder>` | Re-encode images added under `public/` before committing them    |
+| `npm run test`                                | Run unit tests once (Vitest)                                     |
+| `npm run test:watch`                          | Run unit tests in watch mode                                     |
 
 ## Project structure
 
@@ -78,6 +79,14 @@ When adding a feature, ask: does it show or change data for "the current user"? 
 ## Cookies & consent (no cookie banner)
 
 See [`docs/cookie-consent-stance.md`](docs/cookie-consent-stance.md) for the full stance, default position, and review rule.
+
+## SEO: confirm with team first
+
+Check with Sagar before you change `src/app/robots.ts`, any sitemap, or SEO metadata (robots or noindex rules, canonical URLs, titles, descriptions, Open Graph).
+
+These changes are easy to miss in review, and a mistake can quietly drop pages from search for weeks.
+
+The current robots stance: the prod host allows all, and every other host disallows all. Do not add path `Disallow` rules on prod. A `/$` rule once blocked `/`, which redirects to `/explore`, so Google could not follow the redirect and some SEO tools read the whole site as blocked.
 
 ## Conventions
 
