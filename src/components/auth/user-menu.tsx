@@ -78,7 +78,8 @@ export function UserMenu() {
             aria-label={tAuth('userMenuLabel')}
             className='h-9 w-auto rounded-full p-0.5 pr-2 flex items-center gap-1 focus-visible:ring-0 focus-visible:ring-offset-0 has-[>svg]:p-0.5 has-[>svg]:pr-2'
           >
-            <Avatar className='h-8 w-8'>
+            {/* The host callout on a fundraiser page points at this avatar. */}
+            <Avatar className='h-8 w-8' data-user-menu-avatar=''>
               {profileImageUrl && (
                 <AvatarImage src={profileImageUrl} alt='' loading='lazy' />
               )}

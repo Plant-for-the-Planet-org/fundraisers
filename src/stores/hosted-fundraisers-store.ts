@@ -1,16 +1,15 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { getFundraisers } from '@/lib/api/fundraisers-service';
-import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
 
 /**
- * Caches the set of fundraiser ids where the current user is an owner/admin
- * host, so surfaces like the public-page host-edit shortcut can tell whether a
- * logged-in visitor may edit a fundraiser they are *not* listed on publicly
- * (private hosts are stripped from the anonymous fundraiser payload).
+ * Caches the set of fundraiser ids the current user actively hosts, in any role,
+ * so the public-page host callout can tell whether a logged-in visitor hosts a
+ * fundraiser they are *not* listed on publicly (private hosts are stripped from
+ * the anonymous fundraiser payload).
  *
  * Why a store and not a per-page fetch:
- * - The source (`GET /fundraisers`, the user's own hosted list) is identical
+ * - The source (`GET /profile/fundraisers`, the user's own hosted list) is identical
  *   regardless of which fundraiser page is open, so it is fetched ONCE per
  *   identity and reused across every fundraiser the user opens in a session.
  *   Cost is O(active logged-in users), not O(page views) — anonymous donor
@@ -22,30 +21,26 @@ import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
  *   single request instead of stampeding the API.
  *
  * Lives in memory for the session (survives client-side navigation, refetches
- * on hard reload). Staleness is low-risk: it only gates an edit shortcut; the
+ * on hard reload). Staleness is low-risk: it only gates a dashboard shortcut; the
  * dashboard and API remain the real permission boundary.
  */
 interface HostedFundraisersStore {
-  /** Identity the cached `adminIds` belong to; null until first load. */
+  /** Identity the cached `hostIds` belong to; null until first load. */
   identityKey: string | null;
-  /** Fundraiser ids the user owns/admins; null while unloaded/in-flight. */
-  adminIds: Set<string> | null;
+  /** Fundraiser ids the user actively hosts in any role, view-only included; null while unloaded/in-flight. */
+  hostIds: Set<string> | null;
   /** In-flight request for the current identity, for dedupe. */
   promise: Promise<Set<string>> | null;
   /**
-   * Ensure the admin id set for `identityKey` is loaded, returning it. Reuses a
+   * Ensure the host id set for `identityKey` is loaded, returning it. Reuses a
    * completed cache or an in-flight promise for the same identity; otherwise
    * fetches fresh. Rejections (e.g. 401/403) are surfaced to the caller and
    * leave the cache empty so a later attempt can retry.
    */
-  ensureLoaded: (
-    identityKey: string,
-    token: string,
-    userId: string
-  ) => Promise<Set<string>>;
+  ensureLoaded: (identityKey: string, token: string) => Promise<Set<string>>;
   /**
    * Drop the cache so the next read refetches.
-   * - Call after creating a fundraiser (the user gains one) or removing a host (can drop the user's own admin access).
+   * - Call after creating a fundraiser (the user gains one) or removing a host (can drop the user's own access).
    * - Also called on host role changes as cheap insurance, though self-demotion is API-rejected so a role change never changes the current user's own access in practice.
    * - Not needed when adding a host (you cannot add yourself), nor for plain fundraiser edits (they never touch host membership or roles).
    * - Not needed for impersonation switches: they window.location.reload(), which destroys the store anyway.
@@ -57,43 +52,40 @@ export const useHostedFundraisersStore = create<HostedFundraisersStore>()(
   devtools(
     (set, get) => ({
       identityKey: null,
-      adminIds: null,
+      hostIds: null,
       promise: null,
 
       reset: () =>
         set(
-          { identityKey: null, adminIds: null, promise: null },
+          { identityKey: null, hostIds: null, promise: null },
           undefined,
           'hostedFundraisers/reset'
         ),
 
-      ensureLoaded: (identityKey, token, userId) => {
+      ensureLoaded: (identityKey, token) => {
         const state = get();
 
         if (state.identityKey === identityKey) {
-          if (state.adminIds) return Promise.resolve(state.adminIds);
+          if (state.hostIds) return Promise.resolve(state.hostIds);
           if (state.promise) return state.promise;
         }
 
         const promise = getFundraisers(token)
           .then(fundraisers => {
-            const adminIds = new Set(
-              fundraisers
-                .filter(fundraiser =>
-                  isFundraiserOwnerOrAdmin(fundraiser, userId)
-                )
-                .map(fundraiser => fundraiser.id)
+            // The list holds only fundraisers the user actively hosts, so every id in it is a host's.
+            const hostIds = new Set(
+              fundraisers.map(fundraiser => fundraiser.id)
             );
             // Only commit if this identity is still the one we fetched for; a
             // faster identity switch mid-flight must not be overwritten.
             if (get().identityKey === identityKey) {
               set(
-                { adminIds, promise: null },
+                { hostIds, promise: null },
                 undefined,
                 'hostedFundraisers/loaded'
               );
             }
-            return adminIds;
+            return hostIds;
           })
           .catch(error => {
             if (get().identityKey === identityKey) {
@@ -103,7 +95,7 @@ export const useHostedFundraisersStore = create<HostedFundraisersStore>()(
           });
 
         set(
-          { identityKey, adminIds: null, promise },
+          { identityKey, hostIds: null, promise },
           undefined,
           'hostedFundraisers/load_start'
         );
