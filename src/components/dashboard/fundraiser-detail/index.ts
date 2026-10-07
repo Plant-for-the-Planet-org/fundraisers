@@ -10,5 +10,6 @@ export { FundraiserInsightsCard } from './fundraiser-insights-card';
 export { FundraiserInsightsView } from './fundraiser-insights-view';
 export { FundraiserModulesCard } from './fundraiser-modules-card';
 export { FundraiserPerformance } from './fundraiser-performance';
+export { FundraiserPrintShell } from './fundraiser-print-shell';
 export { ShareLinksCard } from './share-links';
 export { useLeaderboardSummary } from './use-leaderboard-summary';

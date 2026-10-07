@@ -189,9 +189,10 @@ export function StageTicker({
                     color: 'var(--accent-color)',
                   }}
                 >
-                  {formatCurrencyFromDecimal(d.amount, d.currency, locale, {
-                    compact: true,
-                  })}
+                  {d.amount !== null &&
+                    formatCurrencyFromDecimal(d.amount, d.currency, locale, {
+                      compact: true,
+                    })}
                 </span>
                 <span className='text-[14px] opacity-50'>
                   {formatTimeAgo(d.created)}

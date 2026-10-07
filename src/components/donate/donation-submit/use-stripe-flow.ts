@@ -43,6 +43,7 @@ export function useStripeFlow(
     createAttempt,
     confirmCardActionPayment,
     token,
+    locale,
     donorProfile,
     paymentOptions,
   } = core;
@@ -145,6 +146,7 @@ export function useStripeFlow(
             selectedPaymentMethod: values.selectedPaymentMethod,
             paymentOptions,
             paymentDetails,
+            locale,
           });
 
         if (paymentResponse.status === 'failed') {
@@ -242,6 +244,7 @@ export function useStripeFlow(
       paymentOptions,
       donorProfile,
       token,
+      locale,
       sepaFormRef,
       cardFormRef,
       classifyPaymentMethodResult,

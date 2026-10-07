@@ -56,7 +56,9 @@ export function StageDemoView({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
   const demo = useStageDemo(donors, currency, startRaised);
-  const top = [...demo.recent].sort((a, b) => b.amount - a.amount).slice(0, 3);
+  const top = [...demo.recent]
+    .sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0))
+    .slice(0, 3);
 
   useLayoutEffect(() => {
     const el = containerRef.current;

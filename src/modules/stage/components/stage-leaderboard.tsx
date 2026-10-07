@@ -74,14 +74,15 @@ export function StageLeaderboard({
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                {formatCurrencyFromDecimal(
-                  entry.amount,
-                  entry.currency,
-                  locale,
-                  {
-                    compact: true,
-                  }
-                )}
+                {entry.amount !== null &&
+                  formatCurrencyFromDecimal(
+                    entry.amount,
+                    entry.currency,
+                    locale,
+                    {
+                      compact: true,
+                    }
+                  )}
               </div>
             </div>
           );

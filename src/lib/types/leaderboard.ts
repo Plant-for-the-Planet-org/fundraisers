@@ -2,7 +2,8 @@ import type { LeaderboardModuleSettings } from './fundraiser';
 
 export interface LeaderboardDonation {
   id: string;
-  amount: number;
+  // null for the public when the host turned show_amount off or hid the goal section. Hosts always get it.
+  amount: number | null;
   currency: string;
   donorName: string;
   /**

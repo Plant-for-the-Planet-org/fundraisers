@@ -7,15 +7,18 @@ import type {
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { userService } from '@/lib/api/user-service';
-import {
-  clearAuthTime,
-  readAuthTime,
-  restoreAuthTime,
-} from '@/lib/auth/auth-time';
+import { readAuthTime, restoreAuthTime } from '@/lib/auth/auth-time';
 import { AUTH0_CONFIG } from '@/lib/auth/auth0-config';
 import { ensureProfile, isRetryable } from '@/lib/auth/implicit-signup';
-import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
-import { getSafeRedirectPath, isProtectedRoute } from '@/lib/utils/auth';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  DEFAULT_REDIRECT_PATH,
+} from '@/lib/constants/auth';
+import {
+  clearStoredSession,
+  getSafeRedirectPath,
+  isProtectedRoute,
+} from '@/lib/utils/auth';
 import {
   IMPERSONATION_STORAGE_KEY,
   useImpersonationStore,
@@ -54,6 +57,22 @@ interface AuthStore {
 }
 
 const isBrowser = typeof window !== 'undefined';
+
+// Guarded like `clearStoredSession`, since `logout` runs this first and a throw would keep the tab from leaving for Auth0.
+// `stop()` needs the guard too: zustand's persist saves after every change and does not catch a failed write, such as a full quota.
+function endImpersonation() {
+  try {
+    useImpersonationStore.getState().stop();
+  } catch {
+    // The in-memory state is already reset before the save runs, so only the save failed.
+  }
+  if (!isBrowser) return;
+  try {
+    localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
+  } catch {
+    // Nothing to do: the caller is signing out either way.
+  }
+}
 
 function userFromProfile(profile: UserProfile): User {
   return {
@@ -94,7 +113,7 @@ async function applySession(token: string) {
   }
 
   if (isBrowser) {
-    localStorage.setItem('access_token', token);
+    localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
   }
 
   useAuthStore.setState(
@@ -217,10 +236,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: (customReturnTo?: string) => {
-        useImpersonationStore.getState().stop();
-        if (isBrowser) {
-          localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
-        }
+        endImpersonation();
 
         const currentPage = window.location.pathname + window.location.search;
         const redirectAfterLogout = customReturnTo || currentPage;
@@ -245,23 +261,16 @@ export const useAuthStore = create<AuthStore>()(
         logoutUrl.searchParams.set('returnTo', logoutSuccessUrl);
 
         // Drop the saved token now, so an abandoned or failed trip to Auth0 does not leave the next visit signed in. The in-memory state stays until /redirecting clears it: clearing it here would let AuthGuard jump to /login before the tab leaves.
-        if (isBrowser) {
-          localStorage.removeItem('access_token');
-          clearAuthTime();
-        }
+        clearStoredSession();
 
         window.location.href = logoutUrl.toString();
       },
 
       clearAuth: () => {
-        useImpersonationStore.getState().stop();
-        if (isBrowser) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem(IMPERSONATION_STORAGE_KEY);
-          clearAuthTime();
-          // The `ui-locale` cookie is intentionally left in place. A profile sync taught this browser the user's language; logging out should not discard that (the profile is not lost, it re-syncs on the next login).
-          // A later different user's profile sync overwrites the `.profile` cookie anyway, and an explicit pick always wins.
-        }
+        clearStoredSession();
+        endImpersonation();
+        // The `ui-locale` cookie is intentionally left in place. A profile sync taught this browser the user's language; logging out should not discard that (the profile is not lost, it re-syncs on the next login).
+        // A later different user's profile sync overwrites the `.profile` cookie anyway, and an explicit pick always wins.
         set(
           {
             user: null,

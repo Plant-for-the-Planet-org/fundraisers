@@ -45,11 +45,11 @@ function classify(referrer: string): KnownSource | null {
   return SOURCE_PATTERNS.find(([, pattern]) => pattern.test(host))?.[0] ?? null;
 }
 
-/** Folds raw referrer hosts into sources, largest first. */
+/** Folds raw referrer hosts into sources, largest first, keeping the top `limit`. `otherVisitors` counts the visitors of the sources left out. */
 export function groupReferrers(
   referrers: Array<{ x: string; y: number }>,
   limit: number
-): SourceCount[] {
+): { sources: SourceCount[]; otherVisitors: number } {
   const totals = new Map<string, SourceCount>();
 
   for (const { x, y } of referrers) {
@@ -66,7 +66,11 @@ export function groupReferrers(
     totals.set(key, entry);
   }
 
-  return [...totals.values()]
-    .sort((a, b) => b.visitors - a.visitors)
-    .slice(0, limit);
+  const sorted = [...totals.values()].sort((a, b) => b.visitors - a.visitors);
+  return {
+    sources: sorted.slice(0, limit),
+    otherVisitors: sorted
+      .slice(limit)
+      .reduce((sum, entry) => sum + entry.visitors, 0),
+  };
 }

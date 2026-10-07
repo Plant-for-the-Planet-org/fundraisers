@@ -35,7 +35,7 @@ function seed(
   }
   return {
     recent,
-    raised: startRaised + recent.reduce((sum, d) => sum + d.amount, 0),
+    raised: startRaised + recent.reduce((sum, d) => sum + (d.amount ?? 0), 0),
     donationCount: SEED_COUNT,
   };
 }
@@ -56,16 +56,17 @@ export function useStageDemo(
       const next = nextId.current;
       nextId.current += 1;
       setState(prev => {
+        const amount = AMOUNTS[next % AMOUNTS.length];
         const donation: LeaderboardDonation = {
           id: `demo-${next}`,
           donorName: donors[next % donors.length],
-          amount: AMOUNTS[next % AMOUNTS.length],
+          amount,
           currency,
           created: timestamp(0),
         };
         return {
           recent: [donation, ...prev.recent].slice(0, MAX_RECENT),
-          raised: prev.raised + donation.amount,
+          raised: prev.raised + amount,
           donationCount: prev.donationCount + 1,
         };
       });
