@@ -6,6 +6,7 @@ import type {
 import type { RawFundraiser } from './normalize-fundraiser';
 
 import { cache } from 'react';
+import { getFundraisers } from './fundraisers-service';
 import { normalizeFundraiser } from './normalize-fundraiser';
 import { platformFetch } from './platform-fetch';
 
@@ -27,16 +28,32 @@ export async function getFundraiser(
   );
 }
 
-export async function getFundraiserAuthenticated(
-  slug: string,
+/**
+ * One of the caller's own fundraisers as its hosts see it: every figure and every host, whatever the host chose to show the public.
+ * Login required, never cached, and answered for any active host, view-only co-hosts included. The public `getFundraiser` follows the host's visibility settings instead.
+ */
+export async function getHostFundraiser(
+  guid: string,
   token: string
 ): Promise<Fundraiser> {
   return normalizeFundraiser(
     await platformFetch<RawFundraiser>(
-      `/fundraisers/${encodeURIComponent(slug)}`,
+      `/profile/fundraisers/${encodeURIComponent(guid)}`,
       { token }
     )
   );
+}
+
+/** `getHostFundraiser` by slug. The host routes take only the guid, so the caller's own list resolves it. Null when the caller does not host this fundraiser. */
+export async function getHostFundraiserBySlug(
+  slug: string,
+  token: string
+): Promise<Fundraiser | null> {
+  const hosted = await getFundraisers(token);
+  const listed = hosted.find(
+    entry => entry.slug === slug || entry.hid === slug || entry.id === slug
+  );
+  return listed ? getHostFundraiser(listed.id, token) : null;
 }
 
 export const getCachedFundraiser = cache(
