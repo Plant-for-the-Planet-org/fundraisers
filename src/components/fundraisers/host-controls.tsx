@@ -78,14 +78,15 @@ export function HostControls({ fundraiser }: { fundraiser: Fundraiser }) {
         onOpenAutoFocus={event => event.preventDefault()}
         onInteractOutside={event => event.preventDefault()}
         onEscapeKeyDown={() => setOpen(false)}
-        className='z-40 flex w-auto items-center gap-3 rounded-xl px-3 py-2 text-sm shadow-lg'
+        // Capped at the width Radix leaves inside the 16px collision padding, so a long translation wraps instead of running off a narrow screen.
+        className='z-40 flex w-auto max-w-(--radix-popover-content-available-width) items-center gap-3 rounded-xl px-3 py-2 text-sm shadow-lg'
       >
         {/* A chart, for the fundraiser's progress. */}
         <ChartSimpleIcon
           className='size-4 shrink-0 text-muted-foreground'
           aria-hidden='true'
         />
-        <span className='text-muted-foreground'>{t('hostLabel')}</span>
+        <span className='min-w-0 text-muted-foreground'>{t('hostLabel')}</span>
         <Link
           href={dashboardPath}
           aria-label={t('progressLabel')}
