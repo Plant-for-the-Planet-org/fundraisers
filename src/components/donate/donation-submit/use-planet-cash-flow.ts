@@ -26,6 +26,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     rotateIdempotencyKeys,
     createAttempt,
     token,
+    locale,
   } = core;
 
   const onSubmit = useCallback(
@@ -51,7 +52,8 @@ export function usePlanetCashFlow(core: SubmissionCore) {
         const donationResponse = await submitPrepaidDonation(
           attempt.payload,
           token,
-          donationAttemptKey
+          donationAttemptKey,
+          locale
         );
         await attempt.complete(donationResponse.donationId);
       } catch (error) {
@@ -64,6 +66,7 @@ export function usePlanetCashFlow(core: SubmissionCore) {
     },
     [
       token,
+      locale,
       rotateIdempotencyKeys,
       createAttempt,
       submittingRef,

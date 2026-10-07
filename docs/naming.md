@@ -145,5 +145,7 @@ Every token in use lives in this table. Add a row before using a new one, so a r
 | ------------ | --------------- | --------------------------------------- | ---------------------------------------------------- |
 | `utm_source` | `fundraiser`    | Public fundraiser page                  | `components/fundraisers/closed-for-contribution.tsx` |
 | `utm_source` | `stage`         | Stage Mode screen                       | `modules/stage/components/stage-qr-panel.tsx`        |
+| `utm_source` | `report`        | Printed Insights report (its QR code)   | `lib/analytics/insights-report.ts`                   |
 | `utm_medium` | `qr`            | QR code scan                            | `modules/stage/components/stage-qr-panel.tsx`        |
+| `utm_medium` | `print`         | QR code on a printed Insights report    | `lib/analytics/insights-report.ts`                   |
 | `utm_medium` | `closed_banner` | Share from the closed fundraiser banner | `components/fundraisers/closed-for-contribution.tsx` |

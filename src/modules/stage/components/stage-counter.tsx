@@ -6,7 +6,10 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useTranslations } from 'next-intl';
 import { formatCompactNumber } from '@/lib/utils';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
-import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
+import {
+  convertTotalRaisedToSingleCurrency,
+  isLeaderboardShown,
+} from '@/lib/utils/fundraiser';
 import { useAlltimeStats } from '../hooks/use-alltime-stats';
 import { GlassPanel } from './glass-panel';
 
@@ -27,13 +30,19 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const currency = data?.stats.goal.currency ?? fundraiser.currency;
+  // Once the stats have loaded they decide what shows. The fundraiser loaded with the page only fills the first frame, and goes stale on a screen left running.
+  const currency = data?.stats.goal?.currency ?? fundraiser.currency;
   const raised = convertTotalRaisedToSingleCurrency(
-    data?.stats.raised ?? fundraiser.totalRaised,
+    (data ? data.stats.raised : fundraiser.totalRaised) ?? {},
     currency
   );
-  const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
-  const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
+  const goal = data ? data.stats.goal?.amount : fundraiser.goalAmount;
+  // null when the host turned the leaderboard off. Then Stage shows no donor count.
+  const donationCount = data
+    ? data.stats.donationCount
+    : isLeaderboardShown(fundraiser)
+      ? fundraiser.donationCount
+      : null;
   const trees = data?.stats.impact.trees ?? 0;
   const restoredM2 = data?.stats.impact.restoredM2 ?? 0;
   const daysLeft = data?.stats.daysLeft;
@@ -44,6 +53,9 @@ export function StageCounter({
 
   const pct = goal ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
   const t = useTranslations('Stage');
+
+  // The host hid the goal section while this screen was open. The stats now carry no money, so the counter steps aside; a reload shows the Stage notice.
+  if (data && data.stats.raised === null) return null;
 
   function formatImpact(unit: HighlightImpactUnit): {
     value: number;
@@ -105,7 +117,7 @@ export function StageCounter({
         {hero.display}
       </div>
 
-      {heroIsFunding && (
+      {heroIsFunding && goal !== undefined && (
         <div className='mt-2 flex items-baseline justify-between text-sm opacity-70'>
           <span>
             {t('ofGoal', {
@@ -118,7 +130,7 @@ export function StageCounter({
         </div>
       )}
 
-      {showProgressBar && heroIsFunding && (
+      {showProgressBar && heroIsFunding && goal !== undefined && (
         <div
           className='mt-2.5 h-2 overflow-hidden rounded-full'
           style={{ background: 'rgba(11,18,32,.08)' }}
@@ -156,17 +168,19 @@ export function StageCounter({
         className='mt-3.5 flex gap-5 border-t pt-3.5'
         style={{ borderColor: 'rgba(11,18,32,.12)' }}
       >
-        <div className='flex flex-col gap-0.5'>
-          <span
-            className='text-[22px] font-bold'
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {formatDonorCount(donationCount)}
-          </span>
-          <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
-            {t('donors')}
-          </span>
-        </div>
+        {donationCount !== null && (
+          <div className='flex flex-col gap-0.5'>
+            <span
+              className='text-[22px] font-bold'
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {formatDonorCount(donationCount)}
+            </span>
+            <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
+              {t('donors')}
+            </span>
+          </div>
+        )}
 
         {!heroIsFunding ? (
           <div className='flex flex-col gap-0.5'>

@@ -6,16 +6,16 @@ import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
 import { useImpersonationStore } from '@/stores/impersonation-store';
 
 /**
- * Returns the set of fundraiser ids the logged-in user owns/admins, loading it
+ * Returns the set of fundraiser ids the logged-in user actively hosts, in any role, loading it
  * once per identity via {@link useHostedFundraisersStore}. Pass `enabled: false`
  * to skip the fetch entirely (e.g. when the caller can already tell from the
  * page payload that the user is a host, or when nobody is logged in).
  *
- * `adminIds` is only returned when it belongs to the *current* identity, so a
+ * `hostIds` is only returned when it belongs to the *current* identity, so a
  * cache left over from a previous user/impersonation is never surfaced.
  */
-export function useHostedAdminIds({ enabled }: { enabled: boolean }): {
-  adminIds: Set<string> | null;
+export function useHostedFundraiserIds({ enabled }: { enabled: boolean }): {
+  hostIds: Set<string> | null;
 } {
   const token = useAuthStore(state => state.accessToken);
   const userId = useAuthStore(state => state.user?.sub);
@@ -26,7 +26,7 @@ export function useHostedAdminIds({ enabled }: { enabled: boolean }): {
   const cachedIdentityKey = useHostedFundraisersStore(
     state => state.identityKey
   );
-  const adminIds = useHostedFundraisersStore(state => state.adminIds);
+  const hostIds = useHostedFundraisersStore(state => state.hostIds);
   const ensureLoaded = useHostedFundraisersStore(state => state.ensureLoaded);
 
   // Namespace the cache by bearer token + impersonation target so a
@@ -38,10 +38,10 @@ export function useHostedAdminIds({ enabled }: { enabled: boolean }): {
   useEffect(() => {
     if (!enabled || !identityKey || !token || !userId) return;
     // A non-host gets a normal 200 with an empty list, so what we catch here is a real failure (network, 5xx, timeout). Swallow it: non-fatal for this cosmetic control, it just means no edit shortcut.
-    ensureLoaded(identityKey, token, userId).catch(() => {});
+    ensureLoaded(identityKey, token).catch(() => {});
   }, [enabled, identityKey, token, userId, ensureLoaded]);
 
   return {
-    adminIds: cachedIdentityKey === identityKey ? adminIds : null,
+    hostIds: cachedIdentityKey === identityKey ? hostIds : null,
   };
 }

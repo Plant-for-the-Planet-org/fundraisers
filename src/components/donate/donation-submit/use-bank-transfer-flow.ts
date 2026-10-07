@@ -34,6 +34,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
     rotateIdempotencyKeys,
     createAttempt,
     token,
+    locale,
     paymentOptions,
   } = core;
 
@@ -62,6 +63,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
             selectedPaymentMethod: 'bank_transfer',
             paymentOptions,
             paymentDetails: {},
+            locale,
           });
 
         if (paymentResponse.status === 'failed') {
@@ -101,6 +103,7 @@ export function useBankTransferFlow(core: SubmissionCore) {
     [
       paymentOptions,
       token,
+      locale,
       rotateIdempotencyKeys,
       createAttempt,
       submittingRef,

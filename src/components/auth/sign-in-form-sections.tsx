@@ -63,7 +63,7 @@ export function EmailSignInSection({ start, isPending }: SectionProps) {
               type='button'
               disabled={isPending}
               onClick={() => start({ method: 'signup', email: email.trim() })}
-              className='font-medium text-accent-color hover:underline'
+              className='font-medium text-accent-text hover:underline'
             >
               {chunks}
             </button>

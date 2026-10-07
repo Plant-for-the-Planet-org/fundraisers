@@ -18,9 +18,15 @@ function cleanPaymentDetails(
 export async function submitPrepaidDonation(
   payload: DonationPayload,
   token: string,
-  donationIdempotencyKey: string
+  donationIdempotencyKey: string,
+  locale: string
 ) {
-  return donationService.createDonation(payload, token, donationIdempotencyKey);
+  return donationService.createDonation(
+    payload,
+    token,
+    donationIdempotencyKey,
+    locale
+  );
 }
 
 interface SubmitStandardPostpaidDonationOptions {
@@ -31,6 +37,7 @@ interface SubmitStandardPostpaidDonationOptions {
   selectedPaymentMethod: PaymentMethod;
   paymentOptions: PaymentOptions;
   paymentDetails: Record<string, string | number | boolean | undefined>;
+  locale: string;
 }
 
 /** Standard postpaid: two-step flow — create donation, then process payment */
@@ -42,12 +49,14 @@ export async function submitStandardPostpaidDonation({
   selectedPaymentMethod,
   paymentOptions,
   paymentDetails,
+  locale,
 }: SubmitStandardPostpaidDonationOptions) {
   // Step 1: Create donation
   const donationResponse = await donationService.createDonation(
     payload,
     token,
-    donationIdempotencyKey
+    donationIdempotencyKey,
+    locale
   );
 
   const paymentData: PaymentData =

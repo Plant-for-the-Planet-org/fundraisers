@@ -17,6 +17,8 @@
     "daysLeft": "T übrig",
     "notEnabled": "Bühnenmodus ist für diesen Spendenaufruf nicht aktiviert.",
     "notEnabledHint": "Aktualisiere die Einstellungen des Aufrufs oder frage den Ersteller.",
+    "goalHidden": "Der Bühnenmodus braucht den Zielbereich.",
+    "goalHiddenHint": "Der Zielbereich ist ausgeblendet. Blende ihn in den Einstellungen des Aufrufs ein, um den Bühnenmodus zu nutzen.",
     "fundraiserNotFound": "Spendenaufruf nicht gefunden.",
     "anonymous": "Anonym",
     "topBar": {

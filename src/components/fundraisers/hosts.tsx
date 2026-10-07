@@ -126,7 +126,7 @@ function HostsStripDisplay({
         ))}
       </div>
       <div className='text-foreground text-sm font-semibold leading-tight'>
-        {t('hostedByLabel')} {namesText}
+        {t('hostedBy', { hostName: namesText })}
       </div>
     </div>
   );
