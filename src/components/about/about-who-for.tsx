@@ -171,7 +171,7 @@ export function AboutWhoFor() {
                       href={FORESTCLOUD_URL}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='inline-flex items-center gap-1.5 text-sm font-semibold text-accent-color hover:opacity-80'
+                      className='inline-flex items-center gap-1.5 text-sm font-semibold text-accent-text hover:opacity-80'
                     >
                       {t('tabs.organizations.learnMore')}
                       <ArrowRight className='h-4 w-4' aria-hidden='true' />

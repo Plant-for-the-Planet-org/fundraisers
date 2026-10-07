@@ -36,7 +36,7 @@ function seed(
   return {
     recent,
     raised: startRaised + recent.reduce((sum, d) => sum + (d.amount ?? 0), 0),
-    donationCount: SEED_COUNT,
+    donationCount: recent.length,
   };
 }
 

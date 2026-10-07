@@ -40,7 +40,7 @@ A fundraiser's accent is picked by the host, and every theme has one. Use these 
 |---|---|---|
 | A solid accent button or fill | `bg-accent-color` with `text-[var(--cta-foreground,#fff)]` | `--cta-foreground` is white when white reaches 4.5:1 on the accent, black otherwise (`getOnColorText`) |
 | Accent text or a link on the page | `text-accent-text` | It falls back to the normal text colour when the accent is too light for the page, in light and dark mode |
-| Accent text on a light accent tint (`bg-accent-color/10` or `/20`) | `text-accent-ink` | The accent darkened to 85%. The plain accent falls just short on its own tint (4.4:1 on 10%) |
+| Accent text on a light accent tint (`bg-accent-color/10` or `/20`) | `text-accent-ink` | The plain accent falls just short on its own tint (4.4:1 on 10%). `ThemeShell` darkens it per theme, only as far as needed, so it stays readable even for a very pale custom accent |
 | Large accent text, like a headline word or a big number | `text-accent-color` is fine | Large text needs only 3:1 |
 
 The palette in `accent-utils.ts` uses shades dark enough for white text (mostly the 700 shade). Only yellow and lime stay bright, with black text. If you add an accent, check it gets white text, or decide on purpose that it should not.

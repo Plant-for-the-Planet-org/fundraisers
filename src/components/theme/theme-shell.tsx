@@ -18,8 +18,10 @@ import {
   getContrastRatio,
   getDominantStopColor,
   getOnColorText,
+  getReadableInk,
   isValidHexColor,
   MIN_TEXT_CONTRAST,
+  mixHex,
 } from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
@@ -127,6 +129,15 @@ export function ThemeShell({
       : undefined;
   const accentTextOnLight = accentTextOn('#ffffff');
   const accentTextOnDark = accentTextOn('#000000');
+  // Accent text on a light accent tint (up to 20%), for each mode: darkened (or lightened) only as far as needed to stay readable, so even a very pale custom accent works.
+  const accentInkOnLight = getReadableInk(
+    accentColor,
+    mixHex(accentColor, '#ffffff', 0.2)
+  );
+  const accentInkOnDark = getReadableInk(
+    accentColor,
+    mixHex(accentColor, '#000000', 0.2)
+  );
 
   // Dialogs and toasts portal to <body>, outside this wrapper, so they would only see the :root default. Mirror the accent on the root element for them.
   useEffect(() => {
@@ -139,13 +150,24 @@ export function ThemeShell({
     html.style.setProperty('--cta-foreground', ctaForeground);
     setOrRemove('--accent-text-on-light', accentTextOnLight);
     setOrRemove('--accent-text-on-dark', accentTextOnDark);
+    html.style.setProperty('--accent-ink-on-light', accentInkOnLight);
+    html.style.setProperty('--accent-ink-on-dark', accentInkOnDark);
     return () => {
       html.style.removeProperty('--accent-color');
       html.style.removeProperty('--cta-foreground');
       html.style.removeProperty('--accent-text-on-light');
       html.style.removeProperty('--accent-text-on-dark');
+      html.style.removeProperty('--accent-ink-on-light');
+      html.style.removeProperty('--accent-ink-on-dark');
     };
-  }, [accentColor, ctaForeground, accentTextOnLight, accentTextOnDark]);
+  }, [
+    accentColor,
+    ctaForeground,
+    accentTextOnLight,
+    accentTextOnDark,
+    accentInkOnLight,
+    accentInkOnDark,
+  ]);
 
   // A single colour representing the chosen background, at full strength (not
   // the 14% wash). Used to tint image/pattern decorations. Falls back to the
@@ -168,6 +190,8 @@ export function ThemeShell({
           '--cta-foreground': ctaForeground,
           '--accent-text-on-light': accentTextOnLight,
           '--accent-text-on-dark': accentTextOnDark,
+          '--accent-ink-on-light': accentInkOnLight,
+          '--accent-ink-on-dark': accentInkOnDark,
         } as React.CSSProperties
       }
     >

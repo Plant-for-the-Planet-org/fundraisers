@@ -63,9 +63,12 @@ export function AboutCustomizeSlides({
     const card = track?.firstElementChild as HTMLElement | null;
     if (!track || !card) return;
     const gap = 16;
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
     track.scrollBy({
       left: direction * (card.offsetWidth + gap),
-      behavior: 'smooth',
+      behavior: reduceMotion ? 'auto' : 'smooth',
     });
   }
 
@@ -74,7 +77,7 @@ export function AboutCustomizeSlides({
       {/* The track runs to the screen edges, so cards slide off the page instead of being cut at the column. --bleed is the gap from the screen edge to the text column: MainContent is 960px wide with 1rem padding. */}
       <ul
         ref={trackRef}
-        className='-mx-(--bleed) flex list-none snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-(--bleed) scroll-px-(--bleed) pb-2 [--bleed:max(1rem,calc((100vw-960px)/2+1rem))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+        className='-mx-(--bleed) flex list-none snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth motion-reduce:scroll-auto px-(--bleed) scroll-px-(--bleed) pb-2 [--bleed:max(1rem,calc((100vw-960px)/2+1rem))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       >
         {slides.map(({ key, title, text }) => {
           const Icon = ICONS[key];

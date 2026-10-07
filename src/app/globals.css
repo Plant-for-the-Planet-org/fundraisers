@@ -55,8 +55,8 @@
   --color-success: hsl(var(--success));
   --color-accent-color: var(--accent-color);
   --color-accent-text: var(--accent-text);
-  /* The accent darkened a little, for accent text on a light accent tint (bg-accent-color/10 or /20), where the plain accent can fall short of 4.5:1. */
-  --color-accent-ink: color-mix(in srgb, var(--accent-color) 85%, black);
+  /* Accent text on a light accent tint (bg-accent-color/10 or /20). ThemeShell works out a readable shade per theme and mode. */
+  --color-accent-ink: var(--accent-ink);
   --color-neutral: hsl(var(--neutral));
   --color-neutral-foreground: hsl(var(--neutral-foreground));
   --color-tab-border: var(--tab-border-color);
@@ -141,6 +141,7 @@
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
   --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
+  --accent-ink: var(--accent-ink-on-light, hsl(var(--foreground)));
 }
 
 .dark {
@@ -168,6 +169,7 @@
   --base-rgb: 0 0 0;
   --reverse-rgb: 255 255 255;
   --accent-text: var(--accent-text-on-dark, hsl(var(--foreground)));
+  --accent-ink: var(--accent-ink-on-dark, hsl(var(--foreground)));
 }
 
 .light {
@@ -195,6 +197,7 @@
   --base-rgb: 255 255 255;
   --reverse-rgb: 0 0 0;
   --accent-text: var(--accent-text-on-light, hsl(var(--foreground)));
+  --accent-ink: var(--accent-ink-on-light, hsl(var(--foreground)));
 }
 
 body {
