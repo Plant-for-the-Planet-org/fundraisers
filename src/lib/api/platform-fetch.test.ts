@@ -6,9 +6,16 @@ vi.mock('@/stores/impersonation-store', () => ({
   },
 }));
 
+vi.mock('./donation-tracking', async importOriginal => {
+  const actual = await importOriginal<typeof DonationTracking>();
+  return { ...actual, needsTrackingId: vi.fn(actual.needsTrackingId) };
+});
+
+import type * as DonationTracking from './donation-tracking';
 import type { PlatformAPIError } from './platform-fetch';
 
 import { useImpersonationStore } from '@/stores/impersonation-store';
+import { needsTrackingId } from './donation-tracking';
 import {
   getActiveImpersonation,
   impersonationHeaders,
@@ -146,6 +153,43 @@ describe('platformFetch', () => {
       const [, init] = fetchMock.mock.calls[0];
       expect(init.headers['x-switch-user']).toBeUndefined();
       expect(init.headers['x-user-support-pin']).toBeUndefined();
+    });
+  });
+
+  describe('locale', () => {
+    it('adds the locale as a query param', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      await platformFetch('/donations', { method: 'POST', locale: 'de' });
+
+      const [url] = fetchMock.mock.calls[0];
+      expect(url).toMatch(/\/donations\?locale=de$/);
+    });
+
+    it('appends to a path that already has a query', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      await platformFetch('/foo?page=2', { locale: 'de' });
+
+      const [url] = fetchMock.mock.calls[0];
+      expect(url).toMatch(/\/foo\?page=2&locale=de$/);
+    });
+
+    it('leaves the URL alone without a locale', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      await platformFetch('/foo');
+
+      const [url] = fetchMock.mock.calls[0];
+      expect(url).toMatch(/\/foo$/);
+    });
+
+    it('checks the tracking id against the bare path, so the locale cannot turn it off', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse({ ok: true }));
+      await platformFetch('/donations', {
+        method: 'POST',
+        body: { amount: 10 },
+        locale: 'de',
+      });
+
+      expect(needsTrackingId).toHaveBeenCalledWith('/donations', 'POST', false);
     });
   });
 
