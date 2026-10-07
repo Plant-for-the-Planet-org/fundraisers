@@ -513,9 +513,10 @@
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
     },
     "hostControls": {
-      "hostLabel": "Du bist Organisator*in",
-      "editButton": "Bearbeiten",
-      "editLabel": "Spendenaufruf bearbeiten"
+      "hostLabel": "Du bist Organisator*in.",
+      "progressButton": "Fortschritt ansehen",
+      "progressLabel": "Fortschritt dieses Spendenaufrufs im Dashboard ansehen",
+      "closeLabel": "Schließen"
     }
   }
 }
