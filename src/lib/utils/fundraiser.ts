@@ -156,6 +156,13 @@ export function getDaysLeft(endDate: string): number {
   );
 }
 
+/** False when the host switched the goal section off. Then no raised amount, goal or progress may show publicly. */
+export function isGoalSectionShown(
+  fundraiser: Pick<Fundraiser, 'settings'>
+): boolean {
+  return fundraiser.settings?.modules?.donor_score?.enabled ?? true;
+}
+
 /**
  * True when the fundraiser has run its course, which is the only state that earns celebratory copy.
  *

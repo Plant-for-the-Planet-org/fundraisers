@@ -10,6 +10,7 @@ import {
   getDaysLeft,
   getFundraiserUrl,
   hasFundraiserConcluded,
+  isGoalSectionShown,
 } from '@/lib/utils/fundraiser';
 import { selectPublicHosts } from '@/lib/utils/fundraiser-hosts';
 import {
@@ -68,6 +69,7 @@ export function FundraiserView({
       : 0;
   const daysLeft = getDaysLeft(fundraiser.endDate);
   const donorScoreSettings = fundraiser.settings?.modules?.donor_score;
+  const showGoalSection = isGoalSectionShown(fundraiser);
   const showGoal = donorScoreSettings?.show_goal ?? true;
   const showDaysLeft = donorScoreSettings?.show_days_left ?? true;
 
@@ -110,14 +112,18 @@ export function FundraiserView({
         </div>
 
         {/* Goal progress */}
-        <GoalProgressDisplay
-          raisedAmount={totalRaisedAmount}
-          goalAmount={fundraiser.goalAmount}
-          currency={fundraiser.currency}
-          progressPercentage={progressPercentage}
-          daysLeft={canReceiveDonations && showDaysLeft ? daysLeft : undefined}
-          showGoal={showGoal}
-        />
+        {showGoalSection && (
+          <GoalProgressDisplay
+            raisedAmount={totalRaisedAmount}
+            goalAmount={fundraiser.goalAmount}
+            currency={fundraiser.currency}
+            progressPercentage={progressPercentage}
+            daysLeft={
+              canReceiveDonations && showDaysLeft ? daysLeft : undefined
+            }
+            showGoal={showGoal}
+          />
+        )}
 
         {/* Donation count + donor avatars (only when leaderboard module is on).
             DonorsSummary renders the count header + strip + a "View all" entry
@@ -200,6 +206,7 @@ export function FundraiserView({
             goalAmount={fundraiser.goalAmount}
             currency={fundraiser.currency}
             donationCount={fundraiser.donationCount}
+            showAmounts={showGoalSection}
             impact={impact}
             projectNames={fundraiser.projectAllocations.map(
               allocation => allocation.project.name

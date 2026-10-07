@@ -48,6 +48,7 @@
       "exploreCta": "Weitere Spendenaufrufe entdecken",
       "shareCta": "Teilen",
       "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",
+      "shareTextNoAmount": "Danke an alle, die für {title} gespendet haben!",
       "shareCopied": "Link kopiert!",
       "shareFailed": "Der Link konnte nicht geteilt werden. Bitte erneut versuchen."
     },
@@ -178,8 +179,13 @@
       "goalSettings": {
         "sectionHeading": "Ziel-Einstellungen",
         "openSettings": "Ziel-Einstellungen",
+        "enableGoal": "Zielbereich anzeigen",
         "showGoal": "Ziel anzeigen",
-        "showDaysLeft": "Verbleibende Tage anzeigen"
+        "showDaysLeft": "Verbleibende Tage anzeigen",
+        "hiddenView": {
+          "title": "Ziel ausgeblendet",
+          "description": "Spender sehen weder den gesammelten Betrag noch das Ziel oder die verbleibenden Tage."
+        }
       },
       "theme": {
         "sectionHeading": "Thema",

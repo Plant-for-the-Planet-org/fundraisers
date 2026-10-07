@@ -25,6 +25,8 @@ interface ClosedForContributionProps {
   goalAmount: number;
   currency: string | null | undefined;
   donationCount: number;
+  /** False when the host hid the goal section. Then no amount, goal or impact figure shows. */
+  showAmounts: boolean;
   projectNames: string[];
   /** Impact units from alltime-stats. Rendered only when SHOW_IMPACT_LINE is on and at least one unit is positive. */
   impact?: FundraiserImpact;
@@ -39,6 +41,7 @@ export function ClosedForContribution({
   goalAmount,
   currency,
   donationCount,
+  showAmounts,
   projectNames,
   impact,
   sharePath,
@@ -47,7 +50,8 @@ export function ClosedForContribution({
   const locale = useLocale();
 
   // A paused or cancelled fundraiser can sit above its goal without having ended, so the badge and the goal-reached heading are held back until it has actually concluded.
-  const goalReached = concluded && goalAmount > 0 && raisedAmount >= goalAmount;
+  const goalReached =
+    showAmounts && concluded && goalAmount > 0 && raisedAmount >= goalAmount;
   const fundedPercent = goalReached
     ? Math.round((raisedAmount / goalAmount) * 100)
     : 0;
@@ -60,7 +64,7 @@ export function ClosedForContribution({
       : t('title');
 
   const raisedSentence =
-    !concluded || raisedAmount <= 0
+    !showAmounts || !concluded || raisedAmount <= 0
       ? null
       : projectNames.length === 1
         ? t('raisedForProject', { amount, project: projectNames[0] })
@@ -90,7 +94,7 @@ export function ClosedForContribution({
   const impactParts =
     SHOW_IMPACT_LINE && concluded ? buildImpactParts(impact) : [];
   const impactSentence =
-    raisedAmount > 0 && impactParts.length > 0
+    showAmounts && raisedAmount > 0 && impactParts.length > 0
       ? t('impactLine', {
           impact: new Intl.ListFormat(locale, {
             style: 'long',
@@ -114,7 +118,9 @@ export function ClosedForContribution({
     url.searchParams.set('utm_source', 'fundraiser');
     url.searchParams.set('utm_medium', 'closed_banner');
     const shareUrl = url.toString();
-    const text = t('shareText', { title, amount });
+    const text = showAmounts
+      ? t('shareText', { title, amount })
+      : t('shareTextNoAmount', { title });
 
     try {
       if (typeof navigator.share === 'function') {
