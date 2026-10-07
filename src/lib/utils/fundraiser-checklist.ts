@@ -1,5 +1,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
+import { hasFundraiserConcluded } from './fundraiser';
+
 /** A story shorter than this reads as a placeholder rather than a reason to give. */
 export const STORY_MIN_LENGTH = 200;
 
@@ -15,7 +17,8 @@ export type ChecklistItemId =
   | 'goal'
   | 'published'
   | 'coHost'
-  | 'firstDonation';
+  | 'firstDonation'
+  | 'share';
 
 export interface ChecklistItem {
   id: ChecklistItemId;
@@ -64,6 +67,8 @@ export function getFundraiserChecklist(
         fundraiser.hosts.filter(host => host.status === 'active').length > 1,
     },
     { id: 'firstDonation', done: fundraiser.donationCount > 0 },
+    // Sharing is never finished while people can still give, so it stays open until the fundraiser ends, and always comes last.
+    { id: 'share', done: hasFundraiserConcluded(fundraiser) },
   ];
 }
 

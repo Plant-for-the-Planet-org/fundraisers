@@ -88,6 +88,8 @@ export interface UserProfileResponse {
     received: number;
     target: number;
   };
+  /** Short code that tags the links this person shares (`?ref=`). Only donor profiles get one; organisation profiles never do. */
+  referralCode?: string | null;
 }
 
 export type ProfilePaymentMethodType =

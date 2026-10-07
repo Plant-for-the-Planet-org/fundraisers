@@ -8,7 +8,13 @@ import type { BankAccountDetails } from './payment';
 
 // Discriminated union for thank-you screen variants
 export type ThankYouState =
-  | { status: 'completed'; donationId: string | null }
+  | {
+      status: 'completed';
+      donationId: string | null;
+      amount: number; // decimal, as returned by the API
+      currency: string;
+      frequency: DonationFrequency;
+    }
   | {
       status: 'bankTransferPending';
       donationId: string | null;

@@ -4,12 +4,13 @@ import {
   ShareLinksCard,
   useFundraiserDetail,
 } from '@/components/dashboard/fundraiser-detail';
+import { ShareStudio } from '@/components/share/share-studio';
 
-// Story images and post templates to download will sit here as more cards.
 export default function FundraiserSharePage() {
   const fundraiser = useFundraiserDetail();
   return (
     <div className='space-y-6'>
+      <ShareStudio fundraiser={fundraiser} variant='host' />
       <ShareLinksCard slug={fundraiser.slug} />
     </div>
   );

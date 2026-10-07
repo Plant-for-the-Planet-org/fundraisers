@@ -1,13 +1,10 @@
 name: Build
 
-# Build gate for the Vercel-deployed branches (develop, main). Runs on every
-# PR into them and blocks the merge if `next build` fails. Merges happen
-# GitHub-side, where the local pre-push hook never runs — so this is the gate
-# that stops a broken commit from triggering a Vercel deploy. (Feature
-# branches deploy via Coolify on push and are guarded by the pre-push build.)
+# Checks for every pull request, into any branch, so stacked PRs get them too. Type check and unit tests run first, then `next build`. A failure blocks the merge.
+# Merges happen on GitHub, where the local pre-push hook never runs, so this is the gate that stops a broken commit from triggering a Vercel deploy of develop or main.
+# Feature branches deploy via Coolify on push and are guarded by the pre-push build.
 on:
   pull_request:
-    branches: [develop, main]
 
 # A new push to the same PR cancels the in-flight run.
 concurrency:
@@ -19,12 +16,8 @@ jobs:
     name: next build
     runs-on: ubuntu-latest
     env:
-      # Public (NEXT_PUBLIC_*) placeholders so the build compiles in CI.
-      # These are NOT secrets — they ship in the browser bundle anyway. The
-      # real per-environment values are injected by Coolify at deploy time.
-      # auth0-config.ts throws at module load without a client id, which would
-      # fail the build; the placeholder satisfies that without weakening the
-      # deploy-time fail-fast.
+      # Public (NEXT_PUBLIC_*) placeholders so the build compiles in CI. They are not secrets: they ship in the browser bundle anyway, and Coolify injects the real values at deploy time.
+      # auth0-config.ts throws at module load without a client id. The placeholder satisfies that without weakening the deploy-time fail-fast.
       NEXT_PUBLIC_AUTH0_CLIENT_ID: ci-placeholder
       NEXT_PUBLIC_API_BASE_URL: https://app.plant-for-the-planet.org
       NEXT_PUBLIC_CDN_URL: https://cdn.plant-for-the-planet.org
@@ -38,6 +31,16 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # A fresh checkout has none of the generated types tsc needs: next-env.d.ts, the route types and next-intl's locale message types.
+      - name: Generate types
+        run: npx next typegen
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Test
+        run: npm run test
 
       - name: Build
         run: npm run build

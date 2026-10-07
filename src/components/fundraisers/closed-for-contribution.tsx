@@ -1,9 +1,10 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { Compass, Share2, Trophy } from 'lucide-react';
-import { toast } from 'sonner';
+import { Compass, Trophy } from 'lucide-react';
 import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +19,6 @@ export interface FundraiserImpact {
 }
 
 interface ClosedForContributionProps {
-  title: string;
   /** True once the fundraiser has run its course. Only then is the celebratory copy true. */
   concluded: boolean;
   raisedAmount: number;
@@ -30,12 +30,11 @@ interface ClosedForContributionProps {
   projectNames: string[];
   /** Impact units from alltime-stats. Rendered only when SHOW_IMPACT_LINE is on and at least one unit is positive. */
   impact?: FundraiserImpact;
-  /** Fundraiser path, e.g. `/raise/my-slug`. Omit for unlisted fundraisers so no share button renders. */
-  sharePath?: string;
+  /** Shown beside Explore, only once the fundraiser has concluded. */
+  shareButton?: ReactNode;
 }
 
 export function ClosedForContribution({
-  title,
   concluded,
   raisedAmount,
   goalAmount,
@@ -44,7 +43,7 @@ export function ClosedForContribution({
   showAmounts,
   projectNames,
   impact,
-  sharePath,
+  shareButton,
 }: ClosedForContributionProps) {
   const t = useTranslations('Fundraisers.closedForContribution');
   const locale = useLocale();
@@ -111,31 +110,6 @@ export function ClosedForContribution({
     .filter(Boolean)
     .join(' ');
 
-  const handleShare = async () => {
-    if (!sharePath) return;
-    // Built from the canonical path, so the sharer's own landing params never travel with the link. Tokens are listed in docs/naming.md.
-    const url = new URL(sharePath, window.location.origin);
-    url.searchParams.set('utm_source', 'fundraiser');
-    url.searchParams.set('utm_medium', 'closed_banner');
-    const shareUrl = url.toString();
-    const text = showAmounts
-      ? t('shareText', { title, amount })
-      : t('shareTextNoAmount', { title });
-
-    try {
-      if (typeof navigator.share === 'function') {
-        await navigator.share({ title, text, url: shareUrl });
-        return;
-      }
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success(t('shareCopied'));
-    } catch (error) {
-      // The user closing the native share sheet is not a failure worth a toast.
-      if (error instanceof DOMException && error.name === 'AbortError') return;
-      toast.error(t('shareFailed'));
-    }
-  };
-
   return (
     <section
       aria-labelledby='closed-for-contribution-title'
@@ -165,12 +139,7 @@ export function ClosedForContribution({
             {t('exploreCta')}
           </Link>
         </Button>
-        {concluded && sharePath && (
-          <Button variant='ghost' size='sm' onClick={handleShare}>
-            <Share2 aria-hidden='true' />
-            {t('shareCta')}
-          </Button>
-        )}
+        {concluded && shareButton}
       </div>
     </section>
   );
