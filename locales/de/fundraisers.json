@@ -515,9 +515,10 @@
       "moreOptions": "Mehr Optionen im Tab Teilen"
     },
     "hostControls": {
-      "hostLabel": "Du bist Organisator*in",
-      "editButton": "Bearbeiten",
-      "editLabel": "Spendenaufruf bearbeiten"
+      "hostLabel": "Dein Spendenaufruf.",
+      "progressButton": "Fortschritt",
+      "progressLabel": "Fortschritt dieses Spendenaufrufs im Dashboard ansehen",
+      "closeLabel": "Schließen"
     }
   }
 }

@@ -515,9 +515,10 @@
       "moreOptions": "More options in your Share tab"
     },
     "hostControls": {
-      "hostLabel": "You're a host",
-      "editButton": "Edit",
-      "editLabel": "Edit fundraiser"
+      "hostLabel": "You're a host.",
+      "progressButton": "View progress",
+      "progressLabel": "View this fundraiser's progress in your dashboard",
+      "closeLabel": "Close"
     }
   }
 }

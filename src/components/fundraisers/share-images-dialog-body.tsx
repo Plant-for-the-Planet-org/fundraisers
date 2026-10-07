@@ -5,7 +5,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { ShareStudio } from '@/components/share/share-studio';
-import { useIsHostAdmin } from './use-is-host-admin';
+import { useIsHost } from './use-is-host';
 
 /** What the "Share images" dialog shows: the donor studio without a gift, and for a host a way to the full studio. */
 export function ShareImagesDialogBody({
@@ -17,19 +17,19 @@ export function ShareImagesDialogBody({
   fitHeight: string;
 }) {
   const t = useTranslations('Fundraisers.shareImages');
-  const isHostAdmin = useIsHostAdmin(fundraiser);
+  const isHost = useIsHost(fundraiser);
 
   return (
     <div className='grid gap-4'>
       <ShareStudio
         fundraiser={fundraiser}
         variant='donor'
-        sharer={isHostAdmin ? 'host' : 'supporter'}
+        sharer={isHost ? 'host' : 'supporter'}
         // A host's link below takes one line and the gap above it.
-        fitHeight={isHostAdmin ? `calc(${fitHeight} - 2.25rem)` : fitHeight}
+        fitHeight={isHost ? `calc(${fitHeight} - 2.25rem)` : fitHeight}
         pinActions
       />
-      {isHostAdmin && (
+      {isHost && (
         <Link
           href={`/dashboard/fundraisers/${encodeURIComponent(fundraiser.slug)}/share`}
           className='justify-self-center text-sm font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline'
