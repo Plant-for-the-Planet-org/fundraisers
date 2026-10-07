@@ -46,7 +46,7 @@ export interface PlatformFetchOptions {
   token?: string;
   timeoutMs?: number;
   idempotencyKey?: string;
-  /** Sent as `?locale=`, the only place the platform reads it when creating a donation. */
+  /** Sent as `?locale=`, which the platform reads before the `x-locale` header. Only `createDonation` passes it today. */
   locale?: string;
   extraHeaders?: ExtraHeaders;
   /**
@@ -143,14 +143,13 @@ export async function platformFetch<T>(
     }
   }
 
-  // Added here, not by callers, because `needsTrackingId` above matches the bare path.
-  const url = opts.locale
-    ? `${path}${path.includes('?') ? '&' : '?'}${new URLSearchParams({ locale: opts.locale })}`
-    : path;
+  // Check for the tracking ID first, then add the locale. Otherwise, the TRACKING-ID header would be lost - needsTrackingId compares the exact path, and '/donations?locale=de' does not match '/donations'.
+  const url = new URL(`${API_BASE_URL}${path}`);
+  if (opts.locale) url.searchParams.set('locale', opts.locale);
 
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${url}`, {
+    response = await fetch(url.toString(), {
       method,
       headers,
       body: requestBody,
