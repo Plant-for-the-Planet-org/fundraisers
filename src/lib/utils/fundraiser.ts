@@ -6,6 +6,7 @@ import type {
   Fundraiser,
   FundraiserStatus,
   FundraiserTransition,
+  LeaderboardModuleSettings,
 } from '../types/fundraiser';
 import type { Nullable } from '../types/utility';
 
@@ -161,6 +162,18 @@ export function isGoalSectionShown(
   fundraiser: Pick<Fundraiser, 'settings'>
 ): boolean {
   return fundraiser.settings?.modules?.donor_score?.enabled ?? true;
+}
+
+/** The fundraiser's leaderboard settings as the public may see them. Amounts add up to the raised total, so they follow the goal section as well as `show_amount`, as in the API. */
+export function getPublicLeaderboardSettings(
+  fundraiser: Pick<Fundraiser, 'settings'>
+): LeaderboardModuleSettings | undefined {
+  const leaderboard = fundraiser.settings?.modules?.leaderboard;
+  if (!leaderboard) return undefined;
+  return {
+    ...leaderboard,
+    show_amount: leaderboard.show_amount && isGoalSectionShown(fundraiser),
+  };
 }
 
 /** False when the host turned the leaderboard off or hid both its lists. Then the donation count may not show publicly. Same rule and defaults as the API. */

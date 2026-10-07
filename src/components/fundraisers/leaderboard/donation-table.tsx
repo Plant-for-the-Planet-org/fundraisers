@@ -73,11 +73,12 @@ function DonationRow({
       </td>
       {showAmount && (
         <td className='py-3 px-4 text-right text-sm font-semibold text-foreground whitespace-nowrap'>
-          {formatCurrencyFromDecimal(
-            donation.amount,
-            donation.currency,
-            locale
-          )}
+          {donation.amount !== null &&
+            formatCurrencyFromDecimal(
+              donation.amount,
+              donation.currency,
+              locale
+            )}
         </td>
       )}
     </tr>

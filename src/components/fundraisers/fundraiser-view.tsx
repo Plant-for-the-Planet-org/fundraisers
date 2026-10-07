@@ -9,6 +9,7 @@ import {
   convertTotalRaisedToSingleCurrency,
   getDaysLeft,
   getFundraiserUrl,
+  getPublicLeaderboardSettings,
   hasFundraiserConcluded,
   isGoalSectionShown,
 } from '@/lib/utils/fundraiser';
@@ -73,7 +74,7 @@ export function FundraiserView({
   const showGoal = donorScoreSettings?.show_goal ?? true;
   const showDaysLeft = donorScoreSettings?.show_days_left ?? true;
 
-  const leaderboardSettings = fundraiser.settings?.modules?.leaderboard;
+  const leaderboardSettings = getPublicLeaderboardSettings(fundraiser);
   const canShowLeaderboard =
     leaderboardSettings?.enabled &&
     (leaderboardSettings.show_recent_list || leaderboardSettings.show_top_list);
