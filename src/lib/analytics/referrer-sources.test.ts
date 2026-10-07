@@ -3,7 +3,7 @@ import { groupReferrers } from './referrer-sources';
 
 describe('groupReferrers', () => {
   it('folds app ids and redirectors into one platform', () => {
-    const result = groupReferrers(
+    const { sources: result } = groupReferrers(
       [
         { x: 'linkedin.com', y: 9 },
         { x: 'com.linkedin.android', y: 8 },
@@ -20,7 +20,7 @@ describe('groupReferrers', () => {
   });
 
   it('drops sign-in redirects and our own domains', () => {
-    const result = groupReferrers(
+    const { sources: result } = groupReferrers(
       [
         { x: 'accounts.google.com', y: 4 },
         { x: 'startplanting.org', y: 3 },
@@ -33,12 +33,12 @@ describe('groupReferrers', () => {
 
   it('counts webmail as email, not search', () => {
     expect(
-      groupReferrers([{ x: 'mail.google.com', y: 1 }], 10)[0]?.source
+      groupReferrers([{ x: 'mail.google.com', y: 1 }], 10).sources[0]?.source
     ).toBe('email');
   });
 
-  it('keeps unknown sites by domain and respects the limit', () => {
-    const result = groupReferrers(
+  it('keeps unknown sites by domain and counts the ones past the limit', () => {
+    const { sources, otherVisitors } = groupReferrers(
       [
         { x: 'www.blog.example', y: 3 },
         { x: 'news.example', y: 2 },
@@ -46,9 +46,10 @@ describe('groupReferrers', () => {
       ],
       2
     );
-    expect(result).toEqual([
+    expect(sources).toEqual([
       { source: 'blog.example', known: false, visitors: 3 },
       { source: 'news.example', known: false, visitors: 2 },
     ]);
+    expect(otherVisitors).toBe(1);
   });
 });

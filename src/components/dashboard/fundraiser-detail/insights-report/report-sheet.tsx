@@ -226,7 +226,7 @@ export function ReportSheet({
   const countries = splitTop(countryRows);
   const sources = splitTop(sourceRows);
   const otherCountries = otherCountryVisitors(data.visitors, countries.shown);
-  const otherSources = sumVisitors(sources.hidden);
+  const otherSources = sumVisitors(sources.hidden) + data.otherSourceVisitors;
   const shownCountries = [
     ...countries.shown,
     ...(countries.shown.length > 0 && otherCountries > 0

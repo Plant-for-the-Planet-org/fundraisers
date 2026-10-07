@@ -46,9 +46,9 @@ Left out on purpose: the status pill (it is stale the day after printing), the "
 - **Generated on** is the moment the page renders, not the Umami snapshot time.
 - **Other rows**:
   - Countries: "Other countries" is total visitors minus the top 4 (clamped at 0). The API only returns the top 6, so summing hidden rows would undercount. This also includes visitors with an unknown country.
-  - Sources: "Other" is the sum of the hidden known rows.
+  - Sources: "Other" is the hidden rows plus the visitors from sites the API leaves out after its top 6 (`otherSourceVisitors`).
 - **QR link**: `<origin>/raise/<slug>?utm_source=report&utm_medium=print`. Same shape as the Share tab links. Both tokens are listed in `docs/naming.md`. Add `report` to the known source names in `insights-audience.tsx` (and its translations) so it reads as "Printed report" under "From your tagged links".
-- **Paid step**: the `donation_completed` event fires for a paid card or wallet payment and a confirmed SEPA mandate. A pending bank transfer does not fire it. A fundraiser can show donations on the platform and 0 in this step (Nepal shows 8 submitted, 0 paid, 4 donations). Open question below.
+- **Paid step**: the `donation_completed` event fires for a paid card or wallet payment and a confirmed SEPA mandate. A pending bank transfer does not fire it. A fundraiser can show donations on the platform and 0 in this step (Nepal shows 8 submitted, 0 paid, 4 donations). Decided in review: keep "Paid", and a confirmed SEPA mandate counts as paid.
 
 ## Steps
 
@@ -135,8 +135,7 @@ Per CLAUDE.md: `npm run type-check`, `npm run lint`, `npm run test`, and `npm ru
 
 ## Open Questions
 
-1. **Paid step**: keep the label "Paid" and accept undercounting, rename it (for example "Paid online"), or add a one line note under the funnel? A fundraiser can show 0 there while the platform lists donations.
-2. **Entry point**: should "Download PDF" also appear on the Overview tab, or only on Insights?
+1. **Entry point**: should "Download PDF" also appear on the Overview tab, or only on Insights?
 
 ## Risks
 
