@@ -82,7 +82,7 @@ export function AboutWhoFor() {
         <h2 className='text-2xl font-semibold tracking-tight text-accent-color sm:text-3xl'>
           {t('title')}
         </h2>
-        <p className='text-lg leading-relaxed text-muted-foreground'>
+        <p className='text-lg leading-relaxed text-gray-600 dark:text-muted-foreground'>
           {t('lead')}
         </p>
       </div>

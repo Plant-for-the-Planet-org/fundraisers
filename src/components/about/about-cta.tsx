@@ -12,7 +12,7 @@ export function AboutCta() {
         <h2 className='text-3xl font-semibold tracking-tight sm:text-4xl'>
           {t('title')}
         </h2>
-        <p className='text-lg leading-relaxed opacity-85'>{t('lead')}</p>
+        <p className='text-lg leading-relaxed'>{t('lead')}</p>
         <div className='flex flex-col justify-center gap-3 pt-3 sm:flex-row'>
           <Link
             href='/fundraisers/create'

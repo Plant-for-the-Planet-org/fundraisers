@@ -78,7 +78,7 @@ export function AboutProjects() {
               <li key={slug}>
                 <Link
                   href='/fundraisers/create'
-                  className='inline-flex h-8 items-center rounded-full border border-accent-color/20 bg-accent-color/10 px-3 text-sm text-accent-color transition-colors hover:bg-accent-color/20'
+                  className='inline-flex h-8 items-center rounded-full border border-accent-color/20 bg-accent-color/10 px-3 text-sm text-accent-ink transition-colors hover:bg-accent-color/20'
                 >
                   {tBundles(`${slug}.label`)}
                 </Link>

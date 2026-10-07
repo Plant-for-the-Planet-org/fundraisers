@@ -28,44 +28,17 @@ export interface CustomizeSlide {
   text: string;
 }
 
-const LOOK: Record<
+// Cards and icon tiles follow the page's accent, so they match whatever theme the page uses.
+const ICONS: Record<
   CustomizeSlideKey,
-  {
-    Icon: ComponentType<{ className?: string }>;
-    tile: string;
-    icon: string;
-  }
+  ComponentType<{ className?: string }>
 > = {
-  themes: {
-    Icon: SwatchbookIcon,
-    tile: 'bg-planet-50 dark:bg-muted',
-    icon: 'bg-planet-100 text-planet-600 dark:bg-background/40',
-  },
-  colours: {
-    Icon: PaletteIcon,
-    tile: 'bg-soft-gold dark:bg-muted',
-    icon: 'bg-amber-100 text-amber-700 dark:bg-background/40',
-  },
-  type: {
-    Icon: FontCaseIcon,
-    tile: 'bg-soft-blue dark:bg-muted',
-    icon: 'bg-blue-100 text-blue-700 dark:bg-background/40',
-  },
-  backgrounds: {
-    Icon: ImageIcon,
-    tile: 'bg-planet-100 dark:bg-muted',
-    icon: 'bg-planet-200 text-planet-700 dark:bg-background/40',
-  },
-  motion: {
-    Icon: WandMagicSparklesIcon,
-    tile: 'bg-soft-gold dark:bg-muted',
-    icon: 'bg-amber-100 text-amber-700 dark:bg-background/40',
-  },
-  story: {
-    Icon: PenLineIcon,
-    tile: 'bg-planet-50 dark:bg-muted',
-    icon: 'bg-planet-100 text-planet-600 dark:bg-background/40',
-  },
+  themes: SwatchbookIcon,
+  colours: PaletteIcon,
+  type: FontCaseIcon,
+  backgrounds: ImageIcon,
+  motion: WandMagicSparklesIcon,
+  story: PenLineIcon,
 };
 
 interface AboutCustomizeSlidesProps {
@@ -75,7 +48,7 @@ interface AboutCustomizeSlidesProps {
 }
 
 const NAV_BUTTON =
-  'rounded-full bg-accent-color/10 text-accent-color hover:bg-accent-color/20 hover:text-accent-color';
+  'rounded-full bg-accent-color/10 text-accent-ink hover:bg-accent-color/20 hover:text-accent-ink';
 
 // Horizontal scroll-snap track. Buttons nudge it one card at a time; swipe and trackpad work without them.
 export function AboutCustomizeSlides({
@@ -98,19 +71,20 @@ export function AboutCustomizeSlides({
 
   return (
     <div className='space-y-2'>
+      {/* The track runs to the screen edges, so cards slide off the page instead of being cut at the column. --bleed is the gap from the screen edge to the text column: MainContent is 960px wide with 1rem padding. */}
       <ul
         ref={trackRef}
-        className='-mx-4 flex list-none snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+        className='-mx-(--bleed) flex list-none snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-(--bleed) scroll-px-(--bleed) pb-2 [--bleed:max(1rem,calc((100vw-960px)/2+1rem))] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       >
         {slides.map(({ key, title, text }) => {
-          const { Icon, tile, icon } = LOOK[key];
+          const Icon = ICONS[key];
           return (
             <li
               key={key}
-              className={`flex w-[280px] shrink-0 snap-start flex-col gap-4 rounded-3xl p-6 sm:w-[340px] ${tile}`}
+              className='flex w-[280px] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-mode-base/60 p-6 sm:w-[340px] dark:bg-muted'
             >
               <span
-                className={`flex h-12 w-12 items-center justify-center rounded-2xl ${icon}`}
+                className='flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-color/10 text-accent-ink dark:bg-background/40'
                 aria-hidden='true'
               >
                 <Icon className='h-6 w-6' />
@@ -119,7 +93,7 @@ export function AboutCustomizeSlides({
                 <h3 className='text-lg font-semibold tracking-tight'>
                   {title}
                 </h3>
-                <p className='text-sm leading-relaxed text-muted-foreground'>
+                <p className='text-sm leading-relaxed text-gray-600 dark:text-muted-foreground'>
                   {text}
                 </p>
               </div>

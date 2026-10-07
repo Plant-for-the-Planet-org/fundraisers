@@ -11,33 +11,11 @@ import { TreesIcon } from '@/components/ui/plant-icons';
 const PILLARS: {
   key: 'youth' | 'forests' | 'tools' | 'voice';
   Icon: ComponentType<{ className?: string }>;
-  tile: string;
-  icon: string;
 }[] = [
-  {
-    key: 'youth',
-    Icon: ChildrenIcon,
-    tile: 'bg-soft-gold',
-    icon: 'text-amber-700',
-  },
-  {
-    key: 'forests',
-    Icon: TreesIcon,
-    tile: 'bg-planet-100',
-    icon: 'text-planet-600',
-  },
-  {
-    key: 'tools',
-    Icon: CloudIcon,
-    tile: 'bg-soft-blue',
-    icon: 'text-blue-700',
-  },
-  {
-    key: 'voice',
-    Icon: BullhornIcon,
-    tile: 'bg-planet-50',
-    icon: 'text-planet-500',
-  },
+  { key: 'youth', Icon: ChildrenIcon },
+  { key: 'forests', Icon: TreesIcon },
+  { key: 'tools', Icon: CloudIcon },
+  { key: 'voice', Icon: BullhornIcon },
 ];
 
 export function AboutMoreThanForests() {
@@ -61,10 +39,10 @@ export function AboutMoreThanForests() {
 
         {/* Four compact rows in two columns: icon, label, one line. Plain rows, no boxes, so the block stays short beside the photo. */}
         <ul className='grid list-none grid-cols-1 gap-x-6 gap-y-4 p-0 pt-3 sm:grid-cols-2'>
-          {PILLARS.map(({ key, Icon, tile, icon }) => (
+          {PILLARS.map(({ key, Icon }) => (
             <li key={key} className='flex items-start gap-3'>
               <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tile} ${icon}`}
+                className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-color/10 text-accent-ink'
                 aria-hidden='true'
               >
                 <Icon className='h-5 w-5' />

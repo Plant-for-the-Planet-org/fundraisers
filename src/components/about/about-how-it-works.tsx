@@ -17,7 +17,7 @@ export function AboutHowItWorks() {
             className='space-y-2 rounded-3xl border border-border/60 bg-mode-base/60 p-5'
           >
             <span
-              className='flex h-9 w-9 items-center justify-center rounded-tl-[70%] rounded-br-[70%] rounded-tr-md rounded-bl-md bg-accent-color/10 text-sm font-bold text-accent-color'
+              className='flex h-9 w-9 items-center justify-center rounded-tl-[70%] rounded-br-[70%] rounded-tr-md rounded-bl-md bg-accent-color/10 text-sm font-bold text-accent-ink'
               aria-hidden='true'
             >
               {index + 1}
