@@ -24,7 +24,8 @@ export function getAccentColor(accent: string): string {
     rose: '#e11d48',
     red: '#dc2626',
     orange: '#c2410c',
-    amber: '#d97706',
+    // amber-700, not amber-600: dark enough that button text on it is white (5.0:1).
+    amber: '#b45309',
     yellow: '#ca8a04',
     slate: '#475569',
     gray: '#4b5563',

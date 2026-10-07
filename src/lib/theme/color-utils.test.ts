@@ -3,7 +3,9 @@ import { getAccentColor } from './accent-utils';
 import {
   getContrastRatio,
   getOnColorText,
+  getReadableInk,
   MIN_TEXT_CONTRAST,
+  mixHex,
 } from './color-utils';
 import { THEMES } from './themes';
 
@@ -58,6 +60,32 @@ describe('getOnColorText', () => {
       expect(
         getContrastRatio(hex, getOnColorText(hex)),
         `${accent} ${hex}`
+      ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+    }
+  });
+});
+
+describe('getReadableInk', () => {
+  const tint = (accent: string, base: string) => mixHex(accent, base, 0.2);
+
+  it('keeps an accent that already reads on the base', () => {
+    expect(getReadableInk('#007a49', '#ffffff')).toBe('#007a49');
+  });
+
+  it('darkens a light accent on its light tint until it passes', () => {
+    for (const accent of ['#b45309', '#ca8a04', '#f5abab', '#ffffff']) {
+      const base = tint(accent, '#ffffff');
+      expect(
+        getContrastRatio(getReadableInk(accent, base), base)
+      ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+    }
+  });
+
+  it('lightens a dark accent on its dark tint until it passes', () => {
+    for (const accent of ['#047857', '#4f46e5', '#000000']) {
+      const base = tint(accent, '#000000');
+      expect(
+        getContrastRatio(getReadableInk(accent, base), base)
       ).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
     }
   });

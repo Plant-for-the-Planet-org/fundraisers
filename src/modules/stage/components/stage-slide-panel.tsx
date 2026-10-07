@@ -6,9 +6,14 @@ import { useEffect, useMemo, useState } from 'react';
 
 interface StageSlidePanelProps {
   slides: StageSlide[];
+  /** The slide title is the page heading on the stage screen. Embedded demos pass 'p' so the host page keeps its own h1. */
+  titleAs?: 'h1' | 'p';
 }
 
-export function StageSlidePanel({ slides }: StageSlidePanelProps) {
+export function StageSlidePanel({
+  slides,
+  titleAs: Title = 'h1',
+}: StageSlidePanelProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const sorted = useMemo(
@@ -51,7 +56,7 @@ export function StageSlidePanel({ slides }: StageSlidePanelProps) {
             {slide.image && (
               <div
                 key={`${slide.position}-${i === activeIndex}`}
-                className='absolute inset-0 bg-cover bg-center'
+                className='absolute inset-0 bg-cover bg-center motion-reduce:animate-none!'
                 style={{
                   backgroundImage: `url(${slide.image})`,
                   animation:
@@ -88,7 +93,7 @@ export function StageSlidePanel({ slides }: StageSlidePanelProps) {
         style={{ left: 380, bottom: 200, maxWidth: 720 }}
       >
         {active?.title && (
-          <h1
+          <Title
             className='font-bold text-white'
             style={{
               fontSize: 58,
@@ -99,7 +104,7 @@ export function StageSlidePanel({ slides }: StageSlidePanelProps) {
             }}
           >
             {active.title}
-          </h1>
+          </Title>
         )}
 
         {active?.description && (

@@ -117,6 +117,10 @@ When a translation string contains an inline element (link, bold, etc.), use `t.
 
 Translation key: `"photoBy": "Photo by <photographerLink>{name}</photographerLink>"`
 
+### Colours: read the guide first
+
+Before adding or changing a colour, read [`docs/colours.md`](docs/colours.md): which token to use for text, accents and brand backgrounds, and how to check contrast on a page.
+
 ### Authored text: don't hard-wrap
 
 This applies to all authored text — code comments, commit messages, PR descriptions, and markdown.
