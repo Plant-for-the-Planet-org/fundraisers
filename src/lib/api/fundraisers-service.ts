@@ -41,13 +41,16 @@ function normalizeFundraisersResponse(payload: unknown): Fundraiser[] {
   return [];
 }
 
-/** `impersonation` is for server routes, which have no impersonation store; in the browser, platformFetch adds it on its own. */
+/**
+ * The fundraisers the caller actively hosts, with every figure and every host. Login required.
+ * `impersonation` is for server routes, which have no impersonation store; in the browser, platformFetch adds it on its own.
+ */
 export async function getFundraisers(
   token: string,
   impersonation?: Impersonation | null
 ): Promise<Fundraiser[]> {
   const payload = await platformFetch<unknown>(
-    '/fundraisers',
+    '/profile/fundraisers',
     impersonation
       ? {
           token,

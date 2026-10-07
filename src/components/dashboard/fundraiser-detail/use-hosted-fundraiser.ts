@@ -3,8 +3,7 @@
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
-import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
-import { getFundraisers } from '@/lib/api/fundraisers-service';
+import { getHostFundraiserBySlug } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
@@ -19,7 +18,7 @@ export type HostedFundraiserState =
 /**
  * Loads a fundraiser for its dashboard pages. Every active host may look, including view-only co-hosts; only owners and admins get `canEdit`.
  *
- * Membership comes from the platform's list of fundraisers the caller actively hosts. That list also carries every host, private ones included, while the single-fundraiser payload only has the public ones, so its hosts replace the payload's.
+ * Reads the host route, which answers only an active host of the fundraiser and carries every figure and every host, whatever the host chose to show the public.
  */
 export function useHostedFundraiser(slug: string): HostedFundraiserState {
   const accessToken = useAuthStore(state => state.accessToken);
@@ -37,22 +36,17 @@ export function useHostedFundraiser(slug: string): HostedFundraiserState {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({ status: 'loading' });
 
-    Promise.all([
-      getFundraiserAuthenticated(slug, accessToken),
-      getFundraisers(accessToken),
-    ])
-      .then(([fundraiser, hosted]) => {
+    getHostFundraiserBySlug(slug, accessToken)
+      .then(fundraiser => {
         if (ignore) return;
-        const listed = hosted.find(entry => entry.id === fundraiser.id);
-        if (!listed) {
+        if (!fundraiser) {
           setState({ status: 'unauthorized' });
           return;
         }
-        const withAllHosts = { ...fundraiser, hosts: listed.hosts };
         setState({
           status: 'ready',
-          fundraiser: withAllHosts,
-          canEdit: isFundraiserOwnerOrAdmin(withAllHosts, userId),
+          fundraiser,
+          canEdit: isFundraiserOwnerOrAdmin(fundraiser, userId),
         });
       })
       .catch(error => {

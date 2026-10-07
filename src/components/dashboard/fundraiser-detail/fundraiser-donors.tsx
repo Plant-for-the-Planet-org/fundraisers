@@ -5,8 +5,9 @@ import type { LeaderboardPageResponse } from '@/lib/types/leaderboard';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { getLeaderboardByTab } from '@/lib/api/leaderboard-service';
+import { getHostLeaderboardByTab } from '@/lib/api/leaderboard-service';
 import { getReversedPageWindow } from '@/lib/utils/reverse-pages';
+import { useAuthStore } from '@/stores/auth-store';
 import { DonationTable } from '@/components/fundraisers/leaderboard/donation-table';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,10 +43,17 @@ interface PageState {
  */
 async function loadOldestFirst(
   fundraiserId: string,
-  page: number
+  page: number,
+  token: string
 ): Promise<LeaderboardPageResponse> {
   // One tiny request for the total, which says where the end of the list is.
-  let { total } = await getLeaderboardByTab(fundraiserId, 'recent', 1, 1);
+  let { total } = await getHostLeaderboardByTab(
+    fundraiserId,
+    'recent',
+    token,
+    1,
+    1
+  );
 
   // A donation arriving between the requests shifts the list by one. Every page reports the total it was cut from, so if that moved, try once more with the new total.
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -54,7 +62,13 @@ async function loadOldestFirst(
 
     const pages = await Promise.all(
       window.apiPages.map(apiPage =>
-        getLeaderboardByTab(fundraiserId, 'recent', apiPage, PAGE_SIZE)
+        getHostLeaderboardByTab(
+          fundraiserId,
+          'recent',
+          token,
+          apiPage,
+          PAGE_SIZE
+        )
       )
     );
     const latestTotal = pages[pages.length - 1]!.total;
@@ -88,6 +102,7 @@ export function FundraiserDonors() {
   const [page, setPage] = useState(1);
   const listTopRef = useRef<HTMLDivElement>(null);
   const { data: summary } = useLeaderboardSummary(fundraiser.id, 1);
+  const accessToken = useAuthStore(s => s.accessToken);
   const [state, setState] = useState<PageState>({
     data: null,
     isLoading: true,
@@ -96,12 +111,19 @@ export function FundraiserDonors() {
 
   const load = useCallback(
     async (signal: { aborted: boolean }) => {
+      if (!accessToken) return;
       setState(prev => ({ ...prev, isLoading: true, hasError: false }));
       try {
         const data =
           tab === 'recent' && order === 'oldest'
-            ? await loadOldestFirst(fundraiser.id, page)
-            : await getLeaderboardByTab(fundraiser.id, tab, page, PAGE_SIZE);
+            ? await loadOldestFirst(fundraiser.id, page, accessToken)
+            : await getHostLeaderboardByTab(
+                fundraiser.id,
+                tab,
+                accessToken,
+                page,
+                PAGE_SIZE
+              );
         if (signal.aborted) return;
         setState({ data, isLoading: false, hasError: false });
       } catch (error) {
@@ -110,7 +132,7 @@ export function FundraiserDonors() {
         setState({ data: null, isLoading: false, hasError: true });
       }
     },
-    [fundraiser.id, tab, page, order]
+    [fundraiser.id, tab, page, order, accessToken]
   );
 
   useEffect(() => {
