@@ -8,6 +8,7 @@ import { buildTheme } from '@/lib/theme/build-theme';
 import {
   convertTotalRaisedToSingleCurrency,
   hasFundraiserConcluded,
+  isGoalSectionShown,
 } from '@/lib/utils/fundraiser';
 import { displayUrl } from '../links';
 import { SHARE_IMAGE_DESIGN_VERSION } from '../render/design-version';
@@ -61,13 +62,15 @@ export function shareImageVersion(
     ['photo', fundraiser.image],
     ['currency', fundraiser.currency],
     ['goal', showsGoal(fundraiser) ? fundraiser.goalAmount : null],
-    // The converted total the image prints, so new exchange rates change the version too.
+    // The converted total the image prints, so new exchange rates change the version too. None when the goal section is hidden, since the image then prints no amount.
     [
       'raised',
-      convertTotalRaisedToSingleCurrency(
-        fundraiser.totalRaised,
-        fundraiser.currency
-      ),
+      isGoalSectionShown(fundraiser)
+        ? convertTotalRaisedToSingleCurrency(
+            fundraiser.totalRaised,
+            fundraiser.currency
+          )
+        : null,
     ],
     // The donor row as the image prints it, so a donor who renames, removes a photo or turns anonymous changes it too.
     [

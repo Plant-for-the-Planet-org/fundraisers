@@ -397,9 +397,10 @@ function drawTitle(
   const lines = wrapBalanced(g, data.name, maxWidth, 3);
   const lineH = nameSize * 1.17;
   const byH = s.by * 1.4;
-  const raisedH = s.raised * 1.6;
+  const raisedLine = data.raisedLine;
+  const raisedH = raisedLine ? s.raised * 1.6 : 0;
   // The name and host belong together; the amount is its own line, so it gets a little room.
-  const raisedGap = s.raised * 0.55;
+  const raisedGap = raisedLine ? s.raised * 0.55 : 0;
   const giftH = giftLine ? giftGap + pillH : 0;
   const height = lines.length * lineH + byH + raisedGap + raisedH + giftH;
   if (measureOnly) return height;
@@ -420,23 +421,25 @@ function drawTitle(
   g.fillStyle = P.muted;
   g.fillText(data.byLine, x, cy + byH / 2 + lift, maxWidth);
   cy += byH + raisedGap;
-  const goalText = data.goal ? data.formatMoney(data.goal) : null;
-  // Fitted to the final amount, so the size holds while the amount counts up.
-  fitFont(
-    g,
-    data.raisedLine(data.formatMoney(data.raised), goalText),
-    maxWidth,
-    s.raised,
-    fontOf(600, fonts.body)
-  );
-  const counted = data.raised * phase(t, RING_START, RING_END);
-  g.fillStyle = P.text;
-  g.fillText(
-    data.raisedLine(data.formatMoney(counted), goalText),
-    x,
-    cy + raisedH / 2 + lift,
-    maxWidth
-  );
+  if (raisedLine) {
+    const goalText = data.goal ? data.formatMoney(data.goal) : null;
+    // Fitted to the final amount, so the size holds while the amount counts up.
+    fitFont(
+      g,
+      raisedLine(data.formatMoney(data.raised), goalText),
+      maxWidth,
+      s.raised,
+      fontOf(600, fonts.body)
+    );
+    const counted = data.raised * phase(t, RING_START, RING_END);
+    g.fillStyle = P.text;
+    g.fillText(
+      raisedLine(data.formatMoney(counted), goalText),
+      x,
+      cy + raisedH / 2 + lift,
+      maxWidth
+    );
+  }
   if (giftLine) {
     cy += raisedH + giftGap;
     const aGift = phase(t, 1.4, 2.0);

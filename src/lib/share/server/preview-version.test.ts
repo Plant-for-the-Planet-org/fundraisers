@@ -136,6 +136,17 @@ const hideGoal = (fundraiser: Fundraiser): Fundraiser => ({
   },
 });
 
+const hideGoalSection = (fundraiser: Fundraiser): Fundraiser => ({
+  ...fundraiser,
+  settings: {
+    ...fundraiser.settings!,
+    modules: {
+      ...fundraiser.settings!.modules,
+      donor_score: { enabled: false, show_goal: true, show_days_left: true },
+    },
+  },
+});
+
 afterEach(() => {
   vi.useRealTimers();
 });
@@ -262,6 +273,15 @@ describe('shareImageVersion', () => {
     expect(version(hideGoal({ ...base, goalAmount: 9000 }))).toBe(
       version(hideGoal(base))
     );
+  });
+
+  it('ignores the goal and the total when the goal section is hidden', () => {
+    expect(
+      version(
+        hideGoalSection({ ...base, goalAmount: 9000, totalRaised: { EUR: 1 } })
+      )
+    ).toBe(version(hideGoalSection(base)));
+    expect(version(hideGoalSection(base))).not.toBe(version(base));
   });
 
   it('reads the theme as the page draws it, so a setting it cannot use changes nothing', () => {

@@ -8,6 +8,7 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import {
   convertTotalRaisedToSingleCurrency,
   hasFundraiserConcluded,
+  isGoalSectionShown,
 } from '@/lib/utils/fundraiser';
 
 /** Fewer public donors than this and the avatar row is left out: two initials look emptier than none. */
@@ -112,9 +113,10 @@ export function getShareHostName(fundraiser: Fundraiser): string | null {
   return host?.displayName ?? host?.user?.name ?? null;
 }
 
-/** Whether the fundraiser shows its goal: the same setting the public page reads. */
+/** Whether the fundraiser shows its goal: the same settings the public page reads, the goal section and its "Show goal" line. */
 export function showsGoal(fundraiser: Fundraiser): boolean {
   return (
+    isGoalSectionShown(fundraiser) &&
     fundraiser.goalAmount > 0 &&
     (fundraiser.settings?.modules?.donor_score?.show_goal ?? true)
   );
@@ -152,9 +154,13 @@ export function buildShareRenderData({
     totals,
     fundraiser.currency
   );
+  // Share images are public, so they show no money when the host hid the goal section, even in the studio where the host sees every figure.
+  const showsMoney = isGoalSectionShown(fundraiser);
   // Nothing raised yet: lead with the goal and invite the first gift, rather than show zeros.
   // A gift in a currency with no rate adds nothing to `raised`, but must still never sit next to the first-gift invite.
-  const fresh = raised <= 0 && !gift && !hasFundraiserConcluded(fundraiser);
+  // With the money hidden the public total arrives empty, which says nothing about whether anyone gave.
+  const fresh =
+    showsMoney && raised <= 0 && !gift && !hasFundraiserConcluded(fundraiser);
   return {
     name: fundraiser.title,
     byLine: host ? labels.byLine(host) : '',
@@ -166,14 +172,16 @@ export function buildShareRenderData({
         fundraiser.currency,
         locale
       ),
-    raisedLine: (raisedText, goal) =>
-      fresh
-        ? goal
-          ? labels.goal(goal)
-          : labels.started()
-        : goal
-          ? labels.raisedOf(raisedText, goal)
-          : labels.raised(raisedText),
+    raisedLine: showsMoney
+      ? (raisedText, goal) =>
+          fresh
+            ? goal
+              ? labels.goal(goal)
+              : labels.started()
+            : goal
+              ? labels.raisedOf(raisedText, goal)
+              : labels.raised(raisedText)
+      : null,
     giftLine:
       gift && showGift && labels.gift
         ? labels.gift(formatShareGiftAmount(gift, locale), gift.frequency)

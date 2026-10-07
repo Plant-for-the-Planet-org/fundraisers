@@ -20,8 +20,8 @@ export interface ShareRenderData {
   /** Null hides the ring and the percentage, for a fundraiser that hides its goal. */
   goal: number | null;
   formatMoney: (amount: number) => string;
-  /** "€3,400 raised of €5,000", or "€3,400 raised" when `goal` is null. Called every frame with the counted-up amount. */
-  raisedLine: (raised: string, goal: string | null) => string;
+  /** "€3,400 raised of €5,000", or "€3,400 raised" when `goal` is null. Called every frame with the counted-up amount. Null leaves the amount out, for a fundraiser that hides its goal section. */
+  raisedLine: ((raised: string, goal: string | null) => string) | null;
   /** The donor's own gift, such as "I just gave €50!", in a pill under the amount. Null leaves it out. */
   giftLine: string | null;
   /** First names of public donors, top donors first. Their avatars, or initials until those load, fill the avatar row. */

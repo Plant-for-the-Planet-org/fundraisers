@@ -151,7 +151,7 @@ describe('buildShareRenderData', () => {
     expect(data.goal).toBe(5000);
     expect(data.donorsLine).toBe('Anna, Ben and 46 others have given');
     expect(
-      data.raisedLine(data.formatMoney(3400), data.formatMoney(5000))
+      data.raisedLine!(data.formatMoney(3400), data.formatMoney(5000))
     ).toContain('raised of');
   });
 
@@ -176,7 +176,34 @@ describe('buildShareRenderData', () => {
     });
     expect(data.goal).toBeNull();
     expect(data.donorsLine).toBeNull();
-    expect(data.raisedLine('€3,400', null)).toBe('€3,400 raised');
+    expect(data.raisedLine!('€3,400', null)).toBe('€3,400 raised');
+  });
+
+  it('shows no money when the host hides the goal section', () => {
+    const data = buildShareRenderData({
+      fundraiser: fundraiser(shownBoard, {
+        // The public API sends an empty total for a hidden goal section, which must not read as "nothing raised".
+        totalRaised: {},
+        settings: {
+          modules: {
+            donor_score: {
+              enabled: false,
+              show_goal: true,
+              show_days_left: true,
+            },
+          },
+        },
+      } as Partial<Fundraiser>),
+      locale: 'en',
+      donors: null,
+      cta: 'Join me',
+      url: 'x',
+      labels,
+    });
+    expect(data.raisedLine).toBeNull();
+    expect(data.goal).toBeNull();
+    expect(data.badge).toBeNull();
+    expect(data.firstLine).toBeNull();
   });
 
   it('never names a private host, even when no host is public', () => {
@@ -290,7 +317,7 @@ describe('buildShareRenderData', () => {
       expect(after.firstLine).toBeNull();
       expect(after.raised).toBe(50);
       expect(
-        after.raisedLine(
+        after.raisedLine!(
           after.formatMoney(after.raised),
           after.formatMoney(5000)
         )
