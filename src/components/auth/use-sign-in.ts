@@ -4,7 +4,7 @@ import type { SignInRequest } from '@/lib/auth/start-sign-in';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { signInWithPopup } from '@/lib/auth/start-sign-in';
 import { getSafeRedirectPath } from '@/lib/utils/auth';
@@ -28,6 +28,7 @@ export function useSignIn({
   forceLogin = false,
 }: UseSignInOptions) {
   const t = useTranslations('Auth');
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
@@ -40,6 +41,7 @@ export function useSignIn({
     try {
       const outcome = await signInWithPopup(request, redirectTo, {
         forceLogin,
+        locale,
       });
 
       if (outcome === 'signed-in') {

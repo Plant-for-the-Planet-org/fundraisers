@@ -35,6 +35,7 @@ export function useWalletFlow(core: SubmissionCore) {
     failSubmission,
     confirmCardActionPayment,
     token,
+    locale,
     paymentOptions,
   } = core;
 
@@ -67,6 +68,7 @@ export function useWalletFlow(core: SubmissionCore) {
             selectedPaymentMethod: wallet,
             paymentOptions,
             paymentDetails: { paymentMethodId },
+            locale,
           });
 
         if (paymentResponse.status === 'failed') {
@@ -123,6 +125,7 @@ export function useWalletFlow(core: SubmissionCore) {
     [
       paymentOptions,
       token,
+      locale,
       rotateIdempotencyKeys,
       createAttempt,
       confirmCardActionPayment,

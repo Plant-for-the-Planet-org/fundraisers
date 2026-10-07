@@ -13,6 +13,7 @@ import type {
 } from './donation-submit-flow-types';
 
 import { useCallback, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { trackEvent } from '@/lib/analytics/track';
 import { paymentService } from '@/lib/api/payment-service';
 import {
@@ -57,6 +58,7 @@ export function useSubmissionCore(
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const donorProfile = useAuthStore(state => state.user?.profile);
   const token = useAuthStore(state => state.accessToken);
+  const locale = useLocale();
 
   const [donationState, setDonationState] = useState<DonationSubmitState>(
     INITIAL_DONATION_STATE
@@ -215,6 +217,7 @@ export function useSubmissionCore(
     failSubmission,
     confirmCardActionPayment,
     token,
+    locale,
     donorProfile,
     paymentOptions,
   };

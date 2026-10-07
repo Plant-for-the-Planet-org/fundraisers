@@ -16,8 +16,15 @@ type RawWorkspace = Omit<FundraiserWorkspace, 'country'> & {
  * normalization. `workspace` may be a populated object, an empty array
  * (ForestCloud's "no workspace" shape) or absent.
  */
-export type RawFundraiser = Omit<Fundraiser, 'workspace'> & {
+export type RawFundraiser = Omit<
+  Fundraiser,
+  'workspace' | 'goalAmount' | 'totalRaised' | 'donationCount'
+> & {
   workspace?: RawWorkspace | RawWorkspace[] | null;
+  // The API sends null to the public for what the host hid: goal and total with the goal section hidden, the count with the leaderboard off.
+  goalAmount: number | null;
+  totalRaised: Record<string, number> | null;
+  donationCount: number | null;
 };
 
 /**
@@ -52,5 +59,9 @@ export function normalizeFundraiser(fundraiser: RawFundraiser): Fundraiser {
   return {
     ...fundraiser,
     workspace: normalizeWorkspace(fundraiser.workspace),
+    // The views read `isGoalSectionShown` and `isLeaderboardShown` to hide these, so a neutral value is enough here.
+    goalAmount: fundraiser.goalAmount ?? 0,
+    totalRaised: fundraiser.totalRaised ?? {},
+    donationCount: fundraiser.donationCount ?? 0,
   };
 }

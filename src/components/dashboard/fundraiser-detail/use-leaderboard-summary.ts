@@ -3,14 +3,15 @@
 import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
 
 import { useEffect, useState } from 'react';
-import { getLeaderboard } from '@/lib/api/leaderboard-service';
+import { getHostLeaderboard } from '@/lib/api/leaderboard-service';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface LeaderboardSummaryState {
   data: LeaderboardApiResponse | null;
   isLoading: boolean;
 }
 
-/** Donor count and the latest donations. This is the public leaderboard feed, so anonymous donors are already masked by the platform. */
+/** Donor count and the latest donations, from the host route: every count, whatever the host chose to show the public. Anonymous donors are still masked by the platform. */
 export function useLeaderboardSummary(
   id: string,
   limit: number
@@ -20,10 +21,13 @@ export function useLeaderboardSummary(
     isLoading: true,
   });
 
+  const accessToken = useAuthStore(s => s.accessToken);
+
   useEffect(() => {
+    if (!accessToken) return;
     let ignore = false;
 
-    getLeaderboard(id, limit)
+    getHostLeaderboard(id, accessToken, limit)
       .then(data => {
         if (!ignore) setState({ data, isLoading: false });
       })
@@ -35,7 +39,7 @@ export function useLeaderboardSummary(
     return () => {
       ignore = true;
     };
-  }, [id, limit]);
+  }, [id, limit, accessToken]);
 
   return state;
 }

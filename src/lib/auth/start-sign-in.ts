@@ -18,6 +18,8 @@ export type SignInRequest =
 export interface SignInOptions {
   /** Ask Auth0 for credentials even though a session exists. This is how a signed-in person switches accounts. */
   forceLogin?: boolean;
+  /** Sent as `ui_locales`, so the Auth0 screens match the page language. */
+  locale?: string;
 }
 
 export type SignInOutcome =
@@ -43,15 +45,13 @@ async function buildAuthorizeUrl(
   redirectTo: RedirectPath,
   options: SignInOptions
 ): Promise<string> {
-  const url = await buildRequestUrl(request, redirectTo);
-  if (!options.forceLogin) return url;
-
-  const withPrompt = new URL(url);
-  withPrompt.searchParams.set('prompt', 'login');
-  return withPrompt.toString();
+  const url = new URL(await buildRequestUrl(request, redirectTo));
+  if (options.locale) url.searchParams.set('ui_locales', options.locale);
+  if (options.forceLogin) url.searchParams.set('prompt', 'login');
+  return url.toString();
 }
 
-/** Today's flow: the whole tab goes to Auth0 and comes back through /redirecting. */
+/** The whole tab goes to Auth0 and comes back through /redirecting. Used when the sign-in popup is blocked. */
 export async function signInWithRedirect(
   request: SignInRequest,
   redirectTo: RedirectPath,

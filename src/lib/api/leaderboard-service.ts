@@ -41,3 +41,37 @@ export async function getLeaderboardByTab(
     `/fundraisers/${encodeURIComponent(idOrSlug)}/leaderboard/${tab}?${params.toString()}`
   );
 }
+
+/**
+ * The leaderboard as the fundraiser's own hosts see it: both lists and every count, whatever the host chose to show the public.
+ * Login required, never cached, and answered for any active host. The public `getLeaderboard` follows the host's settings instead.
+ */
+export async function getHostLeaderboard(
+  guid: string,
+  token: string,
+  limit: number = 10
+): Promise<LeaderboardApiResponse> {
+  const params = new URLSearchParams({ limit: limit.toString() });
+  return platformFetch<LeaderboardApiResponse>(
+    `/profile/fundraisers/${encodeURIComponent(guid)}/leaderboard?${params.toString()}`,
+    { token }
+  );
+}
+
+/** Every donation (`recent`) or donor (`top`), page by page, as the fundraiser's own hosts see them. See `getHostLeaderboard`. */
+export async function getHostLeaderboardByTab(
+  guid: string,
+  tab: 'recent' | 'top',
+  token: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<LeaderboardPageResponse> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  return platformFetch<LeaderboardPageResponse>(
+    `/profile/fundraisers/${encodeURIComponent(guid)}/leaderboard/${tab}?${params.toString()}`,
+    { token }
+  );
+}

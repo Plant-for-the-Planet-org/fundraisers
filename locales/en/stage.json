@@ -17,6 +17,8 @@
     "daysLeft": "days left",
     "notEnabled": "Stage Mode is not enabled for this fundraiser.",
     "notEnabledHint": "Update it on fundraiser settings or ask the Host.",
+    "goalHidden": "Stage Mode needs the goal section.",
+    "goalHiddenHint": "The host hid the goal section. Turn it on in the fundraiser settings to use Stage Mode.",
     "fundraiserNotFound": "Fundraiser not found.",
     "anonymous": "Anonymous",
     "topBar": {

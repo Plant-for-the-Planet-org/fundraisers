@@ -1,6 +1,9 @@
 import type { LeaderboardDonation } from '@/lib/types/leaderboard';
 
-type MockBase = Omit<LeaderboardDonation, 'currency' | 'created'>;
+// Demo rows always have an amount.
+type MockBase = Omit<LeaderboardDonation, 'currency' | 'created' | 'amount'> & {
+  amount: number;
+};
 
 const MOCK_RECENT_BASE: MockBase[] = [
   { id: '1', amount: 50, donorName: 'Maria Schmidt' },

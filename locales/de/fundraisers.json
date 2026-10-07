@@ -175,8 +175,13 @@
       "goalSettings": {
         "sectionHeading": "Ziel-Einstellungen",
         "openSettings": "Ziel-Einstellungen",
+        "enableGoal": "Zielbereich anzeigen",
         "showGoal": "Ziel anzeigen",
-        "showDaysLeft": "Verbleibende Tage anzeigen"
+        "showDaysLeft": "Verbleibende Tage anzeigen",
+        "hiddenView": {
+          "title": "Ziel ausgeblendet",
+          "description": "Spender sehen weder den gesammelten Betrag noch das Ziel oder die verbleibenden Tage."
+        }
       },
       "theme": {
         "sectionHeading": "Thema",
@@ -351,6 +356,8 @@
           "title": "Bühnenmodus",
           "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Spender spenden über den QR-Code; Bildschirm wird in Echtzeit aktualisiert.",
           "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
+          "goalHiddenHint": "Der Bühnenmodus zeigt den gesammelten Betrag und braucht deshalb den Zielbereich. Schalte den Ziel-Schalter ein, um ihn zu nutzen.",
+          "leaderboardOffHint": "Schalte die Bestenliste ein, um im Bühnenmodus die neuesten Spenden und die Top-Spender zu zeigen.",
           "collapse": "Zusammenklappen",
           "expand": "Erweitern",
           "remove": "Bühnenmodus entfernen",

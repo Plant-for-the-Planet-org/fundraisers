@@ -36,6 +36,9 @@ export function DonationItem({
       ? `${donation.donorName.substring(0, 17)}...`
       : donation.donorName;
 
+  // The API sends no amount to the public when the host hid it, whatever this row was asked to show.
+  const amount = showAmount ? donation.amount : null;
+
   return (
     <div className='donation-item flex items-center gap-3 shrink-0'>
       {showAvatar && (
@@ -62,13 +65,9 @@ export function DonationItem({
           {displayName}
         </div>
         <div className='text-zinc-600 dark:text-gray-300 text-xs font-medium leading-tight whitespace-nowrap'>
-          {showAmount &&
-            formatCurrencyFromDecimal(
-              donation.amount,
-              donation.currency,
-              locale
-            )}
-          {showAmount && showDate && ' • '}
+          {amount !== null &&
+            formatCurrencyFromDecimal(amount, donation.currency, locale)}
+          {amount !== null && showDate && ' • '}
           {showDate && formatTimeAgo(donation.created)}
         </div>
       </div>

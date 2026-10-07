@@ -37,6 +37,9 @@ export function StageView({
   const showLeaderboard = Boolean(
     fundraiser.settings?.modules?.leaderboard?.enabled
   );
+  const showRecentGifts =
+    showLeaderboard &&
+    (fundraiser.settings?.modules?.leaderboard?.show_recent_list ?? true);
   const showImpact = stageSettings?.show_impact ?? true;
   const showProgressBar = stageSettings?.show_progress_bar ?? true;
   const slides = stageSettings?.slides ?? [];
@@ -108,13 +111,15 @@ export function StageView({
           className='absolute bottom-[170px] left-12 z-[18] w-[300px]'
         />
 
-        {/* Ticker — bottom bar */}
-        <StageTicker
-          recent={leaderboardData?.recent ?? []}
-          offline={offline}
-          locale={locale}
-          className='absolute bottom-12 left-12 right-12 z-[19]'
-        />
+        {/* Ticker — bottom bar. It is the recent list, so it follows the leaderboard like the page does. */}
+        {showRecentGifts && (
+          <StageTicker
+            recent={leaderboardData?.recent ?? []}
+            offline={offline}
+            locale={locale}
+            className='absolute bottom-12 left-12 right-12 z-[19]'
+          />
+        )}
 
         {/* Toast stack */}
         <StageToastStack />
