@@ -208,6 +208,11 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
     control,
     name: 'settings.modules.donor_score.enabled',
   });
+  // Stage's recent gifts and top donors come from the leaderboard, so they stay off the screen while it is off.
+  const leaderboardOn = useWatch({
+    control,
+    name: 'settings.modules.leaderboard.enabled',
+  });
 
   return (
     <div>
@@ -269,6 +274,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
         <div className='mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20'>
           <Info className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
           <p className='text-xs text-foreground'>{t('goalHiddenHint')}</p>
+        </div>
+      )}
+
+      {!leaderboardOn && (
+        <div className='mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20'>
+          <Info className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
+          <p className='text-xs text-foreground'>{t('leaderboardOffHint')}</p>
         </div>
       )}
 

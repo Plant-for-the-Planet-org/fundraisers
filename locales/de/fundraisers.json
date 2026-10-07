@@ -361,6 +361,7 @@
           "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Spender spenden über den QR-Code; Bildschirm wird in Echtzeit aktualisiert.",
           "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
           "goalHiddenHint": "Der Bühnenmodus zeigt den gesammelten Betrag und braucht deshalb den Zielbereich. Schalte den Ziel-Schalter ein, um ihn zu nutzen.",
+          "leaderboardOffHint": "Schalte die Bestenliste ein, um im Bühnenmodus die neuesten Spenden und die Top-Spender zu zeigen.",
           "collapse": "Zusammenklappen",
           "expand": "Erweitern",
           "remove": "Bühnenmodus entfernen",
