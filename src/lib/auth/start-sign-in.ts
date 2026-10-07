@@ -51,7 +51,7 @@ async function buildAuthorizeUrl(
   return url.toString();
 }
 
-/** Today's flow: the whole tab goes to Auth0 and comes back through /redirecting. */
+/** The whole tab goes to Auth0 and comes back through /redirecting. Used when the sign-in popup is blocked. */
 export async function signInWithRedirect(
   request: SignInRequest,
   redirectTo: RedirectPath,

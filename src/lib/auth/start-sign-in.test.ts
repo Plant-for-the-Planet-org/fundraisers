@@ -24,25 +24,26 @@ vi.mock('@/stores/auth-store', () => ({
   useAuthStore: { getState: vi.fn() },
 }));
 
+import { openSignInPopup, waitForSignInPopup } from '@/lib/auth/sign-in-popup';
 import { DEFAULT_REDIRECT_PATH } from '@/lib/constants/auth';
-import { signInWithRedirect } from './start-sign-in';
+import { signInWithPopup, signInWithRedirect } from './start-sign-in';
+
+let assign: ReturnType<typeof vi.fn>;
+
+beforeEach(() => {
+  assign = vi.fn();
+  vi.stubGlobal('window', { location: { assign } });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+function authorizeUrl(): URL {
+  return new URL(assign.mock.calls[0][0]);
+}
 
 describe('signInWithRedirect', () => {
-  let assign: ReturnType<typeof vi.fn>;
-
-  beforeEach(() => {
-    assign = vi.fn();
-    vi.stubGlobal('window', { location: { assign } });
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  function authorizeUrl(): URL {
-    return new URL(assign.mock.calls[0][0]);
-  }
-
   it.each([
     { method: 'email', email: 'a@example.com' },
     { method: 'signup' },
@@ -79,5 +80,38 @@ describe('signInWithRedirect', () => {
     const params = authorizeUrl().searchParams;
     expect(params.get('prompt')).toBe('login');
     expect(params.get('ui_locales')).toBe('de');
+  });
+});
+
+describe('signInWithPopup', () => {
+  it('sends ui_locales to the popup', async () => {
+    const replace = vi.fn();
+    vi.mocked(openSignInPopup).mockReturnValueOnce({
+      location: { replace },
+      close: vi.fn(),
+    } as unknown as Window);
+    vi.mocked(waitForSignInPopup).mockResolvedValueOnce({
+      status: 'cancelled',
+    });
+
+    await signInWithPopup(
+      { method: 'email', email: 'a@example.com' },
+      DEFAULT_REDIRECT_PATH,
+      { locale: 'de' }
+    );
+
+    expect(
+      new URL(replace.mock.calls[0][0]).searchParams.get('ui_locales')
+    ).toBe('de');
+  });
+
+  it('keeps ui_locales when the popup is blocked', async () => {
+    vi.mocked(openSignInPopup).mockReturnValueOnce(null);
+
+    await signInWithPopup({ method: 'signup' }, DEFAULT_REDIRECT_PATH, {
+      locale: 'de',
+    });
+
+    expect(authorizeUrl().searchParams.get('ui_locales')).toBe('de');
   });
 });
