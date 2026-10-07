@@ -81,10 +81,10 @@
         "retry": "Try again",
         "journey": {
           "title": "Donation journey",
-          "clickRate": "{percent, number}% of visitors clicked Donate",
+          "visited": "Visited",
           "donate_clicked": "Clicked Donate",
           "donation_submitted": "Submitted",
-          "donation_completed": "Completed"
+          "donation_completed": "Paid"
         },
         "audience": {
           "countries": "Top countries",
@@ -106,7 +106,8 @@
             "bing": "Bing",
             "email": "Email",
             "newsletter": "Newsletter",
-            "stage": "Stage Mode QR code"
+            "stage": "Stage Mode QR code",
+            "report": "Printed report"
           },
           "plainLink": "Plain link",
           "copy": "Copy",
@@ -116,7 +117,37 @@
         },
         "updatedLabel": "Updated",
         "changeContext": "vs before",
-        "accuracyNote": "Visitors and donation steps come from privacy-friendly analytics without cookies. People who block trackers are not counted, so read these as a guide rather than exact figures. Amounts raised and donation totals come from our records; donations by direct debit or bank transfer count once the payment arrives, so they can show up a few days later."
+        "accuracyNote": "Visitors and donation steps come from privacy-friendly analytics without cookies. People who block trackers are not counted, so read these as a guide rather than exact figures. Amounts raised and donation totals come from our records; donations by direct debit or bank transfer count once the payment arrives, so they can show up a few days later.",
+        "downloadPdf": "Download PDF",
+        "report": {
+          "label": "Campaign insights",
+          "generatedOn": "Generated on {date}",
+          "by": "by {names}",
+          "byOthers": "by {names} and {count, plural, one {# other} other {# others}}",
+          "raised": "Raised so far",
+          "donationCount": "{count, plural, one {# donation} other {# donations}}",
+          "rangeShort": {
+            "24h": "Last 24 hours",
+            "7d": "Last 7 days",
+            "30d": "Last 30 days",
+            "campaign": "Whole campaign"
+          },
+          "chartTitle": {
+            "hour": "Visitors per hour",
+            "day": "Visitors per day",
+            "month": "Visitors per month"
+          },
+          "otherCountries": "Other countries",
+          "otherSources": "Other",
+          "accuracyNote": "Visitors and donation steps come from privacy-friendly analytics without cookies. People who block trackers are not counted, so these numbers are a guide. Amounts raised come from our records. Donations by direct debit or bank transfer count once the payment arrives.",
+          "qrLabel": "QR code that opens the fundraiser page",
+          "toolbarTitle": "Insights report",
+          "toolbarHint": "Choose Save as PDF in the print dialog.",
+          "print": "Print or save as PDF",
+          "back": "Back to insights",
+          "loading": "Preparing your report",
+          "campaignTotal": "Campaign total"
+        }
       },
       "checklist": {
         "title": "Make it a success",
