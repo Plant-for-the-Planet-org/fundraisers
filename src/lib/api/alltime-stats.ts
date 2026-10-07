@@ -4,16 +4,20 @@ export type HighlightImpactUnit = 'funding' | 'trees' | 'restoredM2';
 
 export interface AlltimeStats {
   stats: {
-    donationCount: number;
-    goal: { amount: number; currency: string };
+    // null when the host turned the leaderboard off.
+    donationCount: number | null;
+    // Left out when the host hid the goal section or turned show_goal off.
+    goal?: { amount: number; currency: string };
     daysLeft: number;
     // Currency-keyed, e.g. { EUR: 6429.56, USD: 100309.56 }, same shape as Fundraiser.totalRaised.
-    raised: Record<string, number>;
+    // null when the host hid the goal section.
+    raised: Record<string, number> | null;
     impact: {
       trees: number;
       conservedM2: number;
       restoredM2: number;
-      funding: number;
+      // null when the host hid the goal section.
+      funding: number | null;
     };
     lastUpdated: string;
   };

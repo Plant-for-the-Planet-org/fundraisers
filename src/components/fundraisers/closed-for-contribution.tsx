@@ -14,7 +14,7 @@ export interface FundraiserImpact {
   trees: number;
   conservedM2: number;
   restoredM2: number;
-  funding: number;
+  funding: number | null;
 }
 
 interface ClosedForContributionProps {
@@ -87,7 +87,7 @@ export function ClosedForContribution({
       parts.push(t('impactRestored', { area: formatArea(units.restoredM2) }));
     if (units.conservedM2 > 0)
       parts.push(t('impactConserved', { area: formatArea(units.conservedM2) }));
-    if (units.funding > 0) parts.push(t('impactFunding'));
+    if ((units.funding ?? 0) > 0) parts.push(t('impactFunding'));
     return parts;
   }
 

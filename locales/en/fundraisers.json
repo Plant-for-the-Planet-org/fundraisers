@@ -360,6 +360,7 @@
           "title": "Stage Mode",
           "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
           "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
+          "goalHiddenHint": "Stage Mode shows the amount raised, so it needs the goal section. Turn on the Goal switch to use it.",
           "collapse": "Collapse",
           "expand": "Expand",
           "remove": "Remove Stage Mode",

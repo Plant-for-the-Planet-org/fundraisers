@@ -27,13 +27,16 @@ export function StageCounter({
 }: StageCounterProps) {
   const { data } = useAlltimeStats(fundraiser.slug ?? fundraiser.id);
 
-  const currency = data?.stats.goal.currency ?? fundraiser.currency;
+  const currency = data?.stats.goal?.currency ?? fundraiser.currency;
   const raised = convertTotalRaisedToSingleCurrency(
     data?.stats.raised ?? fundraiser.totalRaised,
     currency
   );
-  const goal = data?.stats.goal.amount ?? fundraiser.goalAmount;
-  const donationCount = data?.stats.donationCount ?? fundraiser.donationCount;
+  const goal = data?.stats.goal?.amount ?? fundraiser.goalAmount;
+  // null when the host turned the leaderboard off. Then Stage shows no donor count.
+  const donationCount = data
+    ? data.stats.donationCount
+    : fundraiser.donationCount;
   const trees = data?.stats.impact.trees ?? 0;
   const restoredM2 = data?.stats.impact.restoredM2 ?? 0;
   const daysLeft = data?.stats.daysLeft;
@@ -156,17 +159,19 @@ export function StageCounter({
         className='mt-3.5 flex gap-5 border-t pt-3.5'
         style={{ borderColor: 'rgba(11,18,32,.12)' }}
       >
-        <div className='flex flex-col gap-0.5'>
-          <span
-            className='text-[22px] font-bold'
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {formatDonorCount(donationCount)}
-          </span>
-          <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
-            {t('donors')}
-          </span>
-        </div>
+        {donationCount !== null && (
+          <div className='flex flex-col gap-0.5'>
+            <span
+              className='text-[22px] font-bold'
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {formatDonorCount(donationCount)}
+            </span>
+            <span className='text-[11px] font-bold uppercase tracking-[.14em] opacity-60'>
+              {t('donors')}
+            </span>
+          </div>
+        )}
 
         {!heroIsFunding ? (
           <div className='flex flex-col gap-0.5'>

@@ -203,6 +203,12 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
   const stageDescVal =
     (useWatch({ control, name: stageField('description') }) as string) ?? '';
 
+  // Stage shows the amount raised, so it needs the goal section on. The public stats endpoint sends no money otherwise.
+  const goalSectionOn = useWatch({
+    control,
+    name: 'settings.modules.donor_score.enabled',
+  });
+
   return (
     <div>
       {/* Header */}
@@ -258,6 +264,13 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
           )}
         />
       </div>
+
+      {!goalSectionOn && (
+        <div className='mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20'>
+          <Info className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
+          <p className='text-xs text-foreground'>{t('goalHiddenHint')}</p>
+        </div>
+      )}
 
       {expanded && (
         <div className='mb-3 rounded-lg bg-white dark:bg-background p-4 flex flex-col gap-4'>
