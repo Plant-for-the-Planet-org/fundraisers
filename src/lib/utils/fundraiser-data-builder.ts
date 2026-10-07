@@ -170,10 +170,7 @@ export function buildUpdateFundraiserRequest(
             }
           : values.settings.modules.stage, // null = removed; pass through unchanged
         thankYouNote: values.settings.modules.thankYouNote,
-        donor_score: {
-          enabled: existingSettings?.modules?.donor_score?.enabled ?? true,
-          ...values.settings.modules.donor_score,
-        },
+        donor_score: values.settings.modules.donor_score,
       },
     };
   }
@@ -203,10 +200,7 @@ export function buildCreateFundraiserRequest(
         bundle: values.settings.modules.bundle,
         stage: values.settings.modules.stage,
         thankYouNote: values.settings.modules.thankYouNote,
-        donor_score: {
-          enabled: true,
-          ...values.settings.modules.donor_score,
-        },
+        donor_score: values.settings.modules.donor_score,
       },
     },
     startDate: getTodayString(),

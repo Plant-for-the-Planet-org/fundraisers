@@ -2,6 +2,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { LeaderboardApiResponse } from '@/lib/types/leaderboard';
 
 import { getLeaderboardWithRetry } from '@/lib/api/leaderboard-service';
+import { getPublicLeaderboardSettings } from '@/lib/utils/fundraiser';
 import {
   DonorsSummaryPanel,
   type DonorsSummaryPanelProps,
@@ -23,7 +24,7 @@ export function donorsSummaryPanelProps(
   if (!data) {
     // Keep the count header visible (no strip, no view-all) rather than a stale
     // or partial summary.
-    const settings = fundraiser.settings?.modules?.leaderboard;
+    const settings = getPublicLeaderboardSettings(fundraiser);
     if (!settings) return null;
 
     return {
@@ -45,7 +46,7 @@ export function donorsSummaryPanelProps(
   return {
     donations,
     donationCount: data.donationCount,
-    settings: fundraiser.settings?.modules?.leaderboard ?? data.settings,
+    settings: getPublicLeaderboardSettings(fundraiser) ?? data.settings,
     idOrSlug: fundraiser.slug,
     initialRecentDonations: data.recent,
     initialTopDonations: data.top,

@@ -5,8 +5,18 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { getCachedFundraiser } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
+import { isGoalSectionShown } from '@/lib/utils/fundraiser';
 import { routing } from '@/i18n/routing';
 import { StageView } from '@/modules/stage';
+
+function StageNotice({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className='flex h-dvh w-screen flex-col items-center justify-center gap-3 bg-[#0b1220] text-center'>
+      <p className='text-lg font-semibold text-white'>{title}</p>
+      <p className='text-sm text-white/50'>{hint}</p>
+    </div>
+  );
+}
 
 async function loadStageMessages(locale: Locale) {
   const mod = await import(`../../../../../../locales/${locale}/stage.json`);
@@ -43,12 +53,13 @@ export default async function StagePage({
 
   if (!stageSettings?.enabled) {
     const t = await getTranslations({ locale: appLocale, namespace: 'Stage' });
-    return (
-      <div className='flex h-dvh w-screen flex-col items-center justify-center gap-3 bg-[#0b1220] text-center'>
-        <p className='text-lg font-semibold text-white'>{t('notEnabled')}</p>
-        <p className='text-sm text-white/50'>{t('notEnabledHint')}</p>
-      </div>
-    );
+    return <StageNotice title={t('notEnabled')} hint={t('notEnabledHint')} />;
+  }
+
+  // Stage shows the amount raised. With the goal section hidden the stats endpoint sends no money, so Stage asks for it instead.
+  if (!isGoalSectionShown(fundraiser)) {
+    const t = await getTranslations({ locale: appLocale, namespace: 'Stage' });
+    return <StageNotice title={t('goalHidden')} hint={t('goalHiddenHint')} />;
   }
 
   const stageLocale: Locale = hasLocale(routing.locales, stageSettings.locale)

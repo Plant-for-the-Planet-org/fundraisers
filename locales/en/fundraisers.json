@@ -48,6 +48,7 @@
       "exploreCta": "Explore other fundraisers",
       "shareCta": "Share",
       "shareText": "{title} raised {amount}. Thank you to everyone who gave!",
+      "shareTextNoAmount": "Thank you to everyone who gave to {title}!",
       "shareCopied": "Link copied!",
       "shareFailed": "Could not share the link. Try again."
     },
@@ -178,8 +179,13 @@
       "goalSettings": {
         "sectionHeading": "Goal Settings",
         "openSettings": "Goal settings",
+        "enableGoal": "Show goal section",
         "showGoal": "Show goal",
-        "showDaysLeft": "Show days left"
+        "showDaysLeft": "Show days left",
+        "hiddenView": {
+          "title": "Goal hidden",
+          "description": "Donors will not see the amount raised, goal or days left."
+        }
       },
       "theme": {
         "sectionHeading": "Theme",
@@ -354,6 +360,8 @@
           "title": "Stage Mode",
           "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
           "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
+          "goalHiddenHint": "Stage Mode shows the amount raised, so it needs the goal section. Turn on the Goal switch to use it.",
+          "leaderboardOffHint": "Turn on the leaderboard to show recent gifts and top donors on Stage.",
           "collapse": "Collapse",
           "expand": "Expand",
           "remove": "Remove Stage Mode",
