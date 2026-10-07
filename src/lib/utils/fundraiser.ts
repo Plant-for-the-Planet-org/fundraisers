@@ -163,6 +163,18 @@ export function isGoalSectionShown(
   return fundraiser.settings?.modules?.donor_score?.enabled ?? true;
 }
 
+/** False when the host turned the leaderboard off or hid both its lists. Then the donation count may not show publicly. Same rule and defaults as the API. */
+export function isLeaderboardShown(
+  fundraiser: Pick<Fundraiser, 'settings'>
+): boolean {
+  const leaderboard = fundraiser.settings?.modules?.leaderboard;
+  if (!(leaderboard?.enabled ?? true)) return false;
+  return (
+    (leaderboard?.show_recent_list ?? true) ||
+    (leaderboard?.show_top_list ?? true)
+  );
+}
+
 /**
  * True when the fundraiser has run its course, which is the only state that earns celebratory copy.
  *

@@ -9,6 +9,7 @@ import {
   convertTotalRaisedToSingleCurrency,
   getFundraiserUrl,
   isGoalSectionShown,
+  isLeaderboardShown,
 } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { useHostDisplay } from '@/components/fundraisers/use-host-display';
@@ -72,21 +73,23 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
                     </dd>
                   </div>
                 )}
-                <div className='donation-count flex items-center gap-1'>
-                  <UsersRound className='w-3 h-3' />
-                  <dt className='sr-only'>
-                    {tFundraisers('donationCountLabel')}
-                  </dt>
-                  <dd>
-                    {tFundraisers('donationCount', {
-                      count: fundraiser.donationCount,
-                      formattedCount: formatCompactNumber(
-                        fundraiser.donationCount,
-                        locale
-                      ),
-                    })}
-                  </dd>
-                </div>
+                {isLeaderboardShown(fundraiser) && (
+                  <div className='donation-count flex items-center gap-1'>
+                    <UsersRound className='w-3 h-3' />
+                    <dt className='sr-only'>
+                      {tFundraisers('donationCountLabel')}
+                    </dt>
+                    <dd>
+                      {tFundraisers('donationCount', {
+                        count: fundraiser.donationCount,
+                        formattedCount: formatCompactNumber(
+                          fundraiser.donationCount,
+                          locale
+                        ),
+                      })}
+                    </dd>
+                  </div>
+                )}
               </div>
 
               <div className='fundraiser-hosts text-sm text-muted-foreground'>
