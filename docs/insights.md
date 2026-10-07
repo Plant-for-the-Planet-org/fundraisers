@@ -7,6 +7,7 @@ Where it shows up:
 - **Overview**: "Visitors this week" across your fundraisers.
 - **A fundraiser's Insights tab**: visitors over time, donation journey, countries, sources.
 - **Insights page** (`/dashboard/insights`): all your fundraisers combined, a ranking, or one fundraiser picked from a list.
+- **PDF report**: a one page A4 print of a fundraiser's Insights, opened from a button on its Insights tab. See [PDF report](#pdf-report).
 
 The dashboard layout is described in [dashboard-page.md](./dashboard-page.md).
 
@@ -116,3 +117,28 @@ The share studio, the fundraiser page's Copy Link and the thank-you Copy Link ta
 Links shared from the Share tab, from the fundraiser page (Copy Link and the Share images dialog) or after donating carry the sharer's `?ref=` code (see `docs/share.md`). The landing page sends `share_visit` with the code, and every donation event carries it. "From people sharing" counts both per code with `event-data/values` (`propertyName=ref`), filtered to the fundraiser's path.
 
 Both calls are optional: if Umami cannot answer them, the rest of Insights still loads and the list stays empty.
+
+---
+
+## PDF report
+
+A host can print or save a one page A4 report of a fundraiser's Insights, to hand to family, a company or a club. The plan and the design decisions are in [plans/insights-pdf.md](./plans/insights-pdf.md).
+
+There is no PDF library and no server side rendering. The report is a normal web page sized to A4, and the browser's Print dialog turns it into a PDF ("Save as PDF"). The QR code is drawn as an SVG path from the `qrcode` package.
+
+- **Where**: `/dashboard/fundraisers/[slug]/insights/print?range=7d|24h|30d|campaign`, in the `(print)` route group so it has no site header, footer or dashboard menu. The "Download PDF" button on the Insights card opens it in a new tab with the range on screen. An unknown range falls back to 7 days.
+- **Access**: the same as the Insights tab. The page checks sign in and hosting in the browser (`FundraiserPrintShell`), and the numbers come from the same `GET /api/fundraisers/[slug]/insights` route, so there is no new API and no new access rule. Without an Umami key the page is a 404, like the tab.
+- **Content**: raised so far (with goal progress), donors and donations, visitors and page views for the range, a visitors chart, the donation journey, top countries and sources, an accuracy note, the fundraiser link and a QR code. Raised and donors are totals since the start, so the tile row has two captions: "Campaign total" over those two and the range (for example "Last 30 days") over visitors and page views. The chart, journey, countries and sources follow the range too.
+- **Hosts**: the "by" line names public, active hosts only, in the same order as the public page (displayOrder, unset last), two at most, then "and N others". A host marked hidden from public never appears.
+- **Lists**: countries and sources show the top 4 plus one "Other" row. "Other countries" is total visitors minus the shown countries, because the API only returns the top few. That also counts visitors whose country is unknown. "Other" for sources is the hidden rows plus the visitors from sites past the API's top 6 (`otherSourceVisitors`).
+- **Chart**: up to 10 bars get a value and a label each. With more bars only the busiest one is printed and the axis has three labels (first, middle, last). The 7 day bars are built from hourly numbers, so a person who came back later the same day counts twice. Their values would not add up to the Visitors tile, so only the busiest bar is printed there too.
+- **Theme**: bars and the goal bar use the fundraiser accent, and the report uses the theme's body and title fonts. Text, including "PLANTING" in the logo, uses a darker version of the accent (`readableInk`), mixed towards black only as far as needed to read on white. An accent that already reads is used as it is.
+- **Goal**: the percent is not capped, like the Overview tab, so a passed goal reads 180%. Only the bar stops at full.
+- **File name**: the page title is "<fundraiser title> - Insights report", which browsers suggest as the PDF file name.
+- **QR link**: `/raise/<slug>?utm_source=report&utm_medium=print`. Visits from a printed report show up in "From your tagged links" as "Printed report". The tokens are listed in [naming.md](./naming.md#utm-parameters).
+- **Print CSS**: `@page { size: A4; margin: 0 }`, colours forced on (`print-color-adjust: exact`), and everything except the sheet hidden when printing, so banners and toasts never reach the paper. The sheet is 296mm tall in print so rounding does not push a blank second page. Content that does not fit is cut, not carried over, so keep titles and lists capped.
+- **Funnel**: the donation journey is one row of four steps (Visited, Clicked Donate, Submitted, Paid), each with a bar filled to its share of visitors, its count and its percent. A real count that rounds to 0% shows as under 1%. The Insights tab and the PDF share one component (`InsightsFunnel`), so they always read the same.
+- **Paid step**: the last funnel step is `donation_completed`, shown as "Paid". It fires for a paid card or wallet payment and a confirmed SEPA mandate, but not for a pending bank transfer, so it can show 0 while the platform lists donations.
+- **Later**: emailed or scheduled PDFs would need server side rendering, for example Cloudflare Browser Rendering pointed at this page with a short lived signed link, since the page sits behind login.
+
+The pure helpers (list caps, axis labels, funnel steps, hosts line, ink colour, QR link) live in `src/lib/analytics/insights-report.ts` with tests.

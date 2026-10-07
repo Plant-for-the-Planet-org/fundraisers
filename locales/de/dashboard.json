@@ -81,10 +81,10 @@
         "retry": "Erneut versuchen",
         "journey": {
           "title": "Weg zur Spende",
-          "clickRate": "{percent, number} % der Besucher*innen haben auf Spenden geklickt",
+          "visited": "Besucht",
           "donate_clicked": "Auf Spenden geklickt",
           "donation_submitted": "Abgeschickt",
-          "donation_completed": "Abgeschlossen"
+          "donation_completed": "Bezahlt"
         },
         "audience": {
           "countries": "Top-Länder",
@@ -111,7 +111,8 @@
             "stage": "Stage-Mode-QR-Code",
             "fundraiser": "Spendenseite",
             "thank_you": "Dankesseite",
-            "share_sheet": "Teilen-Menü"
+            "share_sheet": "Teilen-Menü",
+            "report": "Gedruckter Bericht"
           },
           "plainLink": "Einfacher Link",
           "copy": "Kopieren",
@@ -126,7 +127,37 @@
         },
         "updatedLabel": "Stand",
         "changeContext": "zum Zeitraum davor",
-        "accuracyNote": "Besucher*innen und Spendenschritte stammen aus datenschutzfreundlicher Analyse ohne Cookies. Wer Tracker blockiert, wird nicht gezählt, daher sind diese Zahlen ein Richtwert. Gesammelte Beträge und Spendenzahlen stammen aus unseren Daten; Spenden per Lastschrift oder Überweisung zählen, sobald die Zahlung eingeht, und können daher einige Tage später erscheinen."
+        "accuracyNote": "Besucher*innen und Spendenschritte stammen aus datenschutzfreundlicher Analyse ohne Cookies. Wer Tracker blockiert, wird nicht gezählt, daher sind diese Zahlen ein Richtwert. Gesammelte Beträge und Spendenzahlen stammen aus unseren Daten; Spenden per Lastschrift oder Überweisung zählen, sobald die Zahlung eingeht, und können daher einige Tage später erscheinen.",
+        "downloadPdf": "PDF herunterladen",
+        "report": {
+          "label": "Einblicke in den Spendenaufruf",
+          "generatedOn": "Erstellt am {date}",
+          "by": "von {names}",
+          "byOthers": "von {names} und {count, plural, one {einer weiteren Person} other {# weiteren Personen}}",
+          "raised": "Bisher gesammelt",
+          "donationCount": "{count, plural, one {# Spende} other {# Spenden}}",
+          "rangeShort": {
+            "24h": "Letzte 24 Std.",
+            "7d": "Letzte 7 Tage",
+            "30d": "Letzte 30 Tage",
+            "campaign": "Gesamte Laufzeit"
+          },
+          "chartTitle": {
+            "hour": "Besucher*innen pro Stunde",
+            "day": "Besucher*innen pro Tag",
+            "month": "Besucher*innen pro Monat"
+          },
+          "otherCountries": "Weitere Länder",
+          "otherSources": "Weitere",
+          "accuracyNote": "Besucher*innen und Spendenschritte stammen aus datenschutzfreundlicher Analyse ohne Cookies. Wer Tracker blockiert, wird nicht gezählt, daher sind diese Zahlen ein Richtwert. Gesammelte Beträge stammen aus unseren Daten. Spenden per Lastschrift oder Überweisung zählen, sobald die Zahlung eingeht.",
+          "qrLabel": "QR-Code, der die Seite des Spendenaufrufs öffnet",
+          "toolbarTitle": "Bericht zu den Einblicken",
+          "toolbarHint": "Wähle im Druckdialog „Als PDF speichern“.",
+          "print": "Drucken oder als PDF speichern",
+          "back": "Zurück zu den Einblicken",
+          "loading": "Dein Bericht wird vorbereitet",
+          "campaignTotal": "Insgesamt seit Start"
+        }
       },
       "checklist": {
         "title": "So wird es ein Erfolg",

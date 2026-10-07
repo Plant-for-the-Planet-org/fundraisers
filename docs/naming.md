@@ -147,6 +147,7 @@ Every token in use lives in this table. Add a row before using a new one, so a r
 | `utm_source` | `fundraiser`    | Copy Link on the fundraiser page and in its Share images dialog     | `components/fundraisers/use-fundraiser-share-url.ts`                                        |
 | `utm_source` | `thank_you`     | Copy Link on the thank-you screen after a donation                  | `components/donate/share-section.tsx`, through `useFundraiserShareUrl`                      |
 | `utm_source` | `stage`         | Stage Mode screen                                                   | `modules/stage/components/stage-qr-panel.tsx`                                               |
+| `utm_source` | `report`        | Printed Insights report (its QR code)                               | `lib/analytics/insights-report.ts`                                                          |
 | `utm_source` | `instagram`     | Instagram, from the share studio or a Share tab link                | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
 | `utm_source` | `whatsapp`      | WhatsApp, from the share studio or a Share tab link                 | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
 | `utm_source` | `tiktok`        | TikTok, from the share studio                                       | `lib/share/channels.ts`                                                                     |
@@ -158,6 +159,7 @@ Every token in use lives in this table. Add a row before using a new one, so a r
 | `utm_source` | `email`         | Email link on the Share tab                                         | `components/dashboard/fundraiser-detail/share-links.tsx`                                    |
 | `utm_source` | `newsletter`    | Newsletter, from the share studio banner or a Share tab link        | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
 | `utm_medium` | `qr`            | QR code scan                                                        | `modules/stage/components/stage-qr-panel.tsx`                                               |
+| `utm_medium` | `print`         | QR code on a printed Insights report                                | `lib/analytics/insights-report.ts`                                                          |
 | `utm_medium` | `copy_link`     | A Copy Link button                                                  | `components/fundraisers/use-fundraiser-share-url.ts`                                        |
 | `utm_medium` | `social`        | Posted on a social platform                                         | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |
 | `utm_medium` | `messaging`     | Sent in a chat app                                                  | `lib/share/channels.ts`, `components/dashboard/fundraiser-detail/share-links.tsx`           |

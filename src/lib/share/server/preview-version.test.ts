@@ -159,7 +159,7 @@ describe('shareImageVersion', () => {
 
   it('does not depend on the server, the clock or a restart', () => {
     // Pinned on purpose. If a change to the version's fields moves it, every preview gets a new URL once, which is fine when it is meant.
-    expect(version(base)).toBe('99332c9571f8');
+    expect(version(base)).toBe('8f3f276169e2');
   });
 
   it.each<[string, Fundraiser]>([

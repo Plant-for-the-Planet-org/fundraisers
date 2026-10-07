@@ -253,9 +253,19 @@ describe('buildShareRenderData', () => {
     };
 
     it.each<[DonationFrequency, number, string, string]>([
-      ['once', 50, 'I just gave €50!', 'Ich habe gerade €50 gespendet!'],
-      ['monthly', 20, 'I give €20 every month!', 'Ich spende jeden Monat €20!'],
-      ['yearly', 50, 'I give €50 every year!', 'Ich spende jedes Jahr €50!'],
+      ['once', 50, 'I just gave €50!', 'Ich habe gerade 50\u00a0€ gespendet!'],
+      [
+        'monthly',
+        20,
+        'I give €20 every month!',
+        'Ich spende jeden Monat 20\u00a0€!',
+      ],
+      [
+        'yearly',
+        50,
+        'I give €50 every year!',
+        'Ich spende jedes Jahr 50\u00a0€!',
+      ],
     ])('says what a %s gift is', (frequency, amount, english, german) => {
       const gift = { amount, currency: 'EUR', frequency };
       expect(build(gift).giftLine).toBe(english);
@@ -270,7 +280,7 @@ describe('buildShareRenderData', () => {
       expect(
         build({ amount: 1250, currency: 'EUR', frequency: 'monthly' }, 'de')
           .giftLine
-      ).toBe('Ich spende jeden Monat €1.250!');
+      ).toBe('Ich spende jeden Monat 1.250\u00a0€!');
     });
 
     it('leaves the line out without a gift', () => {
