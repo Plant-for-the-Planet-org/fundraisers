@@ -72,6 +72,8 @@ export interface SubmissionCore {
 
   // --- Auth/config values the flows read directly --------------------------
   token: string | null;
+  /** The page language, sent with the donation so the platform stores it on a new donor profile. */
+  locale: string;
   donorProfile: UserProfile | undefined;
   paymentOptions: PaymentOptions;
 }

@@ -1,6 +1,7 @@
 import type {
   InsightsBucket,
   InsightsRange,
+  InsightsSeries,
   InsightsUnit,
 } from '@/lib/types/fundraiser-insights';
 
@@ -230,4 +231,48 @@ export function buildDayBucketsFromHours(
   }
   addHour(localKey(window.endAt, 'hour', timeZone));
   return days;
+}
+
+function bucketDate(bucket: InsightsBucket, unit: InsightsUnit) {
+  // Keys are local wall-clock text, so read them back as a local time rather than as UTC.
+  if (unit === 'month') return new Date(`${bucket.key}-15T12:00`);
+  return new Date(unit === 'day' ? `${bucket.key}T12:00` : `${bucket.key}:00`);
+}
+
+export function formatBucket(
+  bucket: InsightsBucket,
+  unit: InsightsUnit,
+  locale: string
+) {
+  const date = bucketDate(bucket, unit);
+  if (unit === 'month') {
+    return date.toLocaleDateString(locale, { month: 'short', year: 'numeric' });
+  }
+  return unit === 'day'
+    ? date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+    : date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+}
+
+/**
+ * The window as text, such as "Sep 23 – 29, 2026". Hours matter for the last 24 hours; everywhere else the day is enough.
+ * A running campaign ends "today" rather than on a date that just means now, worded by `untilToday`.
+ * Null for a response cached from before these fields existed, so callers skip the label rather than crash.
+ */
+export function formatPeriod(
+  data: Pick<InsightsSeries, 'range' | 'startAt' | 'endAt' | 'endsNow'>,
+  locale: string,
+  untilToday: (start: string) => string
+) {
+  if (!Number.isFinite(data.startAt) || !Number.isFinite(data.endAt)) {
+    return null;
+  }
+  const format = new Intl.DateTimeFormat(
+    locale,
+    data.range === '24h'
+      ? { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+      : { day: 'numeric', month: 'short', year: 'numeric' }
+  );
+  return data.range === 'campaign' && data.endsNow
+    ? untilToday(format.format(data.startAt))
+    : format.formatRange(data.startAt, data.endAt);
 }

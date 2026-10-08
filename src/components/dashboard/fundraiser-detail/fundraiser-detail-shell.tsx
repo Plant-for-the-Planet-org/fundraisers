@@ -12,7 +12,7 @@ import { FundraiserDetailHeader } from './fundraiser-detail-header';
 import { FundraiserDetailTabs } from './fundraiser-detail-tabs';
 import { useHostedFundraiser } from './use-hosted-fundraiser';
 
-function StatusMessage({
+export function StatusMessage({
   title,
   description,
 }: {

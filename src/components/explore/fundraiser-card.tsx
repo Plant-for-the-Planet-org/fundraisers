@@ -8,6 +8,8 @@ import { formatCurrencyFromDecimal } from '@/lib/utils/currency';
 import {
   convertTotalRaisedToSingleCurrency,
   getFundraiserUrl,
+  isGoalSectionShown,
+  isLeaderboardShown,
 } from '@/lib/utils/fundraiser';
 import { getImageUrl } from '@/lib/utils/images';
 import { useHostDisplay } from '@/components/fundraisers/use-host-display';
@@ -59,31 +61,35 @@ export function FundraiserCard({ fundraiser }: FundraiserCardProps) {
 
             <div className='space-y-1'>
               <div className='fundraiser-stats text-sm text-muted-foreground flex items-center gap-3'>
-                <div className='amount-raised flex items-center gap-1'>
-                  <dt className='sr-only'>
-                    {tFundraisers('amountRaisedLabel')}
-                  </dt>
-                  <dd>
-                    {tFundraisers('amountRaised', {
-                      formattedAmountWithCurrency: formattedTotalRaised,
-                    })}
-                  </dd>
-                </div>
-                <div className='donation-count flex items-center gap-1'>
-                  <UsersRound className='w-3 h-3' />
-                  <dt className='sr-only'>
-                    {tFundraisers('donationCountLabel')}
-                  </dt>
-                  <dd>
-                    {tFundraisers('donationCount', {
-                      count: fundraiser.donationCount,
-                      formattedCount: formatCompactNumber(
-                        fundraiser.donationCount,
-                        locale
-                      ),
-                    })}
-                  </dd>
-                </div>
+                {isGoalSectionShown(fundraiser) && (
+                  <div className='amount-raised flex items-center gap-1'>
+                    <dt className='sr-only'>
+                      {tFundraisers('amountRaisedLabel')}
+                    </dt>
+                    <dd>
+                      {tFundraisers('amountRaised', {
+                        formattedAmountWithCurrency: formattedTotalRaised,
+                      })}
+                    </dd>
+                  </div>
+                )}
+                {isLeaderboardShown(fundraiser) && (
+                  <div className='donation-count flex items-center gap-1'>
+                    <UsersRound className='w-3 h-3' />
+                    <dt className='sr-only'>
+                      {tFundraisers('donationCountLabel')}
+                    </dt>
+                    <dd>
+                      {tFundraisers('donationCount', {
+                        count: fundraiser.donationCount,
+                        formattedCount: formatCompactNumber(
+                          fundraiser.donationCount,
+                          locale
+                        ),
+                      })}
+                    </dd>
+                  </div>
+                )}
               </div>
 
               <div className='fundraiser-hosts text-sm text-muted-foreground'>

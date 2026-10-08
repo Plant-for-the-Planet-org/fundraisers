@@ -250,6 +250,8 @@ export async function getFundraiserInsights({
     ),
   ]);
 
+  const referrerSources = groupReferrers(referrers, TOP_LIMIT);
+
   return {
     range,
     unit: window.unit,
@@ -265,7 +267,8 @@ export async function getFundraiserInsights({
     countries: countries
       .filter(metric => /^[A-Z]{2}$/.test(metric.x))
       .map(metric => ({ code: metric.x, visitors: metric.y })),
-    sources: groupReferrers(referrers, TOP_LIMIT),
+    sources: referrerSources.sources,
+    otherSourceVisitors: referrerSources.otherVisitors,
     taggedSources: utmSources.map(metric => ({
       source: metric.x,
       visitors: metric.y,

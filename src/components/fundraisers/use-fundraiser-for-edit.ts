@@ -4,7 +4,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
+import { getHostFundraiserBySlug } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
@@ -45,11 +45,12 @@ export function useFundraiserForEdit(slug: string): FundraiserEditState {
       setState({ status: 'loading', fundraiser: null, errorMessage: null });
 
       try {
-        const fundraiser = await getFundraiserAuthenticated(slug, accessToken);
+        // The host route, so the form loads every figure even where the host hid it from the public. Saving the public version would write those back as empty.
+        const fundraiser = await getHostFundraiserBySlug(slug, accessToken);
 
         if (shouldIgnore) return;
 
-        if (!isFundraiserOwnerOrAdmin(fundraiser, userId)) {
+        if (!fundraiser || !isFundraiserOwnerOrAdmin(fundraiser, userId)) {
           setState({
             status: 'unauthorized',
             fundraiser: null,

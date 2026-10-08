@@ -1,7 +1,11 @@
 import type { RedirectPath } from '../types/auth';
 
 import { clearAuthTime } from '../auth/auth-time';
-import { DEFAULT_REDIRECT_PATH, PROTECTED_PATH } from '../constants/auth';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  DEFAULT_REDIRECT_PATH,
+  PROTECTED_PATH,
+} from '../constants/auth';
 import { ALLOWED_REDIRECT_ROOTS } from '../types/auth';
 
 type JwtPayload = {
@@ -66,18 +70,31 @@ export function isTokenExpired(token: string, bufferSeconds = 30): boolean {
 
 const isBrowser = () => typeof window !== 'undefined';
 
+/**
+ * Drops the saved sign-in: the token and its sign-in time always go together, so the next silent login is not treated as a recent sign-in.
+ * Never throws, because Safari private mode and blocked site data throw on localStorage access, and a throw here would stop sign-out from reaching Auth0.
+ * The impersonation state is left alone on purpose: dropping an expired token must not end an impersonation.
+ */
+export function clearStoredSession() {
+  if (!isBrowser()) return;
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  } catch {
+    // Nothing to do: the caller is signing out either way.
+  }
+  clearAuthTime();
+}
+
 // Get token from localStorage and return it only if still valid
 export const getValidStoredToken = () => {
   if (!isBrowser()) return null;
 
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
 
   if (!token) return null;
 
   if (isTokenExpired(token)) {
-    localStorage.removeItem('access_token');
-    // Clear the old sign-in time so the next silent login isn't treated as a recent sign-in.
-    clearAuthTime();
+    clearStoredSession();
     return null;
   }
 

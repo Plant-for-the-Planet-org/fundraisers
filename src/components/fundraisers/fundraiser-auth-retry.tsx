@@ -5,7 +5,7 @@ import type { PaymentOptions } from '@/lib/types/payment-options';
 
 import { useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
-import { getFundraiserAuthenticated } from '@/lib/api/fundraiser-service';
+import { getHostFundraiserBySlug } from '@/lib/api/fundraiser-service';
 import { getPaymentOptions } from '@/lib/api/payment-options-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { buildTheme } from '@/lib/theme/build-theme';
@@ -23,12 +23,18 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
     PaymentOptions | undefined
   >(undefined);
   const [error, setError] = useState<unknown>(null);
+  const [notHosted, setNotHosted] = useState(false);
 
   useEffect(() => {
     if (isAuthInitializing || !accessToken) return;
 
-    getFundraiserAuthenticated(slug, accessToken)
+    // Only a host may see a fundraiser the public cannot, so this reads the host route.
+    getHostFundraiserBySlug(slug, accessToken)
       .then(async data => {
+        if (!data) {
+          setNotHosted(true);
+          return;
+        }
         setSelectedTheme(buildTheme(data.settings?.theme ?? null));
         let options: PaymentOptions | undefined;
         if (data.canDonate) {
@@ -54,6 +60,7 @@ export function FundraiserAuthRetry({ slug }: { slug: string }) {
     }
     throw error;
   }
+  if (notHosted) notFound();
   // Auth finished with no token → treat as not found (drafts stay invisible to the public; a host can view after logging in).
   if (!isAuthInitializing && !accessToken) notFound();
   // Still initializing, or the authenticated fetch is in flight.

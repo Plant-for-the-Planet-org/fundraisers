@@ -1,7 +1,7 @@
 import type { UserProfile } from '@/lib/api/user-service';
 import type * as ImplicitSignupModule from '@/lib/auth/implicit-signup';
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/auth/implicit-signup', async importOriginal => {
   const actual = await importOriginal<typeof ImplicitSignupModule>();
@@ -11,6 +11,7 @@ vi.mock('@/i18n/locale-cookie', () => ({ getClientLocale: () => 'de' }));
 
 import { ensureProfile } from '@/lib/auth/implicit-signup';
 import { useAuthStore } from './auth-store';
+import { useImpersonationStore } from './impersonation-store';
 
 const mockedEnsureProfile = ensureProfile as ReturnType<typeof vi.fn>;
 
@@ -303,5 +304,31 @@ describe('useAuthStore.retryProfileSetup', () => {
     await useAuthStore.getState().retryProfileSetup();
 
     expect(mockedEnsureProfile).not.toHaveBeenCalled();
+  });
+});
+
+describe('useAuthStore.logout', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('still leaves for Auth0 when ending the impersonation throws', () => {
+    const location = {
+      pathname: '/explore',
+      search: '',
+      origin: 'https://fundraisers.test',
+      href: '',
+    };
+    vi.stubGlobal('window', { location });
+    vi.spyOn(useImpersonationStore.getState(), 'stop').mockImplementation(
+      () => {
+        throw new Error('QuotaExceededError');
+      }
+    );
+
+    useAuthStore.getState().logout();
+
+    expect(location.href).toContain('/v2/logout');
   });
 });

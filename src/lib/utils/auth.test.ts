@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getValidStoredToken } from './auth';
+import { clearStoredSession, getValidStoredToken } from './auth';
 
 const store = new Map<string, string>();
 
@@ -57,5 +57,31 @@ describe('getValidStoredToken', () => {
 
     expect(getValidStoredToken()).toBeNull();
     expect(store.has('auth_time')).toBe(false);
+  });
+});
+
+describe('clearStoredSession', () => {
+  it('drops the token and the sign-in time but keeps impersonation', () => {
+    store.set('access_token', 'token');
+    store.set('auth_time', '1700000000');
+    store.set('impersonation-state', '{}');
+
+    clearStoredSession();
+
+    expect(store.has('access_token')).toBe(false);
+    expect(store.has('auth_time')).toBe(false);
+    expect(store.has('impersonation-state')).toBe(true);
+  });
+
+  it('does not throw when the browser refuses localStorage', () => {
+    Object.assign(globalThis, {
+      localStorage: {
+        removeItem: () => {
+          throw new Error('SecurityError');
+        },
+      },
+    });
+
+    expect(() => clearStoredSession()).not.toThrow();
   });
 });

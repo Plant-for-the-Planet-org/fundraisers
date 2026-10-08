@@ -64,6 +64,8 @@ export interface FundraiserInsights extends InsightsSeries {
   eventVisitors: Record<DonationEventName, number>;
   countries: InsightsCountry[];
   sources: InsightsSource[];
+  /** Visitors from referring sites beyond the ones in `sources`. */
+  otherSourceVisitors: number;
   /** Visitors who arrived through a link with `utm_source`, by that value. */
   taggedSources: Array<{ source: string; visitors: number }>;
   /** Visitors with no referrer: typed or pasted links, and apps like WhatsApp that do not send one. */

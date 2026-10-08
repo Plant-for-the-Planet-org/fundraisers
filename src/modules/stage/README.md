@@ -18,6 +18,8 @@ Public — no auth required. Any device with a browser can load it.
 
 **Not enabled:** If `modules.stage.enabled !== true`, the page shows: _"Stage Mode is not enabled for this fundraiser."_
 
+**Goal section hidden:** If the host hid the goal section (`modules.donor_score.enabled === false`), the page shows: _"Stage Mode needs the goal section."_ Stage shows the amount raised, and `alltime-stats` sends no money while the goal section is hidden. The editor's Stage panel shows the same hint.
+
 ---
 
 ## Registration
@@ -68,6 +70,7 @@ The stage locale is resolved from `modules.stage.locale`, falling back to the or
 - Leaderboard visibility — `modules.leaderboard.enabled`
 - Leaderboard display options (tab, anonymize, show_amount) — `modules.leaderboard`
 - `show_days_left` — from alltime-stats settings
+- Donor count — `stats.donationCount` from alltime-stats, `null` (not shown) when the leaderboard is off
 - `show_impact` breakdown values — from alltime-stats settings
 - Font and accent colors — `fundraiser.settings.theme`
 
