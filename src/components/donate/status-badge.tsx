@@ -23,6 +23,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ variant, paymentResultGroup }: StatusBadgeProps) {
+  // i18n-used: completed, bankTransferPending
   const t = useTranslations('Donate.thankYou.status');
 
   const badgeText =

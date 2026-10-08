@@ -40,6 +40,8 @@ export function FundraiserStatusFilter({
   inlineFilterClassName,
   dropdownFilterClassName,
 }: FundraiserStatusFilterProps) {
+  // One label per FundraiserListStatusFilter.
+  // i18n-used: *
   const t = useTranslations('Dashboard.statusFilter');
   const locale = useLocale();
 

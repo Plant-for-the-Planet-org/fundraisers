@@ -88,7 +88,7 @@ Each row below is intended to land as a single commit. Pages are independent; ut
 | U3  | `refactor(i18n): add joinNames helper using Intl.ListFormat`         | extract helper + replace `' and '` join                                                                                                   | [§11.3](#113-joinnames-helper-via-intllistformat)                           |
 | U4  | `refactor(i18n): error-code → translation pattern for services`      | generalize `donation-failure-banner` pattern across services                                                                              | [§11.4](#114-error-code--translation-pattern-for-services)                  |
 | Z1  | `chore(i18n): load cookie.json or document separate dictionary`      | request.ts + types.ts                                                                                                                     | [§13.1](#131-cookiejson-is-not-loaded-by-next-intl)                         |
-| Z2  | `ci(i18n): add EN/DE key-parity guardrail`                           | script + CI step                                                                                                                          | [§13.2](#132-no-automated-key-audit)                                        |
+| Z2  | ✅ `chore(i18n): add unused translation key audit script`            | `scripts/check-translations.mjs` + `npm run check:translations`                                                                           | [§13.2](#132-no-automated-key-audit)                                        |
 
 **Recommended order:** utilities (U1–U4) first if you want page commits to be free of mixed concerns; otherwise pages 1–7 first, utilities after.
 
@@ -537,14 +537,29 @@ Both call sites in [donors-preview.tsx](../src/components/fundraisers/donors-pre
 
 **Fix:** Either (a) load it in `request.ts` and add to `types.ts`, or (b) document explicitly that it's a separate dictionary for `vanilla-cookieconsent`.
 
-### 13.2 No automated key audit
+### 13.2 No automated key audit ✅ Resolved (2026-09-17)
 
-No tooling currently detects orphan keys, and no build-time check guarantees EN/DE key parity (currently true but unguarded).
+Added [`scripts/check-translations.mjs`](../scripts/check-translations.mjs), run as `npm run check:translations`. It flattens `locales/en` into dotted message keys, walks `src/**/*.{ts,tsx}` with the TypeScript AST, resolves every `t(...)` call against the namespace its translator was bound to, and diffs the two sets.
 
-**Recommendation:** Add a CI step using `i18next-scanner`, `lint-i18n-json`, or a small Node script that:
+Off-the-shelf tools were rejected because none model next-intl's namespace binding, where `useTranslations('Fundraisers.edit')` plus `t('title')` resolves to `Fundraisers.edit.title`. They would read nearly every key as dead.
 
-1. Flattens both `en/` and `de/` JSON trees and asserts key-set equality.
-2. Diffs flattened JSON keys against `t('...')` usages in source.
+`useTranslations()` with no argument binds the root, so `t('Fundraisers.edit.title')` already carries the whole key and the namespace file it binds is read off the key itself. A namespace the AST cannot read, as in `useTranslations(someVariable)` or `getTranslations({ namespace })`, is fatal rather than silently unresolved.
+
+It reports:
+
+1. Keys in `locales/en` that no source file uses. Advisory — printed, never fatal.
+2. Keys present in one locale but not the other. Fatal.
+3. Namespace files that no component binds. Fatal, judged per top-level root. A file holding two roots where only one is bound is still in use, so the dead root is reported as a note instead.
+
+Keys built from a value the AST cannot read (`t(status)`, `t(link.labelKey)`) need an `// i18n-used: <keys>` comment above the call or above the translator it uses. `*` covers every key under the bound namespace, `foo.*` every key under `foo`. A missing, stale or malformed comment is fatal, so the audit cannot go quietly stale.
+
+On a translator received as an argument (`t: ReturnType<typeof useTranslations>`) the namespace belongs to whoever calls the helper, so write the entries the way the call site writes them — `one`, not `Fundraisers.one` — and they are matched by suffix against every locale key, the same rule a literal `t('one')` gets in that position.
+
+A comment binds to the one node it is actually attached to, read from the AST rather than by counting lines. Blank lines and prose comments in between are fine, and stacked `i18n-used:` comments all count, but a comment never reaches past the statement it sits above, so it cannot silently cover the next call or the next translator. A comment that ends up covering no call at all is fatal, as is a wildcard with no namespace to anchor it: `*` on a translator received as an argument, or a bare `*` on a root translator, where it would cover every locale file. On a root translator write the namespace into the entry, as in `Fundraisers.*`.
+
+`cookie.json` is allowlisted in the script: it has no namespace wrapper and is read by a direct static import in [`src/lib/constants/cookie-consent-config.ts`](../src/lib/constants/cookie-consent-config.ts), so its keys never appear in a `t()` call. See [§13.1](#131-cookiejson-is-not-loaded-by-next-intl).
+
+Not wired into `prebuild`. Dead keys are cleanup, not a reason to fail a build, and `createMessagesDeclaration` already fails type-check on the opposite problem, a `t('key')` that does not exist.
 
 ---
 
