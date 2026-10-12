@@ -8,8 +8,6 @@
       "label": "Dashboard-Menü",
       "overview": "Übersicht",
       "fundraisers": "Spendenaufrufe",
-      "collapse": "Menü einklappen",
-      "expand": "Menü ausklappen",
       "insights": "Einblicke"
     },
     "overview": {
@@ -51,7 +49,8 @@
         "overview": "Übersicht",
         "donors": "Spender*innen",
         "insights": "Einblicke",
-        "share": "Teilen"
+        "share": "Teilen",
+        "shareNew": "Es gibt Neuigkeiten zum Teilen"
       },
       "stats": {
         "raised": "Gesammelt",
@@ -92,7 +91,7 @@
           "taggedTitle": "Über deine markierten Links",
           "direct": "Direkt oder Apps",
           "noData": "Keine Daten für diesen Zeitraum.",
-          "builderTitle": "Teile deinen Spendenaufruf",
+          "otherPlaces": "Brauchst du einen Link für E-Mail, Newsletter oder einen anderen Ort?",
           "builderHint": "Nutze für jeden Ort, an dem du teilst, einen eigenen Link. Unter Einblicke siehst du dann, welcher Besucher*innen bringt.",
           "linkCopied": "Link für {source} kopiert",
           "linkCopyError": "Link konnte nicht kopiert werden",
@@ -159,6 +158,17 @@
           "campaignTotal": "Insgesamt seit Start"
         }
       },
+      "stageLink": {
+        "title": "Stage-Mode-Link",
+        "hint": "Zeige deinen Spendenaufruf bei einer Veranstaltung auf einem großen Bildschirm. Öffne diesen Link auf dem Bildschirm. Spender*innen geben per QR-Code, und der Bildschirm aktualisiert sich live.",
+        "label": "Stage-Mode-Link",
+        "copy": "Kopieren",
+        "copied": "Stage-Mode-Link kopiert",
+        "copyError": "Der Link konnte nicht kopiert werden",
+        "open": "Öffnen",
+        "off": "Stage Mode ist für diesen Spendenaufruf aus.",
+        "turnOn": "Einschalten"
+      },
       "checklist": {
         "title": "So wird es ein Erfolg",
         "progress": "{done, number} von {total, number} erledigt",
@@ -171,7 +181,7 @@
           },
           "story": {
             "title": "Erzähl deine Geschichte",
-            "hint": "Sag in ein paar ehrlichen Sätzen, warum dir das wichtig ist. Ein Foto oder Video hilft, es zu fühlen."
+            "hint": "Menschen geben Menschen. Erzähl, warum dir das wichtig ist, in deinen eigenen Worten, und füge wenn du kannst ein Foto oder Video hinzu. Eine Geschichte von Herzen macht aus Besucher*innen Spender*innen."
           },
           "goal": {
             "title": "Ziel festlegen",
@@ -185,19 +195,25 @@
             "title": "Mit-Gastgeber*in einladen",
             "hint": "Je mehr Leute den Link teilen, desto mehr Freund*innen sehen ihn."
           },
+          "share": {
+            "title": "Teile deinen Spendenaufruf",
+            "hint": "Dein Spendenaufruf beginnt bei den Menschen, die dich kennen. Teile ihn mit Freund*innen und Familie: Im Tab Teilen liegt für jeden Ort ein Bild oder Video bereit."
+          },
           "firstDonation": {
             "title": "Die erste Spende begrüßen",
             "hint": "Frag zuerst enge Freund*innen oder Familie. Frühe Spenden schaffen Vertrauen."
           },
-          "share": {
+          "keepSharing": {
             "title": "Teile weiter",
-            "hint": "Jedes Teilen bringt neue Menschen. Storys, Beiträge und einen Link für jeden Ort findest du im Tab Teilen."
+            "hint": "Deine ersten Spender*innen sind da. Deine Story kann sie jetzt nennen, und der Betrag ist gewachsen, also ist jedes Teilen neu. Teile sie noch einmal."
           }
         },
         "invite": "Einladen",
         "share": "Teilen",
         "showDone": "{count, number} erledigte anzeigen",
-        "hideDone": "Erledigte ausblenden"
+        "hideDone": "Erledigte ausblenden",
+        "locked": "Gesperrt",
+        "lockedHint": "Wird freigeschaltet, wenn {needed, number} Personen gespendet haben. Bisher: {count, number}."
       },
       "hosts": {
         "invite": "Mit-Gastgeber*in einladen"
@@ -238,6 +254,23 @@
         "range": "{from, number}–{to, number} von {total, number}",
         "newestFirst": "Neueste zuerst",
         "oldestFirst": "Älteste zuerst"
+      },
+      "reshare": {
+        "goal": {
+          "title": "Du hast dein Ziel erreicht!",
+          "body": "Was für ein Moment. Danke allen, die geholfen haben, und teile die Neuigkeit. Deine Story zeigt die neue Summe.",
+          "action": "Neuigkeit teilen"
+        },
+        "progress": {
+          "title": "Du bist bei {percent, number} % deines Ziels",
+          "body": "Jedes Update gibt Menschen einen Grund, noch einmal hinzusehen. Teile deinen Fortschritt: Deine Story zeigt immer den aktuellen Betrag.",
+          "action": "Fortschritt teilen"
+        },
+        "donors": {
+          "title": "Deine Spender*innen können jetzt in deiner Story erscheinen",
+          "body": "{count, plural, one {# Person hat} other {# Personen haben}} gespendet. Aktualisiere deine Story, damit sie sie zeigt, und teile sie noch einmal.",
+          "action": "Story aktualisieren"
+        }
       }
     },
     "manageFundraisers": {
@@ -304,6 +337,7 @@
     "actions": {
       "menuLabel": "Aktionen öffnen",
       "viewPage": "Seite ansehen",
+      "publish": "Veröffentlichen",
       "edit": "Bearbeiten",
       "clone": "Duplizieren",
       "stageMode": "Bühnenmodus",
@@ -314,14 +348,23 @@
       "delete": "Löschen",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "publishSuccess": "Dein Spendenaufruf ist live",
       "deleteSuccess": "Spendenaufruf gelöscht",
-      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
+      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut.",
+      "publishErrorTitle": "Veröffentlichen nicht möglich",
+      "publishErrorDescription": "Öffne den Editor und prüfe, ob alles ausgefüllt ist. Versuche es dann erneut."
     },
     "deleteDialog": {
       "title": "Spendenaufruf löschen?",
       "description": "Möchtest du diesen Spendenaufruf wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "confirm": "Löschen"
+    },
+    "goLiveDialog": {
+      "title": "Spendenaufruf veröffentlichen?",
+      "description": "Dein Spendenaufruf wird öffentlich und Menschen können spenden. Du kannst ihn jederzeit pausieren.",
+      "cancel": "Abbrechen",
+      "confirm": "Veröffentlichen"
     },
     "cloneDialog": {
       "title": "Fundraiser duplizieren",

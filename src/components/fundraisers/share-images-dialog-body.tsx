@@ -1,5 +1,6 @@
 'use client';
 
+import type { ShareChannelId } from '@/lib/share/channels';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import Link from 'next/link';
@@ -11,10 +12,13 @@ import { useIsHost } from './use-is-host';
 export function ShareImagesDialogBody({
   fundraiser,
   fitHeight,
+  initialChannel,
 }: {
   fundraiser: Fundraiser;
   /** The room the dialog leaves for this body, as a CSS length. */
   fitHeight: string;
+  /** The channel to start on, from a QR code's link. */
+  initialChannel?: ShareChannelId;
 }) {
   const t = useTranslations('Fundraisers.shareImages');
   const isHost = useIsHost(fundraiser);
@@ -28,6 +32,7 @@ export function ShareImagesDialogBody({
         // A host's link below takes one line and the gap above it.
         fitHeight={isHost ? `calc(${fitHeight} - 2.25rem)` : fitHeight}
         pinActions
+        initialChannel={initialChannel}
       />
       {isHost && (
         <Link

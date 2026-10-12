@@ -18,6 +18,14 @@ Key differences from the old approach:
 - `allow_dedication` and `show_totals_on_fundraiser` still come from `fundraiser.settings.modules.contribution` since the `paymentOptions` endpoint does not expose them
 - The response also includes `gateways` (Stripe publishable key, PayPal client ID, offline account) — these will be needed for the checkout step
 
+**A host's own choices** (`contribution-editor.ts`, `contribution-settings-popover.tsx`)
+
+The create and edit form shows the contribution box as a preview. The host types over the amounts in its tiles and clicks a tile to choose which is shown first; the set of amounts keeps its size, with no adding or removing, and an amount is kept when the tile loses focus (a duplicate or an invalid amount is dropped). A settings menu in the corner, like the leaderboard's, covers whether donors may enter their own amount and the smallest they may enter, which frequencies are on offer and which is selected first, and whether a gift can be dedicated. They are stored in `settings.modules.contribution`: `options` (a `unit` in whole currency units, `default: true` on the preselected one, and `min` on the option without a `unit`, which is the custom amount), `recurrency_options`, `default_recurrency`, `allow_dedication` and `allow_recurrency`.
+
+Where the host chose nothing, `options` is empty and the platform's own amounts apply, so a host who never opens the menu changes nothing. Where they did, `mapPaymentOptionsToContributionSettings()` lets their amounts, preselected amount and frequencies win. Two limits always hold: the frequencies must be ones the platform supports, and the custom minimum is never below the platform's (`DonationForm` takes the larger of the two). The settings are stored as part of the fundraiser's free-form `settings` JSON, so the platform keeps them as they are, and only a change to them is sent on update.
+
+In the creator's form the box is a preview (`DonationForm` with `preview`): it is marked "Preview" and its button is inactive, so it does not look like a gift to press.
+
 The mapping lives in `mapPaymentOptionsToContributionSettings()` in `contribution-utils.ts`. The old `mapContributionSettings()` is kept as a fallback but is no longer used in the donation flow.
 
 **`canDonate` flag and closed state**

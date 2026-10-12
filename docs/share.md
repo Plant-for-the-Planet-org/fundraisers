@@ -4,32 +4,32 @@ Images and videos people share for a fundraiser, the link preview other apps sho
 
 ## Pieces
 
-| Where | What |
-| --- | --- |
-| `src/lib/share/formats.ts` | Every size we make, with its safe zone: the area the app's own buttons never cover. |
-| `src/lib/share/channels.ts` | Platform → ways to share on it (Instagram Story, Instagram post, …): the size, image or video, and the UTM tags. |
-| `src/lib/share/render/` | The renderer. One `drawShareFrame(g, t, options)` draws any format at time `t`, in the browser and on the server. |
-| `src/lib/share/share-data.ts` | Turns a fundraiser into the text on the image, with the public page's rules for the goal and for naming donors. |
-| `src/lib/share/cta.ts` | Button texts, and the text a season suggests. |
-| `src/lib/share/video.ts` | Encodes the animation to MP4 in the browser (WebCodecs, through `mediabunny`). |
-| `src/components/share/share-studio.tsx` | The UI: host variant in the dashboard Share tab, donor variant on the thank-you screen and in the fundraiser page's Share images dialog. |
-| `src/app/api/share-image/[slug]` | The link preview image, drawn on the server with `@napi-rs/canvas`. |
-| `src/lib/share/render/theme-background.ts` | The fundraiser page's background (base, wash, decoration, animation) rebuilt for a canvas. |
-| `src/lib/share/render/avatars.ts` | Donor avatars: the profile photo, or the app's generated avatar (same icon and colour as `FallbackAvatar`). |
-| `src/app/api/share/photo/[slug]` | The fundraiser's images from our origin (cover photo, theme background, photos of the donors on the image), so a canvas that draws them can still be exported. |
+| Where                                      | What                                                                                                                                                                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/share/formats.ts`                 | Every size we make, with its safe zone: the area the app's own buttons never cover.                                                                                                                              |
+| `src/lib/share/channels.ts`                | Platform → ways to share on it (Instagram Story, Instagram post, …): the size, image or video, and the UTM tags.                                                                                                 |
+| `src/lib/share/render/`                    | The renderer. One `drawShareFrame(g, t, options)` draws any format at time `t`, in the browser and on the server.                                                                                                |
+| `src/lib/share/share-data.ts`              | Turns a fundraiser into the text on the image, with the public page's rules for the goal and for naming donors.                                                                                                  |
+| `src/lib/share/cta.ts`                     | Button texts, and the text a season suggests.                                                                                                                                                                    |
+| `src/lib/share/video.ts`                   | Encodes the animation to MP4 in the browser (WebCodecs, through `mediabunny`).                                                                                                                                   |
+| `src/components/share/share-studio.tsx`    | The UI: host variant in the dashboard Share tab, donor variant on the thank-you screen and in the fundraiser page's Share images dialog.                                                                         |
+| `src/app/api/share-image/[slug]`           | The link preview image, drawn on the server with `@napi-rs/canvas`.                                                                                                                                              |
+| `src/lib/share/render/theme-background.ts` | The fundraiser page's background (base, wash, decoration, animation) rebuilt for a canvas.                                                                                                                       |
+| `src/lib/share/render/avatars.ts`          | Donor avatars: the profile photo, or the app's generated avatar (same icon and colour as `FallbackAvatar`).                                                                                                      |
+| `src/app/api/share/photo/[slug]`           | The fundraiser's images from our origin (cover photo, theme background, photos of the donors on the image, pictures of the projects the fundraiser supports), so a canvas that draws them can still be exported. |
 
 ## Formats and safe zones
 
 All vertical formats are 1080×1920 and differ only in what the app covers. The layout fills whatever zone it gets; a tight zone shrinks the ring first, then drops the avatars, then scales the text. The wide formats (ring beside the text) keep the ring and only drop the avatars, then scale the text.
 
-| Format | Size | Zone (x, y, w, h) | Used for |
-| --- | --- | --- | --- |
-| `story` | 1080×1920 | 65, 250, 950, 1420 | Instagram, Facebook, WhatsApp Status |
+| Format   | Size      | Zone (x, y, w, h)   | Used for                                                                            |
+| -------- | --------- | ------------------- | ----------------------------------------------------------------------------------- |
+| `story`  | 1080×1920 | 65, 250, 950, 1420  | Instagram, Facebook, WhatsApp Status                                                |
 | `tiktok` | 1080×1920 | 150, 140, 780, 1380 | TikTok: narrowed on both sides so the column stays centred and clear of the buttons |
-| `shorts` | 1080×1920 | 120, 380, 840, 1160 | YouTube Shorts |
-| `post` | 1080×1350 | 60, 70, 960, 1210 | 4:5 feed posts. The Instagram grid crops to 3:4, about 34px per side |
-| `banner` | 1200×630 | 60, 40, 1080, 550 | Link previews, LinkedIn wide posts, email |
-| `wide` | 1200×676 | 60, 50, 1080, 576 | X feed images and videos. 676, not 675, because H.264 video needs an even height |
+| `shorts` | 1080×1920 | 120, 380, 840, 1160 | YouTube Shorts                                                                      |
+| `post`   | 1080×1350 | 60, 70, 960, 1210   | 4:5 feed posts. The Instagram grid crops to 3:4, about 34px per side                |
+| `banner` | 1200×630  | 60, 40, 1080, 550   | Link previews, LinkedIn wide posts, email                                           |
+| `wide`   | 1200×676  | 60, 50, 1080, 576   | X feed images and videos. 676, not 675, because H.264 video needs an even height    |
 
 The zones come from creator guides, not official specs. Check a new format with `guides: true`, which draws the zone.
 
@@ -46,9 +46,49 @@ The zones come from creator guides, not official specs. Check a new format with 
 
 ## Seasons
 
-A season is a set of optional drawing hooks (`render/types.ts`, `Season`): palette, background, ring ticks, ring tip, behind the photo, on the photo, on the button, around the button. The plain theme is the season with no hooks. Christmas and Halloween bring their own palette; Birthday keeps the fundraiser's.
+A season is a set of optional drawing hooks (`render/types.ts`, `Season`): palette, background, ring ticks, ring tip, behind the photo, on the photo, on the button, around the button. The plain theme is the season with no hooks. The picker is one flat list of names with no headings (`SEASON_IDS`): your theme, then complete designs, then occasions. Designs bring their own palette, typefaces and background and look far apart from each other; occasions (Birthday, Wedding, In memory, Earth Day, Celebration, Christmas, Halloween) decorate. Pick styles that work in any country, and avoid ones tied to one hemisphere or faith. In memory is the calm one: one still light, nothing moves.
 
 Christmas wording follows the fundraiser's project purposes (`cta.ts`), since not every project plants trees. Mixed or unknown purposes get the neutral "A gift for the planet".
+
+### Designs
+
+| Design       | Feel                                                 | For                                        |
+| ------------ | ---------------------------------------------------- | ------------------------------------------ |
+| `minimal`    | White, black type, nothing else                      | Sophisticated, sparse                      |
+| `corporate`  | Deep navy, a faint grid, a light bar                 | Companies and teams                        |
+| `luxe`       | Black and gold, glitter, a serif title               | Galas and dinners                          |
+| `sport`      | Navy and lime, speed lines, capitals                 | A marathon or a challenge                  |
+| `tech`       | Near black and cyan, a dot grid, a scanning band     | Developer and tech communities             |
+| `playful`    | Yellow and blue, floating shapes                     | Schools and children                       |
+| `pastel`     | Soft colour washes on cream, a serif title           | A gentle, personal feel                    |
+| `love`       | Rose pink, hearts rising, hearts along the ring      | Love and thanks                            |
+| `friendship` | Warm cream, soft overlapping circles, bead dots      | Friends and groups                         |
+| `blossom`    | Pale green, blossoms falling, flowers along the ring | Something beautiful growing                |
+| `balloons`   | Pale sky, clouds and floating balloons               | Lifting something up                       |
+| `festival`   | Dark stage, sweeping light beams, equaliser bars     | Events and concerts                        |
+| `neon`       | Loud pink poster with flat shapes and stars          | Gen Z                                      |
+| `classic`    | Ivory paper, a double border, a serif title          | Older generations: formal and easy to read |
+
+A design is a `Season` with its own `fonts` (from the five theme fonts the app already loads) and, for some, `uppercaseTitle`. The link preview never uses one, so it keeps the fundraiser's own fonts.
+
+## Cards
+
+A card is what the image is built around (`ShareCardId` in `render/types.ts`, set on `theme.card`). A host picks one of three. The progress card stays for the link preview and the donor's thank-you.
+
+| Card       | Who it is for                                | What it shows                                                                                                                                                   |
+| ---------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `impact`   | Anyone who wants to show the good being done | The ring, the amount, and the supported projects: a heading ("Supporting 5 projects") and the names as chips. No shares and no amounts. The default for a host. |
+| `minimal`  | Sophisticated, sparse: companies, teams      | A small photo shown whole, the name, the host, a thin bar.                                                                                                      |
+| `story`    | The host's own words                         | A large photo shown whole, the host's line (or the start of the description, as one sentence) as the biggest text, then the name and a thin bar.                |
+| `progress` | The link preview, the thank-you              | The ring and the donors. Not offered to hosts.                                                                                                                  |
+
+Minimal and Story show the photo whole, in its own proportions (`fitPhoto`), never cropped. Only the ring crops, since a ring needs a circle. Both use a flat button and a thin bar (`drawBar`); Impact swaps the donor row for the project chips (`drawImpact`): up to five names, three rows at most, then a "+N" chip, since a bouquet of projects changes from one fundraiser to the next.
+The story text is the host's own line, and otherwise the start of the fundraiser's description as plain text (`getShareStoryText`, about 110 characters, ending at a sentence when it can). A description that only repeats the title is ignored.
+A card does not change the default drawing, so it needs no `SHARE_IMAGE_DESIGN_VERSION` bump.
+
+## Host choices
+
+The host's Share tab can also set a line of their own (up to 100 characters, with two ideas to tap that match the style), and switch off the amounts (the amount line, the goal and the ring), the host name and the projects. These only ever remove something the public page would show, never add it, so the privacy rules above still hold. The link preview never uses them.
 
 ## Sizes
 
@@ -62,7 +102,7 @@ Files are made as soon as a choice changes, not on the tap: Safari only opens th
 
 Either way it copies first: the link alone for a story, TikTok or Short, which cannot carry a link in its text, and the caption with the link for a post. The tip under the button then says what was copied, but only when the copy worked. When it did not (some in-app browsers block the clipboard), a "Could not copy" toast shows and the tip gives only the channel's advice. A post whose advice is only to put the link in the text (`tipOnlyIfCopyFails` in `channels.ts`) shows it only after a failed copy, since the copied caption already holds the link. The tip is a `role="status"` region, so screen readers read it out.
 
-The host's Caption card says the same: for a story, TikTok or Short its hint says that only the link is copied.
+The host gets one card, and one Copy button, for what the chosen format can carry (`captionCard` in the studio). A story, TikTok or Short has no text, so the card is "Your link" with Copy link. Anything else is "Post text": the editable caption with Copy text and link, and a quiet Copy link only. Links for places the studio does not cover, such as email, sit in a row folded away below (`ShareLinksCard`), since the studio already gives the right tagged link for the platform picked above.
 
 The first file waits for the fonts and the background (`ready`), and for the photo, the donors and, while "Show donors" is on, their avatars (`settled`). Each counts once it has loaded or failed, and after 2.5 s the file is made anyway. So within those 2.5 s a quick tap does not share a plain circle where the photo goes. Anything that arrives later still changes the file, and the 2x image and the 8 s video are made again. The preview does not wait; it fills in as things arrive. The host's zip waits the same way.
 
@@ -112,6 +152,12 @@ Without a bump the old image stays: each URL is cached as immutable, so a fundra
 - When it fails, bump the version and add its entry, keeping the older ones. The failure message prints the new entry; `PRINT_SHARE_FINGERPRINTS=1 npx vitest run src/lib/share/server/share-banner.test.ts --reporter=verbose` prints it too.
 
 Next streams metadata into `<body>` for normal browsers and puts it in `<head>` only for crawlers that read HTML alone. `htmlLimitedBots` in `next.config.ts` sets that list to `LINK_PREVIEW_BOTS` (`preview-bots.ts`): Next's own list (`HTML_LIMITED_BOT_UA_RE`, imported from `next/dist`, so it follows upgrades) plus Pinterest (`Pinterestbot` and `Pinterest/0.`, not the Pinterest app's own browser), Mastodon, Misskey, Pleroma, Akkoma, Matrix (`Synapse`), Viber, Telegram, Bluesky, Snapchat, Teams and Outlook (`MicrosoftPreview`), XING, Mattermost, KakaoTalk (`kakaotalk-scrap`), Embedly and Iframely.
+
+## Project pictures
+
+The Impact card's chips carry each project's own round picture. They load through `/api/share/photo/<slug>?project=<project id>` (`useProjectImages`), so a canvas that draws them can still be exported.
+The route finds the id among the fundraiser's own `projectAllocations`: an id it does not support finds nothing (404), and a URL in the request is never fetched. The picture then goes through `fetchAllowedImage` like every other image.
+A project with no picture, or one that fails to load, shows its initial on a plain disc, and a card whose projects have none shows the plain dot. The studio's files wait for the pictures like they wait for the photo and the donors' avatars, and after the same 2.5 s are made without them.
 
 ## Fetching images on the server
 

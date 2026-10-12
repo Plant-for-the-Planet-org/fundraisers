@@ -8,6 +8,13 @@ import { getFundraiserModuleStates } from '@/lib/utils/fundraiser-checklist';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
+/** Where each feature's settings are in the editor, so "Manage" and "Turn on" land on them. */
+const FOCUS_TARGETS = {
+  leaderboard: 'leaderboard',
+  thankYouNote: 'thankyou',
+  stage: 'stage',
+} as const;
+
 export function FundraiserModulesCard({
   fundraiser,
   canEdit,
@@ -47,7 +54,7 @@ export function FundraiserModulesCard({
                 variant={module.enabled ? 'ghost' : 'outline'}
                 size='sm'
               >
-                <Link href={editHref}>
+                <Link href={`${editHref}?focus=${FOCUS_TARGETS[module.id]}`}>
                   {module.enabled ? t('manage') : t('turnOn')}
                 </Link>
               </Button>

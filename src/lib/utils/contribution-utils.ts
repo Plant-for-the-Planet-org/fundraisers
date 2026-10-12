@@ -9,7 +9,15 @@ import type {
   PaymentOptions,
 } from '@/lib/types/payment-options';
 
-const DEFAULT_CONTRIBUTION_SETTINGS: Required<ContributionModuleSettings> = {
+import { storedToDonationSettings } from './contribution-editor';
+
+/** The settings with every choice made. The frequency to begin with stays optional: without one, the first on offer is used. */
+type ResolvedContributionSettings = Required<
+  Omit<ContributionModuleSettings, 'default_recurrency'>
+> &
+  Pick<ContributionModuleSettings, 'default_recurrency'>;
+
+const DEFAULT_CONTRIBUTION_SETTINGS: ResolvedContributionSettings = {
   recurrency_options: ['once', 'monthly', 'yearly'],
   options: [
     { amount_cent: 1000, label: null, sub_label: null },
@@ -25,7 +33,7 @@ const DEFAULT_CONTRIBUTION_SETTINGS: Required<ContributionModuleSettings> = {
 
 export function getContributionSettings(
   moduleSettings?: ContributionModuleSettings
-): Required<ContributionModuleSettings> {
+): ResolvedContributionSettings {
   const hasValidOptions =
     Array.isArray(moduleSettings?.options) && moduleSettings.options.length > 0;
 
@@ -33,6 +41,7 @@ export function getContributionSettings(
     recurrency_options: Array.isArray(moduleSettings?.recurrency_options)
       ? moduleSettings.recurrency_options
       : DEFAULT_CONTRIBUTION_SETTINGS.recurrency_options,
+    default_recurrency: moduleSettings?.default_recurrency,
     options: hasValidOptions
       ? moduleSettings!.options!
       : DEFAULT_CONTRIBUTION_SETTINGS.options,
@@ -141,11 +150,21 @@ export function mapPaymentOptionsToContributionSettings(
       )[0] as keyof typeof paymentOptions.frequencies
     ];
 
+  // What the host chose wins where they chose something: their amounts, their frequencies (among those the platform supports), the amount and frequency to begin with.
+  // The platform's own apply otherwise, and its minimum always holds (the donation form takes the larger of the two).
+  const host = storedToDonationSettings(
+    fundraiserContribution,
+    recurrencyOptions
+  );
   return {
-    recurrency_options: recurrencyOptions,
-    options: baseFrequency ? mapFrequencyOptions(baseFrequency) : undefined,
-    allow_recurrency: paymentOptions.recurrency.supported,
-    allow_dedication: fundraiserContribution?.allow_dedication,
+    recurrency_options: host.recurrency_options ?? recurrencyOptions,
+    default_recurrency: host.default_recurrency,
+    options:
+      host.options ??
+      (baseFrequency ? mapFrequencyOptions(baseFrequency) : undefined),
+    allow_recurrency:
+      paymentOptions.recurrency.supported && host.allow_recurrency !== false,
+    allow_dedication: host.allow_dedication,
     show_totals_on_fundraiser: undefined,
   };
 }

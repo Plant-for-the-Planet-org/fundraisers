@@ -13,7 +13,11 @@ import {
   SHARE_LEADERBOARD_LIMIT,
 } from '@/lib/share/share-data';
 import { buildTheme } from '@/lib/theme/build-theme';
-import { getImageUrl, resolveFundraiserImageSource } from '@/lib/utils/images';
+import {
+  getImageUrl,
+  resolveFundraiserImageSource,
+  resolveProjectImageSource,
+} from '@/lib/utils/images';
 import { routing } from '@/i18n/routing';
 
 export const runtime = 'nodejs';
@@ -47,7 +51,8 @@ async function findFundraiser(
  * Which image of this fundraiser to serve:
  * - by default, its cover photo;
  * - `?asset=background`: its theme's own background image or pattern, when that is on another host;
- * - `?donor=<donation id>`: the profile photo of a donor the share image names, by the rules of pickShareDonors.
+ * - `?donor=<donation id>`: the profile photo of a donor the share image names, by the rules of pickShareDonors;
+ * - `?project=<project id>`: the picture of a project this fundraiser supports. An id the fundraiser does not support finds nothing.
  * Only URLs that belong to the fundraiser are ever fetched, never one from the request.
  */
 async function resolveSource(
@@ -70,6 +75,14 @@ async function resolveSource(
     return person?.avatarFile
       ? getImageUrl('profile', 'thumb', person.avatarFile)
       : null;
+  }
+  const project = searchParams.get('project');
+  if (project) {
+    // Looked up among the fundraiser's own projects, so the request can only pick one of them, never name a URL.
+    const allocation = fundraiser.projectAllocations?.find(
+      entry => entry.project.id === project
+    );
+    return resolveProjectImageSource(allocation?.project.image);
   }
   if (searchParams.get('asset') === 'background') {
     const src = resolveShareBackground(buildTheme(fundraiser.settings?.theme))

@@ -32,15 +32,20 @@ import {
 import { formatCurrency } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { DonationAmounts } from './donation-amounts';
+import { type AmountEditor, DonationAmounts } from './donation-amounts';
 import { DonationFrequencySelect } from './donation-frequency-select';
 import { DonationGiftSection } from './donation-gift-section';
 
 interface DonationFormProps {
+  /** In a preview, the amount tiles can be edited in place. */
+  amountEditor?: AmountEditor;
   contributionSettings?: ContributionModuleSettings;
+  /** A host looking at how donors will see the box: marked as a preview, and the button does nothing. */
+  preview?: boolean;
   currency?: string;
   frequencies?: PaymentOptions['frequencies'];
-  onDonate: (
+  /** Not needed in a preview, which takes no gift. */
+  onDonate?: (
     amountCents: number,
     isDedicated: boolean,
     frequency: DonationFrequency,
@@ -63,7 +68,9 @@ const recurrencyToValue = (recurrency: RecurrencyType): DonationFrequency => {
 };
 
 export function DonationForm({
+  amountEditor,
   contributionSettings,
+  preview = false,
   currency = 'EUR',
   frequencies,
   onDonate,
@@ -101,16 +108,29 @@ export function DonationForm({
 
   const [selectedAmount, setSelectedAmount] = useState<number>(defaultAmount);
   const [customAmount, setCustomAmount] = useState<number | undefined>();
+  // With an editor, the host's chosen tile is the one that counts.
+  const baseAmount = amountEditor
+    ? (Number(amountEditor.values[amountEditor.selectedIndex]) || 0) * 100
+    : selectedAmount;
+  // The host's preferred frequency begins selected, when it is on offer.
+  const startFrequency =
+    settings.default_recurrency &&
+    availableRecurrencyOptions.includes(settings.default_recurrency)
+      ? settings.default_recurrency
+      : (availableRecurrencyOptions[0] ?? 'once');
   const [selectedFrequency, setSelectedFrequency] = useState(
-    recurrencyToUI(availableRecurrencyOptions[0] ?? 'once')
+    recurrencyToUI(startFrequency)
   );
   const [isDedicated, setIsDedicated] = useState(false);
 
   const freqMinQuantity =
     frequencies?.[selectedFrequency.value as keyof typeof frequencies]
       ?.minQuantity;
-  const activeMinCents =
-    freqMinQuantity != null ? freqMinQuantity * 100 : DEFAULT_MIN_CENTS;
+  // The platform's minimum always holds; a host may ask for a larger smallest amount.
+  const activeMinCents = Math.max(
+    freqMinQuantity != null ? freqMinQuantity * 100 : DEFAULT_MIN_CENTS,
+    customOption?.min ?? 0
+  );
 
   const [giftValues, setGiftValues] = useState<DonationGiftValues>({
     recipientName: '',
@@ -123,7 +143,7 @@ export function DonationForm({
     customAmount !== undefined && customAmount < activeMinCents;
 
   const getDonateButtonText = () => {
-    const amount = customAmount !== undefined ? customAmount : selectedAmount;
+    const amount = customAmount !== undefined ? customAmount : baseAmount;
     const amountText = settings.show_totals_on_fundraiser
       ? `${formatCurrency(amount, currency, locale)} • `
       : '';
@@ -198,6 +218,7 @@ export function DonationForm({
   };
 
   const handleDonate = () => {
+    if (preview || !onDonate) return;
     if (isDedicated) {
       const validationResult = validateDonationGift(giftValues);
 
@@ -236,7 +257,7 @@ export function DonationForm({
 
       setGiftErrors({});
       onDonate(
-        customAmount !== undefined ? customAmount : selectedAmount,
+        customAmount !== undefined ? customAmount : baseAmount,
         true,
         selectedFrequency.value,
         gift
@@ -245,7 +266,7 @@ export function DonationForm({
     }
 
     onDonate(
-      customAmount !== undefined ? customAmount : selectedAmount,
+      customAmount !== undefined ? customAmount : baseAmount,
       false,
       selectedFrequency.value
     );
@@ -254,8 +275,13 @@ export function DonationForm({
   return (
     <Card className='donation-form bg-mode-base/20 dark:bg-white/10 py-0 gap-0 rounded-2xl shadow-none border-2 border-white dark:border-none'>
       <CardHeader className='px-4 py-2.5 bg-mode-base dark:bg-white/15 rounded-t-xl flex flex-row justify-between items-center gap-0 space-y-0'>
-        <div className='text-muted-foreground dark:text-foreground text-sm font-semibold'>
+        <div className='flex items-center gap-2 text-muted-foreground dark:text-foreground text-sm font-semibold'>
           {t('cardHeader')}
+          {preview && (
+            <span className='rounded-full bg-foreground/10 px-2 py-0.5 text-xs font-medium'>
+              {t('previewBadge')}
+            </span>
+          )}
         </div>
         {settings.allow_recurrency && frequencyOptions.length > 1 && (
           <DonationFrequencySelect
@@ -268,6 +294,7 @@ export function DonationForm({
 
       <CardContent className='p-4 bg-mode-base/30 dark:bg-white/5 rounded-bl-2xl rounded-br-2xl flex flex-col gap-4'>
         <DonationAmounts
+          amountEditor={amountEditor}
           amounts={presetAmounts}
           currency={currency}
           onAmountSelect={amount => {
@@ -296,7 +323,10 @@ export function DonationForm({
             backgroundColor: 'var(--accent-color)',
             color: 'var(--cta-foreground, #ffffff)',
           }}
-          disabled={isDonateButtonDisabled}
+          // A preview shows the button as donors see it, but it takes no gift, so it must not look like one to press.
+          disabled={preview || isDonateButtonDisabled}
+          aria-disabled={preview || isDonateButtonDisabled}
+          title={preview ? t('previewButtonHint') : undefined}
           onClick={handleDonate}
         >
           {getDonateButtonText()}

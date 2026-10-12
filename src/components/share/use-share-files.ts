@@ -144,10 +144,16 @@ export function useShareFiles({
     kind,
     slug,
     options.theme,
-    { ...options.data, formatMoney: undefined, raisedLine: undefined },
+    // The amount line is a function, so the key only records whether there is one.
+    {
+      ...options.data,
+      formatMoney: undefined,
+      raisedLine: options.data.raisedLine !== null,
+    },
     idOf(options.photo),
     idOf(options.background),
     idOf(options.avatars),
+    idOf(options.projectImages),
     attempt,
   ]);
 

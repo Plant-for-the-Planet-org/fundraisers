@@ -11,5 +11,7 @@ export { FundraiserInsightsView } from './fundraiser-insights-view';
 export { FundraiserModulesCard } from './fundraiser-modules-card';
 export { FundraiserPerformance } from './fundraiser-performance';
 export { FundraiserPrintShell } from './fundraiser-print-shell';
+export { ReshareMomentCard } from './reshare-moment';
 export { ShareLinksCard } from './share-links';
+export { StageLinkCard } from './stage-link-card';
 export { useLeaderboardSummary } from './use-leaderboard-summary';

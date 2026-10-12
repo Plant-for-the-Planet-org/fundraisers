@@ -20,6 +20,7 @@ import { isValidHexColor } from '@/lib/theme/color-utils';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { BUNDLE_SLUGS } from '@/lib/types/bundle';
 import { bundleToAllocations, getBundlesForTab } from '@/lib/utils/bundle';
+import { DEFAULT_CONTRIBUTION } from '@/lib/utils/contribution-editor';
 import { getCurrencyForCountry } from '@/lib/utils/country-currency';
 import { isAllowedImageUrl } from '@/lib/utils/image-url';
 import { getImageUrl } from '@/lib/utils/images';
@@ -205,6 +206,25 @@ export const fundraiserFormSchema = z.object({
       }),
       stage: stageModeSchema.nullable(),
       thankYouNote: thankYouNoteSchema,
+      contribution: z.object({
+        options: z.array(
+          z.object({
+            unit: z.number().optional(),
+            label: z.string().nullable().optional(),
+            sub_label: z.string().nullable().optional(),
+            default: z.boolean().optional(),
+            min: z.number().optional(),
+          })
+        ),
+        allow_dedication: z.boolean(),
+        allow_recurrency: z.boolean(),
+        recurrency_options: z
+          .array(z.enum(['once', 'monthly', 'quarterly', 'yearly']))
+          .optional(),
+        default_recurrency: z
+          .enum(['once', 'monthly', 'quarterly', 'yearly'])
+          .optional(),
+      }),
       donor_score: z.object({
         enabled: z.boolean(),
         show_goal: z.boolean(),
@@ -248,6 +268,7 @@ export function buildDefaultCreateValues(
         bundle: { slug: defaultBundle?.slug ?? null },
         stage: null,
         thankYouNote: { enabled: false, message: '' },
+        contribution: { ...DEFAULT_CONTRIBUTION },
         donor_score: { ...DEFAULT_DONOR_SCORE },
       },
     },
@@ -351,6 +372,10 @@ export function fundraiserToFormValues(
         thankYouNote: fundraiser.settings?.modules?.thankYouNote ?? {
           enabled: false,
           message: '',
+        },
+        contribution: {
+          ...DEFAULT_CONTRIBUTION,
+          ...fundraiser.settings?.modules?.contribution,
         },
         donor_score: {
           enabled:

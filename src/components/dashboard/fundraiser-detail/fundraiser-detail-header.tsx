@@ -31,51 +31,50 @@ export function FundraiserDetailHeader({
   const showDaysLeft = isLiveStatus(displayStatus) && daysLeft > 0;
 
   return (
-    <div className='space-y-4'>
-      <Link
-        href='/dashboard/fundraisers'
-        className='inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground'
-      >
-        <ArrowLeftIcon className='size-3.5' />
-        {t('back')}
-      </Link>
+    <div className='space-y-3'>
+      {/* The page and edit links sit on the back link's row, so the title, status and tabs start higher and the content below gets more room. */}
+      <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2'>
+        <Link
+          href='/dashboard/fundraisers'
+          className='inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground'
+        >
+          <ArrowLeftIcon className='size-3.5' />
+          {t('back')}
+        </Link>
 
-      {/* Title and status read as one block: tight together, with more room above (back link) and below (tabs). */}
-      <div className='space-y-2'>
-        {/* The title gets the full width, so long names are not squeezed by the buttons. */}
-        <h1 className='text-3xl font-bold break-words text-foreground'>
-          {fundraiser.title}
-        </h1>
-
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-            <FundraiserStatusBadge status={displayStatus} />
-            {showDaysLeft && (
-              <span>{tItem('daysLeft', { count: daysLeft })}</span>
-            )}
-          </div>
-
-          {/* Plain links rather than buttons: they sit quietly next to the status instead of competing with the title. */}
-          <div className='flex items-center gap-4 text-sm font-medium'>
-            <a
-              href={getFundraiserUrl(fundraiser)}
-              target='_blank'
-              rel='noopener noreferrer'
+        {/* Plain links rather than buttons: they sit quietly instead of competing with the title. */}
+        <div className='flex items-center gap-4 text-sm font-medium'>
+          <a
+            href={getFundraiserUrl(fundraiser)}
+            target='_blank'
+            rel='noopener noreferrer'
+            className={LINK_CLASS}
+          >
+            <ArrowUpRightFromSquareIcon className='size-3.5' />
+            {t('viewPage')}
+          </a>
+          {canEdit && (
+            <Link
+              href={`/dashboard/fundraisers/edit/${fundraiser.slug}`}
               className={LINK_CLASS}
             >
-              <ArrowUpRightFromSquareIcon className='size-3.5' />
-              {t('viewPage')}
-            </a>
-            {canEdit && (
-              <Link
-                href={`/dashboard/fundraisers/edit/${fundraiser.slug}`}
-                className={LINK_CLASS}
-              >
-                <PenIcon className='size-3.5' />
-                {t('edit')}
-              </Link>
-            )}
-          </div>
+              <PenIcon className='size-3.5' />
+              {t('edit')}
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* The status reads with the title. It wraps below a long title instead of squeezing it. */}
+      <div className='flex flex-wrap items-center gap-x-4 gap-y-1'>
+        <h1 className='min-w-0 text-3xl font-bold break-words text-foreground'>
+          {fundraiser.title}
+        </h1>
+        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+          <FundraiserStatusBadge status={displayStatus} />
+          {showDaysLeft && (
+            <span>{tItem('daysLeft', { count: daysLeft })}</span>
+          )}
         </div>
       </div>
     </div>

@@ -344,26 +344,20 @@
       "options": {
         "sectionHeading": "Spendenaufruf-Optionen",
         "status": {
-          "label": "Spenden mit diesen Aufruf sammeln",
-          "description": "Aktiviere das Sammeln von Spenden und schalte den Aufruf frei"
+          "label": "Live gehen und Spenden sammeln",
+          "description": "Aus bleibt er ein Entwurf. Schalte ein, wenn du bereit für Spender bist."
         },
         "visibility": {
           "label": "Diesen Spendenaufruf öffentlich listen",
           "description": "Wenn aus, erscheint er nicht in der Suche oder unter Entdecken. Wer den Link hat, kann ihn weiterhin öffnen und spenden."
         },
-        "addModule": "Modul hinzufügen",
         "stage": {
           "title": "Bühnenmodus",
-          "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Spender spenden über den QR-Code; Bildschirm wird in Echtzeit aktualisiert.",
           "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
           "goalHiddenHint": "Der Bühnenmodus zeigt den gesammelten Betrag und braucht deshalb den Zielbereich. Schalte den Ziel-Schalter ein, um ihn zu nutzen.",
           "leaderboardOffHint": "Schalte die Bestenliste ein, um im Bühnenmodus die neuesten Spenden und die Top-Spender zu zeigen.",
-          "collapse": "Zusammenklappen",
-          "expand": "Erweitern",
           "remove": "Bühnenmodus entfernen",
           "toggleEnabled": "Bühnenmodus einschalten",
-          "slideCountOne": "1 Folie",
-          "slideCountMany": "{count} Folien",
           "stageTitle": "Bühnentitel",
           "stageTitlePlaceholder": "Frei lassen, um den Namen des Spendenaufrufs zu verwenden",
           "stageDescription": "Bühnenbeschreibung",
@@ -462,6 +456,27 @@
               "tooLong": "Persönliche Nachricht darf max. 250 Zeichen haben."
             }
           }
+        },
+        "previewBadge": "Vorschau",
+        "previewButtonHint": "Das ist eine Vorschau. Hier wird nicht gespendet.",
+        "previewHint": "So sehen es Spender*innen. Überschreibe einen Betrag, um ihn zu ändern, und wähle, welcher zuerst gezeigt wird. Das Einstellungs-Symbol ändert den Rest.",
+        "settings": {
+          "open": "Einstellungen für Spenden",
+          "preselected": "Vorgewählt",
+          "amountLabel": "Betrag {n}",
+          "customTitle": "Anderer Betrag",
+          "customSwitch": "Eigener Betrag",
+          "customHint": "Spender*innen können einen beliebigen Betrag eingeben.",
+          "minimum": "Kleinster eigener Betrag",
+          "minimumHint": "Mindestens {min}.",
+          "frequencyTitle": "Häufigkeit",
+          "frequencyHint": "Was Spender*innen wählen können.",
+          "selectedFirst": "Zuerst gezeigt",
+          "makeFirst": "Zuerst zeigen",
+          "moreTitle": "Mehr",
+          "dedication": "Widmungen",
+          "dedicationHint": "Spender*innen können ihre Spende jemandem widmen",
+          "reset": "Auf Standard zurücksetzen"
         }
       }
     },

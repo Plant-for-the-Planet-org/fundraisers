@@ -5,8 +5,7 @@ import type { FundraiserFormValues } from '@/components/fundraisers/fundraiser-f
 import { startTransition } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Monitor } from 'lucide-react';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
 import { StageModePanel } from './stage-mode-panel';
 
 const DEFAULT_STAGE_CONFIG: NonNullable<
@@ -20,57 +19,53 @@ const DEFAULT_STAGE_CONFIG: NonNullable<
   slides: [{ position: 1, title: '', description: '', image: '', duration: 8 }],
 };
 
-export function StageMenuItem() {
-  const { setValue } = useFormContext<FundraiserFormValues>();
-  const t = useTranslations('Fundraisers.form.options.stage');
-  const stageAdded =
-    useWatch<FundraiserFormValues, 'settings.modules.stage'>({
-      name: 'settings.modules.stage',
-    }) !== null;
-
-  // Clone the default: RHF stores the object by reference and mutates form
-  // values in place, so reusing the module-level object would resurrect
-  // edited slide data when the module is removed and re-added.
-  const addStage = () =>
-    startTransition(() =>
-      setValue(
-        'settings.modules.stage',
-        structuredClone(DEFAULT_STAGE_CONFIG),
-        {
-          shouldDirty: true,
-        }
-      )
-    );
-
-  return (
-    <DropdownMenuItem
-      onClick={addStage}
-      disabled={stageAdded}
-      className='flex cursor-pointer items-start gap-3 py-3'
-    >
-      <div className='mt-0.5 flex size-7 shrink-0 items-center justify-center rounded bg-primary/10 text-primary'>
-        <Monitor size={14} />
-      </div>
-      <div className='flex min-w-0 flex-col'>
-        <span className='text-sm font-semibold'>{t('title')}</span>
-        <span className='mt-0.5 text-xs leading-snug text-muted-foreground'>
-          {t('blurb')}
-        </span>
-      </div>
-    </DropdownMenuItem>
-  );
-}
-
+/** Stage Mode as one more option, with a switch like the thank-you note's. Its details show while it is on. */
 export function StageSection() {
-  const { setValue } = useFormContext<FundraiserFormValues>();
+  const { control, setValue } = useFormContext<FundraiserFormValues>();
+  const t = useTranslations('Fundraisers.form.options.stage');
   const stageConfig = useWatch<FundraiserFormValues, 'settings.modules.stage'>({
+    control,
     name: 'settings.modules.stage',
   });
+  const enabled = stageConfig?.enabled === true;
 
-  if (!stageConfig) return null;
+  const toggle = (checked: boolean) => {
+    if (checked && !stageConfig) {
+      // Clone the default: RHF stores the object by reference and mutates form values in place, so reusing the module-level object would bring back edited slides.
+      startTransition(() =>
+        setValue(
+          'settings.modules.stage',
+          structuredClone(DEFAULT_STAGE_CONFIG),
+          { shouldDirty: true }
+        )
+      );
+      return;
+    }
+    // Switching off keeps the slides, so switching on again brings them back.
+    if (stageConfig)
+      setValue('settings.modules.stage.enabled', checked, {
+        shouldDirty: true,
+      });
+  };
 
-  const removeStage = () =>
-    setValue('settings.modules.stage', null, { shouldDirty: true });
-
-  return <StageModePanel onRemove={removeStage} />;
+  return (
+    <div data-focus='stage'>
+      <label className='flex cursor-pointer items-center justify-between gap-3'>
+        <div className='flex min-w-0 flex-col'>
+          <span className='text-sm font-medium'>{t('title')}</span>
+          <span className='text-xs text-muted-foreground'>{t('subtitle')}</span>
+        </div>
+        <Switch
+          checked={enabled}
+          onCheckedChange={toggle}
+          aria-label={t('toggleEnabled')}
+        />
+      </label>
+      {enabled && (
+        <div className='mt-3'>
+          <StageModePanel />
+        </div>
+      )}
+    </div>
+  );
 }

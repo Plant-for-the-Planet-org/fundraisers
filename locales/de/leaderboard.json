@@ -5,13 +5,13 @@
       "labels": {
         "enableLeaderboard": "Bestenliste aktivieren",
         "openSettings": "Einstellungen für die Bestenliste",
-        "showRecentList": "Liste mit den letzten Spenden anzeigen",
-        "showTopList": "Liste mit Top-Spendern anzeigen",
-        "showAmounts": "Beträge anzeigen",
-        "viewAllButton": "Alle Spenden anzeigen",
-        "anonymizeDonors": "Spender anonymisieren",
-        "showAvatars": "Avatare anzeigen",
-        "groupTopByDonor": "Gruppiere Top-Spenden nach Spender"
+        "showRecentList": "Neueste Spenden",
+        "showTopList": "Top-Liste",
+        "showAmounts": "Beträge",
+        "viewAllButton": "Alle-anzeigen-Button",
+        "anonymizeDonors": "Spendernamen ausblenden",
+        "showAvatars": "Avatare",
+        "groupTopByDonor": "Eine Zeile pro Spender"
       },
       "disabledView": {
         "title": "Bestenliste deaktiviert",
@@ -19,7 +19,18 @@
       },
       "noTabsWarning": {
         "title": "Keine Tabs ausgewählt",
-        "description": "Aktiviere mindestens \"Liste mit letzten Spenden anzeigen\" oder \"Liste mit Top-Spenden anzeigen\", um die Bestenliste anzuzeigen"
+        "description": "Aktiviere Neueste Spenden oder Top-Liste, um die Bestenliste anzuzeigen"
+      },
+      "hints": {
+        "showTopList": "Zeigt die größten Spenden.",
+        "groupTopByDonor": "Addiert die Spenden jeder Person, sodass sie nur einmal erscheint.",
+        "anonymizeDonors": "Zeigt alle Spender als Anonym.",
+        "viewAllButton": "Besucher können die ganze Spendenliste öffnen."
+      },
+      "groups": {
+        "lists": "Listen",
+        "rows": "In jeder Zeile anzeigen",
+        "more": "Mehr"
       }
     },
     "view": {

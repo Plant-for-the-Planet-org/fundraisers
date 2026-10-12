@@ -9,7 +9,15 @@ import QRCode from 'qrcode';
 const QUIET_ZONE = 4;
 
 /** A QR code drawn as one SVG path, so it stays sharp at any print size. */
-export function ReportQr({ value, label }: { value: string; label: string }) {
+export function ReportQr({
+  value,
+  label,
+  className = 'size-[74px]',
+}: {
+  value: string;
+  label: string;
+  className?: string;
+}) {
   const { size, path } = useMemo(() => {
     const { modules } = QRCode.create(value, { errorCorrectionLevel: 'M' });
     const cells: string[] = [];
@@ -29,7 +37,7 @@ export function ReportQr({ value, label }: { value: string; label: string }) {
       shapeRendering='crispEdges'
       role='img'
       aria-label={label}
-      className='size-[74px]'
+      className={className}
     >
       <rect
         x={-QUIET_ZONE}

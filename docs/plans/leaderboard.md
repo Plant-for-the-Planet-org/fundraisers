@@ -166,7 +166,7 @@ Settings come from the fundraiser object (not the leaderboard API response) — 
 - `src/components/fundraisers/leaderboard/leaderboard-settings.tsx`
 - `locales/en/leaderboard.json`, `locales/de/leaderboard.json`
 
-**Visual test:** Enable the leaderboard, then disable both "Show Recent List" and "Show Top List". An amber warning appears in place of the preview. Re-enable either tab — preview returns.
+**Visual test:** Enable the leaderboard, then disable both "Latest donations" and "Top list". An amber warning appears in place of the preview. Re-enable either tab — preview returns.
 
 ---
 

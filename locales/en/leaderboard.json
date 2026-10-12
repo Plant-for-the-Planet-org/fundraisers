@@ -5,13 +5,13 @@
       "labels": {
         "enableLeaderboard": "Enable leaderboard",
         "openSettings": "Leaderboard settings",
-        "showRecentList": "Show Recent List",
-        "showTopList": "Show Top List",
-        "showAmounts": "Show Amounts",
-        "viewAllButton": "Show all donations",
-        "anonymizeDonors": "Anonymize Donors",
-        "showAvatars": "Show Avatars",
-        "groupTopByDonor": "Group Top Donations by Donor"
+        "showRecentList": "Latest donations",
+        "showTopList": "Top list",
+        "showAmounts": "Amounts",
+        "viewAllButton": "See all button",
+        "anonymizeDonors": "Hide donor names",
+        "showAvatars": "Avatars",
+        "groupTopByDonor": "One row per donor"
       },
       "disabledView": {
         "title": "Leaderboard Disabled",
@@ -19,7 +19,18 @@
       },
       "noTabsWarning": {
         "title": "No Tabs Selected",
-        "description": "Enable at least one of Recent List or Top List to display the leaderboard"
+        "description": "Turn on Latest donations or Top list to show the leaderboard"
+      },
+      "hints": {
+        "showTopList": "Ranks the biggest gifts.",
+        "groupTopByDonor": "Adds up each person's gifts, so they show once.",
+        "anonymizeDonors": "Shows every donor as Anonymous.",
+        "viewAllButton": "Lets visitors open the full list of donations."
+      },
+      "groups": {
+        "lists": "Lists",
+        "rows": "Show on each row",
+        "more": "More"
       }
     },
     "view": {

@@ -8,6 +8,7 @@ import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
 import { drawShareFrame } from '@/lib/share/render/draw-share-frame';
 import { cn } from '@/lib/utils';
+import { AppOverlay } from './app-overlay';
 
 /**
  * The share image or video, live, in a phone-like frame.
@@ -66,17 +67,20 @@ export function SharePreview({
           : 'max-w-[17rem] rounded-[1.75rem] p-2.5'
       )}
     >
-      <canvas
-        ref={canvasRef}
-        width={w}
-        height={h}
-        role='img'
-        aria-label={label}
-        className={cn(
-          'block h-auto w-full',
-          wide ? 'rounded-lg' : 'rounded-[1.25rem]'
-        )}
-      />
+      <div className='relative'>
+        <canvas
+          ref={canvasRef}
+          width={w}
+          height={h}
+          role='img'
+          aria-label={label}
+          className={cn(
+            'block h-auto w-full',
+            wide ? 'rounded-lg' : 'rounded-[1.25rem]'
+          )}
+        />
+        <AppOverlay format={format} />
+      </div>
     </div>
   );
 }

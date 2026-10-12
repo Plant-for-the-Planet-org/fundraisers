@@ -55,7 +55,7 @@ export function BackgroundBaseSelector({
         {tTheme('labelBackgroundColor')}
       </SectionHeader>
 
-      <div className='mt-2 flex flex-wrap items-center gap-2'>
+      <div className='mt-2 flex flex-wrap items-center gap-2 justify-between'>
         {/* None */}
         <button
           type='button'
