@@ -1,3 +1,5 @@
+export type { StageDemoViewProps } from './components/stage-demo-view';
+export { StageDemoView } from './components/stage-demo-view';
 export { StageModePanel } from './components/stage-mode-panel';
 export { StageMenuItem, StageSection } from './components/stage-settings';
 export { StageView } from './components/stage-view';

@@ -6,11 +6,7 @@ import type {
   InsightsRange,
 } from '@/lib/types/fundraiser-insights';
 
-import {
-  getContrastRatio,
-  hexToRgb,
-  MIN_TEXT_CONTRAST,
-} from '@/lib/theme/color-utils';
+import { getReadableInk } from '@/lib/theme/color-utils';
 import { INSIGHTS_RANGES } from '@/lib/types/fundraiser-insights';
 
 /** Lists on the report show this many rows, then one "Other" row. */
@@ -168,22 +164,12 @@ export function goalProgress(raised: number, goal: number) {
   return { percent, bar };
 }
 
-function toHex(channel: number) {
-  return Math.round(channel).toString(16).padStart(2, '0');
-}
-
 /**
  * The accent darkened just enough to read as text on white (WCAG AA).
  * A pale accent such as a light pink fails as text, so it is mixed towards black in small steps. An accent that already passes is returned as it is.
  */
 export function readableInk(accent: string): string {
-  const { r, g, b } = hexToRgb(accent);
-  for (let step = 0; step <= 20; step++) {
-    const keep = 1 - step / 20;
-    const mixed = `#${toHex(r * keep)}${toHex(g * keep)}${toHex(b * keep)}`;
-    if (getContrastRatio(mixed, '#ffffff') >= MIN_TEXT_CONTRAST) return mixed;
-  }
-  return '#000000';
+  return getReadableInk(accent, '#ffffff');
 }
 
 /**
