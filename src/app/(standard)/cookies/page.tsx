@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { FOOTER_LINKS, getFooterLinkHref } from '@/components/footer/config';
-import { CookiesToc, type TocItem } from './cookies-toc';
+import { PageToc, type TocItem } from '@/components/ui/page-toc';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -97,7 +97,7 @@ export default async function CookiesPage() {
   return (
     <div className='lg:flex lg:gap-12'>
       <aside className='hidden w-44 shrink-0 lg:block'>
-        <CookiesToc items={tocItems} label={t('toc.label')} />
+        <PageToc items={tocItems} label={t('toc.label')} />
       </aside>
 
       <article className='min-w-0 flex-1'>
