@@ -14,6 +14,7 @@ const CORE_NAMESPACES = [
   'donate',
   'leaderboard',
   'cookies',
+  'copyright',
   'host-invite',
   'about',
 ] as const;

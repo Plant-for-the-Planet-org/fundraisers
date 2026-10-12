@@ -2,7 +2,12 @@ const BASE_URL = 'https://www.plant-for-the-planet.org';
 
 export const FOOTER_LINK_FALLBACK_LOCALE = 'en';
 
-type FooterLinkLabelKey = 'privacy' | 'terms' | 'imprint' | 'cookies';
+type FooterLinkLabelKey =
+  | 'privacy'
+  | 'terms'
+  | 'imprint'
+  | 'cookies'
+  | 'copyright';
 
 type FooterLink = {
   labelKey: FooterLinkLabelKey;
@@ -43,6 +48,14 @@ export const FOOTER_LINKS: readonly FooterLink[] = [
     hrefByLocale: {
       en: '/cookies',
       de: '/cookies',
+    },
+  },
+  {
+    labelKey: 'copyright',
+    internal: true,
+    hrefByLocale: {
+      en: '/copyright',
+      de: '/copyright',
     },
   },
 ] as const;
