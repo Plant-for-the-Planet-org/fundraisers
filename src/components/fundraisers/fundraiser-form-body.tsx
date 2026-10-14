@@ -90,11 +90,11 @@ export function FundraiserFormBody({
         </div>
       </SidebarPanel>
       <MainPanel flattenOnMobile>
-        <div className='max-md:order-2'>
+        <div data-focus='title' className='max-md:order-2'>
           <Title />
         </div>
         {isEditMode && (
-          <div className='max-md:order-3'>
+          <div data-focus='slug' className='max-md:order-3'>
             <SlugField />
           </div>
         )}
@@ -108,7 +108,9 @@ export function FundraiserFormBody({
           <DescriptionInput />
         </div>
         <div className='max-md:order-10 grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <WorkspaceSelector disabled={isEditMode} />
+          <div data-focus='country'>
+            <WorkspaceSelector disabled={isEditMode} />
+          </div>
           <div data-focus='goal'>
             <GoalInput />
           </div>
@@ -116,7 +118,7 @@ export function FundraiserFormBody({
         <div className='max-md:order-11 empty:hidden'>
           <WorkspaceInfo />
         </div>
-        <div className='max-md:order-12 empty:hidden'>
+        <div data-focus='projects' className='max-md:order-12 empty:hidden'>
           <BundleSelection mode={mode} />
         </div>
         <div data-focus='publish' className='max-md:order-14 empty:hidden'>

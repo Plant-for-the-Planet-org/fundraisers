@@ -24,6 +24,7 @@ import { buildUpdateFundraiserRequest } from '@/lib/utils/fundraiser-data-builde
 import { imageToBase64 } from '@/lib/utils/image-processor';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import { focusFirstError } from './focus-section';
 
 /** Where the status switch sits for a given saved status. Mirrors how the form derives it on load: only a live fundraiser has the switch on. */
 function toggleFor(status: FundraiserStatus): 'draft' | 'active' {
@@ -178,9 +179,10 @@ export function UpdateFundraiserButton({
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
       disabled={isSubmitting || !isDirty}
-      onClick={handleSubmit(onSubmit, errors =>
-        console.error('Update blocked by validation errors:', errors)
-      )}
+      onClick={handleSubmit(onSubmit, errors => {
+        console.error('Update blocked by validation errors:', errors);
+        focusFirstError(errors);
+      })}
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}

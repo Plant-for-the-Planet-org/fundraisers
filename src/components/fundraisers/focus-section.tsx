@@ -1,5 +1,7 @@
 'use client';
 
+import type { FieldErrors } from 'react-hook-form';
+
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -35,6 +37,69 @@ const FOCUSABLE =
   '[contenteditable="true"], input:not([type="hidden"]), textarea, button[role="switch"], select';
 
 /**
+ * Scrolls a section to the middle, puts the cursor in it and marks it for a moment.
+ * Returns a function that stops the marking early.
+ */
+export function highlightSection(section: HTMLElement): () => void {
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  section.querySelector<HTMLElement>(FOCUSABLE)?.focus({ preventScroll: true });
+  section.classList.add(...HIGHLIGHT_BASE, ...HIGHLIGHT_ON);
+  // One gentle pulse outward, so the eye lands on the section. Skipped for people who ask for less motion.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    section.animate(
+      [
+        {
+          boxShadow:
+            '0 0 0 0 color-mix(in srgb, var(--accent-color) 22%, transparent)',
+        },
+        { boxShadow: '0 0 0 10px transparent' },
+      ],
+      { duration: 1200, easing: 'ease-out' }
+    );
+  }
+  let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+  const clearTimer = setTimeout(() => {
+    section.classList.remove(...HIGHLIGHT_ON);
+    fadeTimer = setTimeout(
+      () => section.classList.remove(...HIGHLIGHT_BASE),
+      FADE_MS
+    );
+  }, HIGHLIGHT_MS);
+  return () => {
+    clearTimeout(clearTimer);
+    clearTimeout(fadeTimer);
+    section.classList.remove(...HIGHLIGHT_ON, ...HIGHLIGHT_BASE);
+  };
+}
+
+/** The form field that failed, and the section that holds it. */
+const SECTION_FOR_FIELD: Record<string, string> = {
+  title: 'title',
+  slug: 'slug',
+  description: 'story',
+  image: 'image',
+  country: 'country',
+  goalAmount: 'goal',
+  projectAllocations: 'projects',
+};
+
+/**
+ * After a failed submit: takes the visitor to the first section that needs attention, in the order they appear on the page, and marks it like a link does.
+ * The field's own red message stays; this only shows where to look.
+ */
+export function focusFirstError(errors: FieldErrors): void {
+  const sections = Object.keys(errors)
+    .map(field => SECTION_FOR_FIELD[field])
+    .filter((id): id is string => Boolean(id))
+    .map(id => document.querySelector<HTMLElement>(`[data-focus="${id}"]`))
+    .filter((el): el is HTMLElement => el !== null)
+    .sort((a, b) =>
+      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+    );
+  if (sections[0]) highlightSection(sections[0]);
+}
+
+/**
  * Takes a visitor who came from a checklist step straight to the part of the form they need: scrolls it to the middle, puts the cursor in it and rings it for a moment.
  * Reads `?focus=` once when the form opens and then drops it from the address, so a refresh does not repeat it.
  */
@@ -46,8 +111,7 @@ export function FocusSectionFromLink() {
   useEffect(() => {
     if (!FOCUS_SECTIONS.includes(target as FocusSection)) return;
     let tries = 0;
-    let clearTimer: ReturnType<typeof setTimeout> | undefined;
-    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+    let stopHighlight: (() => void) | undefined;
 
     const find = () => {
       const section = document.querySelector<HTMLElement>(
@@ -57,31 +121,7 @@ export function FocusSectionFromLink() {
         if (++tries < MAX_TRIES) return false;
         return true;
       }
-      section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      section
-        .querySelector<HTMLElement>(FOCUSABLE)
-        ?.focus({ preventScroll: true });
-      section.classList.add(...HIGHLIGHT_BASE, ...HIGHLIGHT_ON);
-      // One gentle pulse outward, so the eye lands on the section. Skipped for people who ask for less motion.
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        section.animate(
-          [
-            {
-              boxShadow:
-                '0 0 0 0 color-mix(in srgb, var(--accent-color) 22%, transparent)',
-            },
-            { boxShadow: '0 0 0 10px transparent' },
-          ],
-          { duration: 1200, easing: 'ease-out' }
-        );
-      }
-      clearTimer = setTimeout(() => {
-        section.classList.remove(...HIGHLIGHT_ON);
-        fadeTimer = setTimeout(
-          () => section.classList.remove(...HIGHLIGHT_BASE),
-          FADE_MS
-        );
-      }, HIGHLIGHT_MS);
+      stopHighlight = highlightSection(section);
       window.history.replaceState(null, '', window.location.pathname);
       return true;
     };
@@ -92,8 +132,7 @@ export function FocusSectionFromLink() {
 
     return () => {
       clearInterval(interval);
-      clearTimeout(clearTimer);
-      clearTimeout(fadeTimer);
+      stopHighlight?.();
     };
   }, [target]);
 
