@@ -72,7 +72,7 @@
     "cards": {
       "impact": "Impact",
       "minimal": "Minimal",
-      "story": "Story"
+      "story": "Your words"
     },
     "hooks": {
       "none": {
@@ -269,10 +269,10 @@
     "studio": {
       "whereTitle": "Where are you sharing?",
       "whereHint": "We make the right size for each app.",
+      "moreOptions": "More options",
+      "moreOptionsHint": "Card design and what the image shows",
       "platformLabel": "Platform",
       "formatLabel": "Format",
-      "customizeTitle": "Make it yours",
-      "customizeHint": "Colors and fonts come from your fundraiser theme.",
       "style": "Style",
       "buttonText": "Button text",
       "showDonors": "Show donors who gave",
@@ -297,8 +297,8 @@
       "previewLabel": "Preview",
       "showProjects": "Show projects",
       "hooksLabel": "Ideas for your line",
-      "cardLabel": "Card",
-      "storyEmpty": "Your fundraiser has no story yet. Write one on its page, or add your own line below.",
+      "cardLabel": "Card design",
+      "storyEmpty": "Your fundraiser has no story yet. Write one on its page, or add your own line above.",
       "noteLabel": "Your own line",
       "notePlaceholder": "Why this fundraiser matters to you",
       "showAmounts": "Show amounts",

@@ -72,7 +72,7 @@
     "cards": {
       "impact": "Wirkung",
       "minimal": "Schlicht",
-      "story": "Geschichte"
+      "story": "Deine Worte"
     },
     "hooks": {
       "none": {
@@ -269,10 +269,10 @@
     "studio": {
       "whereTitle": "Wo teilst du?",
       "whereHint": "Wir erstellen die passende Größe für jede App.",
+      "moreOptions": "Mehr Optionen",
+      "moreOptionsHint": "Kartendesign und was das Bild zeigt",
       "platformLabel": "Plattform",
       "formatLabel": "Format",
-      "customizeTitle": "Mach es zu deinem",
-      "customizeHint": "Farben und Schriften kommen aus dem Design deines Spendenaufrufs.",
       "style": "Stil",
       "buttonText": "Button-Text",
       "showDonors": "Spender*innen zeigen",
@@ -297,8 +297,8 @@
       "previewLabel": "Vorschau",
       "showProjects": "Projekte zeigen",
       "hooksLabel": "Ideen für deine Zeile",
-      "cardLabel": "Karte",
-      "storyEmpty": "Deine Aktion hat noch keine Geschichte. Schreibe eine auf ihrer Seite oder füge unten deine eigene Zeile hinzu.",
+      "cardLabel": "Kartendesign",
+      "storyEmpty": "Deine Aktion hat noch keine Geschichte. Schreibe eine auf ihrer Seite oder füge oben deine eigene Zeile hinzu.",
       "noteLabel": "Deine eigene Zeile",
       "notePlaceholder": "Warum dir diese Aktion wichtig ist",
       "showAmounts": "Beträge zeigen",

@@ -66,6 +66,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ChevronDownIcon } from '@/components/ui/ui-icons';
 import { FormatThumb } from './format-thumb';
 import { PlatformIcon } from './platform-icon';
 import { previewFitProps } from './preview-fit';
@@ -163,6 +164,7 @@ export function ShareStudio({
   >(SUGGESTED);
   const [customCta, setCustomCta] = useState('');
   const [showDonors, setShowDonors] = useState(true);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [note, setNote] = useState('');
   const [card, setCard] = useState<ShareCardId>('impact');
   const [showAmounts, setShowAmounts] = useState(true);
@@ -736,21 +738,6 @@ export function ShareStudio({
     </Card>
   );
 
-  const picker = (
-    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
-      <div>
-        <h2 className='text-lg font-semibold text-foreground'>
-          {t('studio.whereTitle')}
-        </h2>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          {t('studio.whereHint')}
-        </p>
-      </div>
-      {platformRow}
-      {formatTiles}
-    </Card>
-  );
-
   // The thumbnails show each card with the story it would use, so the Story tile does not look empty.
   const storyText = note.trim() || getShareStoryText(fundraiser);
   const cardThumbOptions = (id: ShareCardId) => ({
@@ -762,48 +749,9 @@ export function ShareStudio({
         : options.data,
   });
 
-  const customizeCard = (
-    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
-      <div>
-        <h2 className='text-lg font-semibold text-foreground'>
-          {t('studio.customizeTitle')}
-        </h2>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          {t('studio.customizeHint')}
-        </p>
-      </div>
-      <div className='grid gap-1.5'>
-        <Label id='share-card-label'>{t('studio.cardLabel')}</Label>
-        <div
-          role='group'
-          aria-labelledby='share-card-label'
-          className='grid grid-cols-3 gap-2'
-        >
-          {HOST_CARDS.map(id => (
-            <button
-              key={id}
-              type='button'
-              aria-pressed={id === card}
-              onClick={() => setCard(id)}
-              className={cardClass(id === card)}
-            >
-              <span className='flex h-11 w-full items-center justify-center'>
-                <FormatThumb
-                  format='post'
-                  options={cardThumbOptions(id)}
-                  ready={render.ready && render.settled}
-                />
-              </span>
-              <span className='text-foreground'>{t(`cards.${id}`)}</span>
-            </button>
-          ))}
-        </div>
-        {card === 'story' && !options.data.note && (
-          <p className='text-xs text-muted-foreground'>
-            {t('studio.storyEmpty')}
-          </p>
-        )}
-      </div>
+  // The basics: how it looks, the button, and the host's own line. Everything else waits behind More options.
+  const basicControls = (
+    <>
       {/* Style and button text side by side, the same width. */}
       <div className='grid gap-4 sm:grid-cols-2'>
         <div className='grid gap-1.5'>
@@ -897,7 +845,44 @@ export function ShareStudio({
           })}
         </div>
       </div>
+    </>
+  );
 
+  // For hosts who want to go further: which card design, and what the image shows.
+  const advancedControls = (
+    <>
+      <div className='grid gap-1.5'>
+        <Label id='share-card-label'>{t('studio.cardLabel')}</Label>
+        <div
+          role='group'
+          aria-labelledby='share-card-label'
+          className='grid grid-cols-3 gap-2'
+        >
+          {HOST_CARDS.map(id => (
+            <button
+              key={id}
+              type='button'
+              aria-pressed={id === card}
+              onClick={() => setCard(id)}
+              className={cardClass(id === card)}
+            >
+              <span className='flex h-11 w-full items-center justify-center'>
+                <FormatThumb
+                  format='post'
+                  options={cardThumbOptions(id)}
+                  ready={render.ready && render.settled}
+                />
+              </span>
+              <span className='text-foreground'>{t(`cards.${id}`)}</span>
+            </button>
+          ))}
+        </div>
+        {card === 'story' && !options.data.note && (
+          <p className='text-xs text-muted-foreground'>
+            {t('studio.storyEmpty')}
+          </p>
+        )}
+      </div>
       {/* What the image shows, as one tidy list of switches, with a single short note below when donors cannot be shown yet. */}
       <div className='grid gap-1'>
         <Label id='share-show-label'>{t('studio.showOnImage')}</Label>
@@ -953,6 +938,57 @@ export function ShareStudio({
           </p>
         )}
       </div>
+    </>
+  );
+
+  const moreOptions = (
+    <div className='rounded-xl border border-dashed border-border px-4 py-3'>
+      <button
+        type='button'
+        aria-expanded={moreOpen}
+        aria-controls='share-more-options'
+        onClick={() => setMoreOpen(value => !value)}
+        className='flex w-full items-center justify-between gap-3 text-left'
+      >
+        <span className='grid'>
+          <span className='text-sm font-medium text-foreground'>
+            {t('studio.moreOptions')}
+          </span>
+          <span className='text-xs text-muted-foreground'>
+            {t('studio.moreOptionsHint')}
+          </span>
+        </span>
+        <ChevronDownIcon
+          className={cn(
+            'size-4 shrink-0 text-muted-foreground transition-transform',
+            moreOpen && 'rotate-180'
+          )}
+        />
+      </button>
+      {moreOpen && (
+        <div id='share-more-options' className='mt-4 grid gap-5'>
+          {advancedControls}
+        </div>
+      )}
+    </div>
+  );
+
+  const picker = (
+    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
+      <div>
+        <h2 className='text-lg font-semibold text-foreground'>
+          {t('studio.whereTitle')}
+        </h2>
+        <p className='mt-1 text-sm text-muted-foreground'>
+          {t('studio.whereHint')}
+        </p>
+      </div>
+      {platformRow}
+      {formatTiles}
+      <div className='grid gap-4 border-t border-border/60 pt-4'>
+        {basicControls}
+      </div>
+      {moreOptions}
     </Card>
   );
 
@@ -1050,7 +1086,6 @@ export function ShareStudio({
         {previewCard}
       </div>
       <div className='grid min-w-0 gap-6 md:col-start-1 md:row-start-2'>
-        {customizeCard}
         {captionCard}
         {kitRow}
       </div>
