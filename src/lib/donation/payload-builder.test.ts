@@ -28,22 +28,42 @@ describe('buildDonationMetadata', () => {
       'example.org',
       undefined,
       undefined,
-      { utm_source: 'stage', utm_medium: 'qr' }
+      {
+        utm_source: 'instagram',
+        utm_medium: 'social',
+        utm_campaign: 'christmas',
+      }
     );
 
     expect(metadata).toMatchObject({
-      utm_campaign: fundraiser.id,
-      utm_source: 'stage',
-      utm_medium: 'qr',
+      utm_source: 'instagram',
+      utm_medium: 'social',
+      utm_campaign: 'christmas',
+      fundraiser: { id: fundraiser.id },
     });
+  });
+
+  it('sends no utm_campaign when the donor arrived without one', () => {
+    const metadata = buildDonationMetadata(
+      formData,
+      fundraiser,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    );
+
+    expect(metadata).not.toHaveProperty('utm_campaign');
+    expect(metadata.fundraiser.id).toBe(fundraiser.id);
   });
 
   // `DonationMetadata extends DonationUtm`, so a wider object is assignable to the
   // `utm` parameter without tripping an excess property check. The platform matches
-  // on `utm_campaign` to attach the donation, so it must survive the spread.
-  it('never lets a wider object displace utm_campaign', () => {
+  // on `fundraiser.id` to attach the donation, so it must survive the spread.
+  it('never lets a wider object displace fundraiser.id', () => {
     const hostile: DonationMetadata = {
-      utm_campaign: 'fr_someOtherOne',
       fundraiser: { id: 'fr_someOtherOne', privacy: { is_anonymous: false } },
     };
 
@@ -58,7 +78,6 @@ describe('buildDonationMetadata', () => {
       hostile
     );
 
-    expect(metadata.utm_campaign).toBe(fundraiser.id);
     expect(metadata.fundraiser.id).toBe(fundraiser.id);
   });
 });

@@ -7,12 +7,13 @@ describe('parseUtmParams', () => {
   it('reads every campaign param off the query string', () => {
     expect(
       parseUtmParams(
-        '?utm_source=stage&utm_medium=qr&utm_id=abc123&utm_content=panel&utm_term=trees',
+        '?utm_source=stage&utm_medium=qr&utm_campaign=christmas&utm_id=abc123&utm_content=panel&utm_term=trees',
         fundraiser
       )
     ).toEqual({
       utm_source: 'stage',
       utm_medium: 'qr',
+      utm_campaign: 'christmas',
       utm_id: 'abc123',
       utm_content: 'panel',
       utm_term: 'trees',
@@ -38,14 +39,28 @@ describe('parseUtmParams', () => {
     ).toEqual({ utm_medium: 'qr' });
   });
 
-  // The platform still reserves `utm_campaign` for the fundraiser GUID, so the URL's
-  // own campaign is left alone rather than stored under an invented key.
-  it('does not capture utm_campaign yet', () => {
+  it('keeps the donor campaign in utm_campaign', () => {
     expect(
-      parseUtmParams('?utm_campaign=spring-drive', fundraiser)
+      parseUtmParams(
+        '?utm_source=instagram&utm_medium=social&utm_campaign=christmas',
+        fundraiser
+      )
+    ).toEqual({
+      utm_source: 'instagram',
+      utm_medium: 'social',
+      utm_campaign: 'christmas',
+    });
+  });
+
+  it('drops a fundraiser reference arriving as utm_campaign', () => {
+    expect(
+      parseUtmParams(`?utm_campaign=${fundraiser.id}`, fundraiser)
     ).toBeUndefined();
     expect(
-      parseUtmParams('?utm_source=qr&utm_campaign=spring-drive', fundraiser)
+      parseUtmParams(`?utm_campaign=${fundraiser.hid}`, fundraiser)
+    ).toBeUndefined();
+    expect(
+      parseUtmParams('?utm_source=qr&utm_campaign=fr_aBcDeFgHiJkL', fundraiser)
     ).toEqual({ utm_source: 'qr' });
   });
 

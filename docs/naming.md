@@ -134,7 +134,7 @@ Readable tokens win. UTM values show up as labels in Umami and in the donation `
 - Avoid values that read as something else in an analytics column. `fr` looks like the French locale before it looks like a fundraiser.
 - `utm_source` names the surface the link was made on: `fundraiser` (fundraiser page), `stage` (Stage Mode).
 - `utm_medium` names the placement or mechanism on that surface: `qr`, `closed_banner` (closed fundraiser banner share).
-- `utm_campaign` is reserved by the platform for the fundraiser GUID. Never set it from this app (see `src/lib/donation/utm.ts`).
+- `utm_campaign` names the donor's campaign (for example `christmas`) and is kept on the donation as is. The platform matches the fundraiser on `metadata.fundraiser.id`, not on this. Our own links leave it unset so hosts can use it.
 - `utm_id` carries a fundraiser GUID only on links that leave the fundraiser, so the destination knows who sent the donor. Never on internal links.
 - Internal navigation gets no UTM at all. Umami records page flow on its own, and rewriting a visitor's UTM would steal attribution from the channel that brought them.
 - Third-party attribution formats (for example the Unsplash `utm_source=plant-for-the-planet&utm_medium=referral` links) follow the third party's spec, not this list.

@@ -21,7 +21,6 @@ const payload: PrepaidDonationPayload = {
   frequency: 'once',
   lineItems: [{ project: 'proj_1', amount: 10 }],
   metadata: {
-    utm_campaign: 'fundraiser_1',
     fundraiser: {
       id: 'fundraiser_1',
       privacy: { is_anonymous: false },
