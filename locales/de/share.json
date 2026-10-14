@@ -76,10 +76,10 @@
       "story": "Deine Worte"
     },
     "cardHints": {
-      "progress": "Dein Fortschrittsring und deine Spender*innen. Das Aussehen aus den Bildern zum Teilen.",
-      "minimal": "Ein kleines Foto, der Titel und dein Name. Klar und einfach.",
-      "impact": "Zeigt die Projekte, die deine Spenden unterstützen.",
-      "story": "Deine eigene Zeile in großer Schrift über einem großen Foto."
+      "progress": "Fortschrittsring und Spender*innen",
+      "minimal": "Kleines Foto, Titel und dein Name",
+      "impact": "Die Projekte, die deine Spenden unterstützen",
+      "story": "Deine Zeile über einem großen Foto"
     },
     "hooks": {
       "none": {

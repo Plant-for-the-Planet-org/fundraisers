@@ -76,10 +76,10 @@
       "story": "Your words"
     },
     "cardHints": {
-      "progress": "Your progress ring and your donors. The look people know from Share images.",
-      "minimal": "A small photo, the title and your name. Clean and simple.",
-      "impact": "Shows the projects your gifts support.",
-      "story": "Your own line in big text, over a large photo."
+      "progress": "Progress ring and donors",
+      "minimal": "Small photo, title and your name",
+      "impact": "The projects your gifts support",
+      "story": "Your line over a large photo"
     },
     "hooks": {
       "none": {

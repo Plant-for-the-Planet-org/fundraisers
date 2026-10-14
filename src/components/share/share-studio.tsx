@@ -17,6 +17,7 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { captionKey } from '@/lib/share/caption';
 import {
@@ -851,39 +852,57 @@ export function ShareStudio({
   // For hosts who want to go further: which card design, and what the image shows.
   const advancedControls = (
     <>
-      <div className='grid gap-1.5'>
+      <div className='grid gap-3'>
         <Label id='share-card-label'>{t('studio.cardLabel')}</Label>
         <div
           role='group'
           aria-labelledby='share-card-label'
-          className='grid gap-2 sm:grid-cols-2'
+          className='grid gap-3 sm:grid-cols-2'
         >
-          {HOST_CARDS.map(id => (
-            <button
-              key={id}
-              type='button'
-              aria-pressed={id === card}
-              onClick={() => setCard(id)}
-              className={cn(cardClass(id === card), 'flex-row items-center')}
-            >
-              <span className='flex h-11 w-11 shrink-0 items-center justify-center'>
-                <FormatThumb
-                  format='post'
-                  options={cardThumbOptions(id)}
-                  ready={render.ready && render.settled}
-                />
-              </span>
-              {/* A line on what each design is, so the names do not have to be guessed. */}
-              <span className='min-w-0'>
-                <span className='block text-foreground'>
-                  {t(`cards.${id}`)}
+          {HOST_CARDS.map(id => {
+            const selected = id === card;
+            return (
+              <button
+                key={id}
+                type='button'
+                aria-pressed={selected}
+                onClick={() => setCard(id)}
+                className={cn(
+                  'relative flex items-center gap-3 rounded-xl border p-3 text-left transition-colors',
+                  selected
+                    ? 'border-accent-color bg-accent-color/10 ring-1 ring-accent-color'
+                    : 'border-border hover:bg-accent/60'
+                )}
+              >
+                {/* The picture sits in a soft frame the same size for every design, so the four tiles line up. */}
+                <span className='flex h-[4.5rem] w-16 shrink-0 items-center justify-center rounded-lg bg-muted/60'>
+                  <FormatThumb
+                    format='post'
+                    size={56}
+                    options={cardThumbOptions(id)}
+                    ready={render.ready && render.settled}
+                  />
                 </span>
-                <span className='block text-xs text-muted-foreground'>
-                  {t(`cardHints.${id}`)}
+                <span className='min-w-0 flex-1 pr-5'>
+                  <span className='block text-sm font-medium text-foreground'>
+                    {t(`cards.${id}`)}
+                  </span>
+                  {/* A short line on what the design is, so the names do not have to be guessed. */}
+                  <span className='mt-0.5 block text-xs leading-snug text-muted-foreground'>
+                    {t(`cardHints.${id}`)}
+                  </span>
                 </span>
-              </span>
-            </button>
-          ))}
+                {selected && (
+                  <span
+                    aria-hidden='true'
+                    className='absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-accent-color text-background'
+                  >
+                    <Check className='size-3' strokeWidth={3} />
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
         {card === 'story' && !options.data.note && (
           <p className='text-xs text-muted-foreground'>
@@ -892,7 +911,7 @@ export function ShareStudio({
         )}
       </div>
       {/* What the image shows, as one tidy list of switches, with a single short note below when donors cannot be shown yet. */}
-      <div className='grid gap-1'>
+      <div className='grid gap-2'>
         <Label id='share-show-label'>{t('studio.showOnImage')}</Label>
         <div
           role='group'

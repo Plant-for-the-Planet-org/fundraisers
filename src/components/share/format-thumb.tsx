@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
 import { drawShareFrame } from '@/lib/share/render/draw-share-frame';
 
-/** The long side of a thumbnail, in CSS px. */
+/** The default long side of a thumbnail, in CSS px. */
 const THUMB_LONG_SIDE = 44;
 const DENSITY = 2;
 
@@ -16,16 +16,19 @@ export function FormatThumb({
   format,
   options,
   ready,
+  size = THUMB_LONG_SIDE,
 }: {
   format: ShareFormatId;
   options: ShareDrawOptions;
   ready: boolean;
+  /** The long side, in CSS px. */
+  size?: number;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const { w, h } = SHARE_FORMATS[format];
-  const unit = (THUMB_LONG_SIDE * DENSITY) / Math.max(w, h);
-  const cssW = Math.round((w / Math.max(w, h)) * THUMB_LONG_SIDE);
-  const cssH = Math.round((h / Math.max(w, h)) * THUMB_LONG_SIDE);
+  const unit = (size * DENSITY) / Math.max(w, h);
+  const cssW = Math.round((w / Math.max(w, h)) * size);
+  const cssH = Math.round((h / Math.max(w, h)) * size);
 
   useEffect(() => {
     const g = ref.current?.getContext('2d');
