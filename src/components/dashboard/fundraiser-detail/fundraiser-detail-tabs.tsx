@@ -30,6 +30,7 @@ export function FundraiserDetailTabs({
       ? [{ href: `${base}/insights`, label: t('insights'), dot: false }]
       : []),
     { href: `${base}/share`, label: t('share'), dot: shareDot },
+    { href: `${base}/stage`, label: t('stage'), dot: false },
   ];
 
   return (

@@ -50,6 +50,7 @@
         "donors": "Donors",
         "insights": "Insights",
         "share": "Share",
+        "stage": "Stage Mode",
         "shareNew": "There is news to share"
       },
       "stats": {
@@ -166,8 +167,7 @@
         "copied": "Stage Mode link copied",
         "copyError": "Could not copy the link",
         "open": "Open",
-        "off": "Stage Mode is off for this fundraiser.",
-        "turnOn": "Turn on"
+        "off": "Stage Mode is off for this fundraiser."
       },
       "checklist": {
         "title": "Make it a success",

@@ -2,7 +2,6 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useOrigin } from '@/components/share/use-origin';
@@ -11,15 +10,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { getStageUrl, openStageWindow } from '@/modules/stage';
 
-/** The Stage Mode link, to copy or open, next to the other ways of sharing. Stage is for big screens at events, so it has its own link rather than a studio card. */
-export function StageLinkCard({
-  fundraiser,
-  canEdit,
-}: {
-  fundraiser: Fundraiser;
-  /** Turning Stage Mode on needs edit rights. */
-  canEdit: boolean;
-}) {
+/** The Stage Mode link, to copy or open. Stage is for big screens at events, so it has its own tab and its own link rather than a studio card. */
+export function StageLinkCard({ fundraiser }: { fundraiser: Fundraiser }) {
   const t = useTranslations('Dashboard.fundraiser.stageLink');
   const origin = useOrigin();
   const enabled = fundraiser.settings?.modules?.stage?.enabled === true;
@@ -56,17 +48,7 @@ export function StageLinkCard({
             {t('open')}
           </Button>
         </div>
-      ) : (
-        canEdit && (
-          <Button asChild variant='outline' size='sm' className='self-start'>
-            <Link
-              href={`/dashboard/fundraisers/edit/${encodeURIComponent(fundraiser.slug)}?focus=stage`}
-            >
-              {t('turnOn')}
-            </Link>
-          </Button>
-        )
-      )}
+      ) : null}
     </Card>
   );
 }

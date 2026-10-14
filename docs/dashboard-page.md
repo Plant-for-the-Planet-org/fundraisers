@@ -18,6 +18,7 @@ For Umami page views and donation events, see [insights.md](./insights.md).
 | `/dashboard/fundraisers/[slug]/donors`   | Donors and donations, paged                                                                | Fundraisers |
 | `/dashboard/fundraisers/[slug]/insights` | That fundraiser's visitors, donation journey, countries, sources                           | Fundraisers |
 | `/dashboard/fundraisers/[slug]/share`    | Tagged share links per channel                                                             | Fundraisers |
+| `/dashboard/fundraisers/[slug]/stage`    | Stage Mode: its link, and its switch and slides                                            | Fundraisers |
 | `/dashboard/insights`                    | All your fundraisers combined, a ranking, or one picked from a list (`?fundraiser=<slug>`) | Insights    |
 | `/dashboard/fundraisers/edit/[slug]`     | The editor (no menu, full width)                                                           | none        |
 
@@ -122,6 +123,14 @@ Above the links, the share studio makes images and videos for each platform (sto
 The first card, Where are you sharing?, holds the platform, the format, and the basics: style, button text and the host's own line. A More options row under it, closed at first, holds the card design (Impact, Minimal or Your words) and what the image shows (amounts, name, projects, donors).
 
 On phones the studio shows the platforms first, then the preview with its Share button, then the caption, so a host sees the result of a pick without scrolling. From `md` up the preview sits in its own column beside the other cards, and the tab order follows the same order.
+
+### Stage Mode tab
+
+The tab sits next to Share. It shows the Stage Mode link to copy or open (only while Stage Mode is on), and, for owners and admins, the Stage Mode switch with its details and slides, the same as in the editor.
+
+A Save button sends only what changed, through the same update as the editor, and then loads the fundraiser again so the other tabs and the Features card show the new state.
+
+View-only co-hosts see the link but cannot edit.
 
 ---
 

@@ -54,7 +54,13 @@ export function FundraiserModulesCard({
                 variant={module.enabled ? 'ghost' : 'outline'}
                 size='sm'
               >
-                <Link href={`${editHref}?focus=${FOCUS_TARGETS[module.id]}`}>
+                <Link
+                  href={
+                    module.id === 'stage'
+                      ? `/dashboard/fundraisers/${encodeURIComponent(fundraiser.slug)}/stage`
+                      : `${editHref}?focus=${FOCUS_TARGETS[module.id]}`
+                  }
+                >
                   {module.enabled ? t('manage') : t('turnOn')}
                 </Link>
               </Button>

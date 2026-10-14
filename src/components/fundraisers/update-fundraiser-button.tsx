@@ -35,12 +35,15 @@ interface UpdateFundraiserButtonProps {
   existingSettings: FundraiserSettings | null;
   /** The saved status, needed to work out which transition the status switch is asking for. */
   currentStatus: FundraiserStatus;
+  /** Called after a save, for pages that show the fundraiser elsewhere and want it fresh. */
+  onSaved?: () => void;
 }
 
 export function UpdateFundraiserButton({
   fundraiserId,
   existingSettings,
   currentStatus,
+  onSaved,
 }: UpdateFundraiserButtonProps) {
   // The prop is a snapshot from page load and the page does not refetch after a save, so the saved status is tracked here and refreshed from every response.
   // Reading the prop instead would misread the second toggle in a session: after switching a live fundraiser off (now `paused`), switching it back on would still map from `active` and ask for no transition.
@@ -159,6 +162,8 @@ export function UpdateFundraiserButton({
       if (updated.slug && updated.slug !== defaultValues?.slug) {
         router.replace(`/dashboard/fundraisers/edit/${updated.slug}`);
       }
+
+      onSaved?.();
 
       return updated;
     } catch (err) {

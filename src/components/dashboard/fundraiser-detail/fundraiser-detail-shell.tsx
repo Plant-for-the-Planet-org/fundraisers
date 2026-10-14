@@ -79,7 +79,11 @@ function FundraiserDetailBody({
 
   return (
     <FundraiserDetailContext.Provider
-      value={{ fundraiser: state.fundraiser, canEdit: state.canEdit }}
+      value={{
+        fundraiser: state.fundraiser,
+        canEdit: state.canEdit,
+        refresh: state.refresh,
+      }}
     >
       <DonorReadinessProvider fundraiser={state.fundraiser}>
         <section className='space-y-6'>

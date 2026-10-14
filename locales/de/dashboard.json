@@ -50,6 +50,7 @@
         "donors": "Spender*innen",
         "insights": "Einblicke",
         "share": "Teilen",
+        "stage": "Stage Mode",
         "shareNew": "Es gibt Neuigkeiten zum Teilen"
       },
       "stats": {
@@ -166,8 +167,7 @@
         "copied": "Stage-Mode-Link kopiert",
         "copyError": "Der Link konnte nicht kopiert werden",
         "open": "Öffnen",
-        "off": "Stage Mode ist für diesen Spendenaufruf aus.",
-        "turnOn": "Einschalten"
+        "off": "Stage Mode ist für diesen Spendenaufruf aus."
       },
       "checklist": {
         "title": "So wird es ein Erfolg",
