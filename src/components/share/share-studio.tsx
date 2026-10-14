@@ -84,8 +84,8 @@ import { useProjectPurposes, useShareRender } from './use-share-render';
 const CUSTOM = '__custom';
 const SUGGESTED = '__suggested';
 
-/** The cards a host can pick. The progress card stays for the link preview and the donor's thank-you. */
-const HOST_CARDS = ['impact', 'minimal', 'story'] as const;
+/** The cards a host can pick, the plain one first, since it is where a host starts. The progress card stays for the link preview and the donor's thank-you. */
+const HOST_CARDS = ['minimal', 'impact', 'story'] as const;
 
 /** The host's own line on the image, short enough for three lines in every format. */
 const NOTE_MAX_LENGTH = 100;
@@ -166,7 +166,7 @@ export function ShareStudio({
   const [showDonors, setShowDonors] = useState(true);
   const [moreOpen, setMoreOpen] = useState(false);
   const [note, setNote] = useState('');
-  const [card, setCard] = useState<ShareCardId>('impact');
+  const [card, setCard] = useState<ShareCardId>('minimal');
   const [showAmounts, setShowAmounts] = useState(true);
   const [showHost, setShowHost] = useState(true);
   const [showProjects, setShowProjects] = useState(true);

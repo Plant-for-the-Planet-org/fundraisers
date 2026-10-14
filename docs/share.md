@@ -75,12 +75,12 @@ A design is a `Season` with its own `fonts` (from the five theme fonts the app a
 
 A card is what the image is built around (`ShareCardId` in `render/types.ts`, set on `theme.card`). A host picks one of three. The progress card stays for the link preview and the donor's thank-you.
 
-| Card       | Who it is for                                | What it shows                                                                                                                                                   |
-| ---------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `impact`   | Anyone who wants to show the good being done | The ring, the amount, and the supported projects: a heading ("Supporting 5 projects") and the names as chips. No shares and no amounts. The default for a host. |
-| `minimal`  | Sophisticated, sparse: companies, teams      | A small photo shown whole, the name, the host, a thin bar.                                                                                                      |
-| `story`    | The host's own words                         | A large photo shown whole, the host's line (or the start of the description, as one sentence) as the biggest text, then the name and a thin bar.                |
-| `progress` | The link preview, the thank-you              | The ring and the donors. Not offered to hosts.                                                                                                                  |
+| Card       | Who it is for                                | What it shows                                                                                                                                    |
+| ---------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `impact`   | Anyone who wants to show the good being done | The ring, the amount, and the supported projects: a heading ("Supporting 5 projects") and the names as chips. No shares and no amounts.          |
+| `minimal`  | Sophisticated, sparse: companies, teams      | A small photo shown whole, the name, the host, a thin bar. The default for a host.                                                               |
+| `story`    | The host's own words                         | A large photo shown whole, the host's line (or the start of the description, as one sentence) as the biggest text, then the name and a thin bar. |
+| `progress` | The link preview, the thank-you              | The ring and the donors. Not offered to hosts.                                                                                                   |
 
 Minimal and Story show the photo whole, in its own proportions (`fitPhoto`), never cropped. Only the ring crops, since a ring needs a circle. Both use a flat button and a thin bar (`drawBar`); Impact swaps the donor row for the project chips (`drawImpact`): up to five names, three rows at most, then a "+N" chip, since a bouquet of projects changes from one fundraiser to the next.
 The story text is the host's own line, and otherwise the start of the fundraiser's description as plain text (`getShareStoryText`, about 110 characters, ending at a sentence when it can). A description that only repeats the title is ignored.
