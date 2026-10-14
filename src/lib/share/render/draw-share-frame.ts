@@ -5,6 +5,7 @@ import type {
   Ctx,
   FrameContext,
   Palette,
+  ShareImage,
   ShareRenderData,
   ShareRenderOptions,
   ShareRenderTheme,
@@ -35,6 +36,9 @@ import { SEASONS } from './seasons';
 import { paintShareBackground } from './theme-background';
 
 type Align = 'center' | 'left';
+
+/** The Minimal and Story cards: a photo shown whole and a thin bar, in place of the ring and the donors. */
+const isPlain = (f: FrameContext) => f.card === 'minimal' || f.card === 'story';
 
 // Timeline, in seconds. Everything has landed by about 3.4 s; the rest of the video holds.
 const RING_START = 1.0;
@@ -391,18 +395,51 @@ function drawTitle(
   const pillH = giftFont * PILL_HEIGHT;
   const giftGap = s.raised * 0.25;
 
+  // The Story card leads with the host's own words as the one big line; the name and host drop to supporting lines.
+  const hookFirst = f.card === 'story' && Boolean(data.note?.trim());
+  const caps = (text: string) =>
+    f.season.uppercaseTitle ? text.toLocaleUpperCase() : text;
+  const headline = caps(hookFirst ? data.note!.trim() : data.name);
   const titleFont = fontOf(700, fonts.title);
-  const nameSize = titleSize(g, data.name, maxWidth, s.title, titleFont);
+  const nameSize = titleSize(
+    g,
+    headline,
+    maxWidth,
+    hookFirst ? Math.round(s.title * 0.82) : s.title,
+    titleFont
+  );
   g.font = titleFont(nameSize);
-  const lines = wrapBalanced(g, data.name, maxWidth, 3);
+  const lines = wrapBalanced(g, headline, maxWidth, 3);
+  const subGap = hookFirst ? s.by * 0.4 : 0;
+  const subH = hookFirst ? s.by * 1.55 + subGap : 0;
   const lineH = nameSize * 1.17;
   const byH = s.by * 1.4;
+  // The host's own line, or on the Story card the story, sits between the host name and the amount.
+  const isStory = f.card === 'story';
+  const noteFont = fontOf(isStory ? 500 : 600, fonts.body);
+  const noteText = hookFirst ? null : data.note?.trim() || null;
+  let noteLines: string[] = [];
+  if (noteText) {
+    g.font = noteFont(s.by);
+    noteLines = wrapBalanced(g, noteText, maxWidth, isStory ? 5 : 3);
+  }
+  const noteLineH = s.by * 1.35;
+  const noteGap = noteText ? s.by * 0.35 : 0;
+  const noteH = noteLines.length * noteLineH;
   const raisedLine = data.raisedLine;
   const raisedH = raisedLine ? s.raised * 1.6 : 0;
   // The name and host belong together; the amount is its own line, so it gets a little room.
   const raisedGap = raisedLine ? s.raised * 0.55 : 0;
   const giftH = giftLine ? giftGap + pillH : 0;
-  const height = lines.length * lineH + byH + raisedGap + raisedH + giftH;
+  const height =
+    lines.length * lineH +
+    subH +
+    byH +
+    noteGap +
+    noteH +
+    raisedGap +
+    raisedH +
+    giftH;
   if (measureOnly) return height;
 
   const aTitle = phase(t, 0.5, 1.1);
@@ -412,15 +449,37 @@ function drawTitle(
   g.globalAlpha = aTitle;
   g.fillStyle = P.text;
   let cy = y;
+  // The note's wrapping above changed the font, so the name's is set again.
+  g.font = titleFont(nameSize);
   for (const line of lines) {
     g.fillText(line, x, cy + lineH / 2 + lift);
     cy += lineH;
   }
   // A long host name or amount shrinks to fit the column, and past that is narrowed by fillText.
+  if (hookFirst) {
+    fitFont(g, caps(data.name), maxWidth, s.by * 1.25, fontOf(700, fonts.body));
+    g.fillStyle = P.text;
+    g.fillText(
+      caps(data.name),
+      x,
+      cy + subGap + (subH - subGap) / 2 + lift,
+      maxWidth
+    );
+    cy += subH;
+  }
   fitFont(g, data.byLine, maxWidth, s.by, fontOf(500, fonts.body));
   g.fillStyle = P.muted;
   g.fillText(data.byLine, x, cy + byH / 2 + lift, maxWidth);
-  cy += byH + raisedGap;
+  cy += byH + noteGap;
+  if (noteText) {
+    g.font = noteFont(s.by);
+    g.fillStyle = P.text;
+    for (const line of noteLines) {
+      g.fillText(line, x, cy + noteLineH / 2 + lift, maxWidth);
+      cy += noteLineH;
+    }
+  }
+  cy += raisedGap;
   if (raisedLine) {
     const goalText = data.goal ? data.formatMoney(data.goal) : null;
     // Fitted to the final amount, so the size holds while the amount counts up.
@@ -465,6 +524,255 @@ function drawTitle(
       cy + pillH / 2 + giftFont * 0.04 + drop
     );
   }
+  g.globalAlpha = 1;
+  return height;
+}
+
+/** A thin bar for the Minimal and Story cards: the share of the goal, filling over the same time as the ring. Returns the height it takes, with its gap above; with `measureOnly` it draws nothing. */
+function drawBar(
+  g: Ctx,
+  f: FrameContext,
+  x: number,
+  y: number,
+  align: Align,
+  maxWidth: number,
+  s: ShareSizes,
+  measureOnly = false
+): number {
+  const { t, P, data } = f;
+  if (!data.goal) return 0;
+  const thick = Math.max(8, Math.round(s.raised * 0.4));
+  const gap = s.raised * 0.7;
+  if (measureOnly) return gap + thick;
+  const width = Math.min(maxWidth, s.title * 9);
+  const left = align === 'center' ? x - width / 2 : x;
+  const top = y + gap;
+  const share =
+    Math.min(1, data.raised / data.goal) * phase(t, RING_START, RING_END);
+  g.globalAlpha = phase(t, 0.7, 1.3);
+  g.fillStyle = P.track;
+  roundRect(g, left, top, width, thick, thick / 2);
+  g.fill();
+  if (share > 0) {
+    g.fillStyle = P.bar;
+    roundRect(g, left, top, Math.max(thick, width * share), thick, thick / 2);
+    g.fill();
+  }
+  g.globalAlpha = 1;
+  return gap + thick;
+}
+
+/** The photo's size when shown whole: as wide as `maxW` allows, no taller than `maxH`, and never cropped. Without a photo it is a 4:3 placeholder. */
+function fitPhoto(
+  photo: ShareImage | null,
+  maxW: number,
+  maxH: number
+): { w: number; h: number } {
+  const aspect = photo ? photo.width / photo.height : 4 / 3;
+  if (aspect >= maxW / maxH) return { w: maxW, h: maxW / aspect };
+  return { w: maxH * aspect, h: maxH };
+}
+
+/** The Minimal and Story cards' photo: the whole picture in a rounded frame, as it was uploaded. */
+function drawPhotoFrame(
+  g: Ctx,
+  f: FrameContext,
+  x: number,
+  y: number,
+  w: number,
+  h: number
+) {
+  const { t, P, photo } = f;
+  const pIn = phase(t, 0, 0.7);
+  const r = Math.min(w, h) * 0.06;
+  g.save();
+  g.globalAlpha = pIn;
+  g.shadowColor = 'rgba(0,0,0,0.25)';
+  g.shadowBlur = 36 * f.scale;
+  g.shadowOffsetY = 10 * f.scale;
+  g.fillStyle = P.frame;
+  roundRect(g, x - 7, y - 7, w + 14, h + 14, r + 7);
+  g.fill();
+  g.shadowColor = 'transparent';
+  g.save();
+  roundRect(g, x, y, w, h, r);
+  g.clip();
+  if (photo) g.drawImage(photo as CanvasImageSource, x, y, w, h);
+  else {
+    g.fillStyle = P.bar;
+    g.fillRect(x, y, w, h);
+  }
+  g.restore();
+  g.restore();
+}
+
+/** `text` cut with an ellipsis until it fits `maxWidth` in the current font. */
+function ellipsize(g: Ctx, text: string, maxWidth: number): string {
+  if (g.measureText(text).width <= maxWidth) return text;
+  const chars = Array.from(text);
+  while (
+    chars.length > 1 &&
+    g.measureText(`${chars.join('').trimEnd()}…`).width > maxWidth
+  )
+    chars.pop();
+  return `${chars.join('').trimEnd()}…`;
+}
+
+/** The most rows of project chips the Impact card draws. */
+const IMPACT_MAX_ROWS = 3;
+
+/**
+ * The Impact card's content: a small heading ("Supporting 5 projects") and the projects as chips.
+ * A chip carries the project's own round picture when there is one, and a plain mark when not.
+ * No shares and no amounts: it says what is being made possible, however many projects a bouquet holds.
+ * Chips that do not fit in three rows give way to a "+N" chip. Returns the height; with `measureOnly` it draws nothing.
+ */
+function drawImpact(
+  g: Ctx,
+  f: FrameContext,
+  x: number,
+  y: number,
+  align: Align,
+  maxWidth: number,
+  s: ShareSizes,
+  measureOnly = false,
+  maxRows = IMPACT_MAX_ROWS
+): number {
+  const impact = f.data.impact;
+  if (!impact || impact.names.length === 0) return 0;
+  const { t, P, fonts } = f;
+  const size = Math.round(s.by * 0.95);
+  // With pictures the chips grow to hold them. A project with no picture then gets its initial on a plain disc.
+  const photos = impact.names.some((_, i) => f.projectImages[i]);
+  const chipH = Math.round(size * (photos ? 2.6 : 1.9));
+  const pad = Math.round(size * 0.3);
+  const disc = chipH - 2 * pad;
+  const padX = size * 0.8;
+  const dot = size * 0.4;
+  const gapX = size * 0.55;
+  const gapY = size * 0.5;
+  const labelH = s.by * 1.5;
+  // A chip is: left padding, the picture or dot, a gap, the name, right padding.
+  const padL = photos ? pad : padX * 0.7;
+  const lead = (photos ? disc : dot) + size * 0.45;
+  g.font = `600 ${size}px ${fonts.body}`;
+  const inner = maxWidth - padL - lead - padX;
+  const chipWidth = (text: string) =>
+    Math.min(maxWidth, padL + lead + g.measureText(text).width + padX);
+
+  interface Chip {
+    text: string;
+    /** The project's place in `impact.names`, or -1 for the "+N" chip. */
+    index: number;
+    w: number;
+  }
+  const pack = (items: Array<{ text: string; index: number }>) => {
+    const rows: Chip[][] = [[]];
+    let used = 0;
+    for (const item of items) {
+      const w =
+        item.index < 0
+          ? Math.min(maxWidth, g.measureText(item.text).width + 2 * padX)
+          : chipWidth(item.text);
+      if (used > 0 && used + gapX + w > maxWidth) {
+        rows.push([]);
+        used = 0;
+      }
+      rows[rows.length - 1].push({ ...item, w });
+      used += (used > 0 ? gapX : 0) + w;
+    }
+    return rows;
+  };
+  const names = impact.names.map((name, index) => ({
+    text: ellipsize(g, name, inner),
+    index,
+  }));
+  let shown = names.length;
+  let rows: Chip[][];
+  for (;;) {
+    const hidden = impact.more + (names.length - shown);
+    rows = pack([
+      ...names.slice(0, shown),
+      ...(hidden > 0 ? [{ text: `+${hidden}`, index: -1 }] : []),
+    ]);
+    if (rows.length <= maxRows || shown <= 1) break;
+    shown--;
+  }
+  const height = labelH + rows.length * chipH + (rows.length - 1) * gapY;
+  if (measureOnly) return height;
+
+  g.textBaseline = 'middle';
+  g.globalAlpha = phase(t, 1.9, 2.4);
+  g.fillStyle = P.muted;
+  g.font = `700 ${Math.round(s.by * 0.85)}px ${fonts.body}`;
+  g.textAlign = align;
+  g.fillText(impact.label, x, y + labelH * 0.4, maxWidth);
+
+  let drawn = 0;
+  rows.forEach((row, r) => {
+    const rowW =
+      row.reduce((sum, chip) => sum + chip.w, 0) + (row.length - 1) * gapX;
+    let cx = align === 'center' ? x - rowW / 2 : x;
+    const top = y + labelH + r * (chipH + gapY);
+    for (const chip of row) {
+      g.globalAlpha = phase(t, 2.0 + drawn * 0.12, 2.7 + drawn * 0.12);
+      g.fillStyle = P.track;
+      roundRect(g, cx, top, chip.w, chipH, chipH / 2);
+      g.fill();
+      const isMore = chip.index < 0;
+      if (!isMore) {
+        const mx = cx + padL;
+        const my = top + chipH / 2;
+        const image = f.projectImages[chip.index];
+        if (photos) {
+          if (image) {
+            g.save();
+            g.beginPath();
+            g.arc(mx + disc / 2, my, disc / 2, 0, Math.PI * 2);
+            g.clip();
+            const cover = Math.max(disc / image.width, disc / image.height);
+            g.drawImage(
+              image as CanvasImageSource,
+              mx + (disc - image.width * cover) / 2,
+              my - disc / 2 + (disc - image.height * cover) / 2,
+              image.width * cover,
+              image.height * cover
+            );
+            g.restore();
+          } else {
+            g.fillStyle = P.badgeBg;
+            g.beginPath();
+            g.arc(mx + disc / 2, my, disc / 2, 0, Math.PI * 2);
+            g.fill();
+            g.fillStyle = P.badgeText;
+            g.font = `700 ${Math.round(disc * 0.42)}px ${fonts.body}`;
+            g.textAlign = 'center';
+            g.fillText(
+              Array.from(impact.names[chip.index])[0]?.toUpperCase() ?? '',
+              mx + disc / 2,
+              my + disc * 0.03
+            );
+          }
+        } else {
+          g.fillStyle = P.bar;
+          g.beginPath();
+          g.arc(mx + dot / 2, my, dot / 2, 0, Math.PI * 2);
+          g.fill();
+        }
+      }
+      g.fillStyle = P.text;
+      g.font = `600 ${size}px ${fonts.body}`;
+      g.textAlign = 'left';
+      g.fillText(
+        chip.text,
+        cx + (isMore ? padX : padL + lead),
+        top + chipH / 2 + size * 0.04,
+        chip.w - (isMore ? 2 * padX : padL + lead + padX)
+      );
+      cx += chip.w + gapX;
+      drawn++;
+    }
+  });
   g.globalAlpha = 1;
   return height;
 }
@@ -642,10 +950,19 @@ function drawCta(
   g.save();
   g.globalAlpha = aCta;
   g.translate(cx, cy);
-  g.rotate(-0.045);
+  // Minimal and Story keep the button flat and quiet: no tilt, a small shadow, no arrows or sparkles.
+  const flat = isPlain(f);
+  g.rotate(flat ? 0 : -0.045);
   g.scale(pop, pop);
   g.fillStyle = P.ctaShadow;
-  roundRect(g, -ctaW / 2 + 10 * k, -s.cta / 2 + 12 * k, ctaW, s.cta, s.cta / 2);
+  roundRect(
+    g,
+    -ctaW / 2 + (flat ? 5 : 10) * k,
+    -s.cta / 2 + (flat ? 6 : 12) * k,
+    ctaW,
+    s.cta,
+    s.cta / 2
+  );
   g.fill();
   g.fillStyle = P.ctaBg;
   roundRect(g, -ctaW / 2, -s.cta / 2, ctaW, s.cta, s.cta / 2);
@@ -669,7 +986,7 @@ function drawCta(
 
   // Arrows only in the centred layout; beside a left-aligned button there is no room.
   const aArrow = phase(t, 2.9, 3.4);
-  if (aArrow > 0 && align === 'center') {
+  if (aArrow > 0 && align === 'center' && !flat) {
     const bounce = Math.sin((t - 2.9) * 6) * 12 * k;
     g.save();
     g.globalAlpha = aArrow;
@@ -691,7 +1008,7 @@ function drawCta(
     }
     g.restore();
   }
-  if (aCta > 0) {
+  if (aCta > 0 && !flat) {
     const spots = [
       [-ctaW / 2 - 30 * k, -80 * k, 26],
       [ctaW / 2 + 20 * k, 70 * k, 22],
@@ -761,51 +1078,115 @@ function scaleText(
   return s;
 }
 
-/** One centred column. Tight zones shrink the ring, then drop the avatars, then scale the text. */
+/** What can sit under the title: the supported projects (the Impact card) and the donors (every card). */
+interface Extras {
+  projects: boolean;
+  donors: boolean;
+}
+
+/**
+ * The donors on the card. The progress card also shows its invitation to be first; the others show a row only when there are donors to name.
+ */
+function hasDonorRow(f: FrameContext) {
+  return f.card === 'progress'
+    ? hasAvatarRow(f.data)
+    : f.data.donorsLine !== null && f.data.donors.length > 0;
+}
+
+function wantedExtras(f: FrameContext): Extras {
+  return {
+    projects: f.card === 'impact' && (f.data.impact?.names.length ?? 0) > 0,
+    donors: hasDonorRow(f),
+  };
+}
+
+const extraBlocks = (e: Extras) => (e.projects ? 1 : 0) + (e.donors ? 1 : 0);
+
+/** The project chips take two rows when the donors share the card, so both fit; alone they may take three. */
+const impactRows = (e: Extras) => (e.donors ? 2 : IMPACT_MAX_ROWS);
+
+/** The height of the extras. */
+function measureExtras(
+  g: Ctx,
+  f: FrameContext,
+  align: Align,
+  maxWidth: number,
+  s: ShareSizes,
+  e: Extras
+): number {
+  return (
+    (e.projects
+      ? drawImpact(g, f, 0, 0, align, maxWidth, s, true, impactRows(e))
+      : 0) + (e.donors ? drawAvatars(g, f, 0, 0, align, maxWidth, s, true) : 0)
+  );
+}
+
+/**
+ * One centred column. Tight zones shrink the ring, then drop the donors, then the projects, then scale the text.
+ */
 function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   const z = F.zone;
   const cx = z.x + z.w / 2;
   const textW = z.w - 40;
-  const measure = (s: ShareSizes, avatars: boolean) => {
+  const plain = isPlain(f);
+  // The photo: whole in a frame (Minimal small, Story large), or round inside the ring.
+  const photoBox = (s: ShareSizes) =>
+    plain
+      ? fitPhoto(
+          f.photo,
+          textW,
+          Math.round(s.gauge * (f.card === 'story' ? 0.9 : 0.5))
+        )
+      : { w: s.gauge, h: s.gauge };
+  const measure = (s: ShareSizes, e: Extras) => {
     const gs = s.gauge / 640;
     return (
-      s.gauge +
+      photoBox(s).h +
       drawTitle(g, f, 0, 0, 'center', textW, s, true) +
-      (avatars ? drawAvatars(g, f, 0, 0, 'center', textW, s, true) : 0) +
+      (plain ? drawBar(g, f, 0, 0, 'center', textW, s, true) : 0) +
+      measureExtras(g, f, 'center', textW, s, e) +
       drawCta(g, f, 0, 0, 'center', textW, s, true) +
-      (48 + 80 + (avatars ? 48 : 0)) * gs
+      (48 + 80 + extraBlocks(e) * 48 + (extraBlocks(e) > 0 ? 28 : 0)) * gs
     );
   };
-  const shrinkRing = (s: ShareSizes, avatars: boolean) => {
-    while (measure(s, avatars) > z.h && s.gauge > F.size.gauge * 0.62)
-      s.gauge -= 10;
+  const shrinkRing = (s: ShareSizes, e: Extras) => {
+    while (measure(s, e) > z.h && s.gauge > F.size.gauge * 0.62) s.gauge -= 10;
   };
 
-  let avatars = hasAvatarRow(f.data);
-  let s: ShareSizes = { ...F.size };
-  shrinkRing(s, avatars);
-  if (measure(s, avatars) > z.h && avatars) {
-    avatars = false;
-    s = { ...F.size };
-    shrinkRing(s, avatars);
+  // Fit by shrinking the ring, then the text a little (down to `minFactor`). Only when that is not enough is something dropped: the donors first, then the projects.
+  const attempt = (e: Extras, minFactor: number): ShareSizes => {
+    let size: ShareSizes = { ...F.size };
+    shrinkRing(size, e);
+    for (
+      let factor = 0.97;
+      measure(size, e) > z.h && factor >= minFactor;
+      factor -= 0.03
+    ) {
+      size = scaleText(F.size, factor, size.gauge);
+    }
+    return size;
+  };
+  let extras = wantedExtras(f);
+  let s = attempt(extras, 0.85);
+  for (const drop of ['donors', 'projects'] as const) {
+    if (measure(s, extras) <= z.h || !extras[drop]) continue;
+    extras = { ...extras, [drop]: false };
+    s = attempt(extras, 0.85);
   }
-  for (
-    let factor = 0.97;
-    measure(s, avatars) > z.h && factor > 0.7;
-    factor -= 0.03
-  ) {
-    s = scaleText(F.size, factor, s.gauge);
-  }
+  // Without anything left to drop, the text may shrink further.
+  if (measure(s, extras) > z.h) s = attempt(extras, 0.7);
 
   // Spare height goes to the gaps, most of it between the fundraiser and the invite.
   const gs = s.gauge / 640;
+  const blocks = extraBlocks(extras);
   const gaps = {
     photo: 48 * gs,
     group: 80 * gs,
-    social: avatars ? 48 * gs : 0,
+    // The room above the button too, so the arrows beside it clear the last line.
+    social: (blocks * 48 + (blocks > 0 ? 28 : 0)) * gs,
   };
-  const weights = { photo: 1, group: 2, social: avatars ? 1 : 0 };
-  const fixed = measure(s, avatars) - gaps.photo - gaps.group - gaps.social;
+  const weights = { photo: 1, group: 2, social: blocks };
+  const fixed = measure(s, extras) - gaps.photo - gaps.group - gaps.social;
   const spare = Math.max(
     0,
     z.h - fixed - gaps.photo - gaps.group - gaps.social
@@ -814,57 +1195,86 @@ function layoutStack(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   for (const key of Object.keys(gaps) as Array<keyof typeof gaps>) {
     gaps[key] += Math.min(
       (spare * weights[key]) / weightSum,
-      90 * weights[key]
+      (plain ? 56 : 90) * weights[key]
     );
   }
   const total = fixed + gaps.photo + gaps.group + gaps.social;
   let y = z.y + Math.max(0, (z.h - total) / 2);
 
-  drawBackground(g, f, F.w, F.h, cx, y + s.gauge / 2);
-  drawGauge(g, f, cx, y + s.gauge / 2, s.gauge);
-  y += s.gauge + gaps.photo;
-  y += drawTitle(g, f, cx, y, 'center', textW, s) + gaps.group;
-  if (avatars) y += drawAvatars(g, f, cx, y, 'center', textW, s) + gaps.social;
+  const box = photoBox(s);
+  drawBackground(g, f, F.w, F.h, cx, y + box.h / 2);
+  if (plain) drawPhotoFrame(g, f, cx - box.w / 2, y, box.w, box.h);
+  else drawGauge(g, f, cx, y + s.gauge / 2, s.gauge);
+  y += box.h + gaps.photo;
+  y += drawTitle(g, f, cx, y, 'center', textW, s);
+  if (plain) y += drawBar(g, f, cx, y, 'center', textW, s);
+  y += gaps.group;
+  const socialGap = blocks > 0 ? (gaps.social - 28 * gs) / blocks : 0;
+  if (extras.projects)
+    y +=
+      drawImpact(g, f, cx, y, 'center', textW, s, false, impactRows(extras)) +
+      socialGap;
+  if (extras.donors)
+    y += drawAvatars(g, f, cx, y, 'center', textW, s) + socialGap;
+  if (blocks > 0) y += 28 * gs;
   f.maxCtaWidth = z.w - 2 * 170 * (s.cta / 104);
   drawCta(g, f, cx, y, 'center', textW, s);
   if (guides) drawGuides(g, z, F.w, F.h);
 }
 
-/** The ring on the left, the text on the right, for wide formats. Text that does not fit drops the avatars, then scales down. */
+/** The photo on the left, the text on the right, for wide formats. Text that does not fit drops the donors, then the projects, then scales down. */
 function layoutSplit(g: Ctx, f: FrameContext, F: ShareFormat, guides: boolean) {
   const z = F.zone;
   const gaugeSize = Math.min(F.size.gauge, z.h);
   const textX = z.x + gaugeSize + z.w * 0.05;
   const textW = z.x + z.w - textX;
-  const measure = (s: ShareSizes, avatars: boolean) =>
+  const plain = isPlain(f);
+  const measure = (s: ShareSizes, e: Extras) =>
     drawTitle(g, f, 0, 0, 'left', textW, s, true) +
+    (plain ? drawBar(g, f, 0, 0, 'left', textW, s, true) : 0) +
     s.title * 0.7 +
-    (avatars
-      ? drawAvatars(g, f, 0, 0, 'left', textW, s, true) + s.title * 0.55
-      : 0) +
+    measureExtras(g, f, 'left', textW, s, e) +
+    extraBlocks(e) * s.title * 0.55 +
     drawCta(g, f, 0, 0, 'left', textW, s, true);
 
-  let avatars = hasAvatarRow(f.data);
-  if (measure(F.size, avatars) > z.h) avatars = false;
+  let extras = wantedExtras(f);
+  for (const drop of ['donors', 'projects'] as const) {
+    if (measure(F.size, extras) <= z.h || !extras[drop]) continue;
+    extras = { ...extras, [drop]: false };
+  }
   let s: ShareSizes = { ...F.size };
   for (
     let factor = 0.97;
-    measure(s, avatars) > z.h && factor > 0.7;
+    measure(s, extras) > z.h && factor > 0.7;
     factor -= 0.03
   ) {
     s = scaleText(F.size, factor, s.gauge);
   }
   const gapGroup = s.title * 0.7;
   const gapSocial = s.title * 0.55;
-  const total = measure(s, avatars);
+  const total = measure(s, extras);
   const gcx = z.x + gaugeSize / 2;
   const gcy = z.y + z.h / 2;
 
   drawBackground(g, f, F.w, F.h, gcx, gcy);
-  drawGauge(g, f, gcx, gcy, gaugeSize);
+  if (plain) {
+    const box = fitPhoto(
+      f.photo,
+      gaugeSize,
+      Math.round(z.h * (f.card === 'story' ? 0.92 : 0.6))
+    );
+    drawPhotoFrame(g, f, gcx - box.w / 2, gcy - box.h / 2, box.w, box.h);
+  } else drawGauge(g, f, gcx, gcy, gaugeSize);
   let y = z.y + Math.max(0, (z.h - total) / 2);
-  y += drawTitle(g, f, textX, y, 'left', textW, s) + gapGroup;
-  if (avatars) y += drawAvatars(g, f, textX, y, 'left', textW, s) + gapSocial;
+  y += drawTitle(g, f, textX, y, 'left', textW, s);
+  if (plain) y += drawBar(g, f, textX, y, 'left', textW, s);
+  y += gapGroup;
+  if (extras.projects)
+    y +=
+      drawImpact(g, f, textX, y, 'left', textW, s, false, impactRows(extras)) +
+      gapSocial;
+  if (extras.donors)
+    y += drawAvatars(g, f, textX, y, 'left', textW, s) + gapSocial;
   f.maxCtaWidth = textW - 30;
   drawCta(g, f, textX, y, 'left', textW, s);
   if (guides) drawGuides(g, z, F.w, F.h);
@@ -882,10 +1292,12 @@ export function drawShareFrame(g: Ctx, t: number, options: ShareRenderOptions) {
     t,
     P: season.palette ? season.palette() : themePalette(options.theme),
     season,
+    card: options.theme.card ?? 'progress',
     data: options.data,
     photo: options.photo,
     background: options.background ?? null,
     avatars: options.avatars ?? [],
+    projectImages: options.projectImages ?? [],
     dark: options.theme.mode === 'dark',
     fonts: {
       title: `"${options.theme.titleFont}", sans-serif`,

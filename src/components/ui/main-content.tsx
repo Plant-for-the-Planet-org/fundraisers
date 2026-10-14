@@ -6,7 +6,7 @@ export function MainContent({ children }: { children: ReactNode }) {
       {/* data-main-content-surface is queried by ThemeShell's blur layer to measure its clip bounds. Don't remove or rename it without updating MainContentBackdropBlur in theme-shell.tsx. */}
       <div
         data-main-content-surface
-        className='max-w-[960px] rounded-2xl w-full mx-auto my-8 px-4 py-4'
+        className='max-w-[var(--page-max,60rem)] rounded-2xl w-full mx-auto my-8 px-4 py-4'
       >
         {children}
       </div>

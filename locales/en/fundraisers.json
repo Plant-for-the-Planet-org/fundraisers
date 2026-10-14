@@ -344,26 +344,20 @@
       "options": {
         "sectionHeading": "Fundraiser Options",
         "status": {
-          "label": "Collect Donations for the Fundraiser",
-          "description": "Enable donation collection and make the fundraiser active"
+          "label": "Go live and start collecting donations",
+          "description": "Off keeps it as a draft. Turn it on when you are ready for donors."
         },
         "visibility": {
           "label": "List this fundraiser publicly",
           "description": "When off, it won't show up in search or on Explore. Anyone with the link can still open it and donate."
         },
-        "addModule": "Add a module",
         "stage": {
           "title": "Stage Mode",
-          "blurb": "Read-only fullscreen display for live events. Donors give via QR; the screen updates in real time.",
           "subtitle": "Show your fundraiser full-screen at concerts, galas, and events",
           "goalHiddenHint": "Stage Mode shows the amount raised, so it needs the goal section. Turn on the Goal switch to use it.",
           "leaderboardOffHint": "Turn on the leaderboard to show recent gifts and top donors on Stage.",
-          "collapse": "Collapse",
-          "expand": "Expand",
           "remove": "Remove Stage Mode",
           "toggleEnabled": "Toggle Stage Mode",
-          "slideCountOne": "1 slide",
-          "slideCountMany": "{count} slides",
           "stageTitle": "Stage title",
           "stageTitlePlaceholder": "Leave blank to use fundraiser title",
           "stageDescription": "Stage description",
@@ -462,6 +456,27 @@
               "tooLong": "Personal message cannot exceed 250 characters"
             }
           }
+        },
+        "previewBadge": "Preview",
+        "previewButtonHint": "This is a preview. It does not take a gift.",
+        "previewHint": "How donors will see it. Type over an amount to change it, and choose which one donors see first. The settings icon changes the rest.",
+        "settings": {
+          "open": "Contribution settings",
+          "preselected": "Preselected",
+          "amountLabel": "Amount {n}",
+          "customTitle": "Other amount",
+          "customSwitch": "Own amount",
+          "customHint": "Lets donors type any amount they like.",
+          "minimum": "Smallest own amount",
+          "minimumHint": "At least {min}.",
+          "frequencyTitle": "Frequency",
+          "frequencyHint": "What donors can choose.",
+          "selectedFirst": "Shown first",
+          "makeFirst": "Show first",
+          "moreTitle": "More",
+          "dedication": "Dedications",
+          "dedicationHint": "Donors can dedicate their gift to someone",
+          "reset": "Reset to defaults"
         }
       }
     },

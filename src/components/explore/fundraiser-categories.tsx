@@ -116,10 +116,10 @@ export async function FundraiserCategories() {
           <li key={category.id}>
             <Link
               href={`/explore/${category.slug}`}
-              className='block rounded-xl bg-background/50 p-4 backdrop-blur-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-background'
+              className='block rounded-xl border border-border/60 bg-card p-4 shadow-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:shadow-sm'
             >
               <div className='flex flex-col items-start space-y-2'>
-                <CategoryIcon category={category} size='compact' />
+                <CategoryIcon category={category} size='compact' tile />
                 <div>
                   <h3 className='font-medium text-foreground mb-0.5'>
                     {category.name}

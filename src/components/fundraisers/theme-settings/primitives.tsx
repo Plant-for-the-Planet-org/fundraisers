@@ -18,15 +18,22 @@ import { ANIMATION_OPTIONS, DECORATIONS, FONT_OPTIONS } from './constants';
 export function ThemeChipRow({
   label,
   children,
+  spread = false,
   ...rest
 }: {
   label: string;
   children: React.ReactNode;
+  /** Spread the choices to both edges, for rows of equal swatches or chips. */
+  spread?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div>
       <SectionHeader showDivider={false}>{label}</SectionHeader>
-      <div className='flex flex-wrap gap-2 mt-2' role='group' {...rest}>
+      <div
+        className={cn('flex flex-wrap gap-2 mt-2', spread && 'justify-between')}
+        role='group'
+        {...rest}
+      >
         {children}
       </div>
     </div>
@@ -43,7 +50,7 @@ export function FontChipRow({
   onChange: (font: FontId) => void;
 }) {
   return (
-    <ThemeChipRow label={label} role='radiogroup'>
+    <ThemeChipRow label={label} role='radiogroup' spread>
       {FONT_OPTIONS.map(font => {
         const active = value === font.id;
         return (
@@ -55,7 +62,7 @@ export function FontChipRow({
             onClick={() => onChange(font.id)}
             title={font.id}
             className={cn(
-              'inline-flex items-center justify-center w-9 h-8 rounded-md border text-foreground font-semibold',
+              'inline-flex flex-1 items-center justify-center h-9 rounded-md border text-foreground font-semibold',
               active
                 ? 'border-foreground'
                 : 'border-border hover:border-foreground/40'
@@ -126,6 +133,7 @@ export function AccentDotRow({
   const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
   return (
     <ThemeChipRow
+      spread
       label={tTheme('labelAccentColor')}
       aria-label={tTheme('labelAccentColor')}
     >

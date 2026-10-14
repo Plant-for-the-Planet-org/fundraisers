@@ -54,7 +54,7 @@ export function LeaderboardView({
         onValueChange={value => setActiveTab(value as 'recent' | 'top')}
       >
         <SectionHeader
-          className='flex-row items-center justify-between'
+          className='flex-row items-center justify-between max-sm:flex-col max-sm:items-start max-sm:gap-2'
           showDivider={false}
           actionSlot={
             shouldShowTabs && (
@@ -69,7 +69,7 @@ export function LeaderboardView({
             )
           }
         >
-          <span className='flex items-center gap-2'>
+          <span className='flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-2'>
             {sectionTitle}
             {demo && (
               <span className='text-xs font-normal text-muted-foreground'>

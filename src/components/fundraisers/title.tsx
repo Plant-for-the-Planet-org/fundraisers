@@ -15,8 +15,12 @@ function resizeToContent(element: HTMLTextAreaElement | null) {
     return;
   }
 
+  // An empty field would otherwise measure one line and clip a placeholder that wraps on narrow screens.
+  const isEmpty = element.value === '';
+  if (isEmpty) element.value = element.placeholder;
   element.style.height = 'auto';
   element.style.height = `${element.scrollHeight}px`;
+  if (isEmpty) element.value = '';
 }
 
 export function Title() {
@@ -79,8 +83,8 @@ function TitleInput({
       <div className='flex items-baseline justify-between gap-2'>
         <label
           htmlFor={inputId}
-          className='text-sm font-medium'
-          style={{ fontFamily: 'var(--theme-title-font)' }}
+          // Same style as the section headings (Goal, Description), so the form's labels match.
+          className='text-heading text-sm font-semibold leading-tight'
         >
           {label}
           <span aria-hidden='true' className='text-destructive ml-0.5'>
@@ -104,7 +108,7 @@ function TitleInput({
         placeholder={placeholder}
         style={{ fontFamily: 'var(--theme-title-font)' }}
         className={cn(
-          'text-4xl font-bold wrap-anywhere',
+          'text-3xl md:text-4xl font-bold leading-tight wrap-anywhere',
           'rounded-none border-0 border-b border-transparent px-0 py-0 shadow-none overflow-hidden',
           'focus-visible:ring-0 focus-visible:border-transparent',
           'aria-invalid:ring-0 aria-invalid:border-b-destructive',

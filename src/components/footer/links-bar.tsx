@@ -12,7 +12,7 @@ export function LinksBar() {
 
   return (
     <nav className='links-bar' aria-label={tAria('legalLinks')}>
-      <ul className='flex flex-wrap items-center justify-center md:justify-start gap-1 text-xs text-muted-foreground list-none p-0 m-0'>
+      <ul className='flex flex-wrap items-center justify-center md:justify-end gap-1 text-xs text-muted-foreground list-none p-0 m-0'>
         {FOOTER_LINKS.map((link, index) => (
           <li key={link.labelKey} className='flex items-center gap-1'>
             {index > 0 && (

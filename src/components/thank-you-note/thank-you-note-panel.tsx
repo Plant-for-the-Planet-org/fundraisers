@@ -49,7 +49,7 @@ export function ThankYouNotePanel() {
   };
 
   return (
-    <div>
+    <div data-focus='thankyou'>
       {/* Header */}
       <label className='flex cursor-pointer items-center justify-between gap-3'>
         <div className='flex min-w-0 flex-col'>

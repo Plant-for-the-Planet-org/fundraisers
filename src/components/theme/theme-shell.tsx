@@ -22,6 +22,7 @@ import {
   MIN_TEXT_CONTRAST,
 } from '@/lib/theme/color-utils';
 import { getFontStack } from '@/lib/theme/font-utils';
+import { getPageMaxForPath } from '@/lib/theme/page-width';
 import { getThemeForPath } from '@/lib/theme/route-themes';
 import { useThemeStore } from '@/stores/theme-store';
 
@@ -30,16 +31,17 @@ const AnimationOverlay = dynamic(() => import('./animation-overlay'), {
 });
 
 // SSR / first-paint approximation for the blur layer, before useLayoutEffect measures the real element.
-// Matches MainContent: 6.5rem top clears header + my-8, max() centers the 60rem column, bottom:0 extends to viewport.
-// Keep in sync with header height and MainContent's max-width.
+// Matches MainContent: 6.5rem top clears header + my-8, max() centers a column as wide as the page's maximum (`getPageMaxForPath`), bottom:0 extends to viewport.
+// Keep in sync with header height.
 // Note: uses top/left/right/bottom positioning instead of clip-path — clip-path with backdrop-filter causes a
 // visible compositing layer border in Chromium (Chrome/Edge) but not in Firefox or Safari.
-const INITIAL_BLUR_STYLE = {
-  top: '6.5rem',
-  bottom: '0',
-  left: 'max(0px, calc((100vw - 60rem) / 2))',
-  right: 'max(0px, calc((100vw - 60rem) / 2))',
-} as React.CSSProperties;
+const initialBlurStyle = (pageMax: string) =>
+  ({
+    top: '6.5rem',
+    bottom: '0',
+    left: `max(0px, calc((100vw - ${pageMax}) / 2))`,
+    right: `max(0px, calc((100vw - ${pageMax}) / 2))`,
+  }) as React.CSSProperties;
 
 // Opacity of the user colour selection (solid or custom gradient) painted as a
 // tint over the mode base layer. Preset gradient classes keep their authored alpha.
@@ -225,13 +227,22 @@ export function ThemeShell({
       {bg.animation !== 'none' && (
         <AnimationOverlay animation={bg.animation} mode={activeTheme.mode} />
       )}
-      {shouldBlurMainContentBackdrop && <MainContentBackdropBlur />}
-      <div className='relative z-10 flex flex-col min-h-screen'>{children}</div>
+      {shouldBlurMainContentBackdrop && (
+        <MainContentBackdropBlur pageMax={getPageMaxForPath(pathname)} />
+      )}
+      <div
+        className='relative z-10 flex flex-col min-h-screen'
+        style={
+          { '--page-max': getPageMaxForPath(pathname) } as React.CSSProperties
+        }
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
-function MainContentBackdropBlur() {
+function MainContentBackdropBlur({ pageMax }: { pageMax: string }) {
   const layerRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -300,7 +311,7 @@ function MainContentBackdropBlur() {
     <div
       ref={layerRef}
       className='fixed z-[6] pointer-events-none backdrop-blur-[10px] rounded-2xl'
-      style={INITIAL_BLUR_STYLE}
+      style={initialBlurStyle(pageMax)}
       aria-hidden
     />
   );

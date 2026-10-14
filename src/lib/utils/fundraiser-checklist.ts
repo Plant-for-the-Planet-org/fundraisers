@@ -17,13 +17,21 @@ export type ChecklistItemId =
   | 'goal'
   | 'published'
   | 'coHost'
+  /** The first share: tell the people who know you. */
+  | 'share'
   | 'firstDonation'
-  | 'share';
+  /** Opens once a few people have given, and stays open until the fundraiser ends. */
+  | 'keepSharing';
 
 export interface ChecklistItem {
   id: ChecklistItemId;
   done: boolean;
+  /** Shown, but not yet open: it unlocks later. */
+  locked?: boolean;
 }
+
+/** How many donors unlock "Keep sharing". The same number lets a story name its donors. */
+export const KEEP_SHARING_MIN_DONORS = 3;
 
 export type ModuleId = 'leaderboard' | 'thankYouNote' | 'stage';
 
@@ -52,10 +60,15 @@ function hasStory(description: string | null): boolean {
   );
 }
 
-/** The steps that most often decide whether a fundraiser gets going, in the order a host would do them. */
+/**
+ * The steps that most often decide whether a fundraiser gets going, in the order a host would do them.
+ * `donorCount` is everyone who has given, or null while it is not known yet; "Keep sharing" stays locked until it reaches `KEEP_SHARING_MIN_DONORS`.
+ */
 export function getFundraiserChecklist(
-  fundraiser: Fundraiser
+  fundraiser: Fundraiser,
+  donorCount: number | null = null
 ): ChecklistItem[] {
+  const concluded = hasFundraiserConcluded(fundraiser);
   return [
     { id: 'coverImage', done: Boolean(fundraiser.image) },
     { id: 'story', done: hasStory(fundraiser.description) },
@@ -66,9 +79,15 @@ export function getFundraiserChecklist(
       done:
         fundraiser.hosts.filter(host => host.status === 'active').length > 1,
     },
+    // Nothing records that a host has shared, so a first gift is the proof that the link reached someone.
+    { id: 'share', done: fundraiser.donationCount > 0 },
     { id: 'firstDonation', done: fundraiser.donationCount > 0 },
-    // Sharing is never finished while people can still give, so it stays open until the fundraiser ends, and always comes last.
-    { id: 'share', done: hasFundraiserConcluded(fundraiser) },
+    // Sharing is never finished while people can still give, so once unlocked it stays open until the fundraiser ends, and always comes last.
+    {
+      id: 'keepSharing',
+      done: concluded,
+      locked: !concluded && (donorCount ?? 0) < KEEP_SHARING_MIN_DONORS,
+    },
   ];
 }
 

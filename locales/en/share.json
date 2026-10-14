@@ -1,6 +1,7 @@
 {
   "Share": {
     "image": {
+      "supporting": "Supporting {count, plural, one {# project} other {# projects}}",
       "byLine": "by {name}",
       "raisedOf": "{raised} raised of {goal}",
       "raised": "{raised} raised",
@@ -20,12 +21,16 @@
       "supportMyFundraiser": "Support my fundraiser",
       "helpUsFinish": "Help us finish",
       "yourTurn": "Your turn",
+      "readMyStory": "Read my story",
+      "seeWhereItGoes": "See where it goes",
       "giftTree": "Gift a tree",
       "protectForest": "Protect a forest",
       "youngVoices": "Give young people a voice",
       "giftForPlanet": "A gift for the planet",
       "treatPlanet": "Treat the planet",
       "celebrateWithMe": "Celebrate with me",
+      "celebrateWithUs": "Celebrate with us",
+      "giveInMemory": "Give in memory",
       "thankYou": "Thank you!",
       "custom": "Write your own…",
       "customLabel": "Your text",
@@ -36,6 +41,10 @@
       "christmas": "This Christmas I'm fundraising for {name}. Want to give a gift that matters? Join me.",
       "halloween": "No tricks, just a treat for the planet: I'm fundraising for {name}. Join me!",
       "birthday": "For my birthday I'm fundraising for {name} instead of gifts. Celebrate with me!",
+      "wedding": "Instead of wedding gifts, we're fundraising for {name}. Celebrate with us!",
+      "inMemory": "In loving memory, I'm fundraising for {name}. You can remember with me by giving a gift.",
+      "earthDay": "This Earth Day I'm fundraising for {name}. Every gift helps nature. Will you join me?",
+      "celebration": "I'm celebrating by fundraising for {name}. Join me!",
       "donor": "I just supported {name}. Will you join me?",
       "supporter": "Please support {name}. Every donation helps!",
       "gift": {
@@ -43,13 +52,148 @@
         "monthly": "I give {amount} every month to \"{name}\". Join me:",
         "yearly": "I give {amount} every year to \"{name}\". Join me:"
       },
-      "concluded": "We did it! Thank you to everyone who gave to {name}."
+      "concluded": "We did it! Thank you to everyone who gave to {name}.",
+      "minimal": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "corporate": "Our team is fundraising for {name}. Join us in making a real impact.",
+      "luxe": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "sport": "I'm taking on a challenge for {name}. Every step counts, and every gift helps. Support me!",
+      "tech": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "pastel": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "love": "I'm fundraising for {name} with lots of love. Will you join me?",
+      "friendship": "My friends and I are fundraising for {name}. Join our circle!",
+      "blossom": "Let's help something beautiful grow: I'm fundraising for {name}. Join me!",
+      "balloons": "Help lift {name} up: I'm fundraising and every gift counts. Join me!",
+      "playful": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "supports": "Your gift supports {projects}.",
+      "festival": "Join us for a good cause: we're raising funds for {name}. Be part of it!",
+      "neon": "I'm fundraising for {name}. Every donation helps. Will you join me?",
+      "classic": "With your kind help, we are raising funds for {name}. We would be grateful for your support."
+    },
+    "cards": {
+      "progress": "Classic",
+      "impact": "Impact",
+      "minimal": "Minimal",
+      "story": "Your words"
+    },
+    "cardHints": {
+      "progress": "Progress ring and donors",
+      "minimal": "Small photo, title and your name",
+      "impact": "The projects your gifts support",
+      "story": "Your line over a large photo"
+    },
+    "hooks": {
+      "none": {
+        "a": "I'm planting trees, and I'd love your help.",
+        "b": "A small gift from you becomes a real tree."
+      },
+      "birthday": {
+        "a": "This birthday I want trees instead of gifts.",
+        "b": "Give me a forest for my birthday."
+      },
+      "wedding": {
+        "a": "Our best gift is a forest that outlives us.",
+        "b": "Instead of gifts, help us plant trees."
+      },
+      "inMemory": {
+        "a": "A tree to remember someone we love.",
+        "b": "Let's plant something that lasts, in their memory."
+      },
+      "earthDay": {
+        "a": "One day, one planet, one tree at a time.",
+        "b": "Earth Day starts with what we plant."
+      },
+      "celebration": {
+        "a": "Something worth celebrating: new trees.",
+        "b": "Celebrate with me, one tree at a time."
+      },
+      "christmas": {
+        "a": "This year, the best gift is a tree.",
+        "b": "A gift that keeps growing for years."
+      },
+      "halloween": {
+        "a": "No tricks, only trees.",
+        "b": "The scariest thing is a planet without forests."
+      },
+      "minimal": {
+        "a": "Small gift. Real trees.",
+        "b": "One simple way to help."
+      },
+      "corporate": {
+        "a": "Our team is planting a forest.",
+        "b": "Let's turn our effort into impact."
+      },
+      "luxe": {
+        "a": "Generosity that grows for generations.",
+        "b": "Make a gift that lasts."
+      },
+      "sport": {
+        "a": "Every kilometre plants a tree.",
+        "b": "I run. You plant. Deal?"
+      },
+      "tech": {
+        "a": "Code is temporary. Forests aren't.",
+        "b": "Let's back something that keeps growing."
+      },
+      "pastel": {
+        "a": "Paint the world a little greener.",
+        "b": "Every tree is a brushstroke."
+      },
+      "love": {
+        "a": "Love grows. So do trees.",
+        "b": "Show some love for the planet."
+      },
+      "friendship": {
+        "a": "Better together: let's plant with friends.",
+        "b": "Friends plant forests."
+      },
+      "blossom": {
+        "a": "Let something beautiful grow.",
+        "b": "Every tree starts as a seed."
+      },
+      "balloons": {
+        "a": "Help me lift this one up.",
+        "b": "Big hopes, light as a balloon."
+      },
+      "playful": {
+        "a": "Let's grow a forest together!",
+        "b": "Tiny seeds, big smiles."
+      },
+      "festival": {
+        "a": "One night. One cause. Let's make it count.",
+        "b": "Turn up the volume for trees."
+      },
+      "neon": {
+        "a": "Plant trees. Be iconic.",
+        "b": "Trees are the new flex."
+      },
+      "classic": {
+        "a": "A gift for generations to come.",
+        "b": "Your kindness will grow for decades."
+      }
     },
     "seasons": {
       "none": "Your theme",
+      "minimal": "Minimal",
+      "corporate": "Corporate",
+      "luxe": "Luxe",
+      "sport": "Sport",
+      "tech": "Tech",
+      "pastel": "Pastel",
+      "love": "Love",
+      "friendship": "Friendship",
+      "blossom": "Blossom",
+      "balloons": "Balloons",
+      "playful": "Playful",
       "christmas": "Christmas",
       "halloween": "Halloween",
-      "birthday": "Birthday"
+      "birthday": "Birthday",
+      "wedding": "Wedding",
+      "inMemory": "In memory",
+      "earthDay": "Earth Day",
+      "celebration": "Celebration",
+      "festival": "Festival",
+      "neon": "Neon",
+      "classic": "Classic"
     },
     "platforms": {
       "other": "Any app",
@@ -64,17 +208,14 @@
     "channels": {
       "instagramStory": {
         "label": "Story",
-        "hint": "Video or image, 9:16",
         "tip": "After posting, add your link with the link sticker."
       },
       "instagramPost": {
         "label": "Post",
-        "hint": "Image or video, 4:5",
         "tip": "Links in Instagram captions are not clickable. Put the link in your bio or a story too."
       },
       "whatsappStatus": {
         "label": "Status",
-        "hint": "Video or image, 9:16",
         "tip": "Add your link as the Status caption so friends can tap it."
       },
       "whatsappMessage": {
@@ -84,76 +225,74 @@
       },
       "tiktokVideo": {
         "label": "Video",
-        "hint": "Video or image, 9:16",
         "tip": "Links in TikTok captions are not clickable. Add your link to your bio."
       },
       "youtubeShort": {
         "label": "Short",
-        "hint": "Video, 9:16",
+        "hint": "Video",
         "tip": "Add your link to the Short description, or pin it as a comment."
       },
       "linkedinPost": {
         "label": "Post",
-        "hint": "Image, 4:5",
+        "hint": "Image",
         "tip": "Put the link in your post text so people can tap it."
       },
       "linkedinWide": {
         "label": "Wide post",
-        "hint": "Image or video, 1.91:1",
         "tip": "Put the link in your post text so people can tap it."
       },
       "facebookPost": {
         "label": "Post",
-        "hint": "Image or video, 4:5",
         "tip": "Put the link in your post text so people can tap it."
       },
       "facebookStory": {
         "label": "Story",
-        "hint": "Video or image, 9:16",
         "tip": "After posting, add your link with the link sticker."
       },
       "xPost": {
         "label": "Post",
-        "hint": "Image or video, 16:9",
         "tip": "Put the link in your post text so people can tap it."
       },
       "xTallPost": {
         "label": "Tall post",
-        "hint": "Image, 4:5",
+        "hint": "Image",
         "tip": "Put the link in your post text so people can tap it."
       },
       "newsletter": {
         "label": "Newsletter",
-        "hint": "Banner, 1.91:1",
+        "hint": "Banner",
         "tip": "Add the banner at the top of your email and link it to your fundraiser."
       },
       "anyStory": {
         "label": "Story",
-        "hint": "Video or image, 9:16",
         "tip": "Add your link wherever the app allows."
       },
       "anyPost": {
         "label": "Post",
-        "hint": "Image, 4:5",
+        "hint": "Image",
         "tip": "Put the link in your post text so people can tap it."
       }
     },
     "studio": {
       "whereTitle": "Where are you sharing?",
-      "whereHint": "We make the right size, with a link that shows which channel brought donations.",
+      "whereHint": "We make the right size for each app.",
+      "moreOptions": "Customize image",
       "platformLabel": "Platform",
       "formatLabel": "Format",
-      "customizeTitle": "Make it yours",
-      "customizeHint": "Colors and fonts come from your fundraiser theme.",
       "style": "Style",
       "buttonText": "Button text",
       "showDonors": "Show donors who gave",
-      "donorsUnavailable": "Shown when at least 3 donors are public and the leaderboard is on.",
-      "captionTitle": "Caption",
-      "captionHint": "Copied with your link when you share. Edit it if you like.",
-      "captionHintLinkAlone": "For this format we copy only your link when you share. Use Copy to get the text too.",
+      "donorsOff": "Donors are hidden by your leaderboard settings. <settings>Change them</settings>.",
+      "donorsFew": "{count, plural, =0 {No public donors yet.} other {# of 3 public donors so far.}} Once 3 have given, your story can name them and the Share tab gets a dot.",
       "linkLabel": "Your link",
-      "copy": "Copy",
+      "linkTitle": "Your link",
+      "linkHint": "Stories can't carry text. Add this link as a sticker, or put it in your bio.",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "postTextTitle": "Post text",
+      "postTextHint": "Edit it if you like. We add your link when you copy.",
+      "copyTextAndLink": "Copy text and link",
+      "copyLinkOnly": "Copy link only",
       "captionCopied": "Text and link copied",
       "copyFailed": "Could not copy",
       "kindLabel": "Image or video",
@@ -162,6 +301,19 @@
       "videoMeta": "Video, {seconds} s · {width}×{height}",
       "imageMeta": "Image · {width}×{height}",
       "previewLabel": "Preview",
+      "showProjects": "Show projects",
+      "hooksLabel": "Ideas for your line",
+      "cardLabel": "Card design",
+      "storyEmpty": "Your fundraiser has no story yet. Write one on its page, or add your own line above.",
+      "noteLabel": "Your own line",
+      "notePlaceholder": "Why this fundraiser matters to you",
+      "showAmounts": "Show amounts",
+      "showHost": "Show my name",
+      "showOnImage": "On the image",
+      "kitHint": "Need every size at once? Get the Story, Post and Wide images in one file.",
+      "phoneTitle": "Share from your phone",
+      "phoneHint": "Scan to open this on your phone, then tap Share.",
+      "phoneQrLabel": "QR code that opens this share page on your phone",
       "preparing": "Preparing…",
       "preparingVideo": "Preparing video… {percent}%",
       "renderFailed": "Try again",

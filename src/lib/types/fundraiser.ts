@@ -15,6 +15,7 @@ export interface ContributionOption {
 
 export interface ContributionModuleSettings {
   recurrency_options?: RecurrencyType[];
+  default_recurrency?: RecurrencyType;
   options?: ContributionOption[];
   allow_dedication?: boolean;
   allow_recurrency?: boolean;
@@ -134,13 +135,23 @@ export interface FundraiserSettings {
     };
     thankYouNote?: ThankYouNoteModuleSettings | null;
     contribution?: {
+      /**
+       * The amounts a donor can pick, in whole currency units; an option with no `unit` is the custom amount.
+       * Empty means the platform's own amounts. `default` marks the preselected amount; `min` on the custom option is its smallest amount.
+       */
       options: Array<{
         unit?: number;
         label?: string | null;
         sub_label?: string | null;
+        default?: boolean;
+        min?: number;
       }>;
       allow_dedication: boolean;
       allow_recurrency: boolean;
+      /** The frequencies on offer; absent means all the platform supports. */
+      recurrency_options?: RecurrencyType[];
+      /** The frequency selected to begin with. */
+      default_recurrency?: RecurrencyType;
     };
     donor_score?: DonorScoreModuleSettings;
     projects_supported?: {

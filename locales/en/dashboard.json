@@ -8,8 +8,6 @@
       "label": "Dashboard menu",
       "overview": "Overview",
       "fundraisers": "Fundraisers",
-      "collapse": "Collapse menu",
-      "expand": "Expand menu",
       "insights": "Insights"
     },
     "overview": {
@@ -51,7 +49,9 @@
         "overview": "Overview",
         "donors": "Donors",
         "insights": "Insights",
-        "share": "Share"
+        "share": "Share",
+        "stage": "Stage Mode",
+        "shareNew": "There is news to share"
       },
       "stats": {
         "raised": "Raised",
@@ -92,7 +92,7 @@
           "taggedTitle": "From your tagged links",
           "direct": "Direct or apps",
           "noData": "No data for this period.",
-          "builderTitle": "Share your fundraiser",
+          "otherPlaces": "Need a link for email, a newsletter or another place?",
           "builderHint": "Use a different link for each place you share it. Insights then shows which one brings visitors.",
           "linkCopied": "Link for {source} copied",
           "linkCopyError": "Could not copy link",
@@ -159,6 +159,16 @@
           "campaignTotal": "Campaign total"
         }
       },
+      "stageLink": {
+        "title": "Stage Mode link",
+        "hint": "Show your fundraiser on a big screen at an event. Open this link on the screen. Donors give by QR code, and the screen updates live.",
+        "label": "Stage Mode link",
+        "copy": "Copy",
+        "copied": "Stage Mode link copied",
+        "copyError": "Could not copy the link",
+        "open": "Open",
+        "off": "Stage Mode is off for this fundraiser."
+      },
       "checklist": {
         "title": "Make it a success",
         "progress": "{done, number} of {total, number} done",
@@ -171,7 +181,7 @@
           },
           "story": {
             "title": "Tell your story",
-            "hint": "Say why this matters to you, in a few honest lines. A photo or video helps people feel it."
+            "hint": "People give to people. Tell them why this matters to you, in your own words, and add a photo or video if you can. A story from the heart is what turns a visitor into a donor."
           },
           "goal": {
             "title": "Set a goal",
@@ -185,19 +195,25 @@
             "title": "Invite a co-host",
             "hint": "More people sharing the link means more friends see it."
           },
+          "share": {
+            "title": "Share your fundraiser",
+            "hint": "Your fundraiser starts with the people who know you. Share it with friends and family: the Share tab has an image or video ready for every place you post."
+          },
           "firstDonation": {
             "title": "Welcome the first donation",
             "hint": "Ask a close friend or family member first. Early gifts build trust."
           },
-          "share": {
+          "keepSharing": {
             "title": "Keep sharing",
-            "hint": "Each share brings new people. Stories, posts and a link for every place you share are ready in the Share tab."
+            "hint": "Your first donors are in. Your story can name them now, and the amount has grown, so each share is new. Share it again."
           }
         },
         "invite": "Invite",
         "share": "Share",
         "showDone": "Show {count, number} done",
-        "hideDone": "Hide done"
+        "hideDone": "Hide done",
+        "locked": "Locked",
+        "lockedHint": "Unlocks when {needed, number} people have given. {count, number} so far."
       },
       "hosts": {
         "invite": "Invite co-host"
@@ -238,6 +254,23 @@
         "range": "{from, number}–{to, number} of {total, number}",
         "newestFirst": "Newest first",
         "oldestFirst": "Oldest first"
+      },
+      "reshare": {
+        "goal": {
+          "title": "You reached your goal!",
+          "body": "What a moment. Thank everyone who helped, and share the news. Your story shows the new total.",
+          "action": "Share the news"
+        },
+        "progress": {
+          "title": "You are at {percent, number}% of your goal",
+          "body": "Each update gives people a reason to look again. Share your progress: your story always shows the latest amount.",
+          "action": "Share my progress"
+        },
+        "donors": {
+          "title": "Your donors can now be on your story",
+          "body": "{count, plural, one {# person has} other {# people have}} given. Refresh your story so it shows them, then share it again.",
+          "action": "Refresh my story"
+        }
       }
     },
     "manageFundraisers": {
@@ -304,6 +337,7 @@
     "actions": {
       "menuLabel": "Open actions",
       "viewPage": "View page",
+      "publish": "Go live",
       "edit": "Edit",
       "clone": "Duplicate",
       "stageMode": "Stage Mode",
@@ -314,14 +348,23 @@
       "delete": "Delete",
       "pauseSuccess": "Fundraiser paused",
       "resumeSuccess": "Fundraiser resumed",
+      "publishSuccess": "Your fundraiser is live",
       "deleteSuccess": "Fundraiser deleted",
-      "mutationError": "Something went wrong. Try again."
+      "mutationError": "Something went wrong. Try again.",
+      "publishErrorTitle": "Could not go live",
+      "publishErrorDescription": "Open the editor to check that everything is filled in, then try again."
     },
     "deleteDialog": {
       "title": "Delete fundraiser?",
       "description": "Are you sure you want to delete this fundraiser? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "goLiveDialog": {
+      "title": "Go live?",
+      "description": "Your fundraiser becomes public and people can start giving. You can pause it at any time.",
+      "cancel": "Cancel",
+      "confirm": "Go live"
     },
     "cloneDialog": {
       "title": "Duplicate fundraiser",

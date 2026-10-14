@@ -1,3 +1,4 @@
+import type { FontId } from '@/lib/theme/types';
 import type { ShareFormatId } from '../formats';
 import type { SeasonId } from './seasons';
 import type { ShareBackground } from './theme-background';
@@ -32,12 +33,40 @@ export interface ShareRenderData {
   firstLine: string | null;
   /** Replaces the percentage in the ring's badge, such as "New" before anyone has given. */
   badge: string | null;
+  /** The host's own line, under the host name: why this fundraiser matters to them. Wrapped to three lines. */
+  note?: string | null;
+  /**
+   * The Impact card's content: how many projects the fundraiser supports, and their names (at most five).
+   * It carries no shares or amounts: the card is about the impact being made, not how the gifts are split.
+   * Null leaves it out. The link preview never sets it.
+   */
+  impact?: {
+    label: string;
+    names: readonly string[];
+    /** How many more projects there are than names. */
+    more: number;
+  } | null;
   cta: string;
   /** The fundraiser has ended: confetti falls, whatever the style, and the button thanks people. */
   concluded: boolean;
   /** Shown under the button, without the protocol. */
   url: string;
 }
+
+/**
+ * What a share image is built around.
+ * `progress` is the ring and the donors: the link preview and the donor's thank-you use it.
+ * `impact` is the ring and where the money goes, as a bar for each project.
+ * `minimal` is a small photo, the title and a thin bar: sparse and sophisticated.
+ * `story` is a large photo, shown whole, with the host's own words.
+ */
+export const SHARE_CARD_IDS = [
+  'progress',
+  'impact',
+  'minimal',
+  'story',
+] as const;
+export type ShareCardId = (typeof SHARE_CARD_IDS)[number];
 
 export interface ShareRenderTheme {
   accent: string;
@@ -46,6 +75,8 @@ export interface ShareRenderTheme {
   titleFont: string;
   bodyFont: string;
   season: SeasonId;
+  /** Defaults to `progress`. */
+  card?: ShareCardId;
 }
 
 export interface ShareRenderOptions {
@@ -55,6 +86,8 @@ export interface ShareRenderOptions {
   photo: ShareImage | null;
   /** The fundraiser page's own background. Without it, the image uses a wash of the accent. */
   background?: ShareBackground | null;
+  /** One picture per project in `data.impact.names`, in the same order: the project's own, or null for none. Without any, the chips carry a plain mark instead. */
+  projectImages?: ReadonlyArray<ShareImage | null> | null;
   /** One image per donor in `data.donors`: their photo, or the app's generated avatar. */
   avatars?: Array<ShareImage | null> | null;
   /** Pixel density: the canvas is `scale` times the format's size. Images export at 2 for sharp text; video stays at 1. */
@@ -100,10 +133,12 @@ export interface FrameContext {
   t: number;
   P: Palette;
   season: Season;
+  card: ShareCardId;
   data: ShareRenderData;
   photo: ShareImage | null;
   background: ShareBackground | null;
   avatars: Array<ShareImage | null>;
+  projectImages: ReadonlyArray<ShareImage | null>;
   dark: boolean;
   fonts: Fonts;
   /** The widest the button may grow, set by the layout before it draws the button. */
@@ -128,6 +163,10 @@ export interface TickOptions {
 
 /** A seasonal look: an optional palette and drawing hooks. The plain theme is a season with no hooks. */
 export interface Season {
+  /** A look's own typefaces, in place of the fundraiser page's. The studio resolves them in the browser; the link preview never uses a look. */
+  fonts?: { title: FontId; body: FontId };
+  /** Draws the name in capitals. */
+  uppercaseTitle?: boolean;
   palette?: () => Palette;
   background?: (g: Ctx, w: number, h: number, t: number) => void;
   ticks?: (g: Ctx, options: TickOptions) => void;

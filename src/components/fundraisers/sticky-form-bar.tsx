@@ -29,7 +29,8 @@ export function StickyFormBar({ children }: { children: React.ReactNode }) {
       >
         <div
           className={cn(
-            isStuck && 'max-w-[960px] w-full mx-auto px-4 flex justify-end'
+            isStuck &&
+              'max-w-[var(--page-max,60rem)] w-full mx-auto px-4 flex justify-end'
           )}
         >
           {children}

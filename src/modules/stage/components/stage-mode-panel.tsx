@@ -14,7 +14,6 @@ import {
 import { useTranslations } from 'next-intl';
 import {
   ChevronDown,
-  ChevronRight,
   ChevronUp,
   Clock,
   Eye,
@@ -23,7 +22,6 @@ import {
   Plus,
   Sparkles,
   Trash2,
-  X,
 } from 'lucide-react';
 import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import { Button } from '@/components/ui/button';
@@ -36,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { routing } from '@/i18n/routing';
 import { STAGE_LIMITS } from '../constants';
@@ -78,9 +75,9 @@ function CharCount({ current, max }: { current: number; max: number }) {
   );
 }
 
-export function StageModePanel({ onRemove }: { onRemove: () => void }) {
+/** The details of Stage Mode, shown under its switch in the options while it is on. */
+export function StageModePanel() {
   const t = useTranslations('Fundraisers.form.options.stage');
-  const [expanded, setExpanded] = useState(true);
 
   const { control, register, getValues, setValue } =
     useFormContext<FundraiserFormValues>();
@@ -219,60 +216,6 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
 
   return (
     <div>
-      {/* Header */}
-      <div className='flex items-center gap-3 pb-3'>
-        <button
-          type='button'
-          onClick={() => setExpanded(v => !v)}
-          aria-label={expanded ? t('collapse') : t('expand')}
-          aria-expanded={expanded}
-          className='text-muted-foreground hover:text-foreground transition-colors'
-        >
-          <ChevronRight
-            size={16}
-            className='transition-transform duration-150'
-            style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
-          />
-        </button>
-
-        <div className='flex-1 min-w-0'>
-          <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold'>{t('title')}</span>
-            <span className='text-[10px] font-bold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded'>
-              {slideCount === 1
-                ? t('slideCountOne')
-                : t('slideCountMany', { count: String(slideCount) })}
-            </span>
-          </div>
-          <p className='text-xs text-muted-foreground mt-0.5'>
-            {t('subtitle')}
-          </p>
-        </div>
-
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon'
-          className='size-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10'
-          onClick={onRemove}
-          aria-label={t('remove')}
-        >
-          <X size={14} />
-        </Button>
-
-        <Controller
-          control={control}
-          name='settings.modules.stage.enabled'
-          render={({ field }) => (
-            <Switch
-              checked={field.value ?? true}
-              onCheckedChange={field.onChange}
-              aria-label={t('toggleEnabled')}
-            />
-          )}
-        />
-      </div>
-
       {stageOn && !goalSectionOn && (
         <div className='mb-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20'>
           <Info className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
@@ -287,7 +230,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
         </div>
       )}
 
-      {expanded && (
+      <>
         <div className='mb-3 rounded-lg bg-white dark:bg-background p-4 flex flex-col gap-4'>
           {/* Stage title */}
           <div className='flex flex-col gap-1.5'>
@@ -460,7 +403,7 @@ export function StageModePanel({ onRemove }: { onRemove: () => void }) {
             </div>
           </div>
         </div>
-      )}
+      </>
 
       <StageSlideTemplatesDialog
         open={templatesOpen}

@@ -6,6 +6,7 @@ import {
   FundraiserHostsCard,
   FundraiserModulesCard,
   FundraiserPerformance,
+  ReshareMomentCard,
   useCanEditFundraiser,
   useFundraiserDetail,
   useLeaderboardSummary,
@@ -20,6 +21,7 @@ export default function FundraiserDetailOverviewPage() {
 
   return (
     <div className='space-y-6'>
+      <ReshareMomentCard fundraiser={fundraiser} />
       <FundraiserPerformance
         fundraiser={fundraiser}
         donorCount={data?.donorCount ?? null}
@@ -28,6 +30,7 @@ export default function FundraiserDetailOverviewPage() {
         fundraiser={fundraiser}
         canEdit={canEdit}
         onInviteCoHost={() => setHostsDialogOpen(true)}
+        donorCount={data?.donorCount ?? null}
       />
       <FundraiserHostsCard
         fundraiser={fundraiser}

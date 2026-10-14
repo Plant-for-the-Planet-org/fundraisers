@@ -43,15 +43,21 @@ function fundraiser({
   image = 'cover.jpg',
   leaderboard = shownBoard,
   theme,
+  projects = [],
 }: {
   slug?: string;
   image?: string | null;
   leaderboard?: Record<string, unknown>;
   theme?: Record<string, unknown>;
+  projects?: Array<{ id: string; image: string }>;
 } = {}): Fundraiser {
   return {
     slug,
     image,
+    projectAllocations: projects.map(project => ({
+      percentage: 50,
+      project: { ...project, name: project.id, description: '' },
+    })),
     settings: { modules: { leaderboard }, theme },
   } as unknown as Fundraiser;
 }
@@ -347,6 +353,94 @@ describe('GET /api/share/photo/[slug]: donor photos', () => {
 
     expect((await get('?donor=d1')).status).toBe(404);
     expect(calls).toEqual([]);
+  });
+});
+
+describe('GET /api/share/photo/[slug]: project pictures', () => {
+  const projectImage = (file: string) => `${CDN}/project/small/${file}`;
+  const withProjects = (
+    projects: Array<{ id: string; image: string }>,
+    slug = SLUG
+  ) =>
+    vi
+      .mocked(getCachedFundraiser)
+      .mockResolvedValue(fundraiser({ slug, projects }));
+
+  it('serves the picture of a project the fundraiser supports', async () => {
+    withProjects([{ id: 'proj_1', image: 'yucatan.jpg' }]);
+    const calls = mockFetch({
+      [projectImage('yucatan.jpg')]: () => image('image/jpeg'),
+    });
+    const response = await get('?project=proj_1');
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('image/jpeg');
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(response.headers.get('content-security-policy')).toBe(
+      "default-src 'none'; sandbox"
+    );
+    expect(calls).toEqual([projectImage('yucatan.jpg')]);
+  });
+
+  it('serves a project of a draft to its host', async () => {
+    vi.mocked(getCachedFundraiser).mockRejectedValue(new Error('404'));
+    vi.mocked(getFundraisers).mockResolvedValue([
+      fundraiser({ projects: [{ id: 'proj_1', image: 'yucatan.jpg' }] }),
+    ]);
+    mockFetch({ [projectImage('yucatan.jpg')]: () => image('image/jpeg') });
+
+    expect(
+      (await get('?project=proj_1', { authorization: 'Bearer host-token' }))
+        .status
+    ).toBe(200);
+  });
+
+  it('answers 404 for a project this fundraiser does not support', async () => {
+    withProjects([{ id: 'proj_1', image: 'yucatan.jpg' }]);
+    const calls = mockFetch({});
+
+    expect((await get('?project=proj_other')).status).toBe(404);
+    expect(calls).toEqual([]);
+  });
+
+  it('never fetches a URL named in the request', async () => {
+    withProjects([{ id: 'proj_1', image: 'yucatan.jpg' }]);
+    const calls = mockFetch({});
+    const url = encodeURIComponent('https://images.unsplash.com/evil.jpg');
+
+    expect((await get(`?project=${url}`)).status).toBe(404);
+    expect(calls).toEqual([]);
+  });
+
+  it('answers 404 for a project with no picture', async () => {
+    withProjects([{ id: 'proj_1', image: '' }]);
+    const calls = mockFetch({});
+
+    expect((await get('?project=proj_1')).status).toBe(404);
+    expect(calls).toEqual([]);
+  });
+
+  it('never downloads a project picture on a host off the server list', async () => {
+    withProjects([{ id: 'proj_1', image: ELB }]);
+    const calls = mockFetch({});
+
+    expect((await get('?project=proj_1')).status).toBe(502);
+    expect(calls).toEqual([]);
+  });
+
+  it('never passes on an SVG', async () => {
+    withProjects([{ id: 'proj_1', image: 'logo.svg' }]);
+    mockFetch({
+      [projectImage('logo.svg')]: () =>
+        image(
+          'image/svg+xml',
+          '<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"/>'
+        ),
+    });
+    const response = await get('?project=proj_1');
+
+    expect(response.status).toBe(502);
+    expect(await response.text()).not.toContain('<svg');
   });
 });
 

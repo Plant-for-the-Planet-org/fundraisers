@@ -3,11 +3,16 @@
 import type { SeasonId } from '@/lib/share/render/seasons';
 import type { ShareBackground } from '@/lib/share/render/theme-background';
 import type {
+  ShareCardId,
   ShareImage,
   ShareRenderData,
   ShareRenderTheme,
 } from '@/lib/share/render/types';
-import type { ShareDonors, ShareGift } from '@/lib/share/share-data';
+import type {
+  ShareDonorProgress,
+  ShareDonors,
+  ShareGift,
+} from '@/lib/share/share-data';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 import type { ProjectPurpose } from '@/lib/types/project-selection';
 
@@ -22,13 +27,19 @@ import {
 } from '@/lib/share/fonts';
 import { displayUrl } from '@/lib/share/links';
 import { loadShareAvatars } from '@/lib/share/render/avatars';
+import { SEASONS } from '@/lib/share/render/seasons';
 import {
   loadShareBackgroundAssets,
   resolveShareBackground,
 } from '@/lib/share/render/theme-background';
 import {
   buildShareRenderData,
+  getShareDonorProgress,
+  getShareProjectList,
+  IMPACT_NAMES,
   pickShareDonors,
+  previewDonorProgress,
+  previewLeaderboard,
   SHARE_LEADERBOARD_LIMIT,
 } from '@/lib/share/share-data';
 import { getAccentColor } from '@/lib/theme/accent-utils';
@@ -74,32 +85,49 @@ function useSharePhoto(
 }
 
 /** Public donors for the avatar row, by the public page's rules. */
-function useShareDonors(
-  fundraiser: Fundraiser
-): ShareDonors | null | undefined {
-  const [donors, setDonors] = useState<{
+function useShareDonors(fundraiser: Fundraiser): {
+  /** Undefined while loading, null when no donor may be named. */
+  donors: ShareDonors | null | undefined;
+  /** Undefined while loading. */
+  progress: ShareDonorProgress | undefined;
+} {
+  const [loaded, setLoaded] = useState<{
     slug: string;
     value: ShareDonors | null;
+    progress: ShareDonorProgress;
   } | null>(null);
   useEffect(() => {
     let ignore = false;
-    getLeaderboard(fundraiser.slug, SHARE_LEADERBOARD_LIMIT)
+    // A development server can stand in made-up donors (`?donors=4`), to see a story with donors before anyone has given.
+    const previewBoard = previewLeaderboard(window.location.search);
+    (previewBoard
+      ? Promise.resolve(previewBoard)
+      : getLeaderboard(fundraiser.slug, SHARE_LEADERBOARD_LIMIT)
+    )
       .then(board => {
         if (!ignore)
-          setDonors({
+          setLoaded({
             slug: fundraiser.slug,
             value: pickShareDonors(fundraiser, board),
+            progress:
+              previewDonorProgress(window.location.search) ??
+              getShareDonorProgress(fundraiser, board),
           });
       })
       .catch(() => {
-        if (!ignore) setDonors({ slug: fundraiser.slug, value: null });
+        if (!ignore)
+          setLoaded({
+            slug: fundraiser.slug,
+            value: null,
+            progress: getShareDonorProgress(fundraiser, null),
+          });
       });
     return () => {
       ignore = true;
     };
   }, [fundraiser]);
-  // Undefined while loading, null when no donor may be named.
-  return donors?.slug === fundraiser.slug ? donors.value : undefined;
+  const current = loaded?.slug === fundraiser.slug ? loaded : null;
+  return { donors: current?.value, progress: current?.progress };
 }
 
 /** The host's token and any impersonation, for our routes that serve a draft's images. */
@@ -195,6 +223,52 @@ function useShareAvatars(
     : undefined;
 }
 
+/**
+ * The picture of each project the Impact card names, in the order of `getShareProjectList`.
+ * Undefined while they load; null when the card does not need them or no project has one.
+ * A project with no picture, or whose picture fails to load, is null in its place and shows a plain mark.
+ */
+function useProjectImages(
+  fundraiser: Fundraiser,
+  enabled: boolean,
+  headers: Record<string, string>
+): Array<ShareImage | null> | null | undefined {
+  const slug = fundraiser.slug;
+  const projects = useMemo(
+    () => getShareProjectList(fundraiser).slice(0, IMPACT_NAMES),
+    [fundraiser]
+  );
+  const wanted = enabled && projects.some(project => project.hasImage);
+  const key = `${slug}|${projects.map(p => `${p.id}${p.hasImage ? '+' : '-'}`).join(',')}`;
+  const [loaded, setLoaded] = useState<{
+    key: string;
+    images: Array<ShareImage | null>;
+  } | null>(null);
+  useEffect(() => {
+    if (!wanted) return;
+    let ignore = false;
+    Promise.all(
+      projects.map(project =>
+        project.hasImage
+          ? fetchImage(
+              `/api/share/photo/${encodeURIComponent(slug)}?project=${encodeURIComponent(project.id)}`,
+              headers
+            ).catch(() => null)
+          : null
+      )
+    ).then(images => {
+      if (!ignore) setLoaded({ key, images });
+    });
+    return () => {
+      ignore = true;
+    };
+    // `key` stands for `projects` and `slug`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wanted, key, headers]);
+  if (!wanted) return null;
+  return loaded?.key === key ? loaded.images : undefined;
+}
+
 /** How long a file waits for the photo and donors before it is made without the ones still loading. */
 const SETTLE_TIMEOUT_MS = 2500;
 
@@ -286,6 +360,11 @@ export function useShareRender({
   showDonors,
   gift = null,
   showGift = true,
+  note = null,
+  showAmounts = true,
+  showHost = true,
+  card = 'progress',
+  showProjects = false,
 }: {
   fundraiser: Fundraiser;
   season: SeasonId;
@@ -295,26 +374,42 @@ export function useShareRender({
   gift?: ShareGift | null;
   /** Puts the gift on its own line under the amount. */
   showGift?: boolean;
+  /** The host's own line on the image. */
+  note?: string | null;
+  showAmounts?: boolean;
+  showHost?: boolean;
+  card?: ShareCardId;
+  /** Names the supported projects on the image. */
+  showProjects?: boolean;
 }): {
   data: ShareRenderData;
   theme: ShareRenderTheme;
   photo: ShareImage | null;
   background: ShareBackground | null;
   avatars: ShareImage[] | null;
+  /** The pictures of the projects on the Impact card, in order; null when there are none to show. */
+  projectImages: Array<ShareImage | null> | null;
   /** The fonts and the background are loaded, so the preview can draw. */
   ready: boolean;
   /** The photo, the donors and their avatars have loaded or failed, or waited long enough. Files wait for this, so a quick tap never shares a picture with a plain circle where the photo goes. */
   settled: boolean;
   /** False once it is known that no donor may be named; see pickShareDonors. */
   donorsAvailable: boolean;
+  /** Why donors can or cannot be named, and how many are public so far. Undefined while loading. */
+  donorProgress: ShareDonorProgress | undefined;
 } {
   const locale = useLocale();
   const t = useTranslations('Share');
   const origin = useOrigin();
   const headers = useShareHeaders();
   const photo = useSharePhoto(fundraiser.slug, headers);
-  const donors = useShareDonors(fundraiser);
+  const { donors, progress: donorProgress } = useShareDonors(fundraiser);
   const background = useShareBackground(fundraiser, headers);
+  const projectImages = useProjectImages(
+    fundraiser,
+    showProjects && card === 'impact',
+    headers
+  );
 
   const built = buildTheme(fundraiser.settings?.theme);
   const avatars = useShareAvatars(
@@ -323,15 +418,19 @@ export function useShareRender({
     built.mode === 'dark',
     headers
   );
+  // A look brings its own typefaces; every other style keeps the fundraiser page's.
+  const lookFonts = SEASONS[season].fonts;
+  const titleFontId = lookFonts?.title ?? built.titleFont;
+  const bodyFontId = lookFonts?.body ?? built.bodyFont;
   const [titleFont, bodyFont] = useMemo(
     () =>
       typeof document === 'undefined'
         ? ['sans-serif', 'sans-serif']
         : [
-            resolveBrowserFontFamily(built.titleFont),
-            resolveBrowserFontFamily(built.bodyFont),
+            resolveBrowserFontFamily(titleFontId),
+            resolveBrowserFontFamily(bodyFontId),
           ],
-    [built.titleFont, built.bodyFont]
+    [titleFontId, bodyFontId]
   );
   const fontsReady = useFontsReady([titleFont, bodyFont]);
 
@@ -342,8 +441,9 @@ export function useShareRender({
       titleFont,
       bodyFont,
       season,
+      card,
     }),
-    [built.accent, built.mode, titleFont, bodyFont, season]
+    [built.accent, built.mode, titleFont, bodyFont, season, card]
   );
 
   const data = useMemo(
@@ -366,12 +466,33 @@ export function useShareRender({
           started: () => t('image.started'),
           first: () => t('image.first'),
           newBadge: () => t('image.newBadge'),
+          supporting: count => t('image.supporting', { count }),
           gift: (amount, frequency) => t(`image.gift.${frequency}`, { amount }),
         },
         gift,
         showGift,
+        note,
+        showAmounts,
+        showHost,
+        card,
+        showProjects,
       }),
-    [fundraiser, locale, donors, showDonors, cta, t, origin, gift, showGift]
+    [
+      fundraiser,
+      locale,
+      donors,
+      showDonors,
+      cta,
+      t,
+      origin,
+      gift,
+      showGift,
+      note,
+      showAmounts,
+      showHost,
+      card,
+      showProjects,
+    ]
   );
 
   const timedOut = useSettleTimeout(fundraiser.slug);
@@ -379,7 +500,8 @@ export function useShareRender({
     timedOut ||
     (photo !== undefined &&
       donors !== undefined &&
-      (!showDonors || donors === null || avatars !== undefined));
+      (!showDonors || donors === null || avatars !== undefined) &&
+      projectImages !== undefined);
 
   return {
     data,
@@ -388,9 +510,12 @@ export function useShareRender({
     background,
     // Off, the avatars stay out of the options, so their late arrival does not make the file again.
     avatars: showDonors ? (avatars ?? null) : null,
+    // Still loading counts as none, so a late arrival makes the file again rather than blocking the preview.
+    projectImages: projectImages ?? null,
     // The background is part of the look; wait for it like the fonts. The photo and avatars fill in the preview when they load.
     ready: fontsReady && background !== null,
     settled,
     donorsAvailable: donors !== null,
+    donorProgress,
   };
 }

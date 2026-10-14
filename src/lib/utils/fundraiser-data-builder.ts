@@ -37,6 +37,14 @@ function isLeaderboardDirty(dirty: UpdateDirtyFields): boolean {
   return Object.values(leaderboard).some(Boolean);
 }
 
+function isContributionDirty(dirty: UpdateDirtyFields): boolean {
+  const contribution = dirty.settings?.modules?.contribution;
+  if (!contribution) return false;
+  if (typeof contribution === 'boolean') return contribution;
+  // The options are a list, so a change anywhere in it counts.
+  return JSON.stringify(contribution).includes('true');
+}
+
 function isBundleDirty(dirty: UpdateDirtyFields): boolean {
   const bundle = dirty.settings?.modules?.bundle;
   if (!bundle) return false;
@@ -148,6 +156,7 @@ export function buildUpdateFundraiserRequest(
     isStageDirty(dirtyFields) ||
     isThankYouNoteDirty(dirtyFields) ||
     isBundleDirty(dirtyFields) ||
+    isContributionDirty(dirtyFields) ||
     isDonorScoreDirty(dirtyFields);
 
   if (isSettingsDirty) {
@@ -170,6 +179,8 @@ export function buildUpdateFundraiserRequest(
             }
           : values.settings.modules.stage, // null = removed; pass through unchanged
         thankYouNote: values.settings.modules.thankYouNote,
+        // Replaced as a whole, so a host who resets to the platform's amounts also drops the frequencies they had chosen.
+        contribution: values.settings.modules.contribution,
         donor_score: values.settings.modules.donor_score,
       },
     };
@@ -200,6 +211,7 @@ export function buildCreateFundraiserRequest(
         bundle: values.settings.modules.bundle,
         stage: values.settings.modules.stage,
         thankYouNote: values.settings.modules.thankYouNote,
+        contribution: values.settings.modules.contribution,
         donor_score: values.settings.modules.donor_score,
       },
     },

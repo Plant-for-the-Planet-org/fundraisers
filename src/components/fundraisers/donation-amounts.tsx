@@ -4,13 +4,26 @@ import type { ContributionOption } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Check, X } from 'lucide-react';
+import { Check, Pencil, X } from 'lucide-react';
 import { DEFAULT_MIN_CENTS } from '@/lib/constants/donation';
 import { cn } from '@/lib/utils/cn';
 import { formatCurrency, getCurrencySymbol } from '@/lib/utils/currency';
 import { Button } from '@/components/ui/button';
 
+/** Lets a host change the preset amounts right in the tiles, in the form's preview. The set stays the same size: amounts can be changed, never added or removed. */
+export interface AmountEditor {
+  /** What each tile shows, in whole currency units, as the host is typing it. */
+  values: string[];
+  /** The tile that is shown first. */
+  selectedIndex: number;
+  onSelect: (index: number) => void;
+  onChange: (index: number, raw: string) => void;
+  /** Called when a tile loses focus, to keep or drop what was typed. */
+  onCommit: (index: number) => void;
+}
+
 interface DonationAmountsProps {
+  amountEditor?: AmountEditor;
   amounts: number[];
   currency: string;
   onAmountSelect: (amount: number) => void;
@@ -21,6 +34,7 @@ interface DonationAmountsProps {
 }
 
 export function DonationAmounts({
+  amountEditor,
   amounts,
   currency,
   onAmountSelect,
@@ -58,39 +72,111 @@ export function DonationAmounts({
     <div className='space-y-4'>
       {/* Preset amounts */}
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-3.5'>
-        {amounts.map(amount => (
-          <Button
-            key={amount}
-            variant='outline'
-            onClick={() => {
-              onAmountSelect(amount);
-              setIsCustomInputSelected(false);
-              setInputValue('');
-            }}
-            className={cn(
-              'h-14 p-5 bg-card dark:bg-white/10 rounded-lg border border-border/50 flex items-center gap-3 transition-all justify-start',
-              selectedAmount === amount && !isCustomInputSelected
-                ? 'border-foreground dark:border-foreground'
-                : 'hover:border-border'
-            )}
-          >
-            <div
+        {amountEditor &&
+          amountEditor.values.map((value, index) => {
+            const selected =
+              amountEditor.selectedIndex === index && !isCustomInputSelected;
+            return (
+              <div
+                key={index}
+                onClick={() => {
+                  amountEditor.onSelect(index);
+                  setIsCustomInputSelected(false);
+                  setInputValue('');
+                  onCustomAmountChange(undefined);
+                }}
+                className={cn(
+                  'flex cursor-pointer flex-col gap-2 rounded-lg border bg-card p-3 transition-all dark:bg-white/10',
+                  selected
+                    ? 'border-foreground dark:border-foreground'
+                    : 'border-border/50 hover:border-border'
+                )}
+              >
+                {/* Looks like a field, with a pencil, so it is clear the amount can be typed over. */}
+                <label className='flex h-9 cursor-text items-center gap-2 rounded-md border border-input bg-background/70 px-3 text-base font-semibold text-foreground focus-within:border-foreground focus-within:ring-2 focus-within:ring-foreground/10 dark:bg-white/5'>
+                  <span aria-hidden='true'>{symbol}</span>
+                  <input
+                    inputMode='numeric'
+                    aria-label={t('settings.amountLabel', {
+                      n: String(index + 1),
+                    })}
+                    value={value}
+                    onClick={e => e.stopPropagation()}
+                    onChange={e => amountEditor.onChange(index, e.target.value)}
+                    onBlur={() => amountEditor.onCommit(index)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') e.currentTarget.blur();
+                    }}
+                    className='min-w-0 flex-1 border-0 bg-transparent p-0 text-base font-semibold outline-none'
+                  />
+                  <Pencil
+                    aria-hidden='true'
+                    className='size-3.5 shrink-0 text-muted-foreground'
+                  />
+                </label>
+                <button
+                  type='button'
+                  role='radio'
+                  aria-checked={selected}
+                  className={cn(
+                    'flex items-center gap-2 text-left text-xs',
+                    selected
+                      ? 'font-medium text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <span
+                    aria-hidden='true'
+                    className={cn(
+                      'flex size-4 shrink-0 items-center justify-center rounded-full border transition-all',
+                      selected
+                        ? 'border-foreground bg-foreground'
+                        : 'border-input'
+                    )}
+                  >
+                    {selected && <Check className='size-3 text-background' />}
+                  </span>
+                  {selected
+                    ? t('settings.selectedFirst')
+                    : t('settings.makeFirst')}
+                </button>
+              </div>
+            );
+          })}
+        {!amountEditor &&
+          amounts.map(amount => (
+            <Button
+              key={amount}
+              variant='outline'
+              onClick={() => {
+                onAmountSelect(amount);
+                setIsCustomInputSelected(false);
+                setInputValue('');
+              }}
               className={cn(
-                'w-4 h-4 rounded-lg border transition-all flex items-center justify-center',
+                'h-14 p-5 bg-card dark:bg-white/10 rounded-lg border border-border/50 flex items-center gap-3 transition-all justify-start',
                 selectedAmount === amount && !isCustomInputSelected
-                  ? 'bg-foreground border-foreground'
-                  : 'border-input'
+                  ? 'border-foreground dark:border-foreground'
+                  : 'hover:border-border'
               )}
             >
-              {selectedAmount === amount && !isCustomInputSelected && (
-                <Check className='w-3 h-3 text-background' />
-              )}
-            </div>
-            <div className='text-foreground text-base font-semibold'>
-              {formatCurrency(amount, currency, locale)}
-            </div>
-          </Button>
-        ))}
+              <div
+                className={cn(
+                  'w-4 h-4 rounded-lg border transition-all flex items-center justify-center',
+                  selectedAmount === amount && !isCustomInputSelected
+                    ? 'bg-foreground border-foreground'
+                    : 'border-input'
+                )}
+              >
+                {selectedAmount === amount && !isCustomInputSelected && (
+                  <Check className='w-3 h-3 text-background' />
+                )}
+              </div>
+              <div className='text-foreground text-base font-semibold'>
+                {formatCurrency(amount, currency, locale)}
+              </div>
+            </Button>
+          ))}
       </div>
 
       {/* Custom amount - only show if custom option exists */}

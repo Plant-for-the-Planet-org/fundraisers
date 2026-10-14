@@ -34,41 +34,30 @@ const NAV_ITEMS = [
 ] as const;
 
 interface DashboardNavProps {
-  /** Icons only; the label stays for screen readers and shows as a tooltip. */
-  collapsed?: boolean;
   /** Insights needs the Umami key, so the item only shows where one is set. */
   insightsEnabled?: boolean;
 }
 
-export function DashboardNav({
-  collapsed = false,
-  insightsEnabled = false,
-}: DashboardNavProps) {
+export function DashboardNav({ insightsEnabled = false }: DashboardNavProps) {
   const t = useTranslations('Dashboard.nav');
   const pathname = usePathname();
 
   return (
     <nav aria-label={t('label')}>
-      <ul
-        className={cn(
-          'm-0 flex list-none gap-1 p-0',
-          // Collapsed on a small screen, the icons sit in a row above the content.
-          collapsed ? 'flex-row md:flex-col' : 'flex-col'
-        )}
-      >
+      {/* The menu is always open: a column beside the content, and on a small screen a row above it. */}
+      <ul className='m-0 flex list-none flex-row gap-1 rounded-xl border border-border/60 bg-background/60 p-1 md:flex-col md:rounded-none md:border-0 md:bg-transparent md:p-0'>
         {NAV_ITEMS.filter(
           item => item.labelKey !== 'insights' || insightsEnabled
         ).map(({ href, labelKey, icon: Icon, isActive }) => {
           const active = isActive(pathname);
           return (
-            <li key={href}>
+            <li key={href} className='max-md:flex-1'>
               <Link
                 href={href}
                 aria-current={active ? 'page' : undefined}
-                title={collapsed ? t(labelKey) : undefined}
                 className={cn(
-                  // Fixed height and padding, so rows keep their size with or without the label and the icons stay put when the menu is toggled.
-                  'flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors',
+                  // Fixed height and padding, so every row is the same size.
+                  'flex items-center rounded-md text-sm font-medium whitespace-nowrap transition-colors max-md:h-14 max-md:flex-col max-md:justify-center max-md:gap-1 max-md:text-xs md:h-9 md:gap-2 md:px-3',
                   active
                     ? 'bg-accent-color/10 text-foreground'
                     : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'
@@ -77,13 +66,11 @@ export function DashboardNav({
                 {/* The current page's icon takes the accent; its duotone back layer becomes a soft tint of it. */}
                 <Icon
                   className={cn(
-                    'size-4 shrink-0',
+                    'size-5 shrink-0 md:size-4',
                     active && 'text-accent-color'
                   )}
                 />
-                <span className={cn(collapsed && 'sr-only')}>
-                  {t(labelKey)}
-                </span>
+                <span>{t(labelKey)}</span>
               </Link>
             </li>
           );

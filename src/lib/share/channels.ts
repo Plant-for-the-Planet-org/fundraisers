@@ -154,6 +154,10 @@ export function channelsFor(platform: SharePlatformId): ShareChannel[] {
   return SHARE_CHANNELS.filter(channel => channel.platform === platform);
 }
 
+export function isShareChannelId(value: unknown): value is ShareChannelId {
+  return SHARE_CHANNELS.some(channel => channel.id === value);
+}
+
 export function getChannel(id: ShareChannelId): ShareChannel {
   return SHARE_CHANNELS.find(channel => channel.id === id)!;
 }

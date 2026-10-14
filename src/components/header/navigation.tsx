@@ -4,14 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { isProtectedRoute } from '@/lib/utils/auth';
+import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/stores/auth-store';
 import { openSignInModal } from '@/stores/sign-in-modal-store';
-import { HEADER_LINKS } from './config';
-
-const HIDE_START_FUNDRAISER_PATHS = [
-  '/fundraisers/create',
-  '/dashboard/fundraisers/edit',
-];
+import { PlusIcon } from '@/components/ui/ui-icons';
+import { getHeaderLinks } from './config';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -20,11 +17,7 @@ export function Navigation() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
-  const displayedLinks = HEADER_LINKS.filter(
-    link =>
-      link.labelKey !== 'startFundraiser' ||
-      !HIDE_START_FUNDRAISER_PATHS.some(p => pathname.startsWith(p))
-  );
+  const displayedLinks = getHeaderLinks(pathname);
 
   return (
     <nav
@@ -48,8 +41,17 @@ export function Navigation() {
                 event.preventDefault();
                 openSignInModal(link.href);
               }}
-              className='text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
+              className={cn(
+                'text-sm font-medium transition-colors',
+                // Starting a fundraiser is the main thing to do here, so it is a filled button; Explore stays a quiet link.
+                link.labelKey === 'startFundraiser'
+                  ? 'inline-flex h-9 items-center gap-1.5 rounded-full bg-accent-color px-4 font-semibold text-[var(--cta-foreground,#fff)] shadow-xs hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
+              {link.labelKey === 'startFundraiser' && (
+                <PlusIcon className='size-3.5' />
+              )}
               {tHeaderLinks(link.labelKey)}
             </Link>
           </li>

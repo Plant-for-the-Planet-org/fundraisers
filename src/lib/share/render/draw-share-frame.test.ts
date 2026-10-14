@@ -1,6 +1,6 @@
 import type { ShareFormatId } from '../formats';
 import type { SeasonId } from './seasons';
-import type { ShareRenderData } from './types';
+import type { ShareCardId, ShareRenderData, ShareRenderOptions } from './types';
 
 import { describe, expect, it } from 'vitest';
 import { createCanvas } from '@napi-rs/canvas';
@@ -103,7 +103,9 @@ const contains = (outer: Box, inner: Box) =>
 function drawnFrame(
   format: ShareFormatId,
   frameData: ShareRenderData,
-  season: SeasonId
+  season: SeasonId,
+  card: ShareCardId = 'progress',
+  extra: Partial<ShareRenderOptions> = {}
 ): { boxes: TextBox[]; shapes: Box[] } {
   const { w, h } = SHARE_FORMATS[format];
   const target = createCanvas(w, h).getContext(
@@ -158,7 +160,12 @@ function drawnFrame(
             Math.min(obj.measureText(text).width, maxWidth ?? Infinity) * scale;
           const cx = m.a * x + m.c * y + m.e;
           const cy = m.b * x + m.d * y + m.f;
-          const left = obj.textAlign === 'center' ? cx - width / 2 : cx;
+          const left =
+            obj.textAlign === 'center'
+              ? cx - width / 2
+              : obj.textAlign === 'right'
+                ? cx - width
+                : cx;
           boxes.push({
             text,
             top: cy - size / 2,
@@ -182,8 +189,10 @@ function drawnFrame(
       titleFont: 'sans-serif',
       bodyFont: 'sans-serif',
       season,
+      card,
     },
     photo: null,
+    ...extra,
   });
   return { boxes, shapes };
 }
@@ -353,5 +362,217 @@ describe('drawShareFrame', () => {
         }
       }
     }
+  });
+  it('draws the name at the same size with or without the host line', () => {
+    const height = (frameData: ShareRenderData) => {
+      const box = drawnFrame('story', frameData, 'none').boxes.find(
+        entry => entry.text === frameData.name
+      )!;
+      return box.bottom - box.top;
+    };
+    expect(height({ ...data, note: 'For my daughter' })).toBeCloseTo(
+      height(data),
+      3
+    );
+  });
+
+  const LONG_NAME =
+    'Education for Climate Justice, Environmental Stewardship and Reforestation of the Democratic Republic of Congo';
+  const impactOf = (count: number, more: number) => ({
+    label: `Supporting ${count + more} projects`,
+    names: [
+      'Yucatán Restoration',
+      'Education for Climate Justice',
+      'Ghana Forest',
+      'Andalucía Reforestation',
+      'Youth Academies',
+    ].slice(0, count),
+    more,
+  });
+  describe('every card', () => {
+    const story =
+      'Last spring my grandmother and I planted a small orchard together. This year I want to give a hundred more trees to the forest she loved, so her garden can keep growing long after us.';
+    const withStory = { ...data, note: story };
+    for (const format of FORMATS) {
+      for (const card of ['progress', 'impact', 'minimal', 'story'] as const) {
+        for (const [label, frameData] of [
+          ['a short line', { ...data, note: 'For my daughter' }],
+          ['a long story', withStory],
+          [
+            'a gift and a long story',
+            { ...withStory, giftLine: 'I just gave €50!' },
+          ],
+          ['no goal', { ...withStory, goal: null }],
+          [
+            'five projects and a long story',
+            { ...withStory, impact: impactOf(5, 2) },
+          ],
+          ['one project', { ...withStory, impact: impactOf(1, 0) }],
+          [
+            'a very long project name',
+            {
+              ...withStory,
+              impact: {
+                label: 'Supporting 1 project',
+                names: [LONG_NAME],
+                more: 0,
+              },
+            },
+          ],
+        ] as const) {
+          it(`keeps ${format} on the ${card} card with ${label} inside the safe zone, without overlap`, () => {
+            const z = SHARE_FORMATS[format].zone;
+            const { boxes, shapes } = drawnFrame(
+              format,
+              frameData,
+              'none',
+              card
+            );
+            for (const box of boxes) {
+              expect(box.top, box.text).toBeGreaterThanOrEqual(z.y);
+              expect(box.bottom, box.text).toBeLessThanOrEqual(z.y + z.h);
+              expect(box.left, box.text).toBeGreaterThanOrEqual(z.x);
+              expect(box.right, box.text).toBeLessThanOrEqual(z.x + z.w);
+            }
+            boxes.forEach((a, i) => {
+              for (const b of boxes.slice(i + 1))
+                expect(overlaps(a, b), `${a.text} / ${b.text}`).toBe(false);
+            });
+            const button = boxes.find(box => box.text === frameData.cta)!;
+            expect(
+              shapes.some(shape => contains(shape, button)),
+              'button text inside the button'
+            ).toBe(true);
+          });
+        }
+      }
+    }
+
+    it('ends a very long project name with an ellipsis', () => {
+      const { boxes } = drawnFrame(
+        'story',
+        {
+          ...data,
+          impact: {
+            label: 'Supporting 1 project',
+            names: [LONG_NAME],
+            more: 0,
+          },
+        },
+        'none',
+        'impact'
+      );
+      const name = boxes.find(box => box.text.startsWith('Education'))!;
+      expect(name.text.endsWith('…')).toBe(true);
+      expect(name.text.length).toBeLessThan(LONG_NAME.length);
+    });
+
+    it('shows no percentages and no amounts for the projects', () => {
+      const { boxes } = drawnFrame(
+        'story',
+        { ...data, impact: impactOf(5, 2) },
+        'none',
+        'impact'
+      );
+      // The ring's own badge is the only percentage: the share of the goal, not of a project.
+      expect(boxes.filter(box => /\d+%/.test(box.text))).toHaveLength(1);
+      expect(boxes.some(box => box.text === 'Supporting 7 projects')).toBe(
+        true
+      );
+    });
+
+    describe('with project pictures', () => {
+      const picture = () => createCanvas(160, 120);
+      const cases = [
+        [
+          'every project has a picture',
+          [picture(), picture(), picture(), picture(), picture()],
+        ],
+        [
+          'only some projects have one',
+          [picture(), null, picture(), null, null],
+        ],
+        ['no project has one', [null, null, null, null, null]],
+      ] as const;
+      for (const format of FORMATS) {
+        for (const [label, images] of cases) {
+          it(`keeps ${format} inside the safe zone when ${label}`, () => {
+            const z = SHARE_FORMATS[format].zone;
+            const { boxes, shapes } = drawnFrame(
+              format,
+              { ...data, impact: impactOf(5, 2) },
+              'none',
+              'impact',
+              { projectImages: images }
+            );
+            for (const box of boxes) {
+              expect(box.top, box.text).toBeGreaterThanOrEqual(z.y);
+              expect(box.bottom, box.text).toBeLessThanOrEqual(z.y + z.h);
+              expect(box.left, box.text).toBeGreaterThanOrEqual(z.x);
+              expect(box.right, box.text).toBeLessThanOrEqual(z.x + z.w);
+            }
+            boxes.forEach((a, i) => {
+              for (const b of boxes.slice(i + 1))
+                expect(overlaps(a, b), `${a.text} / ${b.text}`).toBe(false);
+            });
+            const button = boxes.find(box => box.text === data.cta)!;
+            expect(shapes.some(shape => contains(shape, button))).toBe(true);
+          });
+        }
+      }
+
+      it('puts a plain initial on a project that has no picture, beside pictures', () => {
+        const { boxes } = drawnFrame(
+          'story',
+          { ...data, impact: impactOf(3, 0) },
+          'none',
+          'impact',
+          { projectImages: [picture(), null, picture()] }
+        );
+        expect(boxes.some(box => box.text === 'E')).toBe(true);
+        expect(boxes.some(box => box.text === 'Y')).toBe(false);
+      });
+    });
+
+    it('shows the donors on every card when there are donors to name', () => {
+      for (const card of ['progress', 'impact', 'minimal', 'story'] as const) {
+        const { boxes } = drawnFrame(
+          'story',
+          {
+            ...data,
+            donorsLine: 'Anna, Ben and 46 others have given',
+            donors: ['Anna', 'Ben', 'Chloé'],
+            impact: impactOf(3, 0),
+          },
+          'none',
+          card
+        );
+        expect(
+          boxes.some(box => box.text.includes('have given')),
+          card
+        ).toBe(true);
+      }
+    });
+
+    it('invites a first gift only on the progress card, and leaves the others plain', () => {
+      const fresh = {
+        ...data,
+        donors: [],
+        donorsLine: null,
+        firstLine: 'Be the first to give',
+      };
+      for (const card of ['impact', 'minimal', 'story'] as const) {
+        const { boxes } = drawnFrame('story', fresh, 'none', card);
+        expect(
+          boxes.some(box => box.text.includes('first to give')),
+          card
+        ).toBe(false);
+      }
+      expect(
+        drawnFrame('story', fresh, 'none', 'progress').boxes.some(box =>
+          box.text.includes('first to give')
+        )
+      ).toBe(true);
+    });
   });
 });

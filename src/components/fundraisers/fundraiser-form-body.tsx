@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import type { FundraiserHost } from '@/lib/types/fundraiser';
 
+import { Suspense } from 'react';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
 import { MainPanel } from '@/components/ui/fundraiser-layout/main-panel';
 import { SidebarPanel } from '@/components/ui/fundraiser-layout/sidebar-panel';
@@ -10,6 +11,7 @@ import { BundleSelection } from './bundle-selection/bundle-selection';
 import { ContributionSettings } from './contribution-settings';
 import DescriptionInput from './description-input';
 import { DonorsPreview } from './donors-preview';
+import { FocusSectionFromLink } from './focus-section';
 import { GoalSettings } from './goal/goal-settings';
 import { GoalInput } from './goal-input';
 import { Hosts } from './hosts';
@@ -54,8 +56,13 @@ export function FundraiserFormBody({
   return (
     // On mobile both panels merge into one column, ordered like the public page: title and hosts first, then goal and donors, then the contribution form. Desktop keeps the two-column source order.
     <FundraiserLayout>
+      {isEditMode && (
+        <Suspense fallback={null}>
+          <FocusSectionFromLink />
+        </Suspense>
+      )}
       <SidebarPanel flattenOnMobile>
-        <div className='max-md:order-1 empty:hidden'>
+        <div data-focus='image' className='max-md:order-1 empty:hidden'>
           <ImageSelector autoLoadDefault={!isEditMode} />
         </div>
         <div className='max-md:order-5 empty:hidden'>
@@ -83,34 +90,38 @@ export function FundraiserFormBody({
         </div>
       </SidebarPanel>
       <MainPanel flattenOnMobile>
-        <div className='max-md:order-2'>
+        <div data-focus='title' className='max-md:order-2'>
           <Title />
         </div>
         {isEditMode && (
-          <div className='max-md:order-3'>
+          <div data-focus='slug' className='max-md:order-3'>
             <SlugField />
           </div>
         )}
-        <div className='max-md:order-8 empty:hidden'>
+        <div data-focus='leaderboard' className='max-md:order-8 empty:hidden'>
           <LeaderboardSettings />
         </div>
         <div className='max-md:order-7 empty:hidden'>
           <ContributionSettings />
         </div>
-        <div className='max-md:order-9'>
+        <div data-focus='story' className='max-md:order-9'>
           <DescriptionInput />
         </div>
         <div className='max-md:order-10 grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <WorkspaceSelector disabled={isEditMode} />
-          <GoalInput />
+          <div data-focus='country'>
+            <WorkspaceSelector disabled={isEditMode} />
+          </div>
+          <div data-focus='goal'>
+            <GoalInput />
+          </div>
         </div>
         <div className='max-md:order-11 empty:hidden'>
           <WorkspaceInfo />
         </div>
-        <div className='max-md:order-12 empty:hidden'>
+        <div data-focus='projects' className='max-md:order-12 empty:hidden'>
           <BundleSelection mode={mode} />
         </div>
-        <div className='max-md:order-14 empty:hidden'>
+        <div data-focus='publish' className='max-md:order-14 empty:hidden'>
           <Options />
         </div>
         {/* Without an order the bar defaults to 0 on mobile and jumps above the image, which also breaks its docking at the end of the form. */}

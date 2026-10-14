@@ -8,6 +8,8 @@ interface FundraiserDetailValue {
   fundraiser: Fundraiser;
   /** Owners and admins. View-only co-hosts see the same pages without the edit actions. */
   canEdit: boolean;
+  /** Loads the fundraiser again, after a page saved a change. */
+  refresh: () => Promise<void>;
 }
 
 export const FundraiserDetailContext =
@@ -29,4 +31,8 @@ export function useFundraiserDetail(): Fundraiser {
 
 export function useCanEditFundraiser(): boolean {
   return useDetailValue().canEdit;
+}
+
+export function useRefreshFundraiser(): () => Promise<void> {
+  return useDetailValue().refresh;
 }

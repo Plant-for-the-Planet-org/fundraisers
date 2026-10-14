@@ -10,16 +10,17 @@ For Umami page views and donation events, see [insights.md](./insights.md).
 
 ## Routes
 
-| Route | What it shows | Menu |
-| --- | --- | --- |
-| `/dashboard` | Overview: stats strip, pending host invitations, latest 2 fundraisers | Overview |
-| `/dashboard/fundraisers` | The full list with search, status filter and sort | Fundraisers |
-| `/dashboard/fundraisers/[slug]` | One fundraiser: stats, "Make it a success" checklist, hosts, features | Fundraisers |
-| `/dashboard/fundraisers/[slug]/donors` | Donors and donations, paged | Fundraisers |
-| `/dashboard/fundraisers/[slug]/insights` | That fundraiser's visitors, donation journey, countries, sources | Fundraisers |
-| `/dashboard/fundraisers/[slug]/share` | Tagged share links per channel | Fundraisers |
-| `/dashboard/insights` | All your fundraisers combined, a ranking, or one picked from a list (`?fundraiser=<slug>`) | Insights |
-| `/dashboard/fundraisers/edit/[slug]` | The editor (no menu, full width) | none |
+| Route                                    | What it shows                                                                              | Menu        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ | ----------- |
+| `/dashboard`                             | Overview: stats strip, pending host invitations, latest 2 fundraisers                      | Overview    |
+| `/dashboard/fundraisers`                 | The full list with search, status filter and sort                                          | Fundraisers |
+| `/dashboard/fundraisers/[slug]`          | One fundraiser: stats, "Make it a success" checklist, hosts, features                      | Fundraisers |
+| `/dashboard/fundraisers/[slug]/donors`   | Donors and donations, paged                                                                | Fundraisers |
+| `/dashboard/fundraisers/[slug]/insights` | That fundraiser's visitors, donation journey, countries, sources                           | Fundraisers |
+| `/dashboard/fundraisers/[slug]/share`    | Tagged share links per channel                                                             | Fundraisers |
+| `/dashboard/fundraisers/[slug]/stage`    | Stage Mode: its link, and its switch and slides                                            | Fundraisers |
+| `/dashboard/insights`                    | All your fundraisers combined, a ranking, or one picked from a list (`?fundraiser=<slug>`) | Insights    |
+| `/dashboard/fundraisers/edit/[slug]`     | The editor (no menu, full width)                                                           | none        |
 
 Both Insights routes, and the Insights menu item and tab, only exist when Umami is set up (`UMAMI_API_KEY`). Without it they return a 404 and are hidden.
 
@@ -49,9 +50,8 @@ src/app/(standard)/dashboard/
 ### The menu (`DashboardShell`, `DashboardNav`)
 
 - Items: Overview, Fundraisers, Insights (only with Umami).
-- Collapsed to an icon rail by default. The choice is remembered per browser (`localStorage`, `use-menu-collapsed.ts`); the server renders the default.
-- Rows have a fixed height and padding, so icons stay in place when the menu is toggled. The toggle is instant; a width animation would reflow the content on every frame.
-- On small screens the same menu sits above the content: a row of icons plus the toggle when collapsed, the full list with labels when expanded. It shares the collapse setting with desktop.
+- The menu is always open, with its labels: a 12rem column beside the content from `md` up, and a row of items above it on a small screen. There is no collapse toggle, so nothing is stored on the device for it.
+- Rows have a fixed height and padding, so every item is the same size.
 - Starting a fundraiser is in the site header ("Start Fundraiser"), not in the menu.
 
 ### Theme
@@ -92,7 +92,10 @@ For view-only co-hosts, the edit actions are hidden: the header's Edit button, t
 ### Overview tab
 
 - **Stats strip**: Raised (with % of goal), Donations, Donors, Avg. donation value.
-- **Make it a success**: cover image, story (200 characters of text, or 100 with a picture or video), goal, published, a co-host who has accepted, first donation, and keep sharing. Logic in `src/lib/utils/fundraiser-checklist.ts`. Sharing is never finished while people can still give, so it stays open, and counted, until the fundraiser ends. While donations are open, it and the first donation step link to the Share tab. So a live fundraiser shows at most 6 of 7, and "All done", which thanks the host, appears only once it has ended.
+- **Make it a success**: cover image, story (200 characters of text, or 100 with a picture or video; the hint asks for a personal story and a photo or video), goal, published, a co-host who has accepted, **share**, first donation, and **keep sharing**. Logic in `src/lib/utils/fundraiser-checklist.ts`.
+  - The first share links to the Share tab. Nothing records that a host has shared, so a first gift counts as the proof that the link reached someone, and ticks it together with the first donation step (which has no button of its own, since the step before it is where to share).
+  - **Keep sharing** is shown but locked, with a lock and "N of 3 so far", until three people have given (`KEEP_SHARING_MIN_DONORS`, the same number that lets a story name its donors; the count comes from the host's leaderboard, so it includes anonymous donors). Once open it stays open, and counted, until the fundraiser ends, and it links to the Share tab. So a live fundraiser always shows at most 7 of 8, and "All done", which thanks the host, appears only once it has ended.
+- **Reshare moments** (`src/lib/utils/fundraiser-reshare.ts`, `reshare-moment.tsx`): a fundraiser changes as people give, and the share images always draw the latest numbers, so the loop is to remind the host when there is news. In order of weight: the goal reached, a milestone of 25, 50 or 75 percent passed, or the first donors who can be named. Each one shows a card at the top of the Overview and a dot on the Share tab. A milestone counts for `MILESTONE_WINDOW` (10) points after it is passed, the goal for 20, and the donors while there are at most nine in all. The card then goes by itself, so nothing is stored on the device to know whether the host acted. A fundraiser that cannot take gifts, or has ended, has none, and progress news is skipped when the goal is hidden.
 - **Hosts**: active and invited hosts, with Invite co-host (opens the existing Manage hosts dialog). The checklist's co-host step opens the same dialog.
 - **Features**: Leaderboard, Thank-you note, Stage Mode, each On or with a Turn on link to the editor.
 
@@ -117,7 +120,17 @@ Every host-facing "Share" button leads here: the checklist, the donors empty sta
 
 Above the links, the share studio makes images and videos for each platform (story, post, TikTok, Shorts, link preview), in the fundraiser's theme with live progress, and shares or downloads them. See `docs/share.md`. Links from both carry the host's `?ref=` code once the profile has one.
 
-On phones the studio shows the platforms first, then the preview with its Share button, then Make it yours and the caption, so a host sees the result of a pick without scrolling. From `md` up the preview sits in its own column beside the other cards, and the tab order follows the same order.
+The first card, Where are you sharing?, holds the platform, the format, and the basics: style, button text and the host's own line. A quiet Customize image link under it, closed at first, holds the card design (Classic, which is the default and the look of the page's Share images, Minimal, Impact, or Your words) and what the image shows (amounts, name, projects, donors).
+
+On phones the studio shows the platforms first, then the preview with its Share button, then the caption, so a host sees the result of a pick without scrolling. From `md` up the preview sits in its own column beside the other cards, and the tab order follows the same order.
+
+### Stage Mode tab
+
+The tab sits next to Share. It shows the Stage Mode link to copy or open (only while Stage Mode is on), and, for owners and admins, the Stage Mode switch with its details and slides, the same as in the editor.
+
+A Save button sends only what changed, through the same update as the editor, and then loads the fundraiser again so the other tabs and the Features card show the new state.
+
+View-only co-hosts see the link but cannot edit.
 
 ---
 
@@ -133,10 +146,10 @@ One rule, `getStatusBucket` in `src/lib/utils/fundraiser-list.ts`, drives the ba
 
 `DELETE /fundraisers/{id}` succeeds in one of two shapes, and the UI treats them the same:
 
-| Response | Backend meaning | UI |
-| --- | --- | --- |
-| `204 No Content` | No donations, hard-deleted | Row removed |
-| `200 OK` with `{ "status": "archived" }` | Had donations, archived | Row removed |
+| Response                                 | Backend meaning            | UI          |
+| ---------------------------------------- | -------------------------- | ----------- |
+| `204 No Content`                         | No donations, hard-deleted | Row removed |
+| `200 OK` with `{ "status": "archived" }` | Had donations, archived    | Row removed |
 
 The list API does not return archived fundraisers, so there is no client-side filter for them. While the request runs, the dialog cannot be dismissed. On error the dialog stays open with a toast. On success the row and its dialog go, and the stats (derived from the list) update.
 
@@ -144,17 +157,17 @@ The list API does not return archived fundraisers, so there is no client-side fi
 
 ## Edge cases
 
-| Scenario | Behavior |
-| --- | --- |
-| No fundraisers | Toolbar hidden, empty state with a create button. Stats show zeros. |
-| Search or filter matches nothing | "No results" with Clear filters. |
-| Several currencies | Total raised is one amount in the dominant currency, converted with `convertTotalRaisedToSingleCurrency`. |
-| Active, but past its end date and closed to donations | Counted and shown as **Ended** (see Status). |
-| End date 7 days away or less | "Ending soon" badge; still counted as Active. |
-| Fundraiser has no donations | Donors tab shows an empty state; the Share button only shows while it takes donations. |
-| View-only co-host | Sees every dashboard page; edit actions hidden. |
-| Clipboard not available | Error toast. |
-| Pause, resume or delete fails | Toast; local state unchanged. |
+| Scenario                                              | Behavior                                                                                                  |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| No fundraisers                                        | Toolbar hidden, empty state with a create button. Stats show zeros.                                       |
+| Search or filter matches nothing                      | "No results" with Clear filters.                                                                          |
+| Several currencies                                    | Total raised is one amount in the dominant currency, converted with `convertTotalRaisedToSingleCurrency`. |
+| Active, but past its end date and closed to donations | Counted and shown as **Ended** (see Status).                                                              |
+| End date 7 days away or less                          | "Ending soon" badge; still counted as Active.                                                             |
+| Fundraiser has no donations                           | Donors tab shows an empty state; the Share button only shows while it takes donations.                    |
+| View-only co-host                                     | Sees every dashboard page; edit actions hidden.                                                           |
+| Clipboard not available                               | Error toast.                                                                                              |
+| Pause, resume or delete fails                         | Toast; local state unchanged.                                                                             |
 
 ---
 

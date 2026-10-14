@@ -5,8 +5,12 @@ import type { Fundraiser } from '@/lib/types/fundraiser';
 import { useId, useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { getFundraiserChecklist } from '@/lib/utils/fundraiser-checklist';
+import {
+  getFundraiserChecklist,
+  KEEP_SHARING_MIN_DONORS,
+} from '@/lib/utils/fundraiser-checklist';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -19,21 +23,33 @@ export function FundraiserChecklistCard({
   fundraiser,
   canEdit,
   onInviteCoHost,
+  donorCount,
 }: {
   fundraiser: Fundraiser;
   /** View-only co-hosts see the steps and can share, but the fixes need edit rights. */
   canEdit: boolean;
   onInviteCoHost: () => void;
+  /** Everyone who has given, or null until it is known. "Keep sharing" unlocks with the third donor. */
+  donorCount: number | null;
 }) {
   const t = useTranslations('Dashboard.fundraiser.checklist');
   const [showDone, setShowDone] = useState(false);
   const listId = useId();
 
-  const items = getFundraiserChecklist(fundraiser);
+  const items = getFundraiserChecklist(fundraiser, donorCount);
   const doneCount = items.filter(item => item.done).length;
   // Done steps stay out of the way until asked for; shown, they keep their place so the order reads the same.
   const visibleItems = showDone ? items : items.filter(item => !item.done);
   const editHref = `/dashboard/fundraisers/edit/${fundraiser.slug}`;
+  // Each fix opens the editor at the part that needs the work.
+  const fixTargets: Partial<Record<(typeof items)[number]['id'], string>> = {
+    coverImage: 'image',
+    story: 'story',
+    goal: 'goal',
+    published: 'publish',
+  };
+  const fixHref = (id: (typeof items)[number]['id']) =>
+    fixTargets[id] ? `${editHref}?focus=${fixTargets[id]}` : editHref;
 
   return (
     <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
@@ -60,6 +76,14 @@ export function FundraiserChecklistCard({
               <li key={item.id} className='flex items-start gap-3 py-3'>
                 {item.done ? (
                   <CircleCheckIcon className='mt-0.5 size-4 shrink-0 text-success' />
+                ) : item.locked ? (
+                  <>
+                    <Lock
+                      aria-hidden='true'
+                      className='mt-0.5 size-4 shrink-0 text-muted-foreground'
+                    />
+                    <span className='sr-only'>{t('locked')}</span>
+                  </>
                 ) : (
                   <CircleDashedIcon className='mt-0.5 size-4 shrink-0 text-muted-foreground' />
                 )}
@@ -69,19 +93,29 @@ export function FundraiserChecklistCard({
                       'text-sm font-medium',
                       item.done
                         ? 'text-muted-foreground line-through'
-                        : 'text-foreground'
+                        : item.locked
+                          ? 'text-muted-foreground'
+                          : 'text-foreground'
                     )}
                   >
                     {t(`items.${item.id}.title`)}
                   </p>
                   {!item.done && (
                     <p className='mt-0.5 text-sm text-muted-foreground'>
-                      {t(`items.${item.id}.hint`)}
+                      {item.locked
+                        ? t('lockedHint', {
+                            needed: KEEP_SHARING_MIN_DONORS,
+                            count: donorCount ?? 0,
+                          })
+                        : t(`items.${item.id}.hint`)}
                     </p>
                   )}
                 </div>
                 {!item.done &&
-                  (item.id === 'firstDonation' || item.id === 'share' ? (
+                  !item.locked &&
+                  // The first donation needs no button: the step before it is where to share.
+                  (item.id === 'firstDonation' ? null : item.id === 'share' ||
+                    item.id === 'keepSharing' ? (
                     fundraiser.canDonate && (
                       <Button asChild variant='outline' size='sm'>
                         <Link
@@ -101,7 +135,7 @@ export function FundraiserChecklistCard({
                     </Button>
                   ) : (
                     <Button asChild variant='outline' size='sm'>
-                      <Link href={editHref}>{t('fix')}</Link>
+                      <Link href={fixHref(item.id)}>{t('fix')}</Link>
                     </Button>
                   ))}
               </li>

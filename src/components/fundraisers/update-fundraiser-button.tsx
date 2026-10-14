@@ -24,6 +24,7 @@ import { buildUpdateFundraiserRequest } from '@/lib/utils/fundraiser-data-builde
 import { imageToBase64 } from '@/lib/utils/image-processor';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import { focusFirstError } from './focus-section';
 
 /** Where the status switch sits for a given saved status. Mirrors how the form derives it on load: only a live fundraiser has the switch on. */
 function toggleFor(status: FundraiserStatus): 'draft' | 'active' {
@@ -35,12 +36,15 @@ interface UpdateFundraiserButtonProps {
   existingSettings: FundraiserSettings | null;
   /** The saved status, needed to work out which transition the status switch is asking for. */
   currentStatus: FundraiserStatus;
+  /** Called after a save, for pages that show the fundraiser elsewhere and want it fresh. */
+  onSaved?: () => void;
 }
 
 export function UpdateFundraiserButton({
   fundraiserId,
   existingSettings,
   currentStatus,
+  onSaved,
 }: UpdateFundraiserButtonProps) {
   // The prop is a snapshot from page load and the page does not refetch after a save, so the saved status is tracked here and refreshed from every response.
   // Reading the prop instead would misread the second toggle in a session: after switching a live fundraiser off (now `paused`), switching it back on would still map from `active` and ask for no transition.
@@ -160,6 +164,8 @@ export function UpdateFundraiserButton({
         router.replace(`/dashboard/fundraisers/edit/${updated.slug}`);
       }
 
+      onSaved?.();
+
       return updated;
     } catch (err) {
       console.error('Failed to update fundraiser:', err);
@@ -173,9 +179,10 @@ export function UpdateFundraiserButton({
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
       disabled={isSubmitting || !isDirty}
-      onClick={handleSubmit(onSubmit, errors =>
-        console.error('Update blocked by validation errors:', errors)
-      )}
+      onClick={handleSubmit(onSubmit, errors => {
+        console.error('Update blocked by validation errors:', errors);
+        focusFirstError(errors);
+      })}
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}

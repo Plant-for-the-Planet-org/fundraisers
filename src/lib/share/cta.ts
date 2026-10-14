@@ -7,6 +7,8 @@ export const CTA_PRESETS = [
   'supportMyFundraiser',
   'helpUsFinish',
   'yourTurn',
+  'readMyStory',
+  'seeWhereItGoes',
 ] as const;
 
 export type CtaKey =
@@ -17,6 +19,8 @@ export type CtaKey =
   | 'giftForPlanet'
   | 'treatPlanet'
   | 'celebrateWithMe'
+  | 'celebrateWithUs'
+  | 'giveInMemory'
   | 'thankYou';
 
 /** A custom button text stays short, so it reads as a button and fits every format. */
@@ -61,7 +65,12 @@ export function seasonalCta(
     case 'halloween':
       return 'treatPlanet';
     case 'birthday':
+    case 'celebration':
       return 'celebrateWithMe';
+    case 'wedding':
+      return 'celebrateWithUs';
+    case 'inMemory':
+      return 'giveInMemory';
     default:
       return 'joinMe';
   }

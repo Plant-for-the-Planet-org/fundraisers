@@ -17,6 +17,7 @@ import { imageToBase64 } from '@/lib/utils/image-processor';
 import { useAuthStore } from '@/stores/auth-store';
 import { useHostedFundraisersStore } from '@/stores/hosted-fundraisers-store';
 import { Button } from '@/components/ui/button';
+import { focusFirstError } from './focus-section';
 
 export function CreateFundraiserButton() {
   const t = useTranslations('Fundraisers.create.formSubmission');
@@ -92,7 +93,7 @@ export function CreateFundraiserButton() {
     <Button
       className='bg-blue-500 text-white rounded-lg font-semibold'
       disabled={isSubmitting}
-      onClick={handleSubmit(onSubmit)}
+      onClick={handleSubmit(onSubmit, focusFirstError)}
       type='button'
     >
       {isSubmitting && <Loader2 className='animate-spin' />}

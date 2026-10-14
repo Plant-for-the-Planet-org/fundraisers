@@ -11,7 +11,12 @@ export function FundraiserLayout({
 }) {
   return (
     <div className='fundraiser-layout flex-1'>
-      <div className={cn('flex flex-col md:flex-row gap-6 min-w-0', className)}>
+      <div
+        className={cn(
+          'flex flex-col md:flex-row gap-6 lg:gap-8 min-w-0',
+          className
+        )}
+      >
         {children}
       </div>
     </div>

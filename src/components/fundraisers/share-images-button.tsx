@@ -1,12 +1,14 @@
 'use client';
 
 import type { CSSProperties, ReactElement } from 'react';
+import type { ShareChannelId } from '@/lib/share/channels';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { Images } from 'lucide-react';
+import { isShareChannelId } from '@/lib/share/channels';
 import { buildTheme } from '@/lib/theme/build-theme';
 import { getFontStack } from '@/lib/theme/font-utils';
 import { CopyLinkButton } from '@/components/fundraisers/copy-link-button';
@@ -49,6 +51,13 @@ interface ShareImagesButtonProps {
   trigger?: ReactElement;
 }
 
+const subscribeToNothing = () => () => {};
+
+function readLinkedChannel(search: string): ShareChannelId | null {
+  const wanted = new URLSearchParams(search).get('share');
+  return isShareChannelId(wanted) ? wanted : null;
+}
+
 /** Opens the donor share studio from the fundraiser page, for anyone who wants to share it. */
 export function ShareImagesButton({
   fundraiser,
@@ -56,10 +65,19 @@ export function ShareImagesButton({
 }: ShareImagesButtonProps) {
   const t = useTranslations('Fundraisers.shareImages');
   const tShare = useTranslations('Donate.thankYou.share');
-  const [open, setOpen] = useState(false);
+  // Set once the person opens or closes the dialog; until then a link can open it.
+  const [pickedOpen, setPickedOpen] = useState<boolean | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const shareUrl = useFundraiserShareUrl(fundraiser.slug);
 
+  // The QR code in the studio on a computer opens this page with `?share=<channel>`, so a phone lands on the same choice with its share sheet.
+  // Only the page's own button listens, not the ended section's trigger. The server renders without it, so the dialog opens right after hydration.
+  const linkedChannel = useSyncExternalStore(
+    subscribeToNothing,
+    () => (trigger ? null : readLinkedChannel(window.location.search)),
+    () => null
+  );
+  const open = pickedOpen ?? linkedChannel !== null;
   // The dialog is portalled to <body>, outside ThemeShell's wrapper. ThemeShell copies the accent onto <html> for portals, but not the fonts.
   const fontStyle = useMemo(() => {
     const theme = buildTheme(fundraiser.settings?.theme);
@@ -70,7 +88,7 @@ export function ShareImagesButton({
   }, [fundraiser.settings?.theme]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setPickedOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button
@@ -117,6 +135,7 @@ export function ShareImagesButton({
             <ShareImagesDialogBody
               fundraiser={fundraiser}
               fitHeight={STUDIO_FIT_HEIGHT}
+              initialChannel={linkedChannel ?? undefined}
             />
           </StudioErrorBoundary>
         </div>

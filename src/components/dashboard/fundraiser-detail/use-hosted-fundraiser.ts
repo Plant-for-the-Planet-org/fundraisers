@@ -2,7 +2,7 @@
 
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getHostFundraiserBySlug } from '@/lib/api/fundraiser-service';
 import { PlatformAPIError } from '@/lib/api/platform-fetch';
 import { isFundraiserOwnerOrAdmin } from '@/lib/utils/fundraiser';
@@ -20,7 +20,9 @@ export type HostedFundraiserState =
  *
  * Reads the host route, which answers only an active host of the fundraiser and carries every figure and every host, whatever the host chose to show the public.
  */
-export function useHostedFundraiser(slug: string): HostedFundraiserState {
+export function useHostedFundraiser(
+  slug: string
+): HostedFundraiserState & { refresh: () => Promise<void> } {
   const accessToken = useAuthStore(state => state.accessToken);
   const userId = useAuthStore(state => state.user?.sub);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
@@ -66,5 +68,21 @@ export function useHostedFundraiser(slug: string): HostedFundraiserState {
     };
   }, [accessToken, slug, isAuthInitializing, userId]);
 
-  return state;
+  // Loads the fundraiser again without the loading screen, for pages that save a change and want every tab to show it.
+  const refresh = useCallback(async () => {
+    if (!accessToken || !slug) return;
+    try {
+      const fundraiser = await getHostFundraiserBySlug(slug, accessToken);
+      if (!fundraiser) return;
+      setState({
+        status: 'ready',
+        fundraiser,
+        canEdit: isFundraiserOwnerOrAdmin(fundraiser, userId),
+      });
+    } catch (error) {
+      console.error('[useHostedFundraiser] Failed to refresh:', error);
+    }
+  }, [accessToken, slug, userId]);
+
+  return { ...state, refresh };
 }

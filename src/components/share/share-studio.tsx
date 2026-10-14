@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import type { ShareSharer } from '@/lib/share/caption';
 import type {
   ShareChannel,
@@ -9,11 +10,14 @@ import type {
 } from '@/lib/share/channels';
 import type { CtaKey } from '@/lib/share/cta';
 import type { SeasonId } from '@/lib/share/render/seasons';
+import type { ShareCardId } from '@/lib/share/render/types';
 import type { ShareGift } from '@/lib/share/share-data';
 import type { Fundraiser } from '@/lib/types/fundraiser';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { captionKey } from '@/lib/share/caption';
 import {
@@ -29,15 +33,26 @@ import {
 } from '@/lib/share/cta';
 import { shareKitFileName } from '@/lib/share/file-name';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
+import { shareIntentUrl } from '@/lib/share/intent';
 import { buildShareUrl } from '@/lib/share/links';
+import { SCREEN_QR_ERROR_CORRECTION, SCREEN_QR_PX } from '@/lib/share/qr';
 import { getReferralCode } from '@/lib/share/referral';
 import { isSeasonId, SEASON_IDS } from '@/lib/share/render/seasons';
-import { formatShareGiftAmount } from '@/lib/share/share-data';
-import { downloadBlob, shareFile, shareText } from '@/lib/share/web-share';
+import {
+  formatShareGiftAmount,
+  getShareProjectNames,
+  getShareStoryText,
+} from '@/lib/share/share-data';
+import {
+  downloadBlob,
+  shareFile,
+  shareText as shareTextToSheet,
+} from '@/lib/share/web-share';
 import { createZipParts } from '@/lib/share/zip';
 import { cn } from '@/lib/utils';
 import { hasFundraiserConcluded } from '@/lib/utils/fundraiser';
 import { useAuthStore } from '@/stores/auth-store';
+import { ReportQr } from '@/components/dashboard/fundraiser-detail/insights-report/report-qr';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -53,6 +68,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ChevronDownIcon } from '@/components/ui/ui-icons';
+import { FormatThumb } from './format-thumb';
 import { PlatformIcon } from './platform-icon';
 import { previewFitProps } from './preview-fit';
 import { SharePreview } from './share-preview';
@@ -69,19 +86,15 @@ import { useProjectPurposes, useShareRender } from './use-share-render';
 const CUSTOM = '__custom';
 const SUGGESTED = '__suggested';
 
+/** The cards a host can pick. Classic (the progress card) is first and the default: it is the design of the fundraiser page's Share images, so a host starts from the look people already know. */
+const HOST_CARDS = ['progress', 'minimal', 'impact', 'story'] as const;
+
+/** The host's own line on the image, short enough for three lines in every format. */
+const NOTE_MAX_LENGTH = 100;
+
 // For aria-disabled buttons: they look and act disabled but keep keyboard focus, which a disabled button drops when it turns busy under the cursor, for example right after Try again.
 const UNAVAILABLE =
   'aria-disabled:pointer-events-none aria-disabled:opacity-50';
-
-/** Aspect shapes for the format cards, in px. */
-const SHAPES = {
-  story: [12, 20],
-  tiktok: [12, 20],
-  shorts: [12, 20],
-  post: [16, 20],
-  banner: [22, 12],
-  wide: [22, 13],
-} as const;
 
 function cardClass(active: boolean) {
   return cn(
@@ -114,6 +127,7 @@ export function ShareStudio({
   sharer = 'donor',
   fitHeight,
   pinActions = false,
+  initialChannel,
 }: {
   fundraiser: Fundraiser;
   variant: 'host' | 'donor';
@@ -125,6 +139,8 @@ export function ShareStudio({
   fitHeight?: string;
   /** Donor layout, one column: keeps the Share or Download button at the bottom of the scroll area. The bar spans the scroll area's 1.5rem side and bottom padding (`-mx-6`, `-bottom-6`), so both must change with it. */
   pinActions?: boolean;
+  /** A channel to start on, from a link such as the QR code's. */
+  initialChannel?: ShareChannelId;
 }) {
   const t = useTranslations('Share');
   const locale = useLocale();
@@ -134,7 +150,7 @@ export function ShareStudio({
 
   const shareFiles = useCanShareFiles();
   const [pickedChannel, setPickedChannel] = useState<ShareChannelId | null>(
-    null
+    initialChannel ?? null
   );
   // Until one is picked, donors start on a story where the share sheet takes files, and on a post where the file is downloaded instead.
   const channelId: ShareChannelId =
@@ -150,6 +166,12 @@ export function ShareStudio({
   >(SUGGESTED);
   const [customCta, setCustomCta] = useState('');
   const [showDonors, setShowDonors] = useState(true);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [note, setNote] = useState('');
+  const [card, setCard] = useState<ShareCardId>('progress');
+  const [showAmounts, setShowAmounts] = useState(true);
+  const [showHost, setShowHost] = useState(true);
+  const [showProjects, setShowProjects] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [tip, setTip] = useState<string | null>(null);
   const [kitBusy, setKitBusy] = useState(false);
@@ -193,6 +215,11 @@ export function ShareStudio({
     season,
     cta,
     showDonors,
+    note: isHost ? note : null,
+    card: isHost ? card : 'progress',
+    showAmounts,
+    showHost,
+    showProjects,
     gift: donorGift,
     // A link-only share sends just the text, and the chat previews it with the server's image, which never has the gift line.
     showGift: shownGift !== null && !channel.linkOnly,
@@ -204,8 +231,16 @@ export function ShareStudio({
       photo: render.photo,
       background: render.background,
       avatars: render.avatars,
+      projectImages: render.projectImages,
     }),
-    [render.data, render.theme, render.photo, render.background, render.avatars]
+    [
+      render.data,
+      render.theme,
+      render.photo,
+      render.background,
+      render.avatars,
+      render.projectImages,
+    ]
   );
   const format = channel.format;
   const effectiveKind: ShareKind = channel.kinds.includes(kind)
@@ -228,7 +263,22 @@ export function ShareStudio({
         name: fundraiser.title,
       })
     : t(`captions.${plainCaption}`, { name: fundraiser.title });
-  const caption = `${message ?? defaultMessage}\n${link}`;
+  // The caption also says where a gift goes, in the same words as the image.
+  const projectNames = getShareProjectNames(fundraiser);
+  const supportsSentence =
+    showProjects && !shownGift && !concluded && projectNames.length > 0
+      ? t('captions.supports', {
+          projects: new Intl.ListFormat(locale, {
+            style: 'long',
+            type: 'conjunction',
+          }).format(projectNames.slice(0, 2)),
+        })
+      : '';
+  const defaultCaption = supportsSentence
+    ? `${defaultMessage} ${supportsSentence}`
+    : defaultMessage;
+  const shareText = message ?? defaultCaption;
+  const caption = `${shareText}\n${link}`;
   const platformLabel = t(`platforms.${channel.platform}`);
   const channelTip = t(`channels.${channelId}.tip`);
   // A story, TikTok or Short cannot carry a link in its text, so it gets the link alone, for a sticker or the bio. A post gets the caption with the link.
@@ -252,29 +302,44 @@ export function ShareStudio({
     if (ctaChoice !== CUSTOM) setCtaChoice(SUGGESTED);
   };
 
+  // On a computer, some platforms take a link in their own share page. Their Share button opens it and needs no file.
+  const intentUrl =
+    shareFiles === false && link
+      ? shareIntentUrl(channel, { link, text: shareText })
+      : null;
+  // The other apps only share from a phone. A computer shows a QR code that opens this studio there, on the same choice.
+  const phoneUrl =
+    shareFiles === false && !intentUrl && origin
+      ? `${origin}/raise/${encodeURIComponent(fundraiser.slug)}?share=${channelId}`
+      : null;
+
   const busy = !file || files.progress !== null;
   // A link-only share needs no file, so its Share button keeps working and the download button offers the retry instead.
-  const failed = files.failed && !channel.linkOnly;
+  const failed = files.failed && !channel.linkOnly && !intentUrl;
   const retryDownload = files.failed && channel.linkOnly === true;
-  const primaryDisabled = busy && !channel.linkOnly && !failed;
+  const primaryDisabled = busy && !channel.linkOnly && !failed && !intentUrl;
   const downloadDisabled = busy && !retryDownload;
-  const primaryLabel = failed
-    ? t('studio.renderFailed')
-    : files.progress !== null
-      ? t('studio.preparingVideo', {
-          percent: String(Math.round(files.progress * 100)),
-        })
-      : channel.linkOnly
-        ? t('studio.shareLink')
-        : !file
-          ? t('studio.preparing')
-          : shareFiles
-            ? channel.platform === 'other'
-              ? t('studio.share')
-              : t('studio.shareTo', { platform: platformLabel })
-            : effectiveKind === 'video' && files.video
-              ? t('studio.downloadVideo')
-              : t('studio.downloadImage');
+  const primaryLabel = intentUrl
+    ? channel.linkOnly
+      ? t('studio.shareLink')
+      : t('studio.shareTo', { platform: platformLabel })
+    : failed
+      ? t('studio.renderFailed')
+      : files.progress !== null
+        ? t('studio.preparingVideo', {
+            percent: String(Math.round(files.progress * 100)),
+          })
+        : channel.linkOnly
+          ? t('studio.shareLink')
+          : !file
+            ? t('studio.preparing')
+            : shareFiles
+              ? channel.platform === 'other'
+                ? t('studio.share')
+                : t('studio.shareTo', { platform: platformLabel })
+              : effectiveKind === 'video' && files.video
+                ? t('studio.downloadVideo')
+                : t('studio.downloadImage');
 
   /** Copies what the channel needs and returns its tip, which says what was copied only when it was. */
   const copyForChannel = async (): Promise<string> => {
@@ -291,6 +356,11 @@ export function ShareStudio({
   const onPrimary = async () => {
     if (primaryDisabled) return;
     setTip(null);
+    if (intentUrl) {
+      // Opens in the tap itself, so a popup blocker lets it through.
+      window.open(intentUrl, '_blank', 'noopener');
+      return;
+    }
     if (failed) {
       files.retry();
       return;
@@ -298,7 +368,7 @@ export function ShareStudio({
     if (channel.linkOnly) {
       // Desktop browsers without a share sheet leave `share` undefined, whatever the types say.
       if ('share' in navigator) {
-        await shareText(caption).catch(() =>
+        await shareTextToSheet(caption).catch(() =>
           toast.error(t('studio.shareFailed'))
         );
       } else if (await copyText(caption))
@@ -439,7 +509,7 @@ export function ShareStudio({
         )}
       >
         {/* The video's progress runs along the button's bottom edge, so nothing around it moves while it is made. */}
-        {files.progress !== null && (
+        {files.progress !== null && !intentUrl && (
           <span
             className='absolute inset-x-0 bottom-0 h-1 bg-current/20'
             aria-hidden='true'
@@ -452,7 +522,7 @@ export function ShareStudio({
         )}
         {primaryLabel}
       </Button>
-      {(shareFiles || channel.linkOnly) && (
+      {(shareFiles || channel.linkOnly || intentUrl) && (
         <Button
           variant='outline'
           onClick={onDownload}
@@ -482,15 +552,25 @@ export function ShareStudio({
       >
         {files.failed ? t('studio.renderFailedTip') : tip}
       </p>
-      {isHost && (
-        <Button
-          variant='link'
-          size='sm'
-          onClick={() => void onKit()}
-          disabled={kitBusy || !render.ready || !render.settled}
-        >
-          {kitBusy ? t('studio.kitPreparing') : t('studio.kit')}
-        </Button>
+      {phoneUrl && (
+        <div className='flex flex-col items-center gap-3 rounded-lg border border-border/60 bg-background p-4 text-center'>
+          {/* Big enough for a phone camera to read off a screen: see lib/share/qr. */}
+          <ReportQr
+            value={phoneUrl}
+            label={t('studio.phoneQrLabel')}
+            errorCorrectionLevel={SCREEN_QR_ERROR_CORRECTION}
+            className='shrink-0 rounded-md border border-border/60'
+            style={{ width: SCREEN_QR_PX, height: SCREEN_QR_PX }}
+          />
+          <div className='grid gap-0.5'>
+            <p className='text-sm font-medium text-foreground'>
+              {t('studio.phoneTitle')}
+            </p>
+            <p className='text-xs text-muted-foreground'>
+              {t('studio.phoneHint')}
+            </p>
+          </div>
+        </div>
       )}
     </>
   );
@@ -523,34 +603,53 @@ export function ShareStudio({
             aria-pressed={active}
             onClick={() => selectPlatform(platform)}
             className={cn(
-              'flex items-center justify-center rounded-md transition-colors',
-              isHost ? 'size-9' : 'aspect-square w-full max-w-9',
+              'flex items-center justify-center gap-1.5 rounded-md transition-colors',
+              isHost
+                ? cn(
+                    // On a phone every icon fits in one row, so the chosen one gives up its name.
+                    'h-9 max-sm:size-8',
+                    active ? 'px-3 max-sm:px-0' : 'w-9'
+                  )
+                : 'aspect-square w-full max-w-9',
               active
                 ? 'bg-accent-color/10 text-accent-color'
                 : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'
             )}
           >
             <PlatformIcon platform={platform} className='size-4' />
-            <span className='sr-only'>{label}</span>
+            {/* The chosen platform is named, so nobody has to hover to learn what an icon is. */}
+            <span
+              className={
+                isHost && active
+                  ? 'text-sm font-medium max-sm:sr-only'
+                  : 'sr-only'
+              }
+            >
+              {label}
+            </span>
           </button>
         );
       })}
     </div>
   );
 
-  const formatTiles = (
+  const formatOptions = channelsFor(channel.platform);
+  // A platform with one format needs no choice.
+  const formatTiles = formatOptions.length > 1 && (
     <div
       className={cn(
-        'grid grid-cols-2 gap-2',
+        'grid gap-2',
         // Donors: by the width of the choices column, which is a container.
-        isHost ? 'sm:grid-cols-3' : '@sm:grid-cols-3'
+        isHost ? 'grid-cols-3' : 'grid-cols-2 @sm:grid-cols-3'
       )}
       role='group'
       aria-label={t('studio.formatLabel')}
     >
-      {channelsFor(channel.platform).map(option => {
-        const [sw, sh] = SHAPES[option.format];
+      {formatOptions.map(option => {
         const id = option.id as ShareChannelId;
+        // Only formats with something to say have a hint; Post and Story speak for themselves.
+        const hintKey =
+          `channels.${id}.hint` as 'channels.whatsappMessage.hint';
         return (
           <button
             key={id}
@@ -559,19 +658,22 @@ export function ShareStudio({
             onClick={() => selectChannel(id)}
             className={cardClass(id === channelId)}
           >
-            <span className='flex h-5 items-center' aria-hidden='true'>
-              <span
-                className='rounded-[3px] border-2 border-current opacity-50'
-                style={{ width: sw, height: sh }}
+            <span className='flex h-11 w-11 items-center justify-center'>
+              <FormatThumb
+                format={option.format}
+                options={options}
+                ready={render.ready && render.settled}
               />
             </span>
             <span className='min-w-0'>
               <span className='block text-foreground'>
                 {t(`channels.${id}.label`)}
               </span>
-              <span className='block text-xs text-muted-foreground'>
-                {t(`channels.${id}.hint`)}
-              </span>
+              {t.has(hintKey) && (
+                <span className='block text-xs text-muted-foreground'>
+                  {t(hintKey)}
+                </span>
+              )}
             </span>
           </button>
         );
@@ -625,38 +727,38 @@ export function ShareStudio({
   const previewCard = (
     <Card className='items-center gap-3 border-border/60 px-5 py-5 shadow-xs'>
       {kindToggle}
-      {preview}
+      {/* On a short screen the phone shrinks so the card, with its Download buttons, fits without scrolling. The 28rem is the page above the card plus what the card holds besides the phone. */}
+      <div
+        className='flex w-full justify-center md:mx-auto md:max-w-(--host-preview-cap)'
+        style={
+          {
+            '--host-preview-cap': `max(12rem, calc((100svh - 28rem) * ${w / h}))`,
+          } as CSSProperties
+        }
+      >
+        {preview}
+      </div>
       {meta}
       <div className='grid w-full gap-2'>{actions}</div>
     </Card>
   );
 
-  const picker = (
-    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
-      <div>
-        <h2 className='text-lg font-semibold text-foreground'>
-          {t('studio.whereTitle')}
-        </h2>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          {t('studio.whereHint')}
-        </p>
-      </div>
-      {platformRow}
-      {formatTiles}
-    </Card>
-  );
+  // The thumbnails show each card with the story it would use, so the Story tile does not look empty.
+  const storyText = note.trim() || getShareStoryText(fundraiser);
+  const cardThumbOptions = (id: ShareCardId) => ({
+    ...options,
+    theme: { ...options.theme, card: id },
+    data:
+      id === 'story'
+        ? { ...options.data, note: options.data.note ?? storyText }
+        : options.data,
+  });
 
-  const customizeCard = (
-    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
-      <div>
-        <h2 className='text-lg font-semibold text-foreground'>
-          {t('studio.customizeTitle')}
-        </h2>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          {t('studio.customizeHint')}
-        </p>
-      </div>
-      <div className='flex flex-wrap items-end gap-4'>
+  // The basics: how it looks, the button, and the host's own line. Everything else waits behind Customize image.
+  const basicControls = (
+    <>
+      {/* Style and button text side by side, the same width. */}
+      <div className='grid gap-4 sm:grid-cols-2'>
         <div className='grid gap-1.5'>
           <Label htmlFor='share-style'>{t('studio.style')}</Label>
           <Select
@@ -665,7 +767,7 @@ export function ShareStudio({
               if (isSeasonId(value)) selectSeason(value);
             }}
           >
-            <SelectTrigger id='share-style' className='w-40'>
+            <SelectTrigger id='share-style' className='w-full'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -685,7 +787,7 @@ export function ShareStudio({
               setCtaChoice(value as CtaKey | typeof CUSTOM)
             }
           >
-            <SelectTrigger id='share-cta' className='w-56'>
+            <SelectTrigger id='share-cta' className='w-full'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -699,7 +801,7 @@ export function ShareStudio({
           </Select>
         </div>
         {ctaKey === CUSTOM && (
-          <div className='grid gap-1.5'>
+          <div className='grid gap-1.5 sm:col-span-2'>
             <Label htmlFor='share-cta-custom'>{t('cta.customLabel')}</Label>
             <Input
               id='share-cta-custom'
@@ -707,12 +809,136 @@ export function ShareStudio({
               maxLength={CUSTOM_CTA_MAX_LENGTH}
               placeholder={t('cta.customPlaceholder')}
               onChange={event => setCustomCta(event.target.value)}
-              className='w-56'
               autoFocus
             />
           </div>
         )}
-        <div className='grid gap-1'>
+      </div>
+
+      {/* The host's own words, with ideas to tap. The counter says what the field allows, so no sentence is needed. */}
+      <div className='grid gap-1.5'>
+        <div className='flex items-baseline justify-between gap-3'>
+          <Label htmlFor='share-note'>{t('studio.noteLabel')}</Label>
+          <span className='text-xs text-muted-foreground' aria-hidden='true'>
+            {note.length}/{NOTE_MAX_LENGTH}
+          </span>
+        </div>
+        <Input
+          id='share-note'
+          value={note}
+          maxLength={NOTE_MAX_LENGTH}
+          placeholder={t('studio.notePlaceholder')}
+          onChange={event => setNote(event.target.value)}
+        />
+        <div
+          className='flex flex-wrap gap-1.5'
+          role='group'
+          aria-label={t('studio.hooksLabel')}
+        >
+          {(['a', 'b'] as const).map(key => {
+            const hook = t(`hooks.${season}.${key}`);
+            return (
+              <button
+                key={key}
+                type='button'
+                onClick={() => setNote(hook)}
+                className='rounded-full border border-border px-3 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground'
+              >
+                {hook}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+
+  // For hosts who want to go further: which card design, and what the image shows.
+  const advancedControls = (
+    <>
+      <div className='grid gap-3'>
+        <Label id='share-card-label'>{t('studio.cardLabel')}</Label>
+        <div
+          role='group'
+          aria-labelledby='share-card-label'
+          className='grid gap-3 sm:grid-cols-2'
+        >
+          {HOST_CARDS.map(id => {
+            const selected = id === card;
+            return (
+              <button
+                key={id}
+                type='button'
+                aria-pressed={selected}
+                onClick={() => setCard(id)}
+                className={cn(
+                  'relative flex items-center gap-3 rounded-xl border p-3 text-left transition-colors',
+                  selected
+                    ? 'border-accent-color bg-accent-color/10 ring-1 ring-accent-color'
+                    : 'border-border hover:bg-accent/60'
+                )}
+              >
+                {/* The picture sits in a soft frame the same size for every design, so the four tiles line up. */}
+                <span className='flex h-[4.5rem] w-16 shrink-0 items-center justify-center rounded-lg bg-muted/60'>
+                  <FormatThumb
+                    format='post'
+                    size={56}
+                    options={cardThumbOptions(id)}
+                    ready={render.ready && render.settled}
+                  />
+                </span>
+                <span className='min-w-0 flex-1 pr-5'>
+                  <span className='block text-sm font-medium text-foreground'>
+                    {t(`cards.${id}`)}
+                  </span>
+                  {/* A short line on what the design is, so the names do not have to be guessed. */}
+                  <span className='mt-0.5 block text-xs leading-snug text-muted-foreground'>
+                    {t(`cardHints.${id}`)}
+                  </span>
+                </span>
+                {selected && (
+                  <span
+                    aria-hidden='true'
+                    className='absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-accent-color text-background'
+                  >
+                    <Check className='size-3' strokeWidth={3} />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        {card === 'story' && !options.data.note && (
+          <p className='text-xs text-muted-foreground'>
+            {t('studio.storyEmpty')}
+          </p>
+        )}
+      </div>
+      {/* What the image shows, as one tidy list of switches, with a single short note below when donors cannot be shown yet. */}
+      <div className='grid gap-2'>
+        <Label id='share-show-label'>{t('studio.showOnImage')}</Label>
+        <div
+          role='group'
+          aria-labelledby='share-show-label'
+          className='grid gap-x-6 sm:grid-cols-2'
+        >
+          <label className='flex h-9 items-center gap-2 text-sm'>
+            <Switch checked={showAmounts} onCheckedChange={setShowAmounts} />
+            {t('studio.showAmounts')}
+          </label>
+          <label className='flex h-9 items-center gap-2 text-sm'>
+            <Switch checked={showHost} onCheckedChange={setShowHost} />
+            {t('studio.showHost')}
+          </label>
+          {projectNames.length > 0 && (
+            <label className='flex h-9 items-center gap-2 text-sm'>
+              <Switch
+                checked={showProjects}
+                onCheckedChange={setShowProjects}
+              />
+              {t('studio.showProjects')}
+            </label>
+          )}
           <label className='flex h-9 items-center gap-2 text-sm'>
             <Switch
               checked={showDonors && render.donorsAvailable}
@@ -721,35 +947,110 @@ export function ShareStudio({
             />
             {t('studio.showDonors')}
           </label>
-          {!render.donorsAvailable && (
-            <p className='max-w-64 text-xs text-muted-foreground'>
-              {t('studio.donorsUnavailable')}
-            </p>
-          )}
         </div>
+        {/* Visible from the first share: why donors are not on the story yet, and what will tell the host when they can be. */}
+        {render.donorProgress?.status === 'off' && (
+          <p className='text-xs text-muted-foreground'>
+            {t.rich('studio.donorsOff', {
+              settings: chunks => (
+                <Link
+                  href={`/dashboard/fundraisers/edit/${encodeURIComponent(fundraiser.slug)}`}
+                  className='font-medium text-foreground underline underline-offset-2'
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
+        )}
+        {render.donorProgress?.status === 'few' && (
+          <p className='text-xs text-muted-foreground'>
+            {t('studio.donorsFew', { count: render.donorProgress.count })}
+          </p>
+        )}
       </div>
+    </>
+  );
+
+  // A quiet text link, not a box: most hosts never need it, so it should not ask for attention.
+  const moreOptions = (
+    <div>
+      <button
+        type='button'
+        aria-expanded={moreOpen}
+        aria-controls='share-more-options'
+        onClick={() => setMoreOpen(value => !value)}
+        className='inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
+      >
+        {t('studio.moreOptions')}
+        <ChevronDownIcon
+          className={cn(
+            'size-3.5 shrink-0 transition-transform',
+            moreOpen && 'rotate-180'
+          )}
+        />
+      </button>
+      {moreOpen && (
+        <div
+          id='share-more-options'
+          className='mt-4 grid gap-5 border-t border-border/60 pt-4'
+        >
+          {advancedControls}
+        </div>
+      )}
+    </div>
+  );
+
+  const picker = (
+    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
+      <div>
+        <h2 className='text-lg font-semibold text-foreground'>
+          {t('studio.whereTitle')}
+        </h2>
+        <p className='mt-1 text-sm text-muted-foreground'>
+          {t('studio.whereHint')}
+        </p>
+      </div>
+      {platformRow}
+      {formatTiles}
+      <div className='grid gap-4 border-t border-border/60 pt-4'>
+        {basicControls}
+      </div>
+      {moreOptions}
     </Card>
   );
 
-  const captionCard = (
+  // Every size at once is not on the path of sharing to one app, so it sits apart from the preview card's buttons.
+  const kitRow = (
+    <div className='flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-border px-5 py-4'>
+      <p className='text-sm text-muted-foreground'>{t('studio.kitHint')}</p>
+      <Button
+        variant='outline'
+        size='sm'
+        onClick={() => void onKit()}
+        disabled={kitBusy || !render.ready || !render.settled}
+      >
+        {kitBusy ? t('studio.kitPreparing') : t('studio.kit')}
+      </Button>
+    </div>
+  );
+
+  const copyLinkOnly = async () => {
+    if (await copyText(link)) toast.success(t('studio.linkCopied'));
+    else toast.error(t('studio.copyFailed'));
+  };
+
+  // One card, and one Copy button, for what the chosen format can carry. A story, TikTok or Short has no text, so it is only a link to copy. Anything else is a post text, copied with its link.
+  const captionCard = copiesLink ? (
     <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
       <div>
-        <h2
-          id='share-caption-title'
-          className='text-lg font-semibold text-foreground'
-        >
-          {t('studio.captionTitle')}
+        <h2 className='text-lg font-semibold text-foreground'>
+          {t('studio.linkTitle')}
         </h2>
         <p className='mt-1 text-sm text-muted-foreground'>
-          {t(copiesLink ? 'studio.captionHintLinkAlone' : 'studio.captionHint')}
+          {t('studio.linkHint')}
         </p>
       </div>
-      <Textarea
-        aria-labelledby='share-caption-title'
-        value={message ?? defaultMessage}
-        onChange={event => setMessage(event.target.value)}
-        rows={3}
-      />
       <div className='flex min-w-0 gap-2'>
         <Input
           readOnly
@@ -758,6 +1059,31 @@ export function ShareStudio({
           onFocus={event => event.currentTarget.select()}
           className='min-w-0 flex-1 text-xs text-muted-foreground'
         />
+        <Button variant='outline' onClick={() => void copyLinkOnly()}>
+          {t('studio.copyLink')}
+        </Button>
+      </div>
+    </Card>
+  ) : (
+    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
+      <div>
+        <h2
+          id='share-caption-title'
+          className='text-lg font-semibold text-foreground'
+        >
+          {t('studio.postTextTitle')}
+        </h2>
+        <p className='mt-1 text-sm text-muted-foreground'>
+          {t('studio.postTextHint')}
+        </p>
+      </div>
+      <Textarea
+        aria-labelledby='share-caption-title'
+        value={message ?? defaultMessage}
+        onChange={event => setMessage(event.target.value)}
+        rows={3}
+      />
+      <div className='flex flex-wrap items-center justify-between gap-3'>
         <Button
           variant='outline'
           onClick={async () => {
@@ -766,7 +1092,15 @@ export function ShareStudio({
             else toast.error(t('studio.copyFailed'));
           }}
         >
-          {t('studio.copy')}
+          {t('studio.copyTextAndLink')}
+        </Button>
+        <Button
+          variant='link'
+          size='sm'
+          className='px-0'
+          onClick={() => void copyLinkOnly()}
+        >
+          {t('studio.copyLinkOnly')}
         </Button>
       </div>
     </Card>
@@ -774,14 +1108,14 @@ export function ShareStudio({
 
   // On phones the preview and its Share button come right after the platforms, so a host who picks one sees the result without scrolling past the other cards. From md up the preview sits in its own column beside all three, and the order still matches the tab order.
   return (
-    <div className='grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_17rem] md:grid-rows-[auto_1fr] lg:grid-cols-[minmax(0,1fr)_22rem]'>
+    <div className='grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_17rem] md:grid-rows-[auto_1fr] lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_28rem]'>
       <div className='min-w-0 md:col-start-1 md:row-start-1'>{picker}</div>
-      <div className='md:sticky md:top-8 md:col-start-2 md:row-span-2 md:row-start-1'>
+      <div className='md:sticky md:top-4 md:col-start-2 md:row-span-2 md:row-start-1'>
         {previewCard}
       </div>
       <div className='grid min-w-0 gap-6 md:col-start-1 md:row-start-2'>
-        {customizeCard}
         {captionCard}
+        {kitRow}
       </div>
     </div>
   );

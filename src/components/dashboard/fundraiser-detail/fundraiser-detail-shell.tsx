@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
+import { DonorReadinessProvider } from './donor-readiness';
 import { FundraiserDetailContext } from './fundraiser-detail-context';
 import { FundraiserDetailHeader } from './fundraiser-detail-header';
 import { FundraiserDetailTabs } from './fundraiser-detail-tabs';
@@ -78,16 +79,26 @@ function FundraiserDetailBody({
 
   return (
     <FundraiserDetailContext.Provider
-      value={{ fundraiser: state.fundraiser, canEdit: state.canEdit }}
+      value={{
+        fundraiser: state.fundraiser,
+        canEdit: state.canEdit,
+        refresh: state.refresh,
+      }}
     >
-      <section className='space-y-6'>
-        <FundraiserDetailHeader
-          fundraiser={state.fundraiser}
-          canEdit={state.canEdit}
-        />
-        <FundraiserDetailTabs slug={slug} insightsEnabled={insightsEnabled} />
-        {children}
-      </section>
+      <DonorReadinessProvider fundraiser={state.fundraiser}>
+        <section className='space-y-6'>
+          <FundraiserDetailHeader
+            fundraiser={state.fundraiser}
+            canEdit={state.canEdit}
+          />
+          <FundraiserDetailTabs
+            slug={slug}
+            insightsEnabled={insightsEnabled}
+            fundraiser={state.fundraiser}
+          />
+          {children}
+        </section>
+      </DonorReadinessProvider>
     </FundraiserDetailContext.Provider>
   );
 }

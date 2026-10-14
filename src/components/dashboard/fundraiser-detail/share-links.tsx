@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { buildShareUrl } from '@/lib/share/links';
 import { getReferralCode } from '@/lib/share/referral';
+import { cn } from '@/lib/utils/cn';
 import { useAuthStore } from '@/stores/auth-store';
 import { useOrigin } from '@/components/share/use-origin';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ChevronDownIcon } from '@/components/ui/ui-icons';
 
 /** One tagged link per place a host shares. Same shape as the Stage Mode QR link: a source and a medium, no campaign. */
 const CHANNELS = [
@@ -91,18 +92,37 @@ function ShareLinkPicker({ slug }: { slug: string }) {
   );
 }
 
-/** The link section of the Share tab. */
+/**
+ * Links for places the studio does not cover, such as email, tucked away until asked for.
+ * The studio already gives the right tagged link for the platform picked above, so most hosts never need this.
+ */
 export function ShareLinksCard({ slug }: { slug: string }) {
   const t = useTranslations('Dashboard.fundraiser.insights.audience');
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
   return (
-    <Card className='gap-4 border-border/60 px-6 py-5 shadow-xs'>
-      <div>
-        <h2 className='text-lg font-semibold text-foreground'>
-          {t('builderTitle')}
-        </h2>
-        <p className='mt-1 text-sm text-muted-foreground'>{t('builderHint')}</p>
-      </div>
-      <ShareLinkPicker slug={slug} />
-    </Card>
+    <div className='rounded-xl border border-dashed border-border px-5 py-3'>
+      <button
+        type='button'
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen(value => !value)}
+        className='flex w-full items-center justify-between gap-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
+      >
+        {t('otherPlaces')}
+        <ChevronDownIcon
+          className={cn(
+            'size-4 shrink-0 transition-transform',
+            open && 'rotate-180'
+          )}
+        />
+      </button>
+      {open && (
+        <div id={panelId} className='mt-3 space-y-3'>
+          <p className='text-sm text-muted-foreground'>{t('builderHint')}</p>
+          <ShareLinkPicker slug={slug} />
+        </div>
+      )}
+    </div>
   );
 }
