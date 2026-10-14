@@ -1,5 +1,7 @@
 'use client';
 
+import type { CSSProperties } from 'react';
+
 import { useMemo } from 'react';
 import QRCode from 'qrcode';
 
@@ -13,13 +15,18 @@ export function ReportQr({
   value,
   label,
   className = 'size-[74px]',
+  style,
+  errorCorrectionLevel = 'M',
 }: {
   value: string;
   label: string;
   className?: string;
+  style?: CSSProperties;
+  /** Lower levels make fewer, bigger cells, which a camera reads more easily off a screen. */
+  errorCorrectionLevel?: 'L' | 'M';
 }) {
   const { size, path } = useMemo(() => {
-    const { modules } = QRCode.create(value, { errorCorrectionLevel: 'M' });
+    const { modules } = QRCode.create(value, { errorCorrectionLevel });
     const cells: string[] = [];
     for (let row = 0; row < modules.size; row++) {
       for (let column = 0; column < modules.size; column++) {
@@ -27,7 +34,7 @@ export function ReportQr({
       }
     }
     return { size: modules.size, path: cells.join('') };
-  }, [value]);
+  }, [value, errorCorrectionLevel]);
   const box = size + 2 * QUIET_ZONE;
 
   return (
@@ -38,6 +45,7 @@ export function ReportQr({
       role='img'
       aria-label={label}
       className={className}
+      style={style}
     >
       <rect
         x={-QUIET_ZONE}

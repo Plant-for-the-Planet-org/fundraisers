@@ -35,6 +35,7 @@ import { shareKitFileName } from '@/lib/share/file-name';
 import { SHARE_FORMATS, SHARE_VIDEO_SECONDS } from '@/lib/share/formats';
 import { shareIntentUrl } from '@/lib/share/intent';
 import { buildShareUrl } from '@/lib/share/links';
+import { SCREEN_QR_ERROR_CORRECTION, SCREEN_QR_PX } from '@/lib/share/qr';
 import { getReferralCode } from '@/lib/share/referral';
 import { isSeasonId, SEASON_IDS } from '@/lib/share/render/seasons';
 import {
@@ -552,11 +553,14 @@ export function ShareStudio({
         {files.failed ? t('studio.renderFailedTip') : tip}
       </p>
       {phoneUrl && (
-        <div className='flex items-center gap-3 rounded-lg border border-border/60 bg-background p-3 text-left'>
+        <div className='flex flex-col items-center gap-3 rounded-lg border border-border/60 bg-background p-4 text-center'>
+          {/* Big enough for a phone camera to read off a screen: see lib/share/qr. */}
           <ReportQr
             value={phoneUrl}
             label={t('studio.phoneQrLabel')}
-            className='size-20 shrink-0 rounded-md'
+            errorCorrectionLevel={SCREEN_QR_ERROR_CORRECTION}
+            className='shrink-0 rounded-md border border-border/60'
+            style={{ width: SCREEN_QR_PX, height: SCREEN_QR_PX }}
           />
           <div className='grid gap-0.5'>
             <p className='text-sm font-medium text-foreground'>
