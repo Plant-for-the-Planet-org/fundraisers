@@ -25,8 +25,17 @@ const HIGHLIGHT_BASE = [
   'transition-[background-color,box-shadow]',
   'duration-700',
 ];
-const HIGHLIGHT_ON = ['bg-accent-color/5', 'ring-1', 'ring-accent-color/30'];
-const HIGHLIGHT_MS = 2500;
+const HIGHLIGHT_ON = [
+  'bg-accent-color/[0.07]',
+  'ring-2',
+  'ring-accent-color/40',
+];
+// Long enough to find it and start working, without staying on for good.
+const HIGHLIGHT_MS = 6000;
+// Where the section is checked again, in ms, while the page settles.
+const SETTLE_MS = [500, 1200, 2200];
+const STICKY_BAR_PX = 80;
+const TOP_GAP_PX = 96;
 // The tint fades out before the spacing is taken away, so nothing jumps.
 const FADE_MS = 700;
 // The form fills in as the fundraiser loads, so the section may not exist yet.
@@ -36,12 +45,61 @@ const MAX_TRIES = 100;
 const FOCUSABLE =
   '[contenteditable="true"], input:not([type="hidden"]), textarea, button[role="switch"], select';
 
+/** The nearest ancestor that scrolls on its own, or the window. */
+function getScroller(el: HTMLElement): HTMLElement | Window {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    const { overflowY } = getComputedStyle(node);
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      node.scrollHeight > node.clientHeight
+    )
+      return node;
+  }
+  return window;
+}
+
 /**
  * Scrolls a section to the middle, puts the cursor in it and marks it for a moment.
  * Returns a function that stops the marking early.
  */
 export function highlightSection(section: HTMLElement): () => void {
-  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const scroller = getScroller(section);
+  const place = () => {
+    // The visible box of whatever scrolls, less the sticky save bar that covers its bottom.
+    const box =
+      scroller === window
+        ? { top: 0, height: window.innerHeight }
+        : (scroller as HTMLElement).getBoundingClientRect();
+    const usable = box.height - STICKY_BAR_PX;
+    const rect = section.getBoundingClientRect();
+    // A section taller than the visible box starts below the top edge instead of being centred.
+    const offset =
+      rect.height > usable * 0.8
+        ? rect.top - box.top - TOP_GAP_PX
+        : rect.top - box.top - (usable - rect.height) / 2;
+    if (Math.abs(offset) > 24)
+      scroller.scrollBy({ top: offset, behavior: 'smooth' });
+  };
+  place();
+  // The form is still loading images and editors, which moves things after the first scroll. So the section is put back in the middle a few times, until the visitor takes over by scrolling or typing.
+  let moved = false;
+  const takeOver = () => {
+    moved = true;
+  };
+  const takeOverEvents = [
+    'wheel',
+    'touchstart',
+    'keydown',
+    'mousedown',
+  ] as const;
+  takeOverEvents.forEach(type =>
+    window.addEventListener(type, takeOver, { passive: true, once: true })
+  );
+  const settleTimers = SETTLE_MS.map(ms =>
+    setTimeout(() => {
+      if (!moved) place();
+    }, ms)
+  );
   section.querySelector<HTMLElement>(FOCUSABLE)?.focus({ preventScroll: true });
   section.classList.add(...HIGHLIGHT_BASE, ...HIGHLIGHT_ON);
   // One gentle pulse outward, so the eye lands on the section. Skipped for people who ask for less motion.
@@ -50,7 +108,7 @@ export function highlightSection(section: HTMLElement): () => void {
       [
         {
           boxShadow:
-            '0 0 0 0 color-mix(in srgb, var(--accent-color) 22%, transparent)',
+            '0 0 0 0 color-mix(in srgb, var(--accent-color) 30%, transparent)',
         },
         { boxShadow: '0 0 0 10px transparent' },
       ],
@@ -66,6 +124,8 @@ export function highlightSection(section: HTMLElement): () => void {
     );
   }, HIGHLIGHT_MS);
   return () => {
+    settleTimers.forEach(clearTimeout);
+    takeOverEvents.forEach(type => window.removeEventListener(type, takeOver));
     clearTimeout(clearTimer);
     clearTimeout(fadeTimer);
     section.classList.remove(...HIGHLIGHT_ON, ...HIGHLIGHT_BASE);
