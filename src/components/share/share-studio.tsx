@@ -84,8 +84,8 @@ import { useProjectPurposes, useShareRender } from './use-share-render';
 const CUSTOM = '__custom';
 const SUGGESTED = '__suggested';
 
-/** The cards a host can pick, the plain one first, since it is where a host starts. The progress card stays for the link preview and the donor's thank-you. */
-const HOST_CARDS = ['minimal', 'impact', 'story'] as const;
+/** The cards a host can pick. Classic (the progress card) is first and the default: it is the design of the fundraiser page's Share images, so a host starts from the look people already know. */
+const HOST_CARDS = ['progress', 'minimal', 'impact', 'story'] as const;
 
 /** The host's own line on the image, short enough for three lines in every format. */
 const NOTE_MAX_LENGTH = 100;
@@ -166,7 +166,7 @@ export function ShareStudio({
   const [showDonors, setShowDonors] = useState(true);
   const [moreOpen, setMoreOpen] = useState(false);
   const [note, setNote] = useState('');
-  const [card, setCard] = useState<ShareCardId>('minimal');
+  const [card, setCard] = useState<ShareCardId>('progress');
   const [showAmounts, setShowAmounts] = useState(true);
   const [showHost, setShowHost] = useState(true);
   const [showProjects, setShowProjects] = useState(true);
@@ -856,7 +856,7 @@ export function ShareStudio({
         <div
           role='group'
           aria-labelledby='share-card-label'
-          className='grid grid-cols-3 gap-2'
+          className='grid grid-cols-2 gap-2 sm:grid-cols-4'
         >
           {HOST_CARDS.map(id => (
             <button

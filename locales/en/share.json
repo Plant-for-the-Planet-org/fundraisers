@@ -70,6 +70,7 @@
       "classic": "With your kind help, we are raising funds for {name}. We would be grateful for your support."
     },
     "cards": {
+      "progress": "Classic",
       "impact": "Impact",
       "minimal": "Minimal",
       "story": "Your words"

@@ -120,7 +120,7 @@ Every host-facing "Share" button leads here: the checklist, the donors empty sta
 
 Above the links, the share studio makes images and videos for each platform (story, post, TikTok, Shorts, link preview), in the fundraiser's theme with live progress, and shares or downloads them. See `docs/share.md`. Links from both carry the host's `?ref=` code once the profile has one.
 
-The first card, Where are you sharing?, holds the platform, the format, and the basics: style, button text and the host's own line. A More options row under it, closed at first, holds the card design (Minimal, which is the default, Impact, or Your words) and what the image shows (amounts, name, projects, donors).
+The first card, Where are you sharing?, holds the platform, the format, and the basics: style, button text and the host's own line. A More options row under it, closed at first, holds the card design (Classic, which is the default and the look of the page's Share images, Minimal, Impact, or Your words) and what the image shows (amounts, name, projects, donors).
 
 On phones the studio shows the platforms first, then the preview with its Share button, then the caption, so a host sees the result of a pick without scrolling. From `md` up the preview sits in its own column beside the other cards, and the tab order follows the same order.
 

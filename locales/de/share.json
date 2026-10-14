@@ -70,6 +70,7 @@
       "classic": "Mit Ihrer freundlichen Hilfe sammeln wir Spenden für {name}. Wir freuen uns über Ihre Unterstützung."
     },
     "cards": {
+      "progress": "Klassisch",
       "impact": "Wirkung",
       "minimal": "Schlicht",
       "story": "Deine Worte"
