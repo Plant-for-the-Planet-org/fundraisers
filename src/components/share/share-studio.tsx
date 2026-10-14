@@ -856,7 +856,7 @@ export function ShareStudio({
         <div
           role='group'
           aria-labelledby='share-card-label'
-          className='grid grid-cols-2 gap-2 sm:grid-cols-4'
+          className='grid gap-2 sm:grid-cols-2'
         >
           {HOST_CARDS.map(id => (
             <button
@@ -864,16 +864,24 @@ export function ShareStudio({
               type='button'
               aria-pressed={id === card}
               onClick={() => setCard(id)}
-              className={cardClass(id === card)}
+              className={cn(cardClass(id === card), 'flex-row items-center')}
             >
-              <span className='flex h-11 w-full items-center justify-center'>
+              <span className='flex h-11 w-11 shrink-0 items-center justify-center'>
                 <FormatThumb
                   format='post'
                   options={cardThumbOptions(id)}
                   ready={render.ready && render.settled}
                 />
               </span>
-              <span className='text-foreground'>{t(`cards.${id}`)}</span>
+              {/* A line on what each design is, so the names do not have to be guessed. */}
+              <span className='min-w-0'>
+                <span className='block text-foreground'>
+                  {t(`cards.${id}`)}
+                </span>
+                <span className='block text-xs text-muted-foreground'>
+                  {t(`cardHints.${id}`)}
+                </span>
+              </span>
             </button>
           ))}
         </div>
@@ -941,32 +949,29 @@ export function ShareStudio({
     </>
   );
 
+  // A quiet text link, not a box: most hosts never need it, so it should not ask for attention.
   const moreOptions = (
-    <div className='rounded-xl border border-dashed border-border px-4 py-3'>
+    <div>
       <button
         type='button'
         aria-expanded={moreOpen}
         aria-controls='share-more-options'
         onClick={() => setMoreOpen(value => !value)}
-        className='flex w-full items-center justify-between gap-3 text-left'
+        className='inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
       >
-        <span className='grid'>
-          <span className='text-sm font-medium text-foreground'>
-            {t('studio.moreOptions')}
-          </span>
-          <span className='text-xs text-muted-foreground'>
-            {t('studio.moreOptionsHint')}
-          </span>
-        </span>
+        {t('studio.moreOptions')}
         <ChevronDownIcon
           className={cn(
-            'size-4 shrink-0 text-muted-foreground transition-transform',
+            'size-3.5 shrink-0 transition-transform',
             moreOpen && 'rotate-180'
           )}
         />
       </button>
       {moreOpen && (
-        <div id='share-more-options' className='mt-4 grid gap-5'>
+        <div
+          id='share-more-options'
+          className='mt-4 grid gap-5 border-t border-border/60 pt-4'
+        >
           {advancedControls}
         </div>
       )}

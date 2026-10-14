@@ -75,6 +75,12 @@
       "minimal": "Minimal",
       "story": "Your words"
     },
+    "cardHints": {
+      "progress": "Your progress ring and your donors. The look people know from Share images.",
+      "minimal": "A small photo, the title and your name. Clean and simple.",
+      "impact": "Shows the projects your gifts support.",
+      "story": "Your own line in big text, over a large photo."
+    },
     "hooks": {
       "none": {
         "a": "I'm planting trees, and I'd love your help.",
@@ -271,7 +277,6 @@
       "whereTitle": "Where are you sharing?",
       "whereHint": "We make the right size for each app.",
       "moreOptions": "More options",
-      "moreOptionsHint": "Card design and what the image shows",
       "platformLabel": "Platform",
       "formatLabel": "Format",
       "style": "Style",

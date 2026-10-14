@@ -75,6 +75,12 @@
       "minimal": "Schlicht",
       "story": "Deine Worte"
     },
+    "cardHints": {
+      "progress": "Dein Fortschrittsring und deine Spender*innen. Das Aussehen aus den Bildern zum Teilen.",
+      "minimal": "Ein kleines Foto, der Titel und dein Name. Klar und einfach.",
+      "impact": "Zeigt die Projekte, die deine Spenden unterstützen.",
+      "story": "Deine eigene Zeile in großer Schrift über einem großen Foto."
+    },
     "hooks": {
       "none": {
         "a": "Ich pflanze Bäume und freue mich über deine Hilfe.",
@@ -271,7 +277,6 @@
       "whereTitle": "Wo teilst du?",
       "whereHint": "Wir erstellen die passende Größe für jede App.",
       "moreOptions": "Mehr Optionen",
-      "moreOptionsHint": "Kartendesign und was das Bild zeigt",
       "platformLabel": "Plattform",
       "formatLabel": "Format",
       "style": "Stil",
