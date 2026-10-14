@@ -749,7 +749,7 @@ export function ShareStudio({
         : options.data,
   });
 
-  // The basics: how it looks, the button, and the host's own line. Everything else waits behind More options.
+  // The basics: how it looks, the button, and the host's own line. Everything else waits behind Customize image.
   const basicControls = (
     <>
       {/* Style and button text side by side, the same width. */}
