@@ -15,15 +15,18 @@ export const FOCUS_SECTIONS = [
 ] as const;
 export type FocusSection = (typeof FOCUS_SECTIONS)[number];
 
-const HIGHLIGHT_CLASSES = [
+// A light touch: a faint tint and a thin soft outline, with a little room around the section (the negative margin keeps the layout from moving).
+const HIGHLIGHT_BASE = [
   'rounded-xl',
-  'ring-2',
-  'ring-accent-color',
-  'ring-offset-8',
-  'ring-offset-transparent',
-  'transition-shadow',
+  '-m-3',
+  'p-3',
+  'transition-[background-color,box-shadow]',
+  'duration-700',
 ];
-const HIGHLIGHT_MS = 3000;
+const HIGHLIGHT_ON = ['bg-accent-color/5', 'ring-1', 'ring-accent-color/30'];
+const HIGHLIGHT_MS = 2500;
+// The tint fades out before the spacing is taken away, so nothing jumps.
+const FADE_MS = 700;
 // The form fills in as the fundraiser loads, so the section may not exist yet.
 const WAIT_MS = 100;
 const MAX_TRIES = 100;
@@ -44,6 +47,7 @@ export function FocusSectionFromLink() {
     if (!FOCUS_SECTIONS.includes(target as FocusSection)) return;
     let tries = 0;
     let clearTimer: ReturnType<typeof setTimeout> | undefined;
+    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
 
     const find = () => {
       const section = document.querySelector<HTMLElement>(
@@ -57,24 +61,27 @@ export function FocusSectionFromLink() {
       section
         .querySelector<HTMLElement>(FOCUSABLE)
         ?.focus({ preventScroll: true });
-      section.classList.add(...HIGHLIGHT_CLASSES);
-      // A soft pulse out from the ring, twice, so the eye lands on the section. Skipped for people who ask for less motion.
+      section.classList.add(...HIGHLIGHT_BASE, ...HIGHLIGHT_ON);
+      // One gentle pulse outward, so the eye lands on the section. Skipped for people who ask for less motion.
       if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         section.animate(
           [
             {
               boxShadow:
-                '0 0 0 0 color-mix(in srgb, var(--accent-color) 45%, transparent)',
+                '0 0 0 0 color-mix(in srgb, var(--accent-color) 22%, transparent)',
             },
-            { boxShadow: '0 0 0 14px transparent' },
+            { boxShadow: '0 0 0 10px transparent' },
           ],
-          { duration: 1100, iterations: 2, easing: 'ease-out' }
+          { duration: 1200, easing: 'ease-out' }
         );
       }
-      clearTimer = setTimeout(
-        () => section.classList.remove(...HIGHLIGHT_CLASSES),
-        HIGHLIGHT_MS
-      );
+      clearTimer = setTimeout(() => {
+        section.classList.remove(...HIGHLIGHT_ON);
+        fadeTimer = setTimeout(
+          () => section.classList.remove(...HIGHLIGHT_BASE),
+          FADE_MS
+        );
+      }, HIGHLIGHT_MS);
       window.history.replaceState(null, '', window.location.pathname);
       return true;
     };
@@ -86,6 +93,7 @@ export function FocusSectionFromLink() {
     return () => {
       clearInterval(interval);
       clearTimeout(clearTimer);
+      clearTimeout(fadeTimer);
     };
   }, [target]);
 
