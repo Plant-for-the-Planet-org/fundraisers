@@ -73,6 +73,35 @@ export function getOnColorText(hex: string): string {
     : '#000000';
 }
 
+function channelHex(channel: number) {
+  return Math.round(channel).toString(16).padStart(2, '0');
+}
+
+/** `a` laid over `b` at `amount` (0 to 1), like `color-mix(in srgb, a, b)`. */
+export function mixHex(a: string, b: string, amount: number): string {
+  const top = hexToRgb(a);
+  const bottom = hexToRgb(b);
+  const mix = (x: number, y: number) =>
+    channelHex(x * amount + y * (1 - amount));
+  return `#${mix(top.r, bottom.r)}${mix(top.g, bottom.g)}${mix(top.b, bottom.b)}`;
+}
+
+/**
+ * The accent as text on `base`, reaching AA: mixed towards black on a light base (or white on a dark one) in small steps, only as far as needed.
+ * An accent that already passes is returned as it is.
+ */
+export function getReadableInk(accent: string, base: string): string {
+  const target =
+    getRelativeLuminance(base) > LIGHT_MODE_LUMINANCE_THRESHOLD
+      ? '#000000'
+      : '#ffffff';
+  for (let step = 0; step <= 20; step++) {
+    const ink = mixHex(target, accent, step / 20);
+    if (getContrastRatio(ink, base) >= MIN_TEXT_CONTRAST) return ink;
+  }
+  return target;
+}
+
 // Above this luminance a colour reads better with dark text (light mode);
 // below it, with light text (dark mode). 0.179 is the WCAG cross-over point
 // between black-on-colour and white-on-colour contrast.

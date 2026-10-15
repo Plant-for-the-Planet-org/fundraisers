@@ -1,8 +1,10 @@
 // Use type-safe message keys with `next-intl`
+import type MessagesAbout from '../../locales/en/about.json';
 import type MessageAuth from '../../locales/en/auth.json';
 import type MessagesBundles from '../../locales/en/bundles.json';
 import type MessagesCommon from '../../locales/en/common.json';
 import type MessagesCookies from '../../locales/en/cookies.json';
+import type MessagesCopyright from '../../locales/en/copyright.json';
 import type MessageDashboard from '../../locales/en/dashboard.json';
 import type MessageDonate from '../../locales/en/donate.json';
 import type MessagesExplore from '../../locales/en/explore.json';
@@ -21,7 +23,9 @@ type Messages = typeof MessagesCommon &
   typeof MessagesStage &
   typeof MessagesLeaderboard &
   typeof MessagesCookies &
-  typeof MessagesHostInvite;
+  typeof MessagesCopyright &
+  typeof MessagesHostInvite &
+  typeof MessagesAbout;
 
 declare module 'next-intl' {
   interface AppConfig {

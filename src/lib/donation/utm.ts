@@ -5,31 +5,32 @@ import type { Fundraiser } from '../types/fundraiser';
  * Every key is stored under its own standard name. Planet widgets already forward
  * `utm_id` (see planet-widgets/utils/utmParams.js).
  *
- * `utm_campaign` is absent, deliberately. The platform still reserves that key for
- * the fundraiser GUID and matches donations on it, so the URL's own campaign has
- * nowhere honest to go yet. Once FundraiserSubscriber associates on
- * `metadata.fundraiser.id` instead, add `utm_campaign` here and it lands correctly,
- * with no invented field to migrate away from.
+ * The platform attaches the donation to its fundraiser through `metadata.fundraiser.id`,
+ * so `utm_campaign` is free to hold the donor's real campaign.
  */
 const UTM_PARAMS = [
   ['utm_source', 'utm_source'],
   ['utm_medium', 'utm_medium'],
+  ['utm_campaign', 'utm_campaign'],
   ['utm_id', 'utm_id'],
   ['utm_content', 'utm_content'],
   ['utm_term', 'utm_term'],
 ] as const;
 
+/** Keys that old links used to address a fundraiser, see `isFundraiserReference`. */
+const REFERENCE_KEYS: ReadonlySet<string> = new Set(['utm_campaign', 'utm_id']);
+
 /** Anyone can craft a link, so cap the values before they reach the API. */
 const MAX_VALUE_LENGTH = 200;
 
-/** Fundraiser GUID, e.g. `fr_GhHeVDCYkqsh`. Same shape the platform matches on. */
+/** Fundraiser GUID, e.g. `fr_GhHeVDCYkqsh`. */
 const FUNDRAISER_GUID = /^fr_[a-zA-Z0-9]{12}$/;
 
 export type FundraiserRef = Pick<Fundraiser, 'id' | 'hid'>;
 
 /**
- * Links built for the legacy donate app addressed a fundraiser through a campaign
- * field, so one can still arrive holding an identifier rather than a campaign.
+ * Links built for the legacy donate app addressed a fundraiser through `utm_campaign`
+ * or `utm_id`, so one can still arrive holding an identifier rather than a campaign.
  *
  * This is the fundraiser donation path, so the donation already belongs to a
  * fundraiser. Keeping a second reference would make it read as belonging to two,
@@ -57,7 +58,7 @@ export function parseUtmParams(
   for (const [param, key] of UTM_PARAMS) {
     const value = params.get(param)?.trim();
     if (!value) continue;
-    if (key === 'utm_id' && isFundraiserReference(value, fundraiser)) {
+    if (REFERENCE_KEYS.has(key) && isFundraiserReference(value, fundraiser)) {
       continue;
     }
 

@@ -1,0 +1,42 @@
+{
+  "Copyright": {
+    "meta": {
+      "title": "Copyright and content reports",
+      "description": "How to tell us if a fundraiser uses your work without permission, and what we do next."
+    },
+    "title": "Copyright and content reports",
+    "lead": "Fundraiser hosts can add their own images to their pages. If you think something on a fundraiser breaks your copyright or another right, or is illegal, tell us and we will look into it.",
+    "toc": {
+      "label": "On this page",
+      "send": "What to send us",
+      "next": "What happens next",
+      "other": "Other content problems"
+    },
+    "send": {
+      "title": "What to send us",
+      "intro": "Email us at <mail>{email}</mail> with these details:",
+      "items": {
+        "explanation": "A clear explanation of why you think the content is illegal or uses your work without permission. Say which work it is and, if you can, where it is published.",
+        "location": "The exact web address (URL) of the fundraiser page that shows it.",
+        "contact": "Your name and email address, so we can reach you.",
+        "goodFaith": "A statement that you believe in good faith that your notice is correct and complete."
+      }
+    },
+    "next": {
+      "title": "What happens next",
+      "review": "We confirm that we received your notice and read it. If the content is illegal or uses your work without permission, we remove it or block access, and tell the fundraiser host why.",
+      "counter": "The host can reply if they think we made a mistake. We look at both sides, decide, and tell you the result.",
+      "repeat": "Hosts who repeatedly use content they have no right to use can lose access to their account."
+    },
+    "other": {
+      "title": "Other content problems",
+      "body": "You can use the same address to report other illegal content on a fundraiser, or an image of you that you did not agree to. Tell us the fundraiser URL and what is wrong."
+    },
+    "misuse": {
+      "body": "Please only send a notice if you are sure. A false notice can have legal consequences."
+    },
+    "legal": {
+      "body": "This page works together with section 10 of our <terms>Terms & Conditions</terms>. See also our <privacy>Privacy Policy</privacy>. We use the details in your notice only to handle it, and we may share them with the fundraiser host."
+    }
+  }
+}

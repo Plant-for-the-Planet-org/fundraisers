@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export interface TocItem {
@@ -12,24 +12,23 @@ export interface TocItem {
 const ACTIVE_OFFSET = 120;
 
 /**
- * Sticky "on this page" menu for the cookies page. Desktop only (the page
+ * Sticky "on this page" menu for long text pages. Desktop only (the page
  * stacks to a single readable column on smaller screens). Highlights the last
  * section whose heading has scrolled past the top of the reading area.
  */
-export function CookiesToc({
-  items,
-  label,
-}: {
-  items: TocItem[];
-  label: string;
-}) {
+export function PageToc({ items, label }: { items: TocItem[]; label: string }) {
   const [activeId, setActiveId] = useState(items[0]?.id);
+  // On a short page a jump can land at the page bottom, where the scroll rule
+  // below would mark the last item. So a clicked item stays marked until the
+  // reader scrolls on their own.
+  const clickedRef = useRef(false);
 
   useEffect(() => {
     let frame = 0;
 
     const update = () => {
       frame = 0;
+      if (clickedRef.current) return;
 
       // At (or near) the bottom the trailing sections can't scroll high enough
       // to pass the offset, so pin the last item once the page bottom is shown.
@@ -54,10 +53,21 @@ export function CookiesToc({
       if (!frame) frame = requestAnimationFrame(update);
     };
 
+    const releaseClick = () => {
+      clickedRef.current = false;
+    };
+    const userScrollEvents = ['wheel', 'touchstart', 'keydown'] as const;
+
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
+    for (const type of userScrollEvents) {
+      window.addEventListener(type, releaseClick, { passive: true });
+    }
     return () => {
       window.removeEventListener('scroll', onScroll);
+      for (const type of userScrollEvents) {
+        window.removeEventListener(type, releaseClick);
+      }
       if (frame) cancelAnimationFrame(frame);
     };
   }, [items]);
@@ -72,6 +82,10 @@ export function CookiesToc({
           <li key={id}>
             <a
               href={`#${id}`}
+              onClick={() => {
+                clickedRef.current = true;
+                setActiveId(id);
+              }}
               className={cn(
                 '-ml-px block border-l-2 py-1 pl-4 text-sm transition-colors',
                 activeId === id

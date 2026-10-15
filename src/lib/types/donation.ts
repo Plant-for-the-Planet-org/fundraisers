@@ -80,6 +80,7 @@ export interface CustomFieldValue {
 export interface DonationUtm {
   utm_source?: string;
   utm_medium?: string;
+  utm_campaign?: string;
   /** The sender's own campaign ID, e.g. from an ad platform or a Planet widget. */
   utm_id?: string;
   utm_content?: string;
@@ -87,12 +88,8 @@ export interface DonationUtm {
 }
 
 export interface DonationMetadata extends DonationUtm {
-  /**
-   * Fundraiser GUID (`fr_*`) or legacy HID, not a campaign name despite the key.
-   * The platform's FundraiserSubscriber matches on this to attach the donation.
-   */
-  utm_campaign: string;
   fundraiser: {
+    /** Fundraiser GUID (`fr_*`). The platform's FundraiserSubscriber matches on this to attach the donation. */
     id: string;
     source?: string;
     referrer?: string;
