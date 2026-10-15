@@ -6,12 +6,7 @@ import { useTranslations } from 'next-intl';
 import { isProtectedRoute } from '@/lib/utils/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { openSignInModal } from '@/stores/sign-in-modal-store';
-import { HEADER_LINKS } from './config';
-
-const HIDE_START_FUNDRAISER_PATHS = [
-  '/fundraisers/create',
-  '/dashboard/fundraisers/edit',
-];
+import { HEADER_LINKS, shouldShowStartFundraiser } from './config';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -22,8 +17,7 @@ export function Navigation() {
 
   const displayedLinks = HEADER_LINKS.filter(
     link =>
-      link.labelKey !== 'startFundraiser' ||
-      !HIDE_START_FUNDRAISER_PATHS.some(p => pathname.startsWith(p))
+      link.labelKey !== 'startFundraiser' || shouldShowStartFundraiser(pathname)
   );
 
   return (
