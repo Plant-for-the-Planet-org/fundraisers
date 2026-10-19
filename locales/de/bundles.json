@@ -4,37 +4,30 @@
     "moreLabel": "Mehr",
     "tabs": {
       "staff-picks": {
-        "label": "Team-Auswahl",
-        "description": "Handverlesen vom Plant-for-the-Planet-Team."
+        "label": "Team-Auswahl"
       },
       "wonder": {
-        "label": "Staunen",
-        "description": "Die Welt ist riesig und wunderschön."
+        "label": "Staunen"
       },
       "rage": {
-        "label": "Wut",
-        "description": "Das ist defekt und muss repariert werden."
+        "label": "Wut"
       },
       "love": {
-        "label": "Liebe",
-        "description": "Für Menschen, Orte und Dinge, die mir wichtig sind."
+        "label": "Liebe"
       },
       "custom": {
-        "label": "Individuell",
-        "description": "Erstelle dein eigenes Paket - wähle Projekte einzeln aus."
+        "label": "Individuell"
       }
     },
     "card": {
       "projectCount": "{count, plural, one {# Projekt} other {# Projekte}}",
       "seeInside": "Ansehen",
-      "selected": "Ausgewählt",
       "containsNonDonatable": "Enthält ein Projekt, das derzeit nicht bespendbar ist"
     },
     "aria": {
       "openBundle": "Sehe dir das {name} Paket an",
       "selectBundle": "Wähle das {name} Paket",
       "selectedBundle": "Das {name} Paket ist gerade ausgewählt",
-      "openProject": "Erfahre mehr über {name} (öffnet in neuem Tab)",
       "closeModal": "Vorschau schließen"
     },
     "modal": {
@@ -49,7 +42,6 @@
       }
     },
     "custom": {
-      "description": "Erstelle dein eigenes Paket - wähle Projekte einzeln aus.",
       "searchPlaceholder": "Suche und wähle Projekte aus, um dein Paket zu erstellen",
       "maxReached": "6 Projekte ausgewählt. Entferne eines, um ein anderes hinzuzufügen.",
       "showingCount": "Top {shown, number} von {total, number} · Suche nach mehr · ✨ Top-Projekten",
@@ -72,8 +64,7 @@
       "aria": {
         "search": "Projekte suchen",
         "addProject": "{name} hinzufügen",
-        "removeProject": "{name} entfernen",
-        "defaultProjectLocked": "{name} ist das Standardprojekt und kann nicht entfernt werden"
+        "removeProject": "{name} entfernen"
       }
     },
     "projectImageAlt": "Bild für {name}",

@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl';
 import { DONATION_FORM_ERRORS } from '@/lib/types/donation-form-errors';
 
 export function useFieldError() {
+  // One message per key in DONATION_FORM_ERRORS.
+  // i18n-used: *
   const tDonate = useTranslations('Donate.errors');
 
   return function translateError(

@@ -14,6 +14,8 @@ export const DonationFailureBanner = ({
   errorCode: SubmissionErrorKey;
   reset: () => void;
 }) => {
+  // One message per SubmissionErrorKey.
+  // i18n-used: *
   const t = useTranslations('Donate.submissionErrors');
   return (
     <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4'>

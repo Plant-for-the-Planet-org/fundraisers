@@ -52,8 +52,6 @@
       },
       "country": {
         "label": "Country *",
-        "placeholder": "Select country",
-        "searchPlaceholder": "Search countries...",
         "noResults": "No countries found",
         "selectCountry": "Select Country"
       },
@@ -156,7 +154,6 @@
       "accountHolderNamePlaceholder": "Jane Doe",
       "accountHolderNameRequired": "Account holder name is required",
       "errors": {
-        "validationFailed": "Validation failed",
         "stripeNotInitialized": "Stripe not initialized",
         "ibanElementNotFound": "IBAN element not found",
         "paymentMethodFailed": "Payment method creation failed"
@@ -203,7 +200,6 @@
       "countryPlaceholder": "Select country",
       "countryNoResults": "No countries found",
       "errors": {
-        "validationFailed": "Validation failed",
         "stripeNotInitialized": "Stripe not initialized",
         "cardElementNotFound": "Card element not found",
         "paymentMethodFailed": "Payment method creation failed",

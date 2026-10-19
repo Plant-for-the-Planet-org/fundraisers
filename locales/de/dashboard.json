@@ -248,8 +248,7 @@
     "statsError": {
       "title": "Die Dashboard-Statistiken konnten nicht geladen werden.",
       "description": "Beim Laden der Daten zu deinem Aufruf ist etwas schief gelaufen.",
-      "retry": "Erneut versuchen",
-      "exploreLinkText": "Spendenaufrufe entdecken"
+      "retry": "Erneut versuchen"
     },
     "toolbar": {
       "searchPlaceholder": "Name o. Ersteller*in...",
@@ -265,7 +264,6 @@
       "ended": "Beendet"
     },
     "sort": {
-      "triggerLabel": "Sortieren:",
       "options": {
         "newest": "Neueste zuerst",
         "oldest": "Älteste zuerst",
