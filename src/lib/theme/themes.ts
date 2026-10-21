@@ -24,7 +24,8 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-leaves', 'bg-meadow-loop', 'bg-botanic', 'bg-watercolor'],
     bg: defineBg(
-      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20'
+      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20',
+      { decoration: 'pattern', pattern_id: 'bg-spring', opacity: 0.2 }
     ),
   },
   birthday: {

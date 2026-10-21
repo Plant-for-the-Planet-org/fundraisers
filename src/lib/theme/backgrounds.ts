@@ -149,6 +149,14 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     masked: true,
     fullBleed: true,
   },
+  {
+    id: 'bg-spring',
+    label: 'Spring',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-spring.svg',
+    masked: true,
+    fullBleed: true,
+  },
   // Curated images.
   {
     id: 'bg-forest',
