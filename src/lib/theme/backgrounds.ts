@@ -141,6 +141,14 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     fullBleed: true,
     thumbMaskSize: '400%',
   },
+  {
+    id: 'bg-leafy',
+    label: 'Leafy',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-leafy.svg',
+    masked: true,
+    fullBleed: true,
+  },
   // Curated images.
   {
     id: 'bg-forest',

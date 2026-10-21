@@ -101,6 +101,7 @@ const PICKABLE_BG_IDS = new Set([
   'bg-grid-lines',
   'bg-trees',
   'bg-woodgrain',
+  'bg-leafy',
   'bg-forest',
   'bg-forest-bw',
   'bg-forest-bw-2',
