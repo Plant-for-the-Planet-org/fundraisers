@@ -141,6 +141,38 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     fullBleed: true,
     thumbMaskSize: '400%',
   },
+  {
+    id: 'bg-leafy',
+    label: 'Leafy',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-leafy.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-spring',
+    label: 'Spring',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-spring.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-baby-shower',
+    label: 'Baby shower',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-baby-shower.svg',
+    masked: true,
+    fullBleed: true,
+  },
+  {
+    id: 'bg-sports',
+    label: 'Sports',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-sports.svg',
+    masked: true,
+    fullBleed: true,
+  },
   // Curated images.
   {
     id: 'bg-forest',
