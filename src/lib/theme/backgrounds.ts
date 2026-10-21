@@ -165,6 +165,14 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     masked: true,
     fullBleed: true,
   },
+  {
+    id: 'bg-sports',
+    label: 'Sports',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-sports.svg',
+    masked: true,
+    fullBleed: true,
+  },
   // Curated images.
   {
     id: 'bg-forest',

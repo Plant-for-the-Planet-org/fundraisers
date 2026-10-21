@@ -104,6 +104,25 @@ export const THEMES: Record<string, Theme> = {
       opacity: 0.55,
     }),
   },
+  sports: {
+    id: 'sports',
+    name: 'Sports',
+    category: 'celebration',
+    // Hex accents from the design, as for Baby Shower.
+    accent: '#EB5757' as AccentColor,
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    featured: true,
+    colorOptions: ['#EB5757', '#42A5AD', '#5C4915'].map(
+      hex => hex as AccentColor
+    ),
+    bg: defineBg('', {
+      decoration: 'pattern',
+      pattern_id: 'bg-sports',
+      opacity: 0.2,
+    }),
+  },
   stratospheric: {
     id: 'stratospheric',
     name: 'Polar Stratospheric Clouds',
