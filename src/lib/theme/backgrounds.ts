@@ -157,6 +157,14 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     masked: true,
     fullBleed: true,
   },
+  {
+    id: 'bg-baby-shower',
+    label: 'Baby shower',
+    type: 'pattern',
+    src: '/theme-backgrounds/pattern-baby-shower.svg',
+    masked: true,
+    fullBleed: true,
+  },
   // Curated images.
   {
     id: 'bg-forest',

@@ -10,6 +10,7 @@ import type {
 import { useTranslations } from 'next-intl';
 import { getAccentColor } from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { AccentColorControl } from './accent-color-control';
@@ -124,6 +125,9 @@ export function AccentDotRow({
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
+  const isCustom =
+    isValidHexColor(value) &&
+    !displayedColorOptions.includes(value as AccentColor);
   return (
     <ThemeChipRow
       label={tTheme('labelAccentColor')}
@@ -140,6 +144,7 @@ export function AccentDotRow({
       ))}
       <AccentColorControl
         accent={value}
+        isCustom={isCustom}
         bgColorHex={bgColorHex}
         label={tTheme('customAccentColor')}
         onPick={hex => onChange(hex as AccentColor)}
