@@ -69,6 +69,15 @@ function getStatusBucket(fundraiser: Fundraiser): StatusBucket {
   }
 }
 
+/**
+ * The filter chip a fundraiser counts under. A suspended fundraiser is not live, so it leaves Active and shows only under All, which keeps the chip in step with the Overview's "Active fundraisers" count.
+ * One that is suspended while paused, a draft or ended keeps that bucket: it was not live anyway.
+ */
+function getFilterBucket(fundraiser: Fundraiser): StatusBucket | null {
+  const bucket = getStatusBucket(fundraiser);
+  return fundraiser.isSuspended && bucket === 'active' ? null : bucket;
+}
+
 /** Live right now: taking donations and before its end date. */
 export function isLiveStatus(status: DisplayStatus): boolean {
   return status === 'active' || status === 'ending-soon';
@@ -79,7 +88,7 @@ export function isFundraiserLive(fundraiser: Fundraiser): boolean {
 }
 
 // Used by `FundraiserStatusBadge` to pick the badge variant.
-// Suspended wins over the lifecycle status for the badge only. The status filter still files it under its lifecycle bucket, so it stays in the normal list.
+// Suspended wins over the lifecycle status, so a suspended fundraiser is never live. It stays in the list under All, see `getFilterBucket`.
 export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
   if (fundraiser.isSuspended) return 'suspended';
   const bucket = getStatusBucket(fundraiser);
@@ -117,7 +126,7 @@ function matchesStatus(
   fundraiser: Fundraiser,
   filter: FundraiserListStatusFilter
 ): boolean {
-  return filter === 'all' || getStatusBucket(fundraiser) === filter;
+  return filter === 'all' || getFilterBucket(fundraiser) === filter;
 }
 
 export function filterFundraisers(
@@ -180,8 +189,9 @@ export function sortFundraisers(
       // below still-running ones — the backend is expected to transition
       // it to `completed`, so this is a transient state.
       return sorted.sort((a, b) => {
-        const aActive = a.status === 'active';
-        const bActive = b.status === 'active';
+        // A suspended fundraiser is not running, so it sorts with the non-active ones.
+        const aActive = a.status === 'active' && !a.isSuspended;
+        const bActive = b.status === 'active' && !b.isSuspended;
         if (aActive && !bActive) return -1;
         if (!aActive && bActive) return 1;
         if (!aActive && !bActive) {
@@ -216,7 +226,8 @@ export function getStatusCounts(
   };
 
   for (const fundraiser of fundraisers) {
-    counts[getStatusBucket(fundraiser)] += 1;
+    const bucket = getFilterBucket(fundraiser);
+    if (bucket) counts[bucket] += 1;
   }
 
   return counts;

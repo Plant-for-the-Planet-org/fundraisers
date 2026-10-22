@@ -7,7 +7,8 @@ export function SuspendedNotice({ className }: { className?: string }) {
   const t = useTranslations('Fundraisers');
 
   return (
-    <Alert variant='destructive' className={className}>
+    // `status`, not the default `alert`: it stays on the page, so it should not interrupt a screen reader on every load.
+    <Alert variant='destructive' role='status' className={className}>
       <CircleAlert aria-hidden='true' />
       <AlertDescription>
         <p>
