@@ -4,14 +4,25 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { isProtectedRoute } from '@/lib/utils/auth';
+import { cn } from '@/lib/utils/index';
 import { useAuthStore } from '@/stores/auth-store';
 import { openSignInModal } from '@/stores/sign-in-modal-store';
+import { buttonVariants } from '@/components/ui/button';
 import { HEADER_LINKS } from './config';
 
 const HIDE_START_FUNDRAISER_PATHS = [
   '/fundraisers/create',
   '/dashboard/fundraisers/edit',
 ];
+
+// Start Fundraiser is a filled button only where people are browsing for ideas. Elsewhere (donating, signing in, the dashboard) it stays a quiet link so it does not compete with the page's own task.
+const CTA_START_FUNDRAISER_PATHS = ['/', '/explore'];
+
+function isCtaPath(pathname: string) {
+  return CTA_START_FUNDRAISER_PATHS.some(p =>
+    p === '/' ? pathname === '/' : pathname.startsWith(p)
+  );
+}
 
 export function Navigation() {
   const pathname = usePathname();
@@ -20,11 +31,13 @@ export function Navigation() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isAuthInitializing = useAuthStore(state => state.isAuthInitializing);
 
-  const displayedLinks = HEADER_LINKS.filter(
-    link =>
-      link.labelKey !== 'startFundraiser' ||
-      !HIDE_START_FUNDRAISER_PATHS.some(p => pathname.startsWith(p))
-  );
+  // Category pages keep the Explore link: it is the way back to the main list.
+  const displayedLinks = HEADER_LINKS.filter(link => {
+    if (link.labelKey === 'explore') return pathname !== '/explore';
+    return !HIDE_START_FUNDRAISER_PATHS.some(p => pathname.startsWith(p));
+  });
+
+  const showStartFundraiserCta = isCtaPath(pathname);
 
   return (
     <nav
@@ -48,7 +61,14 @@ export function Navigation() {
                 event.preventDefault();
                 openSignInModal(link.href);
               }}
-              className='text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
+              className={
+                link.labelKey === 'startFundraiser' && showStartFundraiserCta
+                  ? cn(
+                      buttonVariants({ size: 'sm' }),
+                      'rounded-full bg-foreground px-4 text-background hover:bg-foreground/85'
+                    )
+                  : 'text-sm font-medium text-muted-foreground hover:text-foreground transition-colors'
+              }
             >
               {tHeaderLinks(link.labelKey)}
             </Link>
