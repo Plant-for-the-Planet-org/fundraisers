@@ -38,6 +38,8 @@ interface FundraiserFormBodyProps {
   fundraiserId?: string;
   /** Existing hosts. Only meaningful in edit mode. */
   hosts?: FundraiserHost[];
+  /** Locks the status switch: going live would not make a suspended fundraiser public. */
+  isSuspended?: boolean;
 }
 
 export function FundraiserFormBody({
@@ -48,6 +50,7 @@ export function FundraiserFormBody({
   endDate,
   fundraiserId,
   hosts,
+  isSuspended = false,
 }: FundraiserFormBodyProps) {
   const isEditMode = mode === 'edit';
 
@@ -111,7 +114,7 @@ export function FundraiserFormBody({
           <BundleSelection mode={mode} />
         </div>
         <div className='max-md:order-14 empty:hidden'>
-          <Options />
+          <Options statusLocked={isSuspended} />
         </div>
         {/* Without an order the bar defaults to 0 on mobile and jumps above the image, which also breaks its docking at the end of the form. */}
         <div className='max-md:order-last'>

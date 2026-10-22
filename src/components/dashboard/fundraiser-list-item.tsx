@@ -62,7 +62,10 @@ export function FundraiserListItem({
   const showEnded = fundraiser.status === 'completed';
   const isCancelled = fundraiser.status === 'cancelled';
   const shouldShowDaysLeft =
-    displayStatus !== 'draft' && daysLeft > 0 && !isCancelled;
+    displayStatus !== 'draft' &&
+    displayStatus !== 'suspended' &&
+    daysLeft > 0 &&
+    !isCancelled;
 
   return (
     <li className='fundraiser-list-item group flex items-start gap-4 py-4'>

@@ -7,7 +7,8 @@ export type DisplayStatus =
   | 'draft'
   | 'paused'
   | 'ended'
-  | 'ending-soon';
+  | 'ending-soon'
+  | 'suspended';
 
 export type FundraiserListSort =
   | 'newest'
@@ -78,7 +79,9 @@ export function isFundraiserLive(fundraiser: Fundraiser): boolean {
 }
 
 // Used by `FundraiserStatusBadge` to pick the badge variant.
+// Suspended wins over the lifecycle status for the badge only. The status filter still files it under its lifecycle bucket, so it stays in the normal list.
 export function deriveDisplayStatus(fundraiser: Fundraiser): DisplayStatus {
+  if (fundraiser.isSuspended) return 'suspended';
   const bucket = getStatusBucket(fundraiser);
   if (bucket === 'active') {
     const daysLeft = getDaysLeft(fundraiser.endDate);

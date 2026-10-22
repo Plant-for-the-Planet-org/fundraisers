@@ -279,7 +279,8 @@
       "draft": "Draft",
       "paused": "Paused",
       "ended": "Ended",
-      "ending-soon": "Ending soon"
+      "ending-soon": "Ending soon",
+      "suspended": "Suspended"
     },
     "noResults": {
       "title": "No fundraisers match these filters.",

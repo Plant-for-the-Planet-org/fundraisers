@@ -218,6 +218,8 @@ export interface Fundraiser {
   content: Nullable<Record<string, unknown>>;
   metadata: Nullable<Record<string, unknown>>;
   settings: Nullable<FundraiserSettings>;
+  /** Set by staff. Sent to hosts only, so a missing value (public reads, older API) means not suspended. */
+  isSuspended?: boolean;
 }
 
 export interface UpdateFundraiserRequest {

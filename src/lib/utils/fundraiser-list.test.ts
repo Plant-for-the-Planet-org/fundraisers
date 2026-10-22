@@ -68,3 +68,29 @@ describe('fundraiser status on the dashboard', () => {
     ).toEqual(['fr_past']);
   });
 });
+
+describe('suspended fundraisers on the dashboard', () => {
+  const suspended = makeFundraiser({ id: 'fr_suspended', isSuspended: true });
+
+  it('shows suspended over the lifecycle status', () => {
+    expect(deriveDisplayStatus(suspended)).toBe('suspended');
+    expect(deriveDisplayStatus({ ...pastEndDate, isSuspended: true })).toBe(
+      'suspended'
+    );
+  });
+
+  it('treats a missing field as not suspended', () => {
+    expect(
+      deriveDisplayStatus(makeFundraiser({ isSuspended: undefined }))
+    ).toBe('active');
+  });
+
+  it('keeps it in its lifecycle bucket for the filter', () => {
+    expect(getStatusCounts([suspended])).toMatchObject({ all: 1, active: 1 });
+    expect(
+      filterFundraisers([suspended], { search: '', status: 'active' }).map(
+        f => f.id
+      )
+    ).toEqual(['fr_suspended']);
+  });
+});
