@@ -9,6 +9,7 @@ import { convertTotalRaisedToSingleCurrency } from '@/lib/utils/fundraiser';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { EditFundraiserFormProvider } from '@/components/fundraisers/edit-fundraiser-form-context';
 import { FundraiserFormBody } from '@/components/fundraisers/fundraiser-form-body';
+import { SuspendedNotice } from '@/components/fundraisers/suspended-notice';
 import { UpdateFundraiserButton } from '@/components/fundraisers/update-fundraiser-button';
 import { useFundraiserForEdit } from '@/components/fundraisers/use-fundraiser-for-edit';
 import { BreadcrumbTrail } from '@/components/ui/breadcrumb';
@@ -33,6 +34,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
           <h1 className='text-4xl font-bold text-foreground'>{t('title')}</h1>
           <p className='mt-1 text-muted-foreground'>{t('subtitle')}</p>
         </div>
+        {fundraiser.isSuspended && <SuspendedNotice />}
       </div>
       <FundraiserFormBody
         mode='edit'
@@ -51,6 +53,7 @@ function EditFundraiserContent({ fundraiser }: { fundraiser: Fundraiser }) {
         endDate={fundraiser.endDate}
         fundraiserId={fundraiser.id}
         hosts={fundraiser.hosts}
+        isSuspended={fundraiser.isSuspended}
       />
     </EditFundraiserFormProvider>
   );

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getDaysLeft, getFundraiserUrl } from '@/lib/utils/fundraiser';
 import { deriveDisplayStatus, isLiveStatus } from '@/lib/utils/fundraiser-list';
+import { SuspendedNotice } from '@/components/fundraisers/suspended-notice';
 import {
   ArrowLeftIcon,
   ArrowUpRightFromSquareIcon,
@@ -78,6 +79,8 @@ export function FundraiserDetailHeader({
           </div>
         </div>
       </div>
+
+      {fundraiser.isSuspended && <SuspendedNotice />}
     </div>
   );
 }

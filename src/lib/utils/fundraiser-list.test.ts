@@ -5,6 +5,7 @@ import {
   deriveDisplayStatus,
   filterFundraisers,
   getStatusCounts,
+  isFundraiserLive,
 } from './fundraiser-list';
 
 function daysFromNow(days: number): string {
@@ -66,5 +67,53 @@ describe('fundraiser status on the dashboard', () => {
     expect(
       filterFundraisers(list, { search: '', status: 'ended' }).map(f => f.id)
     ).toEqual(['fr_past']);
+  });
+});
+
+describe('suspended fundraisers on the dashboard', () => {
+  const suspended = makeFundraiser({ id: 'fr_suspended', isSuspended: true });
+
+  it('shows suspended over the lifecycle status', () => {
+    expect(deriveDisplayStatus(suspended)).toBe('suspended');
+    expect(deriveDisplayStatus({ ...pastEndDate, isSuspended: true })).toBe(
+      'suspended'
+    );
+  });
+
+  it('treats a missing field as not suspended', () => {
+    expect(
+      deriveDisplayStatus(makeFundraiser({ isSuspended: undefined }))
+    ).toBe('active');
+  });
+
+  it('is never live', () => {
+    expect(isFundraiserLive(suspended)).toBe(false);
+  });
+
+  it('leaves the Active filter and shows only under All', () => {
+    expect(getStatusCounts([suspended])).toMatchObject({ all: 1, active: 0 });
+    expect(
+      filterFundraisers([suspended], { search: '', status: 'active' })
+    ).toEqual([]);
+    expect(
+      filterFundraisers([suspended], { search: '', status: 'all' }).map(
+        f => f.id
+      )
+    ).toEqual(['fr_suspended']);
+  });
+
+  it('keeps a bucket that was not live anyway', () => {
+    const pausedAndSuspended = makeFundraiser({
+      id: 'fr_paused',
+      status: 'paused',
+      isSuspended: true,
+    });
+    expect(getStatusCounts([pausedAndSuspended])).toMatchObject({ paused: 1 });
+    expect(
+      filterFundraisers([pausedAndSuspended], {
+        search: '',
+        status: 'paused',
+      }).map(f => f.id)
+    ).toEqual(['fr_paused']);
   });
 });

@@ -75,7 +75,7 @@ export interface FundraiserInsights extends InsightsSeries {
 export interface AccountInsightsFundraiser {
   slug: string;
   title: string;
-  status: 'active' | 'draft' | 'paused' | 'ended' | 'ending-soon';
+  status: 'active' | 'draft' | 'paused' | 'ended' | 'ending-soon' | 'suspended';
   /** For the single-fundraiser view, which offers the campaign range once a fundraiser has started. */
   startDate: string;
   visitors: number;

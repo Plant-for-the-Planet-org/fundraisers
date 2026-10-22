@@ -6,6 +6,7 @@ import type { FundraiserFormValues } from './fundraiser-form-schema';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ThankYouNotePanel } from '@/components/thank-you-note/thank-you-note-panel';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ interface SwitchFieldProps<TName extends FieldPath<FormValues>> {
   descriptionId: string;
   onValue: FieldPathValue<FormValues, TName>;
   offValue: FieldPathValue<FormValues, TName>;
+  disabled?: boolean;
 }
 
 function SwitchField<TName extends FieldPath<FormValues>>({
@@ -38,9 +40,15 @@ function SwitchField<TName extends FieldPath<FormValues>>({
   descriptionId,
   onValue,
   offValue,
+  disabled = false,
 }: SwitchFieldProps<TName>) {
   return (
-    <label className='flex cursor-pointer items-center justify-between'>
+    <label
+      className={cn(
+        'flex items-center justify-between',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+      )}
+    >
       <div className='flex flex-col'>
         <span className='text-sm font-medium'>{label}</span>
         <span id={descriptionId} className='text-xs text-muted-foreground'>
@@ -54,6 +62,7 @@ function SwitchField<TName extends FieldPath<FormValues>>({
           <Switch
             aria-describedby={descriptionId}
             checked={field.value === onValue}
+            disabled={disabled}
             onCheckedChange={checked =>
               field.onChange(checked ? onValue : offValue)
             }
@@ -90,7 +99,7 @@ function AddModuleMenu() {
   );
 }
 
-export function Options() {
+export function Options({ statusLocked = false }: { statusLocked?: boolean }) {
   const { control } = useFormContext<FormValues>();
   const t = useTranslations('Fundraisers.form.options');
 
@@ -115,6 +124,7 @@ export function Options() {
         descriptionId='status-desc'
         onValue='active'
         offValue='draft'
+        disabled={statusLocked}
       />
 
       <SwitchField

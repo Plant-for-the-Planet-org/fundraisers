@@ -16,6 +16,7 @@ const STATUS_INDICATOR_STYLES: Record<DisplayStatus, string> = {
   paused: 'bg-muted-foreground/60',
   ended: 'bg-muted-foreground/40',
   'ending-soon': 'bg-warning',
+  suspended: 'bg-destructive',
 };
 
 const STATUS_BADGE_STYLES: Record<DisplayStatus, string> = {
@@ -24,6 +25,8 @@ const STATUS_BADGE_STYLES: Record<DisplayStatus, string> = {
   paused: 'border border-border bg-muted text-muted-foreground',
   ended: 'border border-border bg-muted text-muted-foreground',
   'ending-soon': 'bg-warning/15 text-warning',
+  // No tint behind the text: red on a red tint falls below 4.5:1.
+  suspended: 'border border-destructive/30 text-destructive',
 };
 
 export function FundraiserStatusBadge({
