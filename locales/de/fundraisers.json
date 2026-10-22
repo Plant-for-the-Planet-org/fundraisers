@@ -348,8 +348,8 @@
       "options": {
         "sectionHeading": "Spendenaufruf-Optionen",
         "status": {
-          "label": "Spenden mit diesen Aufruf sammeln",
-          "description": "Aktiviere das Sammeln von Spenden und schalte den Aufruf frei"
+          "label": "Live gehen und Spenden sammeln",
+          "description": "Aus bleibt er ein Entwurf. Schalte ein, wenn du bereit für Spender bist."
         },
         "visibility": {
           "label": "Diesen Spendenaufruf öffentlich listen",

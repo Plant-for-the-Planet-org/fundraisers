@@ -289,6 +289,7 @@
     "actions": {
       "menuLabel": "Aktionen öffnen",
       "viewPage": "Seite ansehen",
+      "publish": "Veröffentlichen",
       "edit": "Bearbeiten",
       "clone": "Duplizieren",
       "stageMode": "Bühnenmodus",
@@ -299,14 +300,23 @@
       "delete": "Löschen",
       "pauseSuccess": "Spendenaufruf pausiert",
       "resumeSuccess": "Spendenaufruf fortgesetzt",
+      "publishSuccess": "Dein Spendenaufruf ist live",
       "deleteSuccess": "Spendenaufruf gelöscht",
-      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut."
+      "mutationError": "Etwas ist schief gelaufen. Versuche es erneut.",
+      "publishErrorTitle": "Veröffentlichen nicht möglich",
+      "publishErrorDescription": "Öffne den Editor und prüfe, ob alles ausgefüllt ist. Versuche es dann erneut."
     },
     "deleteDialog": {
       "title": "Spendenaufruf löschen?",
       "description": "Möchtest du diesen Spendenaufruf wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancel": "Abbrechen",
       "confirm": "Löschen"
+    },
+    "goLiveDialog": {
+      "title": "Veröffentlichen?",
+      "description": "Möchtest du diesen Spendenaufruf aktivieren und für andere sichtbar machen?",
+      "cancel": "Noch nicht",
+      "confirm": "Ja, veröffentlichen"
     },
     "cloneDialog": {
       "title": "Fundraiser duplizieren",
