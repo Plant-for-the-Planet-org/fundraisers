@@ -1,42 +1,42 @@
 {
   "Copyright": {
     "meta": {
-      "title": "Urheberrechts- und Inhaltsmeldungen",
-      "description": "Wie kannst du uns mitteilen, dass ein Spendenaufruf deine Arbeit ohne Genehmigung nutzt, und was wir als nächstes machen."
+      "title": "Urheberrecht und Meldung von Inhalten",
+      "description": "So teilst du uns mit, wenn eine Spendenaktion dein Werk ohne Erlaubnis nutzt, und was wir dann tun."
     },
-    "title": "Urheberrechts- und Inhaltsmeldungen",
-    "lead": "Organisatoren des Spendenaufrufs können ihre eigenen Bilder zu ihrer Seite hinzufügen. Wenn du der Meinung bist, dass etwas bei einem Spendenaufruf dein Urheberrecht oder ein anderes Recht verletzt, oder illegal ist, dann informiere uns, und wir werden es uns ansehen.",
+    "title": "Urheberrecht und Meldung von Inhalten",
+    "lead": "Gastgeber von Spendenaktionen können eigene Bilder auf ihren Seiten einfügen. Wenn du glaubst, dass etwas auf der Seite einer Spendenaktion dein Urheberrecht oder ein anderes Recht verletzt oder rechtswidrig ist, schreib uns. Wir prüfen das.",
     "toc": {
       "label": "Auf dieser Seite",
-      "send": "Was wir brauchen",
-      "next": "Was passiert als nächstes",
-      "other": "Andere Inhaltsprobleme"
+      "send": "Was du uns schicken solltest",
+      "next": "Wie es weitergeht",
+      "other": "Andere Probleme mit Inhalten"
     },
     "send": {
-      "title": "Was wir brauchen",
-      "intro": "Schicke uns eine Email mit diesen Details an <mail>{email}</mail>:",
+      "title": "Was du uns schicken solltest",
+      "intro": "Schreib uns an <mail>{email}</mail> und nenne diese Angaben:",
       "items": {
-        "explanation": "Eine klare Erklärung, warum du denkst, dass der Inhalt illegal ist, oder deine Arbeit ohne Erlaubnis verwendet. Benenne die Arbeit und, falls möglich, wo sie erschienen ist.",
-        "location": "Die exakte Adresse (URL) des Spendenaufrufs, das die Arbeit zeigt.",
-        "contact": "Dein Name und deine Email, damit wir dich erreichen können.",
-        "goodFaith": "Eine Erklärung, dass du nach besten Gewissen davon ausgehst, dass die Information korrekt und vollständig ist."
+        "explanation": "Eine klare Erklärung, warum du den Inhalt für rechtswidrig hältst oder warum er dein Werk ohne Erlaubnis nutzt. Nenne das Werk und, wenn möglich, wo es veröffentlicht ist.",
+        "location": "Die genaue Webadresse (URL) der Spendenaktion, die den Inhalt zeigt.",
+        "contact": "Dein Name und deine E-Mail-Adresse, damit wir dich erreichen können.",
+        "goodFaith": "Eine Erklärung, dass du in gutem Glauben überzeugt bist, dass die Angaben in deiner Meldung richtig und vollständig sind."
       }
     },
     "next": {
-      "title": "Was als nächstes passiert",
-      "review": "Wir bestätigen, dass wir die Nachricht erhalten haben, und lesen sie. Falls der Inhalt illegal ist, oder deine Arbeit ohne Erlaubnis verwendet, werden wir ihn entfernen oder blockieren den Zugriff. Außerdem informieren wir den Organisator des Spendenaufrufs darüber.",
-      "counter": "Der Organisator kann Einspruch erheben, wenn er der Meinung ist, dass wir einen Fehler gemacht haben. Wir schauen uns beiden Seiten an, entscheiden und teilen dir das Ergebnis mit.",
-      "repeat": "Organisatoren, die wiederholt Inhalte verwenden, für die sie keine Rechte haben, können den Zugriff auf ihr Konto verlieren."
+      "title": "Wie es weitergeht",
+      "review": "Wir bestätigen den Eingang deiner Meldung und lesen sie. Ist der Inhalt rechtswidrig oder nutzt er dein Werk ohne Erlaubnis, entfernen wir ihn oder sperren den Zugang dazu und teilen dem Gastgeber der Spendenaktion mit, warum.",
+      "counter": "Gastgeber können antworten, wenn sie glauben, dass wir uns geirrt haben. Wir prüfen beide Seiten, entscheiden und teilen dir das Ergebnis mit.",
+      "repeat": "Gastgeber, die wiederholt Inhalte ohne Nutzungsrecht verwenden, können den Zugang zu ihrem Konto verlieren."
     },
     "other": {
-      "title": "Andere Inhaltsprobleme",
-      "body": "Du kannst die gleiche Adresse verwenden, um andere illegale Inhalte bei einem Spendenaufruf zu melden, oder ein Bild von dir melden, dem du nicht zugestimmt hast. Teile uns die URL des Spendenaufrufs mit und was das Problem ist."
+      "title": "Andere Probleme mit Inhalten",
+      "body": "Über dieselbe Adresse kannst du auch andere rechtswidrige Inhalte auf einer Spendenaktion melden oder ein Bild von dir, das ohne deine Zustimmung gezeigt wird. Nenne uns die URL der Spendenaktion und was nicht stimmt."
     },
     "misuse": {
-      "body": "Bitte benachrichtige uns nur, wenn du dir sicher bist. Eine falsche Meldung kann rechtliche Konsequenzen haben."
+      "body": "Bitte sende eine Meldung nur, wenn du dir sicher bist. Eine falsche Meldung kann rechtliche Folgen haben."
     },
     "legal": {
-      "body": "Diese Seite steht im Zusammenhang mit Abschnitt 10 unserer <terms>Allgemeinen Geschäftsbedingungen</terms>. Siehe auch <privacy>Privacy Policy</privacy>. Wir verwenden die Details in deiner Meldung nur, um sie zu bearbeiten, und wir können sie auch mit dem Organisator des Spendenaufrufs teilen."
+      "body": "Diese Seite ergänzt Abschnitt 10 unserer <terms>Nutzungsbedingungen</terms>. Siehe auch unsere <privacy>Datenschutzbestimmungen</privacy>. Wir verwenden die Angaben in deiner Meldung nur, um sie zu bearbeiten, und geben sie eventuell an den Gastgeber der Spendenaktion weiter."
     }
   }
 }

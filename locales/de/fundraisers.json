@@ -48,7 +48,7 @@
       "exploreCta": "Weitere Spendenaufrufe entdecken",
       "shareCta": "Teilen",
       "shareText": "{title} hat {amount} gesammelt. Danke an alle, die gespendet haben!",
-      "shareTextNoAmount": "Danke an alle, die zu {title} beigetragen haben!",
+      "shareTextNoAmount": "Danke an alle, die für {title} gespendet haben!",
       "shareCopied": "Link kopiert!",
       "shareFailed": "Der Link konnte nicht geteilt werden. Bitte erneut versuchen."
     },
@@ -179,12 +179,12 @@
       "goalSettings": {
         "sectionHeading": "Ziel-Einstellungen",
         "openSettings": "Ziel-Einstellungen",
-        "enableGoal": "Zeige Ziel-Abschnitt",
+        "enableGoal": "Zielbereich anzeigen",
         "showGoal": "Ziel anzeigen",
         "showDaysLeft": "Verbleibende Tage anzeigen",
         "hiddenView": {
-          "title": "Ziel verborgen",
-          "description": "Spender werden nicht sehen, was bereits gesammelt wurde, das ziel oder wie viele Tage noch verbleiben."
+          "title": "Ziel ausgeblendet",
+          "description": "Spender sehen weder den gesammelten Betrag noch das Ziel oder die verbleibenden Tage."
         }
       },
       "theme": {
@@ -360,8 +360,8 @@
           "title": "Bühnenmodus",
           "blurb": "Schreibgeschützte Vollbildanzeige für Live-Veranstaltungen. Spender spenden über den QR-Code; Bildschirm wird in Echtzeit aktualisiert.",
           "subtitle": "Zeige deinen Spendenaufruf bei Konzerten, Galas und Veranstaltungen bildschirmfüllend an.",
-          "goalHiddenHint": "Der Bühnenmodus zeigt den Betrag, der bereits gesammelt wurde, daher braucht er das Ziel. Stelle es an, damit es verwendet werden kann.",
-          "leaderboardOffHint": "Schalte die Bestenliste ein, damit kürzliche Spenden und die Top-Spender auf der Bühne gezeigt werden können.",
+          "goalHiddenHint": "Der Bühnenmodus zeigt den gesammelten Betrag und braucht deshalb den Zielbereich. Schalte den Ziel-Schalter ein, um ihn zu nutzen.",
+          "leaderboardOffHint": "Schalte die Bestenliste ein, um im Bühnenmodus die neuesten Spenden und die Top-Spender zu zeigen.",
           "collapse": "Zusammenklappen",
           "expand": "Erweitern",
           "remove": "Bühnenmodus entfernen",
@@ -513,9 +513,9 @@
       "errorToast": "Link konnte nicht kopiert werden. Kopiere die URL manuell."
     },
     "hostControls": {
-      "hostLabel": "Du bist Organisator*in",
-      "progressButton": "Fortschritt anzeigen",
-      "progressLabel": "Schaue dir den Fortschritt deines Spendenaufrufs im Dashboard an.",
+      "hostLabel": "Dein Spendenaufruf.",
+      "progressButton": "Fortschritt",
+      "progressLabel": "Fortschritt dieses Spendenaufrufs im Dashboard ansehen",
       "closeLabel": "Schließen"
     }
   }
