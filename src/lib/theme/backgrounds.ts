@@ -157,6 +157,7 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     src: '/theme-backgrounds/pattern-spring.svg',
     masked: true,
     fullBleed: true,
+    thumbMaskSize: '800%',
   },
   {
     id: 'bg-baby-shower',
