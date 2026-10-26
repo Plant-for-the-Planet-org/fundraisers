@@ -181,20 +181,8 @@ export function FundraiserActionMenu({
   const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
-  const hasAnyAction =
-    actions.edit ||
-    actions.clone ||
-    actions.copyLink ||
-    actions.pause ||
-    actions.resume ||
-    actions.stageMode ||
-    actions.delete;
-  const showStatusGroup = actions.pause || actions.resume;
-  const showSeparator =
-    showStatusGroup &&
-    (actions.edit || actions.clone || actions.copyLink || actions.stageMode);
-
-  if (!hasAnyAction) return null;
+  // "View page" always renders, so the menu is never empty and the status group always has an item above it.
+  const showSeparator = actions.pause || actions.resume;
 
   const editHref = `/dashboard/fundraisers/edit/${fundraiser.slug}`;
 
