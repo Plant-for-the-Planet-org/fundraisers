@@ -264,7 +264,6 @@ export const THEMES: Record<string, Theme> = {
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    featured: true,
     colorOptions: [
       'slate',
       'gray',
