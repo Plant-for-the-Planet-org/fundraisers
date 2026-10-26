@@ -54,6 +54,7 @@ export interface BackgroundAsset {
   masked?: boolean; // Render `src` as a monochrome stencil (white shapes on transparent) tinted by the theme colour, instead of a baked-in image.
   fullBleed?: boolean; // Render as one full-bleed cover layer instead of a repeating tile (for large full-canvas designs).
   thumbMaskSize?: string; // Per-asset zoom for a masked picker thumbnail (CSS mask-size); defaults to THUMB_MASK_SIZE.
+  thumbHideWash?: boolean; // Full-bleed masked only: drop the faint page wash from the picker thumbnail, so only the shapes show. Needs a % zoom.
 }
 
 export const DEFAULT_PATTERN_TILE = '115px 77px';
@@ -164,6 +165,8 @@ export const BG_LIBRARY: BackgroundAsset[] = [
     src: '/theme-backgrounds/pattern-baby-shower.svg',
     masked: true,
     fullBleed: true,
+    thumbMaskSize: '1200%',
+    thumbHideWash: true,
   },
   {
     id: 'bg-sports',
