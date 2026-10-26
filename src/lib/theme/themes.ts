@@ -1,4 +1,4 @@
-import type { Theme } from './types';
+import type { AccentColor, Theme } from './types';
 
 import { defineBg } from './backgrounds';
 
@@ -24,7 +24,8 @@ export const THEMES: Record<string, Theme> = {
     ],
     curatedBgs: ['bg-leaves', 'bg-meadow-loop', 'bg-botanic', 'bg-watercolor'],
     bg: defineBg(
-      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20'
+      'bg-gradient-to-br from-emerald-300/25 via-pink-200/20 via-sky-200/15 to-lime-300/20',
+      { decoration: 'pattern', pattern_id: 'bg-spring', opacity: 0.1 }
     ),
   },
   birthday: {
@@ -82,6 +83,45 @@ export const THEMES: Record<string, Theme> = {
       }
     ),
   },
+  'baby-shower': {
+    id: 'baby-shower',
+    name: 'Baby Shower',
+    category: 'celebration',
+    // Hex accents from the design; accents accept a raw hex like the custom picker does.
+    accent: '#6FCF97' as AccentColor,
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    featured: true,
+    colorOptions: ['#6FCF97', '#6C63FF', '#C83289', '#2F80ED', '#BABA67'].map(
+      hex => hex as AccentColor
+    ),
+    // No gradient: the plain white base shows through the pattern's cloud bank, so the clouds stay white.
+    bg: defineBg('', {
+      decoration: 'pattern',
+      pattern_id: 'bg-baby-shower',
+      opacity: 0.8,
+    }),
+  },
+  sports: {
+    id: 'sports',
+    name: 'Sports',
+    category: 'celebration',
+    // Hex accents from the design, as for Baby Shower.
+    accent: '#EB5757' as AccentColor,
+    mode: 'light',
+    bodyFont: 'open-sans',
+    titleFont: 'poppins',
+    featured: true,
+    colorOptions: ['#EB5757', '#42A5AD', '#5C4915'].map(
+      hex => hex as AccentColor
+    ),
+    bg: defineBg('', {
+      decoration: 'pattern',
+      pattern_id: 'bg-sports',
+      opacity: 0.25,
+    }),
+  },
   stratospheric: {
     id: 'stratospheric',
     name: 'Polar Stratospheric Clouds',
@@ -135,7 +175,6 @@ export const THEMES: Record<string, Theme> = {
     mode: 'light',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    featured: true,
     colorOptions: [
       'orange',
       'amber',
@@ -205,7 +244,6 @@ export const THEMES: Record<string, Theme> = {
     mode: 'dark',
     bodyFont: 'open-sans',
     titleFont: 'poppins',
-    featured: true,
     colorOptions: [
       'orange',
       'red',
@@ -351,4 +389,15 @@ export const THEMES: Record<string, Theme> = {
   },
 };
 
-export const DEFAULT_THEME = THEMES.spring;
+// Spring Vibes without its pattern: the fallback for pages and fundraisers that never picked a theme.
+// Picking Spring Vibes in the editor applies THEMES.spring, pattern included.
+// The fallback for pages and fundraisers without a theme: Spring Vibes' look without its pattern. Not offered in the picker.
+THEMES.default = {
+  ...THEMES.spring,
+  id: 'default',
+  name: 'Default',
+  featured: false,
+  bg: defineBg(THEMES.spring.bg.gradient),
+};
+
+export const DEFAULT_THEME = THEMES.default;
