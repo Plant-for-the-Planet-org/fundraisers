@@ -11,7 +11,7 @@
       "explore": "Spendenaufrufe entdecken",
       "orbit": {
         "alt": "Menschen, die für einen Zweck spenden, als Ring um ein Herz",
-        "justGave": "at gespendet",
+        "justGave": "hat gespendet",
         "people": {
           "lena": "Lena",
           "fernmoor": "Fernmoor",
@@ -35,7 +35,7 @@
               "host": "Die Sonntagswanderer"
             },
             "c2": {
-              "title": "Bäume statt Blumen, in Erinnerung an Rosa\"",
+              "title": "Bäume statt Blumen, in Erinnerung an Rosa",
               "host": "Familie Berger"
             },
             "c3": {
@@ -53,7 +53,7 @@
                 },
                 "m2": {
                   "label": "Die Wanderung",
-                  "text": "Freunde und Nachbarn spenden in ihrem Namen, und jede Spende bekommt ein persönliches Dankeschön."
+                  "text": "Freunde zu Hause spenden an jedem Gipfel, und jede Spende bekommt sofort ein Dankeschön."
                 },
                 "m3": {
                   "label": "Jahre später",
@@ -70,7 +70,7 @@
                 },
                 "m2": {
                   "label": "Die Wochen danach",
-                  "text": "Freunde und Nachbarn spenden in ihrem Namen, und jedes Geschenk bekommt ein persönliches Dankeschön."
+                  "text": "Freunde und Nachbarn spenden in ihrem Namen, und jede Spende bekommt ein persönliches Dankeschön."
                 },
                 "m3": {
                   "label": "Jeden Frühling",
@@ -178,7 +178,7 @@
           },
           "stories": {
             "s1": {
-              "scene": "Ein Waldbrand hat letzten Sommer einen Teil deiner Fläche zerstört",
+              "scene": "Ein Waldbrand hat letzten Sommer einen Teil deiner Fläche zerstört.",
               "moments": {
                 "m1": {
                   "label": "Der Aufruf",
@@ -276,7 +276,7 @@
       },
       "bouquets": "Oder starte mit einem Bouquet von Anliegen",
       "poweredBy": "Mit unserer <link>Restoration Platform</link>.",
-      "globeAlt": "in Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst",
+      "globeAlt": "Ein Globus mit einem Punkt für jeden Ort, an dem ein Wiederherstellungsprojekt wächst",
       "viewAll": "Alle Projekte ansehen"
     },
     "customize": {
