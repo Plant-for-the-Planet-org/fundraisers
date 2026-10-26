@@ -119,7 +119,7 @@ export const THEMES: Record<string, Theme> = {
     bg: defineBg('', {
       decoration: 'pattern',
       pattern_id: 'bg-sports',
-      opacity: 0.2,
+      opacity: 0.25,
     }),
   },
   stratospheric: {
