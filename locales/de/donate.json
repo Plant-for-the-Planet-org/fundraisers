@@ -7,8 +7,8 @@
       },
       "leaveConfirm": {
         "title": "Spende verlassen?",
-        "description": "Deine eingegebenen Angaben gehen verloren.",
-        "cancel": "Weiter ausfüllen",
+        "description": "Die Details, die du eingegeben hast, gehen verloren.",
+        "cancel": "Weiter bearbeiten",
         "confirm": "Verlassen"
       }
     },
@@ -17,7 +17,7 @@
       "anonymousDonationDescription": "Dein Name erscheint nicht öffentlich auf der Seite des Spendenaufrufs."
     },
     "yourInfo": "Deine Informationen",
-    "signInNudge": "Schon ein Konto? <signInLink>Anmelden</signInLink>",
+    "signInNudge": "Du hast schon ein Konto? <signInLink>Anmelden</signInLink>",
     "notYou": "Nicht {name}? <switchLink>Konto wechseln</switchLink>",
     "organization": "(Firma/Organisation)",
     "donorIdentity": {
