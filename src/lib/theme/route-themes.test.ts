@@ -7,8 +7,27 @@ describe('getThemeForPath', () => {
   });
 
   it('keeps the default theme for unknown paths, including an empty one', () => {
-    expect(getThemeForPath('').id).toBe('spring');
-    expect(getThemeForPath('/raise/some-fundraiser').id).toBe('spring');
+    expect(getThemeForPath('').id).toBe('default');
+    expect(getThemeForPath('/raise/some-fundraiser').id).toBe('default');
+  });
+
+  it('keeps fallback pages and the editor loading state on the plain default', () => {
+    // The id check also catches '/' matching as a prefix, which would give these pages the home theme.
+    for (const path of [
+      '/copyright',
+      '/cookies',
+      '/dashboard/fundraisers/edit/x',
+    ]) {
+      const theme = getThemeForPath(path);
+      expect(theme.id, path).toBe('default');
+      expect(theme.bg.decoration, path).toBe('none');
+    }
+  });
+
+  it('starts a new fundraiser on the full Spring Vibes, as the picker shows it', () => {
+    expect(getThemeForPath('/fundraisers/create').bg.decoration).toBe(
+      'pattern'
+    );
   });
 
   it('matches the longest prefix', () => {

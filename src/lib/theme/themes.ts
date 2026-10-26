@@ -389,4 +389,15 @@ export const THEMES: Record<string, Theme> = {
   },
 };
 
-export const DEFAULT_THEME = THEMES.spring;
+// Spring Vibes without its pattern: the fallback for pages and fundraisers that never picked a theme.
+// Picking Spring Vibes in the editor applies THEMES.spring, pattern included.
+// The fallback for pages and fundraisers without a theme: Spring Vibes' look without its pattern. Not offered in the picker.
+THEMES.default = {
+  ...THEMES.spring,
+  id: 'default',
+  name: 'Default',
+  featured: false,
+  bg: defineBg(THEMES.spring.bg.gradient),
+};
+
+export const DEFAULT_THEME = THEMES.default;
