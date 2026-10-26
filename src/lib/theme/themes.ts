@@ -100,8 +100,7 @@ export const THEMES: Record<string, Theme> = {
     bg: defineBg('', {
       decoration: 'pattern',
       pattern_id: 'bg-baby-shower',
-      // #6FCF97 at 0.55 on white is the design's #AFE5C5.
-      opacity: 0.55,
+      opacity: 0.8,
     }),
   },
   sports: {
