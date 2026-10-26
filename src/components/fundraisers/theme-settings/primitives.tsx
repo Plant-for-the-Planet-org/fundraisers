@@ -9,7 +9,11 @@ import type {
 
 import { useId } from 'react';
 import { useTranslations } from 'next-intl';
-import { getAccentColor, isSameAccent } from '@/lib/theme/accent-utils';
+import {
+  getAccentColor,
+  getAccentName,
+  isSameAccent,
+} from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
@@ -138,7 +142,7 @@ export function AccentDotRow({
         <AccentDot
           key={accent}
           active={isSameAccent(value, accent)}
-          title={tTheme('selectAccent', { accent })}
+          title={tTheme('selectAccent', { accent: getAccentName(accent) })}
           onClick={() => onChange(accent)}
           swatchStyle={{ backgroundColor: getAccentColor(accent) }}
         />
