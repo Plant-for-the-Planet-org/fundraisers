@@ -9,7 +9,7 @@ import type {
 
 import { useId } from 'react';
 import { useTranslations } from 'next-intl';
-import { getAccentColor } from '@/lib/theme/accent-utils';
+import { getAccentColor, isSameAccent } from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
@@ -128,7 +128,7 @@ export function AccentDotRow({
   const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
   const isCustom =
     isValidHexColor(value) &&
-    !displayedColorOptions.includes(value as AccentColor);
+    !displayedColorOptions.some(accent => isSameAccent(accent, value));
   return (
     <ThemeChipRow
       label={tTheme('labelAccentColor')}
@@ -137,7 +137,7 @@ export function AccentDotRow({
       {displayedColorOptions.map(accent => (
         <AccentDot
           key={accent}
-          active={value === accent}
+          active={isSameAccent(value, accent)}
           title={tTheme('selectAccent', { accent })}
           onClick={() => onChange(accent)}
           swatchStyle={{ backgroundColor: getAccentColor(accent) }}

@@ -2,6 +2,11 @@ import type { AccentColor } from './types';
 
 import { isValidHexColor } from './color-utils';
 
+// Accents are palette names or hex values. Compare without case: the colour picker returns lowercase hex, while theme presets use uppercase.
+export function isSameAccent(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
+
 // Hex values used to set the --accent-color CSS variable (for non-Tailwind
 // consumers, e.g. SVG fills). Accepts a named palette accent OR a raw hex
 // (the accent can be seeded from the background colour), and never returns
