@@ -203,7 +203,7 @@
                 },
                 "m2": {
                   "label": "Der Abend",
-                  "text": "Ein Live-Event im Stage Mode, die Summe steigt auf der großen Leinwand."
+                  "text": "Ein Live-Event im Bühnenmodus, die Summe steigt auf der großen Leinwand."
                 },
                 "m3": {
                   "label": "Danach",
@@ -313,7 +313,7 @@
       "next": "Weiter"
     },
     "stage": {
-      "eyebrow": "Stage Mode",
+      "eyebrow": "Bühnenmodus",
       "title": "Bereit für die große Rede?",
       "p1": "Sammle mit Stil. Bring deinen Spendenaufruf auf die große Leinwand, mit Live-Summe, Bestenliste und jeder Spende, die sofort aufpoppt. Die Gäste scannen den Code und spenden vom Platz aus.",
       "demo": {

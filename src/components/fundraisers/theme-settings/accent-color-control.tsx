@@ -2,7 +2,7 @@
 
 import { Palette } from 'lucide-react';
 import { getAccentColor } from '@/lib/theme/accent-utils';
-import { getSwatchContrast, isValidHexColor } from '@/lib/theme/color-utils';
+import { getSwatchContrast } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import {
   Popover,
@@ -15,19 +15,22 @@ import { SolidPicker } from './solid-picker';
 // can be any hex, not just a palette token. Mirrors the background's
 // CustomColorButton, sized as an accent dot. It's always shown; the picker
 // seeds to the current accent when that is a custom hex, otherwise defaults to
-// the background colour.
+// the background colour. `isCustom` comes from the row, since a theme's own
+// palette dots can be hex too (Baby shower) and those are not custom.
 export function AccentColorControl({
   accent,
+  isCustom,
   bgColorHex,
   label,
   onPick,
 }: {
   accent: string;
+  isCustom: boolean;
   bgColorHex: string;
   label: string;
   onPick: (hex: string) => void;
 }) {
-  const isActive = isValidHexColor(accent);
+  const isActive = isCustom;
   // Stay empty (transparent, just the palette icon) until a custom hex accent is
   // applied — mirrors the background custom-colour swatch. Named palette tokens
   // are shown by their own dots, not here.

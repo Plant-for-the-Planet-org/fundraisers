@@ -7,9 +7,15 @@ import type {
   FontId,
 } from '@/lib/theme/types';
 
+import { useId } from 'react';
 import { useTranslations } from 'next-intl';
-import { getAccentColor } from '@/lib/theme/accent-utils';
+import {
+  getAccentColor,
+  getAccentName,
+  isSameAccent,
+} from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
+import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { AccentColorControl } from './accent-color-control';
@@ -124,6 +130,9 @@ export function AccentDotRow({
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
   const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
+  const isCustom =
+    isValidHexColor(value) &&
+    !displayedColorOptions.some(accent => isSameAccent(accent, value));
   return (
     <ThemeChipRow
       label={tTheme('labelAccentColor')}
@@ -132,14 +141,15 @@ export function AccentDotRow({
       {displayedColorOptions.map(accent => (
         <AccentDot
           key={accent}
-          active={value === accent}
-          title={tTheme('selectAccent', { accent })}
+          active={isSameAccent(value, accent)}
+          title={tTheme('selectAccent', { accent: getAccentName(accent) })}
           onClick={() => onChange(accent)}
           swatchStyle={{ backgroundColor: getAccentColor(accent) }}
         />
       ))}
       <AccentColorControl
         accent={value}
+        isCustom={isCustom}
         bgColorHex={bgColorHex}
         label={tTheme('customAccentColor')}
         onPick={hex => onChange(hex as AccentColor)}
@@ -189,6 +199,36 @@ export function OpacitySlider({
 // can follow.
 const THUMB_MASK_SIZE = '600%';
 
+// A full-bleed stencil thumbnail drawn through an SVG filter that drops faint alpha, so a pattern's page wash does not grey out the tiny cell.
+// Same crop as the mask thumbnail: the image is `zoom` times the cell width, centred.
+function WashlessThumb({ src, zoom }: { src: string; zoom: string }) {
+  const filterId = `washless-${useId().replace(/[^a-zA-Z0-9-]/g, '')}`;
+  const size = (150 * parseFloat(zoom)) / 100;
+  return (
+    <svg
+      viewBox='0 0 150 100'
+      className='absolute inset-0 h-full w-full text-foreground'
+    >
+      <filter id={filterId} colorInterpolationFilters='sRGB'>
+        {/* 1.3a - 0.3: the 0.22 wash drops to nothing, solid lines stay solid */}
+        <feComponentTransfer result='shapes'>
+          <feFuncA type='linear' slope={1.3} intercept={-0.3} />
+        </feComponentTransfer>
+        <feFlood floodColor='currentColor' />
+        <feComposite in2='shapes' operator='in' />
+      </filter>
+      <image
+        href={src}
+        x={(150 - size) / 2}
+        y={(100 - size) / 2}
+        width={size}
+        height={size}
+        filter={`url(#${filterId})`}
+      />
+    </svg>
+  );
+}
+
 export function AssetGrid({
   items,
   activeId,
@@ -231,19 +271,23 @@ export function AssetGrid({
           >
             {maskUrl ? (
               <span className='absolute inset-0 bg-muted' aria-hidden>
-                <span
-                  className='absolute inset-0 bg-foreground'
-                  style={{
-                    WebkitMaskImage: maskUrl,
-                    maskImage: maskUrl,
-                    WebkitMaskRepeat: b.fullBleed ? 'no-repeat' : 'repeat',
-                    maskRepeat: b.fullBleed ? 'no-repeat' : 'repeat',
-                    WebkitMaskSize: maskTileSize,
-                    maskSize: maskTileSize,
-                    WebkitMaskPosition: 'center',
-                    maskPosition: 'center',
-                  }}
-                />
+                {b.fullBleed && b.thumbHideWash ? (
+                  <WashlessThumb src={b.src} zoom={maskTileSize} />
+                ) : (
+                  <span
+                    className='absolute inset-0 bg-foreground'
+                    style={{
+                      WebkitMaskImage: maskUrl,
+                      maskImage: maskUrl,
+                      WebkitMaskRepeat: b.fullBleed ? 'no-repeat' : 'repeat',
+                      maskRepeat: b.fullBleed ? 'no-repeat' : 'repeat',
+                      WebkitMaskSize: maskTileSize,
+                      maskSize: maskTileSize,
+                      WebkitMaskPosition: 'center',
+                      maskPosition: 'center',
+                    }}
+                  />
+                )}
               </span>
             ) : (
               <img

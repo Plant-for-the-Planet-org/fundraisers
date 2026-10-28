@@ -62,7 +62,27 @@ export const IMAGE_MODES: BgImageMode[] = ['cover', 'repeat'];
 export const DECORATION_MAX_OPACITY = 1;
 
 export const THEME_LIST: Theme[] = Object.values(THEMES);
-export const FEATURED_THEMES = THEME_LIST.filter(t => t.featured);
+// Theme picker order, read row by row in its two-column grid. A featured theme missing from this list still shows, at the end.
+const THEME_PICKER_ORDER = [
+  'planet',
+  'lush-forest',
+  'birthday',
+  'wedding',
+  'baby-shower',
+  'sports',
+  'stratospheric',
+  'dark-ocean',
+  'spring',
+  'dark',
+  'minimal',
+];
+const pickerRank = (theme: Theme) => {
+  const index = THEME_PICKER_ORDER.indexOf(theme.id);
+  return index === -1 ? THEME_PICKER_ORDER.length : index;
+};
+export const FEATURED_THEMES = THEME_LIST.filter(t => t.featured).sort(
+  (a, b) => pickerRank(a) - pickerRank(b)
+);
 
 export type GradientOption = {
   id: string;
@@ -101,6 +121,10 @@ const PICKABLE_BG_IDS = new Set([
   'bg-grid-lines',
   'bg-trees',
   'bg-woodgrain',
+  'bg-leafy',
+  'bg-spring',
+  'bg-baby-shower',
+  'bg-sports',
   'bg-forest',
   'bg-forest-bw',
   'bg-forest-bw-2',

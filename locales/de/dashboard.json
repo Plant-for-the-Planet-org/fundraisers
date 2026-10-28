@@ -106,7 +106,7 @@
             "bing": "Bing",
             "email": "E-Mail",
             "newsletter": "Newsletter",
-            "stage": "Stage-Mode-QR-Code",
+            "stage": "Bühnenmodus QR-Code",
             "report": "Gedruckter Bericht"
           },
           "plainLink": "Einfacher Link",
@@ -202,7 +202,7 @@
             "hint": "Eine persönliche Nachricht, die Spender*innen nach ihrer Spende sehen."
           },
           "stage": {
-            "title": "Stage Mode",
+            "title": "Bühnenmodus",
             "hint": "Eine Vollbildansicht für Events und Bildschirme vor Ort."
           }
         }
