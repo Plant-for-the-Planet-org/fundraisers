@@ -23,12 +23,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { AdvancedPanel } from './advanced-panel';
 import { type BgFormValue, FEATURED_THEMES, pickRandom } from './constants';
+import { useThemeLabels } from './labels';
 import { QuickPanel } from './quick-panel';
 import { ThemeBrowseGrid } from './theme-browse-grid';
 
 export function ThemeSettings() {
   const pathname = usePathname();
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const { themeName } = useThemeLabels();
   const { selectedTheme, setSelectedTheme } = useThemeStore();
   const { field } = useController<FundraiserFormValues, 'settings.theme'>({
     name: 'settings.theme',
@@ -152,7 +154,7 @@ export function ThemeSettings() {
             {tTheme('sectionHeading')}
           </SectionHeader>
           <div className='text-xs text-muted-foreground truncate mt-0.5'>
-            {activeTheme.name}
+            {themeName(activeTheme)}
           </div>
         </div>
         {/* TODO - consider using ui/buttons instead of rolling up custom styles here. */}

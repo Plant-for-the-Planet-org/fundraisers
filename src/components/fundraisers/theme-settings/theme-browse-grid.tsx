@@ -7,6 +7,7 @@ import { resolveBgAsset } from '@/lib/theme/backgrounds';
 import { customGradientCss, isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { FEATURED_THEMES } from './constants';
+import { useThemeLabels } from './labels';
 
 // Resolve a theme's background to a small preview visual, mirroring how
 // ThemeShell paints its base wash. Falls back to the decoration thumbnail (then
@@ -49,6 +50,7 @@ export function ThemeBrowseGrid({
   activeId: string;
   onPick: (theme: Theme) => void;
 }) {
+  const { themeName, categoryName } = useThemeLabels();
   return (
     <div className='grid grid-cols-2 gap-2'>
       {FEATURED_THEMES.map(theme => {
@@ -60,7 +62,7 @@ export function ThemeBrowseGrid({
             key={theme.id}
             onClick={() => onPick(theme)}
             aria-pressed={active}
-            title={theme.name}
+            title={themeName(theme)}
             className={cn(
               'flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left',
               active
@@ -77,10 +79,10 @@ export function ThemeBrowseGrid({
             />
             <div className='flex-1 min-w-0'>
               <div className='text-xs font-semibold text-foreground truncate'>
-                {theme.name}
+                {themeName(theme)}
               </div>
               <div className='text-[10px] text-muted-foreground capitalize'>
-                {theme.category}
+                {categoryName(theme.category)}
               </div>
             </div>
             <span
