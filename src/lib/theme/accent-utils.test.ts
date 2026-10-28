@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getAccentName, isSameAccent } from './accent-utils';
+import { getAccentLabel, isSameAccent } from './accent-utils';
 import { THEMES } from './themes';
 
 describe('isSameAccent', () => {
@@ -15,20 +15,38 @@ describe('isSameAccent', () => {
   });
 });
 
-describe('getAccentName', () => {
+describe('getAccentLabel', () => {
   it('names every hex accent offered by a theme preset', () => {
-    // A hex here would be read out as a code by screen readers.
+    // A hex without a name would be read out as a code by screen readers.
     const hexAccents = Object.values(THEMES).flatMap(theme =>
       [theme.accent, ...theme.colorOptions].filter(a => a.startsWith('#'))
     );
     expect(hexAccents.length).toBeGreaterThan(0);
     for (const hex of hexAccents)
-      expect(getAccentName(hex), hex).not.toMatch(/^#/);
+      expect(getAccentLabel(hex), hex).not.toBeNull();
   });
 
-  it('finds the name in any case and keeps other accents as they are', () => {
-    expect(getAccentName('#6fcf97')).toBe('Mint');
-    expect(getAccentName('emerald')).toBe('emerald');
-    expect(getAccentName('#123456')).toBe('#123456');
+  it('gives different colours different names', () => {
+    const palette = Object.values(THEMES)
+      .flatMap(t => [t.accent, ...t.colorOptions])
+      .filter(a => !a.startsWith('#'));
+    const hexKeys = Object.values(THEMES)
+      .flatMap(t => [t.accent, ...t.colorOptions])
+      .filter(a => a.startsWith('#'))
+      .map(a => getAccentLabel(a)?.key);
+    for (const key of hexKeys) expect(palette, key).not.toContain(key);
+  });
+
+  it('finds the name in any case, and has none for other hex', () => {
+    expect(getAccentLabel('#6fcf97')).toEqual({
+      key: 'brightGreen',
+      fallback: 'Bright Green',
+    });
+    expect(getAccentLabel('#6FCF97')?.key).toBe('brightGreen');
+    expect(getAccentLabel('emerald')).toEqual({
+      key: 'emerald',
+      fallback: 'Emerald',
+    });
+    expect(getAccentLabel('#123456')).toBeNull();
   });
 });
