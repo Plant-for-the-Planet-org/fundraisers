@@ -277,7 +277,7 @@
         }
       },
       "message": {
-        "completed": "Wir haben dir eine Bestätigung per E-Mail zugeschickt. Nach 60 Tagen kannst du eine steuerlich absetzbare Zuwendungsbescheinigung über pp.eco/profile herunterladen.",
+        "completed": "Wir haben dir eine Bestätigung per E-Mail zugeschickt. Nach 45 Tagen kannst du eine steuerlich absetzbare Zuwendungsbescheinigung über pp.eco/donation-receipt herunterladen.",
         "paymentProcessing": {
           "processing": "Deine Zahlung wird gerade abgewickelt. Du erhälst eine E-Mail, sobald sie bestätigt ist.",
           "failed": "Deine Zahlung ist leider fehlgeschlagen. Versuche es erneut oder wähle eine andere Zahlungsart aus.",
