@@ -4,6 +4,7 @@ import type { Fundraiser, FundraiserStatus } from '@/lib/types/fundraiser';
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
   Copy,
@@ -13,12 +14,14 @@ import {
   Pause,
   Pencil,
   Play,
+  Rocket,
   Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   deleteFundraiser,
   pauseFundraiser,
+  publishFundraiser,
   resumeFundraiser,
 } from '@/lib/api/fundraiser-service';
 import {
@@ -55,6 +58,7 @@ interface FundraiserActionMenuProps {
 }
 
 interface ActionVisibility {
+  publish: boolean;
   edit: boolean;
   clone: boolean;
   copyLink: boolean;
@@ -67,6 +71,7 @@ interface ActionVisibility {
 // Viewers can clone. It only reads the original and creates a separate
 // fundraiser they own, so it is not the write access their role withholds.
 const NON_OWNER_ACTIONS: ActionVisibility = {
+  publish: false,
   edit: false,
   clone: true,
   copyLink: true,
@@ -76,12 +81,13 @@ const NON_OWNER_ACTIONS: ActionVisibility = {
   delete: false,
 };
 
-// Status drives edit/pause/resume; Stage Mode is orthogonal (it depends on the
+// Status drives publish/edit/pause/resume; Stage Mode is orthogonal (it depends on the
 // fundraiser's module settings, not its status) and is layered on afterwards.
 type StatusActions = Omit<ActionVisibility, 'stageMode'>;
 
 const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   active: {
+    publish: false,
     edit: true,
     clone: true,
     copyLink: true,
@@ -90,6 +96,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
     delete: true,
   },
   paused: {
+    publish: false,
     edit: true,
     clone: true,
     copyLink: true,
@@ -98,6 +105,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
     delete: true,
   },
   draft: {
+    publish: true,
     edit: true,
     clone: true,
     copyLink: true,
@@ -109,6 +117,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   // description, thank-you message) after the campaign ends. Cancelled is a
   // deliberate termination and remains locked.
   completed: {
+    publish: false,
     edit: true,
     clone: true,
     copyLink: true,
@@ -119,6 +128,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   // Cloning stays available on a cancelled fundraiser: the original is locked,
   // but its setup is still the fastest way to start the campaign again.
   cancelled: {
+    publish: false,
     edit: false,
     clone: true,
     copyLink: true,
@@ -128,6 +138,7 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   },
   // Archived fundraisers are not returned by the list API, so this is a defensive check.
   archived: {
+    publish: false,
     edit: false,
     clone: false,
     copyLink: true,
@@ -151,7 +162,7 @@ function getAvailableActions(
 }
 
 type StatusActionKind = 'pause' | 'resume';
-type PendingAction = StatusActionKind | 'delete' | null;
+type PendingAction = StatusActionKind | 'publish' | 'delete' | null;
 
 export function FundraiserActionMenu({
   fundraiser,
@@ -160,16 +171,20 @@ export function FundraiserActionMenu({
 }: FundraiserActionMenuProps) {
   const t = useTranslations('Dashboard.actions');
   const tDialog = useTranslations('Dashboard.deleteDialog');
+  const tLive = useTranslations('Dashboard.goLiveDialog');
+  const router = useRouter();
   const accessToken = useAuthStore(state => state.accessToken);
   const currentUserId = useAuthStore(state => state.user?.sub ?? null);
 
   const [pending, setPending] = useState<PendingAction>(null);
   const [open, setOpen] = useState(false);
+  const [goLiveDialogOpen, setGoLiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
   const hasAnyAction =
+    actions.publish ||
     actions.edit ||
     actions.clone ||
     actions.copyLink ||
@@ -209,6 +224,30 @@ export function FundraiserActionMenu({
     }
   };
 
+  const handlePublish = async () => {
+    if (pending || !accessToken) return;
+
+    setPending('publish');
+    try {
+      const updatedFundraiser = await publishFundraiser(
+        fundraiser.id,
+        accessToken
+      );
+      toast.success(t('publishSuccess'));
+      setGoLiveDialogOpen(false);
+      onFundraiserUpdated(updatedFundraiser);
+    } catch (error) {
+      // The platform may refuse a draft that is not complete. Keep the dialog open and point to the editor.
+      console.error('[FundraiserActionMenu] publish failed:', error);
+      toast.error(t('publishErrorTitle'), {
+        description: t('publishErrorDescription'),
+        action: { label: t('edit'), onClick: () => router.push(editHref) },
+      });
+    } finally {
+      setPending(null);
+    }
+  };
+
   const handleDelete = async () => {
     if (pending || !accessToken) return;
 
@@ -231,6 +270,7 @@ export function FundraiserActionMenu({
   };
 
   const isMutating = pending !== null;
+  const isPublishing = pending === 'publish';
   const isDeleting = pending === 'delete';
 
   return (
@@ -261,6 +301,24 @@ export function FundraiserActionMenu({
             {t('viewPage')}
           </a>
         </DropdownMenuItem>
+
+        {actions.publish && (
+          <DropdownMenuItem
+            className='cursor-pointer rounded-lg py-2 text-emerald-700 focus:bg-emerald-50 focus:text-emerald-700 dark:text-emerald-400 dark:focus:bg-emerald-950/40 dark:focus:text-emerald-400'
+            disabled={isMutating}
+            onSelect={event => {
+              event.preventDefault();
+              setOpen(false);
+              setGoLiveDialogOpen(true);
+            }}
+          >
+            <Rocket
+              className='text-emerald-600 dark:text-emerald-400'
+              aria-hidden='true'
+            />
+            {t('publish')}
+          </DropdownMenuItem>
+        )}
 
         {actions.edit && (
           <DropdownMenuItem asChild className='cursor-pointer rounded-lg py-2'>
@@ -380,6 +438,47 @@ export function FundraiserActionMenu({
         open={cloneDialogOpen}
         onOpenChange={setCloneDialogOpen}
       />
+
+      <Dialog
+        open={goLiveDialogOpen}
+        onOpenChange={next => {
+          // Don't allow closing mid-request; the button shows a spinner.
+          if (isPublishing) return;
+          setGoLiveDialogOpen(next);
+        }}
+      >
+        <DialogContent
+          className='sm:max-w-md'
+          showCloseButton={false}
+          // Keep focus on the dialog, not on "Not yet", so no button shows a focus ring on open.
+          onOpenAutoFocus={event => {
+            event.preventDefault();
+            (event.currentTarget as HTMLElement | null)?.focus();
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{tLive('title')}</DialogTitle>
+            <DialogDescription>{tLive('description')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type='button' variant='outline' disabled={isPublishing}>
+                {tLive('cancel')}
+              </Button>
+            </DialogClose>
+            <Button
+              type='button'
+              disabled={isPublishing}
+              onClick={() => void handlePublish()}
+            >
+              {isPublishing && (
+                <Loader2 className='animate-spin' aria-hidden='true' />
+              )}
+              {tLive('confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={deleteDialogOpen}

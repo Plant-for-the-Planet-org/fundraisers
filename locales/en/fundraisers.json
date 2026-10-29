@@ -421,8 +421,8 @@
       "options": {
         "sectionHeading": "Fundraiser Options",
         "status": {
-          "label": "Collect Donations for the Fundraiser",
-          "description": "Enable donation collection and make the fundraiser active"
+          "label": "Go live and start collecting donations",
+          "description": "Off keeps it as a draft. Turn it on when you are ready for donors."
         },
         "visibility": {
           "label": "List this fundraiser publicly",
