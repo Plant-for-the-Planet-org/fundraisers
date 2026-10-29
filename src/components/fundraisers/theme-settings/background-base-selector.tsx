@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionHeader } from '../typography';
 import { defaultCustomGradient, GRADIENT_OPTIONS } from './constants';
 import { GradientMaker } from './gradient-maker';
+import { useThemeLabels } from './labels';
 import { SolidPicker } from './solid-picker';
 
 // The theme gradient swatches shown as circles, skipping the leading "None"
@@ -45,6 +46,7 @@ export function BackgroundBaseSelector({
   onGradient: (value: string) => void;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const { themeName } = useThemeLabels();
 
   const isNone = !bg.background_color && !bg.custom_gradient && !bg.gradient;
   const isCustom = Boolean(bg.background_color || bg.custom_gradient);
@@ -94,8 +96,8 @@ export function BackgroundBaseSelector({
               type='button'
               key={g.id}
               onClick={() => onGradient(g.value)}
-              title={g.label}
-              aria-label={g.label}
+              title={themeName({ id: g.id, name: g.label })}
+              aria-label={themeName({ id: g.id, name: g.label })}
               aria-pressed={active}
               className={cn(
                 circleBase,

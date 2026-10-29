@@ -9,17 +9,14 @@ import type {
 
 import { useId } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  getAccentColor,
-  getAccentName,
-  isSameAccent,
-} from '@/lib/theme/accent-utils';
+import { getAccentColor, isSameAccent } from '@/lib/theme/accent-utils';
 import { type BG_LIBRARY, DEFAULT_PATTERN_TILE } from '@/lib/theme/backgrounds';
 import { isValidHexColor } from '@/lib/theme/color-utils';
 import { cn } from '@/lib/utils/cn';
 import { SectionHeader } from '../typography';
 import { AccentColorControl } from './accent-color-control';
 import { ANIMATION_OPTIONS, DECORATIONS, FONT_OPTIONS } from './constants';
+import { useThemeLabels } from './labels';
 
 export function ThemeChipRow({
   label,
@@ -129,6 +126,7 @@ export function AccentDotRow({
   bgColorHex: string;
 }) {
   const tTheme = useTranslations('Fundraisers.form.theme');
+  const { accentName } = useThemeLabels();
   const displayedColorOptions = colorOptions.slice(0, MAX_ACCENT_OPTIONS);
   const isCustom =
     isValidHexColor(value) &&
@@ -142,7 +140,7 @@ export function AccentDotRow({
         <AccentDot
           key={accent}
           active={isSameAccent(value, accent)}
-          title={tTheme('selectAccent', { accent: getAccentName(accent) })}
+          title={tTheme('selectAccent', { accent: accentName(accent) })}
           onClick={() => onChange(accent)}
           swatchStyle={{ backgroundColor: getAccentColor(accent) }}
         />
@@ -240,6 +238,7 @@ export function AssetGrid({
   onPick: (id: string | null) => void;
   cols: 3 | 4;
 }) {
+  const { decorationName } = useThemeLabels();
   return (
     <div
       className={cn(
@@ -260,7 +259,7 @@ export function AssetGrid({
             type='button'
             key={b.id}
             onClick={() => onPick(active ? null : b.id)}
-            title={b.label}
+            title={decorationName(b)}
             aria-pressed={active}
             className={cn(
               'relative aspect-[3/2] rounded-md overflow-hidden border',
@@ -292,7 +291,7 @@ export function AssetGrid({
             ) : (
               <img
                 src={b.thumb ?? b.src}
-                alt={b.label}
+                alt={decorationName(b)}
                 className='block w-full h-full object-cover'
               />
             )}
