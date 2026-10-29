@@ -590,6 +590,7 @@
       "progressButton": "View progress",
       "progressLabel": "View this fundraiser's progress in your dashboard",
       "closeLabel": "Close"
-    }
+    },
+    "suspendedNotice": "This fundraiser has been suspended. Please contact <link>support@plant-for-the-planet.org</link> for a review."
   }
 }

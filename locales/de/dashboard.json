@@ -279,7 +279,8 @@
       "draft": "Entwurf",
       "paused": "Pausiert",
       "ended": "Beendet",
-      "ending-soon": "Endet bald"
+      "ending-soon": "Endet bald",
+      "suspended": "Gesperrt"
     },
     "noResults": {
       "title": "Keiner der Aufrufe entspricht diesem Filter.",

@@ -137,17 +137,29 @@ const OWNER_ACTIONS_BY_STATUS: Record<FundraiserStatus, StatusActions> = {
   },
 };
 
+// While suspended the public page is a 404 and a status change would not make it public, so hide what points people there or changes the status.
+// Clone is hidden too, so the suspended content is not copied into a new fundraiser that is not suspended. Edit stays, so hosts can fix it before asking for a review.
+const SUSPENDED_OVERRIDES: Partial<ActionVisibility> = {
+  clone: false,
+  copyLink: false,
+  pause: false,
+  resume: false,
+  stageMode: false,
+};
+
 function getAvailableActions(
   fundraiser: Fundraiser,
   currentUserId: string | null
 ): ActionVisibility {
-  if (!isFundraiserOwnerOrAdmin(fundraiser, currentUserId)) {
-    return NON_OWNER_ACTIONS;
-  }
-  return {
-    ...OWNER_ACTIONS_BY_STATUS[fundraiser.status],
-    stageMode: isStageModeEnabled(fundraiser),
-  };
+  const actions = isFundraiserOwnerOrAdmin(fundraiser, currentUserId)
+    ? {
+        ...OWNER_ACTIONS_BY_STATUS[fundraiser.status],
+        stageMode: isStageModeEnabled(fundraiser),
+      }
+    : NON_OWNER_ACTIONS;
+  return fundraiser.isSuspended
+    ? { ...actions, ...SUSPENDED_OVERRIDES }
+    : actions;
 }
 
 type StatusActionKind = 'pause' | 'resume';
@@ -169,20 +181,8 @@ export function FundraiserActionMenu({
   const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
 
   const actions = getAvailableActions(fundraiser, currentUserId);
-  const hasAnyAction =
-    actions.edit ||
-    actions.clone ||
-    actions.copyLink ||
-    actions.pause ||
-    actions.resume ||
-    actions.stageMode ||
-    actions.delete;
-  const showStatusGroup = actions.pause || actions.resume;
-  const showSeparator =
-    showStatusGroup &&
-    (actions.edit || actions.clone || actions.copyLink || actions.stageMode);
-
-  if (!hasAnyAction) return null;
+  // "View page" always renders, so the menu is never empty and the status group always has an item above it.
+  const showSeparator = actions.pause || actions.resume;
 
   const editHref = `/dashboard/fundraisers/edit/${fundraiser.slug}`;
 

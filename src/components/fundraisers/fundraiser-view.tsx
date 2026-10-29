@@ -29,6 +29,7 @@ import { Hosts } from '@/components/fundraisers/hosts';
 import ImageDisplay from '@/components/fundraisers/image-display';
 import { ProjectsSupportedDisplay } from '@/components/fundraisers/projects-supported-display';
 import { SecurityNotice } from '@/components/fundraisers/security-notice';
+import { SuspendedNotice } from '@/components/fundraisers/suspended-notice';
 import TitleDisplay from '@/components/fundraisers/title-display';
 import { SectionHeader } from '@/components/fundraisers/typography';
 import { FundraiserLayout } from '@/components/ui/fundraiser-layout';
@@ -83,6 +84,9 @@ export function FundraiserView({
     paymentOptions !== undefined &&
     fundraiser.workspace !== null;
   const hasHosts = selectPublicHosts(fundraiser.hosts).length > 0;
+  // A suspended page is a 404 for everyone but its hosts, so its link is not worth sharing.
+  const isShareable =
+    fundraiser.visibility === 'public' && !fundraiser.isSuspended;
 
   return (
     // Mobile is one column, capped so wide phones and small tablets don't stretch the image and form.
@@ -155,7 +159,7 @@ export function FundraiserView({
           ))}
 
         {/** Copy link */}
-        {fundraiser.visibility === 'public' && (
+        {isShareable && (
           <div className='hidden md:block md:order-1 mt-3'>
             <CopyLinkButton />
           </div>
@@ -163,6 +167,9 @@ export function FundraiserView({
       </SidebarPanel>
 
       <MainPanel>
+        {/* Only hosts get `isSuspended`. On mobile this lands right above the closed notice, which it explains. */}
+        {fundraiser.isSuspended && <SuspendedNotice />}
+
         {/* Title */}
         <TitleDisplay className='hidden md:block' value={fundraiser.title} />
 
@@ -213,7 +220,7 @@ export function FundraiserView({
               allocation => allocation.project.name
             )}
             sharePath={
-              fundraiser.visibility === 'public'
+              isShareable
                 ? getFundraiserUrl({
                     id: fundraiser.id,
                     slug: fundraiser.slug || fundraiser.hid,

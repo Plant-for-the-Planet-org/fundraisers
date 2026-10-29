@@ -590,6 +590,7 @@
       "progressButton": "Fortschritt",
       "progressLabel": "Fortschritt dieses Spendenaufrufs im Dashboard ansehen",
       "closeLabel": "Schließen"
-    }
+    },
+    "suspendedNotice": "Diese Spendenaktion wurde gesperrt. Bitte wende dich für eine Überprüfung an <link>support@plant-for-the-planet.org</link>."
   }
 }
